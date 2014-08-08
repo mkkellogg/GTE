@@ -1,14 +1,15 @@
 LIBS=-lm -lGL -lglut -lGLU -lGLEW
 CFLAGS=-I src -std=c++11 -Wall
 CC=g++
-OBJECTFILES= obj/shadermanager.o obj/shadersource.o obj/shader.o obj/graphics.o obj/debug.o obj/gte.o
-PLATFORMOBJECTFILES= obj/graphicsGL.o
+OBJECTFILES= obj/shadermanager.o obj/shadersource.o obj/shader.o obj/graphics.o obj/debug.o obj/point3.o obj/vector3.o obj/basevector3.o obj/gte.o
+PLATFORMOBJECTFILES= obj/graphicsGL.o obj/shaderGL.o
 
+GEOMETRYSRC= src/geometry
+UTILSRC= src/util
 GRAPHICSSRC= src/graphics
 SHADERSRC= $(GRAPHICSSRC)/shader
 
-
-all: gtemain graphics ui
+all: gtemain graphics ui geometry 
 	$(CC) -o bin/gte $(OBJECTFILES) $(PLATFORMOBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -24,9 +25,18 @@ shader: $(SHADERSRC)/shadermanager.cpp $(SHADERSRC)/shadermanager.h $(SHADERSRC)
 	$(CC) $(CFLAGS) -o obj/shadermanager.o -c $(SHADERSRC)/shadermanager.cpp 
 	$(CC) $(CFLAGS) -o obj/shadersource.o -c $(SHADERSRC)/shadersource.cpp
 	$(CC) $(CFLAGS) -o obj/shader.o -c $(SHADERSRC)/shader.cpp
+	$(CC) $(CFLAGS) -o obj/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
 
 ui: src/ui/debug.cpp src/ui/debug.h
 	$(CC) $(CFLAGS) -o obj/debug.o -c src/ui/debug.cpp 
+
+geometry: $(GEOMETRYSRC)/point3.cpp $(GEOMETRYSRC)/point3.h $(GEOMETRYSRC)/vector3.cpp $(GEOMETRYSRC)/vector3.h
+	$(CC) $(CFLAGS) -o obj/point3.o -c $(GEOMETRYSRC)/point3.cpp
+	$(CC) $(CFLAGS) -o obj/vector3.o -c $(GEOMETRYSRC)/vector3.cpp
+	$(CC) $(CFLAGS) -o obj/basevector3.o -c $(GEOMETRYSRC)/basevector3.cpp
+
+#util: $(UTILSRC)/varproxy.cpp $(UTILSRC)/varproxy.h
+#	$(CC) $(CFLAGS) -o obj/varproxy.o -c $(UTILSRC)/varproxy.cpp
 
 clean:
 	rm -f obj/*   

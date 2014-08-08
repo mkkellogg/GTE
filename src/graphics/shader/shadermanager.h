@@ -1,15 +1,13 @@
 #ifndef _SHADER_MANAGER_H_
 #define _SHADER_MANAGER_H_
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include "shader.h"
 
 class ShaderManager
 {
     public :
 
-    GLuint SetupShaders();
- 
+    Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
 };
 
 #endif

@@ -7,13 +7,13 @@
 
 class GraphicsGL : Graphics
 {
+    friend class Graphics;
+
     GraphicsCallbacks * callbacks;
-    static GraphicsGL * theInstance;
     GraphicsGL();
 
     public :
 
-    static GraphicsGL * Instance();
     ~GraphicsGL();
     void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks);
 };

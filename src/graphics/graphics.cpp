@@ -3,19 +3,37 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
  
 #include "graphics.h"
+#include "graphicsGL.h"
 #include "gte.h"
+
+Graphics * Graphics::theInstance = NULL;
 
 Graphics::~Graphics()
 {
-    
+    shaderManager = new ShaderManager();
 }
 
 Graphics::Graphics()
 {
-    
+    delete shaderManager;
+}
+
+ShaderManager * Graphics::GetShaderManager()
+{
+    return shaderManager;
+}
+
+Graphics * Graphics::Instance()
+{
+    if(theInstance == NULL)
+    {
+        // TODO: add switch to detect correct type for platform
+        // for now, only support OpenGL
+        theInstance = new GraphicsGL();
+    }
+
+    return theInstance;
 }
 

@@ -1,25 +1,33 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include "shader/shadermanager.h"
+
+class Graphics;
 
 class GraphicsCallbacks
 {
-        public:
+    public:
 
-        virtual void OnInit() = 0;
+    virtual void OnInit(Graphics * graphics) = 0;
+    virtual void OnQuit(Graphics * graphics) = 0;
 };
 
 class Graphics
 {
     protected:
-
+    static Graphics * theInstance;
     Graphics();
+
+    ShaderManager * shaderManager;
 
     public :
 
-    ~Graphics();
+    static Graphics * Instance();
+
+    ShaderManager * GetShaderManager();
+
+    virtual ~Graphics();
     virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks) = 0;
 };
 

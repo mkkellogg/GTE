@@ -9,8 +9,6 @@
 #include "graphicsGL.h"
 #include "gte.h"
 
-GraphicsGL * GraphicsGL::theInstance = NULL;
-
 void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks)
 {
     this->callbacks = callbacks;
@@ -40,29 +38,26 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
 
     if(callbacks != NULL)
     {
-        callbacks->OnInit();
+        callbacks->OnInit(this);
     }
 
     glutMainLoop(); 
-}
 
-GraphicsGL::~GraphicsGL()
-{
-    
-}
-
-GraphicsGL::GraphicsGL()
-{
-    
-}
-
-
-GraphicsGL * GraphicsGL::Instance()
-{
-    if(theInstance == NULL)
+    if(callbacks != NULL)
     {
-        theInstance = new GraphicsGL();
+        callbacks->OnQuit(this);
     }
-
-    return theInstance;
 }
+
+GraphicsGL::~GraphicsGL() 
+{
+    
+}
+
+GraphicsGL::GraphicsGL() : Graphics()
+{
+    
+}
+
+
+
