@@ -5,14 +5,14 @@
 #include <math.h>
  
 #include "vector3.h"
-
+#include "gtemath/gtemath.h"
 
 Vector3::Vector3() : BaseVector3()
 {
    
 }
 
-Vector3::Vector3(float x, float y, float z) : BaseVector3(x,y,z)
+Vector3::Vector3(float x, float y, float z) : BaseVector3(x,y,z,0)
 {
     
 }
@@ -20,6 +20,12 @@ Vector3::Vector3(float x, float y, float z) : BaseVector3(x,y,z)
 Vector3::Vector3(Vector3 * vector) : BaseVector3(vector)
 {
     
+}
+
+
+Vector3::Vector3(float * data) : BaseVector3(data)
+{
+
 }
 
 Vector3::~Vector3()
@@ -48,59 +54,76 @@ void Vector3::Subtract(Vector3 * v1, Vector3 * v2, Vector3 * result)
     result->z = v1->z - v2->z;
 }
 
-public void scale(float magnitude)
+void Vector3::Scale(float magnitude)
 {
-X *= magnitude;
-Y *= magnitude;
-Z *= magnitude;
-}
-public void setCopy(float[] components)
-{
-set(components[0],components[1],components[2]);
-}
-public void normalize()
-{
-float magnitude = (float)(Math.sqrt(X*X + Y*Y + Z*Z));
-if( magnitude != 0f)
-{
-X = X/magnitude;
-Y = Y/magnitude;
-Z= Z/magnitude;
-}
-}
-public float magnitude()
-{
-return (float)Math.sqrt(X*X + Y*Y + Z*Z);
-}
-public void invert()
-{
-X = -X;
-Y = -Y;
-Z = -Z;
-}
-public static Vector3 cross(Vector3 a, Vector3 b)
-{
-float x,y,z;
-x = (a.Y*b.Z) - (b.Y*a.Z);
-y = (b.X*a.Z) - (a.X*b.Z);
-z = (a.X*b.Y) - (b.X*a.Y);	
-Vector3 vec = new Vector3(x,y,z);
-return vec;
-}	
-public static void cross(Vector3 a, Vector3 b, Vector3 results)
-{
-float x,y,z;
-x = (a.Y*b.Z) - (b.Y*a.Z);
-y = (b.X*a.Z) - (a.X*b.Z);
-z = (a.X*b.Y) - (b.X*a.Y);	
-results.set(x,y,z);
+    x *= magnitude;
+    y *= magnitude;
+    z *= magnitude;
 }
 
-//static
-static void calcNormal(Vector3 a, Vector3 b, Vector3 result)
+void Vector3::Normalize()
 {
-cross(a,b,result);
-result.normalize();
+    float magnitude = Magnitude();
+    if(magnitude != 0)
+    {
+        Scale(1/magnitude);
+    }
+}
+
+void Vector3::QuickNormlize()
+{
+    float magnitude = QuickMagnitude();
+    if(magnitude != 0)
+    {
+        Scale(1/magnitude);
+    }
+}
+
+float Vector3::Magnitude()
+{
+    return (float)sqrt(x*x + y*y + z*z);
+}
+
+float Vector3::QuickMagnitude()
+{
+    return GTEMath::QuickSquareRoot(x*x + y*y + z*z);
+}
+
+void Vector3::Invert()
+{
+    x = -x;
+    y = -y;
+    z = -z;
+}
+
+void Vector3::Cross(Vector3 * a, Vector3 * b, Vector3 * results)
+{
+    float x,y,z;
+    x = (a->y*b->z) - (b->y*a->z);
+    y = (b->x*a->z) - (a->x*b->z);
+    z = (a->x*b->y) - (b->x*a->y);	
+    results->Set(x,y,z);
+}
+
+void Vector3::CalcNormal(Vector3 * a, Vector3 * b, Vector3 * result)
+{
+    Cross(a,b,result);
+    result->Normalize();
+}
+
+
+float Vector3::Dot(Vector3 * a, Vector3 * b)
+{
+    float x = a->x * b->x;
+    float y = a->y * b->y;
+    float z = a->z * b->z;
+    return x+y+z;
+}
+
+// static
+float Vector3::AngleBetween(Vector3 * a, Vector3 * b, Vector3 * refRightNormal)
+{
+    return 0 ;
 }
 
 /*
@@ -143,19 +166,6 @@ vec.normalize();
 return vec;
 }*/
 
-//static
-float dot(Vector3 * a, Vector3 * b)
-{
-    float x = a->x * b->x;
-    float y = a->y * b->y;
-    float z = a->z * b->z;
-    return x+y+z;
-}
 
-// static
-float Vector3::AngleBetween(Vector3 * a, Vector3 * b, Vector3 * refRightNormal)
-{
-
-}
 
 

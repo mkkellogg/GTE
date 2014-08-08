@@ -12,7 +12,7 @@ Point3::Point3() : BaseVector3()
 
 }
 
-Point3::Point3(float x, float y, float z) : BaseVector3(x,y,z)
+Point3::Point3(float x, float y, float z) : BaseVector3(x,y,z,1)
 {
    
 }
@@ -20,6 +20,11 @@ Point3::Point3(float x, float y, float z) : BaseVector3(x,y,z)
 Point3::Point3(Point3 * point) : BaseVector3(point)
 {
    
+}
+
+Point3::Point3(float * data) : BaseVector3(data)
+{
+    
 }
 
 Point3::~Point3()

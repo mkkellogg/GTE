@@ -11,6 +11,7 @@ class Point3 : public BaseVector3
     Point3();
     Point3(float x, float y, float z);
     Point3(Point3 * point);
+    Point3(float * data);
     ~Point3();
 
     void Add(Vector3 * v);

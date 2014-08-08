@@ -8,6 +8,10 @@
 
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"
+#include "geometry/matrix.h"
+#include "geometry/basevector3.h"
+#include "geometry/point3.h"
+#include "geometry/vector3.h"
 #include "ui/debug.h"
 #include "gte.h"
 
@@ -22,6 +26,33 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
     CustomGraphicsCallbacks()
     {
         basicShader = NULL;
+    }
+
+    void PrintMatrix(Matrix *m)
+    {
+        float * data = m->GetDataPtr();
+        for(int r=0; r < 4; r++)
+        {
+            printf("[");
+            for(int c=0; c < 4; c++)
+            {   
+                if(c>0)printf(",");
+                printf("%f", data[c*4+r]);
+            }
+            printf("]\n");
+        }
+    }
+
+    void PrintVector(BaseVector3 * vector)
+    {
+        float * data = vector->GetDataPtr();
+        printf("[");
+        for(int c=0; c < 4; c++)
+        {   
+            if(c>0)printf(",");
+            printf("%f", data[c]);
+        }
+        printf("]\n");
     }
 
     void OnInit(Graphics * graphics)
@@ -46,6 +77,35 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         printf("\n");
 
         delete point;*/
+
+        float dataA[] = {1,0,0,0,
+                         0,1,0,0,
+                         0,0,1,0,
+                         4,4,4,1};
+
+        float dataB[] = {1,0,0,0,
+                         0,1,0,0,
+                         0,0,1,0,
+                         1,2,3,1};
+
+        Matrix a(dataA);
+        Matrix b(dataB);
+        Matrix c;  
+
+        Matrix::Multiply(&a, &b, &c);        
+
+        PrintMatrix(&c);   
+
+        printf("\n");
+
+        float vaData[] = {0,0,0,1};
+        float vbData[] = {0,0,0,1};
+        Point3 va(vaData);
+        Point3 vb(vbData);
+
+        c.Multiply(&va, &vb);
+
+        PrintVector(&vb);
     }
 
     void OnQuit(Graphics * graphics)
