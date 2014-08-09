@@ -314,11 +314,13 @@ void Matrix::Translate(Vector3 * vector)
 
 void Matrix::Translate(float x, float y, float z)
 {
-    for (int i=0 ; i<4 ; i++) 
+    /*for (int i=0 ; i<4 ; i++) 
     {
         int mi = i;
         data[12 + mi] += data[mi] * x + data[4 + mi] * y + data[8 + mi] * z;
-    }
+    }*/
+    
+    Translate(data, data, x, y, z);
 }
 
 void Matrix::Translate(Matrix * source, Matrix * out, Vector3 * vector)
@@ -333,9 +335,12 @@ void Matrix::Translate(Matrix * source, Matrix * out,float x, float y, float z)
 
 void Matrix::Translate(float * source, float * dest, float x, float y, float z)
 {
-    for (int i=0 ; i<12 ; i++) 
+    if(source != dest)
     {
-        dest[i] = source[i];
+        for (int i=0 ; i<12 ; i++) 
+        {
+            dest[i] = source[i];
+        }
     }
     
     for (int i=0 ; i<4 ; i++) 
@@ -349,15 +354,23 @@ void Matrix::Translate(float * source, float * dest, float x, float y, float z)
 
 void Matrix::Rotate(Vector3 * vector, float a)
 {
-    SetRotate(data, vector->x, vector->y, vector->z, a);
+    float temp[DATA_SIZE];  
+    float r[DATA_SIZE];  
+    SetRotate(r, vector->x, vector->y, vector->z, a);
+    MultiplyMM(data, r, temp);
+    memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
 void Matrix::Rotate(float x, float y, float z, float a)
 {
-    SetRotate(data, x, y, z, a);
+    float temp[DATA_SIZE];  
+    float r[DATA_SIZE];  
+    SetRotate(r, x, y, z, a);
+    MultiplyMM(data, r, temp);
+    memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::RotateEuler(float x, float y, float z)
+void Matrix::SetRotateEuler(float x, float y, float z)
 {
     SetRotateEuler(data, x, y, z);
 }

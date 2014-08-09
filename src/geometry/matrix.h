@@ -64,7 +64,7 @@ class Matrix
 
     void Rotate(Vector3 * vector, float a);
     void Rotate(float x, float y, float z, float a);
-    void RotateEuler(float x, float y, float z);
+    void SetRotateEuler(float x, float y, float z);
     static void SetRotate(float * rm, float x, float y, float z, float a);
     static void SetRotateEuler(float * rm, float x, float y, float z);
 
