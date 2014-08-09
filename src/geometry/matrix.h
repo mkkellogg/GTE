@@ -38,6 +38,7 @@ class Matrix
     ~Matrix();
 
     Matrix & operator= (const Matrix & source);
+
     void Multiply(Vector3 * vector, Vector3 * out);
     void Multiply(Point3 * point, Point3 * out);
     void Multiply(Matrix * matrix);
@@ -45,12 +46,30 @@ class Matrix
     static void Multiply(Matrix * lhs, Matrix *rhs, Matrix * out);
     static void MultiplyMV(float * lhsMat, float * rhsVec, float * out);
     static void MultiplyMM(float * lhs, float *rhs, float * out);
+
     void Transpose();
     static void Transpose(float* source, float *dest);
+
     void Invert();
     static void Invert(float * source, float * dest);
+
     void SetIdentity();
     static void SetIdentity(float * source);
+
+    void Translate(Vector3 * vector);
+    void Translate(float x, float y, float z);
+    static void Translate(Matrix * src, Matrix * out, Vector3 * vector);
+    static void Translate(Matrix * src, Matrix * out,float x, float y, float z);
+    static void Translate(float * source, float * dest, float x, float y, float z);
+
+    void Rotate(Vector3 * vector, float a);
+    void Rotate(Vector3 * vector, float a);
+    void RotateEuler(float x, float y, float z);
+    static void Rotate(Matrix * src, Matrix * out, Vector3 * vector, float a);
+    static void Rotate(Matrix * src, Matrix * out,float x, float y, float z);
+    static void Rotate(float * source, float * dest, Vector3 * vector, float a);
+    static void Rotate(float * source, float * dest, float x, float y, float z);
+
     static inline void Mx4transform(float x, float y, float z, float w, const float* pM, float* pDest);
 
     float * GetDataPtr();

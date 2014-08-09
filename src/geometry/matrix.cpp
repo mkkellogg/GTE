@@ -277,3 +277,103 @@ float * Matrix::GetDataPtr()
 {
     return data;
 }
+
+void Matrix::Translate(Vector3 * vector)
+{
+    float x = vector->x;
+    float y = vector->y;
+    float z = vector->x;
+    Translate(x,y,z);
+}
+
+void Matrix::Translate(float x, float y, float z)
+{
+    for (int i=0 ; i<4 ; i++) 
+    {
+        int mi = i;
+        data[12 + mi] += data[mi] * x + data[4 + mi] * y + data[8 + mi] * z;
+    }
+}
+
+void Matrix::Translate(Matrix * source, Matrix * out, Vector3 * vector)
+{
+    Translate(source->data, out->data, vector->x, vector->y, vector->z);
+}
+
+void Matrix::Translate(Matrix * source, Matrix * out,float x, float y, float z)
+{
+    Translate(source->data, out->data, x, y, z);
+}
+
+void Matrix::Translate(float * source, float * dest, float x, float y, float z)
+{
+    for (int i=0 ; i<12 ; i++) 
+    {
+        dest[i] = source[i];
+    }
+    
+    for (int i=0 ; i<4 ; i++) 
+    {
+        int tmi = i;
+        int mi = i;
+        dest[12 + tmi] = source[mi] * x + source[4 + mi] * y + source[8 + mi] * z + source[12 + mi];
+    }
+}
+
+public static void More ...setRotateM(float[] rm, int rmOffset,
+487            float a, float x, float y, float z) {
+488        rm[rmOffset + 3] = 0;
+489        rm[rmOffset + 7] = 0;
+490        rm[rmOffset + 11]= 0;
+491        rm[rmOffset + 12]= 0;
+492        rm[rmOffset + 13]= 0;
+493        rm[rmOffset + 14]= 0;
+494        rm[rmOffset + 15]= 1;
+495        a *= (float) (Math.PI / 180.0f);
+496        float s = (float) Math.sin(a);
+497        float c = (float) Math.cos(a);
+498        if (1.0f == x && 0.0f == y && 0.0f == z) {
+499            rm[rmOffset + 5] = c;   rm[rmOffset + 10]= c;
+500            rm[rmOffset + 6] = s;   rm[rmOffset + 9] = -s;
+501            rm[rmOffset + 1] = 0;   rm[rmOffset + 2] = 0;
+502            rm[rmOffset + 4] = 0;   rm[rmOffset + 8] = 0;
+503            rm[rmOffset + 0] = 1;
+504        } else if (0.0f == x && 1.0f == y && 0.0f == z) {
+505            rm[rmOffset + 0] = c;   rm[rmOffset + 10]= c;
+506            rm[rmOffset + 8] = s;   rm[rmOffset + 2] = -s;
+507            rm[rmOffset + 1] = 0;   rm[rmOffset + 4] = 0;
+508            rm[rmOffset + 6] = 0;   rm[rmOffset + 9] = 0;
+509            rm[rmOffset + 5] = 1;
+510        } else if (0.0f == x && 0.0f == y && 1.0f == z) {
+511            rm[rmOffset + 0] = c;   rm[rmOffset + 5] = c;
+512            rm[rmOffset + 1] = s;   rm[rmOffset + 4] = -s;
+513            rm[rmOffset + 2] = 0;   rm[rmOffset + 6] = 0;
+514            rm[rmOffset + 8] = 0;   rm[rmOffset + 9] = 0;
+515            rm[rmOffset + 10]= 1;
+516        } else {
+517            float len = length(x, y, z);
+518            if (1.0f != len) {
+519                float recipLen = 1.0f / len;
+520                x *= recipLen;
+521                y *= recipLen;
+522                z *= recipLen;
+523            }
+524            float nc = 1.0f - c;
+525            float xy = x * y;
+526            float yz = y * z;
+527            float zx = z * x;
+528            float xs = x * s;
+529            float ys = y * s;
+530            float zs = z * s;
+531            rm[rmOffset +  0] = x*x*nc +  c;
+532            rm[rmOffset +  4] =  xy*nc - zs;
+533            rm[rmOffset +  8] =  zx*nc + ys;
+534            rm[rmOffset +  1] =  xy*nc + zs;
+535            rm[rmOffset +  5] = y*y*nc +  c;
+536            rm[rmOffset +  9] =  yz*nc - xs;
+537            rm[rmOffset +  2] =  zx*nc - ys;
+538            rm[rmOffset +  6] =  yz*nc + xs;
+539            rm[rmOffset + 10] = z*z*nc +  c;
+540        }
+541    }
+

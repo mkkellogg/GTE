@@ -6,9 +6,11 @@ class BaseVector3
     protected:
 
     void Init(float x, float y, float z, float w);
+    void UpdateComponentPointers();
 
     float * data;
-    bool deleteData;
+    float * baseData;
+    bool attached;
 
     public:
     
@@ -28,6 +30,9 @@ class BaseVector3
     void Set(float x, float y, float z, float w);
     void Set(float x, float y, float z);
     void Get(BaseVector3 * baseVector);
+
+    void AttachTo(float * data);
+    void Detach();
 };
 
 #endif

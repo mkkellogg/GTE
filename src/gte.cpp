@@ -98,12 +98,16 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
         printf("\n");
 
-        float vaData[] = {0,0,0,1};
+        float vaData[] = {1,1,1,1};
         float vbData[] = {0,0,0,1};
         Point3 va(vaData);
         Point3 vb(vbData);
 
         c.Multiply(&va, &vb);
+
+        PrintVector(&vb);
+
+        vb.AttachTo(va.GetDataPtr());
 
         PrintVector(&vb);
     }

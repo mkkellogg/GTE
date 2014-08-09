@@ -120,7 +120,7 @@ float Vector3::Dot(Vector3 * a, Vector3 * b)
     return x+y+z;
 }
 
-// static
+// TODO: Implement!!!
 float Vector3::AngleBetween(Vector3 * a, Vector3 * b, Vector3 * refRightNormal)
 {
     return 0 ;
