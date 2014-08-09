@@ -63,12 +63,14 @@ class Matrix
     static void Translate(float * source, float * dest, float x, float y, float z);
 
     void Rotate(Vector3 * vector, float a);
-    void Rotate(Vector3 * vector, float a);
+    void Rotate(float x, float y, float z, float a);
     void RotateEuler(float x, float y, float z);
-    static void Rotate(Matrix * src, Matrix * out, Vector3 * vector, float a);
-    static void Rotate(Matrix * src, Matrix * out,float x, float y, float z);
-    static void Rotate(float * source, float * dest, Vector3 * vector, float a);
-    static void Rotate(float * source, float * dest, float x, float y, float z);
+    static void SetRotate(float * rm, float x, float y, float z, float a);
+    static void SetRotateEuler(float * rm, float x, float y, float z);
+
+    void Scale(float x, float y, float z);
+    void Scale(Matrix * out, float x, float y, float z);
+    static void Scale(float * source, float * dest, float x, float y , float z);
 
     static inline void Mx4transform(float x, float y, float z, float w, const float* pM, float* pDest);
 

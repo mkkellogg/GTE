@@ -28,6 +28,7 @@
 #include "vector3.h"
 
 #define I(_i, _j) ((_j)+ DIM_SIZE*(_i))
+#define PI 3.14159265
 
 Matrix::Matrix()
 {
@@ -278,6 +279,31 @@ float * Matrix::GetDataPtr()
     return data;
 }
 
+void Matrix::Scale(float x, float y, float z)
+{
+    float temp[DATA_SIZE];
+    Scale(this->data, data, x, y, z);
+    memcpy(data, temp, sizeof(float) * DATA_SIZE);
+}
+
+void Matrix::Scale(Matrix * out, float x, float y, float z)
+{
+    Scale(this->data, out->data, x, y, z);
+}
+
+void Matrix::Scale(float * source, float * dest,  float x, float y, float z) 
+{
+    for (int i=0 ; i<4 ; i++) 
+    {
+        int smi = i;
+        int mi = i;
+        dest[smi] = source[mi] * x;
+        dest[4 + smi] = source[4 + mi] * y;
+        dest[8 + smi] = source[8 + mi] * z;
+        dest[12 + smi] = source[12 + mi];
+    }
+}
+
 void Matrix::Translate(Vector3 * vector)
 {
     float x = vector->x;
@@ -320,60 +346,119 @@ void Matrix::Translate(float * source, float * dest, float x, float y, float z)
     }
 }
 
-public static void More ...setRotateM(float[] rm, int rmOffset,
-487            float a, float x, float y, float z) {
-488        rm[rmOffset + 3] = 0;
-489        rm[rmOffset + 7] = 0;
-490        rm[rmOffset + 11]= 0;
-491        rm[rmOffset + 12]= 0;
-492        rm[rmOffset + 13]= 0;
-493        rm[rmOffset + 14]= 0;
-494        rm[rmOffset + 15]= 1;
-495        a *= (float) (Math.PI / 180.0f);
-496        float s = (float) Math.sin(a);
-497        float c = (float) Math.cos(a);
-498        if (1.0f == x && 0.0f == y && 0.0f == z) {
-499            rm[rmOffset + 5] = c;   rm[rmOffset + 10]= c;
-500            rm[rmOffset + 6] = s;   rm[rmOffset + 9] = -s;
-501            rm[rmOffset + 1] = 0;   rm[rmOffset + 2] = 0;
-502            rm[rmOffset + 4] = 0;   rm[rmOffset + 8] = 0;
-503            rm[rmOffset + 0] = 1;
-504        } else if (0.0f == x && 1.0f == y && 0.0f == z) {
-505            rm[rmOffset + 0] = c;   rm[rmOffset + 10]= c;
-506            rm[rmOffset + 8] = s;   rm[rmOffset + 2] = -s;
-507            rm[rmOffset + 1] = 0;   rm[rmOffset + 4] = 0;
-508            rm[rmOffset + 6] = 0;   rm[rmOffset + 9] = 0;
-509            rm[rmOffset + 5] = 1;
-510        } else if (0.0f == x && 0.0f == y && 1.0f == z) {
-511            rm[rmOffset + 0] = c;   rm[rmOffset + 5] = c;
-512            rm[rmOffset + 1] = s;   rm[rmOffset + 4] = -s;
-513            rm[rmOffset + 2] = 0;   rm[rmOffset + 6] = 0;
-514            rm[rmOffset + 8] = 0;   rm[rmOffset + 9] = 0;
-515            rm[rmOffset + 10]= 1;
-516        } else {
-517            float len = length(x, y, z);
-518            if (1.0f != len) {
-519                float recipLen = 1.0f / len;
-520                x *= recipLen;
-521                y *= recipLen;
-522                z *= recipLen;
-523            }
-524            float nc = 1.0f - c;
-525            float xy = x * y;
-526            float yz = y * z;
-527            float zx = z * x;
-528            float xs = x * s;
-529            float ys = y * s;
-530            float zs = z * s;
-531            rm[rmOffset +  0] = x*x*nc +  c;
-532            rm[rmOffset +  4] =  xy*nc - zs;
-533            rm[rmOffset +  8] =  zx*nc + ys;
-534            rm[rmOffset +  1] =  xy*nc + zs;
-535            rm[rmOffset +  5] = y*y*nc +  c;
-536            rm[rmOffset +  9] =  yz*nc - xs;
-537            rm[rmOffset +  2] =  zx*nc - ys;
-538            rm[rmOffset +  6] =  yz*nc + xs;
-539            rm[rmOffset + 10] = z*z*nc +  c;
-540        }
-541    }
 
+void Matrix::Rotate(Vector3 * vector, float a)
+{
+    SetRotate(data, vector->x, vector->y, vector->z, a);
+}
+
+void Matrix::Rotate(float x, float y, float z, float a)
+{
+    SetRotate(data, x, y, z, a);
+}
+
+void Matrix::RotateEuler(float x, float y, float z)
+{
+    SetRotateEuler(data, x, y, z);
+}
+
+void Matrix::SetRotate(float * rm, float x, float y, float z, float a)
+{
+    rm[3] = 0;
+    rm[7] = 0;
+    rm[11]= 0;
+    rm[12]= 0;
+    rm[13]= 0;
+    rm[14]= 0;
+    rm[15]= 1;
+    a *= (float) (PI/ 180.0f);
+    float s = (float) sin(a);
+    float c = (float) cos(a);
+    if (1.0f == x && 0.0f == y && 0.0f == z) 
+    {
+        rm[5] = c;   rm[10]= c;
+        rm[6] = s;   rm[9] = -s;
+        rm[1] = 0;   rm[2] = 0;
+        rm[4] = 0;   rm[8] = 0;
+        rm[0] = 1;
+    } 
+    else if (0.0f == x && 1.0f == y && 0.0f == z) 
+    {
+        rm[0] = c;   rm[10]= c;
+        rm[8] = s;   rm[2] = -s;
+        rm[1] = 0;   rm[4] = 0;
+        rm[6] = 0;   rm[9] = 0;
+        rm[5] = 1;
+    }
+    else if (0.0f == x && 0.0f == y && 1.0f == z) 
+    {
+        rm[0] = c;   rm[5] = c;
+        rm[1] = s;   rm[4] = -s;
+        rm[2] = 0;   rm[6] = 0;
+        rm[8] = 0;   rm[9] = 0;
+        rm[10]= 1;
+    } 
+    else 
+    {
+        float len = Vector3::Magnitude(x, y, z);
+        if (1.0f != len)  
+        {
+            float recipLen = 1.0f / len;
+            x *= recipLen;
+            y *= recipLen;
+            z *= recipLen;
+        }
+        float nc = 1.0f - c;
+        float xy = x * y;
+        float yz = y * z;
+        float zx = z * x;
+        float xs = x * s;
+        float ys = y * s;
+        float zs = z * s;
+        rm[ 0] = x*x*nc +  c;
+        rm[ 4] =  xy*nc - zs;
+        rm[ 8] =  zx*nc + ys;
+        rm[ 1] =  xy*nc + zs;
+        rm[ 5] = y*y*nc +  c;
+        rm[ 9] =  yz*nc - xs;
+        rm[ 2] =  zx*nc - ys;
+        rm[ 6] =  yz*nc + xs;
+        rm[10] = z*z*nc +  c;
+    }
+}
+
+void Matrix::SetRotateEuler(float * rm, float x, float y, float z)
+{
+    float piOver180 = PI / 180.0f;
+    x *= piOver180;
+    y *= piOver180;
+    z *= piOver180;
+    float cx = (float) cos(x);
+    float sx = (float) sin(x);
+    float cy = (float) cos(y);
+    float sy = (float) sin(y);
+    float cz = (float) cos(z);
+    float sz = (float) sin(z);
+    float cxsy = cx * sy;
+    float sxsy = sx * sy;
+
+    rm[0]  =   cy * cz;
+    rm[1]  =  -cy * sz;
+    rm[2]  =   sy;
+    rm[3]  =  0.0f;
+
+    rm[4]  =  cxsy * cz + cx * sz;
+    rm[5]  = -cxsy * sz + cx * cz;
+    rm[6]  =  -sx * cy;
+    rm[7]  =  0.0f;
+
+    rm[8]  = -sxsy * cz + sx * sz;
+    rm[9]  =  sxsy * sz + sx * cz;
+    rm[10] =  cx * cy;
+    rm[11] =  0.0f;
+
+    rm[12] =  0.0f;
+    rm[13] =  0.0f;
+    rm[14] =  0.0f;
+    rm[15] =  1.0f;
+}

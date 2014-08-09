@@ -81,6 +81,11 @@ void Vector3::QuickNormlize()
 
 float Vector3::Magnitude()
 {
+    return Magnitude(x,y,x);
+}
+
+float Vector3::Magnitude(float x, float y, float z)
+{
     return (float)sqrt(x*x + y*y + z*z);
 }
 

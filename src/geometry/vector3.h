@@ -21,6 +21,7 @@ class Vector3 : public BaseVector3
     void Normalize();
     void QuickNormlize();
     float Magnitude();
+    static float Magnitude(float x, float y, float z);
     float QuickMagnitude();
     void Invert();
     static void Cross(Vector3 * a, Vector3 * b, Vector3 * results);
