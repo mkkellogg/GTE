@@ -1,5 +1,5 @@
 #ifndef _GRAPHICS_GL_H_
-#define _GRAPHICS_HL_H_
+#define _GRAPHICS_GL_H_
 
 #include <GL/glew.h>
 #include <GL/glut.h>
