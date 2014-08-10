@@ -3,19 +3,27 @@
 
 #include <GL/glew.h>
 #include <GL/glut.h>
+
 #include "graphics.h"
+#include "vertexattrbuffer.h"
 
 class GraphicsGL : Graphics
 {
     friend class Graphics;
 
+    protected:
+
     GraphicsCallbacks * callbacks;
     GraphicsGL();
+    ~GraphicsGL();
 
     public :
 
-    ~GraphicsGL();
     void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks);
+    Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
+    void DestroyShader(Shader * shader);
+    void DestroyVertexAttrBuffer(VertexAttrBuffer * buffer);
+    VertexAttrBuffer * CreateVertexAttrBuffer();
 };
 
 #endif

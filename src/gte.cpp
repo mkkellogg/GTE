@@ -57,8 +57,7 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
     void OnInit(Graphics * graphics)
     {
-        ShaderManager * shaderManager = graphics->GetShaderManager();
-        basicShader = shaderManager->CreateShader("resources/basic.vertex.shader","resources/basic.fragment.shader");
+        basicShader = graphics->CreateShader("resources/basic.vertex.shader","resources/basic.fragment.shader");
         basicShader->Load();
 
         /*Point3 *point = new Point3(0,1,2);

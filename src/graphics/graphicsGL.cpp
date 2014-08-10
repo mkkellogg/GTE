@@ -7,6 +7,10 @@
 #include <GL/glut.h>
  
 #include "graphicsGL.h"
+#include "shader/shaderGL.h"
+#include "shader/shader.h"
+#include "vertexattrbuffer.h"
+#include "vertexattrbufferGL.h"
 #include "gte.h"
 
 void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks)
@@ -57,6 +61,29 @@ GraphicsGL::~GraphicsGL()
 GraphicsGL::GraphicsGL() : Graphics()
 {
     
+}
+
+Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)
+{
+    //TODO: Add switch for different platforms; for now only support OpenGL
+    Shader * shader = new ShaderGL(vertexShaderPath, fragmentShaderPath);
+    return shader;
+}
+
+VertexAttrBuffer * GraphicsGL::CreateVertexAttrBuffer()
+{
+    VertexAttrBufferGL * buffer = new VertexAttrBufferGL();
+    return buffer;
+}
+
+void GraphicsGL::DestroyShader(Shader * shader)
+{
+    delete shader;
+}
+
+void GraphicsGL::DestroyVertexAttrBuffer(VertexAttrBuffer * buffer)
+{
+    delete buffer;
 }
 
 

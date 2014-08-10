@@ -9,6 +9,8 @@
 
 class ShaderGL : public Shader
 {
+    friend class GraphicsGL;
+
     bool ready;
     char * name;
     ShaderSource * vertexShaderSource;
@@ -26,10 +28,13 @@ class ShaderGL : public Shader
     char * GetProgramLog(GLuint obj);
     bool CheckCompilation(int shaderID, ShaderType shaderType);
 
-    public :
+    protected:
 
     ShaderGL(const char * vertexSourcePath, const char * fragmentSourcePath);
     virtual ~ShaderGL();
+
+    public :
+
     bool Load();
 };
 

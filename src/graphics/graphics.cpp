@@ -12,17 +12,12 @@ Graphics * Graphics::theInstance = NULL;
 
 Graphics::~Graphics()
 {
-    shaderManager = new ShaderManager();
+
 }
 
 Graphics::Graphics()
 {
-    delete shaderManager;
-}
 
-ShaderManager * Graphics::GetShaderManager()
-{
-    return shaderManager;
 }
 
 Graphics * Graphics::Instance()
