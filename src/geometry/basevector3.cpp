@@ -21,12 +21,12 @@ BaseVector3::BaseVector3(float x, float y, float z, float w) : data(new float[4]
     Init(x,y,z,w);
 }
 
-BaseVector3::BaseVector3(BaseVector3 * baseVector) : data(new float[4]), baseData(data), attached(false), x(data[0]), y(data[1]), z(data[2]), w(data[3])
+BaseVector3::BaseVector3(const BaseVector3 * baseVector) : data(new float[4]), baseData(data), attached(false), x(data[0]), y(data[1]), z(data[2]), w(data[3])
 {
     Init(baseVector->x, baseVector->y, baseVector->z, baseVector->w);
 }
 
-BaseVector3::BaseVector3(float * copyData) : data(new float[4]), baseData(data), attached(false), x(data[0]), y(data[1]), z(data[2]), w(data[3])
+BaseVector3::BaseVector3(const float * copyData) : data(new float[4]), baseData(data), attached(false), x(data[0]), y(data[1]), z(data[2]), w(data[3])
 {
     Init(copyData[0],copyData[1],copyData[2], copyData[3]);
 }
@@ -63,7 +63,7 @@ void BaseVector3::Set(float x, float y, float z)
 
 void BaseVector3::Get(BaseVector3 * baseVector)
 {
-   memcpy(data, baseVector->data, sizeof(float) * 4);
+   memcpy(baseVector->data, data, sizeof(float) * 4);
 }
 
 float * BaseVector3::GetDataPtr()

@@ -120,6 +120,11 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
             basicShader = NULL;
         }
     }
+
+    virtual ~CustomGraphicsCallbacks()
+    {
+
+    }
 };
 
 int main(int argc, char** argv)

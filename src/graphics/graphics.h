@@ -11,6 +11,7 @@ class GraphicsCallbacks
 
     virtual void OnInit(Graphics * graphics) = 0;
     virtual void OnQuit(Graphics * graphics) = 0;
+    virtual ~GraphicsCallbacks();
 };
 
 class Graphics

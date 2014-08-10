@@ -37,3 +37,8 @@ Graphics * Graphics::Instance()
     return theInstance;
 }
 
+GraphicsCallbacks::~GraphicsCallbacks()
+{
+
+}
+

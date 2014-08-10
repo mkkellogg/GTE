@@ -10,13 +10,13 @@ class Point3 : public BaseVector3
 
     Point3();
     Point3(float x, float y, float z);
-    Point3(Point3 * point);
-    Point3(float * data);
+    Point3(const Point3 * point);
+    Point3(const float * data);
     ~Point3();
 
-    void Add(Vector3 * v);
-    static void Add(Point3 * point, Vector3 * v, Point3 * result);
-    static void Subtract(Point3 * p1, Point3 * p2, Vector3 * result);
+    void Add(const Vector3 * v);
+    static void Add(const Point3 * point, const Vector3 * v, Point3 * result);
+    static void Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result);
 };
 
 #endif

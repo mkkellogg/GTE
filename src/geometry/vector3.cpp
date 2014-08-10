@@ -17,13 +17,13 @@ Vector3::Vector3(float x, float y, float z) : BaseVector3(x,y,z,0)
     
 }
 
-Vector3::Vector3(Vector3 * vector) : BaseVector3(vector)
+Vector3::Vector3(const Vector3 * vector) : BaseVector3(vector)
 {
     
 }
 
 
-Vector3::Vector3(float * data) : BaseVector3(data)
+Vector3::Vector3(const float * data) : BaseVector3(data)
 {
 
 }
@@ -33,21 +33,21 @@ Vector3::~Vector3()
    
 }
 
-void Vector3::Add(Vector3 * v)
+void Vector3::Add(const Vector3 * v)
 {
     x += v->x;
     y += v->y;
     z += v->z;
 }
 
-void Vector3::Add(Vector3 * v1, Vector3 * v2, Vector3 * result)
+void Vector3::Add(const Vector3 * v1,const Vector3 * v2, Vector3 * result)
 {
     result->x = v1->x + v2->x;
     result->y = v1->y + v2->y;
     result->z = v1->z + v2->z;
 }
 
-void Vector3::Subtract(Vector3 * v1, Vector3 * v2, Vector3 * result)
+void Vector3::Subtract(const Vector3 * v1,const Vector3 * v2, Vector3 * result)
 {
     result->x = v1->x - v2->x;
     result->y = v1->y - v2->y;
@@ -101,7 +101,7 @@ void Vector3::Invert()
     z = -z;
 }
 
-void Vector3::Cross(Vector3 * a, Vector3 * b, Vector3 * results)
+void Vector3::Cross(const Vector3 * a,const Vector3 * b, Vector3 * results)
 {
     float x,y,z;
     x = (a->y*b->z) - (b->y*a->z);
@@ -110,14 +110,14 @@ void Vector3::Cross(Vector3 * a, Vector3 * b, Vector3 * results)
     results->Set(x,y,z);
 }
 
-void Vector3::CalcNormal(Vector3 * a, Vector3 * b, Vector3 * result)
+void Vector3::CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result)
 {
     Cross(a,b,result);
     result->Normalize();
 }
 
 
-float Vector3::Dot(Vector3 * a, Vector3 * b)
+float Vector3::Dot(const Vector3 * a,const Vector3 * b)
 {
     float x = a->x * b->x;
     float y = a->y * b->y;
@@ -126,7 +126,7 @@ float Vector3::Dot(Vector3 * a, Vector3 * b)
 }
 
 // TODO: Implement!!!
-float Vector3::AngleBetween(Vector3 * a, Vector3 * b, Vector3 * refRightNormal)
+float Vector3::AngleBetween(const Vector3 * a,const Vector3 * b,const Vector3 * refRightNormal)
 {
     return 0 ;
 }

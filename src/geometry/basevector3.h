@@ -21,8 +21,8 @@ class BaseVector3
 
     BaseVector3();
     BaseVector3(float x, float y, float z, float w);
-    BaseVector3(BaseVector3 * baseVector);
-    BaseVector3(float * copyData);
+    BaseVector3(const BaseVector3 * baseVector);
+    BaseVector3(const float * copyData);
     virtual ~BaseVector3();
 
     BaseVector3 & operator= (const BaseVector3 & source);
