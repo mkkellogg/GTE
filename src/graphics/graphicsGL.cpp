@@ -7,15 +7,21 @@
 #include <GL/glut.h>
  
 #include "graphicsGL.h"
+#include "ui/debug.h"
 #include "shader/shaderGL.h"
 #include "shader/shader.h"
 #include "vertexattrbuffer.h"
 #include "vertexattrbufferGL.h"
 #include "gte.h"
 
-void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks)
+GraphicsGL * _thisInstance;
+GraphicsCallbacks * _instanceCallbacks;
+void _glutDisplayFunc();
+
+void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
-    this->callbacks = callbacks;
+	_instanceCallbacks = this->callbacks = callbacks;
+	_thisInstance = this;
 
     int argc = 0;
     char * argv = (char*)"";
@@ -29,16 +35,18 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
        exit(1);
     }
 
-    (void)glutCreateWindow("GLUT Program");
+    (void)glutCreateWindow(windowTitle);
 
     glewExperimental = GL_TRUE; 
     glewInit();
     if (glewIsSupported("GL_VERSION_2_0"))
-        printf("Ready for OpenGL 2.0\n");
+        Debug::PrintMessage("Ready for OpenGL 2.0\n");
     else {	
-        printf("OpenGL 2.0 not supported\n");
+    	Debug::PrintMessage("OpenGL 2.0 not supported\n");
         exit(1);
     }
+
+    glutDisplayFunc(&_glutDisplayFunc);
 
     if(callbacks != NULL)
     {
@@ -60,31 +68,35 @@ GraphicsGL::~GraphicsGL()
 
 GraphicsGL::GraphicsGL() : Graphics()
 {
-    
+
 }
 
-Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)
+Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) const
 {
     //TODO: Add switch for different platforms; for now only support OpenGL
     Shader * shader = new ShaderGL(vertexShaderPath, fragmentShaderPath);
     return shader;
 }
 
-VertexAttrBuffer * GraphicsGL::CreateVertexAttrBuffer()
+VertexAttrBuffer * GraphicsGL::CreateVertexAttrBuffer() const
 {
     VertexAttrBufferGL * buffer = new VertexAttrBufferGL();
     return buffer;
 }
 
-void GraphicsGL::DestroyShader(Shader * shader)
+void GraphicsGL::DestroyShader(Shader * shader) const
 {
     delete shader;
 }
 
-void GraphicsGL::DestroyVertexAttrBuffer(VertexAttrBuffer * buffer)
+void GraphicsGL::DestroyVertexAttrBuffer(VertexAttrBuffer * buffer) const
 {
     delete buffer;
 }
 
+void _glutDisplayFunc()
+{
+	_instanceCallbacks->OnUpdate(_thisInstance);
+}
 
 

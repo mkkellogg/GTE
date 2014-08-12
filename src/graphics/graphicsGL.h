@@ -7,7 +7,7 @@
 #include "graphics.h"
 #include "vertexattrbuffer.h"
 
-class GraphicsGL : Graphics
+class GraphicsGL : public Graphics
 {
     friend class Graphics;
 
@@ -19,11 +19,11 @@ class GraphicsGL : Graphics
 
     public :
 
-    void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks);
-    Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
-    void DestroyShader(Shader * shader);
-    void DestroyVertexAttrBuffer(VertexAttrBuffer * buffer);
-    VertexAttrBuffer * CreateVertexAttrBuffer();
+    void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
+    Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) const;
+    void DestroyShader(Shader * shader) const;
+    VertexAttrBuffer * CreateVertexAttrBuffer() const;
+    void DestroyVertexAttrBuffer(VertexAttrBuffer * buffer) const;
 };
 
 #endif

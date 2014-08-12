@@ -12,6 +12,7 @@ class GraphicsCallbacks
 
     virtual void OnInit(Graphics * graphics) = 0;
     virtual void OnQuit(Graphics * graphics) = 0;
+    virtual void OnUpdate(Graphics * graphics) = 0;
     virtual ~GraphicsCallbacks();
 };
 
@@ -28,12 +29,12 @@ class Graphics
 
     static Graphics * Instance();
 
-    virtual Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) = 0;
-    virtual VertexAttrBuffer * CreateVertexAttrBuffer() = 0;
-    virtual void DestroyShader(Shader * shader) = 0;
-    virtual void DestroyVertexAttrBuffer(VertexAttrBuffer * buffer) = 0;
+    virtual Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)  const  = 0;
+    virtual VertexAttrBuffer * CreateVertexAttrBuffer() const  = 0;
+    virtual void DestroyShader(Shader * shader) const = 0;
+    virtual void DestroyVertexAttrBuffer(VertexAttrBuffer * buffer) const = 0;
 
-    virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks) = 0;
+    virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle) = 0;
 };
 
 #endif

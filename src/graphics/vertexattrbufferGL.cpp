@@ -18,7 +18,7 @@ VertexAttrBufferGL::~VertexAttrBufferGL()
 
 }
 
-void VertexAttrBufferGL::SetData(float * data)
+void VertexAttrBufferGL::SetData(const float * data)
 {
 
 }

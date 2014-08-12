@@ -5,8 +5,8 @@
 
 enum class AttributeType
 {
-    POSITION,
-    NORMAL,
+    Position,
+    Normal,
     UV1,
     UV2
 };
@@ -18,10 +18,15 @@ class Mesh3D
     VertexAttrBuffer * uv1Data;
     VertexAttrBuffer * uv2Data;
 
+    bool InitializeVertexAttrBuffer(VertexAttrBuffer ** buffer);
+    bool CheckAndInitializeVertexAttrBuffer(VertexAttrBuffer ** buffer);
+
     public:
 
     Mesh3D();
     virtual ~Mesh3D();
+
+    void SetVertexData(const float * data, AttributeType attributeType);
 };
 
 #endif

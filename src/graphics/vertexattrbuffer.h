@@ -8,7 +8,7 @@ class VertexAttrBuffer
     VertexAttrBuffer();
     virtual ~VertexAttrBuffer();
 
-    virtual void SetData(float * data) = 0;
+    virtual void SetData(const float * data) = 0;
 };
 
 #endif

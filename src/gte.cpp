@@ -111,6 +111,11 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         PrintVector(&vb);
     }
 
+    void OnUpdate(Graphics * graphics)
+    {
+
+    }
+
     void OnQuit(Graphics * graphics)
     {   
         if(basicShader != NULL)
@@ -129,7 +134,7 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 int main(int argc, char** argv)
 {
     CustomGraphicsCallbacks graphicsCallbacks;
-    Graphics::Instance()->Init(640,480, (CustomGraphicsCallbacks*)(&graphicsCallbacks));   
+    Graphics::Instance()->Init(640,480, (CustomGraphicsCallbacks*)(&graphicsCallbacks), "GTE Test");
 
     return EXIT_SUCCESS;
 }

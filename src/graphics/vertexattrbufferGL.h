@@ -14,7 +14,7 @@ class VertexAttrBufferGL : public VertexAttrBuffer
 
     public:
 
-    void SetData(float * data);
+    void SetData(const float * data);
 };
 
 #endif

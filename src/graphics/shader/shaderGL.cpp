@@ -105,7 +105,6 @@ bool ShaderGL::Load()
         return false;
     }
 
-
     const char * vertexSourceString = (const char *)vertexShaderSource->GetSourceString();
     const char * fragmentSourceString = (const char *)fragmentShaderSource->GetSourceString();
  
