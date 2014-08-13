@@ -7,7 +7,7 @@ class Vector3 : public BaseVector4
 {
 	protected:
 
-	void Vector3::UpdateComponentPointers();
+	void UpdateComponentPointers();
 
     public:
 
@@ -36,6 +36,9 @@ class Vector3 : public BaseVector4
     static void CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result);
     static float Dot(const Vector3 * a,const Vector3 * b);
     static float AngleBetween(const Vector3 * a,const Vector3 * b,const Vector3 * refRightNormal);
+
+    virtual void AttachTo(float * data);
+    virtual void Detach();
 };
 
 #endif

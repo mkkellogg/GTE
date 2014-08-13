@@ -48,3 +48,27 @@ void Point3::Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result)
     result->z = p1->z - p2->z;
 }
 
+void Point3::AttachTo(float * data)
+{
+	BaseVector4::AttachTo(data);
+	UpdateComponentPointers();
+}
+
+void Point3::Detach()
+{
+	BaseVector4::Detach();
+	UpdateComponentPointers();
+}
+
+void Point3::UpdateComponentPointers()
+{
+    float ** rPtr;
+    rPtr = (float **)&x;
+    *rPtr = data;
+    rPtr = (float **)&y;
+    *rPtr = data+1;
+    rPtr = (float **)&z;
+    *rPtr = data+2;
+}
+
+

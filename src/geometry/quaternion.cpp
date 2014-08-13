@@ -3,6 +3,7 @@
 #include "quaternion.h"
 #include "matrix.h"
 #include "vector3.h"
+#include "basevector4.h"
 #include "ui/debug.h"
 
 Quaternion::Quaternion()
@@ -19,12 +20,13 @@ Quaternion::Quaternion(const Vector3& v, float w)
     mData[3] = w;
 }
 
-Quaternion::Quaternion(const Vector3& v)
+Quaternion::Quaternion(const BaseVector4& v)
 {
-    mData[0] = v.x;
-    mData[1] = v.y;
-    mData[2] = v.z;
-    mData[3] = v.w;
+	float * data = v.GetDataPtr();
+    mData[0] = data[0];
+    mData[1] = data[1];
+    mData[2] = data[2];
+    mData[3] = data[3];
 }
 
 Quaternion::Quaternion(const float* array)
@@ -92,7 +94,6 @@ Quaternion Quaternion::conjugate(void) const
     comp.x = -comp.x;
     comp.y = -comp.y;
     comp.z = -comp.z;
-    comp.w = -comp.w;
     return Quaternion(comp, real());
 }
 

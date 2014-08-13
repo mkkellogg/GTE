@@ -14,7 +14,7 @@ class Quaternion
   
     Quaternion();
     Quaternion(const Vector3& v, float w) ;
-    Quaternion(const Vector3& v);
+    Quaternion(const BaseVector4& v);
     Quaternion(const float* array);
     Quaternion(float x, float y, float z, float w);
     float x() const;

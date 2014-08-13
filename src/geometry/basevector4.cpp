@@ -60,7 +60,7 @@ void BaseVector4::Get(BaseVector4 * baseVector)
    memcpy(baseVector->data, data, sizeof(float) * 4);
 }
 
-float * BaseVector4::GetDataPtr()
+float * BaseVector4::GetDataPtr() const
 {
     return data;
 }
@@ -68,14 +68,12 @@ float * BaseVector4::GetDataPtr()
 void BaseVector4::AttachTo(float * data)
 {
     this->data = data;
-    UpdateComponentPointers();
     attached = true;
 }
 
 void BaseVector4::Detach()
 {
     this->data = baseData;
-    UpdateComponentPointers();
     attached = false;
 }
 

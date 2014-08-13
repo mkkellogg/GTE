@@ -5,6 +5,7 @@
 #include <math.h>
  
 #include "vector3.h"
+#include "basevector4.h"
 #include "gtemath/gtemath.h"
 
 Vector3::Vector3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
@@ -128,6 +129,18 @@ float Vector3::Dot(const Vector3 * a,const Vector3 * b)
     float y = a->y * b->y;
     float z = a->z * b->z;
     return x+y+z;
+}
+
+void Vector3::AttachTo(float * data)
+{
+	BaseVector4::AttachTo(data);
+	UpdateComponentPointers();
+}
+
+void Vector3::Detach()
+{
+	BaseVector4::Detach();
+	UpdateComponentPointers();
 }
 
 // TODO: Implement!!!

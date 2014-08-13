@@ -6,6 +6,10 @@
 
 class Point3 : public BaseVector4
 {
+	protected:
+
+	void UpdateComponentPointers();
+
     public:
 
     float &x;
@@ -21,6 +25,9 @@ class Point3 : public BaseVector4
     void Add(const Vector3 * v);
     static void Add(const Point3 * point, const Vector3 * v, Point3 * result);
     static void Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result);
+
+    virtual void AttachTo(float * data);
+    virtual void Detach();
 };
 
 #endif

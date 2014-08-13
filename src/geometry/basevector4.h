@@ -6,7 +6,6 @@ class BaseVector4
     protected:
 
     void Init(float x, float y, float z, float w);
-    virtual void UpdateComponentPointers() = 0;
 
     float * data;
     float * baseData;
@@ -21,13 +20,13 @@ class BaseVector4
     virtual ~BaseVector4();
 
     BaseVector4 & operator= (const BaseVector4 & source);
-    float * GetDataPtr();
+    float * GetDataPtr() const;
     void Set(float x, float y, float z, float w);
     void Set(float x, float y, float z);
     void Get(BaseVector4 * baseVector);
 
-    void AttachTo(float * data);
-    void Detach();
+    virtual void AttachTo(float * data);
+    virtual void Detach();
 };
 
 #endif
