@@ -9,7 +9,7 @@
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"
 #include "geometry/matrix.h"
-#include "geometry/basevector3.h"
+#include "geometry/basevector4.h"
 #include "geometry/point3.h"
 #include "geometry/vector3.h"
 #include "ui/debug.h"
@@ -43,7 +43,7 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         }
     }
 
-    void PrintVector(BaseVector3 * vector)
+    void PrintVector(BaseVector4 * vector)
     {
         float * data = vector->GetDataPtr();
         printf("[");
@@ -97,10 +97,8 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
         printf("\n");
 
-        float vaData[] = {1,1,1,1};
-        float vbData[] = {0,0,0,1};
-        Point3 va(vaData);
-        Point3 vb(vbData);
+        Point3 va(1,1,1);
+        Point3 vb(0,0,0);
 
         c.Multiply(&va, &vb);
 

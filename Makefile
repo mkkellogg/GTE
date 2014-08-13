@@ -11,7 +11,7 @@ SHADERSRC= $(GRAPHICSSRC)/shader
 
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
-GEOMETRYOBJ= obj/matrix.o obj/quaternion.o obj/point3.o obj/vector3.o obj/basevector3.o
+GEOMETRYOBJ= obj/matrix.o obj/quaternion.o obj/point3.o obj/vector3.o obj/basevector4.o obj/vector3array.o
 OBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
 GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o
@@ -87,11 +87,14 @@ obj/point3.o: $(GEOMETRYSRC)/point3.cpp $(GEOMETRYSRC)/point3.h
 obj/vector3.o: $(GEOMETRYSRC)/vector3.cpp $(GEOMETRYSRC)/vector3.h 
 	$(CC) $(CFLAGS) -o obj/vector3.o -c $(GEOMETRYSRC)/vector3.cpp
 	
+obj/vector3array.o: $(GEOMETRYSRC)/vector3array.cpp $(GEOMETRYSRC)/vector3array.h 
+	$(CC) $(CFLAGS) -o obj/vector3array.o -c $(GEOMETRYSRC)/vector3array.cpp
+	
 obj/matrix.o: $(GEOMETRYSRC)/matrix.cpp $(GEOMETRYSRC)/matrix.h 
 	$(CC) $(CFLAGS) -o obj/matrix.o -c $(GEOMETRYSRC)/matrix.cpp
 	
-obj/basevector3.o: $(GEOMETRYSRC)/basevector3.cpp $(GEOMETRYSRC)/basevector3.h 
-	$(CC) $(CFLAGS) -o obj/basevector3.o -c $(GEOMETRYSRC)/basevector3.cpp
+obj/basevector4.o: $(GEOMETRYSRC)/basevector4.cpp $(GEOMETRYSRC)/basevector4.h 
+	$(CC) $(CFLAGS) -o obj/basevector4.o -c $(GEOMETRYSRC)/basevector4.cpp
 	
 obj/quaternion.o: $(GEOMETRYSRC)/quaternion.cpp $(GEOMETRYSRC)/quaternion.h 
 	$(CC) $(CFLAGS) -o obj/quaternion.o -c $(GEOMETRYSRC)/quaternion.cpp

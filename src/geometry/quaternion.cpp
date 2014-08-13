@@ -66,7 +66,7 @@ float Quaternion::w() const
 
 Vector3 Quaternion::complex() const
 {
-    return Vector3(mData);
+    return Vector3(mData[0], mData[1], mData[2]);
 }
 
 void Quaternion::complex(const Vector3& c)

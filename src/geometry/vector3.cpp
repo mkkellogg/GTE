@@ -7,25 +7,19 @@
 #include "vector3.h"
 #include "gtemath/gtemath.h"
 
-Vector3::Vector3() : BaseVector3()
+Vector3::Vector3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
 {
    
 }
 
-Vector3::Vector3(float x, float y, float z) : BaseVector3(x,y,z,0)
+Vector3::Vector3(float x, float y, float z) : BaseVector4(x,y,z,0), x(data[0]), y(data[1]), z(data[2])
 {
     
 }
 
-Vector3::Vector3(const Vector3 * vector) : BaseVector3(vector)
+Vector3::Vector3(const Vector3 * vector) : BaseVector4(vector),  x(data[0]), y(data[1]), z(data[2])
 {
     
-}
-
-
-Vector3::Vector3(const float * data) : BaseVector3(data)
-{
-
 }
 
 Vector3::~Vector3()
@@ -114,6 +108,17 @@ void Vector3::CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result)
 {
     Cross(a,b,result);
     result->Normalize();
+}
+
+void Vector3::UpdateComponentPointers()
+{
+    float ** rPtr;
+    rPtr = (float **)&x;
+    *rPtr = data;
+    rPtr = (float **)&y;
+    *rPtr = data+1;
+    rPtr = (float **)&z;
+    *rPtr = data+2;
 }
 
 

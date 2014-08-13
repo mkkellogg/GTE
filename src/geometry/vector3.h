@@ -1,11 +1,19 @@
 #ifndef _VECTOR3_H_
 #define _VECTOR3_H_
 
-#include "basevector3.h"
+#include "basevector4.h"
 
-class Vector3 : public BaseVector3
+class Vector3 : public BaseVector4
 {
+	protected:
+
+	void Vector3::UpdateComponentPointers();
+
     public:
+
+    float &x;
+    float &y;
+    float &z;
 
     Vector3();
     Vector3(float x, float y, float z);

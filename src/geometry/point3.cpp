@@ -7,24 +7,19 @@
 #include "point3.h"
 #include "vector3.h"
 
-Point3::Point3() : BaseVector3()
+Point3::Point3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
 {
 
 }
 
-Point3::Point3(float x, float y, float z) : BaseVector3(x,y,z,1)
+Point3::Point3(float x, float y, float z) : BaseVector4(x,y,z,1), x(data[0]), y(data[1]), z(data[2])
 {
    
 }
 
-Point3::Point3(const Point3 * point) : BaseVector3(point)
+Point3::Point3(const Point3 * point) : BaseVector4(point), x(data[0]), y(data[1]), z(data[2])
 {
    
-}
-
-Point3::Point3(const float * data) : BaseVector3(data)
-{
-    
 }
 
 Point3::~Point3()

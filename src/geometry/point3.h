@@ -2,11 +2,15 @@
 #define _POINT3_H_
 
 #include "vector3.h"
-#include "basevector3.h"
+#include "basevector4.h"
 
-class Point3 : public BaseVector3
+class Point3 : public BaseVector4
 {
     public:
+
+    float &x;
+    float &y;
+    float &z;
 
     Point3();
     Point3(float x, float y, float z);
