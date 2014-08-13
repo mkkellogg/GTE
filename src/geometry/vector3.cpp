@@ -13,6 +13,12 @@ Vector3::Vector3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
    
 }
 
+Vector3::Vector3(bool permAttached, float * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
+{
+
+
+}
+
 Vector3::Vector3(float x, float y, float z) : BaseVector4(x,y,z,0), x(data[0]), y(data[1]), z(data[2])
 {
     

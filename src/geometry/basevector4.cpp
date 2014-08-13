@@ -6,30 +6,60 @@
  
 #include "basevector4.h"
 
-void BaseVector4::Init(float x, float y, float z, float w)
+void BaseVector4::Init(float x, float y, float z, float w, float *target, bool permAttach)
 {
+	data = baseData = NULL;
+
+	if(permAttach)
+	{
+		canDetach = false;
+	}
+	else
+	{
+		data = baseData = new float[4];
+		canDetach = true;
+	}
+
+	if(target != NULL)
+	{
+		data = target;
+		attached = true;
+	}
+	else
+	{
+		attached = false;
+	}
     Set(x,y,z,w);
 }
 
-BaseVector4::BaseVector4() : data(new float[4]), baseData(data), attached(false)
+BaseVector4::BaseVector4()
 {
-    Init(0,0,0,0);
+    Init(0,0,0,0, NULL, false);
 }
 
-BaseVector4::BaseVector4(float x, float y, float z, float w) : data(new float[4]),  baseData(data), attached(false)
+BaseVector4::BaseVector4(bool permAttached, float * target)
 {
-    Init(x,y,z,w);
+	Init(0,0,0,0,target, true);
 }
 
-BaseVector4::BaseVector4(const BaseVector4 * baseVector) : data(new float[4]), baseData(data), attached(false)
+BaseVector4::BaseVector4(float x, float y, float z, float w)
 {
-    Init(baseVector->data[0], baseVector->data[1], baseVector->data[2], baseVector->data[3]);
+    Init(x,y,z,w, NULL, false);
+}
+
+BaseVector4::BaseVector4(const BaseVector4 * baseVector)
+{
+    Init(baseVector->data[0], baseVector->data[1], baseVector->data[2], baseVector->data[3], NULL, false);
 }
 
 BaseVector4::~BaseVector4()
 {   
-    delete baseData;
-    baseData = NULL;
+	if(baseData != NULL)
+	{
+		delete baseData;
+		baseData = NULL;
+	}
+
     if(!attached)data = NULL;
 }
 
@@ -73,8 +103,11 @@ void BaseVector4::AttachTo(float * data)
 
 void BaseVector4::Detach()
 {
-    this->data = baseData;
-    attached = false;
+	if(canDetach)
+	{
+		this->data = baseData;
+		attached = false;
+	}
 }
 
 

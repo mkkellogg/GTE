@@ -12,6 +12,12 @@ Point3::Point3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
 
 }
 
+Point3::Point3(bool permAttached, float * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
+{
+
+
+}
+
 Point3::Point3(float x, float y, float z) : BaseVector4(x,y,z,1), x(data[0]), y(data[1]), z(data[2])
 {
    

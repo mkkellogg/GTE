@@ -5,15 +5,17 @@ class BaseVector4
 {
     protected:
 
-    void Init(float x, float y, float z, float w);
+    void Init(float x, float y, float z, float w, float *target, bool permAttach);
 
     float * data;
     float * baseData;
     bool attached;
+    bool canDetach;
 
     public:
 
     BaseVector4();
+    BaseVector4(bool permAttached, float * target);
     BaseVector4(float x, float y, float z, float w);
     BaseVector4(const BaseVector4 * baseVector);
     BaseVector4(const float * copyData);

@@ -16,6 +16,7 @@ class Vector3 : public BaseVector4
     float &z;
 
     Vector3();
+    Vector3(bool permAttached, float * target);
     Vector3(float x, float y, float z);
     Vector3(const Vector3 * vector);
     Vector3(const float * data);
