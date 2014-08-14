@@ -2,16 +2,11 @@
 #define _VECTOR3ARRAY_H_
 
 #include "vector3.h"
+#include "base/basevector4.h"
+#include "base/basevector4array.h"
 
-class Vector3Array
+class Vector3Array : public BaseVector4Array
 {
-	float * data;
-	Vector3 ** objects;
-	int count;
-
-	bool Init(int count);
-	void Destroy();
-
     public:
 
 	Vector3Array(int count);
@@ -21,5 +16,4 @@ class Vector3Array
     Vector3 * GetVector(int index);
     Vector3 ** GetVectors();
 };
-
 #endif

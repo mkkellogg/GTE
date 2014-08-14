@@ -10,13 +10,13 @@ UTILSRC= src/util
 GRAPHICSSRC= src/graphics
 SHADERSRC= $(GRAPHICSSRC)/shader
 
-BASEOBJ= obj/basevector4.o obj/basevector2.o
+BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector4factory.o obj/basevector4array.o
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
-GEOMETRYOBJ= obj/matrix.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3array.o obj/point3array.o
+GEOMETRYOBJ= obj/matrix.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o
 OBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
-GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o obj/color4.o obj/uv2.o
+GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o
@@ -68,6 +68,12 @@ obj/vertexattrbufferGL.o:  $(GRAPHICSSRC)/vertexattrbufferGL.cpp  $(GRAPHICSSRC)
 	
 obj/color4.o: $(GRAPHICSSRC)/color4.cpp $(GRAPHICSSRC)/color4.h
 	$(CC) $(CFLAGS) -o obj/color4.o -c $(GRAPHICSSRC)/color4.cpp
+
+obj/color4factory.o: $(GRAPHICSSRC)/color4factory.cpp $(GRAPHICSSRC)/color4factory.h
+	$(CC) $(CFLAGS) -o obj/color4factory.o -c $(GRAPHICSSRC)/color4factory.cpp
+
+obj/color4array.o: $(GRAPHICSSRC)/color4array.cpp $(GRAPHICSSRC)/color4array.h
+	$(CC) $(CFLAGS) -o obj/color4array.o -c $(GRAPHICSSRC)/color4array.cpp
 	
 obj/uv2.o: $(GRAPHICSSRC)/uv2.cpp $(GRAPHICSSRC)/uv2.h
 	$(CC) $(CFLAGS) -o obj/uv2.o -c $(GRAPHICSSRC)/uv2.cpp
@@ -87,15 +93,21 @@ obj/debug.o: src/ui/debug.cpp src/ui/debug.h
 # ==================================
 
 geometry: $(GEOMETRYOBJ)
-
-obj/point3.o: $(GEOMETRYSRC)/point3.cpp $(GEOMETRYSRC)/point3.h 
-	$(CC) $(CFLAGS) -o obj/point3.o -c $(GEOMETRYSRC)/point3.cpp
 	
 obj/vector3.o: $(GEOMETRYSRC)/vector3.cpp $(GEOMETRYSRC)/vector3.h 
 	$(CC) $(CFLAGS) -o obj/vector3.o -c $(GEOMETRYSRC)/vector3.cpp
 	
+obj/vector3factory.o: $(GEOMETRYSRC)/vector3factory.cpp $(GEOMETRYSRC)/vector3factory.h 
+	$(CC) $(CFLAGS) -o obj/vector3factory.o -c $(GEOMETRYSRC)/vector3factory.cpp
+	
 obj/vector3array.o: $(GEOMETRYSRC)/vector3array.cpp $(GEOMETRYSRC)/vector3array.h 
 	$(CC) $(CFLAGS) -o obj/vector3array.o -c $(GEOMETRYSRC)/vector3array.cpp
+
+obj/point3.o: $(GEOMETRYSRC)/point3.cpp $(GEOMETRYSRC)/point3.h 
+	$(CC) $(CFLAGS) -o obj/point3.o -c $(GEOMETRYSRC)/point3.cpp
+
+obj/point3factory.o: $(GEOMETRYSRC)/point3factory.cpp $(GEOMETRYSRC)/point3factory.h 
+	$(CC) $(CFLAGS) -o obj/point3factory.o -c $(GEOMETRYSRC)/point3factory.cpp
 	
 obj/point3array.o: $(GEOMETRYSRC)/point3array.cpp $(GEOMETRYSRC)/point3array.h 
 	$(CC) $(CFLAGS) -o obj/point3array.o -c $(GEOMETRYSRC)/point3array.cpp
@@ -115,6 +127,12 @@ base: $(BASEOBJ)
 
 obj/basevector4.o: $(BASESRC)/basevector4.cpp $(BASESRC)/basevector4.h 
 	$(CC) $(CFLAGS) -o obj/basevector4.o -c $(BASESRC)/basevector4.cpp
+
+obj/basevector4array.o: $(BASESRC)/basevector4array.cpp $(BASESRC)/basevector4array.h 
+	$(CC) $(CFLAGS) -o obj/basevector4array.o -c $(BASESRC)/basevector4array.cpp
+	
+obj/basevector4factory.o: $(BASESRC)/basevector4factory.cpp $(BASESRC)/basevector4factory.h 
+	$(CC) $(CFLAGS) -o obj/basevector4factory.o -c $(BASESRC)/basevector4factory.cpp
 	
 obj/basevector2.o: $(BASESRC)/basevector2.cpp $(BASESRC)/basevector2.h 
 	$(CC) $(CFLAGS) -o obj/basevector2.o -c $(BASESRC)/basevector2.cpp

@@ -2,16 +2,11 @@
 #define _POINT3ARRAY_H_
 
 #include "point3.h"
+#include "base/basevector4.h"
+#include "base/basevector4array.h"
 
-class Point3Array
+class Point3Array : public BaseVector4Array
 {
-	float * data;
-	Point3 ** objects;
-	int count;
-
-	bool Init(int count);
-	void Destroy();
-
     public:
 
 	Point3Array(int count);

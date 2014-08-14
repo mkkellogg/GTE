@@ -12,10 +12,10 @@
 #include "base/basevector4.h"
 #include "geometry/point3.h"
 #include "geometry/vector3.h"
+#include "geometry/point3array.h"
 #include "ui/debug.h"
 #include "gte.h"
 
-#include "geometry/point3.h"
 
 class CustomGraphicsCallbacks : public GraphicsCallbacks
 {
@@ -107,6 +107,10 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         vb.AttachTo(va.GetDataPtr());
 
         PrintVector(&vb);
+
+        Point3Array pointArray(32);
+
+        pointArray.Init();
     }
 
     void OnUpdate(Graphics * graphics)
