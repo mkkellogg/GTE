@@ -1,7 +1,7 @@
 #ifndef _VECTOR3_H_
 #define _VECTOR3_H_
 
-#include "basevector4.h"
+#include "base/basevector4.h"
 
 class Vector3 : public BaseVector4
 {

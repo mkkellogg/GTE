@@ -89,3 +89,13 @@ bool Vector3Array::Init(int count)
 
 	return true;
 }
+
+Vector3 * Vector3Array::GetVector(int index)
+{
+	return objects[index];
+}
+
+Vector3 ** Vector3Array::GetVectors()
+{
+	return objects;
+}

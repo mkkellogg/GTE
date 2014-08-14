@@ -5,7 +5,6 @@
 #include <math.h>
  
 #include "vector3.h"
-#include "basevector4.h"
 #include "gtemath/gtemath.h"
 
 Vector3::Vector3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])

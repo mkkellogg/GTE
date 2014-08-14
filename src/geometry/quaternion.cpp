@@ -3,7 +3,7 @@
 #include "quaternion.h"
 #include "matrix.h"
 #include "vector3.h"
-#include "basevector4.h"
+#include "base/basevector4.h"
 #include "ui/debug.h"
 
 Quaternion::Quaternion()

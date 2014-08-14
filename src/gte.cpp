@@ -9,7 +9,7 @@
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"
 #include "geometry/matrix.h"
-#include "geometry/basevector4.h"
+#include "base/basevector4.h"
 #include "geometry/point3.h"
 #include "geometry/vector3.h"
 #include "ui/debug.h"

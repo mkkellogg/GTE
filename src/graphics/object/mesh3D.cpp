@@ -6,6 +6,9 @@
 
 #include "mesh3D.h"
 #include "graphics/graphics.h"
+#include "geometry/point3.h"
+#include "geometry/vector3.h"
+#include "graphics/color4.h"
 #include "ui/debug.h"
 
 Mesh3D::Mesh3D()
@@ -42,29 +45,47 @@ void Mesh3D::DestroyBuffers()
 	uv2Data = NULL;
 }
 
-void Mesh3D::SetVertexData(const float * data, int count, AttributeType attributeType)
+/*void Mesh3D::SetVertexData(const float * data, int componentCount, int count, AttributeType attributeType)
 {
 	switch(attributeType)
 	{
 		case AttributeType::Position:
-			SetVertexData(data,3,count,0);
+			SetVertexData(positionData, data,componentCount,count,0);
 		break;
 		case AttributeType::Normal:
-			SetVertexData(data,3,count,0);
+			SetVertexData(normalData, data,componentCount,count,0);
 		break;
 		case AttributeType::Color:
-			SetVertexData(data,4,count,0);
+			SetVertexData(colorData, data,componentCount,count,0);
 		break;
 		case AttributeType::UV1:
-			SetVertexData(data,2,count,0);
+			SetVertexData(uv1Data, data,componentCount,count,0);
 		break;
 		case AttributeType::UV2:
-			SetVertexData(data,2,count,0);
+			SetVertexData(uv2Data, data,componentCount,count,0);
 		break;
 	}
+}*/
+
+void Mesh3D::SetPositionData(Point3 ** points)
+{
+
+
 }
 
-void Mesh3D::SetVertexData(const float * data, int componentCount, int totalCount, int stride)
+void Mesh3D::SetNormalData(Vector3 ** normals)
+{
+
+
+}
+
+void Mesh3D::SetColorData(Color4 ** colors)
+{
+
+
+}
+
+void Mesh3D::SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride)
 {
 
 

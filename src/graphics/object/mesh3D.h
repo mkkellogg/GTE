@@ -2,6 +2,9 @@
 #define _MESH3D_H_
 
 #include "graphics/vertexattrbuffer.h"
+#include "geometry/point3.h"
+#include "geometry/vector3.h"
+#include "graphics/color4.h"
 
 enum class AttributeType
 {
@@ -23,14 +26,17 @@ class Mesh3D
     bool InitializeVertexAttrBuffer(VertexAttrBuffer ** buffer);
     bool CheckAndInitializeVertexAttrBuffer(VertexAttrBuffer ** buffer);
     void DestroyBuffers();
-    void SetVertexData(const float * data, int componentCount, int totalCount, int stride);
+    void SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride);
 
     public:
 
     Mesh3D();
     virtual ~Mesh3D();
 
-    void SetVertexData(const float * data, int count, AttributeType attributeType);
+    void SetPositionData(Point3 ** points);
+    void SetNormalData(Vector3 ** normals);
+    void SetColorData(Color4 ** colors);
+   // void SetVertexData(const float * data, int componentCount, int count, AttributeType attributeType);
 };
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef _BASEVECTOR3_H_
-#define _BASEVECTOR3_H_
+#ifndef _BASEVECTOR4_H_
+#define _BASEVECTOR4_H_
 
 class BaseVector4
 {

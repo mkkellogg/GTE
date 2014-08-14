@@ -18,6 +18,8 @@ class Vector3Array
     virtual ~Vector3Array();
 
     void SetData(const float * data, bool includeW);
+    Vector3 * GetVector(int index);
+    Vector3 ** GetVectors();
 };
 
 #endif

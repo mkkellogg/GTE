@@ -2,7 +2,7 @@
 #define _POINT3_H_
 
 #include "vector3.h"
-#include "basevector4.h"
+#include "base/basevector4.h"
 
 class Point3 : public BaseVector4
 {
