@@ -78,13 +78,6 @@ void BaseVector4::Set(float x, float y, float z, float w)
     data[3] = w;
 }
 
-void BaseVector4::Set(float x, float y, float z)
-{
-    data[0] = x;
-    data[1] = y;
-    data[2] = z;
-}
-
 void BaseVector4::Get(BaseVector4 * baseVector)
 {
    memcpy(baseVector->data, data, sizeof(float) * 4);

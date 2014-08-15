@@ -23,7 +23,6 @@ void Point3Array::SetData(const float * data, bool includeW)
 
 }
 
-
 Point3 * Point3Array::GetPoint(int index)
 {
 	return (Point3*)objects[index];

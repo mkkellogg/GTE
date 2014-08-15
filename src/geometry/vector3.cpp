@@ -28,6 +28,12 @@ Vector3::Vector3(const Vector3 * vector) : BaseVector4(vector),  x(data[0]), y(d
     
 }
 
+void Vector3::Set(float x, float y, float z)
+{
+	BaseVector4::Set(x,y,z,0);
+}
+
+
 Vector3::~Vector3()
 {
    

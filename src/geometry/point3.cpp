@@ -15,17 +15,16 @@ Point3::Point3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
 Point3::Point3(bool permAttached, float * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
 {
 
-
 }
 
 Point3::Point3(float x, float y, float z) : BaseVector4(x,y,z,1), x(data[0]), y(data[1]), z(data[2])
 {
-   
+
 }
 
 Point3::Point3(const Point3 * point) : BaseVector4(point), x(data[0]), y(data[1]), z(data[2])
 {
-   
+
 }
 
 Point3::~Point3()
@@ -77,4 +76,8 @@ void Point3::UpdateComponentPointers()
     *rPtr = data+2;
 }
 
+void Point3::Set(float x, float y, float z)
+{
+	BaseVector4::Set(x,y,z,1);
+}
 

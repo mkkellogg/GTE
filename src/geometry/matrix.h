@@ -40,7 +40,9 @@ class Matrix
     Matrix & operator= (const Matrix & source);
 
     void Multiply(Vector3 * vector, Vector3 * out);
+    void Transform(Vector3 * vector);
     void Multiply(Point3 * point, Point3 * out);
+    void Transform(Point3 * point);
     void Multiply(Matrix * matrix);
     void Multiply(Matrix * matrix, Matrix * out);
     static void Multiply(Matrix * lhs, Matrix *rhs, Matrix * out);

@@ -20,7 +20,6 @@ BaseVector4Array::~BaseVector4Array()
 	Destroy();
 }
 
-
 void BaseVector4Array::Destroy()
 {
 	if(objects != NULL)
@@ -54,8 +53,6 @@ bool BaseVector4Array::Init()
 		return false;
 	}
 
-	Debug::PrintMessage(">> Allocated data memory for BaseVector4Array!");
-
 	baseFactory->CreateArray(count, &objects);
 
 	if(objects == NULL)
@@ -66,10 +63,7 @@ bool BaseVector4Array::Init()
 		return false;
 	}
 
-	Debug::PrintMessage(">> Allocated objects memory for BaseVector4Array!");
-
 	float *dataPtr = data;
-
 
 	char strData[64];
 
@@ -77,9 +71,6 @@ bool BaseVector4Array::Init()
 	while(index < count)
 	{
 		BaseVector4 * currentObject = (BaseVector4*)baseFactory->CreatePermAttached(dataPtr);
-
-		sprintf(strData, ">> CreatePermAttached() success! %d", index);
-		Debug::PrintMessage(strData);
 
 		if(currentObject == NULL)
 		{
@@ -95,15 +86,24 @@ bool BaseVector4Array::Init()
 			return false;
 		}
 
-		currentObject->Set(0,0,0);
+		currentObject->Set(0,0,0,0);
 
 		dataPtr += 4;
 		index++;
 	}
 
-	Debug::PrintMessage("init complete!");
-
 	return true;
 }
+
+float * BaseVector4Array::GetData()
+{
+	return data;
+}
+
+BaseVector4 ** BaseVector4Array::GetObjects()
+{
+	return objects;
+}
+
 
 

@@ -111,6 +111,17 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         Point3Array pointArray(32);
 
         pointArray.Init();
+
+        Point3 * p = pointArray.GetPoint(16);
+
+        printf("%p\n", pointArray.GetObjects() + 16);
+        printf("%p\n", pointArray.GetObjects()[16]);
+
+        p->Set(2,2,2);
+
+    //    a.Transform(p);
+
+      //  PrintVector(p);
     }
 
     void OnUpdate(Graphics * graphics)

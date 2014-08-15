@@ -22,6 +22,9 @@ class BaseVector4Array
     virtual ~BaseVector4Array();
 
     bool Init();
+
+    float * GetData();
+    BaseVector4 ** GetObjects();
 };
 
 #endif

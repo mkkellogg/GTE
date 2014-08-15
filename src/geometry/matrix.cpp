@@ -69,6 +69,20 @@ void Matrix::Multiply(Point3 * point, Point3 * out)
     MultiplyMV(this->data, point->GetDataPtr(), out->GetDataPtr());
 }
 
+void Matrix::Transform(Vector3 * vector)
+{
+	float temp[4];
+	MultiplyMV(this->data, vector->GetDataPtr(), temp);
+	memcpy(vector->GetDataPtr(), temp, sizeof(float) * 4);
+}
+
+void Matrix::Transform(Point3 * point)
+{
+	float temp[4];
+	MultiplyMV(this->data, point->GetDataPtr(), temp);
+	memcpy(point->GetDataPtr(), temp, sizeof(float) * 4);
+}
+
 void Matrix::Multiply(Matrix * matrix)
 {
     float temp[DATA_SIZE];

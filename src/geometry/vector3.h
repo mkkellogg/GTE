@@ -40,6 +40,8 @@ class Vector3 : public BaseVector4
 
     virtual void AttachTo(float * data);
     virtual void Detach();
+
+    void Set(float x, float y, float z);
 };
 
 #endif
