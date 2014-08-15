@@ -23,9 +23,7 @@ class BaseVector4
 
     BaseVector4 & operator= (const BaseVector4 & source);
     float * GetDataPtr() const;
-
     void Set(float x, float y, float z, float w);
-
     void Get(BaseVector4 * baseVector);
 
     virtual void AttachTo(float * data);

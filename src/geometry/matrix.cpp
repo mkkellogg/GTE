@@ -86,7 +86,7 @@ void Matrix::Transform(Point3 * point)
 void Matrix::Multiply(Matrix * matrix)
 {
     float temp[DATA_SIZE];
-    MultiplyMM(matrix->data, this->data, temp);
+    MultiplyMM(this->data, matrix->data, temp);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 

@@ -4,28 +4,28 @@
 #include <memory.h>
 #include <math.h>
 
-#include "basevector4array.h"
-#include "basevector4.h"
-#include "basevector4factory.h"
+#include "basevector2array.h"
+#include "basevector2.h"
+#include "basevector2factory.h"
 #include "ui/debug.h"
 
-BaseVector4Array::BaseVector4Array(int count, BaseVector4Factory * factory) : count(count), data(NULL), objects(NULL), baseFactory(factory)
+BaseVector2Array::BaseVector2Array(int count, BaseVector2Factory * factory) : count(count), data(NULL), objects(NULL), baseFactory(factory)
 {
 
 }
 
-BaseVector4Array::~BaseVector4Array()
+BaseVector2Array::~BaseVector2Array()
 {
 	Destroy();
 }
 
-void BaseVector4Array::Destroy()
+void BaseVector2Array::Destroy()
 {
 	if(objects != NULL)
 	{
 		for(int i=0; i < count; i++)
 		{
-			BaseVector4 * baseObj = objects[i];
+			BaseVector2 * baseObj = objects[i];
 			if(baseObj != NULL)
 			{
 				delete baseObj;
@@ -43,12 +43,12 @@ void BaseVector4Array::Destroy()
 	}
 }
 
-bool BaseVector4Array::Init()
+bool BaseVector2Array::Init()
 {
-	data = new float[count * 4];
+	data = new float[count * 2];
 	if(data == NULL)
 	{
-		Debug::PrintError("Could not allocate data memory for BaseVector4Array");
+		Debug::PrintError("Could not allocate data memory for BaseVector2Array");
 		return false;
 	}
 
@@ -56,7 +56,7 @@ bool BaseVector4Array::Init()
 
 	if(objects == NULL)
 	{
-		Debug::PrintError("Could not allocate objects memory for BaseVector4Array");
+		Debug::PrintError("Could not allocate objects memory for BaseVector2Array");
 		delete data;
 		data = NULL;
 		return false;
@@ -67,11 +67,11 @@ bool BaseVector4Array::Init()
 	int index = 0;
 	while(index < count)
 	{
-		BaseVector4 * currentObject = (BaseVector4*)baseFactory->CreatePermAttached(dataPtr);
+		BaseVector2 * currentObject = (BaseVector2*)baseFactory->CreatePermAttached(dataPtr);
 
 		if(currentObject == NULL)
 		{
-			Debug::PrintError("Could not allocate BaseVector4 for BaseVector4Array");
+			Debug::PrintError("Could not allocate BaseVector2 for BaseVector2Array");
 
 			for(int i=0; i< index; i++)delete objects[i];
 			delete objects;
@@ -84,9 +84,9 @@ bool BaseVector4Array::Init()
 		}
 
 		objects[index] = currentObject;
-		currentObject->Set(0,0,0,0);
+		currentObject->Set(0,0);
 
-		dataPtr += 4;
+		dataPtr += 2;
 		index++;
 	}
 

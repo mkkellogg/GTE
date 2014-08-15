@@ -10,7 +10,6 @@ class BaseVector4Array
 
 	int count;
 	float * data;
-	int ** samp;
 	BaseVector4 ** objects;
 	BaseVector4Factory * baseFactory;
 
@@ -22,9 +21,6 @@ class BaseVector4Array
     virtual ~BaseVector4Array();
 
     bool Init();
-
-    float * GetData();
-    BaseVector4 ** GetObjects();
 };
 
 #endif

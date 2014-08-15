@@ -10,13 +10,13 @@ UTILSRC= src/util
 GRAPHICSSRC= src/graphics
 SHADERSRC= $(GRAPHICSSRC)/shader
 
-BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector4factory.o obj/basevector4array.o
+BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o
 OBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
-GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o
+GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o
@@ -36,7 +36,7 @@ all: gtemain graphics ui geometry gtemath object base
 
 gtemain: $(GTEMAINOBJ)
  
-obj/gte.o: src/gte.cpp src/gte.h
+obj/gte.o: src/gte.cpp src/gte.h 
 	$(CC) $(CFLAGS) -o obj/gte.o -c src/gte.cpp
 
 # ==================================
@@ -77,6 +77,12 @@ obj/color4array.o: $(GRAPHICSSRC)/color4array.cpp $(GRAPHICSSRC)/color4array.h
 	
 obj/uv2.o: $(GRAPHICSSRC)/uv2.cpp $(GRAPHICSSRC)/uv2.h
 	$(CC) $(CFLAGS) -o obj/uv2.o -c $(GRAPHICSSRC)/uv2.cpp
+	
+obj/uv2factory.o: $(GRAPHICSSRC)/uv2factory.cpp $(GRAPHICSSRC)/uv2factory.h
+	$(CC) $(CFLAGS) -o obj/uv2factory.o -c $(GRAPHICSSRC)/uv2factory.cpp
+	
+obj/uv2array.o: $(GRAPHICSSRC)/uv2array.cpp $(GRAPHICSSRC)/uv2array.h
+	$(CC) $(CFLAGS) -o obj/uv2array.o -c $(GRAPHICSSRC)/uv2array.cpp
 	
 # ==================================
 # UI
@@ -136,6 +142,13 @@ obj/basevector4factory.o: $(BASESRC)/basevector4factory.cpp $(BASESRC)/basevecto
 	
 obj/basevector2.o: $(BASESRC)/basevector2.cpp $(BASESRC)/basevector2.h 
 	$(CC) $(CFLAGS) -o obj/basevector2.o -c $(BASESRC)/basevector2.cpp
+	
+obj/basevector2factory.o: $(BASESRC)/basevector2factory.cpp $(BASESRC)/basevector2factory.h 
+	$(CC) $(CFLAGS) -o obj/basevector2factory.o -c $(BASESRC)/basevector2factory.cpp
+
+obj/basevector2array.o: $(BASESRC)/basevector2array.cpp $(BASESRC)/basevector2array.h 
+	$(CC) $(CFLAGS) -o obj/basevector2array.o -c $(BASESRC)/basevector2array.cpp
+
 
 # ==================================
 # Object
