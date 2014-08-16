@@ -14,7 +14,7 @@ BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/baseve
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o
-OBJECTOBJ= obj/mesh3D.o 
+OBJECTOBJ= obj/mesh3Drenderer.o obj/mesh3D.o 
 UIOBJ= obj/debug.o 
 GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
@@ -83,6 +83,20 @@ obj/uv2factory.o: $(GRAPHICSSRC)/uv2factory.cpp $(GRAPHICSSRC)/uv2factory.h
 	
 obj/uv2array.o: $(GRAPHICSSRC)/uv2array.cpp $(GRAPHICSSRC)/uv2array.h
 	$(CC) $(CFLAGS) -o obj/uv2array.o -c $(GRAPHICSSRC)/uv2array.cpp
+
+
+# ==================================
+# Object
+# ==================================
+
+object: $(OBJECTOBJ)
+
+obj/mesh3Drenderer.o: $(OBJECTSRC)/mesh3Drenderer.cpp $(OBJECTSRC)/mesh3Drenderer.h
+	$(CC) $(CFLAGS) -o obj/mesh3Drenderer.o -c $(OBJECTSRC)/mesh3Drenderer.cpp
+	
+obj/mesh3D.o: $(OBJECTSRC)/mesh3D.cpp $(OBJECTSRC)/mesh3D.h
+	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(OBJECTSRC)/mesh3D.cpp
+	
 	
 # ==================================
 # UI
@@ -148,16 +162,6 @@ obj/basevector2factory.o: $(BASESRC)/basevector2factory.cpp $(BASESRC)/basevecto
 
 obj/basevector2array.o: $(BASESRC)/basevector2array.cpp $(BASESRC)/basevector2array.h 
 	$(CC) $(CFLAGS) -o obj/basevector2array.o -c $(BASESRC)/basevector2array.cpp
-
-
-# ==================================
-# Object
-# ==================================
-
-object: $(OBJECTOBJ)
-
-obj/mesh3D.o: $(OBJECTSRC)/mesh3D.cpp $(OBJECTSRC)/mesh3D.h
-	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(OBJECTSRC)/mesh3D.cpp
 	
 
 # ==================================

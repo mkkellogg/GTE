@@ -93,5 +93,10 @@ bool BaseVector2Array::Init()
 	return true;
 }
 
+const float * BaseVector2Array::GetDataPtr() const
+{
+	return (const float *)data;
+}
+
 
 

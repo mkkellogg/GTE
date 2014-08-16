@@ -4,133 +4,120 @@
 #include <memory.h>
 #include <math.h>
 
+#include "mesh3Drenderer.h"
 #include "mesh3D.h"
 #include "graphics/graphics.h"
 #include "geometry/point3.h"
 #include "geometry/vector3.h"
 #include "graphics/color4.h"
 #include "graphics/uv2.h"
+#include "geometry/point3array.h"
+#include "geometry/vector3array.h"
+#include "graphics/color4array.h"
+#include "graphics/uv2array.h"
 #include "ui/debug.h"
 
-Mesh3D::Mesh3D() : Mesh3D(false)
+
+
+Mesh3D::Mesh3D(int type)
 {
+	typeMask = type;
 
-}
-
-Mesh3D::Mesh3D(bool buffersOnGPU)
-{
-	this->buffersOnGPU= buffersOnGPU;
-
-	positionData = NULL;
-	colorData = NULL;
-	normalData = NULL;
-	uv1Data = NULL;
-	uv2Data = NULL;
+	positions = NULL;
+	normals = NULL;
+	colors = NULL;
+	uvs1 = NULL;
+	uvs2 = NULL;
 }
 
 Mesh3D::~Mesh3D()
 {
-	DestroyBuffers();
+	Destroy();
 }
 
-void Mesh3D::DestroyBuffers()
+void Mesh3D::Destroy()
 {
-	Graphics * graphics = Graphics::Instance();
-
-	if(positionData != NULL)graphics->DestroyVertexAttrBuffer(positionData);
-	positionData = NULL;
-
-	if(normalData != NULL)graphics->DestroyVertexAttrBuffer(normalData);
-	normalData = NULL;
-
-	if(colorData != NULL)graphics->DestroyVertexAttrBuffer(colorData);
-	colorData = NULL;
-
-	if(uv1Data != NULL)graphics->DestroyVertexAttrBuffer(uv1Data);
-	uv1Data = NULL;
-
-	if(uv2Data != NULL)graphics->DestroyVertexAttrBuffer(uv2Data);
-	uv2Data = NULL;
-}
-
-/*void Mesh3D::SetVertexData(const float * data, int componentCount, int count, AttributeType attributeType)
-{
-	switch(attributeType)
+	if(positions != NULL)
 	{
-		case AttributeType::Position:
-			SetVertexData(positionData, data,componentCount,count,0);
-		break;
-		case AttributeType::Normal:
-			SetVertexData(normalData, data,componentCount,count,0);
-		break;
-		case AttributeType::Color:
-			SetVertexData(colorData, data,componentCount,count,0);
-		break;
-		case AttributeType::UV1:
-			SetVertexData(uv1Data, data,componentCount,count,0);
-		break;
-		case AttributeType::UV2:
-			SetVertexData(uv2Data, data,componentCount,count,0);
-		break;
+		delete positions;
+		positions = NULL;
 	}
-}*/
-
-void Mesh3D::SetPositionData(Point3 ** points)
-{
-
-
 }
 
-void Mesh3D::SetNormalData(Vector3 ** normals)
+bool Mesh3D::Init(int attributeCount)
 {
+	bool initSuccess = false;
+	int errorMask = 0;
 
-
-}
-
-void Mesh3D::SetColorData(Color4 ** colors)
-{
-
-
-}
-
-void Mesh3D::SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride)
-{
-
-
-}
-
-void Mesh3D::SetUV1Data(UV2 ** uvs)
-{
-
-}
-
-void Mesh3D::SetUV2Data(UV2 ** uvs)
-{
-
-}
-
-bool Mesh3D::InitializeVertexAttrBuffer(VertexAttrBuffer ** buffer)
-{
-	if(buffer == NULL)
+	if(typeMask & (int)AttributeType::Position)
 	{
-		Debug::PrintError("Attempted to initialize vertex attribute buffer from null pointer.");
+		positions = new Point3Array(attributeCount);
+		initSuccess = positions->Init() && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeType::Position;
+	}
+
+	if(typeMask & (int)AttributeType::Normal)
+	{
+		normals = new Vector3Array(attributeCount);
+		initSuccess = normals->Init() && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeType::Normal;
+	}
+
+	if(typeMask & (int)AttributeType::Color)
+	{
+		colors = new Color4Array(attributeCount);
+		initSuccess = colors->Init() && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeType::Color;
+	}
+
+	if(typeMask & (int)AttributeType::UV1)
+	{
+		uvs1 = new UV2Array(attributeCount);
+		initSuccess = uvs1->Init() && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeType::UV1;
+	}
+
+	if(typeMask & (int)AttributeType::UV2)
+	{
+		uvs2 = new UV2Array(attributeCount);
+		initSuccess = uvs2->Init() && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeType::UV2;
+	}
+	if(!initSuccess)
+	{
+		char errStr[64];
+		sprintf(errStr, "Error initializing attribute array for Mesh3D: %d\n",errorMask);
+		Debug::PrintError(errStr);
+		Destroy();
 		return false;
 	}
 
-	Graphics * graphics = Graphics::Instance();
-
-	*buffer = graphics->CreateVertexAttrBuffer();
-
 	return true;
 }
 
-bool Mesh3D::CheckAndInitializeVertexAttrBuffer(VertexAttrBuffer ** buffer)
+
+Point3Array * Mesh3D::GetPostions()
 {
-	// only initialize if it is not already initialized
-	if(*buffer == NULL)
-	{
-		return InitializeVertexAttrBuffer(buffer);
-	}
-
-	return true;
+	return positions;
 }
+
+Vector3Array * Mesh3D::GetNormals()
+{
+	return normals;
+}
+
+Color4Array * Mesh3D::GetColors()
+{
+	return colors;
+}
+
+UV2Array * Mesh3D::GetUVs1()
+{
+	return uvs1;
+}
+
+UV2Array * Mesh3D::GetUVs2()
+{
+	return uvs2;
+}
+

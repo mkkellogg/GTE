@@ -20,6 +20,7 @@ class BaseVector4Array
 	BaseVector4Array(int count, BaseVector4Factory * factory);
     virtual ~BaseVector4Array();
 
+    const float * GetDataPtr() const;
     bool Init();
 };
 

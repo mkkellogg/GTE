@@ -10,7 +10,12 @@
 #include "vertexattrbufferGL.h"
 #include "ui/debug.h"
 
-VertexAttrBufferGL::VertexAttrBufferGL(int componentCount, int attributeCount) : VertexAttrBuffer(componentCount, attributeCount), data(NULL), dataOnGPU(false)
+int VertexAttrBufferGL::CalcFullSize()
+{
+	return componentCount * attributeCount * sizeof(float);
+}
+
+VertexAttrBufferGL::VertexAttrBufferGL() : VertexAttrBuffer(),  data(NULL), dataOnGPU(false), gpuBufferID(0)
 {
 
 }
@@ -20,9 +25,12 @@ VertexAttrBufferGL::~VertexAttrBufferGL()
 	Destroy();
 }
 
-bool VertexAttrBufferGL::Init(bool dataOnGPU, float *srcData)
+bool VertexAttrBufferGL::Init(int attributeCount, int componentCount, bool dataOnGPU, float *srcData)
 {
-	int fullDataSize =  componentCount * attributeCount * sizeof(float);
+	this->componentCount = componentCount;
+	this->attributeCount = attributeCount;
+
+	int fullDataSize =  CalcFullSize();
 
 	data = new float[componentCount * attributeCount];
 	if(data == NULL)
@@ -31,35 +39,35 @@ bool VertexAttrBufferGL::Init(bool dataOnGPU, float *srcData)
 		return false;
 	}
 
-	if(srcData != NULL)
+	if(srcData == NULL)
 	{
-		memcpy(data, srcData, fullDataSize);
+		memset(data, 0, fullDataSize);
 	}
 
 	if(dataOnGPU)
 	{
-		GLuint vbo;
-		glGenBuffers(1, &vbo);
+		glGenBuffers(1, &gpuBufferID);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-		if(vbo > 0)
+		if(gpuBufferID > 0)
 		{
-			if(srcData != NULL)
-			{
-				glBufferData(GL_ARRAY_BUFFER, fullDataSize, srcData, GL_DYNAMIC_DRAW);
-			}
+			if(srcData != NULL)SetData(srcData);
 		}
 		else this->dataOnGPU = true;
 	}
 
-
 	return true;
 }
 
-void VertexAttrBufferGL::SetData(const float * data)
+void VertexAttrBufferGL::SetData(const float * srcData)
 {
+	int fullDataSize = CalcFullSize();
+	memcpy(data, srcData, fullDataSize);
 
+	if(dataOnGPU)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
+		glBufferData(GL_ARRAY_BUFFER, fullDataSize, srcData, GL_DYNAMIC_DRAW);
+	}
 }
 
 void VertexAttrBufferGL::Destroy()

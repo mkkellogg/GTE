@@ -66,7 +66,7 @@ GraphicsGL::~GraphicsGL()
     
 }
 
-GraphicsGL::GraphicsGL() : Graphics()
+GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
 {
 
 }

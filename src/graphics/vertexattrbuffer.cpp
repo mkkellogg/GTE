@@ -7,14 +7,23 @@
 
 #include "vertexattrbuffer.h"
 
-VertexAttrBuffer::VertexAttrBuffer(int componentCount, int attributeCount)
+VertexAttrBuffer::VertexAttrBuffer() : componentCount(0), attributeCount(0)
 {
-	this->componentCount = componentCount;
-	this->attributeCount = attributeCount;
+
 }
 
 VertexAttrBuffer::~VertexAttrBuffer()
 {
 
 
+}
+
+int VertexAttrBuffer::GetAttributeCount()
+{
+	return attributeCount;
+}
+
+int VertexAttrBuffer::GetComponentCount()
+{
+	return componentCount;
 }

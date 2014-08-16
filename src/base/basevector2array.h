@@ -20,6 +20,7 @@ class BaseVector2Array
 	BaseVector2Array(int count, BaseVector2Factory * factory);
     virtual ~BaseVector2Array();
 
+    const float * GetDataPtr() const;
     bool Init();
 };
 

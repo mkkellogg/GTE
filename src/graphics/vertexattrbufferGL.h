@@ -11,18 +11,20 @@ class VertexAttrBufferGL : public VertexAttrBuffer
 
     float * data;
     bool dataOnGPU;
+    GLuint gpuBufferID;
     /*
      * The constructor and destructor are protected so that no class besides GraphicsGL can
      * instantiate or destroy a VertexAttrBufferGL object.
      */
-    VertexAttrBufferGL(int componentCount, int attributeCount);
+    VertexAttrBufferGL();
     virtual ~VertexAttrBufferGL();
 
     void Destroy();
+    int CalcFullSize();
 
     public:
 
-    virtual bool Init(bool dataOnGPU, float *srcData);
+    virtual bool Init(int attributeCount, int componentCount, bool dataOnGPU, float *srcData);
     void SetData(const float * data);
 };
 
