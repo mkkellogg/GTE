@@ -59,28 +59,28 @@ void Matrix::Init()
     
 }
 
-void Matrix::Multiply(Vector3 * vector, Vector3 * out)
+void Matrix::Transform(const Vector3 * vector, Vector3 * out) const
 {
     MultiplyMV(this->data, vector->GetDataPtr(), out->GetDataPtr());
 }
 
-void Matrix::Multiply(Point3 * point, Point3 * out)
+void Matrix::Transform(const Point3 * point, Point3 * out) const
 {
     MultiplyMV(this->data, point->GetDataPtr(), out->GetDataPtr());
 }
 
-void Matrix::Transform(Vector3 * vector)
+void Matrix::Transform(Vector3 * vector) const
 {
-	float temp[4];
+	float temp[DIM_SIZE];
 	MultiplyMV(this->data, vector->GetDataPtr(), temp);
-	memcpy(vector->GetDataPtr(), temp, sizeof(float) * 4);
+	memcpy(vector->GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
 }
 
-void Matrix::Transform(Point3 * point)
+void Matrix::Transform(Point3 * point) const
 {
-	float temp[4];
+	float temp[DIM_SIZE];
 	MultiplyMV(this->data, point->GetDataPtr(), temp);
-	memcpy(point->GetDataPtr(), temp, sizeof(float) * 4);
+	memcpy(point->GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
 }
 
 void Matrix::Multiply(Matrix * matrix)
@@ -90,7 +90,7 @@ void Matrix::Multiply(Matrix * matrix)
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::Multiply(Matrix * matrix, Matrix * out)
+void Matrix::Multiply(Matrix * matrix, Matrix * out) const
 {
     MultiplyMM(matrix->data, this->data, out->data);
 }
@@ -100,7 +100,7 @@ void Matrix::Multiply(Matrix * lhs, Matrix *rhs, Matrix * out)
     MultiplyMM(lhs->data, rhs->data, out->data);
 }
 
-void Matrix::MultiplyMV(float * lhsMat, float * rhsVec, float * out)
+void Matrix::MultiplyMV(const float * lhsMat, const float * rhsVec, float * out)
 {
     Mx4transform(rhsVec[0], rhsVec[1], rhsVec[2], rhsVec[3], lhsMat, out);
 }
@@ -127,7 +127,7 @@ void Matrix::Mx4transform(float x, float y, float z, float w, const float* pM, f
 *
 *********************************************************/
 
-void Matrix::MultiplyMM(float * lhs, float *rhs, float * out)
+void Matrix::MultiplyMM(const float * lhs, const float *rhs, float * out)
 {
     for (int i=0 ; i<DIM_SIZE ; i++) 
     {

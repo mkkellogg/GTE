@@ -100,7 +100,7 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         Point3 va(1,1,1);
         Point3 vb(0,0,0);
 
-        c.Multiply(&va, &vb);
+        c.Transform(&va, &vb);
 
         PrintVector(&vb);
 

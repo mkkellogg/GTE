@@ -3,11 +3,17 @@
 
 class VertexAttrBuffer
 {
+	protected:
+
+	int componentCount;
+	int attributeCount;
+
     public:
 
-    VertexAttrBuffer();
+    VertexAttrBuffer(int componentCount, int attributeCount);
     virtual ~VertexAttrBuffer();
 
+    virtual bool Init(bool dataOnGPU, float *srcData) = 0;
     virtual void SetData(const float * data) = 0;
 };
 

@@ -39,15 +39,15 @@ class Matrix
 
     Matrix & operator= (const Matrix & source);
 
-    void Multiply(Vector3 * vector, Vector3 * out);
-    void Transform(Vector3 * vector);
-    void Multiply(Point3 * point, Point3 * out);
-    void Transform(Point3 * point);
+    void Transform(const Vector3 * vector, Vector3 * out) const;
+    void Transform(Vector3 * vector) const;
+    void Transform(const Point3 * point, Point3 * out) const;
+    void Transform(Point3 * point) const;
     void Multiply(Matrix * matrix);
-    void Multiply(Matrix * matrix, Matrix * out);
+    void Multiply(Matrix * matrix, Matrix * out) const;
     static void Multiply(Matrix * lhs, Matrix *rhs, Matrix * out);
-    static void MultiplyMV(float * lhsMat, float * rhsVec, float * out);
-    static void MultiplyMM(float * lhs, float *rhs, float * out);
+    static void MultiplyMV(const float * lhsMat, const float * rhsVec, float * out);
+    static void MultiplyMM(const float * lhs, const float *rhs, float * out);
 
     void Transpose();
     static void Transpose(float* source, float *dest);

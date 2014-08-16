@@ -9,10 +9,18 @@
 #include "geometry/point3.h"
 #include "geometry/vector3.h"
 #include "graphics/color4.h"
+#include "graphics/uv2.h"
 #include "ui/debug.h"
 
-Mesh3D::Mesh3D()
+Mesh3D::Mesh3D() : Mesh3D(false)
 {
+
+}
+
+Mesh3D::Mesh3D(bool buffersOnGPU)
+{
+	this->buffersOnGPU= buffersOnGPU;
+
 	positionData = NULL;
 	colorData = NULL;
 	normalData = NULL;
@@ -88,6 +96,16 @@ void Mesh3D::SetColorData(Color4 ** colors)
 void Mesh3D::SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride)
 {
 
+
+}
+
+void Mesh3D::SetUV1Data(UV2 ** uvs)
+{
+
+}
+
+void Mesh3D::SetUV2Data(UV2 ** uvs)
+{
 
 }
 
