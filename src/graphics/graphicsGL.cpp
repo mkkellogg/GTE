@@ -12,6 +12,8 @@
 #include "shader/shader.h"
 #include "vertexattrbuffer.h"
 #include "vertexattrbufferGL.h"
+#include "object/mesh3Drenderer.h"
+#include "object/mesh3DrendererGL.h"
 #include "gte.h"
 
 GraphicsGL * _thisInstance;
@@ -78,20 +80,19 @@ Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fr
     return shader;
 }
 
-VertexAttrBuffer * GraphicsGL::CreateVertexAttrBuffer() const
-{
-    VertexAttrBufferGL * buffer = new VertexAttrBufferGL();
-    return buffer;
-}
-
 void GraphicsGL::DestroyShader(Shader * shader) const
 {
     delete shader;
 }
 
-void GraphicsGL::DestroyVertexAttrBuffer(VertexAttrBuffer * buffer) const
+Mesh3DRenderer * GraphicsGL::CreateMeshRenderer() const
 {
-    delete buffer;
+	return new Mesh3DRendererGL();
+}
+
+void GraphicsGL::DestroyMeshRenderer(Mesh3DRenderer * renderer)  const
+{
+	delete renderer;
 }
 
 void _glutDisplayFunc()

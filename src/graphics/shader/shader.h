@@ -17,6 +17,7 @@ class Shader
     Shader(const char * vertexSourcePath, const char * fragmentSourcePath);
     virtual ~Shader();
     virtual bool Load() = 0;
+    virtual int GetVariableLocation(const char *varName) const = 0;
 };
 
 #endif

@@ -10,7 +10,7 @@
 #include "base/basevector2array.h"
 #include "ui/debug.h"
 
-UV2Array::UV2Array(int count) : BaseVector2Array(count, UV2Factory::GetInstance())
+UV2Array::UV2Array() : BaseVector2Array(UV2Factory::GetInstance())
 {
 }
 

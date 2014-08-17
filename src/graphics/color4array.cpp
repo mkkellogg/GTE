@@ -10,7 +10,7 @@
 #include "base/basevector4array.h"
 #include "ui/debug.h"
 
-Color4Array::Color4Array(int count) : BaseVector4Array(count, Color4Factory::GetInstance())
+Color4Array::Color4Array() : BaseVector4Array(Color4Factory::GetInstance())
 {
 }
 

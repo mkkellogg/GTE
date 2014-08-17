@@ -16,6 +16,7 @@
 ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
 {
     ready = false;
+    name = NULL;
 
     programID = 0;
     vertexShaderID = 0;
@@ -221,5 +222,11 @@ char * ShaderGL::GetShaderLog(GLuint obj)
     }
 
     return NULL;
+}
+
+int ShaderGL::GetVariableLocation(const char *varName) const
+{
+	GLint loc = glGetAttribLocation(programID, varName);
+	return (int)loc;
 }
  

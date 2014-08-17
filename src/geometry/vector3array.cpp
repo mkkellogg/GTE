@@ -10,7 +10,7 @@
 #include "base/basevector4array.h"
 #include "ui/debug.h"
 
-Vector3Array::Vector3Array(int count) : BaseVector4Array(count, Vector3Factory::GetInstance())
+Vector3Array::Vector3Array() : BaseVector4Array(Vector3Factory::GetInstance())
 {
 
 }

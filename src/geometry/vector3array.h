@@ -9,7 +9,7 @@ class Vector3Array : public BaseVector4Array
 {
     public:
 
-	Vector3Array(int count);
+	Vector3Array();
     virtual ~Vector3Array();
 
     void SetData(const float * data, bool includeW);

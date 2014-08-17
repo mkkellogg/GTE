@@ -17,11 +17,11 @@ class BaseVector4Array
 
     public:
 
-	BaseVector4Array(int count, BaseVector4Factory * factory);
+	BaseVector4Array(BaseVector4Factory * factory);
     virtual ~BaseVector4Array();
 
     const float * GetDataPtr() const;
-    bool Init();
+    bool Init(int count);
 };
 
 #endif

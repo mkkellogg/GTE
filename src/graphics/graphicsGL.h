@@ -5,7 +5,7 @@
 #include <GL/glut.h>
 
 #include "graphics.h"
-#include "vertexattrbuffer.h"
+#include "object/mesh3Drenderer.h"
 
 class GraphicsGL : public Graphics
 {
@@ -22,8 +22,8 @@ class GraphicsGL : public Graphics
     void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
     Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) const;
     void DestroyShader(Shader * shader) const;
-    VertexAttrBuffer * CreateVertexAttrBuffer() const;
-    void DestroyVertexAttrBuffer(VertexAttrBuffer * buffer) const;
+    Mesh3DRenderer * CreateMeshRenderer() const;
+    void DestroyMeshRenderer(Mesh3DRenderer * buffer) const;
 };
 
 #endif

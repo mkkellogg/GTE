@@ -17,11 +17,11 @@ class BaseVector2Array
 
     public:
 
-	BaseVector2Array(int count, BaseVector2Factory * factory);
+	BaseVector2Array(BaseVector2Factory * factory);
     virtual ~BaseVector2Array();
 
     const float * GetDataPtr() const;
-    bool Init();
+    bool Init(int count);
 };
 
 #endif

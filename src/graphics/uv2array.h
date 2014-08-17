@@ -9,7 +9,7 @@ class UV2Array : public BaseVector2Array
 {
     public:
 
-	UV2Array(int count);
+	UV2Array();
     virtual ~UV2Array();
 
     void SetData(const float * data);

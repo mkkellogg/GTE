@@ -108,9 +108,9 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
         PrintVector(&vb);
 
-        Point3Array pointArray(32);
+        Point3Array pointArray;
 
-        pointArray.Init();
+        pointArray.Init(32);
 
         for(int i=0; i< 32; i++)
         {

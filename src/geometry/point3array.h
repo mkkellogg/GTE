@@ -9,7 +9,7 @@ class Point3Array : public BaseVector4Array
 {
     public:
 
-	Point3Array(int count);
+	Point3Array();
     virtual ~Point3Array();
 
     void SetData(const float * data, bool includeW);

@@ -6,6 +6,7 @@
 
 #include "mesh3Drenderer.h"
 #include "mesh3D.h"
+#include "graphics/attributes.h"
 #include "graphics/graphics.h"
 #include "geometry/point3.h"
 #include "geometry/vector3.h"
@@ -17,17 +18,16 @@
 #include "graphics/uv2array.h"
 #include "ui/debug.h"
 
-
-
-Mesh3D::Mesh3D(int type)
+Mesh3D::Mesh3D(int attributes)
 {
-	typeMask = type;
+	attributeMask = attributes;
+	vertexCount = 0;
 
-	positions = NULL;
-	normals = NULL;
-	colors = NULL;
-	uvs1 = NULL;
-	uvs2 = NULL;
+	positions = new Point3Array();
+	normals = new Vector3Array();
+	colors = new Color4Array();
+	uvs1 = new UV2Array();
+	uvs2 = new UV2Array();
 }
 
 Mesh3D::~Mesh3D()
@@ -42,51 +42,82 @@ void Mesh3D::Destroy()
 		delete positions;
 		positions = NULL;
 	}
+
+	if(normals != NULL)
+	{
+		delete normals;
+		normals = NULL;
+	}
+
+	if(colors != NULL)
+	{
+		delete colors;
+		colors = NULL;
+	}
+
+	if(uvs1 != NULL)
+	{
+		delete uvs1;
+		uvs1 = NULL;
+	}
+
+	if(uvs2 != NULL)
+	{
+		delete uvs2;
+		uvs2 = NULL;
+	}
 }
 
-bool Mesh3D::Init(int attributeCount)
+int Mesh3D::GetVertexCount()
 {
+	return vertexCount;
+}
+
+int Mesh3D::GetAttributeMask()
+{
+	return attributeMask;
+}
+
+bool Mesh3D::Init(int vertexCount)
+{
+	this->vertexCount = vertexCount;
+
 	bool initSuccess = false;
 	int errorMask = 0;
 
-	if(typeMask & (int)AttributeType::Position)
+	if(attributeMask & (int)AttributeMask::Position)
 	{
-		positions = new Point3Array(attributeCount);
-		initSuccess = positions->Init() && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeType::Position;
+		initSuccess = positions->Init(vertexCount) && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeMask::Position;
 	}
 
-	if(typeMask & (int)AttributeType::Normal)
+	if(attributeMask & (int)AttributeMask::Normal)
 	{
-		normals = new Vector3Array(attributeCount);
-		initSuccess = normals->Init() && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeType::Normal;
+		initSuccess = normals->Init(vertexCount) && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeMask::Normal;
 	}
 
-	if(typeMask & (int)AttributeType::Color)
+	if(attributeMask & (int)AttributeMask::Color)
 	{
-		colors = new Color4Array(attributeCount);
-		initSuccess = colors->Init() && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeType::Color;
+		initSuccess = colors->Init(vertexCount) && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeMask::Color;
 	}
 
-	if(typeMask & (int)AttributeType::UV1)
+	if(attributeMask & (int)AttributeMask::UV1)
 	{
-		uvs1 = new UV2Array(attributeCount);
-		initSuccess = uvs1->Init() && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeType::UV1;
+		initSuccess = uvs1->Init(vertexCount) && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeMask::UV1;
 	}
 
-	if(typeMask & (int)AttributeType::UV2)
+	if(attributeMask & (int)AttributeMask::UV2)
 	{
-		uvs2 = new UV2Array(attributeCount);
-		initSuccess = uvs2->Init() && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeType::UV2;
+		initSuccess = uvs2->Init(vertexCount) && initSuccess;
+		if(!initSuccess)errorMask &= (int)AttributeMask::UV2;
 	}
 	if(!initSuccess)
 	{
 		char errStr[64];
-		sprintf(errStr, "Error initializing attribute array for Mesh3D: %d\n",errorMask);
+		sprintf(errStr, "Error initializing attribute array(s) for Mesh3D: %d\n",errorMask);
 		Debug::PrintError(errStr);
 		Destroy();
 		return false;

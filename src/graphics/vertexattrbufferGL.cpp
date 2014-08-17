@@ -27,6 +27,8 @@ VertexAttrBufferGL::~VertexAttrBufferGL()
 
 bool VertexAttrBufferGL::Init(int attributeCount, int componentCount, bool dataOnGPU, float *srcData)
 {
+	Destroy();
+
 	this->componentCount = componentCount;
 	this->attributeCount = attributeCount;
 
@@ -72,9 +74,17 @@ void VertexAttrBufferGL::SetData(const float * srcData)
 
 void VertexAttrBufferGL::Destroy()
 {
+	if(dataOnGPU && gpuBufferID)
+	{
+		glDeleteBuffers(1, &gpuBufferID);
+		dataOnGPU = false;
+		gpuBufferID = 0;
+	}
+
 	if(data != NULL)
 	{
 		delete data;
 		data = NULL;
 	}
 }
+

@@ -11,18 +11,12 @@
 #include "graphics/color4array.h"
 #include "graphics/uv2array.h"
 
-enum class AttributeType
-{
-    Position=1,
-    Normal=2,
-    Color=4,
-    UV1=8,
-    UV2=16
-};
+#include "graphics/attributes.h"
 
 class Mesh3D
 {
-	int typeMask;
+	int attributeMask;
+	int vertexCount;
 
     Point3Array * positions;
     Vector3Array * normals;
@@ -38,6 +32,8 @@ class Mesh3D
     virtual ~Mesh3D();
 
     bool Init(int attributeCount);
+    int GetVertexCount();
+    int GetAttributeMask();
 
     Point3Array * GetPostions();
     Vector3Array * GetNormals();

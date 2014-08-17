@@ -16,10 +16,10 @@ GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o
 OBJECTOBJ= obj/mesh3Drenderer.o obj/mesh3D.o 
 UIOBJ= obj/debug.o 
-GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o
+GRAPHICSOBJ= obj/graphics.o obj/vertexattrbuffer.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/material.o obj/attributes.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 
-OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o
+OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o
 
 OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(OBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(SHADEROBJ) $(OPENGLOBJ)
 
@@ -83,8 +83,13 @@ obj/uv2factory.o: $(GRAPHICSSRC)/uv2factory.cpp $(GRAPHICSSRC)/uv2factory.h
 	
 obj/uv2array.o: $(GRAPHICSSRC)/uv2array.cpp $(GRAPHICSSRC)/uv2array.h
 	$(CC) $(CFLAGS) -o obj/uv2array.o -c $(GRAPHICSSRC)/uv2array.cpp
+	
+obj/material.o: $(GRAPHICSSRC)/material.cpp $(GRAPHICSSRC)/material.h
+	$(CC) $(CFLAGS) -o obj/material.o -c $(GRAPHICSSRC)/material.cpp
 
-
+obj/attributes.o: $(GRAPHICSSRC)/attributes.cpp $(GRAPHICSSRC)/attributes.h
+	$(CC) $(CFLAGS) -o obj/attributes.o -c $(GRAPHICSSRC)/attributes.cpp
+	
 # ==================================
 # Object
 # ==================================
@@ -94,7 +99,10 @@ object: $(OBJECTOBJ)
 obj/mesh3Drenderer.o: $(OBJECTSRC)/mesh3Drenderer.cpp $(OBJECTSRC)/mesh3Drenderer.h
 	$(CC) $(CFLAGS) -o obj/mesh3Drenderer.o -c $(OBJECTSRC)/mesh3Drenderer.cpp
 	
-obj/mesh3D.o: $(OBJECTSRC)/mesh3D.cpp $(OBJECTSRC)/mesh3D.h
+obj/mesh3DrendererGL.o: $(OBJECTSRC)/mesh3DrendererGL.cpp $(OBJECTSRC)/mesh3DrendererGL.h
+	$(CC) $(CFLAGS) -o obj/mesh3DrendererGL.o -c $(OBJECTSRC)/mesh3DrendererGL.cpp
+	
+obj/mesh3D.o: $(OBJECTSRC)/mesh3D.cpp $(OBJECTSRC)/mesh3D.h $(GRAPHICSSRC)/attributes.h
 	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(OBJECTSRC)/mesh3D.cpp
 	
 	

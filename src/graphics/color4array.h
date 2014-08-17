@@ -9,7 +9,7 @@ class Color4Array : public BaseVector4Array
 {
     public:
 
-	Color4Array(int count);
+	Color4Array();
     virtual ~Color4Array();
 
     void SetData(const float * data, bool includeW);

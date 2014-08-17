@@ -9,7 +9,7 @@
 #include "basevector4factory.h"
 #include "ui/debug.h"
 
-BaseVector4Array::BaseVector4Array(int count, BaseVector4Factory * factory) : count(count), data(NULL), objects(NULL), baseFactory(factory)
+BaseVector4Array::BaseVector4Array(BaseVector4Factory * factory) : count(0), data(NULL), objects(NULL), baseFactory(factory)
 {
 
 }
@@ -43,8 +43,12 @@ void BaseVector4Array::Destroy()
 	}
 }
 
-bool BaseVector4Array::Init()
+bool BaseVector4Array::Init(int count)
 {
+	Destroy();
+
+	this->count = count;
+
 	data = new float[count * 4];
 	if(data == NULL)
 	{
