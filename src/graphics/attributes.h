@@ -1,7 +1,7 @@
 #ifndef _ATTRIBUTES_H_
 #define _ATTRIBUTES_H_
 
-enum class AttributeMask
+enum class AttributeMaskComponent
 {
     Position=1,
     Normal=2,
@@ -20,14 +20,25 @@ enum class Attribute
     _Last=5 // always keep as last entry
 };
 
+typedef unsigned int AttributeSet;
+
 class Attributes
 {
 	static const char* const attributeNames[];
 
+	static unsigned int GetInvertAttributeMask(Attribute attr);
+
 	public:
 
 	static const char * GetAttributeName(Attribute attr);
-	static int AttributeMaskToIndex(AttributeMask mask);
+	static Attribute AttributeMaskComponentToAttribute(AttributeMaskComponent component);
+	static AttributeMaskComponent AttributeToAttributeMaskComponent(Attribute attr);
+
+	static AttributeSet CreateAttributeSet();
+	static void AddAttribute(AttributeSet * set, Attribute attr);
+	static void RemoveAttribute(AttributeSet * set, Attribute attr);
+
+	static bool HasAttribute(AttributeSet set, Attribute attr);
 };
 
 #endif

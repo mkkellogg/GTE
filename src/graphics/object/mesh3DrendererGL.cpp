@@ -4,6 +4,8 @@
 #include <memory.h>
 #include <math.h>
 
+#include "graphics/graphicsGL.h"
+#include "graphics/shader/shaderGL.h"
 #include "mesh3DrendererGL.h"
 #include "mesh3Drenderer.h"
 #include "mesh3D.h"
@@ -98,59 +100,6 @@ bool Mesh3DRendererGL::InitBuffer(VertexAttrBufferGL ** buffer, int attributeCou
 	return true;
 }
 
-bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
-{
-	mesh = NULL;
-
-	DestroyBuffers();
-
-	Mesh3DRenderer::UseMesh(newMesh);
-
-	int errorMask = 0;
-
-	if(mesh->GetAttributeMask() & (int)AttributeMask::Position)
-	{
-		int initSuccess = InitPositionData(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMask::Position;
-	}
-
-	if(mesh->GetAttributeMask() & (int)AttributeMask::Normal)
-	{
-		int initSuccess = InitNormalData(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMask::Normal;
-	}
-
-	if(mesh->GetAttributeMask() & (int)AttributeMask::Color)
-	{
-		int initSuccess = InitColorData(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMask::Color;
-	}
-
-	if(mesh->GetAttributeMask() & (int)AttributeMask::UV1)
-	{
-		int initSuccess = InitUV1Data(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMask::UV1;
-	}
-
-	if(mesh->GetAttributeMask() & (int)AttributeMask::UV2)
-	{
-		int initSuccess = InitUV2Data(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMask::UV2;
-	}
-
-	if(errorMask != 0)
-	{
-		Mesh3DRenderer::UseMesh(NULL);
-		char errorStr[64];
-		sprintf(errorStr, "Error initializing attribute buffer(s) for Mesh3DRenderer: %d\n",errorMask);
-		Debug::PrintError(errorStr);
-		DestroyBuffers();
-		return false;
-	}
-
-	return true;
-}
-
 bool Mesh3DRendererGL::InitPositionData(int count)
 {
 	DestroyBuffer(&positionData);
@@ -221,8 +170,99 @@ void Mesh3DRendererGL::SetUV2Data(UV2Array * uvs)
 	uv2Data->SetData(uvs->GetDataPtr());
 }
 
+bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
+{
+	mesh = NULL;
+
+	DestroyBuffers();
+
+	Mesh3DRenderer::UseMesh(newMesh);
+
+	int errorMask = 0;
+
+	AttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))
+	{
+		int initSuccess = InitPositionData(mesh->GetVertexCount());
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Position;
+	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))
+	{
+		int initSuccess = InitNormalData(mesh->GetVertexCount());
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Normal;
+	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))
+	{
+		int initSuccess = InitColorData(mesh->GetVertexCount());
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Color;
+	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))
+	{
+		int initSuccess = InitUV1Data(mesh->GetVertexCount());
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV1;
+	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))
+	{
+		int initSuccess = InitUV2Data(mesh->GetVertexCount());
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV2;
+	}
+
+	if(errorMask != 0)
+	{
+		Mesh3DRenderer::UseMesh(NULL);
+		char errorStr[64];
+		sprintf(errorStr, "Error initializing attribute buffer(s) for Mesh3DRenderer: %d\n",errorMask);
+		Debug::PrintError(errorStr);
+		DestroyBuffers();
+		return false;
+	}
+
+	return true;
+}
+
+bool Mesh3DRendererGL::UseMaterial(Material * material)
+{
+	Mesh3DRenderer::UseMaterial(material);
+
+	AttributeSet materialAttributes = material->GetAttributeSet();
+	AttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	for(int i=0; i<(int)Attribute::_Last; i++)
+	{
+		Attribute attr = (Attribute)i;
+
+		if(Attributes::HasAttribute(materialAttributes, attr))
+		{
+			if(!Attributes::HasAttribute(meshAttributes, attr))
+			{
+				char msg[64];
+				sprintf(msg, "Shader was expecting attribute %s, but mesh does not have it.", Attributes::GetAttributeName(attr));
+				Debug::PrintWarning(msg);
+			}
+		}
+	}
+
+	return true;
+}
+
 void Mesh3DRendererGL::Render()
 {
+	GraphicsGL * graphics = (GraphicsGL *)Graphics::Instance();
 
+	graphics->ActivateMaterial(material);
+
+	AttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	ShaderGL * shader = (ShaderGL *)material->GetShader();
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))
+	{
+	//	GLuint varLoc = shader->
+	}
 }
 

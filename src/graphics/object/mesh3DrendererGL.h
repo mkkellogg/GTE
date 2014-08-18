@@ -1,6 +1,8 @@
 #ifndef _MESH3D_RENDERER_GL_H_
 #define _MESH3D_RENDERER_GL_H_
 
+class Mesh3DRendererGL;
+
 #include "mesh3D.h"
 #include "mesh3Drenderer.h"
 
@@ -54,10 +56,9 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
     public:
 
-
-    void Render();
     bool UseMesh(Mesh3D * newMesh);
-
+    bool UseMaterial(Material * material);
+    void Render();
 
    // void SetVertexData(const float * data, int componentCount, int count, AttributeType attributeType);
 };

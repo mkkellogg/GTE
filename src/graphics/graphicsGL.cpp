@@ -7,6 +7,7 @@
 #include <GL/glut.h>
  
 #include "graphicsGL.h"
+#include "material.h"
 #include "ui/debug.h"
 #include "shader/shaderGL.h"
 #include "shader/shader.h"
@@ -73,14 +74,14 @@ GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
 
 }
 
-Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) const
+Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)
 {
     //TODO: Add switch for different platforms; for now only support OpenGL
     Shader * shader = new ShaderGL(vertexShaderPath, fragmentShaderPath);
     return shader;
 }
 
-void GraphicsGL::DestroyShader(Shader * shader) const
+void GraphicsGL::DestroyShader(Shader * shader)
 {
     delete shader;
 }
@@ -94,6 +95,20 @@ void GraphicsGL::DestroyMeshRenderer(Mesh3DRenderer * renderer)  const
 {
 	delete renderer;
 }
+
+void GraphicsGL::ActivateMaterial(Material * material)
+{
+	// TODO: Change this to a proper comparison, and not just
+	// a comparison of memory addresses
+	if(Graphics::GetActiveMaterial() != material)
+	{
+		Graphics::ActivateMaterial(material);
+
+		ShaderGL * shader = (ShaderGL *) material->GetShader();
+		glUseProgram(shader->GetProgramID());
+	}
+}
+
 
 void _glutDisplayFunc()
 {

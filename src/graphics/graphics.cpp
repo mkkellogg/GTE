@@ -15,7 +15,7 @@ Graphics::~Graphics()
 
 }
 
-Graphics::Graphics()
+Graphics::Graphics() : activeMaterial(NULL)
 {
 
 }
@@ -35,5 +35,25 @@ Graphics * Graphics::Instance()
 GraphicsCallbacks::~GraphicsCallbacks()
 {
 
+}
+
+Material * Graphics::CreateMaterial()
+{
+	return new Material();
+}
+
+void Graphics::DestroyMaterial(Material * material)
+{
+	delete material;
+}
+
+void Graphics::ActivateMaterial(Material * material)
+{
+	activeMaterial = material;
+}
+
+Material * Graphics::GetActiveMaterial()
+{
+	return activeMaterial;
 }
 

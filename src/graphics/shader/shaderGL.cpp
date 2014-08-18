@@ -229,4 +229,9 @@ int ShaderGL::GetVariableLocation(const char *varName) const
 	GLint loc = glGetAttribLocation(programID, varName);
 	return (int)loc;
 }
+
+GLuint ShaderGL::GetProgramID()
+{
+	return programID;
+}
  

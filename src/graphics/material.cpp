@@ -31,31 +31,46 @@ void Material::ClearBindings()
 	memset(varBindings,0,sizeof(int)*VAR_BINDINGS_SIZE);
 }
 
-void Material::SetBinding(int location, Attribute attr)
+void Material::SetBinding(unsigned int location, Attribute attr)
 {
 	varBindings[(int)attr] = location;
 }
 
 void Material::BindVars()
 {
+	attributeSet = Attributes::CreateAttributeSet();
 	for(int i=0; i<(int)Attribute::_Last; i++)
 	{
 		Attribute attr = (Attribute)i;
 
-		int loc = TestForAttribue(attr);
+		int loc = TestForAttribute(attr);
 		if(loc >= 0)
 		{
 			SetBinding(loc, attr);
+			Attributes::AddAttribute(&attributeSet,attr);
 		}
 	}
 }
 
-int Material::TestForAttribue(Attribute attr)
+unsigned int Material::TestForAttribute(Attribute attr)
 {
 	const char * attrName = Attributes::GetAttributeName(attr);
-	int loc = shader->GetVariableLocation(attrName);
+	unsigned int loc = shader->GetVariableLocation(attrName);
 
 	return loc;
 }
 
+AttributeSet Material::GetAttributeSet()
+{
+	return attributeSet;
+}
 
+Shader * Material::GetShader()
+{
+	return shader;
+}
+
+unsigned int Material::GetAttributeShaderVarLocation(Attribute attr)
+{
+	return  Material::varBindings[(int)attr];
+}

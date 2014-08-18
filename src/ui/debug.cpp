@@ -13,6 +13,11 @@ void Debug::PrintMessage(const char * message)
     printf("%s\n", message);
 }
 
+void Debug::PrintWarning(const char * message)
+{
+    printf("%s\n", message);
+}
+
 void Debug::PrintError(const char * message)
 {
     printf("%s\n", message);

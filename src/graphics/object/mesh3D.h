@@ -15,7 +15,7 @@
 
 class Mesh3D
 {
-	int attributeMask;
+	AttributeSet attributeSet;
 	int vertexCount;
 
     Point3Array * positions;
@@ -28,12 +28,12 @@ class Mesh3D
 
     public:
 
-    Mesh3D(int type);
+    Mesh3D(AttributeSet attributes);
     virtual ~Mesh3D();
 
     bool Init(int attributeCount);
     int GetVertexCount();
-    int GetAttributeMask();
+    AttributeSet GetAttributeSet();
 
     Point3Array * GetPostions();
     Vector3Array * GetNormals();

@@ -18,9 +18,9 @@
 #include "graphics/uv2array.h"
 #include "ui/debug.h"
 
-Mesh3D::Mesh3D(int attributes)
+Mesh3D::Mesh3D(AttributeSet attributes)
 {
-	attributeMask = attributes;
+	attributeSet = attributes;
 	vertexCount = 0;
 
 	positions = new Point3Array();
@@ -73,9 +73,9 @@ int Mesh3D::GetVertexCount()
 	return vertexCount;
 }
 
-int Mesh3D::GetAttributeMask()
+AttributeSet Mesh3D::GetAttributeSet()
 {
-	return attributeMask;
+	return attributeSet;
 }
 
 bool Mesh3D::Init(int vertexCount)
@@ -85,34 +85,34 @@ bool Mesh3D::Init(int vertexCount)
 	bool initSuccess = false;
 	int errorMask = 0;
 
-	if(attributeMask & (int)AttributeMask::Position)
+	if(Attributes::HasAttribute(attributeSet,Attribute::Position))
 	{
 		initSuccess = positions->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMask::Position;
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Position;
 	}
 
-	if(attributeMask & (int)AttributeMask::Normal)
+	if(Attributes::HasAttribute(attributeSet,Attribute::Normal))
 	{
 		initSuccess = normals->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMask::Normal;
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Normal;
 	}
 
-	if(attributeMask & (int)AttributeMask::Color)
+	if(Attributes::HasAttribute(attributeSet,Attribute::Color))
 	{
 		initSuccess = colors->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMask::Color;
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Color;
 	}
 
-	if(attributeMask & (int)AttributeMask::UV1)
+	if(Attributes::HasAttribute(attributeSet,Attribute::UV1))
 	{
 		initSuccess = uvs1->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMask::UV1;
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV1;
 	}
 
-	if(attributeMask & (int)AttributeMask::UV2)
+	if(Attributes::HasAttribute(attributeSet,Attribute::UV2))
 	{
 		initSuccess = uvs2->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMask::UV2;
+		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV2;
 	}
 	if(!initSuccess)
 	{

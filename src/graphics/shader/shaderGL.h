@@ -37,6 +37,7 @@ class ShaderGL : public Shader
 
     bool Load();
     int GetVariableLocation(const char *varName) const;
+    GLuint GetProgramID();
 };
 
 #endif
