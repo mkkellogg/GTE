@@ -25,12 +25,9 @@ class Mesh3DRenderer
 	Mesh3D * mesh;
 	Material * material;
 
-    bool buffersOnGPU;
-
     public:
 
     Mesh3DRenderer();
-    Mesh3DRenderer(bool buffersOnGPU);
     virtual ~Mesh3DRenderer();
 
     virtual void Render() = 0;

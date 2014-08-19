@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <math.h>
 
+#include "graphics/attributes.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/shader/shaderGL.h"
 #include "mesh3DrendererGL.h"
@@ -16,18 +17,15 @@
 #include "graphics/uv2.h"
 #include "ui/debug.h"
 
+
 Mesh3DRendererGL::Mesh3DRendererGL() : Mesh3DRendererGL(false)
 {
 
 }
 
-Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU) : Mesh3DRenderer(buffersOnGPU)
+Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU) : Mesh3DRenderer(), buffersOnGPU(false)
 {
-	positionData = NULL;
-	colorData = NULL;
-	normalData = NULL;
-	uv1Data = NULL;
-	uv2Data = NULL;
+	memset(attributeBuffers,0,sizeof(VertexAttrBufferGL*) * MAX_ATTRIBUTE_BUFFERS);
 }
 
 Mesh3DRendererGL::~Mesh3DRendererGL()
@@ -37,11 +35,11 @@ Mesh3DRendererGL::~Mesh3DRendererGL()
 
 void Mesh3DRendererGL::DestroyBuffers()
 {
-	DestroyBuffer(&positionData);
-	DestroyBuffer(&normalData);
-	DestroyBuffer(&colorData);
-	DestroyBuffer(&uv1Data);
-	DestroyBuffer(&uv2Data);
+	DestroyBuffer(&attributeBuffers[(int)Attribute::Position]);
+	DestroyBuffer(&attributeBuffers[(int)Attribute::Normal]);
+	DestroyBuffer(&attributeBuffers[(int)Attribute::Color]);
+	DestroyBuffer(&attributeBuffers[(int)Attribute::UV1]);
+	DestroyBuffer(&attributeBuffers[(int)Attribute::UV2]);
 }
 
 void Mesh3DRendererGL::DestroyBuffer(VertexAttrBufferGL ** buffer)
@@ -100,74 +98,38 @@ bool Mesh3DRendererGL::InitBuffer(VertexAttrBufferGL ** buffer, int attributeCou
 	return true;
 }
 
-bool Mesh3DRendererGL::InitPositionData(int count)
+bool Mesh3DRendererGL::InitAttributeData(Attribute attr, int count)
 {
-	DestroyBuffer(&positionData);
-	bool initSuccess = InitBuffer(&positionData, count, 4);
+	DestroyBuffer(&attributeBuffers[(int)attr]);
+	bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], count, 4);
 	if(!initSuccess)return false;
-
 	return true;
 }
 
-bool Mesh3DRendererGL::InitNormalData(int count)
-{
-	DestroyBuffer(&normalData);
-	bool initSuccess = InitBuffer(&normalData, count, 4);
-	if(!initSuccess)return false;
-
-	return true;
-}
-
-bool Mesh3DRendererGL::InitColorData(int count)
-{
-	DestroyBuffer(&colorData);
-	bool initSuccess = InitBuffer(&colorData, count, 4);
-	if(!initSuccess)return false;
-
-	return true;
-}
-
-bool Mesh3DRendererGL::InitUV1Data(int count)
-{
-	DestroyBuffer(&uv1Data);
-	bool initSuccess = InitBuffer(&uv1Data, count, 2);
-	if(!initSuccess)return false;
-
-	return true;
-}
-
-bool Mesh3DRendererGL::InitUV2Data(int count)
-{
-	DestroyBuffer(&uv2Data);
-	bool initSuccess = InitBuffer(&uv2Data, count, 2);
-	if(!initSuccess)return false;
-
-	return true;
-}
 
 void Mesh3DRendererGL::SetPositionData(Point3Array * points)
 {
-	positionData->SetData(points->GetDataPtr());
+	attributeBuffers[(int)Attribute::Position]->SetData(points->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetNormalData(Vector3Array * normals)
 {
-	normalData->SetData(normals->GetDataPtr());
+	attributeBuffers[(int)Attribute::Normal]->SetData(normals->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetColorData(Color4Array * colors)
 {
-	colorData->SetData(colors->GetDataPtr());
+	attributeBuffers[(int)Attribute::Color]->SetData(colors->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetUV1Data(UV2Array * uvs)
 {
-	uv1Data->SetData(uvs->GetDataPtr());
+	attributeBuffers[(int)Attribute::UV1]->SetData(uvs->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetUV2Data(UV2Array * uvs)
 {
-	uv2Data->SetData(uvs->GetDataPtr());
+	attributeBuffers[(int)Attribute::UV2]->SetData(uvs->GetDataPtr());
 }
 
 bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
@@ -178,45 +140,30 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 
 	Mesh3DRenderer::UseMesh(newMesh);
 
-	int errorMask = 0;
-
 	AttributeSet meshAttributes = mesh->GetAttributeSet();
+	AttributeSet err = Attributes::CreateAttributeSet();
 
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))
+	for(int i=0; i<(int)Attribute::_Last; i++)
 	{
-		int initSuccess = InitPositionData(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Position;
+		Attribute attr = (Attribute)i;
+		if(Attributes::HasAttribute(meshAttributes, attr))
+		{
+			int initSuccess = InitAttributeData(attr, mesh->GetVertexCount());
+			if(!initSuccess)Attributes::AddAttribute(&err,attr);
+		}
 	}
 
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))
-	{
-		int initSuccess = InitNormalData(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Normal;
-	}
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))SetPositionData(mesh->GetPostions());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))SetNormalData(mesh->GetNormals());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))SetColorData(mesh->GetColors());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))SetUV1Data(mesh->GetUVs1());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))SetUV2Data(mesh->GetUVs2());
 
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))
-	{
-		int initSuccess = InitColorData(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Color;
-	}
-
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))
-	{
-		int initSuccess = InitUV1Data(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV1;
-	}
-
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))
-	{
-		int initSuccess = InitUV2Data(mesh->GetVertexCount());
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV2;
-	}
-
-	if(errorMask != 0)
+	if(err != 0)
 	{
 		Mesh3DRenderer::UseMesh(NULL);
 		char errorStr[64];
-		sprintf(errorStr, "Error initializing attribute buffer(s) for Mesh3DRenderer: %d\n",errorMask);
+		sprintf(errorStr, "Error initializing attribute buffer(s) for Mesh3DRenderer: %d\n",err);
 		Debug::PrintError(errorStr);
 		DestroyBuffers();
 		return false;
@@ -258,29 +205,13 @@ void Mesh3DRendererGL::Render()
 
 	AttributeSet meshAttributes = mesh->GetAttributeSet();
 
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))
+	for(int i=0; i<(int)Attribute::_Last; i++)
 	{
-		material->SendAttributeBufferToShader(Attribute::Position, positionData);
-	}
-
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))
-	{
-		material->SendAttributeBufferToShader(Attribute::Normal, normalData);
-	}
-
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))
-	{
-		material->SendAttributeBufferToShader(Attribute::Color, colorData);
-	}
-
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))
-	{
-		material->SendAttributeBufferToShader(Attribute::UV1, uv1Data);
-	}
-
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))
-	{
-		material->SendAttributeBufferToShader(Attribute::UV2, uv2Data);
+		Attribute attr = (Attribute)i;
+		if(Attributes::HasAttribute(meshAttributes, attr))
+		{
+			material->SendAttributeBufferToShader(attr, attributeBuffers[i]);
+		}
 	}
 
 	glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());

@@ -21,13 +21,9 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 {
 	friend class GraphicsGL;
 
-	Mesh3D * mesh;
+	const static int MAX_ATTRIBUTE_BUFFERS = 64;
 
-    VertexAttrBufferGL * positionData;
-    VertexAttrBufferGL * normalData;
-    VertexAttrBufferGL * colorData;
-    VertexAttrBufferGL * uv1Data;
-    VertexAttrBufferGL * uv2Data;
+    VertexAttrBufferGL * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
 
     bool buffersOnGPU;
 
@@ -36,11 +32,7 @@ class Mesh3DRendererGL : public Mesh3DRenderer
     void DestroyBuffer(VertexAttrBufferGL ** buffer);
     void SetVertexData(VertexAttrBufferGL * buffer, const float * data, int componentCount, int totalCount, int stride);
 
-    bool InitPositionData(int count);
-    bool InitNormalData(int count);
-    bool InitColorData(int count);
-    bool InitUV1Data(int count);
-    bool InitUV2Data(int count);
+    bool InitAttributeData(Attribute attr, int count);
 
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);

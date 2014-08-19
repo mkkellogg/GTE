@@ -15,15 +15,9 @@
 #include "ui/debug.h"
 
 
-Mesh3DRenderer::Mesh3DRenderer() : Mesh3DRenderer(false)
-{
-
-}
-
-Mesh3DRenderer::Mesh3DRenderer(bool buffersOnGPU)
+Mesh3DRenderer::Mesh3DRenderer()
 {
 	this->mesh = NULL;
-	this->buffersOnGPU= buffersOnGPU;
 	this->material = NULL;
 }
 
