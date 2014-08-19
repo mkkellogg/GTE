@@ -2,6 +2,8 @@
 #ifndef _SHADER_H_
 #define _SHADER_H_
 
+#include "graphics/vertexattrbuffer.h"
+
 enum class ShaderType
 {
     Vertex,
@@ -18,6 +20,7 @@ class Shader
     virtual ~Shader();
     virtual bool Load() = 0;
     virtual int GetVariableLocation(const char *varName) const = 0;
+    virtual void SendBufferToShader(int loc, VertexAttrBuffer * buffer) = 0;
 };
 
 #endif

@@ -6,6 +6,7 @@
 
 #include "shadersource.h"
 #include "shader.h"
+#include "graphics/vertexattrbuffer.h"
 
 class ShaderGL : public Shader
 {
@@ -38,6 +39,7 @@ class ShaderGL : public Shader
     bool Load();
     int GetVariableLocation(const char *varName) const;
     GLuint GetProgramID();
+    void SendBufferToShader(int loc, VertexAttrBuffer * buffer);
 };
 
 #endif

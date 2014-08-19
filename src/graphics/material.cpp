@@ -28,12 +28,17 @@ void Material::Init(Shader * shader)
 
 void Material::ClearBindings()
 {
-	memset(varBindings,0,sizeof(int)*VAR_BINDINGS_SIZE);
+	for(int i=0; i < VAR_BINDINGS_SIZE; i++)varBindings[i] = -1;
 }
 
-void Material::SetBinding(unsigned int location, Attribute attr)
+void Material::SetVarBinding(int location, Attribute attr)
 {
 	varBindings[(int)attr] = location;
+}
+
+int Material::GetVarBinding(Attribute attr) const
+{
+	return varBindings[(int)attr];
 }
 
 void Material::BindVars()
@@ -46,13 +51,13 @@ void Material::BindVars()
 		int loc = TestForAttribute(attr);
 		if(loc >= 0)
 		{
-			SetBinding(loc, attr);
+			SetVarBinding(loc, attr);
 			Attributes::AddAttribute(&attributeSet,attr);
 		}
 	}
 }
 
-unsigned int Material::TestForAttribute(Attribute attr)
+int Material::TestForAttribute(Attribute attr) const
 {
 	const char * attrName = Attributes::GetAttributeName(attr);
 	unsigned int loc = shader->GetVariableLocation(attrName);
@@ -70,7 +75,13 @@ Shader * Material::GetShader()
 	return shader;
 }
 
-unsigned int Material::GetAttributeShaderVarLocation(Attribute attr)
+int Material::GetAttributeShaderVarLocation(Attribute attr) const
 {
 	return  Material::varBindings[(int)attr];
+}
+
+void Material::SendAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer)
+{
+	int loc = GetVarBinding(attr);
+	shader->SendBufferToShader(loc, buffer);
 }

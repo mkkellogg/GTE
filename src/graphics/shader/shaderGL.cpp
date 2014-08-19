@@ -9,6 +9,8 @@
  
 #include "shader.h"
 #include "shaderGL.h"
+#include "graphics/vertexattrbuffer.h"
+#include "graphics/vertexattrbufferGL.h"
 #include "ui/debug.h"
 #include "gte.h"
 
@@ -234,4 +236,25 @@ GLuint ShaderGL::GetProgramID()
 {
 	return programID;
 }
- 
+
+void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
+{
+	if(loc < 0)return;
+
+	VertexAttrBufferGL * bufferGL = (VertexAttrBufferGL *)buffer;
+	const float * data = bufferGL->GetDataPtr();
+	int componentCount = bufferGL->GetComponentCount();
+
+	glEnableVertexAttribArray((GLuint)loc);
+
+	if(bufferGL->IsGPUBuffer())
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, bufferGL->GetGPUBufferID());
+		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, 0, 0);
+	}
+	else
+	{
+		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, 0, data);
+	}
+}
+

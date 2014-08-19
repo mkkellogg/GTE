@@ -258,11 +258,31 @@ void Mesh3DRendererGL::Render()
 
 	AttributeSet meshAttributes = mesh->GetAttributeSet();
 
-	ShaderGL * shader = (ShaderGL *)material->GetShader();
-
 	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))
 	{
-	//	GLuint varLoc = shader->
+		material->SendAttributeBufferToShader(Attribute::Position, positionData);
 	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))
+	{
+		material->SendAttributeBufferToShader(Attribute::Normal, normalData);
+	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))
+	{
+		material->SendAttributeBufferToShader(Attribute::Color, colorData);
+	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))
+	{
+		material->SendAttributeBufferToShader(Attribute::UV1, uv1Data);
+	}
+
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))
+	{
+		material->SendAttributeBufferToShader(Attribute::UV2, uv2Data);
+	}
+
+	glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
 }
 

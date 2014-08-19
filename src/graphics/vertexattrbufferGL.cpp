@@ -10,7 +10,7 @@
 #include "vertexattrbufferGL.h"
 #include "ui/debug.h"
 
-int VertexAttrBufferGL::CalcFullSize()
+int VertexAttrBufferGL::CalcFullSize() const
 {
 	return componentCount * attributeCount * sizeof(float);
 }
@@ -88,3 +88,17 @@ void VertexAttrBufferGL::Destroy()
 	}
 }
 
+const float * VertexAttrBufferGL::GetDataPtr() const
+{
+	return (const float *)data;
+}
+
+bool VertexAttrBufferGL::IsGPUBuffer() const
+{
+	return dataOnGPU;
+}
+
+GLuint VertexAttrBufferGL::GetGPUBufferID()
+{
+	return gpuBufferID;
+}

@@ -15,12 +15,13 @@ class Material
 
 	Shader * shader;
 	AttributeSet attributeSet;
-	unsigned int varBindings[VAR_BINDINGS_SIZE];
+	int varBindings[VAR_BINDINGS_SIZE];
 
 	void BindVars();
 	void ClearBindings();
-	void SetBinding(unsigned int location, Attribute attr);
-	unsigned int TestForAttribute(Attribute attr);
+	void SetVarBinding( int location, Attribute attr);
+    int GetVarBinding(Attribute attr) const;
+	int TestForAttribute(Attribute attr) const;
 
     protected:
 
@@ -30,9 +31,10 @@ class Material
 
     public:
 
-    unsigned int GetAttributeShaderVarLocation(Attribute attr);
+    int GetAttributeShaderVarLocation(Attribute attr) const;
     AttributeSet GetAttributeSet();
     Shader * GetShader();
+    void SendAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer);
 };
 
 #endif
