@@ -37,7 +37,8 @@ class ShaderGL : public Shader
     public :
 
     bool Load();
-    int GetVariableLocation(const char *varName) const;
+    int GetAttributeVarLocation(const char *varName) const;
+    int GetUniformVarLocation(const char *varName) const;
     GLuint GetProgramID();
     void SendBufferToShader(int loc, VertexAttrBuffer * buffer);
 };

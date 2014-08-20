@@ -28,17 +28,18 @@ void Material::Init(Shader * shader)
 
 void Material::ClearBindings()
 {
-	for(int i=0; i < VAR_BINDINGS_SIZE; i++)varBindings[i] = -1;
+	for(int i=0; i < VAR_BINDINGS_SIZE; i++)attributeBindings[i] = -1;
+	for(int i=0; i < VAR_BINDINGS_SIZE; i++)uniformBindings[i] = -1;
 }
 
-void Material::SetVarBinding(int location, Attribute attr)
+void Material::SetAttributeBinding(int location, Attribute attr)
 {
-	varBindings[(int)attr] = location;
+	attributeBindings[(int)attr] = location;
 }
 
-int Material::GetVarBinding(Attribute attr) const
+int Material::GetAttributeBinding(Attribute attr) const
 {
-	return varBindings[(int)attr];
+	return attributeBindings[(int)attr];
 }
 
 void Material::BindVars()
@@ -51,8 +52,21 @@ void Material::BindVars()
 		int loc = TestForAttribute(attr);
 		if(loc >= 0)
 		{
-			SetVarBinding(loc, attr);
+			SetAttributeBinding(loc, attr);
 			Attributes::AddAttribute(&attributeSet,attr);
+		}
+	}
+
+	uniformSet = Uniforms::CreateUniformSet();
+	for(int i=0; i<(int)Uniform::_Last; i++)
+	{
+		Uniform uniform = (Uniform)i;
+
+		int loc = TestForUniform(uniform);
+		if(loc >= 0)
+		{
+			SetUniformBinding(loc, uniform);
+			Uniforms::AddUniform(&uniformSet,uniform);
 		}
 	}
 }
@@ -60,28 +74,47 @@ void Material::BindVars()
 int Material::TestForAttribute(Attribute attr) const
 {
 	const char * attrName = Attributes::GetAttributeName(attr);
-	unsigned int loc = shader->GetVariableLocation(attrName);
+	unsigned int loc = shader->GetAttributeVarLocation(attrName);
 
 	return loc;
 }
 
-AttributeSet Material::GetAttributeSet()
+void Material::SetUniformBinding( int location, Uniform uniform)
+{
+	uniformBindings[(int)uniform] = location;
+}
+
+int Material::GetUniformBinding(Uniform uniform) const
+{
+	return uniformBindings[(int)uniform];
+}
+
+int Material::TestForUniform(Uniform uniform) const
+{
+	const char * uniformName = Uniforms::GetUniformName(uniform);
+	unsigned int loc = shader->GetUniformVarLocation(uniformName);
+
+	return loc;
+}
+
+
+AttributeSet Material::GetAttributeSet() const
 {
 	return attributeSet;
 }
 
-Shader * Material::GetShader()
+Shader * Material::GetShader() const
 {
 	return shader;
 }
 
 int Material::GetAttributeShaderVarLocation(Attribute attr) const
 {
-	return  Material::varBindings[(int)attr];
+	return  Material::attributeBindings[(int)attr];
 }
 
 void Material::SendAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer)
 {
-	int loc = GetVarBinding(attr);
+	int loc = GetAttributeBinding(attr);
 	shader->SendBufferToShader(loc, buffer);
 }

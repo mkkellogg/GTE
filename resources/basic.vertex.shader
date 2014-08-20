@@ -2,13 +2,13 @@
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
  
-attribute vec4 position;
-attribute vec3 color;
+attribute vec4 POSITION;
+attribute vec3 COLOR;
  
-varying vec3 Color;
+varying vec3 vColor;
  
 void main()
 {
-    Color = color;
+    vColor = color;
     gl_Position = projMatrix * viewMatrix * position ;
 }

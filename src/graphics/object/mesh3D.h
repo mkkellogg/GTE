@@ -31,7 +31,7 @@ class Mesh3D
     Mesh3D(AttributeSet attributes);
     virtual ~Mesh3D();
 
-    bool Init(int attributeCount);
+    bool Init(int vertexCount);
     int GetVertexCount();
     AttributeSet GetAttributeSet();
 

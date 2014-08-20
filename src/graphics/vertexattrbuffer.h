@@ -6,17 +6,19 @@ class VertexAttrBuffer
 	protected:
 
 	int componentCount;
-	int attributeCount;
+	int vertexCount;
+	int stride;
 
     public:
 
     VertexAttrBuffer();
     virtual ~VertexAttrBuffer();
 
-    virtual bool Init(int attributeCount, int componentCount, bool dataOnGPU, float *srcData) = 0;
+    virtual bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, float *srcData) = 0;
     virtual void SetData(const float * data) = 0;
-    int GetAttributeCount();
+    int GetVertexCount();
     int GetComponentCount();
+    int GetStride();
 };
 
 #endif

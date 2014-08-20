@@ -77,7 +77,7 @@ void Mesh3DRendererGL::SetVertexData(VertexAttrBufferGL * buffer, const float * 
 
 }
 
-bool Mesh3DRendererGL::InitBuffer(VertexAttrBufferGL ** buffer, int attributeCount, int componentCount)
+bool Mesh3DRendererGL::InitBuffer(VertexAttrBufferGL ** buffer, int vertexCount, int componentCount, int stride)
 {
 	if(buffer == NULL)
 	{
@@ -93,15 +93,15 @@ bool Mesh3DRendererGL::InitBuffer(VertexAttrBufferGL ** buffer, int attributeCou
 		return false;
 	}
 
-	(*buffer)->Init(attributeCount, componentCount, buffersOnGPU, NULL);
+	(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, NULL);
 
 	return true;
 }
 
-bool Mesh3DRendererGL::InitAttributeData(Attribute attr, int count)
+bool Mesh3DRendererGL::InitAttributeData(Attribute attr, int componentCount,  int stride)
 {
 	DestroyBuffer(&attributeBuffers[(int)attr]);
-	bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], count, 4);
+	bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], mesh->GetVertexCount(), componentCount, stride);
 	if(!initSuccess)return false;
 	return true;
 }
@@ -148,7 +148,14 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 		Attribute attr = (Attribute)i;
 		if(Attributes::HasAttribute(meshAttributes, attr))
 		{
-			int initSuccess = InitAttributeData(attr, mesh->GetVertexCount());
+			int componentCount = 4;
+			if(attr == Attribute::UV1 || attr == Attribute::UV2)componentCount = 2;
+			if(attr == Attribute::Normal)componentCount = 3;
+
+			int stride =0;
+			if(attr == Attribute::Normal)stride = 1;
+
+			int initSuccess = InitAttributeData(attr, componentCount, stride);
 			if(!initSuccess)Attributes::AddAttribute(&err,attr);
 		}
 	}

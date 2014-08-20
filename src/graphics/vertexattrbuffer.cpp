@@ -7,7 +7,7 @@
 
 #include "vertexattrbuffer.h"
 
-VertexAttrBuffer::VertexAttrBuffer() : componentCount(0), attributeCount(0)
+VertexAttrBuffer::VertexAttrBuffer() : componentCount(0), vertexCount(0), stride(0)
 {
 
 }
@@ -18,12 +18,17 @@ VertexAttrBuffer::~VertexAttrBuffer()
 
 }
 
-int VertexAttrBuffer::GetAttributeCount()
+int VertexAttrBuffer::GetVertexCount()
 {
-	return attributeCount;
+	return vertexCount;
 }
 
 int VertexAttrBuffer::GetComponentCount()
 {
 	return componentCount;
+}
+
+int VertexAttrBuffer::GetStride()
+{
+	return stride;
 }

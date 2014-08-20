@@ -5,6 +5,7 @@ class Material;
 
 #include "shader/shader.h"
 #include "attributes.h"
+#include "uniforms.h"
 #include "graphics.h"
 
 class Material
@@ -15,13 +16,21 @@ class Material
 
 	Shader * shader;
 	AttributeSet attributeSet;
-	int varBindings[VAR_BINDINGS_SIZE];
+	UniformSet uniformSet;
+
+	int attributeBindings[VAR_BINDINGS_SIZE];
+	int uniformBindings[VAR_BINDINGS_SIZE];
 
 	void BindVars();
 	void ClearBindings();
-	void SetVarBinding( int location, Attribute attr);
-    int GetVarBinding(Attribute attr) const;
+
+	void SetAttributeBinding( int location, Attribute attr);
+    int GetAttributeBinding(Attribute attr) const;
 	int TestForAttribute(Attribute attr) const;
+
+	void SetUniformBinding( int location, Uniform uniform);
+	int GetUniformBinding(Uniform uniform) const;
+	int TestForUniform(Uniform uniform) const;
 
     protected:
 
@@ -31,10 +40,16 @@ class Material
 
     public:
 
+    Shader * GetShader() const;
+
     int GetAttributeShaderVarLocation(Attribute attr) const;
-    AttributeSet GetAttributeSet();
-    Shader * GetShader();
+    AttributeSet GetAttributeSet() const;
     void SendAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer);
+
+    int GetUniformShaderVarLocation(Uniform uniform) const;
+    UniformSet GetUniformSet() const;
+
+   // void SendUniformToShader(Uniform attr, VertexAttrBuffer *buffer);
 };
 
 #endif

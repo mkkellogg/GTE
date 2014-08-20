@@ -20,6 +20,7 @@
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
 void _glutDisplayFunc();
+void _glutIdleFunc();
 
 void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
@@ -35,6 +36,7 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
 
     if(!glutGet(GLUT_DISPLAY_MODE_POSSIBLE))
     {
+       Debug::PrintError("GLUT_DISPLAY_MODE_POSSIBLE = false.\n");
        exit(1);
     }
 
@@ -45,11 +47,15 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     if (glewIsSupported("GL_VERSION_2_0"))
         Debug::PrintMessage("Ready for OpenGL 2.0\n");
     else {	
-    	Debug::PrintMessage("OpenGL 2.0 not supported\n");
+    	Debug::PrintError("OpenGL 2.0 not supported\n");
         exit(1);
     }
 
     glutDisplayFunc(&_glutDisplayFunc);
+    glutIdleFunc(&_glutIdleFunc);
+
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(1.0,1.0,1.0,1.0);
 
     if(callbacks != NULL)
     {
@@ -88,6 +94,7 @@ void GraphicsGL::DestroyShader(Shader * shader)
 
 Mesh3DRenderer * GraphicsGL::CreateMeshRenderer() const
 {
+	 //TODO: Add switch for different platforms; for now only support OpenGL
 	return new Mesh3DRendererGL();
 }
 
@@ -113,6 +120,17 @@ void GraphicsGL::ActivateMaterial(Material * material)
 void _glutDisplayFunc()
 {
 	_instanceCallbacks->OnUpdate(_thisInstance);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // your drawing code goes here
+
+    glutSwapBuffers();
 }
+
+void _glutIdleFunc()
+{
+	 glutPostRedisplay();
+}
+
 
 

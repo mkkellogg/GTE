@@ -27,12 +27,12 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
     bool buffersOnGPU;
 
-    bool InitBuffer(VertexAttrBufferGL ** buffer, int attributeCount, int componentCount);
+    bool InitBuffer(VertexAttrBufferGL ** buffer, int vertexCount, int componentCount,  int stride);
     void DestroyBuffers();
     void DestroyBuffer(VertexAttrBufferGL ** buffer);
     void SetVertexData(VertexAttrBufferGL * buffer, const float * data, int componentCount, int totalCount, int stride);
 
-    bool InitAttributeData(Attribute attr, int count);
+    bool InitAttributeData(Attribute attr, int componentCount,  int stride);
 
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);

@@ -4,8 +4,7 @@
 #include <memory.h>
 #include <math.h>
 
-#include "material.h"
-#include "shader/shader.h"
+#include "base/intmask.h"
 #include "attributes.h"
 #include "ui/debug.h"
 
@@ -16,72 +15,29 @@ const char * Attributes::GetAttributeName(Attribute attr)
 	return attributeNames[(int)attr];
 }
 
-unsigned int Attributes::GetInvertAttributeMask(Attribute attr)
-{
-	unsigned int uAttr = (unsigned int)AttributeToAttributeMaskComponent(attr);
-	unsigned int result = 0;
-	unsigned int mask = 0x80000000;
-
-	for(int i=0; i < 32; i++)
-	{
-		if(mask & uAttr)
-		{
-			result |= 1;
-		}
-
-		result <<= 1;
-		mask >>= 1;
-	}
-
-	return result;
-}
-
 Attribute Attributes::AttributeMaskComponentToAttribute(AttributeMaskComponent component)
 {
-	int index=0x00000001;
-	int count = 0;
-	while(!((int)component & index) && count < 64)
-	{
-		index <<= 1;
-
-		// prevent infinite loop if somehow 'mask' gets corrupted and is zero;
-		count++;
-	}
-
-	if(count ==64)Debug::PrintError("Infinite loop in AttributeMaskToIndex()");
-
-	return (Attribute)index;
+	return (Attribute)IntMask::MaskValueToIndex((unsigned int)component);
 }
 
 AttributeMaskComponent Attributes::AttributeToAttributeMaskComponent(Attribute attr)
 {
-	return (AttributeMaskComponent)(2 ^ (unsigned int)attr);
+	return (AttributeMaskComponent)IntMask::IndexToMaskValue((unsigned int)attr);
 }
 
 void Attributes::AddAttribute(AttributeSet * set, Attribute attr)
 {
-	AttributeMaskComponent maskComponent = AttributeToAttributeMaskComponent(attr);
-	unsigned int uPtr = (unsigned int)*set;
-	uPtr |= (unsigned int)maskComponent;
-	*set = (AttributeSet)uPtr;
+	IntMask::SetBitForIndexMask((unsigned int *)set, (unsigned int )attr);
 }
 
 void Attributes::RemoveAttribute(AttributeSet * set, Attribute attr)
 {
-	unsigned int uPtr = (unsigned int)*set;
-	unsigned int mask = GetInvertAttributeMask(attr);
-
-	uPtr &= mask;
-	*set = (AttributeSet)uPtr;
+	IntMask::ClearBitForIndexMask((unsigned int *)set, (unsigned int )attr);
 }
 
 bool Attributes::HasAttribute(AttributeSet set, Attribute attr)
 {
-	unsigned int u = (unsigned int)set;
-
-	AttributeMaskComponent maskComponent = AttributeToAttributeMaskComponent(attr);
-	unsigned int uMask = (unsigned int)maskComponent;
-	return u & uMask;
+	return IntMask::IsBitSet((unsigned int)set, (unsigned int)attr);
 }
 
 AttributeSet Attributes::CreateAttributeSet()

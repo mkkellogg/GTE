@@ -10,9 +10,14 @@
 #include "vertexattrbufferGL.h"
 #include "ui/debug.h"
 
+int VertexAttrBufferGL::CalcFloatCount() const
+{
+	return (componentCount + stride) * vertexCount;
+}
+
 int VertexAttrBufferGL::CalcFullSize() const
 {
-	return componentCount * attributeCount * sizeof(float);
+	return CalcFloatCount() * sizeof(float);
 }
 
 VertexAttrBufferGL::VertexAttrBufferGL() : VertexAttrBuffer(),  data(NULL), dataOnGPU(false), gpuBufferID(0)
@@ -25,16 +30,17 @@ VertexAttrBufferGL::~VertexAttrBufferGL()
 	Destroy();
 }
 
-bool VertexAttrBufferGL::Init(int attributeCount, int componentCount, bool dataOnGPU, float *srcData)
+bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, float *srcData)
 {
 	Destroy();
 
 	this->componentCount = componentCount;
-	this->attributeCount = attributeCount;
+	this->vertexCount = vertexCount;
+	this->stride = stride;
 
 	int fullDataSize =  CalcFullSize();
 
-	data = new float[componentCount * attributeCount];
+	data = new float[CalcFloatCount()];
 	if(data == NULL)
 	{
 		Debug::PrintMessage("Could not allocate VertexAttrBufferGL data.");

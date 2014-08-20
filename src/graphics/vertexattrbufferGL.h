@@ -26,10 +26,11 @@ class VertexAttrBufferGL : public VertexAttrBuffer
 
     void Destroy();
     int CalcFullSize() const;
+    int CalcFloatCount() const;
 
     public:
 
-    bool Init(int attributeCount, int componentCount, bool dataOnGPU, float *srcData);
+    bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, float *srcData);
     void SetData(const float * data);
     const float * GetDataPtr() const;
     bool IsGPUBuffer() const;

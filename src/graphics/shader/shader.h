@@ -19,7 +19,8 @@ class Shader
     Shader(const char * vertexSourcePath, const char * fragmentSourcePath);
     virtual ~Shader();
     virtual bool Load() = 0;
-    virtual int GetVariableLocation(const char *varName) const = 0;
+    virtual int GetAttributeVarLocation(const char *varName) const = 0;
+    virtual int GetUniformVarLocation(const char *varName) const = 0;
     virtual void SendBufferToShader(int loc, VertexAttrBuffer * buffer) = 0;
 };
 

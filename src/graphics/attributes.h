@@ -26,8 +26,6 @@ class Attributes
 {
 	static const char* const attributeNames[];
 
-	static unsigned int GetInvertAttributeMask(Attribute attr);
-
 	public:
 
 	static const char * GetAttributeName(Attribute attr);

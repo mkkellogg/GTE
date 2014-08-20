@@ -226,11 +226,18 @@ char * ShaderGL::GetShaderLog(GLuint obj)
     return NULL;
 }
 
-int ShaderGL::GetVariableLocation(const char *varName) const
+int ShaderGL::GetAttributeVarLocation(const char *varName) const
 {
 	GLint loc = glGetAttribLocation(programID, varName);
 	return (int)loc;
 }
+
+int ShaderGL::GetUniformVarLocation(const char *varName) const
+{
+	GLint loc = glGetUniformLocation(programID, varName);
+	return (int)loc;
+}
+
 
 GLuint ShaderGL::GetProgramID()
 {
@@ -244,17 +251,18 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	VertexAttrBufferGL * bufferGL = (VertexAttrBufferGL *)buffer;
 	const float * data = bufferGL->GetDataPtr();
 	int componentCount = bufferGL->GetComponentCount();
+	int stride = bufferGL->GetStride();
 
 	glEnableVertexAttribArray((GLuint)loc);
 
 	if(bufferGL->IsGPUBuffer())
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, bufferGL->GetGPUBufferID());
-		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, 0, 0);
+		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, stride, 0);
 	}
 	else
 	{
-		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, 0, data);
+		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, stride, data);
 	}
 }
 
