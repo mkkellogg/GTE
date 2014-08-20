@@ -20,8 +20,8 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
-#include "vector3.h"
-#include "point3.h"
+#include "vector/vector3.h"
+#include "point/point3.h"
 
 class Matrix 
 {

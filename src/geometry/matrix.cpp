@@ -24,8 +24,8 @@
 #include <math.h>
  
 #include "matrix.h"
-#include "point3.h"
-#include "vector3.h"
+#include "point/point3.h"
+#include "vector/vector3.h"
 
 #define I(_i, _j) ((_j)+ DIM_SIZE*(_i))
 #define PI 3.14159265

@@ -5,7 +5,7 @@
 #include <math.h>
  
 #include "point3.h"
-#include "vector3.h"
+#include "geometry/vector/vector3.h"
 
 Point3::Point3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
 {

@@ -2,7 +2,7 @@
 #include <math.h>
 #include "quaternion.h"
 #include "matrix.h"
-#include "vector3.h"
+#include "vector/vector3.h"
 #include "base/basevector4.h"
 #include "ui/debug.h"
 

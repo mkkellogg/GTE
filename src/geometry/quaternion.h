@@ -4,7 +4,7 @@
 #include <iostream>
 #include <math.h>
 #include "matrix.h"
-#include "vector3.h"
+#include "vector/vector3.h"
 
 class Quaternion 
 {

@@ -1,15 +1,15 @@
 #ifndef _MESH3D_H_
 #define _MESH3D_H_
 
-#include "geometry/point3.h"
-#include "geometry/vector3.h"
-#include "graphics/color4.h"
-#include "graphics/uv2.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
+#include "graphics/color/color4.h"
+#include "graphics/uv/uv2.h"
 
-#include "geometry/point3array.h"
-#include "geometry/vector3array.h"
-#include "graphics/color4array.h"
-#include "graphics/uv2array.h"
+#include "geometry/point/point3array.h"
+#include "geometry/vector/vector3array.h"
+#include "graphics/color/color4array.h"
+#include "graphics/uv/uv2array.h"
 
 #include "graphics/attributes.h"
 

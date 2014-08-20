@@ -8,10 +8,10 @@
 #include "mesh3D.h"
 #include "graphics/material.h"
 #include "graphics/graphics.h"
-#include "geometry/point3.h"
-#include "geometry/vector3.h"
-#include "graphics/color4.h"
-#include "graphics/uv2.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
+#include "graphics/color/color4.h"
+#include "graphics/uv/uv2.h"
 #include "ui/debug.h"
 
 

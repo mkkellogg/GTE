@@ -10,9 +10,9 @@
 #include "graphics/shader/shader.h"
 #include "geometry/matrix.h"
 #include "base/basevector4.h"
-#include "geometry/point3.h"
-#include "geometry/vector3.h"
-#include "geometry/point3array.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
+#include "geometry/point/point3array.h"
 #include "ui/debug.h"
 #include "gte.h"
 

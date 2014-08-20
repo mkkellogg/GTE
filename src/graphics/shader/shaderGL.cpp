@@ -266,3 +266,60 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	}
 }
 
+void ShaderGL::SendUniformToShader(int loc, Matrix * mat)
+{
+
+}
+
+void ShaderGL::SendUniformToShader(int loc, Point3 * point)
+{
+
+}
+
+void ShaderGL::SendUniformToShader(int loc, Vector3 * vector)
+{
+
+}
+
+void ShaderGL::SendUniformToShader(int loc, Color4 * color)
+{
+
+}
+
+
+void ShaderGL::SendUniformToShader4v(int loc, float * data)
+{
+
+}
+
+void ShaderGL::SendUniformToShader3v(int loc, float * data)
+{
+
+}
+
+void ShaderGL::SendUniformToShader2v(int loc, float * data)
+{
+
+}
+
+void ShaderGL::SendUniformToShader4(int loc, float x, float y, float z, float w)
+{
+
+}
+
+void ShaderGL::SendUniformToShader3(int loc, float x, float y, float z)
+{
+
+}
+
+void ShaderGL::SendUniformToShader2(int loc, float x, float y)
+{
+
+}
+
+void ShaderGL::SendUniformToShader(int loc, float  data)
+{
+
+}
+
+

@@ -116,7 +116,6 @@ void GraphicsGL::ActivateMaterial(Material * material)
 	}
 }
 
-
 void _glutDisplayFunc()
 {
 	_instanceCallbacks->OnUpdate(_thisInstance);
