@@ -7,6 +7,8 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/color/color4.h"
+#include "graphics/attributes.h"
+#include "graphics/uniforms.h"
 
 enum class ShaderType
 {
@@ -27,14 +29,14 @@ class Shader
     virtual int GetUniformVarLocation(const char *varName) const = 0;
     virtual void SendBufferToShader(int loc, VertexAttrBuffer * buffer) = 0;
 
-    virtual void SendUniformToShader(int loc, Matrix * mat) = 0;
-    virtual void SendUniformToShader(int loc, Point3 * point) = 0;
-    virtual void SendUniformToShader(int loc, Vector3 * vector) = 0;
-    virtual void SendUniformToShader(int loc, Color4 * color) = 0;
+    virtual void SendUniformToShader(int loc, const Matrix * mat) = 0;
+    virtual void SendUniformToShader(int loc, const Point3 * point) = 0;
+    virtual void SendUniformToShader(int loc, const Vector3 * vector) = 0;
+    virtual void SendUniformToShader(int loc, const Color4 * color) = 0;
 
-    virtual void SendUniformToShader4v(int loc, float * data) = 0;
-    virtual void SendUniformToShader3v(int loc, float * data) = 0;
-    virtual void SendUniformToShader2v(int loc, float * data) = 0;
+    virtual void SendUniformToShader4v(int loc, const float * data) = 0;
+    virtual void SendUniformToShader3v(int loc, const float * data) = 0;
+    virtual void SendUniformToShader2v(int loc, const float * data) = 0;
     virtual void SendUniformToShader4(int loc, float x, float y, float z, float w) = 0;
     virtual void SendUniformToShader3(int loc, float x, float y, float z) = 0;
     virtual void SendUniformToShader2(int loc, float x, float y) = 0;

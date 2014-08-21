@@ -97,7 +97,6 @@ int Material::TestForUniform(Uniform uniform) const
 	return loc;
 }
 
-
 AttributeSet Material::GetAttributeSet() const
 {
 	return attributeSet;
@@ -110,11 +109,21 @@ Shader * Material::GetShader() const
 
 int Material::GetAttributeShaderVarLocation(Attribute attr) const
 {
-	return  Material::attributeBindings[(int)attr];
+	return GetAttributeBinding(attr);
 }
 
 void Material::SendAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer)
 {
 	int loc = GetAttributeBinding(attr);
 	shader->SendBufferToShader(loc, buffer);
+}
+
+int Material::GetUniformShaderVarLocation(Uniform uniform) const
+{
+	return  GetUniformBinding(uniform);
+}
+
+UniformSet Material::GetUniformSet() const
+{
+	return uniformSet;
 }

@@ -238,7 +238,6 @@ int ShaderGL::GetUniformVarLocation(const char *varName) const
 	return (int)loc;
 }
 
-
 GLuint ShaderGL::GetProgramID()
 {
 	return programID;
@@ -266,38 +265,38 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	}
 }
 
-void ShaderGL::SendUniformToShader(int loc, Matrix * mat)
+void ShaderGL::SendUniformToShader(int loc, const Matrix * mat)
 {
 
 }
 
-void ShaderGL::SendUniformToShader(int loc, Point3 * point)
+void ShaderGL::SendUniformToShader(int loc, const Point3 * point)
 {
 
 }
 
-void ShaderGL::SendUniformToShader(int loc, Vector3 * vector)
+void ShaderGL::SendUniformToShader(int loc, const Vector3 * vector)
 {
 
 }
 
-void ShaderGL::SendUniformToShader(int loc, Color4 * color)
+void ShaderGL::SendUniformToShader(int loc, const Color4 * color)
 {
 
 }
 
 
-void ShaderGL::SendUniformToShader4v(int loc, float * data)
+void ShaderGL::SendUniformToShader4v(int loc, const float * data)
 {
 
 }
 
-void ShaderGL::SendUniformToShader3v(int loc, float * data)
+void ShaderGL::SendUniformToShader3v(int loc, const float * data)
 {
 
 }
 
-void ShaderGL::SendUniformToShader2v(int loc, float * data)
+void ShaderGL::SendUniformToShader2v(int loc, const float * data)
 {
 
 }

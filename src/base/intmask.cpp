@@ -36,7 +36,7 @@ unsigned int IntMask::MaskValueToIndex(unsigned int maskValue)
 {
 	if(maskValue == 0) return 0;
 
-	int index=0x00000001;
+	unsigned int index=0x00000001;
 	int count = 0;
 	while(!(maskValue & index) && count < 64)
 	{

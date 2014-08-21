@@ -116,6 +116,26 @@ void GraphicsGL::ActivateMaterial(Material * material)
 	}
 }
 
+void GraphicsGL::SendStandardUniformsToShader()
+{
+	if(activeMaterial != NULL)
+	{
+		int mvMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ModelViewMatrix);
+		int mvpMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ModelViewProjectionMatrix);
+
+		ShaderGL * shader = (ShaderGL *) activeMaterial->GetShader();
+		if(shader != NULL)
+		{
+			shader->SendUniformToShader(mvMatrixLoc, modelViewTransform->GetMatrix());
+			shader->SendUniformToShader(mvpMatrixLoc, projectionTransform->GetMatrix());
+		}
+	}
+	else
+	{
+		Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() called with NULL active material.");
+	}
+}
+
 void _glutDisplayFunc()
 {
 	_instanceCallbacks->OnUpdate(_thisInstance);

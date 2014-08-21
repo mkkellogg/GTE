@@ -48,14 +48,14 @@ class ShaderGL : public Shader
 
     void SendBufferToShader(int loc, VertexAttrBuffer * buffer);
 
-    void SendUniformToShader(int loc, Matrix * mat);
-    void SendUniformToShader(int loc, Point3 * point);
-    void SendUniformToShader(int loc, Vector3 * vector);
-    void SendUniformToShader(int loc, Color4 * color);
+    void SendUniformToShader(int loc, const Matrix * mat);
+    void SendUniformToShader(int loc, const Point3 * point);
+    void SendUniformToShader(int loc, const Vector3 * vector);
+    void SendUniformToShader(int loc, const Color4 * color);
 
-    void SendUniformToShader4v(int loc, float * data);
-    void SendUniformToShader3v(int loc, float * data);
-    void SendUniformToShader2v(int loc, float * data);
+    void SendUniformToShader4v(int loc, const float * data);
+    void SendUniformToShader3v(int loc, const float * data);
+    void SendUniformToShader2v(int loc, const float * data);
     void SendUniformToShader4(int loc, float x, float y, float z, float w);
     void SendUniformToShader3(int loc, float x, float y, float z);
     void SendUniformToShader2(int loc, float x, float y);

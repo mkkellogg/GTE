@@ -6,6 +6,33 @@
 #include "global/constants.h"
 #include "vector/vector3.h"
 
+
+Transform * Transform::CreteIdentityTransform()
+{
+	return new Transform();
+}
+
+Transform::Transform()
+{
+	matrix = new Matrix();
+	matrix->SetIdentity();
+}
+
+Transform::Transform(Matrix * m) : Transform()
+{
+	matrix->SetTo(m);
+}
+
+Transform::~Transform()
+{
+	delete matrix;
+}
+
+const Matrix * Transform::GetMatrix() const
+{
+	return (const Matrix *)matrix;
+}
+
 void Transform::BuildProjectionMatrix(Matrix * m,float fov, float ratio, float nearP, float farP)
 {
     float f = 1.0f / tan (fov * Constants::PIOver360);

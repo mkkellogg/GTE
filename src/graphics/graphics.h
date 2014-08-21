@@ -3,6 +3,7 @@
 
 #include "shader/shader.h"
 #include "material.h"
+#include "geometry/transform.h"
 #include "graphics/object/mesh3Drenderer.h"
 
 class Graphics;
@@ -24,6 +25,8 @@ class Graphics
     static Graphics * theInstance;
 
     Material * activeMaterial;
+    Transform * modelViewTransform;
+    Transform * projectionTransform;
 
     Graphics();
     virtual ~Graphics();
@@ -44,7 +47,7 @@ class Graphics
     virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle) = 0;
 
     virtual void ActivateMaterial(Material * material);
-    Material * GetActiveMaterial();
+    Material * GetActiveMaterial() const;
 };
 
 #endif

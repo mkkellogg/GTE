@@ -47,10 +47,16 @@ Matrix::~Matrix()
     
 }
 
+void Matrix::SetTo(const Matrix * src)
+{
+	if(this == src)return;
+	memcpy((void*)data,(void*)src->data, sizeof(float) * DATA_SIZE);
+}
+
 Matrix & Matrix::operator= (const Matrix & source)
 {
     if(this == &source)return *this;
-    memcpy((void*)source.data, (void*)data, sizeof(float) * DATA_SIZE); 
+    SetTo(&source);
     return *this;
 }
 

@@ -8,6 +8,7 @@
 #include "object/mesh3Drenderer.h"
 #include "material.h"
 #include "shader/shader.h"
+#include "geometry/transform.h"
 
 class GraphicsGL : public Graphics
 {
@@ -18,6 +19,8 @@ class GraphicsGL : public Graphics
     GraphicsCallbacks * callbacks;
     GraphicsGL();
     ~GraphicsGL();
+
+    void SendStandardUniformsToShader();
 
     public :
 

@@ -4,13 +4,21 @@
 #include "matrix.h"
 #include "global/constants.h"
 
+class Transform;
+
 class Transform
 {
+	Matrix * matrix;
+
     public:
 
     Transform();
     Transform(Matrix * m);
     ~Transform();
+
+    const Matrix * GetMatrix() const;
+
+    static Transform * CreteIdentityTransform();
 
     static void BuildProjectionMatrix(Matrix * m,float fov, float ratio, float nearP, float farP);
     static void BuildLookAtMatrix(Matrix * m, float posX, float posY, float posZ,

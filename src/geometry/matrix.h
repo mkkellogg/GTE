@@ -39,6 +39,8 @@ class Matrix
 
     Matrix & operator= (const Matrix & source);
 
+    void SetTo(const Matrix * src);
+
     void Transform(const Vector3 * vector, Vector3 * out) const;
     void Transform(Vector3 * vector) const;
     void Transform(const Point3 * point, Point3 * out) const;
