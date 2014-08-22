@@ -7,6 +7,7 @@ class ViewSystem;
 #include "global/constants.h"
 #include "geometry/transform.h"
 #include "camera.h"
+#include <vector>
 
 class ViewSystem
 {
@@ -14,7 +15,10 @@ class ViewSystem
 
 	const Graphics * graphics;
 
-	Camera * activeCamera;
+	std::vector<Camera*> cameras;
+
+	void DestroyCameras();
+	void DestroyCamera(Camera * camera);
 
     protected:
 
@@ -23,7 +27,8 @@ class ViewSystem
 
     public:
 
-    Camera * GetActiveCamera();
+    int CameraCount() const;
+    const Camera * GetCamera(int index) const;
 };
 
 #endif

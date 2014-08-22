@@ -20,7 +20,7 @@ class GraphicsGL : public Graphics
     GraphicsGL();
     ~GraphicsGL();
 
-    void SendStandardUniformsToShader();
+    void SendStandardUniformsToShader(const Camera * camera);
 
     public :
 
@@ -34,6 +34,10 @@ class GraphicsGL : public Graphics
 
     void ActivateMaterial(Material * material);
     Material * GetActiveMaterial();
+
+    void RenderScene();
+    void RenderSceneObjects(const Camera * camera);
+    void ClearBuffersForCamera(const Camera * camera) const;
 };
 
 #endif

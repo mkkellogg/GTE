@@ -16,6 +16,8 @@
 #include "object/mesh3Drenderer.h"
 #include "object/mesh3DrendererGL.h"
 #include "view/camera.h"
+#include "renderbuffer.h"
+#include "base/intmask.h"
 
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
@@ -116,12 +118,10 @@ void GraphicsGL::ActivateMaterial(Material * material)
 
 		ShaderGL * shader = (ShaderGL *) material->GetShader();
 		glUseProgram(shader->GetProgramID());
-
-		SendStandardUniformsToShader();
 	}
 }
 
-void GraphicsGL::SendStandardUniformsToShader()
+void GraphicsGL::SendStandardUniformsToShader(const Camera * camera)
 {
 	if(viewSystem == NULL)
 	{
@@ -138,7 +138,6 @@ void GraphicsGL::SendStandardUniformsToShader()
 		ShaderGL * shader = (ShaderGL *) activeMaterial->GetShader();
 		if(shader != NULL)
 		{
-			Camera * camera = viewSystem->GetActiveCamera();
 			const Transform * modelViewTransform = camera->GetModelViewTransform();
 			const Transform * mvpTransform = camera->GetMVPTransform();
 			const Transform * projectionTransform = camera->GetProjectionTransform();
@@ -158,14 +157,40 @@ void GraphicsGL::SendStandardUniformsToShader()
 	}
 }
 
+void GraphicsGL::ClearBuffersForCamera(const Camera * camera) const
+{
+	unsigned int clearBufferMask = camera->GetClearBufferMask();
+	GLbitfield glClearMask = 0;
+	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Color))
+		glClearMask |= GL_COLOR_BUFFER_BIT;
+	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Depth))
+		glClearMask |= GL_DEPTH_BUFFER_BIT;
+
+	glClear(glClearMask);
+}
+
+void GraphicsGL::RenderScene()
+{
+	for( int i = 0; i < viewSystem->CameraCount(); i++)
+	{
+		const Camera * camera = viewSystem->GetCamera(i);
+		ClearBuffersForCamera(camera);
+		RenderSceneObjects(camera);
+	}
+
+	glutSwapBuffers();
+}
+
+void GraphicsGL::RenderSceneObjects(const Camera * camera)
+{
+	SendStandardUniformsToShader(camera);
+}
+
 void _glutDisplayFunc()
 {
 	_instanceCallbacks->OnUpdate(_thisInstance);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // your drawing code goes here
-
-    glutSwapBuffers();
+	_thisInstance->RenderScene();
 }
 
 void _glutIdleFunc()

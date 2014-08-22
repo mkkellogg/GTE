@@ -69,8 +69,29 @@ void IntMask::ClearBitForIndexMask(unsigned int * target, unsigned short index)
 	*target = uPtr;
 }
 
+void IntMask::SetBit(unsigned int * target, unsigned int mask)
+{
+	unsigned int uPtr = (unsigned int)*target;
+	uPtr |= mask;
+	*target = uPtr;
+}
+
+void IntMask::ClearBit(unsigned int * target, unsigned int mask)
+{
+	unsigned int uPtr = (unsigned int)*target;
+	unsigned int iMask = InvertBits(mask);
+
+	uPtr &= iMask;
+	*target = uPtr;
+}
+
 bool IntMask::IsBitSet(unsigned int target, unsigned short index)
 {
 	unsigned int mask = IndexToMaskValue(index);
+	return target & mask;
+}
+
+bool IntMask::IsBitSetForMask(unsigned int target,unsigned int mask)
+{
 	return target & mask;
 }

@@ -14,7 +14,11 @@ class IntMask
 	static void SetBitForIndexMask(unsigned int * target, unsigned short index);
 	static void ClearBitForIndexMask(unsigned int * target, unsigned short index);
 
+	static void SetBit(unsigned int * target, unsigned int mask);
+	static void ClearBit(unsigned int * target, unsigned int mask);
+
 	static bool IsBitSet(unsigned int target, unsigned short index);
+	static bool IsBitSetForMask(unsigned int target,unsigned int mask);
 };
 
 #endif
