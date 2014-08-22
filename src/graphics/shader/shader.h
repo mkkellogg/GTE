@@ -3,7 +3,7 @@
 #define _SHADER_H_
 
 #include "graphics/vertexattrbuffer.h"
-#include "geometry/matrix.h"
+#include "geometry/matrix4x4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/color/color4.h"
@@ -29,7 +29,7 @@ class Shader
     virtual int GetUniformVarLocation(const char *varName) const = 0;
     virtual void SendBufferToShader(int loc, VertexAttrBuffer * buffer) = 0;
 
-    virtual void SendUniformToShader(int loc, const Matrix * mat) = 0;
+    virtual void SendUniformToShader(int loc, const Matrix4x4 * mat) = 0;
     virtual void SendUniformToShader(int loc, const Point3 * point) = 0;
     virtual void SendUniformToShader(int loc, const Vector3 * vector) = 0;
     virtual void SendUniformToShader(int loc, const Color4 * color) = 0;

@@ -15,7 +15,7 @@
 #include "vertexattrbufferGL.h"
 #include "object/mesh3Drenderer.h"
 #include "object/mesh3DrendererGL.h"
-#include "gte.h"
+#include "view/camera.h"
 
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
@@ -24,6 +24,9 @@ void _glutIdleFunc();
 
 void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
+	// case base method
+	Graphics::Init(windowWidth, windowHeight, callbacks, windowTitle);
+
 	_instanceCallbacks = this->callbacks = callbacks;
 	_thisInstance = this;
 
@@ -113,26 +116,45 @@ void GraphicsGL::ActivateMaterial(Material * material)
 
 		ShaderGL * shader = (ShaderGL *) material->GetShader();
 		glUseProgram(shader->GetProgramID());
+
+		SendStandardUniformsToShader();
 	}
 }
 
 void GraphicsGL::SendStandardUniformsToShader()
 {
+	if(viewSystem == NULL)
+	{
+		Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() -> viewSystem is NULL.");
+		return;
+	}
+
 	if(activeMaterial != NULL)
 	{
 		int mvMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ModelViewMatrix);
 		int mvpMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ModelViewProjectionMatrix);
+		int projectionMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ProjectionMatrix);
 
 		ShaderGL * shader = (ShaderGL *) activeMaterial->GetShader();
 		if(shader != NULL)
 		{
-			shader->SendUniformToShader(mvMatrixLoc, modelViewTransform->GetMatrix());
-			shader->SendUniformToShader(mvpMatrixLoc, projectionTransform->GetMatrix());
+			Camera * camera = viewSystem->GetActiveCamera();
+			const Transform * modelViewTransform = camera->GetModelViewTransform();
+			const Transform * mvpTransform = camera->GetMVPTransform();
+			const Transform * projectionTransform = camera->GetProjectionTransform();
+
+			if(mvMatrixLoc >= 0)shader->SendUniformToShader(mvMatrixLoc, modelViewTransform->GetMatrix());
+			if(mvpMatrixLoc >= 0)shader->SendUniformToShader(mvpMatrixLoc, mvpTransform->GetMatrix());
+			if(projectionMatrixLoc >= 0)shader->SendUniformToShader(projectionMatrixLoc, projectionTransform->GetMatrix());
+		}
+		else
+		{
+			Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() -> material contains NULL shader.");
 		}
 	}
 	else
 	{
-		Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() called with NULL active material.");
+		Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() -> activeMaterial is NULL.");
 	}
 }
 

@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "matrix.h"
+#include "matrix4x4.h"
 #include "vector/vector3.h"
 
 class Quaternion 
@@ -34,8 +34,8 @@ class Quaternion
     Quaternion operator-(const Quaternion& rhs) const;
     Quaternion operator-() const;
     Quaternion operator/(float s) const;
-    Matrix matrix() const;
-    Matrix rightMatrix() const;
+    Matrix4x4 matrix() const;
+    Matrix4x4 rightMatrix() const;
     // Vector3 vector() const;
     float norm() const;
     // Matrix rotationMatrix() const;

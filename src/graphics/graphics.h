@@ -1,12 +1,13 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
+class Graphics;
+
 #include "shader/shader.h"
 #include "material.h"
 #include "geometry/transform.h"
 #include "graphics/object/mesh3Drenderer.h"
-
-class Graphics;
+#include "view/viewsystem.h"
 
 class GraphicsCallbacks
 {
@@ -25,8 +26,7 @@ class Graphics
     static Graphics * theInstance;
 
     Material * activeMaterial;
-    Transform * modelViewTransform;
-    Transform * projectionTransform;
+    ViewSystem * viewSystem;
 
     Graphics();
     virtual ~Graphics();
@@ -44,7 +44,7 @@ class Graphics
     virtual Material * CreateMaterial();
     virtual void DestroyMaterial(Material * material);
 
-    virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle) = 0;
+    virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
 
     virtual void ActivateMaterial(Material * material);
     Material * GetActiveMaterial() const;

@@ -8,7 +8,7 @@
 
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"
-#include "geometry/matrix.h"
+#include "geometry/matrix4x4.h"
 #include "base/basevector4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -28,9 +28,9 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         basicShader = NULL;
     }
 
-    void PrintMatrix(Matrix *m)
+    void PrintMatrix(Matrix4x4 *m)
     {
-        float * data = m->GetDataPtr();
+        const float * data = m->GetDataPtr();
         for(int r=0; r < 4; r++)
         {
             printf("[");
@@ -87,11 +87,11 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
                          0,0,1,0,
                          1,2,3,1};
 
-        Matrix a(dataA);
-        Matrix b(dataB);
-        Matrix c;  
+        Matrix4x4 a(dataA);
+        Matrix4x4 b(dataB);
+        Matrix4x4 c;  
 
-        Matrix::Multiply(&a, &b, &c);        
+        Matrix4x4::Multiply(&a, &b, &c);        
 
         PrintMatrix(&c);   
 

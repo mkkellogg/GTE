@@ -1,7 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include "quaternion.h"
-#include "matrix.h"
+#include "matrix4x4.h"
 #include "vector/vector3.h"
 #include "base/basevector4.h"
 #include "ui/debug.h"
@@ -216,10 +216,10 @@ Quaternion Quaternion::operator/(float s) const
  * Note that this is @e NOT the rotation matrix that may be
  * represented by a unit quaternion.
  */
-Matrix Quaternion::matrix() const
+Matrix4x4 Quaternion::matrix() const
 {
     float m[16] = { w(), -z(), y(), x(), z(), w(), -x(), y(), -y(), x(), w(), z(), -x(), -y(), -z(), w() };
-    return Matrix(m);
+    return Matrix4x4(m);
 }
 
 /**
@@ -234,10 +234,10 @@ Matrix Quaternion::matrix() const
  * Note that this is @e NOT the rotation matrix that may be
  * represented by a unit quaternion.
  */
-Matrix Quaternion::rightMatrix() const
+Matrix4x4 Quaternion::rightMatrix() const
 {
     float m[16] = { +w(), -z(), y(), -x(), +z(), w(), -x(), -y(), -y(), x(), w(), -z(), +x(), y(), z(), w() };
-    return Matrix(m);
+    return Matrix4x4(m);
 }
 
 /**

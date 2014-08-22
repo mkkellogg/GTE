@@ -1,24 +1,24 @@
 #include <iostream>
 #include <math.h>
 #include "transform.h"
-#include "matrix.h"
+#include "matrix4x4.h"
 #include "ui/debug.h"
 #include "global/constants.h"
 #include "vector/vector3.h"
 
 
-Transform * Transform::CreteIdentityTransform()
+Transform * Transform::CreateIdentityTransform()
 {
 	return new Transform();
 }
 
 Transform::Transform()
 {
-	matrix = new Matrix();
+	matrix = new Matrix4x4();
 	matrix->SetIdentity();
 }
 
-Transform::Transform(Matrix * m) : Transform()
+Transform::Transform(Matrix4x4 * m) : Transform()
 {
 	matrix->SetTo(m);
 }
@@ -28,18 +28,18 @@ Transform::~Transform()
 	delete matrix;
 }
 
-const Matrix * Transform::GetMatrix() const
+const Matrix4x4 * Transform::GetMatrix() const
 {
-	return (const Matrix *)matrix;
+	return matrix;
 }
 
-void Transform::BuildProjectionMatrix(Matrix * m,float fov, float ratio, float nearP, float farP)
+void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, float nearP, float farP)
 {
     float f = 1.0f / tan (fov * Constants::PIOver360);
 
     m->SetIdentity();
 
-    float * data = m->GetDataPtr();
+    float data[16];
 
     data[0] = f / ratio;
     data[1 * 4 + 1] = f;
@@ -47,9 +47,11 @@ void Transform::BuildProjectionMatrix(Matrix * m,float fov, float ratio, float n
     data[3 * 4 + 2] = (2.0f * farP * nearP) / (nearP - farP);
     data[2 * 4 + 3] = -1.0f;
     data[3 * 4 + 3] = 0.0f;
+
+    m->SetTo(data);
 }
 
-void Transform::BuildLookAtMatrix(Matrix * m, float posX, float posY, float posZ,
+void Transform::BuildLookAtMatrix(Matrix4x4 * m, float posX, float posY, float posZ,
 								  float lookAtX, float lookAtY, float lookAtZ)
 {
 	Vector3 vDir(lookAtX - posX, lookAtY - posY, lookAtZ - posZ);
@@ -64,8 +66,7 @@ void Transform::BuildLookAtMatrix(Matrix * m, float posX, float posY, float posZ
 	Vector3::Cross((const Vector3 *)&vRight, (const Vector3 *)&vDir, &vUp);
 	vUp.Normalize();
 
-	Matrix viewMatrix;
-	float * view = viewMatrix.GetDataPtr();
+	float view[16];
 
 	view[0]  = vRight.x;
 	view[4]  = vRight.y;
@@ -87,10 +88,13 @@ void Transform::BuildLookAtMatrix(Matrix * m, float posX, float posY, float posZ
 	view[11] = 0.0f;
 	view[15] = 1.0f;
 
-	Matrix aux;
+	Matrix4x4 viewMatrix;
+	viewMatrix.SetTo(view);
+
+	Matrix4x4 aux;
 
 	aux.SetIdentity();
 	aux.Translate(-posX, -posY, -posZ);
 
-	Matrix::Multiply(&viewMatrix, &aux, m);
+	Matrix4x4::Multiply(&viewMatrix, &aux, m);
 }

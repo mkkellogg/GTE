@@ -23,7 +23,7 @@
 #include "vector/vector3.h"
 #include "point/point3.h"
 
-class Matrix 
+class Matrix4x4 
 {
     static const int DATA_SIZE = 16;
     static const int DIM_SIZE = 4;
@@ -33,52 +33,55 @@ class Matrix
 
     public:
     
-    Matrix();
-    Matrix(float * data);
-    ~Matrix();
+    Matrix4x4();
+    Matrix4x4(float * data);
+    ~Matrix4x4();
 
-    Matrix & operator= (const Matrix & source);
+    int GetDataSize() const;
 
-    void SetTo(const Matrix * src);
+    Matrix4x4 & operator= (const Matrix4x4 & source);
+
+    void SetTo(const Matrix4x4 * src);
+    void SetTo(const float * data);
 
     void Transform(const Vector3 * vector, Vector3 * out) const;
     void Transform(Vector3 * vector) const;
     void Transform(const Point3 * point, Point3 * out) const;
     void Transform(Point3 * point) const;
-    void Multiply(Matrix * matrix);
-    void Multiply(Matrix * matrix, Matrix * out) const;
-    static void Multiply(Matrix * lhs, Matrix *rhs, Matrix * out);
+    void Multiply(const Matrix4x4 * matrix);
+    void Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const;
+    static void Multiply(const Matrix4x4 * lhs, const Matrix4x4 *rhs, Matrix4x4 * out);
     static void MultiplyMV(const float * lhsMat, const float * rhsVec, float * out);
     static void MultiplyMM(const float * lhs, const float *rhs, float * out);
 
     void Transpose();
-    static void Transpose(float* source, float *dest);
+    static void Transpose(const float* source, float *dest);
 
     void Invert();
-    static void Invert(float * source, float * dest);
+    static void Invert(const float * source, float * dest);
 
     void SetIdentity();
-    static void SetIdentity(float * source);
+    static void SetIdentity(float * target);
 
-    void Translate(Vector3 * vector);
+    void Translate(const Vector3 * vector);
     void Translate(float x, float y, float z);
-    static void Translate(Matrix * src, Matrix * out, Vector3 * vector);
-    static void Translate(Matrix * src, Matrix * out,float x, float y, float z);
-    static void Translate(float * source, float * dest, float x, float y, float z);
+    static void Translate(const Matrix4x4 * src, Matrix4x4 * out, const Vector3 * vector);
+    static void Translate(const Matrix4x4 * src, Matrix4x4 * out,float x, float y, float z);
+    static void Translate(const float * source, float * dest, float x, float y, float z);
 
-    void Rotate(Vector3 * vector, float a);
+    void Rotate(const Vector3 * vector, float a);
     void Rotate(float x, float y, float z, float a);
     void SetRotateEuler(float x, float y, float z);
     static void SetRotate(float * rm, float x, float y, float z, float a);
     static void SetRotateEuler(float * rm, float x, float y, float z);
 
     void Scale(float x, float y, float z);
-    void Scale(Matrix * out, float x, float y, float z);
-    static void Scale(float * source, float * dest, float x, float y , float z);
+    void Scale(Matrix4x4 * out, float x, float y, float z) const ;
+    static void Scale(const float * source, float * dest, float x, float y , float z);
 
     static inline void Mx4transform(float x, float y, float z, float w, const float* pM, float* pDest);
 
-    float * GetDataPtr();
+    const float * GetDataPtr() const;
 };
 
 #endif

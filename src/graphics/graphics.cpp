@@ -13,13 +13,13 @@ Graphics * Graphics::theInstance = NULL;
 
 Graphics::~Graphics()
 {
-	SAFE_DELETE(modelViewTransform);
-	SAFE_DELETE(projectionTransform);
+
 }
 
-Graphics::Graphics() : activeMaterial(NULL), modelViewTransform(Transform::CreteIdentityTransform()), projectionTransform(Transform::CreteIdentityTransform())
+Graphics::Graphics()
 {
-
+	activeMaterial= NULL;
+	viewSystem = NULL;
 }
 
 Graphics * Graphics::Instance()
@@ -38,6 +38,11 @@ Graphics * Graphics::Instance()
 GraphicsCallbacks::~GraphicsCallbacks()
 {
 
+}
+
+void Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
+{
+	viewSystem = new ViewSystem(this);
 }
 
 Material * Graphics::CreateMaterial()

@@ -265,7 +265,7 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	}
 }
 
-void ShaderGL::SendUniformToShader(int loc, const Matrix * mat)
+void ShaderGL::SendUniformToShader(int loc, const Matrix4x4 * mat)
 {
 
 }

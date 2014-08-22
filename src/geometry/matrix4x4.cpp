@@ -23,95 +23,112 @@
 #include <memory.h>
 #include <math.h>
  
-#include "matrix.h"
+#include "ui/debug.h"
+#include "matrix4x4.h"
 #include "point/point3.h"
 #include "vector/vector3.h"
 
 #define I(_i, _j) ((_j)+ DIM_SIZE*(_i))
 #define PI 3.14159265
 
-Matrix::Matrix()
+Matrix4x4::Matrix4x4()
 {
     Init();
     SetIdentity();
 }
 
-Matrix::Matrix(float * data)
+Matrix4x4::Matrix4x4(float * data)
 {
     Init();
     memcpy(this->data, data, sizeof(float) * DATA_SIZE);
 }
 
-Matrix::~Matrix()
+Matrix4x4::~Matrix4x4()
 {
     
 }
 
-void Matrix::SetTo(const Matrix * src)
+int Matrix4x4::GetDataSize() const
 {
-	if(this == src)return;
-	memcpy((void*)data,(void*)src->data, sizeof(float) * DATA_SIZE);
+	return DATA_SIZE;
 }
 
-Matrix & Matrix::operator= (const Matrix & source)
+void Matrix4x4::SetTo(const Matrix4x4 * src)
+{
+	if(this == src)return;
+	SetTo(src->data);
+}
+
+void Matrix4x4::SetTo(const float * srcData)
+{
+	if(srcData == NULL)
+	{
+		Debug::PrintError("Matrix::Set() -> srcData is NULL");
+		return;
+	}
+
+	memcpy((void*)this->data,(void*)srcData, sizeof(float) * DATA_SIZE);
+}
+
+Matrix4x4 & Matrix4x4::operator= (const Matrix4x4 & source)
 {
     if(this == &source)return *this;
     SetTo(&source);
     return *this;
 }
 
-void Matrix::Init()
+void Matrix4x4::Init()
 {
     
 }
 
-void Matrix::Transform(const Vector3 * vector, Vector3 * out) const
+void Matrix4x4::Transform(const Vector3 * vector, Vector3 * out) const
 {
     MultiplyMV(this->data, vector->GetDataPtr(), out->GetDataPtr());
 }
 
-void Matrix::Transform(const Point3 * point, Point3 * out) const
+void Matrix4x4::Transform(const Point3 * point, Point3 * out) const
 {
     MultiplyMV(this->data, point->GetDataPtr(), out->GetDataPtr());
 }
 
-void Matrix::Transform(Vector3 * vector) const
+void Matrix4x4::Transform(Vector3 * vector) const
 {
 	float temp[DIM_SIZE];
 	MultiplyMV(this->data, vector->GetDataPtr(), temp);
 	memcpy(vector->GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
 }
 
-void Matrix::Transform(Point3 * point) const
+void Matrix4x4::Transform(Point3 * point) const
 {
 	float temp[DIM_SIZE];
 	MultiplyMV(this->data, point->GetDataPtr(), temp);
 	memcpy(point->GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
 }
 
-void Matrix::Multiply(Matrix * matrix)
+void Matrix4x4::Multiply(const Matrix4x4 * matrix)
 {
     float temp[DATA_SIZE];
     MultiplyMM(this->data, matrix->data, temp);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::Multiply(Matrix * matrix, Matrix * out) const
+void Matrix4x4::Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const
 {
     MultiplyMM(matrix->data, this->data, out->data);
 }
 
-void Matrix::Multiply(Matrix * lhs, Matrix *rhs, Matrix * out)
+void Matrix4x4::Multiply(const Matrix4x4 * lhs, const Matrix4x4 *rhs, Matrix4x4 * out)
 {
     MultiplyMM(lhs->data, rhs->data, out->data);
 }
 
-void Matrix::MultiplyMV(const float * lhsMat, const float * rhsVec, float * out)
+void Matrix4x4::MultiplyMV(const float * lhsMat, const float * rhsVec, float * out)
 {
     Mx4transform(rhsVec[0], rhsVec[1], rhsVec[2], rhsVec[3], lhsMat, out);
 }
 
-void Matrix::Mx4transform(float x, float y, float z, float w, const float* pM, float* pDest) 
+void Matrix4x4::Mx4transform(float x, float y, float z, float w, const float* pM, float* pDest) 
 {
     pDest[0] = pM[0 + 4 * 0] * x + pM[0 + 4 * 1] * y + pM[0 + 4 * 2] * z + pM[0 + 4 * 3] * w;
     pDest[1] = pM[1 + 4 * 0] * x + pM[1 + 4 * 1] * y + pM[1 + 4 * 2] * z + pM[1 + 4 * 3] * w;
@@ -133,7 +150,7 @@ void Matrix::Mx4transform(float x, float y, float z, float w, const float* pM, f
 *
 *********************************************************/
 
-void Matrix::MultiplyMM(const float * lhs, const float *rhs, float * out)
+void Matrix4x4::MultiplyMM(const float * lhs, const float *rhs, float * out)
 {
     for (int i=0 ; i<DIM_SIZE ; i++) 
     {
@@ -157,14 +174,14 @@ void Matrix::MultiplyMM(const float * lhs, const float *rhs, float * out)
     }
 }
 
-void Matrix::Transpose()
+void Matrix4x4::Transpose()
 {
     float temp[DATA_SIZE];    
     Transpose(data, temp);
     memcpy(temp, data, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::Transpose(float* source, float *dest)
+void Matrix4x4::Transpose(const float* source, float *dest)
 {
     for (int i = 0; i < DIM_SIZE; i++) 
     {
@@ -176,14 +193,14 @@ void Matrix::Transpose(float* source, float *dest)
     }
 }
 
-void Matrix::Invert()
+void Matrix4x4::Invert()
 {
     float temp[DATA_SIZE];    
     Invert(data, temp);
     memcpy(temp, data, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::Invert(float * source, float * dest)
+void Matrix4x4::Invert(const float * source, float * dest)
 {
     // array of transpose source matrix
     float src[DATA_SIZE];
@@ -276,42 +293,42 @@ void Matrix::Invert(float * source, float * dest)
         dest[j] = dst[j] * det;
 }
 
-void Matrix::SetIdentity()
+void Matrix4x4::SetIdentity()
 {
     SetIdentity(data);
 }
 
-void Matrix::SetIdentity(float * source)
+void Matrix4x4::SetIdentity(float * target)
 {
     for (int i=0 ; i< DATA_SIZE; i++) 
     {
-        source[i] = 0;
+        target[i] = 0;
     }
 
     for(int i = 0; i < DATA_SIZE; i += 5) 
     {
-        source[i] = 1.0f;
+        target[i] = 1.0f;
     }
 }
 
-float * Matrix::GetDataPtr()
+const float * Matrix4x4::GetDataPtr() const
 {
-    return data;
+    return (const float *)data;
 }
 
-void Matrix::Scale(float x, float y, float z)
+void Matrix4x4::Scale(float x, float y, float z)
 {
     float temp[DATA_SIZE];
     Scale(this->data, data, x, y, z);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::Scale(Matrix * out, float x, float y, float z)
+void Matrix4x4::Scale(Matrix4x4 * out, float x, float y, float z) const
 {
     Scale(this->data, out->data, x, y, z);
 }
 
-void Matrix::Scale(float * source, float * dest,  float x, float y, float z) 
+void Matrix4x4::Scale(const float * source, float * dest,  float x, float y, float z)
 {
     for (int i=0 ; i<4 ; i++) 
     {
@@ -324,7 +341,7 @@ void Matrix::Scale(float * source, float * dest,  float x, float y, float z)
     }
 }
 
-void Matrix::Translate(Vector3 * vector)
+void Matrix4x4::Translate(const Vector3 * vector)
 {
     float x = vector->x;
     float y = vector->y;
@@ -332,7 +349,7 @@ void Matrix::Translate(Vector3 * vector)
     Translate(x,y,z);
 }
 
-void Matrix::Translate(float x, float y, float z)
+void Matrix4x4::Translate(float x, float y, float z)
 {
     /*for (int i=0 ; i<4 ; i++) 
     {
@@ -343,17 +360,17 @@ void Matrix::Translate(float x, float y, float z)
     Translate(data, data, x, y, z);
 }
 
-void Matrix::Translate(Matrix * source, Matrix * out, Vector3 * vector)
+void Matrix4x4::Translate(const Matrix4x4 * source, Matrix4x4 * out, const Vector3 * vector)
 {
     Translate(source->data, out->data, vector->x, vector->y, vector->z);
 }
 
-void Matrix::Translate(Matrix * source, Matrix * out,float x, float y, float z)
+void Matrix4x4::Translate(const Matrix4x4 * source, Matrix4x4 * out,float x, float y, float z)
 {
     Translate(source->data, out->data, x, y, z);
 }
 
-void Matrix::Translate(float * source, float * dest, float x, float y, float z)
+void Matrix4x4::Translate(const float * source, float * dest, float x, float y, float z)
 {
     if(source != dest)
     {
@@ -372,7 +389,7 @@ void Matrix::Translate(float * source, float * dest, float x, float y, float z)
 }
 
 
-void Matrix::Rotate(Vector3 * vector, float a)
+void Matrix4x4::Rotate(const Vector3 * vector, float a)
 {
     float temp[DATA_SIZE];  
     float r[DATA_SIZE];  
@@ -381,7 +398,7 @@ void Matrix::Rotate(Vector3 * vector, float a)
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::Rotate(float x, float y, float z, float a)
+void Matrix4x4::Rotate(float x, float y, float z, float a)
 {
     float temp[DATA_SIZE];  
     float r[DATA_SIZE];  
@@ -390,12 +407,12 @@ void Matrix::Rotate(float x, float y, float z, float a)
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix::SetRotateEuler(float x, float y, float z)
+void Matrix4x4::SetRotateEuler(float x, float y, float z)
 {
     SetRotateEuler(data, x, y, z);
 }
 
-void Matrix::SetRotate(float * rm, float x, float y, float z, float a)
+void Matrix4x4::SetRotate(float * rm, float x, float y, float z, float a)
 {
     rm[3] = 0;
     rm[7] = 0;
@@ -460,7 +477,7 @@ void Matrix::SetRotate(float * rm, float x, float y, float z, float a)
     }
 }
 
-void Matrix::SetRotateEuler(float * rm, float x, float y, float z)
+void Matrix4x4::SetRotateEuler(float * rm, float x, float y, float z)
 {
     float piOver180 = PI / 180.0f;
     x *= piOver180;

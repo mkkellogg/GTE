@@ -8,7 +8,7 @@
 #include "shader.h"
 #include "graphics/vertexattrbuffer.h"
 
-#include "geometry/matrix.h"
+#include "geometry/matrix4x4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/color/color4.h"
@@ -48,7 +48,7 @@ class ShaderGL : public Shader
 
     void SendBufferToShader(int loc, VertexAttrBuffer * buffer);
 
-    void SendUniformToShader(int loc, const Matrix * mat);
+    void SendUniformToShader(int loc, const Matrix4x4 * mat);
     void SendUniformToShader(int loc, const Point3 * point);
     void SendUniformToShader(int loc, const Vector3 * vector);
     void SendUniformToShader(int loc, const Color4 * color);
