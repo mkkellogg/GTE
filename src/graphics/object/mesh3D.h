@@ -1,19 +1,21 @@
 #ifndef _MESH3D_H_
 #define _MESH3D_H_
 
-#include "geometry/point/point3.h"
-#include "geometry/vector/vector3.h"
-#include "graphics/color/color4.h"
-#include "graphics/uv/uv2.h"
+//forward declarations
+class Point3;
+class Vector3;
+class color4;
+class uv2;
 
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2array.h"
+class Point3Array;
+class Vector3Array;
+class Color4Array;
+class UV2Array;
 
+#include "object/sceneobjectcomponent.h"
 #include "graphics/attributes.h"
 
-class Mesh3D
+class Mesh3D : public SceneObjectComponent
 {
 	AttributeSet attributeSet;
 	int vertexCount;

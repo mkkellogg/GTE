@@ -1,21 +1,13 @@
 #ifndef _MESH3D_RENDERER_H_
 #define _MESH3D_RENDERER_H_
 
-class Mesh3DRenderer;
+// forward declarations
+class Mesh3D;
+class Material;
 
-#include "graphics/object/mesh3D.h"
-#include "vertexattrbuffer.h"
-#include "geometry/point/point3.h"
-#include "geometry/vector/vector3.h"
-#include "graphics/color/color4.h"
-#include "graphics/uv/uv2.h"
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2array.h"
-#include "material.h"
+#include "object/sceneobjectcomponent.h"
 
-class Mesh3DRenderer
+class Mesh3DRenderer : public SceneObjectComponent
 {
 	protected:
 

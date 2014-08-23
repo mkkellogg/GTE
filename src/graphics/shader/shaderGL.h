@@ -4,18 +4,15 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
-#include "shadersource.h"
-#include "shader.h"
-#include "graphics/render/vertexattrbuffer.h"
+//forward declarations
+class ShaderSource;
+class EngineObjectManagerGL;
 
-#include "geometry/matrix4x4.h"
-#include "geometry/point/point3.h"
-#include "geometry/vector/vector3.h"
-#include "graphics/color/color4.h"
+#include "shader.h"
 
 class ShaderGL : public Shader
 {
-    friend class GraphicsGL;
+    friend class EngineObjectManagerGL;
 
     bool ready;
     char * name;

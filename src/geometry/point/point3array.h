@@ -1,8 +1,9 @@
 #ifndef _POINT3ARRAY_H_
 #define _POINT3ARRAY_H_
 
-#include "point3.h"
-#include "base/basevector4.h"
+//forward declarations
+class Point3;
+
 #include "base/basevector4array.h"
 
 class Point3Array : public BaseVector4Array

@@ -26,12 +26,6 @@ class GraphicsGL : public Graphics
 
     void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
 
-    Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
-    void DestroyShader(Shader * shader);
-
-    Mesh3DRenderer * CreateMeshRenderer() const;
-    void DestroyMeshRenderer(Mesh3DRenderer * buffer) const;
-
     void ActivateMaterial(Material * material);
     Material * GetActiveMaterial();
 

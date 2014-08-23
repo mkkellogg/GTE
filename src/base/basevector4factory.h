@@ -1,7 +1,8 @@
 #ifndef _BASEVECTOR4_FACTORY_H_
 #define _BASEVECTOR4_FACTORY_H_
 
-#include "basevector4.h"
+// forward declarations
+class BaseVector4;
 
 class BaseVector4Factory
 {

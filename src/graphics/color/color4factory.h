@@ -1,9 +1,11 @@
 #ifndef _COLOR4_FACTORY_H_
 #define _COLOR4_FACTORY_H_
 
+//forward declarations
+class Color4Factory;
+class Color4;
+
 #include "base/basevector4factory.h"
-#include "base/basevector4.h"
-#include "color4.h"
 
 class Color4Factory : public BaseVector4Factory
 {
@@ -16,7 +18,7 @@ class Color4Factory : public BaseVector4Factory
 	Color4Factory();
     virtual ~Color4Factory();
 
-    virtual Color4 * CreatePermAttached(float * target);
+    virtual BaseVector4 * CreatePermAttached(float * target);
     virtual void CreateArray(int count, BaseVector4 *** ppptr);
 };
 

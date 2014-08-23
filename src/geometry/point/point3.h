@@ -1,7 +1,9 @@
 #ifndef _POINT3_H_
 #define _POINT3_H_
 
-#include "geometry/vector/vector3.h"
+//forward declarations
+class Vector3;
+
 #include "base/basevector4.h"
 
 class Point3 : public BaseVector4

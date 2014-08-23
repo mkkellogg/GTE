@@ -4,17 +4,22 @@
 #include <memory.h>
 #include <math.h>
 
+#include "mesh3DrendererGL.h"
+#include "vertexattrbufferGL.h"
 #include "graphics/attributes.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/shader/shaderGL.h"
-#include "mesh3DrendererGL.h"
 #include "mesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/graphics.h"
 #include "geometry/point/point3.h"
+#include "geometry/point/point3array.h"
 #include "geometry/vector/vector3.h"
+#include "geometry/vector/vector3array.h"
 #include "graphics/color/color4.h"
+#include "graphics/color/color4array.h"
 #include "graphics/uv/uv2.h"
+#include "graphics/uv/uv2array.h"
 #include "ui/debug.h"
 
 
@@ -44,7 +49,7 @@ void Mesh3DRendererGL::DestroyBuffers()
 
 void Mesh3DRendererGL::DestroyBuffer(VertexAttrBufferGL ** buffer)
 {
-	if(*buffer != NULL)delete *buffer;
+	if((*buffer) != NULL)delete (*buffer);
 	*buffer = NULL;
 }
 

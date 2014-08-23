@@ -3,8 +3,11 @@
 
 #include <iostream>
 #include <math.h>
-#include "matrix4x4.h"
-#include "vector/vector3.h"
+
+// forward declarations
+class Matrix4x4;
+class Vector3;
+class BaseVector4;
 
 class Quaternion 
 {

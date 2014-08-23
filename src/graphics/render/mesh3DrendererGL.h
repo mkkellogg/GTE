@@ -1,25 +1,22 @@
 #ifndef _MESH3D_RENDERER_GL_H_
 #define _MESH3D_RENDERER_GL_H_
 
-class Mesh3DRendererGL;
+// forward declarations
+class EngineObjectManagerGL;
+class VertexAttrBufferGL;
+class Point3Array;
+class Vector3Array;
+class Color4Array;
+class UV2Array;
+class Mesh3D;
+class Material;
 
-#include "graphics/object/mesh3D.h"
 #include "mesh3Drenderer.h"
-
-#include "vertexattrbufferGL.h"
-#include "geometry/point/point3.h"
-#include "geometry/vector/vector3.h"
-#include "graphics/color/color4.h"
-#include "graphics/uv/uv2.h"
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2array.h"
-
+#include "graphics/attributes.h"
 
 class Mesh3DRendererGL : public Mesh3DRenderer
 {
-	friend class GraphicsGL;
+	friend class EngineObjectManagerGL;
 
 	const static int MAX_ATTRIBUTE_BUFFERS = 64;
 

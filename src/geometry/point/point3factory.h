@@ -1,8 +1,10 @@
 #ifndef _POINT3_FACTORY_H_
 #define _POINT3_FACTORY_H_
 
+//forward declarations
+class Point3;
+
 #include "base/basevector4factory.h"
-#include "point3.h"
 
 class Point3Factory : public BaseVector4Factory
 {
@@ -15,7 +17,7 @@ class Point3Factory : public BaseVector4Factory
 	Point3Factory();
     virtual ~Point3Factory();
 
-    virtual Point3 * CreatePermAttached(float * target);
+    virtual BaseVector4 * CreatePermAttached(float * target);
     virtual void CreateArray(int count, BaseVector4 *** ppptr);
 };
 

@@ -12,6 +12,7 @@ SHADERSRC= $(GRAPHICSSRC)/shader
 VIEWSYSSRC= $(GRAPHICSSRC)/view
 RENDERSRC= $(GRAPHICSSRC)/render
 GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
+ENGINEOBJECTSRC= src/object
 
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o
@@ -24,12 +25,13 @@ VIEWSYSOBJ= obj/viewsystem.o obj/camera.o
 RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
+ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
 
-OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o
+OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o obj/engineobjectmanagerGL.o
 
-OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(OPENGLOBJ) $(GLOBALOBJ)
+OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
 
-all: gtemain graphics ui geometry gtemath base global
+all: gtemain graphics ui geometry gtemath base global engineobjects
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -45,6 +47,7 @@ gtemain: $(GTEMAINOBJ)
 obj/gte.o: src/gte.cpp src/gte.h 
 	$(CC) $(CFLAGS) -o obj/gte.o -c src/gte.cpp
 
+
 # ==================================
 #Glboal
 # ==================================	
@@ -54,9 +57,33 @@ global: $(GLOBALOBJ)
 obj/constants.o: $(GLOBALSRC)/constants.cpp $(GLOBALSRC)/constants.h
 	$(CC) $(CFLAGS) -o obj/constants.o -c $(GLOBALSRC)/constants.cpp 
 	
+	
+# ==================================
+# EngineObjects
+# ==================================
+
+engineobjects: $(ENGINEOBJECTOBJ)
+	
+obj/sceneobjectcomponent.o: $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp $(ENGINEOBJECTSRC)/sceneobjectcomponent.h 
+	$(CC) $(CFLAGS) -o obj/sceneobjectcomponent.o -c $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp
+	
+obj/sceneobject.o: $(ENGINEOBJECTSRC)/sceneobject.cpp $(ENGINEOBJECTSRC)/sceneobject.h 
+	$(CC) $(CFLAGS) -o obj/sceneobject.o -c $(ENGINEOBJECTSRC)/sceneobject.cpp
+	
+obj/engineobject.o: $(ENGINEOBJECTSRC)/engineobject.cpp $(ENGINEOBJECTSRC)/engineobject.h 
+	$(CC) $(CFLAGS) -o obj/engineobject.o -c $(ENGINEOBJECTSRC)/engineobject.cpp
+	
+obj/engineobjectmanager.o: $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOBJECTSRC)/engineobjectmanager.h 
+	$(CC) $(CFLAGS) -o obj/engineobjectmanager.o -c $(ENGINEOBJECTSRC)/engineobjectmanager.cpp
+	
+obj/engineobjectmanagerGL.o: $(ENGINEOBJECTSRC)/engineobjectmanagerGL.cpp $(ENGINEOBJECTSRC)/engineobjectmanagerGL.h 
+	$(CC) $(CFLAGS) -o obj/engineobjectmanagerGL.o -c $(ENGINEOBJECTSRC)/engineobjectmanagerGL.cpp
+	
+	
 # ==================================
 # Graphics
 # ==================================
+
 
 graphics: $(GRAPHICSOBJ) $(SHADEROBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject
 
@@ -105,6 +132,7 @@ obj/attributes.o: $(GRAPHICSSRC)/attributes.cpp $(GRAPHICSSRC)/attributes.h
 obj/uniforms.o: $(GRAPHICSSRC)/uniforms.cpp $(GRAPHICSSRC)/uniforms.h
 	$(CC) $(CFLAGS) -o obj/uniforms.o -c $(GRAPHICSSRC)/uniforms.cpp
 	
+	
 # ==================================
 # Render
 # ==================================
@@ -131,7 +159,7 @@ obj/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexa
 
 
 # ==================================
-# Object
+# GraphicsObject
 # ==================================
 
 graphicsobject: $(GRAPHICSOBJECTOBJ)

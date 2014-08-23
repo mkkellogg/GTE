@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+
 #include "quaternion.h"
 #include "matrix4x4.h"
 #include "vector/vector3.h"

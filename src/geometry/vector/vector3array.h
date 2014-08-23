@@ -1,8 +1,9 @@
 #ifndef _VECTOR3ARRAY_H_
 #define _VECTOR3ARRAY_H_
 
-#include "vector3.h"
-#include "base/basevector4.h"
+//forward declarations
+class Vector3;
+
 #include "base/basevector4array.h"
 
 class Vector3Array : public BaseVector4Array

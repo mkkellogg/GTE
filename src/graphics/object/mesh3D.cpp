@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <math.h>
 
+#include "object/sceneobjectcomponent.h"
 #include "mesh3D.h"
 #include "graphics/attributes.h"
 #include "graphics/graphics.h"
@@ -20,7 +21,7 @@
 
 #include "ui/debug.h"
 
-Mesh3D::Mesh3D(AttributeSet attributes)
+Mesh3D::Mesh3D(AttributeSet attributes) : SceneObjectComponent()
 {
 	attributeSet = attributes;
 	vertexCount = 0;

@@ -20,8 +20,9 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
-#include "vector/vector3.h"
-#include "point/point3.h"
+// forward declarations
+class Point3;
+class Vector3;
 
 class Matrix4x4 
 {

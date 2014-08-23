@@ -1,8 +1,6 @@
 #ifndef _RENDER_BUFFER_H
 #define _RENDER_BUFFER_H
 
-class RenderBuffer;
-
 enum class RenderBufferType
 {
 	Color=1,

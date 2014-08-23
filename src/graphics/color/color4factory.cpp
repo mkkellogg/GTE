@@ -20,7 +20,7 @@ Color4Factory::~Color4Factory()
 
 }
 
-Color4 * Color4Factory::CreatePermAttached(float * target)
+BaseVector4 * Color4Factory::CreatePermAttached(float * target)
 {
 	return new Color4(true, target);
 }

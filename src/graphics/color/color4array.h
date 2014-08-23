@@ -1,8 +1,9 @@
 #ifndef _COLOR4_ARRAY_H_
 #define _COLOR4_ARRAY_H_
 
-#include "color4.h"
-#include "base/basevector4.h"
+//forward declarations
+class Color4;
+
 #include "base/basevector4array.h"
 
 class Color4Array : public BaseVector4Array

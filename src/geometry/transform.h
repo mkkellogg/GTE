@@ -1,8 +1,9 @@
 #ifndef _TRANSFORM_H_
 #define _TRANSFORM_H_
 
-#include "matrix4x4.h"
-#include "global/constants.h"
+// forward declarations
+class Matrix4x4;
+class Transform;
 
 class Transform;
 

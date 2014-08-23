@@ -20,7 +20,7 @@ Point3Factory:: ~Point3Factory()
 
 }
 
-Point3 * Point3Factory::CreatePermAttached(float * target)
+BaseVector4 * Point3Factory::CreatePermAttached(float * target)
 {
 	return new Point3(true, target);
 }

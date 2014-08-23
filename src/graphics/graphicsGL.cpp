@@ -85,28 +85,6 @@ GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
 
 }
 
-Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)
-{
-    //TODO: Add switch for different platforms; for now only support OpenGL
-    Shader * shader = new ShaderGL(vertexShaderPath, fragmentShaderPath);
-    return shader;
-}
-
-void GraphicsGL::DestroyShader(Shader * shader)
-{
-    delete shader;
-}
-
-Mesh3DRenderer * GraphicsGL::CreateMeshRenderer() const
-{
-	 //TODO: Add switch for different platforms; for now only support OpenGL
-	return new Mesh3DRendererGL();
-}
-
-void GraphicsGL::DestroyMeshRenderer(Mesh3DRenderer * renderer)  const
-{
-	delete renderer;
-}
 
 void GraphicsGL::ActivateMaterial(Material * material)
 {

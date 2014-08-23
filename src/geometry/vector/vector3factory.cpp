@@ -20,7 +20,7 @@ Vector3Factory::~Vector3Factory()
 
 }
 
-Vector3 * Vector3Factory::CreatePermAttached(float * target)
+BaseVector4 * Vector3Factory::CreatePermAttached(float * target)
 {
 	return new Vector3(true, target);
 }

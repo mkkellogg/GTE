@@ -35,12 +35,6 @@ class Graphics
 
     static Graphics * Instance();
 
-    virtual Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) = 0;
-    virtual void DestroyShader(Shader * shader) = 0;
-
-    virtual Mesh3DRenderer * CreateMeshRenderer() const  = 0;
-    virtual void DestroyMeshRenderer(Mesh3DRenderer * buffer) const = 0;
-
     virtual Material * CreateMaterial();
     virtual void DestroyMaterial(Material * material);
 

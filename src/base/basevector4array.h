@@ -1,8 +1,9 @@
 #ifndef _BASEVECTOR4ARRAY_H_
 #define _BASEVECTOR4ARRAY_H_
 
-#include "basevector4.h"
-#include "basevector4factory.h"
+// forward declarations
+class BaseVector4;
+class BaseVector4Factory;
 
 class BaseVector4Array
 {

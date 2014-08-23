@@ -1,7 +1,8 @@
 #ifndef _BASEVECTOR2_FACTORY_H_
 #define _BASEVECTOR2_FACTORY_H_
 
-#include "basevector2.h"
+// forward declarations
+class BaseVector2;
 
 class BaseVector2Factory
 {

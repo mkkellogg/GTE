@@ -1,12 +1,13 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
-class Material;
+//forward declarations
+class Graphics;
+class Shader;
+class VertexAttrBuffer;
 
-#include "graphics/shader/shader.h"
 #include "graphics/attributes.h"
 #include "graphics/uniforms.h"
-#include "graphics/graphics.h"
 
 class Material
 {

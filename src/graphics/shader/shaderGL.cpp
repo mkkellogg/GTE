@@ -9,6 +9,7 @@
  
 #include "shader.h"
 #include "shaderGL.h"
+#include "shadersource.h"
 #include "graphics/render/vertexattrbuffer.h"
 #include "graphics/render/vertexattrbufferGL.h"
 #include "ui/debug.h"
