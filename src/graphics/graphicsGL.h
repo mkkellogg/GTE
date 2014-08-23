@@ -4,15 +4,23 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
+//forward declarations
+class Shader;
+class Mesh3DRenderer;
+class Mesh3DRendererGL;
+class Material;
+class Camera;
+
 #include "graphics.h"
-#include "render/mesh3Drenderer.h"
-#include "render/material.h"
-#include "shader/shader.h"
-#include "geometry/transform.h"
+
 
 class GraphicsGL : public Graphics
 {
     friend class Graphics;
+    friend class Mesh3DRendererGL;
+
+    static void _glutDisplayFunc();
+    static void _glutIdleFunc();
 
     protected:
 
@@ -22,9 +30,11 @@ class GraphicsGL : public Graphics
 
     void SendStandardUniformsToShader(const Camera * camera);
 
-    public :
+    Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
+    void DestroyShader(Shader * shader);
 
-    void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
+    Mesh3DRenderer * CreateMeshRenderer();
+    void DestroyMeshRenderer(Mesh3DRenderer * buffer);
 
     void ActivateMaterial(Material * material);
     Material * GetActiveMaterial();
@@ -32,6 +42,11 @@ class GraphicsGL : public Graphics
     void RenderScene();
     void RenderSceneObjects(const Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;
+
+    public :
+
+    void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
+
 };
 
 #endif

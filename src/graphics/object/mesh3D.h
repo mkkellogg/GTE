@@ -6,17 +6,19 @@ class Point3;
 class Vector3;
 class color4;
 class uv2;
-
 class Point3Array;
 class Vector3Array;
 class Color4Array;
 class UV2Array;
+class EngineObjectManager;
 
 #include "object/sceneobjectcomponent.h"
 #include "graphics/attributes.h"
 
 class Mesh3D : public SceneObjectComponent
 {
+	friend EngineObjectManager;
+
 	AttributeSet attributeSet;
 	int vertexCount;
 
@@ -28,10 +30,13 @@ class Mesh3D : public SceneObjectComponent
 
     void Destroy();
 
-    public:
+	protected :
 
+    Mesh3D();
     Mesh3D(AttributeSet attributes);
     virtual ~Mesh3D();
+
+	public:
 
     bool Init(int vertexCount);
     int GetVertexCount();

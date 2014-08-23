@@ -5,12 +5,16 @@
 class EngineObject;
 class SceneObject;
 class Shader;
+class Mesh3D;
 class Mesh3DRenderer;
+class EngineObjectManager;
 
 #include <vector>
 
 class EngineObjectManager
 {
+	static EngineObjectManager * theInstance;
+
     protected:
 
 	std::vector<EngineObject *> engineObjects;
@@ -21,12 +25,12 @@ class EngineObjectManager
 
     public :
 
-    virtual Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) = 0;
-    virtual void DestroyShader(Shader * shader) = 0;
+    static EngineObjectManager * Instance();
+    SceneObject * CreateSceneObject();
 
-    virtual Mesh3DRenderer * CreateMeshRenderer()  = 0;
-    virtual void DestroyMeshRenderer(Mesh3DRenderer * buffer) = 0;
-
+    Mesh3D * CreateMesh3D();
+    Mesh3DRenderer * CreateMesh3DRenderer();
+    Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
 };
 
 #endif

@@ -2,7 +2,7 @@
 #define _MESH3D_RENDERER_GL_H_
 
 // forward declarations
-class EngineObjectManagerGL;
+class GraphicsGL;
 class VertexAttrBufferGL;
 class Point3Array;
 class Vector3Array;
@@ -16,7 +16,7 @@ class Material;
 
 class Mesh3DRendererGL : public Mesh3DRenderer
 {
-	friend class EngineObjectManagerGL;
+	friend class GraphicsGL;
 
 	const static int MAX_ATTRIBUTE_BUFFERS = 64;
 

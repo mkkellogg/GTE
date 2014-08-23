@@ -10,6 +10,7 @@
 #include "graphics/graphicsGL.h"
 #include "graphics/shader/shaderGL.h"
 #include "mesh3Drenderer.h"
+#include "material.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/graphics.h"
 #include "geometry/point/point3.h"

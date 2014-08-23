@@ -6,13 +6,13 @@
 
 //forward declarations
 class ShaderSource;
-class EngineObjectManagerGL;
+class GraphicsGL;
 
 #include "shader.h"
 
 class ShaderGL : public Shader
 {
-    friend class EngineObjectManagerGL;
+    friend class GraphicsGL;
 
     bool ready;
     char * name;

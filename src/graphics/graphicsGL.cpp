@@ -11,18 +11,18 @@
 #include "ui/debug.h"
 #include "shader/shaderGL.h"
 #include "shader/shader.h"
+#include "render/rendermanager.h"
 #include "render/vertexattrbuffer.h"
 #include "render/vertexattrbufferGL.h"
 #include "render/mesh3Drenderer.h"
 #include "render/mesh3DrendererGL.h"
-#include "view/camera.h"
 #include "render/renderbuffer.h"
+#include "view/camera.h"
+#include "view/viewsystem.h"
 #include "base/intmask.h"
 
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
-void _glutDisplayFunc();
-void _glutIdleFunc();
 
 void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
@@ -83,6 +83,29 @@ GraphicsGL::~GraphicsGL()
 GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
 {
 
+}
+
+Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)
+{
+    //TODO: Add switch for different platforms; for now only support OpenGL
+    Shader * shader = new ShaderGL(vertexShaderPath, fragmentShaderPath);
+    return shader;
+}
+
+void GraphicsGL::DestroyShader(Shader * shader)
+{
+    delete shader;
+}
+
+Mesh3DRenderer * GraphicsGL::CreateMeshRenderer()
+{
+	 //TODO: Add switch for different platforms; for now only support OpenGL
+	return new Mesh3DRendererGL();
+}
+
+void GraphicsGL::DestroyMeshRenderer(Mesh3DRenderer * renderer)
+{
+	delete renderer;
 }
 
 
@@ -162,16 +185,17 @@ void GraphicsGL::RenderScene()
 void GraphicsGL::RenderSceneObjects(const Camera * camera)
 {
 	SendStandardUniformsToShader(camera);
+	renderManager->RenderAll(camera);
 }
 
-void _glutDisplayFunc()
+void GraphicsGL::_glutDisplayFunc()
 {
 	_instanceCallbacks->OnUpdate(_thisInstance);
 
 	_thisInstance->RenderScene();
 }
 
-void _glutIdleFunc()
+void GraphicsGL::_glutIdleFunc()
 {
 	 glutPostRedisplay();
 }

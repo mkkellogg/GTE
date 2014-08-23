@@ -7,7 +7,13 @@
 #include "graphics.h"
 #include "global/global.h"
 #include "graphicsGL.h"
-#include "gte.h"
+#include "shader/shader.h"
+#include "render/material.h"
+#include "geometry/transform.h"
+#include "render/mesh3Drenderer.h"
+#include "render/rendermanager.h"
+#include "view/viewsystem.h"
+
 
 Graphics * Graphics::theInstance = NULL;
 
@@ -20,6 +26,7 @@ Graphics::Graphics()
 {
 	activeMaterial= NULL;
 	viewSystem = NULL;
+	renderManager = new RenderManager(this);
 }
 
 Graphics * Graphics::Instance()
@@ -63,5 +70,10 @@ void Graphics::ActivateMaterial(Material * material)
 Material * Graphics::GetActiveMaterial() const
 {
 	return activeMaterial;
+}
+
+RenderManager * Graphics::GetRenderManager()
+{
+	return renderManager;
 }
 

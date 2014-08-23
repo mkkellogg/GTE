@@ -22,12 +22,12 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/viewsystem.o obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
 
-OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o obj/engineobjectmanagerGL.o
+OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o 
 
 OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
 
@@ -76,8 +76,6 @@ obj/engineobject.o: $(ENGINEOBJECTSRC)/engineobject.cpp $(ENGINEOBJECTSRC)/engin
 obj/engineobjectmanager.o: $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOBJECTSRC)/engineobjectmanager.h 
 	$(CC) $(CFLAGS) -o obj/engineobjectmanager.o -c $(ENGINEOBJECTSRC)/engineobjectmanager.cpp
 	
-obj/engineobjectmanagerGL.o: $(ENGINEOBJECTSRC)/engineobjectmanagerGL.cpp $(ENGINEOBJECTSRC)/engineobjectmanagerGL.h 
-	$(CC) $(CFLAGS) -o obj/engineobjectmanagerGL.o -c $(ENGINEOBJECTSRC)/engineobjectmanagerGL.cpp
 	
 	
 # ==================================
@@ -139,6 +137,9 @@ obj/uniforms.o: $(GRAPHICSSRC)/uniforms.cpp $(GRAPHICSSRC)/uniforms.h
 
 render: $(RENDEROBJ)
 
+obj/rendermanager.o: $(RENDERSRC)/rendermanager.cpp $(RENDERSRC)/rendermanager.h
+	$(CC) $(CFLAGS) -o obj/rendermanager.o -c $(RENDERSRC)/rendermanager.cpp
+	
 obj/mesh3Drenderer.o: $(RENDERSRC)/mesh3Drenderer.cpp $(RENDERSRC)/mesh3Drenderer.h
 	$(CC) $(CFLAGS) -o obj/mesh3Drenderer.o -c $(RENDERSRC)/mesh3Drenderer.cpp
 	
