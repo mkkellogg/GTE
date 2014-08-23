@@ -9,7 +9,7 @@
 #include "graphics/shader/shaderGL.h"
 #include "mesh3DrendererGL.h"
 #include "mesh3Drenderer.h"
-#include "mesh3D.h"
+#include "graphics/object/mesh3D.h"
 #include "graphics/graphics.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -48,28 +48,6 @@ void Mesh3DRendererGL::DestroyBuffer(VertexAttrBufferGL ** buffer)
 	*buffer = NULL;
 }
 
-
-/*void Mesh3D::SetVertexData(const float * data, int componentCount, int count, AttributeType attributeType)
-{
-	switch(attributeType)
-	{
-		case AttributeType::Position:
-			SetVertexData(positionData, data,componentCount,count,0);
-		break;
-		case AttributeType::Normal:
-			SetVertexData(normalData, data,componentCount,count,0);
-		break;
-		case AttributeType::Color:
-			SetVertexData(colorData, data,componentCount,count,0);
-		break;
-		case AttributeType::UV1:
-			SetVertexData(uv1Data, data,componentCount,count,0);
-		break;
-		case AttributeType::UV2:
-			SetVertexData(uv2Data, data,componentCount,count,0);
-		break;
-	}
-}*/
 
 void Mesh3DRendererGL::SetVertexData(VertexAttrBufferGL * buffer, const float * data, int componentCount, int totalCount, int stride)
 {

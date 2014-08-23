@@ -4,7 +4,7 @@
 class Camera;
 
 #include "graphics/graphics.h"
-#include "graphics/renderbuffer.h"
+#include "graphics/render/renderbuffer.h"
 #include "global/constants.h"
 #include "geometry/transform.h"
 

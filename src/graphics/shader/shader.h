@@ -2,7 +2,7 @@
 #ifndef _SHADER_H_
 #define _SHADER_H_
 
-#include "graphics/vertexattrbuffer.h"
+#include "graphics/render/vertexattrbuffer.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"

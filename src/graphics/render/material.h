@@ -3,10 +3,10 @@
 
 class Material;
 
-#include "shader/shader.h"
-#include "attributes.h"
-#include "uniforms.h"
-#include "graphics.h"
+#include "graphics/shader/shader.h"
+#include "graphics/attributes.h"
+#include "graphics/uniforms.h"
+#include "graphics/graphics.h"
 
 class Material
 {

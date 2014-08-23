@@ -3,9 +3,8 @@
 
 class Mesh3DRenderer;
 
-#include "mesh3D.h"
-
-#include "graphics/vertexattrbuffer.h"
+#include "graphics/object/mesh3D.h"
+#include "vertexattrbuffer.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/color/color4.h"
@@ -14,8 +13,7 @@ class Mesh3DRenderer;
 #include "geometry/vector/vector3array.h"
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
-
-#include "graphics/material.h"
+#include "material.h"
 
 class Mesh3DRenderer
 {

@@ -5,8 +5,8 @@
 #include <GL/glut.h>
 
 #include "graphics.h"
-#include "object/mesh3Drenderer.h"
-#include "material.h"
+#include "render/mesh3Drenderer.h"
+#include "render/material.h"
 #include "shader/shader.h"
 #include "geometry/transform.h"
 

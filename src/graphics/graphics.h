@@ -4,9 +4,9 @@
 class Graphics;
 
 #include "shader/shader.h"
-#include "material.h"
+#include "render/material.h"
 #include "geometry/transform.h"
-#include "graphics/object/mesh3Drenderer.h"
+#include "render/mesh3Drenderer.h"
 #include "view/viewsystem.h"
 
 class GraphicsCallbacks

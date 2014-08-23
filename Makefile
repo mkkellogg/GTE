@@ -6,26 +6,30 @@ GLOBALSRC = src/global
 BASESRC = src/base
 GTEMATHSRC = src/gtemath
 GEOMETRYSRC= src/geometry
-OBJECTSRC= src/graphics/object
 UTILSRC= src/util
 GRAPHICSSRC= src/graphics
 SHADERSRC= $(GRAPHICSSRC)/shader
+VIEWSYSSRC= $(GRAPHICSSRC)/view
+RENDERSRC= $(GRAPHICSSRC)/render
+GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
 
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o
-OBJECTOBJ= obj/mesh3Drenderer.o obj/mesh3D.o 
+GRAPHICSOBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
-GRAPHICSOBJ= obj/graphics.o obj/viewsystem.o obj/camera.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/material.o obj/attributes.o obj/uniforms.o
+VIEWSYSOBJ= obj/viewsystem.o obj/camera.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o 
+GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o
 
-OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(OBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(SHADEROBJ) $(OPENGLOBJ) $(GLOBALOBJ)
+OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(OPENGLOBJ) $(GLOBALOBJ)
 
-all: gtemain graphics ui geometry gtemath object base global
+all: gtemain graphics ui geometry gtemath base global
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -54,7 +58,7 @@ obj/constants.o: $(GLOBALSRC)/constants.cpp $(GLOBALSRC)/constants.h
 # Graphics
 # ==================================
 
-graphics: $(GRAPHICSOBJ) $(SHADEROBJ) $(OPENGLOBJ)
+graphics: $(GRAPHICSOBJ) $(SHADEROBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject
 
 obj/graphics.o: $(GRAPHICSSRC)/graphics.cpp  $(GRAPHICSSRC)/graphics.h 
 	$(CC) $(CFLAGS) -o obj/graphics.o -c $(GRAPHICSSRC)/graphics.cpp
@@ -64,12 +68,6 @@ obj/viewsystem.o: $(GRAPHICSSRC)/view/viewsystem.cpp  $(GRAPHICSSRC)/view/viewsy
 	
 obj/camera.o: $(GRAPHICSSRC)/view/camera.cpp  $(GRAPHICSSRC)/view/camera.h 
 	$(CC) $(CFLAGS) -o obj/camera.o -c $(GRAPHICSSRC)/view/camera.cpp
-
-obj/renderbuffer.o: $(GRAPHICSSRC)/renderbuffer.cpp  $(GRAPHICSSRC)/renderbuffer.h 
-	$(CC) $(CFLAGS) -o obj/renderbuffer.o -c $(GRAPHICSSRC)/renderbuffer.cpp
-	
-obj/vertexattrbuffer.o:  $(GRAPHICSSRC)/vertexattrbuffer.cpp  $(GRAPHICSSRC)/vertexattrbuffer.h
-	$(CC) $(CFLAGS) -o obj/vertexattrbuffer.o -c $(GRAPHICSSRC)/vertexattrbuffer.cpp
 
 obj/shadersource.o: $(SHADERSRC)/shadersource.cpp  $(SHADERSRC)/shadersource.h 
 	$(CC) $(CFLAGS) -o obj/shadersource.o -c $(SHADERSRC)/shadersource.cpp
@@ -82,9 +80,6 @@ obj/graphicsGL.o: $(GRAPHICSSRC)/graphicsGL.cpp  $(GRAPHICSSRC)/graphicsGL.h
 		
 obj/shaderGL.o: $(SHADERSRC)/shaderGL.cpp $(SHADERSRC)/shaderGL.h
 	$(CC) $(CFLAGS) -o obj/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
-
-obj/vertexattrbufferGL.o:  $(GRAPHICSSRC)/vertexattrbufferGL.cpp  $(GRAPHICSSRC)/vertexattrbufferGL.h
-	$(CC) $(CFLAGS) -o obj/vertexattrbufferGL.o -c $(GRAPHICSSRC)/vertexattrbufferGL.cpp
 	
 obj/color4.o: $(GRAPHICSSRC)/color/color4.cpp $(GRAPHICSSRC)/color/color4.h
 	$(CC) $(CFLAGS) -o obj/color4.o -c $(GRAPHICSSRC)/color/color4.cpp
@@ -103,9 +98,6 @@ obj/uv2factory.o: $(GRAPHICSSRC)/uv/uv2factory.cpp $(GRAPHICSSRC)/uv/uv2factory.
 	
 obj/uv2array.o: $(GRAPHICSSRC)/uv/uv2array.cpp $(GRAPHICSSRC)/uv/uv2array.h
 	$(CC) $(CFLAGS) -o obj/uv2array.o -c $(GRAPHICSSRC)/uv/uv2array.cpp
-	
-obj/material.o: $(GRAPHICSSRC)/material.cpp $(GRAPHICSSRC)/material.h
-	$(CC) $(CFLAGS) -o obj/material.o -c $(GRAPHICSSRC)/material.cpp
 
 obj/attributes.o: $(GRAPHICSSRC)/attributes.cpp $(GRAPHICSSRC)/attributes.h
 	$(CC) $(CFLAGS) -o obj/attributes.o -c $(GRAPHICSSRC)/attributes.cpp
@@ -114,19 +106,38 @@ obj/uniforms.o: $(GRAPHICSSRC)/uniforms.cpp $(GRAPHICSSRC)/uniforms.h
 	$(CC) $(CFLAGS) -o obj/uniforms.o -c $(GRAPHICSSRC)/uniforms.cpp
 	
 # ==================================
+# Render
+# ==================================
+
+render: $(RENDEROBJ)
+
+obj/mesh3Drenderer.o: $(RENDERSRC)/mesh3Drenderer.cpp $(RENDERSRC)/mesh3Drenderer.h
+	$(CC) $(CFLAGS) -o obj/mesh3Drenderer.o -c $(RENDERSRC)/mesh3Drenderer.cpp
+	
+obj/mesh3DrendererGL.o: $(RENDERSRC)/mesh3DrendererGL.cpp $(RENDERSRC)/mesh3DrendererGL.h
+	$(CC) $(CFLAGS) -o obj/mesh3DrendererGL.o -c $(RENDERSRC)/mesh3DrendererGL.cpp
+	
+obj/material.o: $(RENDERSRC)/material.cpp $(RENDERSRC)/material.h
+	$(CC) $(CFLAGS) -o obj/material.o -c $(RENDERSRC)/material.cpp
+	
+obj/vertexattrbufferGL.o:  $(RENDERSRC)/vertexattrbufferGL.cpp  $(RENDERSRC)/vertexattrbufferGL.h
+	$(CC) $(CFLAGS) -o obj/vertexattrbufferGL.o -c $(RENDERSRC)/vertexattrbufferGL.cpp
+	
+obj/renderbuffer.o: $(RENDERSRC)/renderbuffer.cpp  $(RENDERSRC)/renderbuffer.h 
+	$(CC) $(CFLAGS) -o obj/renderbuffer.o -c $(RENDERSRC)/renderbuffer.cpp
+	
+obj/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexattrbuffer.h
+	$(CC) $(CFLAGS) -o obj/vertexattrbuffer.o -c $(RENDERSRC)/vertexattrbuffer.cpp
+
+
+# ==================================
 # Object
 # ==================================
 
-object: $(OBJECTOBJ)
-
-obj/mesh3Drenderer.o: $(OBJECTSRC)/mesh3Drenderer.cpp $(OBJECTSRC)/mesh3Drenderer.h
-	$(CC) $(CFLAGS) -o obj/mesh3Drenderer.o -c $(OBJECTSRC)/mesh3Drenderer.cpp
+graphicsobject: $(GRAPHICSOBJECTOBJ)
 	
-obj/mesh3DrendererGL.o: $(OBJECTSRC)/mesh3DrendererGL.cpp $(OBJECTSRC)/mesh3DrendererGL.h
-	$(CC) $(CFLAGS) -o obj/mesh3DrendererGL.o -c $(OBJECTSRC)/mesh3DrendererGL.cpp
-	
-obj/mesh3D.o: $(OBJECTSRC)/mesh3D.cpp $(OBJECTSRC)/mesh3D.h $(GRAPHICSSRC)/attributes.h
-	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(OBJECTSRC)/mesh3D.cpp
+obj/mesh3D.o: $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/mesh3D.h 
+	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(GRAPHICSOBJECTSRC)/mesh3D.cpp
 	
 	
 # ==================================

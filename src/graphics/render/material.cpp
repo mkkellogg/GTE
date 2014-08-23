@@ -5,8 +5,8 @@
 #include <math.h>
 
 #include "material.h"
-#include "shader/shader.h"
-#include "attributes.h"
+#include "graphics/shader/shader.h"
+#include "graphics/attributes.h"
 
 Material::Material()
 {

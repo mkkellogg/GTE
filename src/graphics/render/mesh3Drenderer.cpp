@@ -5,8 +5,8 @@
 #include <math.h>
 
 #include "mesh3Drenderer.h"
-#include "mesh3D.h"
-#include "graphics/material.h"
+#include "graphics/object/mesh3D.h"
+#include "material.h"
 #include "graphics/graphics.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"

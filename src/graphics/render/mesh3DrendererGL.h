@@ -3,10 +3,10 @@
 
 class Mesh3DRendererGL;
 
-#include "mesh3D.h"
+#include "graphics/object/mesh3D.h"
 #include "mesh3Drenderer.h"
 
-#include "graphics/vertexattrbufferGL.h"
+#include "vertexattrbufferGL.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/color/color4.h"
@@ -51,8 +51,6 @@ class Mesh3DRendererGL : public Mesh3DRenderer
     bool UseMesh(Mesh3D * newMesh);
     bool UseMaterial(Material * material);
     void Render();
-
-   // void SetVertexData(const float * data, int componentCount, int count, AttributeType attributeType);
 };
 
 #endif

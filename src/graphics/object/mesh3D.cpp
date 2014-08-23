@@ -4,7 +4,6 @@
 #include <memory.h>
 #include <math.h>
 
-#include "mesh3Drenderer.h"
 #include "mesh3D.h"
 #include "graphics/attributes.h"
 #include "graphics/graphics.h"

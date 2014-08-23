@@ -7,16 +7,16 @@
 #include <GL/glut.h>
  
 #include "graphicsGL.h"
-#include "material.h"
+#include "render/material.h"
 #include "ui/debug.h"
 #include "shader/shaderGL.h"
 #include "shader/shader.h"
-#include "vertexattrbuffer.h"
-#include "vertexattrbufferGL.h"
-#include "object/mesh3Drenderer.h"
-#include "object/mesh3DrendererGL.h"
+#include "render/vertexattrbuffer.h"
+#include "render/vertexattrbufferGL.h"
+#include "render/mesh3Drenderer.h"
+#include "render/mesh3DrendererGL.h"
 #include "view/camera.h"
-#include "renderbuffer.h"
+#include "render/renderbuffer.h"
 #include "base/intmask.h"
 
 GraphicsGL * _thisInstance;

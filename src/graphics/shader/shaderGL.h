@@ -6,7 +6,7 @@
 
 #include "shadersource.h"
 #include "shader.h"
-#include "graphics/vertexattrbuffer.h"
+#include "graphics/render/vertexattrbuffer.h"
 
 #include "geometry/matrix4x4.h"
 #include "geometry/point/point3.h"
