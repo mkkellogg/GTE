@@ -12,6 +12,7 @@
 #include "graphics/attributes.h"
 #include "graphics/object/mesh3D.h"
 #include "ui/debug.h"
+#include "graphics/view/camera.h"
 
 EngineObjectManager * EngineObjectManager::theInstance = NULL;
 
@@ -39,7 +40,7 @@ EngineObjectManager::~EngineObjectManager()
 SceneObject * EngineObjectManager::CreateSceneObject()
 {
 	SceneObject *obj = new SceneObject();
-	sceneObjects.push_back(obj);
+	sceneRoot.AddChild(obj);
 	return obj;
 }
 
@@ -80,7 +81,7 @@ Material * EngineObjectManager::CreateMaterial(Shader * shader)
 	return m;
 }
 
-Material * EngineObjectManager:: CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
+Material * EngineObjectManager::CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
 {
 	Shader * shader = CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
 	if(shader == NULL)return NULL;
@@ -94,4 +95,15 @@ Material * EngineObjectManager:: CreateMaterial(const char * shaderVertexSourceP
 		return NULL;
 	}
 	return m;
+}
+
+Camera * EngineObjectManager::CreateCamera()
+{
+	Graphics * graphics = Graphics::Instance();
+	return new Camera(graphics);
+}
+
+const SceneObject * EngineObjectManager::GetSceneRoot() const
+{
+	return &sceneRoot;
 }

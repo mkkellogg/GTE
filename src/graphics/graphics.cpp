@@ -12,7 +12,8 @@
 #include "geometry/transform.h"
 #include "render/mesh3Drenderer.h"
 #include "render/rendermanager.h"
-#include "view/viewsystem.h"
+#include "object/engineobjectmanager.h"
+#include "object/sceneobject.h"
 
 
 Graphics * Graphics::theInstance = NULL;
@@ -25,8 +26,8 @@ Graphics::~Graphics()
 Graphics::Graphics()
 {
 	activeMaterial= NULL;
-	viewSystem = NULL;
-	renderManager = new RenderManager(this);
+	renderManager = new RenderManager(this, EngineObjectManager::Instance());
+	screenDescriptor = NULL;
 }
 
 Graphics * Graphics::Instance()
@@ -49,17 +50,7 @@ GraphicsCallbacks::~GraphicsCallbacks()
 
 void Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
-	viewSystem = new ViewSystem(this);
-}
 
-Material * Graphics::CreateMaterial()
-{
-	return new Material();
-}
-
-void Graphics::DestroyMaterial(Material * material)
-{
-	SAFE_DELETE(material);
 }
 
 void Graphics::ActivateMaterial(Material * material)
@@ -76,4 +67,10 @@ RenderManager * Graphics::GetRenderManager()
 {
 	return renderManager;
 }
+
+ScreenDescriptor * Graphics::GetScreenDescriptor() const
+{
+	return screenDescriptor;
+}
+
 

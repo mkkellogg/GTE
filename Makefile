@@ -21,9 +21,9 @@ GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o
 GRAPHICSOBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
-VIEWSYSOBJ= obj/viewsystem.o obj/camera.o 
+VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o
-GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o
+GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o obj/screendesc.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
 
@@ -87,9 +87,9 @@ graphics: $(GRAPHICSOBJ) $(SHADEROBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphics
 
 obj/graphics.o: $(GRAPHICSSRC)/graphics.cpp  $(GRAPHICSSRC)/graphics.h 
 	$(CC) $(CFLAGS) -o obj/graphics.o -c $(GRAPHICSSRC)/graphics.cpp
-	
-obj/viewsystem.o: $(GRAPHICSSRC)/view/viewsystem.cpp  $(GRAPHICSSRC)/view/viewsystem.h 
-	$(CC) $(CFLAGS) -o obj/viewsystem.o -c $(GRAPHICSSRC)/view/viewsystem.cpp
+
+obj/screendesc.o: $(GRAPHICSSRC)/screendesc.cpp  $(GRAPHICSSRC)/screendesc.h 
+	$(CC) $(CFLAGS) -o obj/screendesc.o -c $(GRAPHICSSRC)/screendesc.cpp
 	
 obj/camera.o: $(GRAPHICSSRC)/view/camera.cpp  $(GRAPHICSSRC)/view/camera.h 
 	$(CC) $(CFLAGS) -o obj/camera.o -c $(GRAPHICSSRC)/view/camera.cpp

@@ -7,6 +7,7 @@
 #include <GL/glut.h>
  
 #include "graphicsGL.h"
+#include "graphics/screendesc.h"
 #include "render/material.h"
 #include "ui/debug.h"
 #include "shader/shaderGL.h"
@@ -18,8 +19,10 @@
 #include "render/mesh3DrendererGL.h"
 #include "render/renderbuffer.h"
 #include "view/camera.h"
-#include "view/viewsystem.h"
 #include "base/intmask.h"
+#include "object/sceneobject.h"
+#include "geometry/transform.h"
+#include "global/global.h"
 
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
@@ -56,6 +59,8 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
         exit(1);
     }
 
+    screenDescriptor = new ScreenDescriptor(windowWidth, windowHeight);
+
     glutDisplayFunc(&_glutDisplayFunc);
     glutIdleFunc(&_glutIdleFunc);
 
@@ -77,7 +82,7 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
 
 GraphicsGL::~GraphicsGL() 
 {
-    
+    SAFE_DELETE(screenDescriptor);
 }
 
 GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
@@ -108,7 +113,6 @@ void GraphicsGL::DestroyMeshRenderer(Mesh3DRenderer * renderer)
 	delete renderer;
 }
 
-
 void GraphicsGL::ActivateMaterial(Material * material)
 {
 	// TODO: Change this to a proper comparison, and not just
@@ -122,14 +126,8 @@ void GraphicsGL::ActivateMaterial(Material * material)
 	}
 }
 
-void GraphicsGL::SendStandardUniformsToShader(const Camera * camera)
+void GraphicsGL::SendStandardUniformsToShader(const Transform * modelView, const Transform * projection)
 {
-	if(viewSystem == NULL)
-	{
-		Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() -> viewSystem is NULL.");
-		return;
-	}
-
 	if(activeMaterial != NULL)
 	{
 		int mvMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ModelViewMatrix);
@@ -139,13 +137,13 @@ void GraphicsGL::SendStandardUniformsToShader(const Camera * camera)
 		ShaderGL * shader = (ShaderGL *) activeMaterial->GetShader();
 		if(shader != NULL)
 		{
-			const Transform * modelViewTransform = camera->GetModelViewTransform();
-			const Transform * mvpTransform = camera->GetMVPTransform();
-			const Transform * projectionTransform = camera->GetProjectionTransform();
+			Transform mvpTransform;
+			mvpTransform.TransformBy(modelView);
+			mvpTransform.TransformBy(projection);
 
-			if(mvMatrixLoc >= 0)shader->SendUniformToShader(mvMatrixLoc, modelViewTransform->GetMatrix());
-			if(mvpMatrixLoc >= 0)shader->SendUniformToShader(mvpMatrixLoc, mvpTransform->GetMatrix());
-			if(projectionMatrixLoc >= 0)shader->SendUniformToShader(projectionMatrixLoc, projectionTransform->GetMatrix());
+			if(mvMatrixLoc >= 0)shader->SendUniformToShader(mvMatrixLoc, modelView->GetMatrix());
+			if(mvpMatrixLoc >= 0)shader->SendUniformToShader(mvpMatrixLoc, mvpTransform.GetMatrix());
+			if(projectionMatrixLoc >= 0)shader->SendUniformToShader(projectionMatrixLoc, projection->GetMatrix());
 		}
 		else
 		{
@@ -172,21 +170,24 @@ void GraphicsGL::ClearBuffersForCamera(const Camera * camera) const
 
 void GraphicsGL::RenderScene()
 {
-	for( int i = 0; i < viewSystem->CameraCount(); i++)
+	/*for( int i = 0; i < viewSystem->CameraCount(); i++)
 	{
 		const Camera * camera = viewSystem->GetCamera(i);
 		ClearBuffersForCamera(camera);
 		RenderSceneObjects(camera);
-	}
+	}*/
+
+	renderManager->RenderAll();
 
 	glutSwapBuffers();
 }
 
+/*
 void GraphicsGL::RenderSceneObjects(const Camera * camera)
 {
-	SendStandardUniformsToShader(camera);
+	//SendStandardUniformsToShader(camera);
 	renderManager->RenderAll(camera);
-}
+}*/
 
 void GraphicsGL::_glutDisplayFunc()
 {

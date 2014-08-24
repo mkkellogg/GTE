@@ -5,8 +5,12 @@
 class EngineObjectManager;
 class Mesh3DRenderer;
 class Mesh3D;
+class Transform;
+class Camera;
+class SceneObject;
 
 #include "engineobject.h"
+#include <vector>
 
 class SceneObject : public EngineObject
 {
@@ -14,18 +18,31 @@ class SceneObject : public EngineObject
 
 	protected:
 
+	std::vector<SceneObject * > children;
+
+	Transform * modelViewTransform;
+
 	Mesh3DRenderer * renderer3D;
 	Mesh3D * mesh3D;
+	Camera * camera;
 
 	SceneObject();
     virtual ~SceneObject();
-    void UpdateRenderManager();
 
 	public:
 
+    const Transform * GetModelViewTransform() const ;
+
     bool SetMeshRenderer(Mesh3DRenderer *renderer);
     bool SetMesh(Mesh3D *mesh);
+    bool SetCamera(Camera * camera);
+
     Mesh3DRenderer * GetRenderer3D();
+    Camera * GetCamera();
+
+    void AddChild(SceneObject * child);
+    unsigned int GetChildrenCount() const;
+    SceneObject * GetChildAt(int index) const;
 };
 
 #endif

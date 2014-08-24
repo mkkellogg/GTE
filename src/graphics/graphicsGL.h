@@ -28,7 +28,7 @@ class GraphicsGL : public Graphics
     GraphicsGL();
     ~GraphicsGL();
 
-    void SendStandardUniformsToShader(const Camera * camera);
+    void SendStandardUniformsToShader(const Transform * modelView, const Transform * projection);
 
     Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
     void DestroyShader(Shader * shader);
@@ -40,7 +40,7 @@ class GraphicsGL : public Graphics
     Material * GetActiveMaterial();
 
     void RenderScene();
-    void RenderSceneObjects(const Camera * camera);
+   // void RenderSceneObjects(const Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;
 
     public :

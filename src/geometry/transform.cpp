@@ -6,7 +6,6 @@
 #include "global/constants.h"
 #include "vector/vector3.h"
 
-
 Transform * Transform::CreateIdentityTransform()
 {
 	return new Transform();
@@ -14,23 +13,32 @@ Transform * Transform::CreateIdentityTransform()
 
 Transform::Transform()
 {
-	matrix = new Matrix4x4();
-	matrix->SetIdentity();
+	matrix.SetIdentity();
 }
 
 Transform::Transform(Matrix4x4 * m) : Transform()
 {
-	matrix->SetTo(m);
+	matrix.SetTo(m);
 }
 
 Transform::~Transform()
 {
-	delete matrix;
+
 }
 
 const Matrix4x4 * Transform::GetMatrix() const
 {
-	return matrix;
+	return &matrix;
+}
+
+void Transform::SetTo(const Matrix4x4 * matrix)
+{
+	this->matrix.SetTo(matrix);
+}
+
+void Transform::TransformBy(const Transform * transform)
+{
+	matrix.LeftMultiply(transform->GetMatrix());
 }
 
 void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, float nearP, float farP)

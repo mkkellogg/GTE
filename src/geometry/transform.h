@@ -2,14 +2,13 @@
 #define _TRANSFORM_H_
 
 // forward declarations
-class Matrix4x4;
 class Transform;
 
-class Transform;
+#include "matrix4x4.h"
 
 class Transform
 {
-	Matrix4x4 * matrix;
+	Matrix4x4 matrix;
 
     public:
 
@@ -18,6 +17,8 @@ class Transform
     ~Transform();
 
     const  Matrix4x4 * GetMatrix() const ;
+    void SetTo(const Matrix4x4 * matrix);
+    void TransformBy(const Transform * transform);
 
     static Transform * CreateIdentityTransform();
 

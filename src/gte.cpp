@@ -133,6 +133,11 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         Attributes::AddAttribute(&meshAttributes, Attribute::Position);
         Attributes::AddAttribute(&meshAttributes, Attribute::Color);
 
+
+        SceneObject * cameraObject = objectManager->CreateSceneObject();
+        Camera * camera = objectManager->CreateCamera();
+        cameraObject->SetCamera(camera);
+
         SceneObject * sceneObject = objectManager->CreateSceneObject();
 
         Material * material = objectManager->CreateMaterial("resources/basic.vertex.shader","resources/basic.fragment.shader");

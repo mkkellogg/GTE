@@ -1,33 +1,31 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
+//forward declarations
 class Camera;
+class Transform;
+class Graphics;
 
-#include "graphics/graphics.h"
 #include "graphics/render/renderbuffer.h"
-#include "global/constants.h"
-#include "geometry/transform.h"
+#include "object/sceneobjectcomponent.h"
 
-class Camera
+class Camera : public SceneObjectComponent
 {
-	friend class ViewSystem;
-
-    Transform * modelViewTransform;
-    Transform * projectionTransform;
-    Transform * mvpTransform;
+	friend class EngineObjectManager;
 
     unsigned int clearBufferMask;
 
+    Transform * projectionTransform;
+    Graphics * graphics;
+
     protected:
 
-    Camera();
+    Camera(Graphics * graphics);
     ~Camera();
 
     public:
 
-    const Transform * GetModelViewTransform() const ;
     const Transform * GetProjectionTransform() const ;
-    const Transform * GetMVPTransform() const ;
     void AddClearBuffer(RenderBufferType buffer);
     void RemoveClearBuffer(RenderBufferType buffer);
     unsigned int GetClearBufferMask() const;

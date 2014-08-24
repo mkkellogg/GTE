@@ -9,6 +9,9 @@ class Mesh3DRenderer;
 class RenderManager;
 class Camera;
 class Graphics;
+class SceneObject;
+class Transform;
+class ScreenDescriptor;
 
 class GraphicsCallbacks
 {
@@ -27,8 +30,8 @@ class Graphics
     protected:
 
     Material * activeMaterial;
-    ViewSystem * viewSystem;
     RenderManager * renderManager;
+    ScreenDescriptor * screenDescriptor;
 
     Graphics();
     virtual ~Graphics();
@@ -37,11 +40,8 @@ class Graphics
 
     static Graphics * Instance();
 
-    virtual  void SendStandardUniformsToShader(const Camera * camera) = 0;
+    virtual  void SendStandardUniformsToShader(const Transform * modelView, const Transform * projection) = 0;
     RenderManager * GetRenderManager();
-
-    virtual Material * CreateMaterial();
-    virtual void DestroyMaterial(Material * material);
 
     virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
 
@@ -53,6 +53,8 @@ class Graphics
 
     virtual void ActivateMaterial(Material * material);
     Material * GetActiveMaterial() const;
+
+    virtual ScreenDescriptor * GetScreenDescriptor() const;
 };
 
 #endif

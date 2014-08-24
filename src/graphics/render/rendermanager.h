@@ -5,22 +5,24 @@
 class SceneObject;
 class Camera;
 class Graphics;
+class EngineObjectManager;
+class Transform;
 
 #include <vector>
 
 class RenderManager
 {
-	std::vector<SceneObject *> renderers;
 	Graphics * graphics;
+	EngineObjectManager * objectManager;
+
+	void RenderScene(Transform *modelViewTransform, Camera * camera);
 
     public:
 
-	RenderManager(Graphics * graphics);
+	RenderManager(Graphics * graphics, EngineObjectManager * objectManager);
     ~RenderManager();
 
-    void AddMeshRenderer(SceneObject * renderer);
-    void RemoveMeshRenderer(SceneObject * renderer);
-    void RenderAll(const Camera * camera);
+    void RenderAll();
 };
 
 #endif

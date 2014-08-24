@@ -113,6 +113,14 @@ void Matrix4x4::Multiply(const Matrix4x4 * matrix)
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
+void Matrix4x4::LeftMultiply(const Matrix4x4 * matrix)
+{
+    float temp[DATA_SIZE];
+    MultiplyMM(matrix->data, this->data, temp);
+    memcpy(data, temp, sizeof(float) * DATA_SIZE);
+}
+
+
 void Matrix4x4::Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const
 {
     MultiplyMM(matrix->data, this->data, out->data);

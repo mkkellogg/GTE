@@ -9,9 +9,11 @@ class Mesh3D;
 class Mesh3DRenderer;
 class EngineObjectManager;
 class Material;
+class Camera;
 
 #include <vector>
 #include "graphics/attributes.h"
+#include "object/sceneobject.h"
 
 class EngineObjectManager
 {
@@ -20,7 +22,7 @@ class EngineObjectManager
     protected:
 
 	std::vector<EngineObject *> engineObjects;
-	std::vector<SceneObject *> sceneObjects;
+	SceneObject sceneRoot;
 
 	EngineObjectManager();
     virtual ~EngineObjectManager();
@@ -35,6 +37,9 @@ class EngineObjectManager
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     Material * CreateMaterial(Shader * shader);
     Material * CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
+    Camera * CreateCamera();
+
+    const SceneObject * GetSceneRoot() const;
 };
 
 #endif

@@ -7,19 +7,30 @@
 #include "sceneobject.h"
 #include "engineobject.h"
 #include "graphics/graphics.h"
+#include "graphics/view/camera.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/rendermanager.h"
 #include "ui/debug.h"
+#include "global/global.h"
+#include "geometry/transform.h"
 
 SceneObject::SceneObject() : EngineObject()
 {
 	renderer3D = NULL;
 	mesh3D = NULL;
+	camera = NULL;
+
+	modelViewTransform = Transform::CreateIdentityTransform();
 }
 
 SceneObject::~SceneObject()
 {
+	SAFE_DELETE(modelViewTransform);
+}
 
+const Transform * SceneObject::GetModelViewTransform() const
+{
+	return modelViewTransform;
 }
 
 bool SceneObject::SetMeshRenderer(Mesh3DRenderer *renderer)
@@ -30,7 +41,6 @@ bool SceneObject::SetMeshRenderer(Mesh3DRenderer *renderer)
 		if(mesh3D != NULL)
 		{
 			renderer3D->UseMesh(mesh3D);
-			UpdateRenderManager();
 		}
 	}
 	else
@@ -57,22 +67,42 @@ bool SceneObject::SetMesh(Mesh3D *mesh)
 	return true;
 }
 
-void SceneObject::UpdateRenderManager()
+bool SceneObject::SetCamera(Camera * camera)
 {
-	Graphics * graphics = Graphics::Instance();
-	RenderManager * renderManager = graphics->GetRenderManager();
-
-	if(renderManager != NULL)
-	{
-		renderManager->AddMeshRenderer(this);
-	}
-	else
-	{
-		Debug::PrintError("SceneObject::UpdateRenderManager -> the render manager is NULL.");
-	}
+	this->camera = camera;
+	return true;
 }
 
 Mesh3DRenderer * SceneObject::GetRenderer3D()
 {
 	return renderer3D;
+}
+
+Camera * SceneObject::GetCamera()
+{
+	return camera;
+}
+
+void SceneObject::AddChild(SceneObject * child)
+{
+	//TODO: add check for duplicate children
+	children.push_back(child);
+}
+
+unsigned int SceneObject::GetChildrenCount() const
+{
+	return children.size();
+}
+
+SceneObject * SceneObject::GetChildAt(int index) const
+{
+	if(index >=0 && index < (int)children.size())
+	{
+		return children[index];
+	}
+	else
+	{
+		Debug::PrintError("SceneObject::GetChildAt -> index out of range.");
+		return NULL;
+	}
 }

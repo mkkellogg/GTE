@@ -50,6 +50,7 @@ class Matrix4x4
     void Transform(const Point3 * point, Point3 * out) const;
     void Transform(Point3 * point) const;
     void Multiply(const Matrix4x4 * matrix);
+    void LeftMultiply(const Matrix4x4 * matrix);
     void Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const;
     static void Multiply(const Matrix4x4 * lhs, const Matrix4x4 *rhs, Matrix4x4 * out);
     static void MultiplyMV(const float * lhsMat, const float * rhsVec, float * out);

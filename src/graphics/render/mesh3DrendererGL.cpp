@@ -198,8 +198,6 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 
 void Mesh3DRendererGL::Render()
 {
-	graphics->ActivateMaterial(material);
-
 	AttributeSet meshAttributes = mesh->GetAttributeSet();
 
 	for(int i=0; i<(int)Attribute::_Last; i++)

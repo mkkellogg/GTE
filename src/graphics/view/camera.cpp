@@ -1,17 +1,27 @@
 #include <iostream>
 #include <math.h>
+
 #include "camera.h"
+#include "graphics/render/renderbuffer.h"
+#include "graphics/graphics.h"
+#include "graphics/screendesc.h"
 #include "base/intmask.h"
-#include "viewsystem.h"
 #include "global/global.h"
+#include "geometry/transform.h"
+#include "geometry/matrix4x4.h"
 
-Camera::Camera()
+Camera::Camera(Graphics * graphics)
 {
-	modelViewTransform = Transform::CreateIdentityTransform();
-	projectionTransform = Transform::CreateIdentityTransform();
-	mvpTransform = Transform::CreateIdentityTransform();
-
 	clearBufferMask = 0;
+	this->graphics = graphics;
+
+	projectionTransform = Transform::CreateIdentityTransform();
+
+	Matrix4x4 proj;
+	ScreenDescriptor *screenDesc = graphics->GetScreenDescriptor();
+
+	float ratio = (float)screenDesc->GetScreenWidth() / (float)screenDesc->getScreenHeight();
+	Transform::BuildProjectionMatrix(&proj, 65, ratio, 10, 100);
 
 	//Matrix4x4 * projectionMatrix = projectionTransform->GetMatrix();
 	//Transform::BuildProjectionMatrix(projectioNmatrix);
@@ -19,24 +29,7 @@ Camera::Camera()
 
 Camera::~Camera()
 {
-	SAFE_DELETE(modelViewTransform);
 	SAFE_DELETE(projectionTransform);
-	SAFE_DELETE(mvpTransform);
-}
-
-const Transform * Camera::GetModelViewTransform() const
-{
-	return modelViewTransform;
-}
-
-const Transform * Camera::GetProjectionTransform() const
-{
-	return projectionTransform;
-}
-
-const Transform * Camera::GetMVPTransform() const
-{
-	return mvpTransform;
 }
 
 void Camera::AddClearBuffer(RenderBufferType buffer)
@@ -53,4 +46,10 @@ unsigned int Camera::GetClearBufferMask() const
 {
 	return clearBufferMask;
 }
+
+const Transform * Camera::GetProjectionTransform() const
+{
+	return projectionTransform;
+}
+
 
