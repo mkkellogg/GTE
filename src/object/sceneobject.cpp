@@ -22,7 +22,7 @@ SceneObject::~SceneObject()
 
 }
 
-bool SceneObject::AddMeshRenderer(Mesh3DRenderer *renderer)
+bool SceneObject::SetMeshRenderer(Mesh3DRenderer *renderer)
 {
 	if(renderer != NULL && renderer3D != renderer)
 	{
@@ -40,7 +40,7 @@ bool SceneObject::AddMeshRenderer(Mesh3DRenderer *renderer)
 	return true;
 }
 
-bool SceneObject::AddMesh(Mesh3D *mesh)
+bool SceneObject::SetMesh(Mesh3D *mesh)
 {
 	if(mesh != NULL)
 	{

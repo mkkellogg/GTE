@@ -7,6 +7,7 @@
 #include "material.h"
 #include "graphics/shader/shader.h"
 #include "graphics/attributes.h"
+#include "ui/debug.h"
 
 Material::Material()
 {
@@ -19,11 +20,25 @@ Material::~Material()
 
 }
 
-void Material::Init(Shader * shader)
+bool Material::Init(Shader * shader)
 {
+	if(shader == NULL)
+	{
+		Debug::PrintError(" Material::Init(Shader *) -> tried to Init with NULL shader.");
+		return false;
+	}
+
+	if(!shader->IsLoaded())
+	{
+		Debug::PrintError(" Material::Init(Shader *) -> tried to Init with unloaded shader.");
+		return false;
+	}
+
 	this->shader = shader;
 	ClearBindings();
 	BindVars();
+
+	return true;
 }
 
 void Material::ClearBindings()

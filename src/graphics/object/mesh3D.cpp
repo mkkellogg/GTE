@@ -90,37 +90,37 @@ bool Mesh3D::Init(int vertexCount)
 {
 	this->vertexCount = vertexCount;
 
-	bool initSuccess = false;
+	bool initSuccess = true;
 	int errorMask = 0;
 
 	if(Attributes::HasAttribute(attributeSet,Attribute::Position))
 	{
 		initSuccess = positions->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Position;
+		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::Position;
 	}
 
 	if(Attributes::HasAttribute(attributeSet,Attribute::Normal))
 	{
 		initSuccess = normals->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Normal;
+		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::Normal;
 	}
 
 	if(Attributes::HasAttribute(attributeSet,Attribute::Color))
 	{
 		initSuccess = colors->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::Color;
+		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::Color;
 	}
 
 	if(Attributes::HasAttribute(attributeSet,Attribute::UV1))
 	{
 		initSuccess = uvs1->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV1;
+		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::UV1;
 	}
 
 	if(Attributes::HasAttribute(attributeSet,Attribute::UV2))
 	{
 		initSuccess = uvs2->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask &= (int)AttributeMaskComponent::UV2;
+		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::UV2;
 	}
 	if(!initSuccess)
 	{

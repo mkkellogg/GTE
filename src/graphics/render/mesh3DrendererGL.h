@@ -3,6 +3,7 @@
 
 // forward declarations
 class GraphicsGL;
+class Graphics;
 class VertexAttrBufferGL;
 class Point3Array;
 class Vector3Array;
@@ -39,8 +40,8 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
     protected:
 
-    Mesh3DRendererGL();
-    Mesh3DRendererGL(bool buffersOnGPU);
+    Mesh3DRendererGL(Graphics * graphics);
+    Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics);
     virtual ~Mesh3DRendererGL();
 
     public:

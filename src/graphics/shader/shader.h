@@ -9,13 +9,15 @@ class Point3;
 class Vector3;
 class Color4;
 
+#include "object/engineobject.h"
+
 enum class ShaderType
 {
     Vertex,
     Fragment
 };
 
-class Shader
+class Shader : EngineObject
 {
     protected: 
 
@@ -24,6 +26,7 @@ class Shader
     Shader(const char * vertexSourcePath, const char * fragmentSourcePath);
     virtual ~Shader();
     virtual bool Load() = 0;
+    virtual bool IsLoaded() = 0;
     virtual int GetAttributeVarLocation(const char *varName) const = 0;
     virtual int GetUniformVarLocation(const char *varName) const = 0;
     virtual void SendBufferToShader(int loc, VertexAttrBuffer * buffer) = 0;

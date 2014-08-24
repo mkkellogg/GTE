@@ -8,10 +8,11 @@ class VertexAttrBuffer;
 
 #include "graphics/attributes.h"
 #include "graphics/uniforms.h"
+#include "object/engineobject.h"
 
-class Material
+class Material : EngineObject
 {
-	friend class Graphics;
+	friend class EngineObjectManager;
 
 	static const int VAR_BINDINGS_SIZE=64;
 
@@ -37,7 +38,7 @@ class Material
 
     Material();
     virtual ~Material();
-    void Init(Shader * shader);
+    bool Init(Shader * shader);
 
     public:
 

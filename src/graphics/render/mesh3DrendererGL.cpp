@@ -24,12 +24,12 @@
 #include "ui/debug.h"
 
 
-Mesh3DRendererGL::Mesh3DRendererGL() : Mesh3DRendererGL(false)
+Mesh3DRendererGL::Mesh3DRendererGL(Graphics * graphics) : Mesh3DRendererGL(false, graphics)
 {
 
 }
 
-Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU) : Mesh3DRenderer(), buffersOnGPU(false)
+Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics) : Mesh3DRenderer(graphics), buffersOnGPU(false)
 {
 	memset(attributeBuffers,0,sizeof(VertexAttrBufferGL*) * MAX_ATTRIBUTE_BUFFERS);
 }
@@ -160,6 +160,11 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 		return false;
 	}
 
+	if(material != NULL)
+	{
+		return UseMaterial(material);
+	}
+
 	return true;
 }
 
@@ -167,20 +172,23 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 {
 	Mesh3DRenderer::UseMaterial(material);
 
-	AttributeSet materialAttributes = material->GetAttributeSet();
-	AttributeSet meshAttributes = mesh->GetAttributeSet();
-
-	for(int i=0; i<(int)Attribute::_Last; i++)
+	if(mesh != NULL)
 	{
-		Attribute attr = (Attribute)i;
+		AttributeSet materialAttributes = material->GetAttributeSet();
+		AttributeSet meshAttributes = mesh->GetAttributeSet();
 
-		if(Attributes::HasAttribute(materialAttributes, attr))
+		for(int i=0; i<(int)Attribute::_Last; i++)
 		{
-			if(!Attributes::HasAttribute(meshAttributes, attr))
+			Attribute attr = (Attribute)i;
+
+			if(Attributes::HasAttribute(materialAttributes, attr))
 			{
-				char msg[64];
-				sprintf(msg, "Shader was expecting attribute %s, but mesh does not have it.", Attributes::GetAttributeName(attr));
-				Debug::PrintWarning(msg);
+				if(!Attributes::HasAttribute(meshAttributes, attr))
+				{
+					char msg[64];
+					sprintf(msg, "Shader was expecting attribute %s, but mesh does not have it.", Attributes::GetAttributeName(attr));
+					Debug::PrintWarning(msg);
+				}
 			}
 		}
 	}
@@ -190,8 +198,6 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 
 void Mesh3DRendererGL::Render()
 {
-	GraphicsGL * graphics = (GraphicsGL *)Graphics::Instance();
-
 	graphics->ActivateMaterial(material);
 
 	AttributeSet meshAttributes = mesh->GetAttributeSet();

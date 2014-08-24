@@ -23,8 +23,8 @@ class SceneObject : public EngineObject
 
 	public:
 
-    bool AddMeshRenderer(Mesh3DRenderer *renderer);
-    bool AddMesh(Mesh3D *mesh);
+    bool SetMeshRenderer(Mesh3DRenderer *renderer);
+    bool SetMesh(Mesh3D *mesh);
     Mesh3DRenderer * GetRenderer3D();
 };
 

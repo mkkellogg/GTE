@@ -157,7 +157,13 @@ bool ShaderGL::Load()
         Debug::PrintMessage("Program linked successfully!");
     }
 
+    ready = true;
     return true;
+}
+
+bool ShaderGL::IsLoaded()
+{
+	return ready;
 }
 
 bool ShaderGL::CheckCompilation(int shaderID, ShaderType shaderType)

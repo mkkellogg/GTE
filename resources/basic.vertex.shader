@@ -9,6 +9,6 @@ varying vec3 vColor;
  
 void main()
 {
-    vColor = color;
-    gl_Position = projMatrix * viewMatrix * position ;
+    vColor = COLOR;
+    gl_Position = projMatrix * viewMatrix * POSITION ;
 }

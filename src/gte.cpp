@@ -7,13 +7,20 @@
 #include <GL/glut.h>
 
 #include "graphics/graphics.h"
+#include "graphics/attributes.h"
+#include "graphics/object/mesh3D.h"
+#include "graphics/render/mesh3Drenderer.h"
 #include "graphics/shader/shader.h"
 #include "geometry/matrix4x4.h"
 #include "base/basevector4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"
+#include "graphics/color/color4.h"
+#include "graphics/color/color4array.h"
 #include "ui/debug.h"
+#include "object/engineobjectmanager.h"
+#include "object/sceneobject.h"
 #include "gte.h"
 
 
@@ -119,7 +126,52 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         	a.Transform(p);
         	PrintVector(p);
         }
-    }
+
+        EngineObjectManager * objectManager = EngineObjectManager::Instance();
+
+        AttributeSet meshAttributes = Attributes::CreateAttributeSet();
+        Attributes::AddAttribute(&meshAttributes, Attribute::Position);
+        Attributes::AddAttribute(&meshAttributes, Attribute::Color);
+
+        SceneObject * sceneObject = objectManager->CreateSceneObject();
+
+        Material * material = objectManager->CreateMaterial("resources/basic.vertex.shader","resources/basic.fragment.shader");
+        Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);
+        Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
+
+        meshRenderer->UseMaterial(material);
+
+        sceneObject->SetMesh(mesh);
+        sceneObject->SetMeshRenderer(meshRenderer);
+
+        mesh->Init(36);
+
+        Point3Array * points = mesh->GetPostions();
+        Color4Array * colors = mesh->GetColors();
+
+        // --- Cube vertices -------
+        // cube front, triangle 1
+        points->GetPoint(0)->Set(-1,1,1);
+        points->GetPoint(1)->Set(1,1,1);
+        points->GetPoint(2)->Set(-1,-1,1);
+
+        // cube front, triangle 2
+        points->GetPoint(3)->Set(1,1,1);
+        points->GetPoint(4)->Set(1,-1,1);
+        points->GetPoint(5)->Set(-1,-1,1);
+
+
+        // --- Cube colors -------
+        // cube front, triangle 1
+        colors->GetColor(0)->Set(1,0,0,1);
+        colors->GetColor(1)->Set(1,0,0,1);
+        colors->GetColor(2)->Set(1,0,0,1);
+
+	    // cube front, triangle 2
+        colors->GetColor(3)->Set(1,0,0,1);
+        colors->GetColor(4)->Set(1,0,0,1);
+        colors->GetColor(5)->Set(1,0,0,1);
+}
 
     void OnUpdate(Graphics * graphics)
     {

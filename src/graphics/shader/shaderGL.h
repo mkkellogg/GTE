@@ -39,6 +39,7 @@ class ShaderGL : public Shader
     public :
 
     bool Load();
+    bool IsLoaded();
     int GetAttributeVarLocation(const char *varName) const;
     int GetUniformVarLocation(const char *varName) const;
     GLuint GetProgramID();

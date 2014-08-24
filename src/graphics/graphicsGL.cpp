@@ -100,7 +100,7 @@ void GraphicsGL::DestroyShader(Shader * shader)
 Mesh3DRenderer * GraphicsGL::CreateMeshRenderer()
 {
 	 //TODO: Add switch for different platforms; for now only support OpenGL
-	return new Mesh3DRendererGL();
+	return new Mesh3DRendererGL(this);
 }
 
 void GraphicsGL::DestroyMeshRenderer(Mesh3DRenderer * renderer)

@@ -8,8 +8,10 @@ class Shader;
 class Mesh3D;
 class Mesh3DRenderer;
 class EngineObjectManager;
+class Material;
 
 #include <vector>
+#include "graphics/attributes.h"
 
 class EngineObjectManager
 {
@@ -28,9 +30,11 @@ class EngineObjectManager
     static EngineObjectManager * Instance();
     SceneObject * CreateSceneObject();
 
-    Mesh3D * CreateMesh3D();
+    Mesh3D * CreateMesh3D(AttributeSet attributes);
     Mesh3DRenderer * CreateMesh3DRenderer();
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
+    Material * CreateMaterial(Shader * shader);
+    Material * CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
 };
 
 #endif
