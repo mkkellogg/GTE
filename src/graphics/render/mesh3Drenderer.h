@@ -11,6 +11,7 @@ class Graphics;
 class Mesh3DRenderer : public SceneObjectComponent
 {
 	friend class SceneObject;
+	friend class Mesh3D;
 
 	protected:
 

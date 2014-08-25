@@ -32,6 +32,9 @@ Mesh3DRendererGL::Mesh3DRendererGL(Graphics * graphics) : Mesh3DRendererGL(false
 Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics) : Mesh3DRenderer(graphics), buffersOnGPU(false)
 {
 	memset(attributeBuffers,0,sizeof(VertexAttrBufferGL*) * MAX_ATTRIBUTE_BUFFERS);
+
+	attributeBuffers[(int)Attribute::Position]= NULL;
+	attributeBuffers[(int)Attribute::Color]= NULL;
 }
 
 Mesh3DRendererGL::~Mesh3DRendererGL()
@@ -123,6 +126,7 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 	DestroyBuffers();
 
 	Mesh3DRenderer::UseMesh(newMesh);
+	mesh->SetRenderer(this);
 
 	AttributeSet meshAttributes = mesh->GetAttributeSet();
 	AttributeSet err = Attributes::CreateAttributeSet();

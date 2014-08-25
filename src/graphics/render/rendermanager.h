@@ -16,6 +16,7 @@ class RenderManager
 	EngineObjectManager * objectManager;
 
 	void RenderScene(Transform *modelViewTransform, Camera * camera);
+    void ClearBuffersForCamera(const Camera * camera) const;
 
     public:
 

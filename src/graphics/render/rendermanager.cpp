@@ -9,6 +9,7 @@
 #include "object/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "ui/debug.h"
+#include "base/intmask.h"
 #include "graphics/graphics.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/view/camera.h"
@@ -25,6 +26,19 @@ RenderManager::~RenderManager()
 
 }
 
+void RenderManager::ClearBuffersForCamera(const Camera * camera) const
+{
+	unsigned int clearBufferMask = camera->GetClearBufferMask();
+
+	GLbitfield glClearMask = 0;
+	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Color))
+		glClearMask |= GL_COLOR_BUFFER_BIT;
+	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Depth))
+		glClearMask |= GL_DEPTH_BUFFER_BIT;
+
+	glClear(glClearMask);
+}
+
 void RenderManager::RenderAll()
 {
 	Transform modelView;
@@ -39,6 +53,7 @@ void RenderManager::RenderAll()
 			Camera * camera = obj->GetCamera();
 			if(camera != NULL)
 			{
+				ClearBuffersForCamera(camera);
 				RenderScene(&modelView, camera);
 			}
 		}

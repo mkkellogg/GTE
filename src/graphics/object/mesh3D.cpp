@@ -6,6 +6,7 @@
 
 #include "object/sceneobjectcomponent.h"
 #include "mesh3D.h"
+#include "graphics/render/mesh3Drenderer.h"
 #include "graphics/attributes.h"
 #include "graphics/graphics.h"
 
@@ -36,6 +37,8 @@ Mesh3D::Mesh3D(AttributeSet attributes) : SceneObjectComponent()
 	colors = new Color4Array();
 	uvs1 = new UV2Array();
 	uvs2 = new UV2Array();
+
+	renderer = NULL;
 }
 
 Mesh3D::~Mesh3D()
@@ -131,9 +134,18 @@ bool Mesh3D::Init(int vertexCount)
 		return false;
 	}
 
+	UpdateRenderer();
+
 	return true;
 }
 
+void Mesh3D::UpdateRenderer()
+{
+	if(renderer != NULL)
+	{
+		renderer->UseMesh(this);
+	}
+}
 
 Point3Array * Mesh3D::GetPostions()
 {
@@ -158,5 +170,10 @@ UV2Array * Mesh3D::GetUVs1()
 UV2Array * Mesh3D::GetUVs2()
 {
 	return uvs2;
+}
+
+void Mesh3D::SetRenderer(Mesh3DRenderer * renderer)
+{
+	this->renderer = renderer;
 }
 

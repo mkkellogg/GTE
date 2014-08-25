@@ -66,6 +66,10 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(1.0,1.0,1.0,1.0);
+    glFrontFace(GL_CW);
+
+    //TODO: remove this line, it's only for debugging
+    glDisable(GL_CULL_FACE);
 
     if(callbacks != NULL)
     {
@@ -156,38 +160,12 @@ void GraphicsGL::SendStandardUniformsToShader(const Transform * modelView, const
 	}
 }
 
-void GraphicsGL::ClearBuffersForCamera(const Camera * camera) const
-{
-	unsigned int clearBufferMask = camera->GetClearBufferMask();
-	GLbitfield glClearMask = 0;
-	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Color))
-		glClearMask |= GL_COLOR_BUFFER_BIT;
-	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Depth))
-		glClearMask |= GL_DEPTH_BUFFER_BIT;
-
-	glClear(glClearMask);
-}
-
 void GraphicsGL::RenderScene()
 {
-	/*for( int i = 0; i < viewSystem->CameraCount(); i++)
-	{
-		const Camera * camera = viewSystem->GetCamera(i);
-		ClearBuffersForCamera(camera);
-		RenderSceneObjects(camera);
-	}*/
-
 	renderManager->RenderAll();
 
 	glutSwapBuffers();
 }
-
-/*
-void GraphicsGL::RenderSceneObjects(const Camera * camera)
-{
-	//SendStandardUniformsToShader(camera);
-	renderManager->RenderAll(camera);
-}*/
 
 void GraphicsGL::_glutDisplayFunc()
 {

@@ -21,7 +21,10 @@ Camera::Camera(Graphics * graphics)
 	ScreenDescriptor *screenDesc = graphics->GetScreenDescriptor();
 
 	float ratio = (float)screenDesc->GetScreenWidth() / (float)screenDesc->getScreenHeight();
+
 	Transform::BuildProjectionMatrix(&proj, 65, ratio, 10, 100);
+
+	projectionTransform->SetTo(&proj);
 
 	//Matrix4x4 * projectionMatrix = projectionTransform->GetMatrix();
 	//Transform::BuildProjectionMatrix(projectioNmatrix);

@@ -10,7 +10,9 @@
 #include "graphics/attributes.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/renderbuffer.h"
 #include "graphics/shader/shader.h"
+#include "graphics/view/camera.h"
 #include "geometry/matrix4x4.h"
 #include "base/basevector4.h"
 #include "geometry/point/point3.h"
@@ -133,9 +135,10 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         Attributes::AddAttribute(&meshAttributes, Attribute::Position);
         Attributes::AddAttribute(&meshAttributes, Attribute::Color);
 
-
         SceneObject * cameraObject = objectManager->CreateSceneObject();
         Camera * camera = objectManager->CreateCamera();
+        camera->AddClearBuffer(RenderBufferType::Color);
+        camera->AddClearBuffer(RenderBufferType::Depth);
         cameraObject->SetCamera(camera);
 
         SceneObject * sceneObject = objectManager->CreateSceneObject();
@@ -156,15 +159,14 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
         // --- Cube vertices -------
         // cube front, triangle 1
-        points->GetPoint(0)->Set(-1,1,1);
-        points->GetPoint(1)->Set(1,1,1);
-        points->GetPoint(2)->Set(-1,-1,1);
+        points->GetPoint(0)->Set(-1,1,-11);
+        points->GetPoint(1)->Set(1,1,-11);
+        points->GetPoint(2)->Set(-1,-1,-11);
 
         // cube front, triangle 2
-        points->GetPoint(3)->Set(1,1,1);
-        points->GetPoint(4)->Set(1,-1,1);
-        points->GetPoint(5)->Set(-1,-1,1);
-
+        points->GetPoint(3)->Set(1,1,-11);
+        points->GetPoint(4)->Set(1,-1,-11);
+        points->GetPoint(5)->Set(-1,-1,-11);
 
         // --- Cube colors -------
         // cube front, triangle 1
@@ -176,6 +178,8 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         colors->GetColor(3)->Set(1,0,0,1);
         colors->GetColor(4)->Set(1,0,0,1);
         colors->GetColor(5)->Set(1,0,0,1);
+
+        mesh->UpdateRenderer();
 }
 
     void OnUpdate(Graphics * graphics)

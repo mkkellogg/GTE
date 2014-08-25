@@ -67,7 +67,7 @@ void Matrix4x4::SetTo(const float * srcData)
 		return;
 	}
 
-	memcpy((void*)this->data,(void*)srcData, sizeof(float) * DATA_SIZE);
+	memcpy(data, srcData, sizeof(float) * DATA_SIZE);
 }
 
 Matrix4x4 & Matrix4x4::operator= (const Matrix4x4 & source)

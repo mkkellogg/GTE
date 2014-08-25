@@ -40,8 +40,6 @@ class GraphicsGL : public Graphics
     Material * GetActiveMaterial();
 
     void RenderScene();
-   // void RenderSceneObjects(const Camera * camera);
-    void ClearBuffersForCamera(const Camera * camera) const;
 
     public :
 

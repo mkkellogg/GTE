@@ -12,6 +12,7 @@
 #include "shadersource.h"
 #include "graphics/render/vertexattrbuffer.h"
 #include "graphics/render/vertexattrbufferGL.h"
+#include "geometry/matrix4x4.h"
 #include "ui/debug.h"
 #include "gte.h"
 
@@ -259,6 +260,7 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	int componentCount = bufferGL->GetComponentCount();
 	int stride = bufferGL->GetStride();
 
+	//TODO: move this so it is not called every single draw call
 	glEnableVertexAttribArray((GLuint)loc);
 
 	if(bufferGL->IsGPUBuffer())
@@ -268,13 +270,13 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	}
 	else
 	{
-		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, stride, data);
+		glVertexAttribPointer(loc, componentCount, GL_FLOAT, GL_FALSE, stride, data);
 	}
 }
 
 void ShaderGL::SendUniformToShader(int loc, const Matrix4x4 * mat)
 {
-
+	glUniformMatrix4fv(loc,1, GL_FALSE, mat->GetDataPtr());
 }
 
 void ShaderGL::SendUniformToShader(int loc, const Point3 * point)

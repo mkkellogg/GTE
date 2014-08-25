@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include <memory.h>
 #include "transform.h"
 #include "matrix4x4.h"
 #include "ui/debug.h"
@@ -48,6 +49,7 @@ void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, floa
     m->SetIdentity();
 
     float data[16];
+    memset(data,0,16 * sizeof(float));
 
     data[0] = f / ratio;
     data[1 * 4 + 1] = f;

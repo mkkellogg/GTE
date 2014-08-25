@@ -11,6 +11,7 @@ class Vector3Array;
 class Color4Array;
 class UV2Array;
 class EngineObjectManager;
+class Mesh3DRenderer;
 
 #include "object/sceneobjectcomponent.h"
 #include "graphics/attributes.h"
@@ -19,6 +20,7 @@ class Mesh3D : public SceneObjectComponent
 {
 	friend EngineObjectManager;
 
+	Mesh3DRenderer * renderer;
 	AttributeSet attributeSet;
 	int vertexCount;
 
@@ -38,6 +40,8 @@ class Mesh3D : public SceneObjectComponent
 
 	public:
 
+    void SetRenderer(Mesh3DRenderer * render);
+    void UpdateRenderer();
     bool Init(int vertexCount);
     int GetVertexCount();
     AttributeSet GetAttributeSet();
