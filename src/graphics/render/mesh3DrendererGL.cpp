@@ -35,6 +35,9 @@ Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics) : Mes
 
 	attributeBuffers[(int)Attribute::Position]= NULL;
 	attributeBuffers[(int)Attribute::Color]= NULL;
+
+	storedVertexCount = 0;
+	storedAttributes = Attributes::CreateAttributeSet();
 }
 
 Mesh3DRendererGL::~Mesh3DRendererGL()
@@ -148,12 +151,6 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 		}
 	}
 
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))SetPositionData(mesh->GetPostions());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))SetNormalData(mesh->GetNormals());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))SetColorData(mesh->GetColors());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))SetUV1Data(mesh->GetUVs1());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))SetUV2Data(mesh->GetUVs2());
-
 	if(err != 0)
 	{
 		Mesh3DRenderer::UseMesh(NULL);
@@ -164,12 +161,42 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 		return false;
 	}
 
+	storedVertexCount = mesh->GetVertexCount();
+	CopyMeshData();
+
 	if(material != NULL)
 	{
 		return UseMaterial(material);
 	}
 
+	//storedAttributes = meshAttributes;
+
 	return true;
+}
+
+void Mesh3DRendererGL::CopyMeshData()
+{
+	AttributeSet meshAttributes = mesh->GetAttributeSet();
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))SetPositionData(mesh->GetPostions());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))SetNormalData(mesh->GetNormals());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))SetColorData(mesh->GetColors());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))SetUV1Data(mesh->GetUVs1());
+	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))SetUV2Data(mesh->GetUVs2());
+}
+
+void Mesh3DRendererGL::UpdateFromMesh()
+{
+	if(mesh != NULL)
+	{
+		if(mesh->GetVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
+		{
+			UseMesh(mesh);
+		}
+		else
+		{
+			CopyMeshData();
+		}
+	}
 }
 
 bool Mesh3DRendererGL::UseMaterial(Material * material)

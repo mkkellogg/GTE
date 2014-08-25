@@ -41,7 +41,6 @@ class Mesh3D : public SceneObjectComponent
 	public:
 
     void SetRenderer(Mesh3DRenderer * render);
-    void UpdateRenderer();
     bool Init(int vertexCount);
     int GetVertexCount();
     AttributeSet GetAttributeSet();

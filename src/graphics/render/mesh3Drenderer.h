@@ -28,6 +28,7 @@ class Mesh3DRenderer : public SceneObjectComponent
 
     virtual void Render() = 0;
     Mesh3D * GetMesh();
+    virtual void UpdateFromMesh() = 0;
     virtual bool UseMaterial(Material * material);
     Material * GetMaterial();
 };

@@ -86,7 +86,7 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
         delete point;*/
 
-        float dataA[] = {1,0,0,0,
+       /* float dataA[] = {1,0,0,0,
                          0,1,0,0,
                          0,0,1,0,
                          4,4,4,1};
@@ -127,7 +127,7 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         	p->Set(2,2,2);
         	a.Transform(p);
         	PrintVector(p);
-        }
+        }*/
 
         EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
@@ -179,7 +179,7 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
         colors->GetColor(4)->Set(1,0,0,1);
         colors->GetColor(5)->Set(1,0,0,1);
 
-        mesh->UpdateRenderer();
+        meshRenderer->UpdateFromMesh();
 }
 
     void OnUpdate(Graphics * graphics)

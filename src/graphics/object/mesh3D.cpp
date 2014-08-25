@@ -134,17 +134,7 @@ bool Mesh3D::Init(int vertexCount)
 		return false;
 	}
 
-	UpdateRenderer();
-
 	return true;
-}
-
-void Mesh3D::UpdateRenderer()
-{
-	if(renderer != NULL)
-	{
-		renderer->UseMesh(this);
-	}
 }
 
 Point3Array * Mesh3D::GetPostions()

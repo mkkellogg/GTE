@@ -23,6 +23,8 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
     VertexAttrBufferGL * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
 
+	int storedVertexCount;
+	AttributeSet storedAttributes;
     bool buffersOnGPU;
 
     bool InitBuffer(VertexAttrBufferGL ** buffer, int vertexCount, int componentCount,  int stride);
@@ -47,6 +49,8 @@ class Mesh3DRendererGL : public Mesh3DRenderer
     public:
 
     bool UseMesh(Mesh3D * newMesh);
+    void CopyMeshData();
+    void UpdateFromMesh();
     bool UseMaterial(Material * material);
     void Render();
 };
