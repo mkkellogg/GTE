@@ -106,6 +106,13 @@ void Matrix4x4::Transform(Point3 * point) const
 	memcpy(point->GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
 }
 
+void Matrix4x4::Transform(float * vector4f) const
+{
+	float temp[DIM_SIZE];
+	MultiplyMV(this->data, vector4f, temp);
+	memcpy(vector4f, temp, sizeof(float) * DIM_SIZE);
+}
+
 void Matrix4x4::Multiply(const Matrix4x4 * matrix)
 {
     float temp[DATA_SIZE];
@@ -205,7 +212,12 @@ void Matrix4x4::Invert()
 {
     float temp[DATA_SIZE];    
     Invert(data, temp);
-    memcpy(temp, data, sizeof(float) * DATA_SIZE);
+    memcpy(data, temp, sizeof(float) * DATA_SIZE);
+}
+
+void Matrix4x4::Invert(Matrix4x4 * out)
+{
+	Invert(data, out->data);
 }
 
 void Matrix4x4::Invert(const float * source, float * dest)
@@ -359,13 +371,14 @@ void Matrix4x4::Translate(const Vector3 * vector)
 
 void Matrix4x4::Translate(float x, float y, float z)
 {
-    /*for (int i=0 ; i<4 ; i++) 
-    {
-        int mi = i;
-        data[12 + mi] += data[mi] * x + data[4 + mi] * y + data[8 + mi] * z;
-    }*/
-    
     Translate(data, data, x, y, z);
+}
+
+void Matrix4x4::PostTranslate(float x, float y, float z)
+{
+	float dest[DATA_SIZE];
+	Matrix4x4::PostTranslate(data,dest, x,y,z);
+	memcpy(data, dest, sizeof(float)*DATA_SIZE);
 }
 
 void Matrix4x4::Translate(const Matrix4x4 * source, Matrix4x4 * out, const Vector3 * vector)
@@ -396,6 +409,19 @@ void Matrix4x4::Translate(const float * source, float * dest, float x, float y, 
     }
 }
 
+void Matrix4x4::PostTranslate(const float * source, float * dest, float x, float y, float z)
+{
+    Matrix4x4 trans;
+    trans.SetIdentity();
+
+    float *matrixData = const_cast<float *>(trans.GetDataPtr());
+    matrixData[12] = x;
+    matrixData[13] = y;
+    matrixData[14] = z;
+
+    Matrix4x4::MultiplyMM(matrixData, source, dest);
+}
+
 
 void Matrix4x4::Rotate(const Vector3 * vector, float a)
 {
@@ -412,6 +438,24 @@ void Matrix4x4::Rotate(float x, float y, float z, float a)
     float r[DATA_SIZE];  
     SetRotate(r, x, y, z, a);
     MultiplyMM(data, r, temp);
+    memcpy(data, temp, sizeof(float) * DATA_SIZE);
+}
+
+void Matrix4x4::PostRotate(const Vector3 * vector, float a)
+{
+    float temp[DATA_SIZE];
+    float r[DATA_SIZE];
+    SetRotate(r, vector->x, vector->y, vector->z, a);
+    MultiplyMM(r, data,temp);
+    memcpy(data, temp, sizeof(float) * DATA_SIZE);
+}
+
+void Matrix4x4::PostRotate(float x, float y, float z, float a)
+{
+    float temp[DATA_SIZE];
+    float r[DATA_SIZE];
+    SetRotate(r, x, y, z, a);
+    MultiplyMM(r, data, temp);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 

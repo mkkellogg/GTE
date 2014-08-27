@@ -45,11 +45,12 @@ class Graphics
 
     virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
 
+
     virtual Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) = 0;
     virtual void DestroyShader(Shader * shader) = 0;
-
     virtual Mesh3DRenderer * CreateMeshRenderer()  = 0;
     virtual void DestroyMeshRenderer(Mesh3DRenderer * buffer) = 0;
+
 
     virtual void ActivateMaterial(Material * material);
     Material * GetActiveMaterial() const;

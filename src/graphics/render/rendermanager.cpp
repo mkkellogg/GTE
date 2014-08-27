@@ -53,6 +53,7 @@ void RenderManager::RenderAll()
 			Camera * camera = obj->GetCamera();
 			if(camera != NULL)
 			{
+				modelView.TransformBy(obj->GetTransform());
 				ClearBuffersForCamera(camera);
 				RenderScene(&modelView, camera);
 			}
@@ -80,7 +81,10 @@ void RenderManager::RenderScene(Transform *modelViewTransform, Camera * camera)
 				if(m != NULL)
 				{
 					graphics->ActivateMaterial(m);
-					graphics->SendStandardUniformsToShader(modelViewTransform, camera->GetProjectionTransform());
+					Transform inverse(modelViewTransform);
+					inverse.Invert();
+					inverse.TransformBy(obj->GetTransform());
+					graphics->SendStandardUniformsToShader(&inverse, camera->GetProjectionTransform());
 					renderer->Render();
 				}
 				else

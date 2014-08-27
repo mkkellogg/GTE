@@ -13,6 +13,7 @@ VIEWSYSSRC= $(GRAPHICSSRC)/view
 RENDERSRC= $(GRAPHICSSRC)/render
 GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
 ENGINEOBJECTSRC= src/object
+UTILSRC= src/util
 
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o
@@ -26,12 +27,13 @@ RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/ma
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o obj/screendesc.o
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
+UTILOBJ= obj/datastack.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o 
 
 OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
 
-all: gtemain graphics ui geometry gtemath base global engineobjects
+all: gtemain graphics ui geometry gtemath base global engineobjects util
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -240,6 +242,16 @@ obj/basevector2factory.o: $(BASESRC)/basevector2factory.cpp $(BASESRC)/basevecto
 obj/basevector2array.o: $(BASESRC)/basevector2array.cpp $(BASESRC)/basevector2array.h 
 	$(CC) $(CFLAGS) -o obj/basevector2array.o -c $(BASESRC)/basevector2array.cpp
 	
+	
+# ==================================
+# Util
+# ==================================	
+
+util: $(UTILOBJ)
+
+obj/datastack.o: $(UTILSRC)/datastack.cpp $(UTILSRC)/datastack.h
+	$(CC) $(CFLAGS) -o obj/datastack.o -c $(UTILSRC)/datastack.cpp 
+
 
 # ==================================
 # Math

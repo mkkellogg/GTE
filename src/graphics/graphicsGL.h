@@ -30,11 +30,12 @@ class GraphicsGL : public Graphics
 
     void SendStandardUniformsToShader(const Transform * modelView, const Transform * projection);
 
+
     Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
     void DestroyShader(Shader * shader);
-
     Mesh3DRenderer * CreateMeshRenderer();
     void DestroyMeshRenderer(Mesh3DRenderer * buffer);
+
 
     void ActivateMaterial(Material * material);
     Material * GetActiveMaterial();

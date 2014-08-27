@@ -49,10 +49,21 @@ Mesh3D * EngineObjectManager::CreateMesh3D(AttributeSet attributes)
 	return new Mesh3D(attributes);
 }
 
+void EngineObjectManager::DestroyMesh3D(Mesh3D * mesh)
+{
+	delete mesh;
+}
+
 Mesh3DRenderer * EngineObjectManager::CreateMesh3DRenderer()
 {
 	Graphics * graphics = Graphics::Instance();
 	return graphics->CreateMeshRenderer();
+}
+
+void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRenderer * renderer)
+{
+	Graphics * graphics = Graphics::Instance();
+	graphics->DestroyMeshRenderer(renderer);
 }
 
 Shader * EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)
@@ -66,6 +77,12 @@ Shader * EngineObjectManager::CreateShader(const char * vertexSourcePath, const 
 		return NULL;
 	}
 	return shader;
+}
+
+void EngineObjectManager::DestroyShader(Shader * shader)
+{
+	Graphics * graphics = Graphics::Instance();
+	graphics->DestroyShader(shader);
 }
 
 Material * EngineObjectManager::CreateMaterial(Shader * shader)
@@ -97,10 +114,26 @@ Material * EngineObjectManager::CreateMaterial(const char * shaderVertexSourcePa
 	return m;
 }
 
+void EngineObjectManager::DestroyMaterial(Material * material)
+{
+	Shader * shader = material->GetShader();
+	if(shader != NULL)
+	{
+		DestroyShader(shader);
+	}
+
+	delete material;
+}
+
 Camera * EngineObjectManager::CreateCamera()
 {
 	Graphics * graphics = Graphics::Instance();
 	return new Camera(graphics);
+}
+
+void EngineObjectManager::DestroyCamera(Camera * camera)
+{
+	delete camera;
 }
 
 const SceneObject * EngineObjectManager::GetSceneRoot() const

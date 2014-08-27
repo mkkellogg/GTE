@@ -29,7 +29,7 @@ GraphicsCallbacks * _instanceCallbacks;
 
 void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
-	// case base method
+	// call base method
 	Graphics::Init(windowWidth, windowHeight, callbacks, windowTitle);
 
 	_instanceCallbacks = this->callbacks = callbacks;
@@ -67,9 +67,8 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     glEnable(GL_DEPTH_TEST);
     glClearColor(1.0,1.0,1.0,1.0);
     glFrontFace(GL_CW);
-
-    //TODO: remove this line, it's only for debugging
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     if(callbacks != NULL)
     {

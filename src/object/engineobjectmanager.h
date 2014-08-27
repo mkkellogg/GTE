@@ -33,11 +33,16 @@ class EngineObjectManager
     SceneObject * CreateSceneObject();
 
     Mesh3D * CreateMesh3D(AttributeSet attributes);
+    void DestroyMesh3D(Mesh3D * mesh);
     Mesh3DRenderer * CreateMesh3DRenderer();
+    void DestroyMesh3DRenderer(Mesh3DRenderer * renderer);
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
+    void DestroyShader(Shader * shader);
     Material * CreateMaterial(Shader * shader);
     Material * CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
+    void DestroyMaterial(Material * material);
     Camera * CreateCamera();
+    void DestroyCamera(Camera * camera);
 
     const SceneObject * GetSceneRoot() const;
 };

@@ -5,7 +5,10 @@
 #include "matrix4x4.h"
 #include "ui/debug.h"
 #include "global/constants.h"
+#include "global/global.h"
 #include "vector/vector3.h"
+#include "point/point3.h"
+#include "util/datastack.h"
 
 Transform * Transform::CreateIdentityTransform()
 {
@@ -14,6 +17,8 @@ Transform * Transform::CreateIdentityTransform()
 
 Transform::Transform()
 {
+	matrixStack = new DataStack<float>(256,16);
+	matrixStackInitialized = matrixStack->Init();
 	matrix.SetIdentity();
 }
 
@@ -22,9 +27,17 @@ Transform::Transform(Matrix4x4 * m) : Transform()
 	matrix.SetTo(m);
 }
 
+Transform::Transform(Transform * transform) : Transform()
+{
+	if(transform != NULL)
+	{
+		matrix.SetTo(transform->GetMatrix());
+	}
+}
+
 Transform::~Transform()
 {
-
+	SAFE_DELETE(matrixStack);
 }
 
 const Matrix4x4 * Transform::GetMatrix() const
@@ -37,9 +50,41 @@ void Transform::SetTo(const Matrix4x4 * matrix)
 	this->matrix.SetTo(matrix);
 }
 
-void Transform::TransformBy(const Transform * transform)
+void Transform::TransformBy(const Transform * transform, bool push)
 {
 	matrix.LeftMultiply(transform->GetMatrix());
+}
+
+void Transform::Invert()
+{
+	matrix.Invert();
+}
+
+void Transform::Translate(float x, float y, float z, bool local)
+{
+	if(local)
+	{
+		float localVector[4] = {x,y,z,0};
+		matrix.Transform(localVector);
+
+		x = localVector[0];
+		y = localVector[1];
+		z = localVector[2];
+	}
+
+	matrix.PostTranslate(x,y,z);
+}
+
+void Transform::RotateAround(Point3 * point, Vector3 * axis, float angle)
+{
+	RotateAround(point->x, point->y, point->z, axis->x, axis->y, axis->z, angle);
+}
+
+void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle)
+{
+	matrix.PostTranslate(-px,-py,-pz);
+	matrix.PostRotate(ax,ay,az,angle);
+	matrix.PostTranslate(px,py,pz);
 }
 
 void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, float nearP, float farP)

@@ -20,7 +20,7 @@ class SceneObject : public EngineObject
 
 	std::vector<SceneObject * > children;
 
-	Transform * modelViewTransform;
+	Transform * transform;
 
 	Mesh3DRenderer * renderer3D;
 	Mesh3D * mesh3D;
@@ -31,7 +31,7 @@ class SceneObject : public EngineObject
 
 	public:
 
-    const Transform * GetModelViewTransform() const ;
+    Transform * GetTransform() const ;
 
     bool SetMeshRenderer(Mesh3DRenderer *renderer);
     bool SetMesh(Mesh3D *mesh);

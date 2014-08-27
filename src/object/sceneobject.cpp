@@ -20,17 +20,17 @@ SceneObject::SceneObject() : EngineObject()
 	mesh3D = NULL;
 	camera = NULL;
 
-	modelViewTransform = Transform::CreateIdentityTransform();
+	transform = Transform::CreateIdentityTransform();
 }
 
 SceneObject::~SceneObject()
 {
-	SAFE_DELETE(modelViewTransform);
+	SAFE_DELETE(transform);
 }
 
-const Transform * SceneObject::GetModelViewTransform() const
+Transform * SceneObject::GetTransform() const
 {
-	return modelViewTransform;
+	return transform;
 }
 
 bool SceneObject::SetMeshRenderer(Mesh3DRenderer *renderer)

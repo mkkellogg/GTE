@@ -49,6 +49,7 @@ class Matrix4x4
     void Transform(Vector3 * vector) const;
     void Transform(const Point3 * point, Point3 * out) const;
     void Transform(Point3 * point) const;
+    void Transform(float * vector4f) const;
     void Multiply(const Matrix4x4 * matrix);
     void LeftMultiply(const Matrix4x4 * matrix);
     void Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const;
@@ -60,6 +61,7 @@ class Matrix4x4
     static void Transpose(const float* source, float *dest);
 
     void Invert();
+    void Invert(Matrix4x4 * out);
     static void Invert(const float * source, float * dest);
 
     void SetIdentity();
@@ -67,12 +69,16 @@ class Matrix4x4
 
     void Translate(const Vector3 * vector);
     void Translate(float x, float y, float z);
+    void PostTranslate(float x, float y, float z);
     static void Translate(const Matrix4x4 * src, Matrix4x4 * out, const Vector3 * vector);
     static void Translate(const Matrix4x4 * src, Matrix4x4 * out,float x, float y, float z);
     static void Translate(const float * source, float * dest, float x, float y, float z);
+    static void PostTranslate(const float * source, float * dest, float x, float y, float z);
 
     void Rotate(const Vector3 * vector, float a);
     void Rotate(float x, float y, float z, float a);
+    void PostRotate(const Vector3 * vector, float a);
+    void PostRotate(float x, float y, float z, float a);
     void SetRotateEuler(float x, float y, float z);
     static void SetRotate(float * rm, float x, float y, float z, float a);
     static void SetRotateEuler(float * rm, float x, float y, float z);
