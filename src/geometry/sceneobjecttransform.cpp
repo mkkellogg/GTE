@@ -33,21 +33,26 @@ SceneObjectTransform::~SceneObjectTransform()
 
 }
 
+void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool invert)
+{
+	Transform full;
+	SceneObject * parent = sceneObject->GetParent();
+	while(parent != NULL)
+	{
+		full.PreTransformBy(parent->GetTransform());
+		parent = parent->GetParent();
+	}
+	if(invert == true)full.Invert();
+	transform->SetTo(&full);
+}
+
 void SceneObjectTransform::Translate(float x, float y, float z, bool local)
 {
 	if(!local)
 	{
 		float trans[] = {x,y,z,0};
 		Transform full;
-		full.SetTo(this);
-
-		SceneObject * parent = sceneObject->GetParent();
-		while(parent != NULL)
-		{
-			full.PreTransformBy(parent->GetTransform());
-			parent = parent->GetParent();
-		}
-		full.Invert();
+		GetInheritedTransform(&full, true);
 		full.GetMatrix()->Transform(trans);
 
 		matrix.PreTranslate(trans[0], trans[1], trans[2]);

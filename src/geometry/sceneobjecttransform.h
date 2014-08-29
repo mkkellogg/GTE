@@ -14,6 +14,8 @@ class SceneObjectTransform : public Transform
 {
 	SceneObject * sceneObject;
 
+	void GetInheritedTransform(Transform * transform, bool invert);
+
     public:
 
 	SceneObjectTransform(SceneObject * sceneObject);
