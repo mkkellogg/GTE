@@ -16,6 +16,7 @@
 #include "geometry/matrix4x4.h"
 #include "base/basevector4.h"
 #include "geometry/transform.h"
+#include "geometry/sceneobjecttransform.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"
@@ -136,15 +137,15 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
         cameraObject = objectManager->CreateSceneObject();
         Camera * camera = objectManager->CreateCamera();
-        cameraObject->GetTransform()->Translate(0,5,5,false);
-        cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
-        cameraObject->GetTransform()->Translate(0,0,5,true);
+        cameraObject->GetTransform()->Translate(0,5,5,true);
+       // cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
         camera->AddClearBuffer(RenderBufferType::Color);
         camera->AddClearBuffer(RenderBufferType::Depth);
         cameraObject->SetCamera(camera);
 
         SceneObject * sceneObject = objectManager->CreateSceneObject();
-
+        sceneObject->GetTransform()->RotateAround(0,0,0,0,1,0,45);
+        sceneObject->GetTransform()->Translate(0,0,-12,false);
         Material * material = objectManager->CreateMaterial("resources/basic.vertex.shader","resources/basic.fragment.shader");
         Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);
         Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
@@ -161,54 +162,54 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 
         // --- Cube vertices -------
         // cube front, triangle 1
-        points->GetPoint(0)->Set(-1,1,-11);
-        points->GetPoint(1)->Set(1,1,-11);
-        points->GetPoint(2)->Set(-1,-1,-11);
+        points->GetPoint(0)->Set(-1,1,1);
+        points->GetPoint(1)->Set(1,1,1);
+        points->GetPoint(2)->Set(-1,-1,1);
 
         // cube front, triangle 2
-        points->GetPoint(3)->Set(1,1,-11);
-        points->GetPoint(4)->Set(1,-1,-11);
-        points->GetPoint(5)->Set(-1,-1,-11);
+        points->GetPoint(3)->Set(1,1,1);
+        points->GetPoint(4)->Set(1,-1,1);
+        points->GetPoint(5)->Set(-1,-1,1);
 
         // cube right, triangle 1
-	   points->GetPoint(6)->Set(1,1,-11);
-	   points->GetPoint(7)->Set(1,1,-13);
-	   points->GetPoint(8)->Set(1,-1,-11);
+	   points->GetPoint(6)->Set(1,1,1);
+	   points->GetPoint(7)->Set(1,1,-1);
+	   points->GetPoint(8)->Set(1,-1,1);
 
 	   // cube right, triangle 2
-	   points->GetPoint(9)->Set(1,-1,-11);
-	   points->GetPoint(10)->Set(1,1,-13);
-	   points->GetPoint(11)->Set(1,-1,-13);
+	   points->GetPoint(9)->Set(1,-1,1);
+	   points->GetPoint(10)->Set(1,1,-1);
+	   points->GetPoint(11)->Set(1,-1,-1);
 
        // cube left, triangle 1
-	   points->GetPoint(12)->Set(-1,1,-13);
-	   points->GetPoint(13)->Set(-1,1,-11);
-	   points->GetPoint(14)->Set(-1,-1,-13);
+	   points->GetPoint(12)->Set(-1,1,-1);
+	   points->GetPoint(13)->Set(-1,1,1);
+	   points->GetPoint(14)->Set(-1,-1,-1);
 
 	   // cube left, triangle 2
-	   points->GetPoint(15)->Set(-1,1,-11);
-	   points->GetPoint(16)->Set(-1,-1,-11);
-	   points->GetPoint(17)->Set(-1,-1,-13);
+	   points->GetPoint(15)->Set(-1,1,1);
+	   points->GetPoint(16)->Set(-1,-1,1);
+	   points->GetPoint(17)->Set(-1,-1,-1);
 
        // cube top, triangle 1
-	   points->GetPoint(18)->Set(-1,1,-13);
-	   points->GetPoint(19)->Set(1,1,-11);
-	   points->GetPoint(20)->Set(-1,1,-11);
+	   points->GetPoint(18)->Set(-1,1,-1);
+	   points->GetPoint(19)->Set(1,1,1);
+	   points->GetPoint(20)->Set(-1,1,1);
 
 	   // cube top, triangle 2
-	   points->GetPoint(21)->Set(-1,1,-13);
-	   points->GetPoint(22)->Set(1,1,-13);
-	   points->GetPoint(23)->Set(1,1,-11);
+	   points->GetPoint(21)->Set(-1,1,-1);
+	   points->GetPoint(22)->Set(1,1,-1);
+	   points->GetPoint(23)->Set(1,1,1);
 
 	   // cube back, triangle 1
-	   points->GetPoint(24)->Set(1,1,-13);
-	   points->GetPoint(25)->Set(-1,1,-13);
-	   points->GetPoint(26)->Set(-1,-1,-13);
+	   points->GetPoint(24)->Set(1,1,-1);
+	   points->GetPoint(25)->Set(-1,1,-1);
+	   points->GetPoint(26)->Set(-1,-1,-1);
 
 	   // cube back, triangle 2
-	   points->GetPoint(27)->Set(1,1,-13);
-	   points->GetPoint(28)->Set(-1,-1,-13);
-	   points->GetPoint(29)->Set(1,-1,-13);
+	   points->GetPoint(27)->Set(1,1,-1);
+	   points->GetPoint(28)->Set(-1,-1,-1);
+	   points->GetPoint(29)->Set(1,-1,-1);
 
         // --- Cube colors -------
         // cube front, triangle 1
@@ -262,6 +263,13 @@ class CustomGraphicsCallbacks : public GraphicsCallbacks
 		colors->GetColor(29)->Set(0,1,0,1);
 
         meshRenderer->UpdateFromMesh();
+
+       /* SceneObject * childSceneObject = objectManager->CreateSceneObject();
+        sceneObject->AddChild(childSceneObject);
+        childSceneObject->SetMesh(mesh);
+        childSceneObject->SetMeshRenderer(meshRenderer);
+        childSceneObject->GetTransform()->Translate(5,1,0,true);
+        childSceneObject->GetTransform()->Translate(15,0,0,false);*/
     }
 
     void OnUpdate(Graphics * graphics)

@@ -9,14 +9,20 @@ class EngineObjectManager;
 class Transform;
 
 #include <vector>
+#include "util/datastack.h"
 
 class RenderManager
 {
 	Graphics * graphics;
 	EngineObjectManager * objectManager;
+	DataStack<float> * viewTransformStack;
+	DataStack<float> * modelTransformStack;
 
-	void RenderScene(Transform *modelViewTransform, Camera * camera);
+	void RenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;
+    void PushTransformData(const Transform * transform, DataStack<float> * transformStack);
+    void PopTransformData(Transform * transform, DataStack<float> * transformStack);
+    int RenderDepth(DataStack<float> * transformStack);
 
     public:
 
@@ -24,6 +30,7 @@ class RenderManager
     ~RenderManager();
 
     void RenderAll();
+    void RenderAll(SceneObject * parent, Transform * viewTransform);
 };
 
 #endif

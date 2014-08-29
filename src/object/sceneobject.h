@@ -8,6 +8,7 @@ class Mesh3D;
 class Transform;
 class Camera;
 class SceneObject;
+class SceneObjectTransform;
 
 #include "engineobject.h"
 #include <vector>
@@ -19,8 +20,9 @@ class SceneObject : public EngineObject
 	protected:
 
 	std::vector<SceneObject * > children;
+	SceneObject * parent;
 
-	Transform * transform;
+	SceneObjectTransform * transform;
 
 	Mesh3DRenderer * renderer3D;
 	Mesh3D * mesh3D;
@@ -31,7 +33,7 @@ class SceneObject : public EngineObject
 
 	public:
 
-    Transform * GetTransform() const ;
+    SceneObjectTransform * GetTransform() const ;
 
     bool SetMeshRenderer(Mesh3DRenderer *renderer);
     bool SetMesh(Mesh3D *mesh);
@@ -41,8 +43,10 @@ class SceneObject : public EngineObject
     Camera * GetCamera();
 
     void AddChild(SceneObject * child);
+    void RemoveChild(SceneObject * child);
     unsigned int GetChildrenCount() const;
     SceneObject * GetChildAt(int index) const;
+    SceneObject * GetParent();
 };
 
 #endif

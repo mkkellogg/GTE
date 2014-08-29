@@ -13,14 +13,16 @@
 #include "ui/debug.h"
 #include "global/global.h"
 #include "geometry/transform.h"
+#include "geometry/sceneobjecttransform.h"
 
 SceneObject::SceneObject() : EngineObject()
 {
 	renderer3D = NULL;
 	mesh3D = NULL;
 	camera = NULL;
+	parent = NULL;
 
-	transform = Transform::CreateIdentityTransform();
+	transform = new SceneObjectTransform(this);
 }
 
 SceneObject::~SceneObject()
@@ -28,7 +30,7 @@ SceneObject::~SceneObject()
 	SAFE_DELETE(transform);
 }
 
-Transform * SceneObject::GetTransform() const
+SceneObjectTransform * SceneObject::GetTransform() const
 {
 	return transform;
 }
@@ -86,7 +88,35 @@ Camera * SceneObject::GetCamera()
 void SceneObject::AddChild(SceneObject * child)
 {
 	//TODO: add check for duplicate children
+
+	if(child->parent != NULL)
+	{
+		parent->RemoveChild(child);
+	}
+
+	child->parent = this;
 	children.push_back(child);
+}
+
+void SceneObject::RemoveChild(SceneObject * child)
+{
+	if(child != NULL)
+	{
+		for(std::vector<SceneObject *>::iterator it = children.begin(); it != children.end(); ++it)
+		{
+			if (*it == child)
+			{
+				children.erase(it);
+				break;
+			}
+		}
+
+		child->parent = NULL;
+	}
+	else
+	{
+		Debug::PrintError("SceneObject::RemoveChild -> adding NULL child.");
+	}
 }
 
 unsigned int SceneObject::GetChildrenCount() const
@@ -105,4 +135,9 @@ SceneObject * SceneObject::GetChildAt(int index) const
 		Debug::PrintError("SceneObject::GetChildAt -> index out of range.");
 		return NULL;
 	}
+}
+
+SceneObject * SceneObject::GetParent()
+{
+	return parent;
 }

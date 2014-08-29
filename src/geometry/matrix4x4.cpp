@@ -120,7 +120,7 @@ void Matrix4x4::Multiply(const Matrix4x4 * matrix)
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix4x4::LeftMultiply(const Matrix4x4 * matrix)
+void Matrix4x4::PreMultiply(const Matrix4x4 * matrix)
 {
     float temp[DATA_SIZE];
     MultiplyMM(matrix->data, this->data, temp);
@@ -374,10 +374,10 @@ void Matrix4x4::Translate(float x, float y, float z)
     Translate(data, data, x, y, z);
 }
 
-void Matrix4x4::PostTranslate(float x, float y, float z)
+void Matrix4x4::PreTranslate(float x, float y, float z)
 {
 	float dest[DATA_SIZE];
-	Matrix4x4::PostTranslate(data,dest, x,y,z);
+	Matrix4x4::PreTranslate(data,dest, x,y,z);
 	memcpy(data, dest, sizeof(float)*DATA_SIZE);
 }
 
@@ -409,7 +409,7 @@ void Matrix4x4::Translate(const float * source, float * dest, float x, float y, 
     }
 }
 
-void Matrix4x4::PostTranslate(const float * source, float * dest, float x, float y, float z)
+void Matrix4x4::PreTranslate(const float * source, float * dest, float x, float y, float z)
 {
     Matrix4x4 trans;
     trans.SetIdentity();

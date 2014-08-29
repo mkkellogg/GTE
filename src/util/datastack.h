@@ -39,9 +39,9 @@ template <typename T> class DataStack
 		return true;
 	}
 
-	void Push(T * entryData)
+	void Push(const T * entryData)
 	{
-		if(entries < maxEntryCount)
+		if(data != NULL && stackPointer != NULL && entries < maxEntryCount)
 		{
 			memcpy(stackPointer, entryData, elementsPerEntry * sizeof(T));
 			stackPointer += elementsPerEntry;
@@ -49,17 +49,31 @@ template <typename T> class DataStack
 		}
 	}
 
+	/*
+	 * !!! Important: The pointer returned from this method points to the data array for this stack. This
+	 * means the data this pointer points to can be overwritten by Push() operations. Therefore the return
+	 * value from this method is only guaranteed to be valid up until any subsequent Push() calls.
+	 */
 	T * Pop()
 	{
-		if(entries > 0)
+		if(data != NULL && stackPointer != NULL && entries > 0)
 		{
-			T * ptr = stackPointer;
 			stackPointer -= elementsPerEntry;
 			entries--;
-			return ptr;
+			return stackPointer;
 		}
 
 		return NULL;
+	}
+
+	int GetMaxEntryCount()
+	{
+		return maxEntryCount;
+	}
+
+	int GetEntryCount()
+	{
+		return entries;
 	}
 };
 

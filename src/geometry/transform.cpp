@@ -17,8 +17,6 @@ Transform * Transform::CreateIdentityTransform()
 
 Transform::Transform()
 {
-	matrixStack = new DataStack<float>(256,16);
-	matrixStackInitialized = matrixStack->Init();
 	matrix.SetIdentity();
 }
 
@@ -37,7 +35,7 @@ Transform::Transform(Transform * transform) : Transform()
 
 Transform::~Transform()
 {
-	SAFE_DELETE(matrixStack);
+
 }
 
 const Matrix4x4 * Transform::GetMatrix() const
@@ -50,10 +48,26 @@ void Transform::SetTo(const Matrix4x4 * matrix)
 	this->matrix.SetTo(matrix);
 }
 
-void Transform::TransformBy(const Transform * transform, bool push)
+void Transform::SetTo(const Transform * transform)
 {
-	matrix.LeftMultiply(transform->GetMatrix());
+	SetTo(transform->GetMatrix());
 }
+
+void Transform::SetIdentity()
+{
+	matrix.SetIdentity();
+}
+
+void Transform::TransformBy(const Transform * transform)
+{
+	matrix.Multiply(transform->GetMatrix());
+}
+
+void Transform::PreTransformBy(const Transform * transform)
+{
+	matrix.PreMultiply(transform->GetMatrix());
+}
+
 
 void Transform::Invert()
 {
@@ -62,17 +76,11 @@ void Transform::Invert()
 
 void Transform::Translate(float x, float y, float z, bool local)
 {
-	if(local)
+	if(!local)
 	{
-		float localVector[4] = {x,y,z,0};
-		matrix.Transform(localVector);
-
-		x = localVector[0];
-		y = localVector[1];
-		z = localVector[2];
+		matrix.PreTranslate(x,y,z);
 	}
-
-	matrix.PostTranslate(x,y,z);
+	else matrix.Translate(x,y,z);
 }
 
 void Transform::RotateAround(Point3 * point, Vector3 * axis, float angle)
@@ -82,9 +90,9 @@ void Transform::RotateAround(Point3 * point, Vector3 * axis, float angle)
 
 void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle)
 {
-	matrix.PostTranslate(-px,-py,-pz);
+	matrix.PreTranslate(-px,-py,-pz);
 	matrix.PostRotate(ax,ay,az,angle);
-	matrix.PostTranslate(px,py,pz);
+	matrix.PreTranslate(px,py,pz);
 }
 
 void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, float nearP, float farP)

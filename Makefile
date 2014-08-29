@@ -19,7 +19,7 @@ GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
-GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o
+GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
 GRAPHICSOBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
@@ -189,6 +189,9 @@ geometry: $(GEOMETRYOBJ)
 	
 obj/transform.o: $(GEOMETRYSRC)/transform.cpp $(GEOMETRYSRC)/transform.h 
 	$(CC) $(CFLAGS) -o obj/transform.o -c $(GEOMETRYSRC)/transform.cpp
+	
+obj/sceneobjecttransform.o: $(GEOMETRYSRC)/sceneobjecttransform.cpp $(GEOMETRYSRC)/sceneobjecttransform.h 
+	$(CC) $(CFLAGS) -o obj/sceneobjecttransform.o -c $(GEOMETRYSRC)/sceneobjecttransform.cpp
 	
 obj/vector3.o: $(GEOMETRYSRC)/vector/vector3.cpp $(GEOMETRYSRC)/vector/vector3.h 
 	$(CC) $(CFLAGS) -o obj/vector3.o -c $(GEOMETRYSRC)/vector/vector3.cpp

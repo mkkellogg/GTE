@@ -51,7 +51,7 @@ class Matrix4x4
     void Transform(Point3 * point) const;
     void Transform(float * vector4f) const;
     void Multiply(const Matrix4x4 * matrix);
-    void LeftMultiply(const Matrix4x4 * matrix);
+    void PreMultiply(const Matrix4x4 * matrix);
     void Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const;
     static void Multiply(const Matrix4x4 * lhs, const Matrix4x4 *rhs, Matrix4x4 * out);
     static void MultiplyMV(const float * lhsMat, const float * rhsVec, float * out);
@@ -69,11 +69,11 @@ class Matrix4x4
 
     void Translate(const Vector3 * vector);
     void Translate(float x, float y, float z);
-    void PostTranslate(float x, float y, float z);
+    void PreTranslate(float x, float y, float z);
     static void Translate(const Matrix4x4 * src, Matrix4x4 * out, const Vector3 * vector);
     static void Translate(const Matrix4x4 * src, Matrix4x4 * out,float x, float y, float z);
     static void Translate(const float * source, float * dest, float x, float y, float z);
-    static void PostTranslate(const float * source, float * dest, float x, float y, float z);
+    static void PreTranslate(const float * source, float * dest, float x, float y, float z);
 
     void Rotate(const Vector3 * vector, float a);
     void Rotate(float x, float y, float z, float a);

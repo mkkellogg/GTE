@@ -7,6 +7,7 @@ class Constants
 
     static const float PI;
     static const float PIOver360;
+    static const int MaxObjectRecursionDepth;
 };
 
 #endif
