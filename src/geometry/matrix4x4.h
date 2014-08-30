@@ -77,8 +77,8 @@ class Matrix4x4
 
     void Rotate(const Vector3 * vector, float a);
     void Rotate(float x, float y, float z, float a);
-    void PostRotate(const Vector3 * vector, float a);
-    void PostRotate(float x, float y, float z, float a);
+    void PreRotate(const Vector3 * vector, float a);
+    void PreRotate(float x, float y, float z, float a);
     void SetRotateEuler(float x, float y, float z);
     static void SetRotate(float * rm, float x, float y, float z, float a);
     static void SetRotateEuler(float * rm, float x, float y, float z);

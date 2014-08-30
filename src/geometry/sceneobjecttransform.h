@@ -24,6 +24,7 @@ class SceneObjectTransform : public Transform
     ~SceneObjectTransform();
 
     void Translate(float x, float y, float z, bool local);
+    void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
 
 };
 

@@ -78,7 +78,12 @@ void Transform::Translate(float x, float y, float z, bool local)
 {
 	if(!local)
 	{
-		matrix.PreTranslate(x,y,z);
+		float trans[] = {x,y,z,0};
+		Transform full;
+		full.SetTo(this);
+		full.Invert();
+		full.GetMatrix()->Transform(trans);
+		matrix.Translate(trans[0], trans[1], trans[2]);
 	}
 	else matrix.Translate(x,y,z);
 }
@@ -90,9 +95,27 @@ void Transform::RotateAround(Point3 * point, Vector3 * axis, float angle)
 
 void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle)
 {
-	matrix.PreTranslate(-px,-py,-pz);
-	matrix.PostRotate(ax,ay,az,angle);
-	matrix.PreTranslate(px,py,pz);
+	/*matrix.PreTranslate(-px,-py,-pz);
+	matrix.PreRotate(ax,ay,az,angle);
+	matrix.PreTranslate(px,py,pz);*/
+
+	float pointTrans[] = {px,py,pz,1};
+	float rotVector[] = {ax,ay,az,0};
+
+	Transform mod;
+	mod.SetTo(this);
+
+	mod.Invert();
+	mod.GetMatrix()->Transform(pointTrans);
+	mod.GetMatrix()->Transform(rotVector);
+
+	float diffX = pointTrans[0];
+	float diffY = pointTrans[1];
+	float diffZ = pointTrans[2];
+
+	matrix.Translate(diffX,diffY,diffZ);
+	matrix.Rotate(rotVector[0],rotVector[1],rotVector[2],angle);
+	matrix.Translate(-diffX,-diffY,-diffZ);
 }
 
 void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, float nearP, float farP)

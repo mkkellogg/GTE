@@ -441,7 +441,7 @@ void Matrix4x4::Rotate(float x, float y, float z, float a)
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix4x4::PostRotate(const Vector3 * vector, float a)
+void Matrix4x4::PreRotate(const Vector3 * vector, float a)
 {
     float temp[DATA_SIZE];
     float r[DATA_SIZE];
@@ -450,7 +450,7 @@ void Matrix4x4::PostRotate(const Vector3 * vector, float a)
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
-void Matrix4x4::PostRotate(float x, float y, float z, float a)
+void Matrix4x4::PreRotate(float x, float y, float z, float a)
 {
     float temp[DATA_SIZE];
     float r[DATA_SIZE];

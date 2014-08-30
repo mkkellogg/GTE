@@ -30,7 +30,7 @@ class Transform
     void PreTransformBy(const Transform * transform);
     virtual void Translate(float x, float y, float z, bool local);
     void RotateAround(Point3 * point, Vector3 * axis, float angle);
-    void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
+    virtual void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
 
     static Transform * CreateIdentityTransform();
 
