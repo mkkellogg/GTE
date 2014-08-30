@@ -51,6 +51,7 @@ class Graphics
     virtual Mesh3DRenderer * CreateMeshRenderer()  = 0;
     virtual void DestroyMeshRenderer(Mesh3DRenderer * buffer) = 0;
 
+    virtual void ClearBuffers(unsigned int bufferMask) const = 0;
 
     virtual void ActivateMaterial(Material * material);
     Material * GetActiveMaterial() const;

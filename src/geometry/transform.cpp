@@ -10,46 +10,73 @@
 #include "point/point3.h"
 #include "util/datastack.h"
 
+/*
+ * Instantiate a transform, which by default is an identity transform.
+ */
 Transform * Transform::CreateIdentityTransform()
 {
 	return new Transform();
 }
 
+/*
+ * Default constructor
+ */
 Transform::Transform()
 {
 	matrix.SetIdentity();
 }
 
+/*
+ * Constructor to build Transform from Matrix4x4
+ */
 Transform::Transform(Matrix4x4 * m) : Transform()
 {
 	matrix.SetTo(m);
 }
 
+/*
+ * Copy constructor
+ */
 Transform::Transform(Transform * transform) : Transform()
 {
-	if(transform != NULL)
-	{
-		matrix.SetTo(transform->GetMatrix());
-	}
+	NULL_CHECK_RTRN(transform, "Transform::copy constructor -> NULL transform passed.");
+
+	matrix.SetTo(transform->GetMatrix());
 }
 
+/*
+ * Clean up
+ */
 Transform::~Transform()
 {
 
 }
 
+/*
+ * Get the underlying Matrix4x4 that is encapsulated by this transform.
+ */
 const Matrix4x4 * Transform::GetMatrix() const
 {
 	return &matrix;
 }
 
+/*
+ * Copy [matrix] into the underlying Matrix4x4 that is encapsulated by this transform.
+ */
 void Transform::SetTo(const Matrix4x4 * matrix)
 {
+	NULL_CHECK_RTRN(matrix, "Transform::SetTo -> NULL matrix passed.");
+
 	this->matrix.SetTo(matrix);
 }
 
+/*
+ * Make this transform equal to [transform]
+ */
 void Transform::SetTo(const Transform * transform)
 {
+	NULL_CHECK_RTRN(transform, "Transform::SetTo -> NULL transform passed.");
+
 	SetTo(transform->GetMatrix());
 }
 
@@ -58,48 +85,75 @@ void Transform::SetIdentity()
 	matrix.SetIdentity();
 }
 
+/*
+ * Post-multiply this transform's matrix by the matrix contained in [transform]
+ */
 void Transform::TransformBy(const Transform * transform)
 {
+	NULL_CHECK_RTRN(transform, "Transform::TransformBy -> NULL transform passed.");
+
 	matrix.Multiply(transform->GetMatrix());
 }
 
+/*
+ * Pre-multiply this transform's matrix by the matrix contained in [transform]
+ */
 void Transform::PreTransformBy(const Transform * transform)
 {
+	NULL_CHECK_RTRN(transform, "Transform::PreTransformBy -> NULL transform passed.");
+
 	matrix.PreMultiply(transform->GetMatrix());
 }
 
-
+/*
+ * Invert the underlying matrix
+ */
 void Transform::Invert()
 {
 	matrix.Invert();
 }
 
+/*
+ * Apply translation transformation to this transform's matrix. The parameter [local]
+ * determines if the transformation is relative to world space or the transform's
+ * local space.
+ */
 void Transform::Translate(float x, float y, float z, bool local)
 {
 	if(!local)
 	{
-		float trans[] = {x,y,z,0};
+		/*float trans[] = {x,y,z,0};
 		Transform full;
 		full.SetTo(this);
 		full.Invert();
 		full.GetMatrix()->Transform(trans);
-		matrix.Translate(trans[0], trans[1], trans[2]);
+		matrix.Translate(trans[0], trans[1], trans[2]);*/
+
+		matrix.PreTranslate(x,y,z);
 	}
 	else matrix.Translate(x,y,z);
 }
 
+/*
+ * Rotate around a specific world point and orientation vector.
+ */
 void Transform::RotateAround(Point3 * point, Vector3 * axis, float angle)
 {
 	RotateAround(point->x, point->y, point->z, axis->x, axis->y, axis->z, angle);
 }
 
+ /*
+ * Rotate around a specific world point and orientation vector.
+ *
+ * The world point is specified by [px], [py], and [pz].
+ *
+ * The orientation vector is specified by [ax], [ay], and [az].
+ *
+ * Pre-multiplication operations are used to achieve the effect in world space.
+ */
 void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle)
 {
-	/*matrix.PreTranslate(-px,-py,-pz);
-	matrix.PreRotate(ax,ay,az,angle);
-	matrix.PreTranslate(px,py,pz);*/
-
-	float pointTrans[] = {px,py,pz,1};
+	/*float pointTrans[] = {px,py,pz,1};
 	float rotVector[] = {ax,ay,az,0};
 
 	Transform mod;
@@ -115,14 +169,30 @@ void Transform::RotateAround(float px, float py, float pz, float ax, float ay, f
 
 	matrix.Translate(diffX,diffY,diffZ);
 	matrix.Rotate(rotVector[0],rotVector[1],rotVector[2],angle);
-	matrix.Translate(-diffX,-diffY,-diffZ);
+	matrix.Translate(-diffX,-diffY,-diffZ);*/
+
+	matrix.PreTranslate(-px,-py,-pz);
+	matrix.PreRotate(ax,ay,az,angle);
+	matrix.PreTranslate(px,py,pz);
 }
 
-void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, float nearP, float farP)
+/*
+ * Utility function to create a projection matrix. An existing Matrix4x4 object is passed in via [matrix],
+ * and its data is set to contain the projection matrix.
+ *
+ * [fov] 	- 	Angle (in degrees) of the field of view.
+ * [ratio] 	-	Ration of the viewport's width to height
+ * [nearP]  -   Distance from the eye to the near clip plane
+ * [farP]   -   Distance from the eye to the far clip plane
+ */
+void Transform::BuildProjectionMatrix(Matrix4x4 * matrix, float fov, float ratio, float nearP, float farP)
 {
-    float f = 1.0f / tan (fov * Constants::PIOver360);
+	NULL_CHECK_RTRN(matrix, "Transform::BuildProjectionMatrix -> [matrix] is null.");
 
-    m->SetIdentity();
+	// convert fov to radians
+    float f = 1.0f / tan (fov * Constants::TwoPIOver360 *.5);
+
+    matrix->SetIdentity();
 
     float data[16];
     memset(data,0,16 * sizeof(float));
@@ -134,12 +204,29 @@ void Transform::BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, floa
     data[2 * 4 + 3] = -1.0f;
     data[3 * 4 + 3] = 0.0f;
 
-    m->SetTo(data);
+    matrix->SetTo(data);
 }
 
-void Transform::BuildLookAtMatrix(Matrix4x4 * m, float posX, float posY, float posZ,
+/*
+ * Utility function to create a matrix that transforms the eye to be at a specific
+ * location, looking in a specific direction. The direction vector does not have
+ * to be normalized.
+ *
+ * [matrix]  -	The existing matrix to which the transformation data will be copied.
+ *
+ * [posX]    -  The X coordinate of the look at location
+ * [posY]    -  The Y coordinate of the look at location
+ * [posZ]    -  The Z coordinate of the look at location
+ *
+ * [lookAtX]    -  The X value of the look at direction
+ * [lookAtY]    -  The Y value of the look at direction
+ * [lookAtZ]    -  The Z value of the look at direction
+ */
+void Transform::BuildLookAtMatrix(Matrix4x4 * matrix, float posX, float posY, float posZ,
 								  float lookAtX, float lookAtY, float lookAtZ)
 {
+	NULL_CHECK_RTRN(matrix, "Transform::BuildLookAtMatrix -> [matrix] is null.");
+
 	Vector3 vDir(lookAtX - posX, lookAtY - posY, lookAtZ - posZ);
 	Vector3 vUp(0,1,0);
 	Vector3 vRight;
@@ -182,5 +269,5 @@ void Transform::BuildLookAtMatrix(Matrix4x4 * m, float posX, float posY, float p
 	aux.SetIdentity();
 	aux.Translate(-posX, -posY, -posZ);
 
-	Matrix4x4::Multiply(&viewMatrix, &aux, m);
+	Matrix4x4::Multiply(&viewMatrix, &aux, matrix);
 }

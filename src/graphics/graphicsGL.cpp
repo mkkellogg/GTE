@@ -105,6 +105,17 @@ void GraphicsGL::DestroyShader(Shader * shader)
     delete shader;
 }
 
+void GraphicsGL::ClearBuffers(unsigned int bufferMask) const
+{
+	GLbitfield glClearMask = 0;
+	if(IntMask::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Color))
+		glClearMask |= GL_COLOR_BUFFER_BIT;
+	if(IntMask::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Depth))
+		glClearMask |= GL_DEPTH_BUFFER_BIT;
+
+	glClear(glClearMask);
+}
+
 Mesh3DRenderer * GraphicsGL::CreateMeshRenderer()
 {
 	 //TODO: Add switch for different platforms; for now only support OpenGL

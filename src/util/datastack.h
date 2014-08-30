@@ -66,12 +66,12 @@ template <typename T> class DataStack
 		return NULL;
 	}
 
-	int GetMaxEntryCount()
+	int GetMaxEntryCount() const
 	{
 		return maxEntryCount;
 	}
 
-	int GetEntryCount()
+	int GetEntryCount() const
 	{
 		return entries;
 	}

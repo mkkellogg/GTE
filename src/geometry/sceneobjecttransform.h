@@ -1,3 +1,13 @@
+/*
+ * class: SceneObjectTransform
+ *
+ * author: Mark Kellogg
+ *
+ * A SceneObjectTransform is an extension of Transform. A SceneObjectTransform is
+ * different in that it is connected to a SceneObject, and whenever a transformation
+ * is applied, the transforms of each ancestor of said SceneObject are factored in.
+ */
+
 #ifndef _SCENEOBJECT_TRANSFORM_H_
 #define _SCENEOBJECT_TRANSFORM_H_
 
@@ -24,6 +34,7 @@ class SceneObjectTransform : public Transform
     ~SceneObjectTransform();
 
     void Translate(float x, float y, float z, bool local);
+    void RotateAround(Point3 * point, Vector3 * axis, float angle);
     void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
 
 };

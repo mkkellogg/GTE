@@ -1,6 +1,11 @@
 /********************************************* 
 *
-* Matrix math utilities. These methods operate on OpenGL ES format matrices and 
+* class: Matrix4x4
+*
+* author: Mark Kellogg, with significant portions derived from the Android
+* OpenGL matrix API: android.opengl.Matrix.
+*
+* These methods operate on OpenGL ES format matrices and
 * vectors stored in float arrays. Matrices are 4 x 4 column-vector matrices 
 * stored in column-major order:
 *
@@ -60,9 +65,9 @@ class Matrix4x4
     void Transpose();
     static void Transpose(const float* source, float *dest);
 
-    void Invert();
-    void Invert(Matrix4x4 * out);
-    static void Invert(const float * source, float * dest);
+    bool Invert();
+    bool Invert(Matrix4x4 * out);
+    static bool Invert(const float * source, float * dest);
 
     void SetIdentity();
     static void SetIdentity(float * target);

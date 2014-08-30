@@ -19,6 +19,10 @@
 #include "global/global.h"
 #include "global/constants.h"
 
+/*
+ * Single constructor, which requires pointers the Graphics and EngineObjectManager
+ * singleton instances.
+ */
 RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectManager)
 {
 	this->graphics = graphics;
@@ -35,56 +39,110 @@ RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectMa
 	}
 }
 
+/*
+ * Clean up
+ */
 RenderManager::~RenderManager()
 {
 	SAFE_DELETE(viewTransformStack);
 	SAFE_DELETE(modelTransformStack);
 }
 
+/*
+ * Look at the clear flags for a given camera and tell the graphics
+ * system to clear the corresponding buffers.
+ */
 void RenderManager::ClearBuffersForCamera(const Camera * camera) const
 {
+	if(camera == NULL)
+	{
+		Debug::PrintError("RenderManager::ClearBuffersForCamera -> camera is NULL.");
+		return;
+	}
 	unsigned int clearBufferMask = camera->GetClearBufferMask();
-
-	GLbitfield glClearMask = 0;
-	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Color))
-		glClearMask |= GL_COLOR_BUFFER_BIT;
-	if(IntMask::IsBitSetForMask(clearBufferMask, (unsigned int)RenderBufferType::Depth))
-		glClearMask |= GL_DEPTH_BUFFER_BIT;
-
-	glClear(glClearMask);
+	graphics->ClearBuffers(clearBufferMask);
 }
 
-void RenderManager:: PushTransformData(const Transform * transform, DataStack<float> * transformStack)
+/*
+ * Save a transform to the transform stack. This method is used to to save transformations
+ * as the render manager progresses through the object tree that makes up the scene.
+ */
+void RenderManager::PushTransformData(const Transform * transform, DataStack<float> * transformStack)
 {
+	if(transform == NULL)
+	{
+		Debug::PrintError("RenderManager::PushTransformData -> transform is NULL.");
+		return;
+	}
+	if(transformStack == NULL)
+	{
+		Debug::PrintError("RenderManager::PushTransformData -> transformStack is NULL.");
+		return;
+	}
 	transformStack->Push(transform->GetMatrix()->GetDataPtr());
 }
 
-void RenderManager::PopTransformData(Transform * transform, DataStack<float> * transformStack)
+/*
+ * Remove the top transform from the transform stack.
+ */
+void RenderManager::PopTransformData(const Transform * transform, DataStack<float> * transformStack)
 {
+	if(transform == NULL)
+	{
+		Debug::PrintError("RenderManager::PopTransformData -> transform is NULL.");
+		return;
+	}
+	if(transformStack == NULL)
+	{
+		Debug::PrintError("RenderManager::PopTransformData -> transformStack is NULL.");
+		return;
+	}
 	float * data = transformStack->Pop();
 	Matrix4x4 * mat = const_cast<Matrix4x4 *>(transform->GetMatrix());
 	if(data != NULL)mat->SetTo(data);
 }
 
-int RenderManager::RenderDepth(DataStack<float> * transformStack)
+/*
+ * Get the number of entries stored on the transform stack.
+ */
+int RenderManager::RenderDepth(const DataStack<float> * transformStack) const
 {
 	if(transformStack == NULL)return Constants::MaxObjectRecursionDepth;
 	return transformStack->GetEntryCount();
 
 }
 
+/*
+ * Kick off rendering of the entire scene. This method starts with the root object
+ * in the scene and kicks off a method that renders all objects in the scene.
+ */
 void RenderManager::RenderAll()
 {
 	Transform cameraModelView;
 	const SceneObject * sceneRoot = objectManager->GetSceneRoot();
-	RenderAll(const_cast<SceneObject*>(sceneRoot), &cameraModelView);
+	if(sceneRoot == NULL)
+	{
+		Debug::PrintError("RenderManager::RenderAll -> sceneRoot is NULL.");
+		return;
+	}
+	RenderFromCameras(const_cast<SceneObject*>(sceneRoot), &cameraModelView);
 }
 
-void RenderManager::RenderAll(SceneObject * parent, Transform * viewTransform)
+/*
+ * Recursively visits each object in the scene that is reachable from 'parent'. Whenever an object
+ * that contains a Camera component is encountered, the entire scene is rendered from the perspective
+ * of that camera via RenderScene().
+ *
+ * The transforms of each scene object are concatenated as progress moves down the scene object tree
+ * and passed to the current invocation via 'viewTransform', since they will ultimately form position
+ * from which the scene is rendered. The transform stored in 'viewTransform' is passed to RenderScene();
+ */
+void RenderManager::RenderFromCameras(SceneObject * parent, Transform * viewTransform)
 {
 	Transform viewInverse;
 	Transform identity;
 
+	// enforce max recursion depth
 	if(RenderDepth(viewTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
 	for(std::vector<SceneObject *>::size_type i = 0; i != parent->GetChildrenCount(); i++)
@@ -93,21 +151,32 @@ void RenderManager::RenderAll(SceneObject * parent, Transform * viewTransform)
 
 		if(child != NULL)
 		{
+			// save the existing view transform
 			PushTransformData(viewTransform, viewTransformStack);
+			// concatenate the current view transform with that of the current scene object
 			viewTransform->TransformBy(child->GetTransform());
 			Camera * camera = child->GetCamera();
 			if(camera != NULL)
 			{
+				// clear the appropriate render buffers this camera
 				ClearBuffersForCamera(camera);
 				const SceneObject * sceneRoot = objectManager->GetSceneRoot();
 
 				identity.SetIdentity();
+
+				// we invert the viewTransform because the viewTransform is really moving the world
+				// relative to the camera, rather than moving the camera in the world
 				viewInverse.SetTo(viewTransform);
 				viewInverse.Invert();
+
+				// render the scene using the view transform of the current camera
 				RenderScene(const_cast<SceneObject*>(sceneRoot),&identity, &viewInverse, camera);
 			}
 
-			RenderAll(child, viewTransform);
+			// continue recursion through child object
+			RenderFromCameras(child, viewTransform);
+
+			// restore previous view transform
 			PopTransformData(viewTransform, viewTransformStack);
 		}
 		else
@@ -117,31 +186,50 @@ void RenderManager::RenderAll(SceneObject * parent, Transform * viewTransform)
 	}
 }
 
+/*
+ * This method recursively visits all objects in the scene that are reachable from 'parent' and renders
+ * them from the perspective of 'viewTransformInverse', which the inverse of the view transform.
+ * The reason the inverse is used is because on the GPU side of things the view transform is used to move
+ * the world relative to the camera, rather than move the camera in the world.
+ *
+ * The transforms of each scene are concatenated as progress moves down the scene object tree and passed
+ * to the current invocation via 'modelTransform'.
+ */
 void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera)
 {
 	Transform modelView;
 
+	// enforce max recursion depth
 	if(RenderDepth(modelTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
 	for(std::vector<SceneObject *>::size_type i = 0; i != parent->GetChildrenCount(); i++)
 	{
-		SceneObject * obj = parent->GetChildAt(i);
+		SceneObject * child = parent->GetChildAt(i);
 
-		if(obj != NULL && obj->GetTransform() != NULL)
+		if(child != NULL && child->GetTransform() != NULL)
 		{
+			// save existing model transform
 			PushTransformData(modelTransform, modelTransformStack);
-			modelTransform->TransformBy(obj->GetTransform());
-			Mesh3DRenderer * renderer = obj->GetRenderer3D();
+			// concatenate the current model transform with that of the current scene object
+			modelTransform->TransformBy(child->GetTransform());
+			// check if current scene object has a mesh renderer
+			Mesh3DRenderer * renderer = child->GetRenderer3D();
 			if(renderer != NULL)
 			{
+				// make sure mesh renderer has a material set
 				Material * m = renderer->GetMaterial();
 				if(m != NULL)
 				{
+					// activate the material, which will switch the GPU's active shader to
+					// the one associated with the material
 					graphics->ActivateMaterial(m);
 
 					modelView.SetTo(modelTransform);
+
+					// concatenate modelTransform with inverted viewTransform
 					modelView.PreTransformBy(viewTransformInverse);
 
+					// pass concatenated modelViewTransform and projection transforms to shader
 					graphics->SendStandardUniformsToShader(&modelView, camera->GetProjectionTransform());
 					renderer->Render();
 				}
@@ -151,7 +239,10 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 				}
 			}
 
-			RenderScene(obj, modelTransform, viewTransformInverse,camera);
+			// continue recursion through child
+			RenderScene(child, modelTransform, viewTransformInverse,camera);
+
+			// restore previous modelTransform
 			PopTransformData(modelTransform,modelTransformStack);
 		}
 		else

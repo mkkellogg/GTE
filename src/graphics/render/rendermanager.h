@@ -1,3 +1,13 @@
+/*
+ * class: RenderManager
+ *
+ * author: Mark Kellogg
+ *
+ * The RenderManager is responsible for processing the scene graph
+ * and rendering all objects with meshes and mesh renderers attached
+ * to them.
+ */
+
 #ifndef _RENDER_MANAGER_H
 #define _RENDER_MANAGER_H
 
@@ -21,8 +31,8 @@ class RenderManager
 	void RenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;
     void PushTransformData(const Transform * transform, DataStack<float> * transformStack);
-    void PopTransformData(Transform * transform, DataStack<float> * transformStack);
-    int RenderDepth(DataStack<float> * transformStack);
+    void PopTransformData(const Transform * transform, DataStack<float> * transformStack);
+    int RenderDepth(const DataStack<float> * transformStack) const;
 
     public:
 
@@ -30,7 +40,7 @@ class RenderManager
     ~RenderManager();
 
     void RenderAll();
-    void RenderAll(SceneObject * parent, Transform * viewTransform);
+    void RenderFromCameras(SceneObject * parent, Transform * viewTransform);
 };
 
 #endif

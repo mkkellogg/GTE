@@ -23,4 +23,22 @@
   }										   \
 }
 
+#define NULL_CHECK_RTRN(ptr, msg)    			\
+{										   		\
+	if((ptr) == NULL)					   		\
+	{									   		\
+		Debug::PrintError((msg));  		   		\
+		return;			       					\
+	}									   		\
+}
+
+#define NULL_CHECK(ptr, msg, returnExp)    \
+{										   \
+	if((ptr) == NULL)					   \
+	{									   \
+		Debug::PrintError((msg));  		   \
+		return (returnExp);			       \
+	}									   \
+}
+
 #endif

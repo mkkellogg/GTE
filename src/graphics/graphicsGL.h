@@ -36,6 +36,7 @@ class GraphicsGL : public Graphics
     Mesh3DRenderer * CreateMeshRenderer();
     void DestroyMeshRenderer(Mesh3DRenderer * buffer);
 
+    void ClearBuffers(unsigned int bufferMask) const;
 
     void ActivateMaterial(Material * material);
     Material * GetActiveMaterial();
