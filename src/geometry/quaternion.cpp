@@ -23,7 +23,7 @@ Quaternion::Quaternion(const Vector3& v, float w)
 
 Quaternion::Quaternion(const BaseVector4& v)
 {
-	float * data = v.GetDataPtr();
+	float * data = const_cast<BaseVector4 *>(&v)->GetDataPtr();
     mData[0] = data[0];
     mData[1] = data[1];
     mData[2] = data[2];

@@ -1,3 +1,12 @@
+/*
+ * class: BaseVector4
+ *
+ * author: Mark Kellogg
+ *
+ * Forms the basis of several vertex attribute classes (Point3, Vector3, Color4, ...) and contains
+ * functionality that is shared by all of them.
+ */
+
 #ifndef _BASEVECTOR4_H_
 #define _BASEVECTOR4_H_
 
@@ -22,9 +31,9 @@ class BaseVector4
     virtual ~BaseVector4();
 
     BaseVector4 & operator= (const BaseVector4 & source);
-    float * GetDataPtr() const;
+    float * GetDataPtr();
     void Set(float x, float y, float z, float w);
-    void Get(BaseVector4 * baseVector);
+    void Get(BaseVector4 * baseVector) const;
 
     virtual void AttachTo(float * data);
     virtual void Detach();

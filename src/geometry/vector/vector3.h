@@ -1,3 +1,12 @@
+/*
+ * class: Vector3
+ *
+ * author: Mark Kellogg
+ *
+ * A utility class for performing 3D vector operations.
+ *
+ */
+
 #ifndef _VECTOR3_H_
 #define _VECTOR3_H_
 

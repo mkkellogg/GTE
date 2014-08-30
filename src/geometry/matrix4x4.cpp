@@ -113,7 +113,7 @@ void Matrix4x4::Init()
  */
 void Matrix4x4::Transform(const Vector3 * vector, Vector3 * out) const
 {
-    MultiplyMV(this->data, vector->GetDataPtr(), out->GetDataPtr());
+    MultiplyMV(this->data, const_cast<Vector3 *>(vector)->GetDataPtr(), out->GetDataPtr());
 }
 
 /*
@@ -121,7 +121,7 @@ void Matrix4x4::Transform(const Vector3 * vector, Vector3 * out) const
  */
 void Matrix4x4::Transform(const Point3 * point, Point3 * out) const
 {
-    MultiplyMV(this->data, point->GetDataPtr(), out->GetDataPtr());
+    MultiplyMV(this->data,  const_cast<Point3 *>(point)->GetDataPtr(), out->GetDataPtr());
 }
 
 /*
