@@ -1,14 +1,18 @@
  
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 PROJECTION_MATRIX;
+uniform sampler2D Texture;
  
 attribute vec4 POSITION;
 attribute vec3 COLOR;
+attribute vec2 UV1;
  
 varying vec3 vColor;
+varying vec2 vUV1;
  
 void main()
 {
     vColor = COLOR;
+    vUV1 = UV1;
     gl_Position = PROJECTION_MATRIX * MODELVIEW_MATRIX * POSITION ;
 }

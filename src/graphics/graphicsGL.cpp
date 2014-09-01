@@ -229,36 +229,6 @@ void GraphicsGL::ActivateMaterial(Material * material)
 	}
 }
 
-void GraphicsGL::SendStandardUniformsToShader(const Transform * modelView, const Transform * projection)
-{
-	if(activeMaterial != NULL)
-	{
-		int mvMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ModelViewMatrix);
-		int mvpMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ModelViewProjectionMatrix);
-		int projectionMatrixLoc = activeMaterial->GetUniformShaderVarLocation(Uniform::ProjectionMatrix);
-
-		ShaderGL * shader = (ShaderGL *) activeMaterial->GetShader();
-		if(shader != NULL)
-		{
-			Transform mvpTransform;
-			mvpTransform.TransformBy(modelView);
-			mvpTransform.TransformBy(projection);
-
-			if(mvMatrixLoc >= 0)shader->SendUniformToShader(mvMatrixLoc, modelView->GetMatrix());
-			if(mvpMatrixLoc >= 0)shader->SendUniformToShader(mvpMatrixLoc, mvpTransform.GetMatrix());
-			if(projectionMatrixLoc >= 0)shader->SendUniformToShader(projectionMatrixLoc, projection->GetMatrix());
-		}
-		else
-		{
-			Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() -> material contains NULL shader.");
-		}
-	}
-	else
-	{
-		Debug::PrintError("GraphicsGL::SendStandardUniformsToShader() -> activeMaterial is NULL.");
-	}
-}
-
 void GraphicsGL::RenderScene()
 {
 	renderManager->RenderAll();

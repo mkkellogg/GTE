@@ -86,9 +86,9 @@ Texture * EngineObjectManager::CreateTexture(const char * sourcePath, TextureAtt
 	return graphics->CreateTexture(sourcePath, attributes);
 }
 
-Material * EngineObjectManager::CreateMaterial(Shader * shader)
+Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader)
 {
-	Material * m = new Material();
+	Material * m = new Material(name);
 	bool initSuccess = m->Init(shader);
 	if(!initSuccess)
 	{
@@ -99,12 +99,12 @@ Material * EngineObjectManager::CreateMaterial(Shader * shader)
 	return m;
 }
 
-Material * EngineObjectManager::CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
+Material * EngineObjectManager::CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
 {
 	Shader * shader = CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
 	if(shader == NULL)return NULL;
 
-	Material * m = new Material();
+	Material * m = new Material(name);
 	bool initSuccess = m->Init(shader);
 	if(!initSuccess)
 	{

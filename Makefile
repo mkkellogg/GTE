@@ -25,7 +25,7 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o
+RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o obj/uniformdesc.o
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o obj/screendesc.o 
 SHADEROBJ= obj/shadersource.o obj/shader.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
@@ -189,6 +189,9 @@ obj/renderbuffer.o: $(RENDERSRC)/renderbuffer.cpp  $(RENDERSRC)/renderbuffer.h
 	
 obj/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexattrbuffer.h
 	$(CC) $(CFLAGS) -o obj/vertexattrbuffer.o -c $(RENDERSRC)/vertexattrbuffer.cpp
+	
+obj/uniformdesc.o:  $(RENDERSRC)/uniformdesc.cpp  $(RENDERSRC)/uniformdesc.h
+	$(CC) $(CFLAGS) -o obj/uniformdesc.o -c $(RENDERSRC)/uniformdesc.cpp
 
 
 # ==================================

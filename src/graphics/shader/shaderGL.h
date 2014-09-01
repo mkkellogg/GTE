@@ -7,6 +7,7 @@
 //forward declarations
 class ShaderSource;
 class GraphicsGL;
+class Texture;
 
 #include "shader.h"
 
@@ -46,6 +47,7 @@ class ShaderGL : public Shader
 
     void SendBufferToShader(int loc, VertexAttrBuffer * buffer);
 
+    void SendUniformToShader(int loc, const Texture * texture);
     void SendUniformToShader(int loc, const Matrix4x4 * mat);
     void SendUniformToShader(int loc, const Point3 * point);
     void SendUniformToShader(int loc, const Vector3 * vector);

@@ -5,6 +5,8 @@
 #include <math.h>
 
 #include "rendermanager.h"
+#include "material.h"
+#include "graphics/shader/shader.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
 #include "object/sceneobject.h"
@@ -25,6 +27,7 @@
  */
 RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectManager)
 {
+	this->activeMaterial = NULL;
 	this->graphics = graphics;
 	this->objectManager = objectManager;
 	viewTransformStack = new DataStack<float>(Constants::MaxObjectRecursionDepth, 16);
@@ -187,13 +190,13 @@ void RenderManager::RenderFromCameras(SceneObject * parent, Transform * viewTran
 }
 
 /*
- * This method recursively visits all objects in the scene that are reachable from 'parent' and renders
- * them from the perspective of 'viewTransformInverse', which the inverse of the view transform.
+ * This method recursively visits all objects in the scene that are reachable from [parent] and renders
+ * them from the perspective of [viewTransformInverse], which the inverse of the view transform.
  * The reason the inverse is used is because on the GPU side of things the view transform is used to move
  * the world relative to the camera, rather than move the camera in the world.
  *
  * The transforms of each scene are concatenated as progress moves down the scene object tree and passed
- * to the current invocation via 'modelTransform'.
+ * to the current invocation via [modelTransform].
  */
 void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera)
 {
@@ -220,17 +223,16 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 				Material * m = renderer->GetMaterial();
 				if(m != NULL)
 				{
-					// activate the material, which will switch the GPU's active shader to
-					// the one associated with the material
-					graphics->ActivateMaterial(m);
-
 					modelView.SetTo(modelTransform);
-
 					// concatenate modelTransform with inverted viewTransform
 					modelView.PreTransformBy(viewTransformInverse);
 
+					// activate the material, which will switch the GPU's active shader to
+					// the one associated with the material
+					ActivateMaterial(m);
 					// pass concatenated modelViewTransform and projection transforms to shader
-					graphics->SendStandardUniformsToShader(&modelView, camera->GetProjectionTransform());
+					SendTransformUniformsToShader(&modelView, camera->GetProjectionTransform());
+					SendCustomUniformsToShader();
 					renderer->Render();
 				}
 				else
@@ -251,3 +253,74 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 		}
 	}
 }
+
+/*
+ * Send the ModelView matrix in [modelView] and Projection matrix in [projection] to the active shader.
+ * The binding information stored in the active material holds the shader variable locations for these matrices.
+ */
+void RenderManager::SendTransformUniformsToShader(const Transform * modelView, const Transform * projection)
+{
+	if(activeMaterial != NULL)
+	{
+		int mvMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(Uniform::ModelViewMatrix);
+		int mvpMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(Uniform::ModelViewProjectionMatrix);
+		int projectionMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(Uniform::ProjectionMatrix);
+
+		Shader * shader = activeMaterial->GetShader();
+		if(shader != NULL)
+		{
+			Transform mvpTransform;
+			mvpTransform.TransformBy(modelView);
+			mvpTransform.TransformBy(projection);
+
+			if(mvMatrixLoc >= 0)shader->SendUniformToShader(mvMatrixLoc, modelView->GetMatrix());
+			if(mvpMatrixLoc >= 0)shader->SendUniformToShader(mvpMatrixLoc, mvpTransform.GetMatrix());
+			if(projectionMatrixLoc >= 0)shader->SendUniformToShader(projectionMatrixLoc, projection->GetMatrix());
+		}
+		else
+		{
+			Debug::PrintError("RenderManager::SendTransformUniformsToShader -> material contains NULL shader.");
+		}
+	}
+	else
+	{
+		Debug::PrintError("RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
+	}
+}
+
+/*
+ * Send any custom uniforms specified by the active material to the active shader
+ */
+void RenderManager::SendCustomUniformsToShader()
+{
+	if(activeMaterial != NULL)
+	{
+		Shader * shader = activeMaterial->GetShader();
+		for(unsigned int i=0; i < activeMaterial->GetCustomUniformCount(); i++)
+		{
+			UniformDescriptor * desc = activeMaterial->GetCustomUniform(i);
+
+			if(desc->Type == UniformType::Sampler)
+			{
+				shader->SendUniformToShader(desc->ShaderVarID, desc->SamplerData);
+			}
+		}
+	}
+	else
+	{
+		Debug::PrintError("RenderManager::SendCustomUniformsToShader -> activeMaterial is NULL.");
+	}
+}
+
+/*
+ * Activate [material], which will switch the GPU's active shader to
+ * the one associated with it.
+ */
+void RenderManager::ActivateMaterial(Material * material)
+{
+	// We MUST notify the graphics system about the change in active material because other
+	// components (like Mesh3DRenderer) need to know about the active material
+	graphics->ActivateMaterial(material);
+	this->activeMaterial = material;
+}
+

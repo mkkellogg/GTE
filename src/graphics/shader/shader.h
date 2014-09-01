@@ -8,6 +8,7 @@ class Matrix4x4;
 class Point3;
 class Vector3;
 class Color4;
+class Texture;
 
 #include "object/engineobject.h"
 
@@ -31,6 +32,7 @@ class Shader : EngineObject
     virtual int GetUniformVarLocation(const char *varName) const = 0;
     virtual void SendBufferToShader(int loc, VertexAttrBuffer * buffer) = 0;
 
+    virtual void SendUniformToShader(int loc, const Texture * texture) = 0;
     virtual void SendUniformToShader(int loc, const Matrix4x4 * mat) = 0;
     virtual void SendUniformToShader(int loc, const Point3 * point) = 0;
     virtual void SendUniformToShader(int loc, const Vector3 * vector) = 0;

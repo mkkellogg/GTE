@@ -13,7 +13,10 @@
 #include "graphics/render/vertexattrbuffer.h"
 #include "graphics/render/vertexattrbufferGL.h"
 #include "geometry/matrix4x4.h"
+#include "graphics/texture/texture.h"
+#include "graphics/texture/textureGL.h"
 #include "ui/debug.h"
+#include "global/global.h"
 #include "gte.h"
 
 
@@ -272,6 +275,22 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	{
 		glVertexAttribPointer(loc, componentCount, GL_FLOAT, GL_FALSE, stride, data);
 	}
+}
+
+void ShaderGL::SendUniformToShader(int loc, const Texture * texture)
+{
+	NULL_CHECK_RTRN(texture, "ShaderGL::SendUniformToShader(int, Texture *) -> NULL texture passed");
+
+	TextureGL * texGL = (TextureGL *)texture;
+
+	if(loc == 0)glActiveTexture(GL_TEXTURE0);
+	else if(loc == 1)glActiveTexture(GL_TEXTURE1);
+	else
+	{
+		Debug::PrintError("ShaderGL::SendUniformToShader(int, Texture *) -> could not find sampler location for texture");
+		return;
+	}
+	glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
 }
 
 void ShaderGL::SendUniformToShader(int loc, const Matrix4x4 * mat)

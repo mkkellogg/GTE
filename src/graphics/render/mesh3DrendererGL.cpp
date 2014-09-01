@@ -205,7 +205,7 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 
 	if(mesh != NULL)
 	{
-		AttributeSet materialAttributes = material->GetAttributeSet();
+		AttributeSet materialAttributes = material->GetStandardAttributes();
 		AttributeSet meshAttributes = mesh->GetAttributeSet();
 
 		for(int i=0; i<(int)Attribute::_Last; i++)
@@ -236,7 +236,7 @@ void Mesh3DRendererGL::Render()
 		Attribute attr = (Attribute)i;
 		if(Attributes::HasAttribute(meshAttributes, attr))
 		{
-			material->SendAttributeBufferToShader(attr, attributeBuffers[i]);
+			material->SendStandardAttributeBufferToShader(attr, attributeBuffers[i]);
 		}
 	}
 

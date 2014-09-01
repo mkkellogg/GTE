@@ -43,7 +43,6 @@ class Graphics
 
     static Graphics * Instance();
 
-    virtual  void SendStandardUniformsToShader(const Transform * modelView, const Transform * projection) = 0;
     RenderManager * GetRenderManager();
 
     virtual void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);

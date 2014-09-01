@@ -42,8 +42,8 @@ class EngineObjectManager
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(Shader * shader);
     Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes);
-    Material * CreateMaterial(Shader * shader);
-    Material * CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
+    Material * CreateMaterial(const char *name,Shader * shader);
+    Material * CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
     void DestroyMaterial(Material * material);
     Camera * CreateCamera();
     void DestroyCamera(Camera * camera);

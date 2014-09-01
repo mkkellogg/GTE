@@ -30,8 +30,6 @@ class GraphicsGL : public Graphics
     GraphicsGL();
     ~GraphicsGL();
 
-    void SendStandardUniformsToShader(const Transform * modelView, const Transform * projection);
-
 
     Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
     void DestroyShader(Shader * shader);

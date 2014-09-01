@@ -9,6 +9,9 @@ class VertexAttrBuffer;
 #include "graphics/attributes.h"
 #include "graphics/uniforms.h"
 #include "object/engineobject.h"
+#include "graphics/texture/texture.h"
+#include "graphics/render/uniformdesc.h"
+#include <vector>
 
 class Material : EngineObject
 {
@@ -16,27 +19,30 @@ class Material : EngineObject
 
 	static const int VAR_BINDINGS_SIZE=64;
 
+	char materialName[32];
 	Shader * shader;
-	AttributeSet attributeSet;
-	UniformSet uniformSet;
+	AttributeSet standardAttributes;
+	UniformSet standardUniforms;
 
-	int attributeBindings[VAR_BINDINGS_SIZE];
-	int uniformBindings[VAR_BINDINGS_SIZE];
+	int standardAttributeBindings[VAR_BINDINGS_SIZE];
+	int standardUniformBindings[VAR_BINDINGS_SIZE];
+	std::vector<UniformDescriptor*> customUniforms;
+	int currentSamplerLoc;
 
 	void BindVars();
 	void ClearBindings();
 
-	void SetAttributeBinding( int location, Attribute attr);
-    int GetAttributeBinding(Attribute attr) const;
-	int TestForAttribute(Attribute attr) const;
+	void SetStandardAttributeBinding( int location, Attribute attr);
+    int GetStandardAttributeBinding(Attribute attr) const;
+	int TestForStandardAttribute(Attribute attr) const;
 
-	void SetUniformBinding( int location, Uniform uniform);
-	int GetUniformBinding(Uniform uniform) const;
-	int TestForUniform(Uniform uniform) const;
+	void SetStandardUniformBinding( int location, Uniform uniform);
+	int GetStandardUniformBinding(Uniform uniform) const;
+	int TestForStandardUniform(Uniform uniform) const;
 
     protected:
 
-    Material();
+    Material(const char * materialName);
     virtual ~Material();
     bool Init(Shader * shader);
 
@@ -44,14 +50,17 @@ class Material : EngineObject
 
     Shader * GetShader() const;
 
-    int GetAttributeShaderVarLocation(Attribute attr) const;
-    AttributeSet GetAttributeSet() const;
-    void SendAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer);
+    int GetStandardAttributeShaderVarLocation(Attribute attr) const;
+    AttributeSet GetStandardAttributes() const;
+    void SendStandardAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer);
 
-    int GetUniformShaderVarLocation(Uniform uniform) const;
-    UniformSet GetUniformSet() const;
+    int GetStandardUniformShaderVarLocation(Uniform uniform) const;
+    UniformSet GetStandardUniforms() const;
 
-   // void SendUniformToShader(Uniform attr, VertexAttrBuffer *buffer);
+    void AddTexture(Texture * texture, const char *shaderVarName);
+    unsigned int GetCustomUniformCount();
+    UniformDescriptor * GetCustomUniform(unsigned int index);
+
 };
 
 #endif
