@@ -11,6 +11,7 @@
 #include "graphics/render/material.h"
 #include "graphics/attributes.h"
 #include "graphics/object/mesh3D.h"
+#include "graphics/texture/texture.h"
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
 
@@ -70,12 +71,6 @@ Shader * EngineObjectManager::CreateShader(const char * vertexSourcePath, const 
 {
 	Graphics * graphics = Graphics::Instance();
 	Shader * shader = graphics->CreateShader(vertexSourcePath,fragmentSourcePath);
-	bool loadSuccess = shader->Load();
-	if(!loadSuccess)
-	{
-		Debug::PrintError("EngineObjectManager::CreateShader -> could not load shader");
-		return NULL;
-	}
 	return shader;
 }
 
@@ -83,6 +78,12 @@ void EngineObjectManager::DestroyShader(Shader * shader)
 {
 	Graphics * graphics = Graphics::Instance();
 	graphics->DestroyShader(shader);
+}
+
+Texture * EngineObjectManager::CreateTexture(const char * sourcePath, TextureAttributes attributes)
+{
+	Graphics * graphics = Graphics::Instance();
+	return graphics->CreateTexture(sourcePath, attributes);
 }
 
 Material * EngineObjectManager::CreateMaterial(Shader * shader)

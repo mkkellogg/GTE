@@ -1,5 +1,5 @@
-LIBS=-lm -lGL -lglut -lGLU -lGLEW
-CFLAGS=-I src -std=c++11 -Wall
+LIBS= -L/usr/lib/nvidia-331-updates/ -lm -lGL -lglut -lGLU -lGLEW 
+CFLAGS=-I src -std=c++11 -Wall 
 CC=g++
 
 GLOBALSRC = src/global
@@ -9,9 +9,11 @@ GEOMETRYSRC= src/geometry
 UTILSRC= src/util
 GRAPHICSSRC= src/graphics
 SHADERSRC= $(GRAPHICSSRC)/shader
+TEXTURESRC= $(GRAPHICSSRC)/texture
 VIEWSYSSRC= $(GRAPHICSSRC)/view
 RENDERSRC= $(GRAPHICSSRC)/render
 GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
+IMAGESRC= $(GRAPHICSSRC)/image
 ENGINEOBJECTSRC= src/object
 UTILSRC= src/util
 
@@ -24,16 +26,18 @@ GRAPHICSOBJECTOBJ= obj/mesh3D.o
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o
-GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o obj/screendesc.o
+GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o obj/screendesc.o 
 SHADEROBJ= obj/shadersource.o obj/shader.o 
+TEXTUREOBJ= obj/texture.o obj/textureattr.o  
+IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
 UTILOBJ= obj/datastack.o
 
-OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o 
+OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
+OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
 
-all: gtemain graphics ui geometry gtemath base global engineobjects util
+all: gtemain graphics ui geometry gtemath base global engineobjects util image
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -51,7 +55,7 @@ obj/gte.o: src/gte.cpp src/gte.h
 
 
 # ==================================
-#Glboal
+# Global
 # ==================================	
 
 global: $(GLOBALOBJ)
@@ -79,17 +83,37 @@ obj/engineobjectmanager.o: $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOB
 	$(CC) $(CFLAGS) -o obj/engineobjectmanager.o -c $(ENGINEOBJECTSRC)/engineobjectmanager.cpp
 	
 	
+# ==================================
+# Image processing
+# ==================================	
+
+image: $(IMAGEOBJ)
+
+obj/lodepng.o: $(IMAGESRC)/lodepng/lodepng.cpp $(IMAGESRC)/lodepng/lodepng.h
+	$(CC) $(CFLAGS) -o obj/lodepng.o -c $(IMAGESRC)/lodepng/lodepng.cpp 
+	
+obj/lodepng_util.o: $(IMAGESRC)/lodepng/lodepng_util.cpp $(IMAGESRC)/lodepng/lodepng_util.h
+	$(CC) $(CFLAGS) -o obj/lodepng_util.o -c $(IMAGESRC)/lodepng/lodepng_util.cpp 
+	
+obj/rawimage.o: $(IMAGESRC)/rawimage.cpp $(IMAGESRC)/rawimage.h
+	$(CC) $(CFLAGS) -o obj/rawimage.o -c $(IMAGESRC)/rawimage.cpp 
+	
+obj/imageloader.o: $(IMAGESRC)/imageloader.cpp $(IMAGESRC)/imageloader.h
+	$(CC) $(CFLAGS) -o obj/imageloader.o -c $(IMAGESRC)/imageloader.cpp 
 	
 # ==================================
 # Graphics
 # ==================================
 
 
-graphics: $(GRAPHICSOBJ) $(SHADEROBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject
+graphics: $(GRAPHICSOBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject
 
 obj/graphics.o: $(GRAPHICSSRC)/graphics.cpp  $(GRAPHICSSRC)/graphics.h 
 	$(CC) $(CFLAGS) -o obj/graphics.o -c $(GRAPHICSSRC)/graphics.cpp
 
+obj/graphicsGL.o: $(GRAPHICSSRC)/graphicsGL.cpp  $(GRAPHICSSRC)/graphicsGL.h
+	$(CC) $(CFLAGS) -o obj/graphicsGL.o -c $(GRAPHICSSRC)/graphicsGL.cpp
+	
 obj/screendesc.o: $(GRAPHICSSRC)/screendesc.cpp  $(GRAPHICSSRC)/screendesc.h 
 	$(CC) $(CFLAGS) -o obj/screendesc.o -c $(GRAPHICSSRC)/screendesc.cpp
 	
@@ -101,13 +125,19 @@ obj/shadersource.o: $(SHADERSRC)/shadersource.cpp  $(SHADERSRC)/shadersource.h
 	
 obj/shader.o: $(SHADERSRC)/shader.cpp $(SHADERSRC)/shader.h 
 	$(CC) $(CFLAGS) -o obj/shader.o -c $(SHADERSRC)/shader.cpp
-
-obj/graphicsGL.o: $(GRAPHICSSRC)/graphicsGL.cpp  $(GRAPHICSSRC)/graphicsGL.h
-	$(CC) $(CFLAGS) -o obj/graphicsGL.o -c $(GRAPHICSSRC)/graphicsGL.cpp
 		
 obj/shaderGL.o: $(SHADERSRC)/shaderGL.cpp $(SHADERSRC)/shaderGL.h
 	$(CC) $(CFLAGS) -o obj/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
+
+obj/texture.o: $(TEXTURESRC)/texture.cpp $(TEXTURESRC)/texture.h 
+	$(CC) $(CFLAGS) -o obj/texture.o -c $(TEXTURESRC)/texture.cpp
 	
+obj/textureattr.o: $(TEXTURESRC)/textureattr.cpp $(TEXTURESRC)/textureattr.h 
+	$(CC) $(CFLAGS) -o obj/textureattr.o -c $(TEXTURESRC)/textureattr.cpp
+	
+obj/textureGL.o: $(TEXTURESRC)/textureGL.cpp $(TEXTURESRC)/textureGL.h 
+	$(CC) $(CFLAGS) -o obj/textureGL.o -c $(TEXTURESRC)/textureGL.cpp
+
 obj/color4.o: $(GRAPHICSSRC)/color/color4.cpp $(GRAPHICSSRC)/color/color4.h
 	$(CC) $(CFLAGS) -o obj/color4.o -c $(GRAPHICSSRC)/color/color4.cpp
 

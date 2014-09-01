@@ -10,10 +10,13 @@ class Mesh3DRenderer;
 class EngineObjectManager;
 class Material;
 class Camera;
+class TextureAttributes;
+class Texture;
 
 #include <vector>
 #include "graphics/attributes.h"
 #include "object/sceneobject.h"
+#include "graphics/texture/textureattr.h"
 
 class EngineObjectManager
 {
@@ -38,6 +41,7 @@ class EngineObjectManager
     void DestroyMesh3DRenderer(Mesh3DRenderer * renderer);
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(Shader * shader);
+    Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes);
     Material * CreateMaterial(Shader * shader);
     Material * CreateMaterial(const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
     void DestroyMaterial(Material * material);

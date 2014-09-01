@@ -41,4 +41,6 @@
 	}									   \
 }
 
+typedef unsigned char BYTE;
+
 #endif

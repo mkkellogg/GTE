@@ -10,6 +10,8 @@ class Mesh3DRenderer;
 class Mesh3DRendererGL;
 class Material;
 class Camera;
+class VertexAttrBuffer;
+class TextureAttributes;
 
 #include "graphics.h"
 
@@ -35,7 +37,10 @@ class GraphicsGL : public Graphics
     void DestroyShader(Shader * shader);
     Mesh3DRenderer * CreateMeshRenderer();
     void DestroyMeshRenderer(Mesh3DRenderer * buffer);
-
+    VertexAttrBuffer * CreateVertexAttributeBuffer();
+    void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
+    Texture * CreateTexture(const char * sourcePath,  TextureAttributes attributes);
+    void DestroyTexture(Texture * texture);
     void ClearBuffers(unsigned int bufferMask) const;
 
     void ActivateMaterial(Material * material);

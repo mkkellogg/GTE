@@ -177,6 +177,29 @@ void Transform::RotateAround(float px, float py, float pz, float ax, float ay, f
 }
 
 /*
+ * Scale this transform by the x,y, and z components of [mag]
+ */
+void Transform::Scale(Vector3 * mag,  bool local)
+{
+	NULL_CHECK_RTRN(mag, "Transform::Scale -> mag is null.");
+
+	Scale(mag->x, mag->y, mag->z, local);
+}
+
+/*
+ * Scale this transform by [x], [y], [z]. If [local] is true then the operation is
+ * performed in local space, otherwise it is performed in local space.
+ */
+void Transform::Scale(float x, float y, float z,  bool local)
+{
+	if(!local)
+	{
+		matrix.PreScale(x,y,z);
+	}
+	else matrix.Scale(x,y,z);
+}
+
+/*
  * Utility function to create a projection matrix. An existing Matrix4x4 object is passed in via [matrix],
  * and its data is set to contain the projection matrix.
  *

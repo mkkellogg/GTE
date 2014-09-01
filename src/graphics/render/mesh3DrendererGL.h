@@ -5,6 +5,7 @@
 class GraphicsGL;
 class Graphics;
 class VertexAttrBufferGL;
+class VertexAttrBuffer;
 class Point3Array;
 class Vector3Array;
 class Color4Array;
@@ -21,16 +22,16 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
 	const static int MAX_ATTRIBUTE_BUFFERS = 64;
 
-    VertexAttrBufferGL * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
+    VertexAttrBuffer * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
 
 	int storedVertexCount;
 	AttributeSet storedAttributes;
     bool buffersOnGPU;
 
-    bool InitBuffer(VertexAttrBufferGL ** buffer, int vertexCount, int componentCount,  int stride);
+    bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount,  int stride);
     void DestroyBuffers();
-    void DestroyBuffer(VertexAttrBufferGL ** buffer);
-    void SetVertexData(VertexAttrBufferGL * buffer, const float * data, int componentCount, int totalCount, int stride);
+    void DestroyBuffer(VertexAttrBuffer ** buffer);
+    void SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride);
 
     bool InitAttributeData(Attribute attr, int componentCount,  int stride);
 

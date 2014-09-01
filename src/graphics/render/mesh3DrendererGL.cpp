@@ -54,20 +54,20 @@ void Mesh3DRendererGL::DestroyBuffers()
 	DestroyBuffer(&attributeBuffers[(int)Attribute::UV2]);
 }
 
-void Mesh3DRendererGL::DestroyBuffer(VertexAttrBufferGL ** buffer)
+void Mesh3DRendererGL::DestroyBuffer(VertexAttrBuffer ** buffer)
 {
 	if((*buffer) != NULL)delete (*buffer);
 	*buffer = NULL;
 }
 
 
-void Mesh3DRendererGL::SetVertexData(VertexAttrBufferGL * buffer, const float * data, int componentCount, int totalCount, int stride)
+void Mesh3DRendererGL::SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride)
 {
 
 
 }
 
-bool Mesh3DRendererGL::InitBuffer(VertexAttrBufferGL ** buffer, int vertexCount, int componentCount, int stride)
+bool Mesh3DRendererGL::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount, int stride)
 {
 	if(buffer == NULL)
 	{
@@ -75,7 +75,7 @@ bool Mesh3DRendererGL::InitBuffer(VertexAttrBufferGL ** buffer, int vertexCount,
 		return false;
 	}
 
-	*buffer = new VertexAttrBufferGL();
+	*buffer = graphics->CreateVertexAttributeBuffer();
 
 	if(*buffer == NULL)
 	{

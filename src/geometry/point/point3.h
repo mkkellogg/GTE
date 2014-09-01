@@ -1,3 +1,12 @@
+/*
+ * class: Point3
+ *
+ * author: Mark Kellogg
+ *
+ * A utility class for performing 3D point operations.
+ *
+ */
+
 #ifndef _POINT3_H_
 #define _POINT3_H_
 

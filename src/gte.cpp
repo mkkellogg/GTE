@@ -12,6 +12,8 @@
 #include "graphics/render/renderbuffer.h"
 #include "graphics/shader/shader.h"
 #include "graphics/view/camera.h"
+#include "graphics/texture/textureattr.h"
+#include "graphics/texture/texture.h"
 #include "geometry/matrix4x4.h"
 #include "base/basevector4.h"
 #include "geometry/transform.h"
@@ -82,8 +84,12 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		cameraObject->SetCamera(camera);
 
 		SceneObject * sceneObject = objectManager->CreateSceneObject();
+		sceneObject->GetTransform()->Scale(3,3,3, true);
 		sceneObject->GetTransform()->RotateAround(0, 0, 0, 0, 1, 0, 45);
 		sceneObject->GetTransform()->Translate(0, 0, -12, false);
+
+		TextureAttributes texAttributes;
+		Texture * texture = objectManager->CreateTexture("textures/cartoonTex01.png", texAttributes);
 		Material * material = objectManager->CreateMaterial("resources/basic.vertex.shader","resources/basic.fragment.shader");
 		Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);
 		Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
@@ -204,13 +210,14 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		sceneObject->AddChild(childSceneObject);
 		childSceneObject->SetMesh(mesh);
 		childSceneObject->SetMeshRenderer(meshRenderer);
+		childSceneObject->GetTransform()->Scale(3,3,3, true);
 		childSceneObject->GetTransform()->Translate(5, 2, 0, true);
 		childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 	}
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.1);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,6);
 	}
 
 	void OnQuit(Graphics * graphics)

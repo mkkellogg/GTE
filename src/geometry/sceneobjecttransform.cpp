@@ -137,3 +137,34 @@ void SceneObjectTransform::RotateAround(float px, float py, float pz, float ax, 
 	matrix.Rotate(rotVector[0],rotVector[1],rotVector[2],angle);
 	matrix.Translate(-diffX,-diffY,-diffZ);
 }
+
+/*
+ * Scale this transform by the x,y, and z components of [mag]
+ */
+void SceneObjectTransform::Scale(Vector3 * mag,  bool local)
+{
+	NULL_CHECK_RTRN(mag, "Transform::Scale -> mag is null.");
+
+	Scale(mag->x, mag->y, mag->z, local);
+}
+
+/*
+ * Scale this transform by [x], [y], [z]. If [local] is true then the operation is
+ * performed in local space, otherwise it is performed in local space.
+ */
+void SceneObjectTransform::Scale(float x, float y, float z,  bool local)
+{
+	if(!local)
+	{
+		float trans[] = {x,y,z,0};
+		Transform full;
+		GetInheritedTransform(&full, false);
+		full.TransformBy(this);
+		full.Invert();
+		full.GetMatrix()->Transform(trans);
+
+		matrix.Scale(trans[0], trans[1], trans[2]);
+	}
+	else matrix.Scale(x,y,z);
+}
+

@@ -233,6 +233,8 @@ float Vector3::Dot(const Vector3 * a,const Vector3 * b)
  */
 void Vector3::AttachTo(float * data)
 {
+	NULL_CHECK_RTRN(data, "Vector3::AttachTo -> NULL data passed.");
+
 	BaseVector4::AttachTo(data);
 	UpdateComponentPointers();
 }

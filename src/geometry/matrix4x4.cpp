@@ -472,8 +472,26 @@ const float * Matrix4x4::GetDataPtr() const
 void Matrix4x4::Scale(float x, float y, float z)
 {
     float temp[DATA_SIZE];
-    Scale(this->data, data, x, y, z);
+    Scale(this->data, temp, x, y, z);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
+}
+
+/*
+ * Scale this matrix by [x], [y], and [z].
+ *
+ * This performs a pre-transformation, in that it is equivalent to pre-multiplying this
+ * matrix by a scale matrix
+ */
+void Matrix4x4::PreScale(float x, float y, float z)
+{
+	float temp[DATA_SIZE];
+	Matrix4x4 scale;
+	scale.SetIdentity();
+	scale.Scale(x,y,z);
+
+	MultiplyMM(scale.GetDataPtr(), this->data, temp);
+
+	memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
 /*
