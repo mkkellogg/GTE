@@ -31,7 +31,7 @@ class TextureGL : public Texture
 
 	public:
 
-	GLuint GetTextureID();
+	GLuint GetTextureID() const;
 };
 
 #endif

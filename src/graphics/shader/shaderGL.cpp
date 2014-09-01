@@ -258,7 +258,10 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 {
 	if(loc < 0)return;
 
-	VertexAttrBufferGL * bufferGL = (VertexAttrBufferGL *)buffer;
+	VertexAttrBufferGL * bufferGL =  dynamic_cast<VertexAttrBufferGL *>(buffer);
+
+	NULL_CHECK_RTRN(bufferGL, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
+
 	const float * data = bufferGL->GetDataPtr();
 	int componentCount = bufferGL->GetComponentCount();
 	int stride = bufferGL->GetStride();
@@ -281,16 +284,21 @@ void ShaderGL::SendUniformToShader(int loc, const Texture * texture)
 {
 	NULL_CHECK_RTRN(texture, "ShaderGL::SendUniformToShader(int, Texture *) -> NULL texture passed");
 
-	TextureGL * texGL = (TextureGL *)texture;
+	const TextureGL * texGL = dynamic_cast<const TextureGL *>(texture);
 
-	if(loc == 0)glActiveTexture(GL_TEXTURE0);
-	else if(loc == 1)glActiveTexture(GL_TEXTURE1);
+	NULL_CHECK_RTRN(texGL, "ShaderGL::SendUniformToShader(int, Texture *) -> texture is not TextureGL !!");
+
+	if(loc >= 0)
+	{
+		glActiveTexture(GL_TEXTURE0 + loc);
+		glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+	}
 	else
 	{
 		Debug::PrintError("ShaderGL::SendUniformToShader(int, Texture *) -> could not find sampler location for texture");
 		return;
 	}
-	glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+
 }
 
 void ShaderGL::SendUniformToShader(int loc, const Matrix4x4 * mat)

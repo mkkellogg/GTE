@@ -220,8 +220,8 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 			if(renderer != NULL)
 			{
 				// make sure mesh renderer has a material set
-				Material * m = renderer->GetMaterial();
-				if(m != NULL)
+				Material * currentMaterial = renderer->GetMaterial();
+				if(currentMaterial != NULL)
 				{
 					modelView.SetTo(modelTransform);
 					// concatenate modelTransform with inverted viewTransform
@@ -229,11 +229,11 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 
 					// activate the material, which will switch the GPU's active shader to
 					// the one associated with the material
-					ActivateMaterial(m);
+					ActivateMaterial(currentMaterial);
 					// pass concatenated modelViewTransform and projection transforms to shader
 					SendTransformUniformsToShader(&modelView, camera->GetProjectionTransform());
 					SendCustomUniformsToShader();
-					renderer->Render();
+					renderer->Render(currentMaterial);
 				}
 				else
 				{

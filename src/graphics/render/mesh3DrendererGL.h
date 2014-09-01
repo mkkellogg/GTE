@@ -47,13 +47,14 @@ class Mesh3DRendererGL : public Mesh3DRenderer
     Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics);
     virtual ~Mesh3DRendererGL();
 
+    bool UseMaterial(Material * material);
+
     public:
 
     bool UseMesh(Mesh3D * newMesh);
     void CopyMeshData();
     void UpdateFromMesh();
-    bool UseMaterial(Material * material);
-    void Render();
+    void Render(Material * material);
 };
 
 #endif

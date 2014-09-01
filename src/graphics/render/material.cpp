@@ -164,14 +164,14 @@ UniformSet Material::GetStandardUniforms() const
 
 void Material::AddTexture(Texture * texture, const char *shaderVarName)
 {
-/*	int loc = shader->GetUniformVarLocation(shaderVarName);
+	int loc = shader->GetUniformVarLocation(shaderVarName);
 	if(loc < 0)
 	{
 		char msg[128];
 		sprintf(msg, "Could not find shader sampler var: '%s' for material: '%s'", shaderVarName, materialName);
 		Debug::PrintError(msg);
 		return;
-	}*/
+	}
 
 	UniformDescriptor * desc = new UniformDescriptor();
 	if(desc == NULL)
@@ -180,7 +180,7 @@ void Material::AddTexture(Texture * texture, const char *shaderVarName)
 		return;
 	}
 
-	desc->ShaderVarID = currentSamplerLoc;
+	desc->ShaderVarID = loc;
 	desc->Type = UniformType::Sampler;
 	desc->SamplerData = texture;
 	customUniforms.push_back(desc);

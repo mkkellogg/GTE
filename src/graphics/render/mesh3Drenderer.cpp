@@ -14,12 +14,14 @@
 #include "graphics/color/color4.h"
 #include "graphics/uv/uv2.h"
 #include "ui/debug.h"
+#include "global/global.h"
 
 
 Mesh3DRenderer::Mesh3DRenderer(Graphics * graphics) : SceneObjectComponent()
 {
 	this->mesh = NULL;
 	this->material = NULL;
+	this->activeMaterial = NULL;
 	this->graphics = graphics;
 }
 
@@ -42,7 +44,8 @@ Mesh3D * Mesh3DRenderer::GetMesh()
 
 bool Mesh3DRenderer::UseMaterial(Material * material)
 {
-	this->material = material;
+	NULL_CHECK(material, "Mesh3DRenderer::UseMaterial -> material is NULL", false);
+	this->activeMaterial = material;
 
 	return true;
 }
@@ -50,5 +53,11 @@ bool Mesh3DRenderer::UseMaterial(Material * material)
 Material * Mesh3DRenderer::GetMaterial()
 {
 	return material;
+}
+
+void Mesh3DRenderer::SetMaterial(Material * material)
+{
+	NULL_CHECK_RTRN(material, "Mesh3DRenderer::SetMaterial -> material is NULL");
+	this->material = material;
 }
 

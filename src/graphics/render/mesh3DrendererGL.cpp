@@ -31,7 +31,7 @@ Mesh3DRendererGL::Mesh3DRendererGL(Graphics * graphics) : Mesh3DRendererGL(false
 
 Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics) : Mesh3DRenderer(graphics), buffersOnGPU(false)
 {
-	memset(attributeBuffers,0,sizeof(VertexAttrBufferGL*) * MAX_ATTRIBUTE_BUFFERS);
+	memset(attributeBuffers,0,sizeof(VertexAttrBuffer*) * MAX_ATTRIBUTE_BUFFERS);
 
 	attributeBuffers[(int)Attribute::Position]= NULL;
 	attributeBuffers[(int)Attribute::Color]= NULL;
@@ -201,6 +201,8 @@ void Mesh3DRendererGL::UpdateFromMesh()
 
 bool Mesh3DRendererGL::UseMaterial(Material * material)
 {
+	if(material == activeMaterial)return true;
+
 	Mesh3DRenderer::UseMaterial(material);
 
 	if(mesh != NULL)
@@ -227,8 +229,10 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 	return true;
 }
 
-void Mesh3DRendererGL::Render()
+void Mesh3DRendererGL::Render(Material * currentMaterial)
 {
+	UseMaterial(currentMaterial);
+
 	AttributeSet meshAttributes = mesh->GetAttributeSet();
 
 	for(int i=0; i<(int)Attribute::_Last; i++)
@@ -236,7 +240,7 @@ void Mesh3DRendererGL::Render()
 		Attribute attr = (Attribute)i;
 		if(Attributes::HasAttribute(meshAttributes, attr))
 		{
-			material->SendStandardAttributeBufferToShader(attr, attributeBuffers[i]);
+			currentMaterial->SendStandardAttributeBufferToShader(attr, attributeBuffers[i]);
 		}
 	}
 

@@ -94,11 +94,14 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		TextureAttributes texAttributes;
 		Texture * texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
+
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 		material->AddTexture(texture, "Texture");
+
 		Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);
 		Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
-		meshRenderer->UseMaterial(material);
+
+		meshRenderer->SetMaterial(material);
 		sceneObject->SetMesh(mesh);
 		sceneObject->SetMeshRenderer(meshRenderer);
 
@@ -203,14 +206,14 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		colors->GetColor(23)->Set(0, 0, 1, 1);
 
 		// cube back, triangle 1
-		colors->GetColor(24)->Set(0, 1, 0, 1);
-		colors->GetColor(25)->Set(0, 1, 0, 1);
-		colors->GetColor(26)->Set(0, 1, 0, 1);
+		colors->GetColor(24)->Set(1, 1, 1, 1);
+		colors->GetColor(25)->Set(1, 1, 1, 1);
+		colors->GetColor(26)->Set(1, 1, 1, 1);
 
 		// cube back, triangle 2
-		colors->GetColor(27)->Set(0, 1, 0, 1);
-		colors->GetColor(28)->Set(0, 1, 0, 1);
-		colors->GetColor(29)->Set(0, 1, 0, 1);
+		colors->GetColor(27)->Set(1, 1, 1, 1);
+		colors->GetColor(28)->Set(1, 1, 1, 1);
+		colors->GetColor(29)->Set(1, 1, 1, 1);
 
 
 

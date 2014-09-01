@@ -26,7 +26,7 @@ TextureGL::~TextureGL()
 
 }
 
-GLuint TextureGL::GetTextureID()
+GLuint TextureGL::GetTextureID() const
 {
 	return textureID;
 }

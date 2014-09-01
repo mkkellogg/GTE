@@ -156,6 +156,8 @@ void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 
 Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes attributes)
 {
+	NULL_CHECK(sourcePath, "GraphicsGL::CreateTexture -> sourcePath is NULL", NULL);
+
 	RawImage * raw = ImageLoader::LoadPNG(sourcePath);
 
 	NULL_CHECK(raw, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
@@ -218,14 +220,23 @@ void GraphicsGL::DestroyTexture(Texture * texture)
 
 void GraphicsGL::ActivateMaterial(Material * material)
 {
+	NULL_CHECK_RTRN(material,"GraphicsGL::ActivateMaterial -> material is NULL");
+
 	// TODO: Change this to a proper comparison, and not just
 	// a comparison of memory addresses
 	if(Graphics::GetActiveMaterial() != material)
 	{
 		Graphics::ActivateMaterial(material);
 
-		ShaderGL * shader = (ShaderGL *) material->GetShader();
-		glUseProgram(shader->GetProgramID());
+		Shader * shader = material->GetShader();
+
+		NULL_CHECK_RTRN(shader,"GraphicsGL::ActivateMaterial -> shader is NULL");
+
+		ShaderGL * shaderGL = dynamic_cast<ShaderGL *>(shader);
+
+		NULL_CHECK_RTRN(shaderGL,"GraphicsGL::ActivateMaterial -> material's shader is not ShaderGL !!");
+
+		glUseProgram(shaderGL->GetProgramID());
 	}
 }
 
