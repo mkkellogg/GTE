@@ -172,6 +172,7 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 	}
 
 	glBindTexture(GL_TEXTURE_2D, tex);
+	glEnable(GL_TEXTURE_2D);
 
 	if(attributes.WrapMode == TextureWrap::Mirror)
 	{
@@ -190,7 +191,13 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 	}
 
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_FLOAT, raw->GetPixels());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexStorage2D(GL_TEXTURE_2D, 9, GL_RGBA8, raw->GetWidth(), raw->GetHeight());
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+
+	//glTexSubImage2D(GL_TEXTURE_2D,0,0,0,raw->GetWidth(),raw->GetHeight()​, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
 
 	if(attributes.FilterMode == TextureFilter::Point)
 	{
@@ -204,6 +211,7 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 	}
 	else if(attributes.FilterMode == TextureFilter::TriLinear)
 	{
+		printf("tri linear filtering!\n");
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);

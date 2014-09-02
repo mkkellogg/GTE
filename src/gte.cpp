@@ -93,6 +93,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		sceneObject->GetTransform()->Translate(0, 0, -12, false);
 
 		TextureAttributes texAttributes;
+		texAttributes.FilterMode = TextureFilter::TriLinear;
 		Texture * texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
 
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
@@ -283,7 +284,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,1);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.001);
 	}
 
 	void OnQuit(Graphics * graphics)
