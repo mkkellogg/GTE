@@ -48,9 +48,9 @@ GraphicsCallbacks::~GraphicsCallbacks()
 
 }
 
-void Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
+bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
-
+	return true;
 }
 
 void Graphics::ActivateMaterial(Material * material)

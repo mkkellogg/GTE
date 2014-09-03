@@ -32,7 +32,7 @@
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
 
-void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
+bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
 	// call base method
 	Graphics::Init(windowWidth, windowHeight, callbacks, windowTitle);
@@ -57,11 +57,25 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
 
     glewExperimental = GL_TRUE; 
     glewInit();
-    if (glewIsSupported("GL_VERSION_2_0"))
-        Debug::PrintMessage("Ready for OpenGL 2.0\n");
-    else {	
-    	Debug::PrintError("OpenGL 2.0 not supported\n");
-        exit(1);
+    if (glewIsSupported("GL_VERSION_3_0"))
+    {
+    	Debug::PrintMessage("Using OpenGL 3.0");
+    	openGLVersion =3;
+    }
+    else if (glewIsSupported("GL_VERSION_2_0"))
+    {
+    	Debug::PrintMessage("Using OpenGL 2.0");
+    	openGLVersion = 2;
+    }
+    else
+    {
+    	openGLVersion = 1;
+    }
+
+    if(openGLVersion <= 1)
+    {
+    	 Debug::PrintError("Requires OpenGL 2.0 or greater.");
+    	 return false;
     }
 
     screenDescriptor = new ScreenDescriptor(windowWidth, windowHeight);
@@ -86,6 +100,8 @@ void GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     {
         callbacks->OnQuit(this);
     }
+
+    return true;
 }
 
 GraphicsGL::~GraphicsGL() 
@@ -95,7 +111,7 @@ GraphicsGL::~GraphicsGL()
 
 GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
 {
-
+	openGLVersion = 0;
 }
 
 Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)
@@ -162,6 +178,7 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 
 	NULL_CHECK(raw, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
 
+	glEnable(GL_TEXTURE_2D);
 	GLuint tex;
 	glGenTextures(1, &tex);
 
@@ -172,7 +189,6 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 	}
 
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glEnable(GL_TEXTURE_2D);
 
 	if(attributes.WrapMode == TextureWrap::Mirror)
 	{
@@ -190,15 +206,6 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	}
 
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_FLOAT, raw->GetPixels());
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
-
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-	glTexStorage2D(GL_TEXTURE_2D, 9, GL_RGBA8, raw->GetWidth(), raw->GetHeight());
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
-
-	//glTexSubImage2D(GL_TEXTURE_2D,0,0,0,raw->GetWidth(),raw->GetHeight()​, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
-
 	if(attributes.FilterMode == TextureFilter::Point)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -211,11 +218,27 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 	}
 	else if(attributes.FilterMode == TextureFilter::TriLinear)
 	{
-		printf("tri linear filtering!\n");
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
+
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_FLOAT, raw->GetPixels());
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+
+
+	if(openGLVersion >= 3)
+	{
+		glTexStorage2D(GL_TEXTURE_2D, attributes.MipMapLevel, GL_RGBA, raw->GetWidth(), raw->GetHeight());
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+		if(attributes.FilterMode == TextureFilter::TriLinear)glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, attributes.MipMapLevel);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+	}
+
 
 	TextureGL * texture = new TextureGL(attributes, tex, sourcePath);
 	return texture;
@@ -253,6 +276,11 @@ void GraphicsGL::RenderScene()
 	renderManager->RenderAll();
 
 	glutSwapBuffers();
+}
+
+unsigned int GraphicsGL::GetOpenGLVersion()
+{
+	return openGLVersion;
 }
 
 void GraphicsGL::_glutDisplayFunc()

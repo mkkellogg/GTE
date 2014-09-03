@@ -94,6 +94,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		TextureAttributes texAttributes;
 		texAttributes.FilterMode = TextureFilter::TriLinear;
+		texAttributes.MipMapLevel = 4;
 		Texture * texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
 
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
@@ -197,14 +198,14 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		colors->GetColor(17)->Set(1, 1, 0, 1);
 
 		// cube top, triangle 1
-		colors->GetColor(18)->Set(0, 0, 1, 1);
-		colors->GetColor(19)->Set(0, 0, 1, 1);
-		colors->GetColor(20)->Set(0, 0, 1, 1);
+		colors->GetColor(18)->Set(1, 1, 1, 1);
+		colors->GetColor(19)->Set(1, 1, 1, 1);
+		colors->GetColor(20)->Set(1, 1, 1, 1);
 
 		// cube top, triangle 2
-		colors->GetColor(21)->Set(0, 0, 1, 1);
-		colors->GetColor(22)->Set(0, 0, 1, 1);
-		colors->GetColor(23)->Set(0, 0, 1, 1);
+		colors->GetColor(21)->Set(1, 1, 1, 1);
+		colors->GetColor(22)->Set(1, 1, 1, 1);
+		colors->GetColor(23)->Set(1, 1, 1, 1);
 
 		// cube back, triangle 1
 		colors->GetColor(24)->Set(1, 1, 1, 1);
@@ -284,7 +285,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.001);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.01);
 	}
 
 	void OnQuit(Graphics * graphics)

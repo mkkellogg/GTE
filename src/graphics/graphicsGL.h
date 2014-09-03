@@ -30,6 +30,7 @@ class GraphicsGL : public Graphics
     GraphicsGL();
     ~GraphicsGL();
 
+    unsigned int openGLVersion;
 
     Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
     void DestroyShader(Shader * shader);
@@ -48,8 +49,8 @@ class GraphicsGL : public Graphics
 
     public :
 
-    void Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
-
+    bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
+    unsigned int GetOpenGLVersion();
 };
 
 #endif

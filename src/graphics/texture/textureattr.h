@@ -33,6 +33,7 @@ class TextureAttributes
 {
 	public:
 
+	unsigned int MipMapLevel;
 	bool UseAlpha;
 	TextureFilter FilterMode;
 	TextureWrap WrapMode;
