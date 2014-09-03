@@ -22,12 +22,12 @@
 
 #include "ui/debug.h"
 
-Mesh3D::Mesh3D() : Mesh3D (Attributes::CreateAttributeSet())
+Mesh3D::Mesh3D() : Mesh3D (StandardAttributes::CreateAttributeSet())
 {
 
 }
 
-Mesh3D::Mesh3D(AttributeSet attributes) : SceneObjectComponent()
+Mesh3D::Mesh3D(StandardAttributeSet attributes) : SceneObjectComponent()
 {
 	attributeSet = attributes;
 	vertexCount = 0;
@@ -84,7 +84,7 @@ int Mesh3D::GetVertexCount()
 	return vertexCount;
 }
 
-AttributeSet Mesh3D::GetAttributeSet()
+StandardAttributeSet Mesh3D::GetAttributeSet()
 {
 	return attributeSet;
 }
@@ -96,34 +96,34 @@ bool Mesh3D::Init(int vertexCount)
 	bool initSuccess = true;
 	int errorMask = 0;
 
-	if(Attributes::HasAttribute(attributeSet,Attribute::Position))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Position))
 	{
 		initSuccess = positions->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::Position;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Position;
 	}
 
-	if(Attributes::HasAttribute(attributeSet,Attribute::Normal))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Normal))
 	{
 		initSuccess = normals->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::Normal;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
 	}
 
-	if(Attributes::HasAttribute(attributeSet,Attribute::Color))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Color))
 	{
 		initSuccess = colors->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::Color;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Color;
 	}
 
-	if(Attributes::HasAttribute(attributeSet,Attribute::UV1))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UV1))
 	{
 		initSuccess = uvs1->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::UV1;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UV1;
 	}
 
-	if(Attributes::HasAttribute(attributeSet,Attribute::UV2))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UV2))
 	{
 		initSuccess = uvs2->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)AttributeMaskComponent::UV2;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UV2;
 	}
 	if(!initSuccess)
 	{

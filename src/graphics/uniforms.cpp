@@ -8,39 +8,39 @@
 #include "uniforms.h"
 #include "ui/debug.h"
 
-const char* const Uniforms::uniformNames[] = {"MODELVIEW_MATRIX","MODELVIEWPROJECTION_MATRIX","PROJECTION_MATRIX","LIGHT"};
+const char* const StandardUniforms::uniformNames[] = {"MODELVIEW_MATRIX","MODELVIEWPROJECTION_MATRIX","PROJECTION_MATRIX","LIGHT"};
 
-const char * Uniforms::GetUniformName(Uniform uniform)
+const char * StandardUniforms::GetUniformName(StandardUniform uniform)
 {
 	return uniformNames[(int)uniform];
 }
 
-Uniform Uniforms::UniformMaskComponentToUniform(UniformMaskComponent component)
+StandardUniform StandardUniforms::UniformMaskComponentToUniform(StandardUniformMaskComponent component)
 {
-	return (Uniform)IntMask::MaskValueToIndex((unsigned int)component);
+	return (StandardUniform)IntMask::MaskValueToIndex((unsigned int)component);
 }
 
-UniformMaskComponent Uniforms::UniformToUniformMaskComponent(Uniform uniform)
+StandardUniformMaskComponent StandardUniforms::UniformToUniformMaskComponent(StandardUniform uniform)
 {
-	return (UniformMaskComponent)IntMask::IndexToMaskValue((unsigned int)uniform);
+	return (StandardUniformMaskComponent)IntMask::IndexToMaskValue((unsigned int)uniform);
 }
 
-void Uniforms::AddUniform(UniformSet * set, Uniform uniform)
+void StandardUniforms::AddUniform(StandardUniformSet * set, StandardUniform uniform)
 {
 	IntMask::SetBitForIndexMask((unsigned int *)set, (unsigned int )uniform);
 }
 
-void Uniforms::RemoveUniform(UniformSet * set, Uniform uniform)
+void StandardUniforms::RemoveUniform(StandardUniformSet * set, StandardUniform uniform)
 {
 	IntMask::ClearBitForIndexMask((unsigned int *)set, (unsigned int )uniform);
 }
 
-bool Uniforms::HasUniform(UniformSet set, Uniform uniform)
+bool StandardUniforms::HasUniform(StandardUniformSet set, StandardUniform uniform)
 {
 	return IntMask::IsBitSet((unsigned int)set, (unsigned int)uniform);
 }
 
-UniformSet Uniforms::CreateUniformSet()
+StandardUniformSet StandardUniforms::CreateUniformSet()
 {
 	return (unsigned int)0;
 }

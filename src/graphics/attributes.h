@@ -1,7 +1,7 @@
 #ifndef _ATTRIBUTES_H_
 #define _ATTRIBUTES_H_
 
-enum class AttributeMaskComponent
+enum class StandardAttributeMaskComponent
 {
     Position=1,
     Normal=2,
@@ -10,7 +10,7 @@ enum class AttributeMaskComponent
     UV2=16
 };
 
-enum class Attribute
+enum class StandardAttribute
 {
     Position=0,
     Normal=1,
@@ -20,23 +20,23 @@ enum class Attribute
     _Last=5 // always keep as last entry
 };
 
-typedef unsigned int AttributeSet;
+typedef unsigned int StandardAttributeSet;
 
-class Attributes
+class StandardAttributes
 {
 	static const char* const attributeNames[];
 
 	public:
 
-	static const char * GetAttributeName(Attribute attr);
-	static Attribute AttributeMaskComponentToAttribute(AttributeMaskComponent component);
-	static AttributeMaskComponent AttributeToAttributeMaskComponent(Attribute attr);
+	static const char * GetAttributeName(StandardAttribute attr);
+	static StandardAttribute AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component);
+	static StandardAttributeMaskComponent AttributeToAttributeMaskComponent(StandardAttribute attr);
 
-	static AttributeSet CreateAttributeSet();
-	static void AddAttribute(AttributeSet * set, Attribute attr);
-	static void RemoveAttribute(AttributeSet * set, Attribute attr);
+	static StandardAttributeSet CreateAttributeSet();
+	static void AddAttribute(StandardAttributeSet * set, StandardAttribute attr);
+	static void RemoveAttribute(StandardAttributeSet * set, StandardAttribute attr);
 
-	static bool HasAttribute(AttributeSet set, Attribute attr);
+	static bool HasAttribute(StandardAttributeSet set, StandardAttribute attr);
 };
 
 #endif

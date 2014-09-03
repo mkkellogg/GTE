@@ -8,39 +8,39 @@
 #include "attributes.h"
 #include "ui/debug.h"
 
-const char* const Attributes::attributeNames[] = {"POSITION","NORMAL","COLOR","UV1","UV2"};
+const char* const StandardAttributes::attributeNames[] = {"POSITION","NORMAL","COLOR","UV1","UV2"};
 
-const char * Attributes::GetAttributeName(Attribute attr)
+const char * StandardAttributes::GetAttributeName(StandardAttribute attr)
 {
 	return attributeNames[(int)attr];
 }
 
-Attribute Attributes::AttributeMaskComponentToAttribute(AttributeMaskComponent component)
+StandardAttribute StandardAttributes::AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component)
 {
-	return (Attribute)IntMask::MaskValueToIndex((unsigned int)component);
+	return (StandardAttribute)IntMask::MaskValueToIndex((unsigned int)component);
 }
 
-AttributeMaskComponent Attributes::AttributeToAttributeMaskComponent(Attribute attr)
+StandardAttributeMaskComponent StandardAttributes::AttributeToAttributeMaskComponent(StandardAttribute attr)
 {
-	return (AttributeMaskComponent)IntMask::IndexToMaskValue((unsigned int)attr);
+	return (StandardAttributeMaskComponent)IntMask::IndexToMaskValue((unsigned int)attr);
 }
 
-void Attributes::AddAttribute(AttributeSet * set, Attribute attr)
+void StandardAttributes::AddAttribute(StandardAttributeSet * set, StandardAttribute attr)
 {
 	IntMask::SetBitForIndexMask((unsigned int *)set, (unsigned int )attr);
 }
 
-void Attributes::RemoveAttribute(AttributeSet * set, Attribute attr)
+void StandardAttributes::RemoveAttribute(StandardAttributeSet * set, StandardAttribute attr)
 {
 	IntMask::ClearBitForIndexMask((unsigned int *)set, (unsigned int )attr);
 }
 
-bool Attributes::HasAttribute(AttributeSet set, Attribute attr)
+bool StandardAttributes::HasAttribute(StandardAttributeSet set, StandardAttribute attr)
 {
 	return IntMask::IsBitSet((unsigned int)set, (unsigned int)attr);
 }
 
-AttributeSet Attributes::CreateAttributeSet()
+StandardAttributeSet StandardAttributes::CreateAttributeSet()
 {
 	return (unsigned int)0;
 }

@@ -12,7 +12,7 @@ varying vec2 vUV1;
  
 void main()
 {
-    vColor = COLOR;
-    vUV1 = UV1;
+   	vColor = COLOR;
+   	vUV1 = UV1;
     gl_Position = PROJECTION_MATRIX * MODELVIEW_MATRIX * POSITION ;
 }

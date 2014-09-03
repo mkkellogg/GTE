@@ -21,7 +21,7 @@ class Mesh3D : public SceneObjectComponent
 	friend EngineObjectManager;
 
 	Mesh3DRenderer * renderer;
-	AttributeSet attributeSet;
+	StandardAttributeSet attributeSet;
 	int vertexCount;
 
     Point3Array * positions;
@@ -35,7 +35,7 @@ class Mesh3D : public SceneObjectComponent
 	protected :
 
     Mesh3D();
-    Mesh3D(AttributeSet attributes);
+    Mesh3D(StandardAttributeSet attributes);
     virtual ~Mesh3D();
 
 	public:
@@ -43,7 +43,7 @@ class Mesh3D : public SceneObjectComponent
     void SetRenderer(Mesh3DRenderer * render);
     bool Init(int vertexCount);
     int GetVertexCount();
-    AttributeSet GetAttributeSet();
+    StandardAttributeSet GetAttributeSet();
 
     Point3Array * GetPostions();
     Vector3Array * GetNormals();

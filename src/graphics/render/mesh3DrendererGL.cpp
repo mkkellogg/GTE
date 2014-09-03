@@ -33,11 +33,11 @@ Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics) : Mes
 {
 	memset(attributeBuffers,0,sizeof(VertexAttrBuffer*) * MAX_ATTRIBUTE_BUFFERS);
 
-	attributeBuffers[(int)Attribute::Position]= NULL;
-	attributeBuffers[(int)Attribute::Color]= NULL;
+	attributeBuffers[(int)StandardAttribute::Position]= NULL;
+	attributeBuffers[(int)StandardAttribute::Color]= NULL;
 
 	storedVertexCount = 0;
-	storedAttributes = Attributes::CreateAttributeSet();
+	storedAttributes = StandardAttributes::CreateAttributeSet();
 }
 
 Mesh3DRendererGL::~Mesh3DRendererGL()
@@ -47,11 +47,11 @@ Mesh3DRendererGL::~Mesh3DRendererGL()
 
 void Mesh3DRendererGL::DestroyBuffers()
 {
-	DestroyBuffer(&attributeBuffers[(int)Attribute::Position]);
-	DestroyBuffer(&attributeBuffers[(int)Attribute::Normal]);
-	DestroyBuffer(&attributeBuffers[(int)Attribute::Color]);
-	DestroyBuffer(&attributeBuffers[(int)Attribute::UV1]);
-	DestroyBuffer(&attributeBuffers[(int)Attribute::UV2]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Position]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Normal]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Color]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UV1]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UV2]);
 }
 
 void Mesh3DRendererGL::DestroyBuffer(VertexAttrBuffer ** buffer)
@@ -88,7 +88,7 @@ bool Mesh3DRendererGL::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, i
 	return true;
 }
 
-bool Mesh3DRendererGL::InitAttributeData(Attribute attr, int componentCount,  int stride)
+bool Mesh3DRendererGL::InitAttributeData(StandardAttribute attr, int componentCount,  int stride)
 {
 	DestroyBuffer(&attributeBuffers[(int)attr]);
 	bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], mesh->GetVertexCount(), componentCount, stride);
@@ -99,27 +99,27 @@ bool Mesh3DRendererGL::InitAttributeData(Attribute attr, int componentCount,  in
 
 void Mesh3DRendererGL::SetPositionData(Point3Array * points)
 {
-	attributeBuffers[(int)Attribute::Position]->SetData(points->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::Position]->SetData(points->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetNormalData(Vector3Array * normals)
 {
-	attributeBuffers[(int)Attribute::Normal]->SetData(normals->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::Normal]->SetData(normals->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetColorData(Color4Array * colors)
 {
-	attributeBuffers[(int)Attribute::Color]->SetData(colors->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::Color]->SetData(colors->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetUV1Data(UV2Array * uvs)
 {
-	attributeBuffers[(int)Attribute::UV1]->SetData(uvs->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::UV1]->SetData(uvs->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetUV2Data(UV2Array * uvs)
 {
-	attributeBuffers[(int)Attribute::UV2]->SetData(uvs->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::UV2]->SetData(uvs->GetDataPtr());
 }
 
 bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
@@ -131,23 +131,23 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 	Mesh3DRenderer::UseMesh(newMesh);
 	mesh->SetRenderer(this);
 
-	AttributeSet meshAttributes = mesh->GetAttributeSet();
-	AttributeSet err = Attributes::CreateAttributeSet();
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+	StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
 
-	for(int i=0; i<(int)Attribute::_Last; i++)
+	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
-		Attribute attr = (Attribute)i;
-		if(Attributes::HasAttribute(meshAttributes, attr))
+		StandardAttribute attr = (StandardAttribute)i;
+		if(StandardAttributes::HasAttribute(meshAttributes, attr))
 		{
 			int componentCount = 4;
-			if(attr == Attribute::UV1 || attr == Attribute::UV2)componentCount = 2;
-			if(attr == Attribute::Normal)componentCount = 3;
+			if(attr == StandardAttribute::UV1 || attr == StandardAttribute::UV2)componentCount = 2;
+			if(attr == StandardAttribute::Normal)componentCount = 3;
 
 			int stride =0;
-			if(attr == Attribute::Normal)stride = 1;
+			if(attr == StandardAttribute::Normal)stride = 1;
 
 			int initSuccess = InitAttributeData(attr, componentCount, stride);
-			if(!initSuccess)Attributes::AddAttribute(&err,attr);
+			if(!initSuccess)StandardAttributes::AddAttribute(&err,attr);
 		}
 	}
 
@@ -176,12 +176,12 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 
 void Mesh3DRendererGL::CopyMeshData()
 {
-	AttributeSet meshAttributes = mesh->GetAttributeSet();
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Position))SetPositionData(mesh->GetPostions());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Normal))SetNormalData(mesh->GetNormals());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::Color))SetColorData(mesh->GetColors());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV1))SetUV1Data(mesh->GetUVs1());
-	if(Attributes::HasAttribute(meshAttributes, Attribute::UV2))SetUV2Data(mesh->GetUVs2());
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Color))SetColorData(mesh->GetColors());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UV1))SetUV1Data(mesh->GetUVs1());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UV2))SetUV2Data(mesh->GetUVs2());
 }
 
 void Mesh3DRendererGL::UpdateFromMesh()
@@ -207,19 +207,19 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 
 	if(mesh != NULL)
 	{
-		AttributeSet materialAttributes = material->GetStandardAttributes();
-		AttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttributeSet materialAttributes = material->GetStandardAttributes();
+		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
-		for(int i=0; i<(int)Attribute::_Last; i++)
+		for(int i=0; i<(int)StandardAttribute::_Last; i++)
 		{
-			Attribute attr = (Attribute)i;
+			StandardAttribute attr = (StandardAttribute)i;
 
-			if(Attributes::HasAttribute(materialAttributes, attr))
+			if(StandardAttributes::HasAttribute(materialAttributes, attr))
 			{
-				if(!Attributes::HasAttribute(meshAttributes, attr))
+				if(!StandardAttributes::HasAttribute(meshAttributes, attr))
 				{
 					char msg[64];
-					sprintf(msg, "Shader was expecting attribute %s, but mesh does not have it.", Attributes::GetAttributeName(attr));
+					sprintf(msg, "Shader was expecting attribute %s, but mesh does not have it.", StandardAttributes::GetAttributeName(attr));
 					Debug::PrintWarning(msg);
 				}
 			}
@@ -233,12 +233,12 @@ void Mesh3DRendererGL::Render(Material * currentMaterial)
 {
 	UseMaterial(currentMaterial);
 
-	AttributeSet meshAttributes = mesh->GetAttributeSet();
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
-	for(int i=0; i<(int)Attribute::_Last; i++)
+	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
-		Attribute attr = (Attribute)i;
-		if(Attributes::HasAttribute(meshAttributes, attr))
+		StandardAttribute attr = (StandardAttribute)i;
+		if(StandardAttributes::HasAttribute(meshAttributes, attr))
 		{
 			currentMaterial->SendStandardAttributeBufferToShader(attr, attributeBuffers[i]);
 		}

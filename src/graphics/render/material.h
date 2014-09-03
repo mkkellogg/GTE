@@ -21,8 +21,8 @@ class Material : EngineObject
 
 	char materialName[32];
 	Shader * shader;
-	AttributeSet standardAttributes;
-	UniformSet standardUniforms;
+	StandardAttributeSet standardAttributes;
+	StandardUniformSet standardUniforms;
 
 	int standardAttributeBindings[VAR_BINDINGS_SIZE];
 	int standardUniformBindings[VAR_BINDINGS_SIZE];
@@ -32,13 +32,13 @@ class Material : EngineObject
 	void BindVars();
 	void ClearBindings();
 
-	void SetStandardAttributeBinding( int location, Attribute attr);
-    int GetStandardAttributeBinding(Attribute attr) const;
-	int TestForStandardAttribute(Attribute attr) const;
+	void SetStandardAttributeBinding( int location, StandardAttribute attr);
+    int GetStandardAttributeBinding(StandardAttribute attr) const;
+	int TestForStandardAttribute(StandardAttribute attr) const;
 
-	void SetStandardUniformBinding( int location, Uniform uniform);
-	int GetStandardUniformBinding(Uniform uniform) const;
-	int TestForStandardUniform(Uniform uniform) const;
+	void SetStandardUniformBinding( int location, StandardUniform uniform);
+	int GetStandardUniformBinding(StandardUniform uniform) const;
+	int TestForStandardUniform(StandardUniform uniform) const;
 
     protected:
 
@@ -50,12 +50,12 @@ class Material : EngineObject
 
     Shader * GetShader() const;
 
-    int GetStandardAttributeShaderVarLocation(Attribute attr) const;
-    AttributeSet GetStandardAttributes() const;
-    void SendStandardAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer);
+    int GetStandardAttributeShaderVarLocation(StandardAttribute attr) const;
+    StandardAttributeSet GetStandardAttributes() const;
+    void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
 
-    int GetStandardUniformShaderVarLocation(Uniform uniform) const;
-    UniformSet GetStandardUniforms() const;
+    int GetStandardUniformShaderVarLocation(StandardUniform uniform) const;
+    StandardUniformSet GetStandardUniforms() const;
 
     void AddTexture(Texture * texture, const char *shaderVarName);
     unsigned int GetCustomUniformCount();

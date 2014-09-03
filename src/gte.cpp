@@ -74,10 +74,10 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 	{
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
-		AttributeSet meshAttributes = Attributes::CreateAttributeSet();
-		Attributes::AddAttribute(&meshAttributes, Attribute::Position);
-		Attributes::AddAttribute(&meshAttributes, Attribute::UV1);
-		Attributes::AddAttribute(&meshAttributes, Attribute::Color);
+		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Color);
 
 		cameraObject = objectManager->CreateSceneObject();
 		Camera * camera = objectManager->CreateCamera();
@@ -285,7 +285,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.01);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.001);
 	}
 
 	void OnQuit(Graphics * graphics)

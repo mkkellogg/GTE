@@ -25,7 +25,7 @@ class Mesh3DRendererGL : public Mesh3DRenderer
     VertexAttrBuffer * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
 
 	int storedVertexCount;
-	AttributeSet storedAttributes;
+	StandardAttributeSet storedAttributes;
     bool buffersOnGPU;
 
     bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount,  int stride);
@@ -33,7 +33,7 @@ class Mesh3DRendererGL : public Mesh3DRenderer
     void DestroyBuffer(VertexAttrBuffer ** buffer);
     void SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride);
 
-    bool InitAttributeData(Attribute attr, int componentCount,  int stride);
+    bool InitAttributeData(StandardAttribute attr, int componentCount,  int stride);
 
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);

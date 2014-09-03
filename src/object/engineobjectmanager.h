@@ -35,7 +35,7 @@ class EngineObjectManager
     static EngineObjectManager * Instance();
     SceneObject * CreateSceneObject();
 
-    Mesh3D * CreateMesh3D(AttributeSet attributes);
+    Mesh3D * CreateMesh3D(StandardAttributeSet attributes);
     void DestroyMesh3D(Mesh3D * mesh);
     Mesh3DRenderer * CreateMesh3DRenderer();
     void DestroyMesh3DRenderer(Mesh3DRenderer * renderer);

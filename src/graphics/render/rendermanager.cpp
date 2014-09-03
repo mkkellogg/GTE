@@ -262,9 +262,9 @@ void RenderManager::SendTransformUniformsToShader(const Transform * modelView, c
 {
 	if(activeMaterial != NULL)
 	{
-		int mvMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(Uniform::ModelViewMatrix);
-		int mvpMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(Uniform::ModelViewProjectionMatrix);
-		int projectionMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(Uniform::ProjectionMatrix);
+		int mvMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(StandardUniform::ModelViewMatrix);
+		int mvpMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(StandardUniform::ModelViewProjectionMatrix);
+		int projectionMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(StandardUniform::ProjectionMatrix);
 
 		Shader * shader = activeMaterial->GetShader();
 		if(shader != NULL)

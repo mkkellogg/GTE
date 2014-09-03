@@ -228,7 +228,7 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 
 	if(openGLVersion >= 3)
 	{
-		glTexStorage2D(GL_TEXTURE_2D, attributes.MipMapLevel, GL_RGBA, raw->GetWidth(), raw->GetHeight());
+		glTexStorage2D(GL_TEXTURE_2D, attributes.MipMapLevel, GL_RGBA8, raw->GetWidth(), raw->GetHeight());
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
 		if(attributes.FilterMode == TextureFilter::TriLinear)glGenerateMipmap(GL_TEXTURE_2D);
 	}

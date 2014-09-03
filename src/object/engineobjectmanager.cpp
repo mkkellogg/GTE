@@ -45,7 +45,7 @@ SceneObject * EngineObjectManager::CreateSceneObject()
 	return obj;
 }
 
-Mesh3D * EngineObjectManager::CreateMesh3D(AttributeSet attributes)
+Mesh3D * EngineObjectManager::CreateMesh3D(StandardAttributeSet attributes)
 {
 	return new Mesh3D(attributes);
 }

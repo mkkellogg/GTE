@@ -1,7 +1,7 @@
 #ifndef _UNIFORMS_H_
 #define _UNIFORMS_H_
 
-enum class UniformMaskComponent
+enum class StandardUniformMaskComponent
 {
     ModelViewMatrix=1,
     ModelViewProjectionMatrix=2,
@@ -9,7 +9,7 @@ enum class UniformMaskComponent
     Light=8
 };
 
-enum class Uniform
+enum class StandardUniform
 {
 	ModelViewMatrix=0,
 	ModelViewProjectionMatrix=1,
@@ -18,23 +18,23 @@ enum class Uniform
     _Last=4 // always keep as last entry
 };
 
-typedef unsigned int UniformSet;
+typedef unsigned int StandardUniformSet;
 
-class Uniforms
+class StandardUniforms
 {
 	static const char* const uniformNames[];
 
 	public:
 
-	static const char * GetUniformName(Uniform uniform);
-	static Uniform UniformMaskComponentToUniform(UniformMaskComponent component);
-	static UniformMaskComponent UniformToUniformMaskComponent(Uniform uniform);
+	static const char * GetUniformName(StandardUniform uniform);
+	static StandardUniform UniformMaskComponentToUniform(StandardUniformMaskComponent component);
+	static StandardUniformMaskComponent UniformToUniformMaskComponent(StandardUniform uniform);
 
-	static UniformSet CreateUniformSet();
-	static void AddUniform(UniformSet * set, Uniform uniform);
-	static void RemoveUniform(UniformSet * set, Uniform uniform);
+	static StandardUniformSet CreateUniformSet();
+	static void AddUniform(StandardUniformSet * set, StandardUniform uniform);
+	static void RemoveUniform(StandardUniformSet * set, StandardUniform uniform);
 
-	static bool HasUniform(UniformSet set, Uniform uniform);
+	static bool HasUniform(StandardUniformSet set, StandardUniform uniform);
 };
 
 #endif

@@ -66,72 +66,72 @@ void Material::ClearBindings()
 	for(int i=0; i < VAR_BINDINGS_SIZE; i++)standardUniformBindings[i] = -1;
 }
 
-void Material::SetStandardAttributeBinding(int location, Attribute attr)
+void Material::SetStandardAttributeBinding(int location, StandardAttribute attr)
 {
 	standardAttributeBindings[(int)attr] = location;
 }
 
-int Material::GetStandardAttributeBinding(Attribute attr) const
+int Material::GetStandardAttributeBinding(StandardAttribute attr) const
 {
 	return standardAttributeBindings[(int)attr];
 }
 
 void Material::BindVars()
 {
-	standardAttributes = Attributes::CreateAttributeSet();
-	for(int i=0; i<(int)Attribute::_Last; i++)
+	standardAttributes = StandardAttributes::CreateAttributeSet();
+	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
-		Attribute attr = (Attribute)i;
+		StandardAttribute attr = (StandardAttribute)i;
 
 		int loc = TestForStandardAttribute(attr);
 		if(loc >= 0)
 		{
 			SetStandardAttributeBinding(loc, attr);
-			Attributes::AddAttribute(&standardAttributes,attr);
+			StandardAttributes::AddAttribute(&standardAttributes,attr);
 		}
 	}
 
-	standardUniforms = Uniforms::CreateUniformSet();
-	for(int i=0; i<(int)Uniform::_Last; i++)
+	standardUniforms = StandardUniforms::CreateUniformSet();
+	for(int i=0; i<(int)StandardUniform::_Last; i++)
 	{
-		Uniform uniform = (Uniform)i;
+		StandardUniform uniform = (StandardUniform)i;
 
 		int loc = TestForStandardUniform(uniform);
 		if(loc >= 0)
 		{
 			SetStandardUniformBinding(loc, uniform);
-			Uniforms::AddUniform(&standardUniforms,uniform);
+			StandardUniforms::AddUniform(&standardUniforms,uniform);
 		}
 	}
 }
 
-int Material::TestForStandardAttribute(Attribute attr) const
+int Material::TestForStandardAttribute(StandardAttribute attr) const
 {
-	const char * attrName = Attributes::GetAttributeName(attr);
+	const char * attrName = StandardAttributes::GetAttributeName(attr);
 	int loc = shader->GetAttributeVarLocation(attrName);
 
 	return loc;
 }
 
-void Material::SetStandardUniformBinding( int location, Uniform uniform)
+void Material::SetStandardUniformBinding( int location, StandardUniform uniform)
 {
 	standardUniformBindings[(int)uniform] = location;
 }
 
-int Material::GetStandardUniformBinding(Uniform uniform) const
+int Material::GetStandardUniformBinding(StandardUniform uniform) const
 {
 	return standardUniformBindings[(int)uniform];
 }
 
-int Material::TestForStandardUniform(Uniform uniform) const
+int Material::TestForStandardUniform(StandardUniform uniform) const
 {
-	const char * uniformName = Uniforms::GetUniformName(uniform);
+	const char * uniformName = StandardUniforms::GetUniformName(uniform);
 	int loc = shader->GetUniformVarLocation(uniformName);
 
 	return loc;
 }
 
-AttributeSet Material::GetStandardAttributes() const
+StandardAttributeSet Material::GetStandardAttributes() const
 {
 	return standardAttributes;
 }
@@ -141,23 +141,23 @@ Shader * Material::GetShader() const
 	return shader;
 }
 
-int Material::GetStandardAttributeShaderVarLocation(Attribute attr) const
+int Material::GetStandardAttributeShaderVarLocation(StandardAttribute attr) const
 {
 	return GetStandardAttributeBinding(attr);
 }
 
-void Material::SendStandardAttributeBufferToShader(Attribute attr, VertexAttrBuffer *buffer)
+void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer)
 {
 	int loc = GetStandardAttributeBinding(attr);
 	shader->SendBufferToShader(loc, buffer);
 }
 
-int Material::GetStandardUniformShaderVarLocation(Uniform uniform) const
+int Material::GetStandardUniformShaderVarLocation(StandardUniform uniform) const
 {
 	return  GetStandardUniformBinding(uniform);
 }
 
-UniformSet Material::GetStandardUniforms() const
+StandardUniformSet Material::GetStandardUniforms() const
 {
 	return standardUniforms;
 }
