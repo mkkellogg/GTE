@@ -12,14 +12,18 @@ class VertexAttrBuffer;
 #include "graphics/texture/texture.h"
 #include "graphics/shader/uniformdesc.h"
 #include <vector>
+#include <map>
+
 
 class Material : EngineObject
 {
 	friend class EngineObjectManager;
 
+	static const int MATERIAL_NAME_MAX_LENGTH = 64;
 	static const int VAR_BINDINGS_SIZE=64;
+	static const int SAMPLER_2D_DATA_SIZE=64;
 
-	char materialName[32];
+	char materialName[MATERIAL_NAME_MAX_LENGTH];
 	Shader * shader;
 	StandardAttributeSet standardAttributes;
 	StandardUniformSet standardUniforms;
@@ -27,16 +31,25 @@ class Material : EngineObject
 	int standardAttributeBindings[VAR_BINDINGS_SIZE];
 	int standardUniformBindings[VAR_BINDINGS_SIZE];
 
-	std::vector<UniformDescriptor*> customUniforms;
+	std::vector<UniformDescriptor*> setUniforms;
 
-	void BindVars();
-	void ClearBindings();
+	bool attributesSetAndVerified;
+	int * attributesSetValues;
+	std::map<int,int> attributeLocationsToVerificationIndex;
 
-	void SetStandardAttributeBinding( int location, StandardAttribute attr);
+	bool uniformsSetAndVerified;
+	int * uniformsSetValues;
+	std::map<int,int> uniformLocationsToVerificationIndex;
+
+	void BindStandardVars();
+	void ClearStandardBindings();
+	bool SetupSetVerifiers();
+
+	void SetStandardAttributeBinding( int varID, StandardAttribute attr);
     int GetStandardAttributeBinding(StandardAttribute attr) const;
 	int TestForStandardAttribute(StandardAttribute attr) const;
 
-	void SetStandardUniformBinding( int location, StandardUniform uniform);
+	void SetStandardUniformBinding( int varID, StandardUniform uniform);
 	int GetStandardUniformBinding(StandardUniform uniform) const;
 	int TestForStandardUniform(StandardUniform uniform) const;
 
@@ -46,7 +59,12 @@ class Material : EngineObject
     virtual ~Material();
     bool Init(Shader * shader);
 
+    void SetAttributeSetValue(int varID, int size);
+    void SetUniformSetValue(int varID, int size);
+
     public:
+
+    void ClearSetVerifiers();
 
     Shader * GetShader() const;
 
@@ -56,14 +74,16 @@ class Material : EngineObject
 
     int GetStandardUniformShaderVarLocation(StandardUniform uniform) const;
     StandardUniformSet GetStandardUniforms() const;
+    void SendSetUniformToShader(unsigned int index);
+    void SendAllSetUniformsToShader();
 
     void SendModelViewMatrixToShader(const Matrix4x4 * mat);
     void SendProjectionMatrixToShader(const Matrix4x4 * mat);
     void SendMVPMatrixToShader(const Matrix4x4 * mat);
 
-    void AddTexture(Texture * texture, const char *shaderVarName);
-    unsigned int GetCustomUniformCount();
-    UniformDescriptor * GetCustomUniform(unsigned int index);
+    void SetTexture(Texture * texture, const char *shaderVarName);
+    unsigned int GetSetUniformCount() const ;
+    UniformDescriptor * GetSetUniform(unsigned int index);
 
 };
 

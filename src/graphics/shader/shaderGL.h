@@ -51,30 +51,30 @@ class ShaderGL : public Shader
 
     bool Load();
     bool IsLoaded();
-    int GetAttributeVarLocation(const char *varName) const;
-    int GetUniformVarLocation(const char *varName) const;
+    int GetAttributeVarID(const char *varName) const;
+    int GetUniformVarID(const char *varName) const;
     GLuint GetProgramID();
 
-    void SendBufferToShader(int loc, VertexAttrBuffer * buffer);
+    void SendBufferToShader(int varID, VertexAttrBuffer * buffer);
 
-    void SendUniformToShader(int loc, const Texture * texture);
-    void SendUniformToShader(int loc, const Matrix4x4 * mat);
-    void SendUniformToShader(int loc, const Point3 * point);
-    void SendUniformToShader(int loc, const Vector3 * vector);
-    void SendUniformToShader(int loc, const Color4 * color);
+    void SendUniformToShader(int varID, const Texture * texture);
+    void SendUniformToShader(int varID, const Matrix4x4 * mat);
+    void SendUniformToShader(int varID, const Point3 * point);
+    void SendUniformToShader(int varID, const Vector3 * vector);
+    void SendUniformToShader(int varID, const Color4 * color);
 
-    void SendUniformToShader4v(int loc, const float * data);
-    void SendUniformToShader3v(int loc, const float * data);
-    void SendUniformToShader2v(int loc, const float * data);
-    void SendUniformToShader4(int loc, float x, float y, float z, float w);
-    void SendUniformToShader3(int loc, float x, float y, float z);
-    void SendUniformToShader2(int loc, float x, float y);
-    void SendUniformToShader(int loc, float  data);
+    void SendUniformToShader4v(int varID, const float * data);
+    void SendUniformToShader3v(int varID, const float * data);
+    void SendUniformToShader2v(int varID, const float * data);
+    void SendUniformToShader4(int varID, float x, float y, float z, float w);
+    void SendUniformToShader3(int varID, float x, float y, float z);
+    void SendUniformToShader2(int varID, float x, float y);
+    void SendUniformToShader(int varID, float  data);
 
-    int GetUniformCount() const;
+    unsigned int GetUniformCount() const;
     const UniformDescriptor * GetUniformDescriptor(unsigned int index) const;
 
-    int GetAttributeCount() const;
+    unsigned int GetAttributeCount() const;
     const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const;
 };
 

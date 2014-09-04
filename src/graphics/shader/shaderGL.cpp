@@ -392,16 +392,16 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 	return true;
 }
 
-int ShaderGL::GetAttributeVarLocation(const char *varName) const
+int ShaderGL::GetAttributeVarID(const char *varName) const
 {
-	GLint loc = glGetAttribLocation(programID, varName);
-	return (int)loc;
+	GLint varID = glGetAttribLocation(programID, varName);
+	return (int)varID;
 }
 
-int ShaderGL::GetUniformVarLocation(const char *varName) const
+int ShaderGL::GetUniformVarID(const char *varName) const
 {
-	GLint loc = glGetUniformLocation(programID, varName);
-	return (int)loc;
+	GLint varID = glGetUniformLocation(programID, varName);
+	return (int)varID;
 }
 
 GLuint ShaderGL::GetProgramID()
@@ -409,9 +409,9 @@ GLuint ShaderGL::GetProgramID()
 	return programID;
 }
 
-void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
+void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
 {
-	if(loc < 0)return;
+	if(varID < 0)return;
 
 	VertexAttrBufferGL * bufferGL =  dynamic_cast<VertexAttrBufferGL *>(buffer);
 
@@ -422,20 +422,20 @@ void ShaderGL::SendBufferToShader(int loc, VertexAttrBuffer * buffer)
 	int stride = bufferGL->GetStride();
 
 	//TODO: move this so it is not called every single draw call
-	glEnableVertexAttribArray((GLuint)loc);
+	glEnableVertexAttribArray((GLuint)varID);
 
 	if(bufferGL->IsGPUBuffer())
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, bufferGL->GetGPUBufferID());
-		glVertexAttribPointer(loc, componentCount, GL_FLOAT, 0, stride, 0);
+		glVertexAttribPointer(varID, componentCount, GL_FLOAT, 0, stride, 0);
 	}
 	else
 	{
-		glVertexAttribPointer(loc, componentCount, GL_FLOAT, GL_FALSE, stride, data);
+		glVertexAttribPointer(varID, componentCount, GL_FLOAT, GL_FALSE, stride, data);
 	}
 }
 
-void ShaderGL::SendUniformToShader(int loc, const Texture * texture)
+void ShaderGL::SendUniformToShader(int varID, const Texture * texture)
 {
 	NULL_CHECK_RTRN(texture, "ShaderGL::SendUniformToShader(int, Texture *) -> NULL texture passed");
 
@@ -443,9 +443,9 @@ void ShaderGL::SendUniformToShader(int loc, const Texture * texture)
 
 	NULL_CHECK_RTRN(texGL, "ShaderGL::SendUniformToShader(int, Texture *) -> texture is not TextureGL !!");
 
-	if(loc >= 0)
+	if(varID >= 0)
 	{
-		glActiveTexture(GL_TEXTURE0 + loc);
+		glActiveTexture(GL_TEXTURE0 + varID);
 		glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
 	}
 	else
@@ -456,63 +456,63 @@ void ShaderGL::SendUniformToShader(int loc, const Texture * texture)
 
 }
 
-void ShaderGL::SendUniformToShader(int loc, const Matrix4x4 * mat)
+void ShaderGL::SendUniformToShader(int varID, const Matrix4x4 * mat)
 {
-	glUniformMatrix4fv(loc,1, GL_FALSE, mat->GetDataPtr());
+	glUniformMatrix4fv(varID,1, GL_FALSE, mat->GetDataPtr());
 }
 
-void ShaderGL::SendUniformToShader(int loc, const Point3 * point)
-{
-
-}
-
-void ShaderGL::SendUniformToShader(int loc, const Vector3 * vector)
+void ShaderGL::SendUniformToShader(int varID, const Point3 * point)
 {
 
 }
 
-void ShaderGL::SendUniformToShader(int loc, const Color4 * color)
+void ShaderGL::SendUniformToShader(int varID, const Vector3 * vector)
+{
+
+}
+
+void ShaderGL::SendUniformToShader(int varID, const Color4 * color)
 {
 
 }
 
 
-void ShaderGL::SendUniformToShader4v(int loc, const float * data)
+void ShaderGL::SendUniformToShader4v(int varID, const float * data)
 {
 
 }
 
-void ShaderGL::SendUniformToShader3v(int loc, const float * data)
+void ShaderGL::SendUniformToShader3v(int varID, const float * data)
 {
 
 }
 
-void ShaderGL::SendUniformToShader2v(int loc, const float * data)
+void ShaderGL::SendUniformToShader2v(int varID, const float * data)
 {
 
 }
 
-void ShaderGL::SendUniformToShader4(int loc, float x, float y, float z, float w)
+void ShaderGL::SendUniformToShader4(int varID, float x, float y, float z, float w)
 {
 
 }
 
-void ShaderGL::SendUniformToShader3(int loc, float x, float y, float z)
+void ShaderGL::SendUniformToShader3(int varID, float x, float y, float z)
 {
 
 }
 
-void ShaderGL::SendUniformToShader2(int loc, float x, float y)
+void ShaderGL::SendUniformToShader2(int varID, float x, float y)
 {
 
 }
 
-void ShaderGL::SendUniformToShader(int loc, float  data)
+void ShaderGL::SendUniformToShader(int varID, float  data)
 {
 
 }
 
-int ShaderGL::GetUniformCount() const
+unsigned int ShaderGL::GetUniformCount() const
 {
 	return uniformCount;
 }
@@ -527,7 +527,7 @@ const UniformDescriptor * ShaderGL::GetUniformDescriptor(unsigned int index) con
 	return NULL;
 }
 
-int ShaderGL::GetAttributeCount() const
+unsigned int ShaderGL::GetAttributeCount() const
 {
 	return attributeCount;
 }

@@ -230,6 +230,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 					// activate the material, which will switch the GPU's active shader to
 					// the one associated with the material
 					ActivateMaterial(currentMaterial);
+					currentMaterial->ClearSetVerifiers();
 					// pass concatenated modelViewTransform and projection transforms to shader
 					SendTransformUniformsToShader(&modelView, camera->GetProjectionTransform());
 					SendCustomUniformsToShader();
@@ -291,16 +292,7 @@ void RenderManager::SendCustomUniformsToShader()
 {
 	if(activeMaterial != NULL)
 	{
-		Shader * shader = activeMaterial->GetShader();
-		for(unsigned int i=0; i < activeMaterial->GetCustomUniformCount(); i++)
-		{
-			UniformDescriptor * desc = activeMaterial->GetCustomUniform(i);
-
-			if(desc->Type == UniformType::Sampler2D)
-			{
-				shader->SendUniformToShader(desc->ShaderVarID, desc->SamplerData);
-			}
-		}
+		activeMaterial->SendAllSetUniformsToShader();
 	}
 	else
 	{

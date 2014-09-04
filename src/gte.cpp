@@ -98,7 +98,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		Texture * texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
 
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
-		material->AddTexture(texture, "Texture");
+		material->SetTexture(texture, "Texture");
 
 		Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);
 		Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
