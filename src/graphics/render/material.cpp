@@ -6,13 +6,12 @@
 
 #include "material.h"
 #include "graphics/shader/shader.h"
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 #include "ui/debug.h"
-#include "graphics/render/uniformdesc.h"
+#include "graphics/shader/uniformdesc.h"
 
 Material::Material(const char * materialName)
 {
-	currentSamplerLoc = 0;
 	if(materialName == NULL)materialName = "_UnnamedMaterial";
 	int index =0;
 	while(materialName != NULL && index < 31)
@@ -162,6 +161,24 @@ StandardUniformSet Material::GetStandardUniforms() const
 	return standardUniforms;
 }
 
+void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
+{
+	int loc = GetStandardUniformBinding(StandardUniform::ModelViewMatrix);
+	if(loc >=0 )shader->SendUniformToShader(loc, mat);
+}
+
+void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
+{
+	int loc = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
+	if(loc >=0 )shader->SendUniformToShader(loc, mat);
+}
+
+void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
+{
+	int loc = GetStandardUniformBinding(StandardUniform::ModelViewProjectionMatrix);
+	if(loc >=0 )shader->SendUniformToShader(loc, mat);
+}
+
 void Material::AddTexture(Texture * texture, const char *shaderVarName)
 {
 	int loc = shader->GetUniformVarLocation(shaderVarName);
@@ -181,10 +198,9 @@ void Material::AddTexture(Texture * texture, const char *shaderVarName)
 	}
 
 	desc->ShaderVarID = loc;
-	desc->Type = UniformType::Sampler;
+	desc->Type = UniformType::Sampler2D;
 	desc->SamplerData = texture;
 	customUniforms.push_back(desc);
-	currentSamplerLoc++;
 }
 
 unsigned int Material::GetCustomUniformCount()

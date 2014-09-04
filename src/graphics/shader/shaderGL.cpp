@@ -18,6 +18,8 @@
 #include "ui/debug.h"
 #include "global/global.h"
 #include "gte.h"
+#include "uniformdesc.h"
+#include "attributedesc.h"
 
 
 ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
@@ -31,6 +33,12 @@ ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPat
 
     vertexShaderSource = new ShaderSource(vertexShaderPath);
     fragmentShaderSource = new ShaderSource(fragmentShaderPath);
+
+    attributeCount = 0;
+    uniformCount = 0;
+
+    attributes = NULL;
+    uniforms = NULL;
 }
 
 ShaderGL::~ShaderGL() 
@@ -78,6 +86,34 @@ void ShaderGL::DestroyComponents()
 {
     DestroyShaders();
     DestroyProgram();
+    DestroyUniformAndAttributeInfo();
+}
+
+void ShaderGL::DestroyUniformAndAttributeInfo()
+{
+	if(attributes != NULL)
+	{
+		for(unsigned int i=0; i < attributeCount; i ++)
+		{
+			if(attributes[i] != NULL)
+			{
+				delete attributes[i];
+			}
+		}
+		delete attributes;
+	}
+
+	if(uniforms != NULL)
+	{
+		for(unsigned  int i=0; i < uniformCount; i ++)
+		{
+			if(uniforms[i] != NULL)
+			{
+				delete uniforms[i];
+			}
+		}
+		delete uniforms;
+	}
 }
 
 bool ShaderGL::Load()
@@ -161,6 +197,11 @@ bool ShaderGL::Load()
         Debug::PrintMessage("Program linked successfully!");
     }
 
+    if(!StoreUniformAndAttributeInfo())
+    {
+    	return false;
+    }
+
     ready = true;
     return true;
 }
@@ -235,6 +276,120 @@ char * ShaderGL::GetShaderLog(GLuint obj)
     }
 
     return NULL;
+}
+
+bool ShaderGL::StoreUniformAndAttributeInfo()
+{
+	int totalUniforms = -1;
+	glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &totalUniforms);
+	if(totalUniforms > 0)
+	{
+		uniforms = new UniformDescriptor*[totalUniforms];
+		if(uniforms == NULL)
+		{
+			Debug::PrintError("Unable to allocate shader uniform descriptors.");
+			return false;
+		}
+		memset(uniforms, 0, sizeof(UniformDescriptor*)*totalUniforms);
+		for(int i=0; i < totalUniforms; i++)
+		{
+			int nameLen = -1;
+			int size = -1;
+			GLenum type = GL_ZERO;
+			char name[126];
+
+			glGetActiveUniform(programID, GLuint(i), 125, &nameLen, &size, &type, name);
+			GLuint loc = glGetUniformLocation(programID, name);
+
+			UniformDescriptor * desc = new UniformDescriptor();
+			uniforms[i] = desc;
+
+			desc->ShaderVarID = loc;
+			desc->Size = size;
+			desc->Type = UniformType::Unknown;
+
+			switch(type)
+			{
+				case GL_SAMPLER_2D:
+					desc->Type = UniformType::Sampler2D;
+				break;
+				case GL_FLOAT_MAT4:
+					desc->Type = UniformType::Matrix4x4;
+				break;
+				case GL_FLOAT_VEC4:
+					desc->Type = UniformType::Float4;
+				break;
+				case GL_FLOAT_VEC3:
+					desc->Type = UniformType::Float3;
+				break;
+				case GL_FLOAT_VEC2:
+					desc->Type = UniformType::Float2;
+				break;
+				case GL_FLOAT:
+					desc->Type = UniformType::Float;
+				break;
+			}
+
+			strcpy(desc->Name, name);
+		}
+
+		uniformCount = totalUniforms;
+	}
+
+	int totalAttributes = -1;
+	glGetProgramiv(programID, GL_ACTIVE_ATTRIBUTES, &totalAttributes);
+	if(totalAttributes > 0)
+	{
+		attributes = new AttributeDescriptor*[totalAttributes];
+		if(attributes == NULL)
+		{
+			Debug::PrintError("Unable to allocate shader attribute descriptors.");
+			return false;
+		}
+		memset(attributes, 0, sizeof(AttributeDescriptor*)*totalAttributes);
+		for(int i=0; i < totalUniforms; i++)
+		{
+			int nameLen = -1;
+			int size = -1;
+			GLenum type = GL_ZERO;
+			char name[126];
+
+			glGetActiveAttrib(programID, GLuint(i), 125, &nameLen, &size, &type, name);
+			GLuint loc = glGetAttribLocation(programID, name);
+
+			AttributeDescriptor * desc = new AttributeDescriptor();
+			attributes[i] = desc;
+
+			desc->ShaderVarID = loc;
+			desc->Size = size;
+			desc->Type = AttributeType::Unknown;
+
+			switch(type)
+			{
+				case GL_FLOAT_MAT4:
+					desc->Type = AttributeType::Matrix4x4;
+				break;
+				case GL_FLOAT_VEC4:
+					desc->Type = AttributeType::Float4;
+				break;
+				case GL_FLOAT_VEC3:
+					desc->Type = AttributeType::Float3;
+				break;
+				case GL_FLOAT_VEC2:
+					desc->Type = AttributeType::Float2;
+				break;
+				case GL_FLOAT:
+					desc->Type = AttributeType::Float;
+				break;
+			}
+
+			strcpy(desc->Name, name);
+		}
+
+		attributeCount = totalAttributes;
+	}
+
+	return true;
 }
 
 int ShaderGL::GetAttributeVarLocation(const char *varName) const
@@ -357,4 +512,32 @@ void ShaderGL::SendUniformToShader(int loc, float  data)
 
 }
 
+int ShaderGL::GetUniformCount() const
+{
+	return uniformCount;
+}
 
+const UniformDescriptor * ShaderGL::GetUniformDescriptor(unsigned int index) const
+{
+	if(index >=0 && index < uniformCount)
+	{
+		return (const UniformDescriptor *)uniforms[index];
+	}
+
+	return NULL;
+}
+
+int ShaderGL::GetAttributeCount() const
+{
+	return attributeCount;
+}
+
+const AttributeDescriptor * ShaderGL::GetAttributeDescriptor(unsigned int index) const
+{
+	if(index >=0 && index < attributeCount)
+	{
+		return (const AttributeDescriptor *)attributes[index];
+	}
+
+	return NULL;
+}

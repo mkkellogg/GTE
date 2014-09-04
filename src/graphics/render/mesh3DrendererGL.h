@@ -14,7 +14,7 @@ class Mesh3D;
 class Material;
 
 #include "mesh3Drenderer.h"
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 
 class Mesh3DRendererGL : public Mesh3DRenderer
 {
@@ -54,7 +54,7 @@ class Mesh3DRendererGL : public Mesh3DRenderer
     bool UseMesh(Mesh3D * newMesh);
     void CopyMeshData();
     void UpdateFromMesh();
-    void Render(Material * material);
+    void Render();
 };
 
 #endif

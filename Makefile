@@ -25,9 +25,9 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o obj/uniformdesc.o
-GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/attributes.o obj/uniforms.o obj/screendesc.o 
-SHADEROBJ= obj/shadersource.o obj/shader.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
+SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
@@ -128,6 +128,12 @@ obj/shader.o: $(SHADERSRC)/shader.cpp $(SHADERSRC)/shader.h
 		
 obj/shaderGL.o: $(SHADERSRC)/shaderGL.cpp $(SHADERSRC)/shaderGL.h
 	$(CC) $(CFLAGS) -o obj/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
+	
+obj/uniformdesc.o: $(SHADERSRC)/uniformdesc.cpp $(SHADERSRC)/uniformdesc.h
+	$(CC) $(CFLAGS) -o obj/uniformdesc.o -c $(SHADERSRC)/uniformdesc.cpp
+	
+obj/attributedesc.o: $(SHADERSRC)/attributedesc.cpp $(SHADERSRC)/attributedesc.h
+	$(CC) $(CFLAGS) -o obj/attributedesc.o -c $(SHADERSRC)/attributedesc.cpp
 
 obj/texture.o: $(TEXTURESRC)/texture.cpp $(TEXTURESRC)/texture.h 
 	$(CC) $(CFLAGS) -o obj/texture.o -c $(TEXTURESRC)/texture.cpp
@@ -156,11 +162,11 @@ obj/uv2factory.o: $(GRAPHICSSRC)/uv/uv2factory.cpp $(GRAPHICSSRC)/uv/uv2factory.
 obj/uv2array.o: $(GRAPHICSSRC)/uv/uv2array.cpp $(GRAPHICSSRC)/uv/uv2array.h
 	$(CC) $(CFLAGS) -o obj/uv2array.o -c $(GRAPHICSSRC)/uv/uv2array.cpp
 
-obj/attributes.o: $(GRAPHICSSRC)/attributes.cpp $(GRAPHICSSRC)/attributes.h
-	$(CC) $(CFLAGS) -o obj/attributes.o -c $(GRAPHICSSRC)/attributes.cpp
+obj/stdattributes.o: $(GRAPHICSSRC)/stdattributes.cpp $(GRAPHICSSRC)/stdattributes.h
+	$(CC) $(CFLAGS) -o obj/stdattributes.o -c $(GRAPHICSSRC)/stdattributes.cpp
 	
-obj/uniforms.o: $(GRAPHICSSRC)/uniforms.cpp $(GRAPHICSSRC)/uniforms.h
-	$(CC) $(CFLAGS) -o obj/uniforms.o -c $(GRAPHICSSRC)/uniforms.cpp
+obj/stduniforms.o: $(GRAPHICSSRC)/stduniforms.cpp $(GRAPHICSSRC)/stduniforms.h
+	$(CC) $(CFLAGS) -o obj/stduniforms.o -c $(GRAPHICSSRC)/stduniforms.cpp
 	
 	
 # ==================================
@@ -190,9 +196,6 @@ obj/renderbuffer.o: $(RENDERSRC)/renderbuffer.cpp  $(RENDERSRC)/renderbuffer.h
 obj/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexattrbuffer.h
 	$(CC) $(CFLAGS) -o obj/vertexattrbuffer.o -c $(RENDERSRC)/vertexattrbuffer.cpp
 	
-obj/uniformdesc.o:  $(RENDERSRC)/uniformdesc.cpp  $(RENDERSRC)/uniformdesc.h
-	$(CC) $(CFLAGS) -o obj/uniformdesc.o -c $(RENDERSRC)/uniformdesc.cpp
-
 
 # ==================================
 # GraphicsObject

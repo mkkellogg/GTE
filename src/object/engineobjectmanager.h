@@ -14,7 +14,7 @@ class TextureAttributes;
 class Texture;
 
 #include <vector>
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 #include "object/sceneobject.h"
 #include "graphics/texture/textureattr.h"
 

@@ -9,7 +9,7 @@
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"
 #include "graphics/render/material.h"
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/texture/texture.h"
 #include "ui/debug.h"

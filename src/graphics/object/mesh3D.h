@@ -14,7 +14,7 @@ class EngineObjectManager;
 class Mesh3DRenderer;
 
 #include "object/sceneobjectcomponent.h"
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 
 class Mesh3D : public SceneObjectComponent
 {

@@ -16,14 +16,25 @@ class Matrix4x4;
 
 enum class UniformType
 {
-	Sampler,
+	Sampler2D,
+	SamplerCube,
 	Matrix4x4,
+	Matrix3x3,
+	Matrix2x3,
 	Float,
 	Float2,
 	Float3,
 	Float4,
-	FloatArray,
-	Custom
+	Int,
+	Int2,
+	Int3,
+	Int4,
+	Bool,
+	Bool2,
+	Bool3,
+	Bool4,
+	Custom,
+	Unknown
 };
 
 class UniformDescriptor
@@ -33,6 +44,8 @@ class UniformDescriptor
 	UniformDescriptor();
 	~UniformDescriptor();
 
+	int Size;
+	char Name [128];
 	unsigned int ShaderVarID;
 	UniformType Type;
 	Texture * SamplerData;

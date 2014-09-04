@@ -9,6 +9,8 @@ class Point3;
 class Vector3;
 class Color4;
 class Texture;
+class UniformDescriptor;
+class AttributeDescriptor;
 
 #include "object/engineobject.h"
 
@@ -45,6 +47,12 @@ class Shader : EngineObject
     virtual void SendUniformToShader3(int loc, float x, float y, float z) = 0;
     virtual void SendUniformToShader2(int loc, float x, float y) = 0;
     virtual void SendUniformToShader(int loc, float  data) = 0;
+
+    virtual int GetUniformCount() const = 0;
+    virtual const UniformDescriptor * GetUniformDescriptor(unsigned int index) const = 0;
+
+    virtual int GetAttributeCount() const = 0;
+    virtual const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const = 0;
 };
 
 #endif

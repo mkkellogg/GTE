@@ -6,7 +6,7 @@
 
 #include "mesh3DrendererGL.h"
 #include "vertexattrbufferGL.h"
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/shader/shaderGL.h"
 #include "mesh3Drenderer.h"
@@ -229,8 +229,9 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 	return true;
 }
 
-void Mesh3DRendererGL::Render(Material * currentMaterial)
+void Mesh3DRendererGL::Render()
 {
+	Material * currentMaterial = graphics->GetActiveMaterial();
 	UseMaterial(currentMaterial);
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();

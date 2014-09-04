@@ -6,11 +6,11 @@ class Graphics;
 class Shader;
 class VertexAttrBuffer;
 
-#include "graphics/attributes.h"
-#include "graphics/uniforms.h"
+#include "graphics/stdattributes.h"
+#include "graphics/stduniforms.h"
 #include "object/engineobject.h"
 #include "graphics/texture/texture.h"
-#include "graphics/render/uniformdesc.h"
+#include "graphics/shader/uniformdesc.h"
 #include <vector>
 
 class Material : EngineObject
@@ -26,8 +26,8 @@ class Material : EngineObject
 
 	int standardAttributeBindings[VAR_BINDINGS_SIZE];
 	int standardUniformBindings[VAR_BINDINGS_SIZE];
+
 	std::vector<UniformDescriptor*> customUniforms;
-	int currentSamplerLoc;
 
 	void BindVars();
 	void ClearBindings();
@@ -56,6 +56,10 @@ class Material : EngineObject
 
     int GetStandardUniformShaderVarLocation(StandardUniform uniform) const;
     StandardUniformSet GetStandardUniforms() const;
+
+    void SendModelViewMatrixToShader(const Matrix4x4 * mat);
+    void SendProjectionMatrixToShader(const Matrix4x4 * mat);
+    void SendMVPMatrixToShader(const Matrix4x4 * mat);
 
     void AddTexture(Texture * texture, const char *shaderVarName);
     unsigned int GetCustomUniformCount();

@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "base/intmask.h"
-#include "uniforms.h"
+#include "stduniforms.h"
 #include "ui/debug.h"
 
 const char* const StandardUniforms::uniformNames[] = {"MODELVIEW_MATRIX","MODELVIEWPROJECTION_MATRIX","PROJECTION_MATRIX","LIGHT"};

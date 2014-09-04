@@ -7,7 +7,7 @@
 #include "object/sceneobjectcomponent.h"
 #include "mesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 #include "graphics/graphics.h"
 
 #include "geometry/point/point3.h"

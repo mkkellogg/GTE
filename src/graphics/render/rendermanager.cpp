@@ -233,7 +233,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 					// pass concatenated modelViewTransform and projection transforms to shader
 					SendTransformUniformsToShader(&modelView, camera->GetProjectionTransform());
 					SendCustomUniformsToShader();
-					renderer->Render(currentMaterial);
+					renderer->Render();
 				}
 				else
 				{
@@ -262,10 +262,6 @@ void RenderManager::SendTransformUniformsToShader(const Transform * modelView, c
 {
 	if(activeMaterial != NULL)
 	{
-		int mvMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(StandardUniform::ModelViewMatrix);
-		int mvpMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(StandardUniform::ModelViewProjectionMatrix);
-		int projectionMatrixLoc = activeMaterial->GetStandardUniformShaderVarLocation(StandardUniform::ProjectionMatrix);
-
 		Shader * shader = activeMaterial->GetShader();
 		if(shader != NULL)
 		{
@@ -273,9 +269,9 @@ void RenderManager::SendTransformUniformsToShader(const Transform * modelView, c
 			mvpTransform.TransformBy(modelView);
 			mvpTransform.TransformBy(projection);
 
-			if(mvMatrixLoc >= 0)shader->SendUniformToShader(mvMatrixLoc, modelView->GetMatrix());
-			if(mvpMatrixLoc >= 0)shader->SendUniformToShader(mvpMatrixLoc, mvpTransform.GetMatrix());
-			if(projectionMatrixLoc >= 0)shader->SendUniformToShader(projectionMatrixLoc, projection->GetMatrix());
+			activeMaterial->SendModelViewMatrixToShader(modelView->GetMatrix());
+			activeMaterial->SendProjectionMatrixToShader(projection->GetMatrix());
+			activeMaterial->SendMVPMatrixToShader(mvpTransform.GetMatrix());
 		}
 		else
 		{
@@ -300,7 +296,7 @@ void RenderManager::SendCustomUniformsToShader()
 		{
 			UniformDescriptor * desc = activeMaterial->GetCustomUniform(i);
 
-			if(desc->Type == UniformType::Sampler)
+			if(desc->Type == UniformType::Sampler2D)
 			{
 				shader->SendUniformToShader(desc->ShaderVarID, desc->SamplerData);
 			}

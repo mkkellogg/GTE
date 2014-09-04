@@ -28,7 +28,7 @@ class Mesh3DRenderer : public SceneObjectComponent
     Mesh3DRenderer(Graphics * graphics);
     virtual ~Mesh3DRenderer();
 
-    virtual void Render(Material * material) = 0;
+    virtual void Render() = 0;
     Mesh3D * GetMesh();
     virtual void UpdateFromMesh() = 0;
     Material * GetMaterial();

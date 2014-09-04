@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "base/intmask.h"
-#include "attributes.h"
+#include "stdattributes.h"
 #include "ui/debug.h"
 
 const char* const StandardAttributes::attributeNames[] = {"POSITION","NORMAL","COLOR","UV1","UV2"};

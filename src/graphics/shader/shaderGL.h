@@ -8,6 +8,8 @@
 class ShaderSource;
 class GraphicsGL;
 class Texture;
+class AttributeDescriptor;
+class UniformDescriptor;
 
 #include "shader.h"
 
@@ -24,13 +26,21 @@ class ShaderGL : public Shader
     GLuint vertexShaderID;
     GLuint fragmentShaderID;
 
+    unsigned int attributeCount;
+    unsigned int uniformCount;
+    AttributeDescriptor ** attributes;
+    UniformDescriptor ** uniforms;
+
     void DestroyShaders();
     void DestroyProgram();
     void DestroyComponents();
+    void DestroyUniformAndAttributeInfo();
 
     char * GetShaderLog(GLuint obj);
     char * GetProgramLog(GLuint obj);
     bool CheckCompilation(int shaderID, ShaderType shaderType);
+
+    bool StoreUniformAndAttributeInfo();
 
     protected:
 
@@ -60,6 +70,12 @@ class ShaderGL : public Shader
     void SendUniformToShader3(int loc, float x, float y, float z);
     void SendUniformToShader2(int loc, float x, float y);
     void SendUniformToShader(int loc, float  data);
+
+    int GetUniformCount() const;
+    const UniformDescriptor * GetUniformDescriptor(unsigned int index) const;
+
+    int GetAttributeCount() const;
+    const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const;
 };
 
 #endif

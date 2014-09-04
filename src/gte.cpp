@@ -6,7 +6,7 @@
 #include <GL/glut.h>
 
 #include "graphics/graphics.h"
-#include "graphics/attributes.h"
+#include "graphics/stdattributes.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/renderbuffer.h"
