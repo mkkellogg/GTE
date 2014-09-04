@@ -21,7 +21,9 @@ class Material : EngineObject
 
 	static const int MATERIAL_NAME_MAX_LENGTH = 64;
 	static const int VAR_BINDINGS_SIZE=64;
+
 	static const int SAMPLER_2D_DATA_SIZE=64;
+	static const int MATRIX4X4_DATA_SIZE=16;
 
 	char materialName[MATERIAL_NAME_MAX_LENGTH];
 	Shader * shader;
@@ -41,14 +43,18 @@ class Material : EngineObject
 	int * uniformsSetValues;
 	std::map<int,int> uniformLocationsToVerificationIndex;
 
+	unsigned int GetRequiredUniformSize(UniformType uniformType);
+
 	void BindStandardVars();
 	void ClearStandardBindings();
 	bool SetupSetVerifiers();
 
+    int GetStandardAttributeShaderVarID(StandardAttribute attr) const;
 	void SetStandardAttributeBinding( int varID, StandardAttribute attr);
     int GetStandardAttributeBinding(StandardAttribute attr) const;
 	int TestForStandardAttribute(StandardAttribute attr) const;
 
+	int GetStandardUniformShaderVarID(StandardUniform uniform) const;
 	void SetStandardUniformBinding( int varID, StandardUniform uniform);
 	int GetStandardUniformBinding(StandardUniform uniform) const;
 	int TestForStandardUniform(StandardUniform uniform) const;
@@ -68,23 +74,22 @@ class Material : EngineObject
 
     Shader * GetShader() const;
 
-    int GetStandardAttributeShaderVarLocation(StandardAttribute attr) const;
     StandardAttributeSet GetStandardAttributes() const;
     void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
 
-    int GetStandardUniformShaderVarLocation(StandardUniform uniform) const;
     StandardUniformSet GetStandardUniforms() const;
+
     void SendSetUniformToShader(unsigned int index);
     void SendAllSetUniformsToShader();
+    void SetTexture(Texture * texture, const char *shaderVarName);
+    unsigned int GetSetUniformCount() const ;
+    UniformDescriptor * GetSetUniform(unsigned int index);
 
     void SendModelViewMatrixToShader(const Matrix4x4 * mat);
     void SendProjectionMatrixToShader(const Matrix4x4 * mat);
     void SendMVPMatrixToShader(const Matrix4x4 * mat);
 
-    void SetTexture(Texture * texture, const char *shaderVarName);
-    unsigned int GetSetUniformCount() const ;
-    UniformDescriptor * GetSetUniform(unsigned int index);
-
+    bool VerifySetVars(int vertexCount);
 };
 
 #endif

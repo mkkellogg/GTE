@@ -3,6 +3,8 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
+#include <string>
+#include <iostream>
 
 #include "material.h"
 #include "graphics/shader/shader.h"
@@ -209,7 +211,7 @@ Shader * Material::GetShader() const
 	return shader;
 }
 
-int Material::GetStandardAttributeShaderVarLocation(StandardAttribute attr) const
+int Material::GetStandardAttributeShaderVarID(StandardAttribute attr) const
 {
 	return GetStandardAttributeBinding(attr);
 }
@@ -220,11 +222,11 @@ void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, Verte
 	if(varID >= 0)
 	{
 		shader->SendBufferToShader(varID, buffer);
-		SetUniformSetValue(varID, buffer->GetVertexCount() * (buffer->GetComponentCount() + buffer->GetStride()));
+		SetAttributeSetValue(varID, buffer->GetVertexCount());
 	}
 }
 
-int Material::GetStandardUniformShaderVarLocation(StandardUniform uniform) const
+int Material::GetStandardUniformShaderVarID(StandardUniform uniform) const
 {
 	return  GetStandardUniformBinding(uniform);
 }
@@ -263,7 +265,7 @@ void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, 16);
+		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
 	}
 }
 
@@ -273,7 +275,7 @@ void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
 	if(varID)
 	{
 		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, 16);
+		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
 	}
 }
 
@@ -283,7 +285,7 @@ void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, 16);
+		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
 	}
 }
 
@@ -324,3 +326,58 @@ UniformDescriptor * Material::GetSetUniform(unsigned int index)
 	}
 	return NULL;
 }
+
+bool Material::VerifySetVars(int vertexCount)
+{
+	NULL_CHECK(shader, "Material::VerifySetVars -> shader is NULL", false);
+
+	for(unsigned int i =0; i< shader->GetAttributeCount(); i++)
+	{
+		const AttributeDescriptor * desc =shader->GetAttributeDescriptor(i);
+		if(attributesSetValues[i] != vertexCount)
+		{
+			std::string msg = "Material::VerifySetVars -> Attribute '";
+			msg += desc->Name + std::string("' set incorrectly: size is ") + std::to_string(attributesSetValues[i]);
+			msg += std::string(" instead of ") + std::to_string(vertexCount);
+
+			Debug::PrintError(msg);
+			return false;
+		}
+	}
+
+	for(unsigned int i =0; i< shader->GetUniformCount(); i++)
+	{
+		const UniformDescriptor * desc =shader->GetUniformDescriptor(i);
+		int requiredSize = GetRequiredUniformSize(desc->Type);
+		if(uniformsSetValues[i] != requiredSize)
+		{
+			std::string msg = "Material::VerifySetVars -> Uniform '";
+			msg += desc->Name + std::string("' set incorrectly: size is ") + std::to_string(uniformsSetValues[i]);
+			msg += std::string(" instead of ") + std::to_string(requiredSize);
+
+			Debug::PrintError(msg);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
+{
+	switch(uniformType)
+	{
+		case UniformType::Sampler2D:
+			return SAMPLER_2D_DATA_SIZE;
+		break;
+		case UniformType::Matrix4x4:
+			return MATRIX4X4_DATA_SIZE;
+		break;
+		default:
+			return - 1;
+		break;
+	}
+
+	return -1;
+}
+

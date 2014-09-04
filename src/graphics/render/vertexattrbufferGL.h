@@ -35,6 +35,7 @@ class VertexAttrBufferGL : public VertexAttrBuffer
     const float * GetDataPtr() const;
     bool IsGPUBuffer() const;
     GLuint GetGPUBufferID();
+    unsigned int GetFullSize() const;
 };
 
 #endif

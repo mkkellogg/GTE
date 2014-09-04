@@ -245,6 +245,8 @@ void Mesh3DRendererGL::Render()
 		}
 	}
 
+	if(!currentMaterial->VerifySetVars(mesh->GetVertexCount()))return;
+
 	glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
 }
 

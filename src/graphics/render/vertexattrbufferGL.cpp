@@ -108,3 +108,8 @@ GLuint VertexAttrBufferGL::GetGPUBufferID()
 {
 	return gpuBufferID;
 }
+
+unsigned int VertexAttrBufferGL::GetFullSize() const
+{
+	return vertexCount * (stride + componentCount);
+}

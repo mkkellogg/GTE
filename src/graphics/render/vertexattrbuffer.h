@@ -19,6 +19,7 @@ class VertexAttrBuffer
     int GetVertexCount();
     int GetComponentCount();
     int GetStride();
+    virtual unsigned int GetFullSize() const = 0;
 };
 
 #endif
