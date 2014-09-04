@@ -44,6 +44,7 @@ class Material : EngineObject
 	std::map<int,int> uniformLocationsToVerificationIndex;
 
 	unsigned int GetRequiredUniformSize(UniformType uniformType);
+	bool allSetUniformsandAttributesVerified;
 
 	void BindStandardVars();
 	void ClearStandardBindings();

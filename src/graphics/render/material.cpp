@@ -29,6 +29,8 @@ Material::Material(const char * materialName)
 	shader = NULL;
 	ClearStandardBindings();
 
+	allSetUniformsandAttributesVerified = false;
+
 	attributesSetAndVerified = false;
 	attributesSetValues = NULL;
 
@@ -128,6 +130,7 @@ void Material::ClearSetVerifiers()
 {
 	if(attributesSetValues != NULL && shader != NULL)memset(attributesSetValues, 0, sizeof(int) * shader->GetAttributeCount());
 	if(uniformsSetValues != NULL && shader != NULL)memset(uniformsSetValues, 0, sizeof(int) * shader->GetUniformCount());
+	allSetUniformsandAttributesVerified = false;
 }
 
 void Material::ClearStandardBindings()
@@ -330,6 +333,7 @@ UniformDescriptor * Material::GetSetUniform(unsigned int index)
 bool Material::VerifySetVars(int vertexCount)
 {
 	NULL_CHECK(shader, "Material::VerifySetVars -> shader is NULL", false);
+	if(allSetUniformsandAttributesVerified == true)return true;
 
 	for(unsigned int i =0; i< shader->GetAttributeCount(); i++)
 	{
@@ -359,6 +363,8 @@ bool Material::VerifySetVars(int vertexCount)
 			return false;
 		}
 	}
+
+	allSetUniformsandAttributesVerified = true;
 
 	return true;
 }
