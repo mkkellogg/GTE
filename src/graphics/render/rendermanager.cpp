@@ -230,7 +230,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 					// activate the material, which will switch the GPU's active shader to
 					// the one associated with the material
 					ActivateMaterial(currentMaterial);
-					currentMaterial->ClearSetVerifiers();
+					currentMaterial->Reset();
 					// pass concatenated modelViewTransform and projection transforms to shader
 					SendTransformUniformsToShader(&modelView, camera->GetProjectionTransform());
 					SendCustomUniformsToShader();

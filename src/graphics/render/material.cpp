@@ -14,17 +14,14 @@
 #include "graphics/shader/uniformdesc.h"
 #include "graphics/shader/attributedesc.h"
 #include "graphics/render/vertexattrbuffer.h"
+#include <string>
 
-Material::Material(const char * materialName)
+/*
+ * Only constructor - requires a material name
+ */
+Material::Material(const std::string& materialName)
 {
-	if(materialName == NULL)materialName = "_UnnamedMaterial";
-	int index =0;
-	while(materialName != NULL && index < MATERIAL_NAME_MAX_LENGTH-1)
-	{
-		this->materialName[index] = materialName[0];
-		index++;
-		materialName++;
-	}
+	this->materialName = materialName;
 
 	shader = NULL;
 	ClearStandardBindings();
@@ -43,15 +40,30 @@ Material::~Material()
 	for(unsigned int i=0; i < setUniforms.size(); i++)
 	{
 		UniformDescriptor * desc = setUniforms[i];
-		if(desc != NULL)
-		{
-			delete desc;
-		}
+		SAFE_DELETE(desc);
 	}
 	setUniforms.clear();
 
 	SAFE_DELETE(attributesSetValues);
 	SAFE_DELETE(uniformsSetValues);
+}
+
+unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
+{
+	switch(uniformType)
+	{
+		case UniformType::Sampler2D:
+			return SAMPLER_2D_DATA_SIZE;
+		break;
+		case UniformType::Matrix4x4:
+			return MATRIX4X4_DATA_SIZE;
+		break;
+		default:
+			return - 1;
+		break;
+	}
+
+	return -1;
 }
 
 bool Material::Init(Shader * shader)
@@ -91,7 +103,7 @@ bool Material::SetupSetVerifiers()
 	uniformsSetValues = new int[uniformCount];
 	NULL_CHECK(uniformsSetValues,"Material::SetupSetVerifiers -> could not allocate uniformsSetValues", false);
 
-	ClearSetVerifiers();
+	Reset();
 
 	for(unsigned int i=0; i < attributeCount; i ++)
 	{
@@ -126,7 +138,7 @@ void Material::SetUniformSetValue(int varID, int size)
 	}
 }
 
-void Material::ClearSetVerifiers()
+void Material::Reset()
 {
 	if(attributesSetValues != NULL && shader != NULL)memset(attributesSetValues, 0, sizeof(int) * shader->GetAttributeCount());
 	if(uniformsSetValues != NULL && shader != NULL)memset(uniformsSetValues, 0, sizeof(int) * shader->GetUniformCount());
@@ -135,8 +147,8 @@ void Material::ClearSetVerifiers()
 
 void Material::ClearStandardBindings()
 {
-	for(int i=0; i < VAR_BINDINGS_SIZE; i++)standardAttributeBindings[i] = -1;
-	for(int i=0; i < VAR_BINDINGS_SIZE; i++)standardUniformBindings[i] = -1;
+	for(int i=0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardAttributeBindings[i] = -1;
+	for(int i=0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardUniformBindings[i] = -1;
 }
 
 void Material::SetStandardAttributeBinding(int varID, StandardAttribute attr)
@@ -147,6 +159,11 @@ void Material::SetStandardAttributeBinding(int varID, StandardAttribute attr)
 int Material::GetStandardAttributeBinding(StandardAttribute attr) const
 {
 	return standardAttributeBindings[(int)attr];
+}
+
+int Material::GetStandardAttributeShaderVarID(StandardAttribute attr) const
+{
+	return GetStandardAttributeBinding(attr);
 }
 
 void Material::BindStandardVars()
@@ -196,6 +213,11 @@ int Material::GetStandardUniformBinding(StandardUniform uniform) const
 	return standardUniformBindings[(int)uniform];
 }
 
+int Material::GetStandardUniformShaderVarID(StandardUniform uniform) const
+{
+	return  GetStandardUniformBinding(uniform);
+}
+
 int Material::TestForStandardUniform(StandardUniform uniform) const
 {
 	const char * uniformName = StandardUniforms::GetUniformName(uniform);
@@ -203,6 +225,10 @@ int Material::TestForStandardUniform(StandardUniform uniform) const
 
 	return loc;
 }
+
+// =====================================================
+//  Public methods
+// =====================================================
 
 StandardAttributeSet Material::GetStandardAttributes() const
 {
@@ -214,11 +240,6 @@ Shader * Material::GetShader() const
 	return shader;
 }
 
-int Material::GetStandardAttributeShaderVarID(StandardAttribute attr) const
-{
-	return GetStandardAttributeBinding(attr);
-}
-
 void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer)
 {
 	int varID = GetStandardAttributeBinding(attr);
@@ -227,11 +248,6 @@ void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, Verte
 		shader->SendBufferToShader(varID, buffer);
 		SetAttributeSetValue(varID, buffer->GetVertexCount());
 	}
-}
-
-int Material::GetStandardUniformShaderVarID(StandardUniform uniform) const
-{
-	return  GetStandardUniformBinding(uniform);
 }
 
 StandardUniformSet Material::GetStandardUniforms() const
@@ -262,44 +278,15 @@ void Material::SendAllSetUniformsToShader()
 	}
 }
 
-void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
-{
-	int varID = GetStandardUniformBinding(StandardUniform::ModelViewMatrix);
-	if(varID >=0 )
-	{
-		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
-	}
-}
-
-void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
-{
-	int varID = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
-	if(varID)
-	{
-		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
-	}
-}
-
-void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
-{
-	int varID = GetStandardUniformBinding(StandardUniform::ModelViewProjectionMatrix);
-	if(varID >=0 )
-	{
-		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
-	}
-}
-
 void Material::SetTexture(Texture * texture, const char *shaderVarName)
 {
 	int loc = shader->GetUniformVarID(shaderVarName);
 	if(loc < 0)
 	{
-		char msg[128];
-		sprintf(msg, "Could not find shader sampler var: '%s' for material: '%s'", shaderVarName, materialName);
-		Debug::PrintError(msg);
+		std::string str = std::string("Could not find shader sampler var:" ) +
+					 std::string(shaderVarName) + std::string("for material: ") + materialName;
+
+		Debug::PrintError(str);
 		return;
 	}
 
@@ -328,6 +315,36 @@ UniformDescriptor * Material::GetSetUniform(unsigned int index)
 		return setUniforms[index];
 	}
 	return NULL;
+}
+
+void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
+{
+	int varID = GetStandardUniformBinding(StandardUniform::ModelViewMatrix);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, mat);
+		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+	}
+}
+
+void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
+{
+	int varID = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
+	if(varID)
+	{
+		shader->SendUniformToShader(varID, mat);
+		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+	}
+}
+
+void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
+{
+	int varID = GetStandardUniformBinding(StandardUniform::ModelViewProjectionMatrix);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, mat);
+		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+	}
 }
 
 bool Material::VerifySetVars(int vertexCount)
@@ -369,21 +386,4 @@ bool Material::VerifySetVars(int vertexCount)
 	return true;
 }
 
-unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
-{
-	switch(uniformType)
-	{
-		case UniformType::Sampler2D:
-			return SAMPLER_2D_DATA_SIZE;
-		break;
-		case UniformType::Matrix4x4:
-			return MATRIX4X4_DATA_SIZE;
-		break;
-		default:
-			return - 1;
-		break;
-	}
-
-	return -1;
-}
 
