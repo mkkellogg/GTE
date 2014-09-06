@@ -13,6 +13,7 @@ class UniformDescriptor;
 class AttributeDescriptor;
 
 #include "object/engineobject.h"
+#include <string>
 
 enum class ShaderType
 {
@@ -30,8 +31,8 @@ class Shader : EngineObject
     virtual ~Shader();
     virtual bool Load() = 0;
     virtual bool IsLoaded() = 0;
-    virtual int GetAttributeVarID(const char *varName) const = 0;
-    virtual int GetUniformVarID(const char *varName) const = 0;
+    virtual int GetAttributeVarID(const std::string& varName) const = 0;
+    virtual int GetUniformVarID(const std::string& varName) const = 0;
     virtual void SendBufferToShader(int varID, VertexAttrBuffer * buffer) = 0;
 
     virtual void SendUniformToShader(int varID, const Texture * texture) = 0;

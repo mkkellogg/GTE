@@ -164,60 +164,13 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		points->GetPoint(28)->Set(-1, -1, -1);
 		points->GetPoint(29)->Set(1, -1, -1);
 
-
-
 		// --- Cube colors -------
 		// cube front, triangle 1
-		colors->GetColor(0)->Set(1, 0, 0, 1);
-		colors->GetColor(1)->Set(1, 0, 0, 1);
-		colors->GetColor(2)->Set(1, 0, 0, 1);
 
-		// cube front, triangle 2
-		colors->GetColor(3)->Set(1, 0, 0, 1);
-		colors->GetColor(4)->Set(1, 0, 0, 1);
-		colors->GetColor(5)->Set(1, 0, 0, 1);
-
-		// cube right, triangle 1
-		colors->GetColor(6)->Set(1, .75, 0, 1);
-		colors->GetColor(7)->Set(1, .75, 0, 1);
-		colors->GetColor(8)->Set(1, .75, 0, 1);
-
-		// cube right, triangle 2
-		colors->GetColor(9)->Set(1, .75, 0, 1);
-		colors->GetColor(10)->Set(1, .75, 0, 1);
-		colors->GetColor(11)->Set(1, .75, 0, 1);
-
-		// cube left, triangle 1
-		colors->GetColor(12)->Set(1, 1, 0, 1);
-		colors->GetColor(13)->Set(1, 1, 0, 1);
-		colors->GetColor(14)->Set(1, 1, 0, 1);
-
-		// cube left, triangle 2
-		colors->GetColor(15)->Set(1, 1, 0, 1);
-		colors->GetColor(16)->Set(1, 1, 0, 1);
-		colors->GetColor(17)->Set(1, 1, 0, 1);
-
-		// cube top, triangle 1
-		colors->GetColor(18)->Set(1, 1, 1, 1);
-		colors->GetColor(19)->Set(1, 1, 1, 1);
-		colors->GetColor(20)->Set(1, 1, 1, 1);
-
-		// cube top, triangle 2
-		colors->GetColor(21)->Set(1, 1, 1, 1);
-		colors->GetColor(22)->Set(1, 1, 1, 1);
-		colors->GetColor(23)->Set(1, 1, 1, 1);
-
-		// cube back, triangle 1
-		colors->GetColor(24)->Set(1, 1, 1, 1);
-		colors->GetColor(25)->Set(1, 1, 1, 1);
-		colors->GetColor(26)->Set(1, 1, 1, 1);
-
-		// cube back, triangle 2
-		colors->GetColor(27)->Set(1, 1, 1, 1);
-		colors->GetColor(28)->Set(1, 1, 1, 1);
-		colors->GetColor(29)->Set(1, 1, 1, 1);
-
-
+		for(int i=0; i< 36; i++)
+		{
+			colors->GetColor(i)->Set(1,1,1,1);
+		}
 
 		// --- Cube UVs -------
 		// cube front, triangle 1
@@ -269,8 +222,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		uvs->GetCoordinate(27)->Set(1,0);
 		uvs->GetCoordinate(28)->Set(1,1);
 		uvs->GetCoordinate(29)->Set(0,1);
-
-
 
 		meshRenderer->UpdateFromMesh();
 

@@ -35,7 +35,19 @@ Material::Material(const std::string& materialName)
 	uniformsSetValues = NULL;
 }
 
+/*
+ * Clean up
+ */
 Material::~Material()
+{
+	SAFE_DELETE(attributesSetValues);
+	SAFE_DELETE(uniformsSetValues);
+}
+
+/*
+ * Clean up set uniform data
+ */
+void Material::DestroySetUniforms()
 {
 	for(unsigned int i=0; i < setUniforms.size(); i++)
 	{
@@ -43,11 +55,11 @@ Material::~Material()
 		SAFE_DELETE(desc);
 	}
 	setUniforms.clear();
-
-	SAFE_DELETE(attributesSetValues);
-	SAFE_DELETE(uniformsSetValues);
 }
 
+/*
+ * Get the size of the data for uniform of type [uniformType].
+ */
 unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
 {
 	switch(uniformType)
@@ -59,20 +71,23 @@ unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
 			return MATRIX4X4_DATA_SIZE;
 		break;
 		default:
-			return - 1;
+			return -1;
 		break;
 	}
 
 	return -1;
 }
 
+/*
+ * Once a material has been instantiated, it must then be initialized. The Init() method
+ * connects the material to [shader] and does all allocation & initialization of
+ * dynamic data structures linked to that shader.
+ *
+ * This method will return true if initialization succeeds, otherwise it returns false.
+ */
 bool Material::Init(Shader * shader)
 {
-	if(shader == NULL)
-	{
-		Debug::PrintError(" Material::Init(Shader *) -> tried to Init with NULL shader.");
-		return false;
-	}
+	NULL_CHECK(shader," Material::Init(Shader *) -> tried to Init with NULL shader.", false);
 
 	if(!shader->IsLoaded())
 	{
@@ -82,14 +97,23 @@ bool Material::Init(Shader * shader)
 
 	this->shader = shader;
 
+	// clear any existing bindings to standard attributes and uniforms
 	ClearStandardBindings();
+	// setup bindings to standard attributes and uniforms for [shader]
 	BindStandardVars();
 
+	// SetupSetVerifiers() must allocate memory so it could fail, though incredibly unlikely
 	if(!SetupSetVerifiers())return false;
 
 	return true;
 }
 
+/*
+ * The member arrays [attributesSetAndVerified] and [uniformsSetAndVerified] store the
+ * size of the data that has been set for all attributes and uniforms respectively. This
+ * information is used to determine if an active uniform or attribute has no data set
+ * for it, which could cause rendering artifacts or crashes.
+ */
 bool Material::SetupSetVerifiers()
 {
 	NULL_CHECK(shader,"Material::SetupSetVerifiers -> shader is NULL", false);
@@ -103,14 +127,17 @@ bool Material::SetupSetVerifiers()
 	uniformsSetValues = new int[uniformCount];
 	NULL_CHECK(uniformsSetValues,"Material::SetupSetVerifiers -> could not allocate uniformsSetValues", false);
 
-	Reset();
+	// initialize all the values in [attributesSetValues] and [uniformsSetValues] to 0
+	ResetVerificationState();
 
+	// create map from attribute id/location to index in [attributesSetValues]
 	for(unsigned int i=0; i < attributeCount; i ++)
 	{
 		const AttributeDescriptor * desc = shader->GetAttributeDescriptor(i);
 		attributeLocationsToVerificationIndex[desc->ShaderVarID] = i;
 	}
 
+	// create map from uniform id/location to index in [uniformsSetValues]
 	for(unsigned int i=0; i < uniformCount; i ++)
 	{
 		const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
@@ -120,6 +147,36 @@ bool Material::SetupSetVerifiers()
 	return true;
 }
 
+bool Material::SetupSetUniforms()
+{
+	NULL_CHECK(shader,"Material::SetupSetUniforms -> shader is NULL", false);
+
+	DestroySetUniforms();
+
+	unsigned int uniformCount = shader->GetUniformCount();
+	for(unsigned int i=0; i < uniformCount; i ++)
+	{
+		const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
+		UniformDescriptor *newDesc = new UniformDescriptor();
+
+		if(newDesc == NULL)
+		{
+			DestroySetUniforms();
+			Debug::PrintError("Material::SetupSetUniforms -> could not allocate UniformDescriptor");
+			return false;
+		}
+
+		*newDesc = *desc;
+		setUniforms.push_back(newDesc);
+	}
+
+	return true;
+}
+
+/*
+ * Indicate the set data size for an attribute in [attributesSetValues]. [varID] is
+ * used to specify the attribute, but is mapped to an index in [attributesSetValues]
+ */
 void Material::SetAttributeSetValue(int varID, int size)
 {
 	int varIndex = attributeLocationsToVerificationIndex[varID];
@@ -129,6 +186,10 @@ void Material::SetAttributeSetValue(int varID, int size)
 	}
 }
 
+/*
+ * Indicate the set data size for an uniform in [uniformsSetValues]. [varID] is
+ * used to specify the uniform, but is mapped to an index in [uniformsSetValues]
+ */
 void Material::SetUniformSetValue(int varID, int size)
 {
 	int varIndex = uniformLocationsToVerificationIndex[varID];
@@ -138,34 +199,106 @@ void Material::SetUniformSetValue(int varID, int size)
 	}
 }
 
-void Material::Reset()
+/*
+ * Initialize all the values in [attributesSetValues] and [uniformsSetValues] to 0.
+ * Also clear the [allSetUniformsandAttributesVerified] flag, which indicates that the
+ * current values set for all uniforms and attributes have passed verification.
+ */
+void Material::ResetVerificationState()
 {
 	if(attributesSetValues != NULL && shader != NULL)memset(attributesSetValues, 0, sizeof(int) * shader->GetAttributeCount());
 	if(uniformsSetValues != NULL && shader != NULL)memset(uniformsSetValues, 0, sizeof(int) * shader->GetUniformCount());
 	allSetUniformsandAttributesVerified = false;
 }
 
-void Material::ClearStandardBindings()
-{
-	for(int i=0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardAttributeBindings[i] = -1;
-	for(int i=0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardUniformBindings[i] = -1;
-}
-
+/*
+ * Map a standard attribute [attr] to a shader var ID/location [varID]
+ */
 void Material::SetStandardAttributeBinding(int varID, StandardAttribute attr)
 {
 	standardAttributeBindings[(int)attr] = varID;
 }
 
+/*
+ * Get the shader var ID/location for [attr]
+ */
 int Material::GetStandardAttributeBinding(StandardAttribute attr) const
 {
 	return standardAttributeBindings[(int)attr];
 }
 
-int Material::GetStandardAttributeShaderVarID(StandardAttribute attr) const
+/*
+ * Check if the standard attribute specified by [attr] is used by
+ * the shader connected to this material
+ */
+int Material::TestForStandardAttribute(StandardAttribute attr) const
 {
-	return GetStandardAttributeBinding(attr);
+	const char * attrName = StandardAttributes::GetAttributeName(attr);
+	int varID = shader->GetAttributeVarID(attrName);
+
+	return varID;
 }
 
+/*
+ * Get the index in the shader's list of uniforms corresponding
+ * to the uniform named [uniformName]
+ */
+int Material::GetUniformIndex(const std::string& uniformName)
+{
+	if(shader == NULL)printf("shader is NULL!\n");
+
+	int foundIndex = -1;
+	for(unsigned int i=0; i< setUniforms.size(); i++)
+	{
+		printf("comparing %s\n",setUniforms[i]->Name);
+		if(uniformName == setUniforms[i]->Name)
+		{
+			foundIndex = (int)i;
+		}
+	}
+
+	return foundIndex;
+}
+
+/*
+ * Map a standard uniform to a shader var ID/location
+ */
+void Material::SetStandardUniformBinding( int varID, StandardUniform uniform)
+{
+	standardUniformBindings[(int)uniform] = varID;
+}
+
+/*
+ * Get the shader var ID/location for [uniform]
+ */
+int Material::GetStandardUniformBinding(StandardUniform uniform) const
+{
+	return standardUniformBindings[(int)uniform];
+}
+
+/*
+ * Check if the standard uniform specified by [uniform] is used by
+ * the shader connected to this material
+ */
+int Material::TestForStandardUniform(StandardUniform uniform) const
+{
+	const char * uniformName = StandardUniforms::GetUniformName(uniform);
+	int loc = shader->GetUniformVarID(uniformName);
+
+	return loc;
+}
+
+/*
+ * Loop through all standard attributes and all standard uniforms and
+ * for each:
+ *
+ *     1. Check if the shader attached to this material uses it
+ *     2. If (1) is true:
+ *        a. Get the var ID/location and set the binding using either
+ *           SetStandardAttributeBinding() or SetStandardUniformBinding().
+ *        b. Set the appropriate bit in [standardAttributes] and [standardUniforms]
+ *           to indicate usage of the attribute or uniform.
+ */
 void Material::BindStandardVars()
 {
 	standardAttributes = StandardAttributes::CreateAttributeSet();
@@ -195,53 +328,45 @@ void Material::BindStandardVars()
 	}
 }
 
-int Material::TestForStandardAttribute(StandardAttribute attr) const
+/*
+ * Remove existing bindings for standard attributes and uniforms.
+ */
+void Material::ClearStandardBindings()
 {
-	const char * attrName = StandardAttributes::GetAttributeName(attr);
-	int varID = shader->GetAttributeVarID(attrName);
-
-	return varID;
-}
-
-void Material::SetStandardUniformBinding( int varID, StandardUniform uniform)
-{
-	standardUniformBindings[(int)uniform] = varID;
-}
-
-int Material::GetStandardUniformBinding(StandardUniform uniform) const
-{
-	return standardUniformBindings[(int)uniform];
-}
-
-int Material::GetStandardUniformShaderVarID(StandardUniform uniform) const
-{
-	return  GetStandardUniformBinding(uniform);
-}
-
-int Material::TestForStandardUniform(StandardUniform uniform) const
-{
-	const char * uniformName = StandardUniforms::GetUniformName(uniform);
-	int loc = shader->GetUniformVarID(uniformName);
-
-	return loc;
+	for(int i=0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardAttributeBindings[i] = -1;
+	for(int i=0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardUniformBindings[i] = -1;
 }
 
 // =====================================================
 //  Public methods
 // =====================================================
 
-StandardAttributeSet Material::GetStandardAttributes() const
-{
-	return standardAttributes;
-}
-
+/*
+ * Get a pointer to the shader to which this material is connected.
+ */
 Shader * Material::GetShader() const
 {
 	return shader;
 }
 
+/*
+ * Get a bit mask that indicates which standard attributes are used by this material's shader
+ */
+StandardAttributeSet Material::GetStandardAttributes() const
+{
+	return standardAttributes;
+}
+
+/*
+ * Send an array of vertex attributes held in [buffer] to this material's shader. This method
+ * maps the standard attribute specified by [attr] to the corresponding shader var ID/location
+ * (if a binding exists) and sends the data to that variable in the shader.
+ *
+ */
 void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer)
 {
+	NULL_CHECK_RTRN(buffer, "Material::SendStandardAttributeBufferToShader -> buffer is NULL.");
+
 	int varID = GetStandardAttributeBinding(attr);
 	if(varID >= 0)
 	{
@@ -250,11 +375,21 @@ void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, Verte
 	}
 }
 
+/*
+ * Get a bit mask that indicates which standard uniforms are used by this material's shader
+ */
 StandardUniformSet Material::GetStandardUniforms() const
 {
 	return standardUniforms;
 }
 
+/*
+ * Send a uniform that already has its value set to this material's shader. The parameter
+ * [index] corresponds to an index in the vector of uniforms for which values have been
+ * set [setUniforms] (which usually correspond to custom uniforms specified by the
+ * developer). This method simply takes the value stored for that uniform and sends
+ * it to the shader.
+ */
 void Material::SendSetUniformToShader(unsigned int index)
 {
 	if(index >=0 && index < setUniforms.size())
@@ -270,6 +405,9 @@ void Material::SendSetUniformToShader(unsigned int index)
 	}
 }
 
+/*
+ * Send all uniforms for which values have been set to the shader.
+ */
 void Material::SendAllSetUniformsToShader()
 {
 	for(unsigned int i=0; i < GetSetUniformCount(); i++)
@@ -278,29 +416,37 @@ void Material::SendAllSetUniformsToShader()
 	}
 }
 
-void Material::SetTexture(Texture * texture, const char *shaderVarName)
+/*
+ * Find a uniform with the name specified by [shaderVarName] and set its
+ * value to the sampler data held by [texture]
+ */
+void Material::SetTexture(Texture * texture, const std::string& varName)
 {
-	int loc = shader->GetUniformVarID(shaderVarName);
+	int loc = shader->GetUniformVarID(varName);
 	if(loc < 0)
 	{
 		std::string str = std::string("Could not find shader sampler var:" ) +
-					 std::string(shaderVarName) + std::string("for material: ") + materialName;
+				varName + std::string("for material: ") + materialName;
 
 		Debug::PrintError(str);
 		return;
 	}
 
-	UniformDescriptor * desc = new UniformDescriptor();
-	if(desc == NULL)
-	{
-		Debug::PrintError("Material::AddTexture -> could not allocate UniformDescriptor");
-		return;
-	}
+	int foundIndex = GetUniformIndex(varName);
 
-	desc->ShaderVarID = loc;
-	desc->Type = UniformType::Sampler2D;
-	desc->SamplerData = texture;
-	setUniforms.push_back(desc);
+	if(foundIndex >= 0)
+	{
+		UniformDescriptor * desc = setUniforms[foundIndex];
+
+		desc->ShaderVarID = loc;
+		desc->Type = UniformType::Sampler2D;
+		desc->SamplerData = texture;
+	}
+	else
+	{
+		std::string err = std::string("Invalid uniform specified: ") + varName;
+		Debug::PrintError(err);
+	}
 }
 
 unsigned int Material::GetSetUniformCount() const
@@ -361,7 +507,7 @@ bool Material::VerifySetVars(int vertexCount)
 			msg += desc->Name + std::string("' set incorrectly: size is ") + std::to_string(attributesSetValues[i]);
 			msg += std::string(" instead of ") + std::to_string(vertexCount);
 
-			Debug::PrintError(msg);
+			//Debug::PrintError(msg);
 			return false;
 		}
 	}
@@ -376,7 +522,7 @@ bool Material::VerifySetVars(int vertexCount)
 			msg += desc->Name + std::string("' set incorrectly: size is ") + std::to_string(uniformsSetValues[i]);
 			msg += std::string(" instead of ") + std::to_string(requiredSize);
 
-			Debug::PrintError(msg);
+			//Debug::PrintError(msg);
 			return false;
 		}
 	}

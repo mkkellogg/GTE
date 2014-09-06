@@ -20,6 +20,7 @@
 #include "gte.h"
 #include "uniformdesc.h"
 #include "attributedesc.h"
+#include <string>
 
 
 ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
@@ -392,15 +393,15 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 	return true;
 }
 
-int ShaderGL::GetAttributeVarID(const char *varName) const
+int ShaderGL::GetAttributeVarID(const std::string& varName) const
 {
-	GLint varID = glGetAttribLocation(programID, varName);
+	GLint varID = glGetAttribLocation(programID, varName.c_str());
 	return (int)varID;
 }
 
-int ShaderGL::GetUniformVarID(const char *varName) const
+int ShaderGL::GetUniformVarID(const std::string& varName) const
 {
-	GLint varID = glGetUniformLocation(programID, varName);
+	GLint varID = glGetUniformLocation(programID, varName.c_str());
 	return (int)varID;
 }
 

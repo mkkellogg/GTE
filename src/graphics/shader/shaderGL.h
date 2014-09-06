@@ -12,6 +12,7 @@ class AttributeDescriptor;
 class UniformDescriptor;
 
 #include "shader.h"
+#include <string>
 
 class ShaderGL : public Shader
 {
@@ -51,8 +52,8 @@ class ShaderGL : public Shader
 
     bool Load();
     bool IsLoaded();
-    int GetAttributeVarID(const char *varName) const;
-    int GetUniformVarID(const char *varName) const;
+    int GetAttributeVarID(const std::string& varName) const;
+    int GetUniformVarID(const std::string& varName) const;
     GLuint GetProgramID();
 
     void SendBufferToShader(int varID, VertexAttrBuffer * buffer);

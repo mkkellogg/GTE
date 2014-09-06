@@ -86,12 +86,14 @@ class Material : public EngineObject
 	void ClearStandardBindings();
 	bool SetupSetVerifiers();
 
-    int GetStandardAttributeShaderVarID(StandardAttribute attr) const;
+	bool SetupSetUniforms();
+	void DestroySetUniforms();
+
 	void SetStandardAttributeBinding( int varID, StandardAttribute attr);
     int GetStandardAttributeBinding(StandardAttribute attr) const;
 	int TestForStandardAttribute(StandardAttribute attr) const;
 
-	int GetStandardUniformShaderVarID(StandardUniform uniform) const;
+	int GetUniformIndex(const std::string& uniformName);
 	void SetStandardUniformBinding( int varID, StandardUniform uniform);
 	int GetStandardUniformBinding(StandardUniform uniform) const;
 	int TestForStandardUniform(StandardUniform uniform) const;
@@ -107,7 +109,7 @@ class Material : public EngineObject
 
     public:
 
-    void Reset();
+    void ResetVerificationState();
 
     Shader * GetShader() const;
 
@@ -118,7 +120,7 @@ class Material : public EngineObject
 
     void SendSetUniformToShader(unsigned int index);
     void SendAllSetUniformsToShader();
-    void SetTexture(Texture * texture, const char *shaderVarName);
+    void SetTexture(Texture * texture, const std::string& varName);
     unsigned int GetSetUniformCount() const ;
     UniformDescriptor * GetSetUniform(unsigned int index);
 
