@@ -22,7 +22,7 @@ class Mesh3D : public SceneObjectComponent
 
 	Mesh3DRenderer * renderer;
 	StandardAttributeSet attributeSet;
-	int vertexCount;
+	unsigned int vertexCount;
 
     Point3Array * positions;
     Vector3Array * normals;
@@ -41,9 +41,11 @@ class Mesh3D : public SceneObjectComponent
 	public:
 
     void SetRenderer(Mesh3DRenderer * render);
-    bool Init(int vertexCount);
-    int GetVertexCount();
+    bool Init(unsigned int vertexCount);
+    unsigned int GetVertexCount();
     StandardAttributeSet GetAttributeSet();
+
+    void CalculateNormals(float smoothingThreshhold);
 
     Point3Array * GetPostions();
     Vector3Array * GetNormals();

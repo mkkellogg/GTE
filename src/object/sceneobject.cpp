@@ -8,6 +8,7 @@
 #include "engineobject.h"
 #include "graphics/graphics.h"
 #include "graphics/view/camera.h"
+#include "graphics/light/light.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/rendermanager.h"
 #include "ui/debug.h"
@@ -21,6 +22,7 @@ SceneObject::SceneObject() : EngineObject()
 	mesh3D = NULL;
 	camera = NULL;
 	parent = NULL;
+	light = NULL;
 
 	transform = new SceneObjectTransform(this);
 }
@@ -75,6 +77,12 @@ bool SceneObject::SetCamera(Camera * camera)
 	return true;
 }
 
+bool SceneObject::SetLight(Light * light)
+{
+	this->light = light;
+	return true;
+}
+
 Mesh3DRenderer * SceneObject::GetRenderer3D()
 {
 	return renderer3D;
@@ -83,6 +91,11 @@ Mesh3DRenderer * SceneObject::GetRenderer3D()
 Camera * SceneObject::GetCamera()
 {
 	return camera;
+}
+
+Light *  SceneObject::GetLight()
+{
+	return light;
 }
 
 void SceneObject::AddChild(SceneObject * child)
@@ -124,9 +137,9 @@ unsigned int SceneObject::GetChildrenCount() const
 	return children.size();
 }
 
-SceneObject * SceneObject::GetChildAt(int index) const
+SceneObject * SceneObject::GetChildAt(unsigned int index) const
 {
-	if(index >=0 && index < (int)children.size())
+	if(index < children.size())
 	{
 		return children[index];
 	}

@@ -13,6 +13,7 @@
 #include "graphics/render/material.h"
 #include "graphics/shader/shader.h"
 #include "graphics/view/camera.h"
+#include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
 #include "geometry/matrix4x4.h"
@@ -72,12 +73,18 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnInit(Graphics * graphics)
 	{
+		Point3 test;
+		test.x = 5;
+		test.y = 5;
+		test.x = 5;
+
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
-		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
-		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
-		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Color);
+		SceneObject * lightObject = objectManager->CreateSceneObject();
+		lightObject->GetTransform()->Translate(-5, 10, -5, false);
+		Light * light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		lightObject->SetLight(light);
 
 		cameraObject = objectManager->CreateSceneObject();
 		Camera * camera = objectManager->CreateCamera();
@@ -99,6 +106,12 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 		material->SetTexture(texture, "Texture");
+
+		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Color);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
 		Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);
 		Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
@@ -223,6 +236,8 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		uvs->GetCoordinate(28)->Set(1,1);
 		uvs->GetCoordinate(29)->Set(0,1);
 
+		mesh->CalculateNormals(65);
+
 		meshRenderer->UpdateFromMesh();
 
 		SceneObject * childSceneObject = objectManager->CreateSceneObject();
@@ -236,7 +251,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.001);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,1);
 	}
 
 	void OnQuit(Graphics * graphics)

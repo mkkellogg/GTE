@@ -14,6 +14,8 @@
 #include "render/rendermanager.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
+#include "global/global.h"
+#include "ui/debug.h"
 
 
 Graphics * Graphics::theInstance = NULL;
@@ -26,7 +28,7 @@ Graphics::~Graphics()
 Graphics::Graphics()
 {
 	activeMaterial= NULL;
-	renderManager = new RenderManager(this, EngineObjectManager::Instance());
+	renderManager = NULL;
 	screenDescriptor = NULL;
 }
 
@@ -50,6 +52,11 @@ GraphicsCallbacks::~GraphicsCallbacks()
 
 bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
+	renderManager = new RenderManager(this, EngineObjectManager::Instance());
+	NULL_CHECK(renderManager, "Graphics::Init -> Unable to allocate render manager", false);
+
+	bool renderInitSuccess = renderManager->Init();
+	if(!renderInitSuccess)return false;
 	return true;
 }
 

@@ -13,22 +13,41 @@
 
 // forward declaration
 class SceneObject;
-class Camera;
 class Graphics;
 class EngineObjectManager;
 class Transform;
 class Material;
+class SceneObjectComponent;
 
 #include <vector>
 #include "util/datastack.h"
+#include "graphics/view/camera.h"
+#include "graphics/light/light.h"
+#include "geometry/transform.h"
 
 class RenderManager
 {
+	class RenderSceneObjectComponent
+	{
+		public:
+
+		Transform transform;
+		SceneObjectComponent * component = NULL;
+	};
+
 	Graphics * graphics;
 	EngineObjectManager * objectManager;
 	DataStack<float> * viewTransformStack;
 	DataStack<float> * modelTransformStack;
 	Material * activeMaterial;
+
+	static const int MAX_LIGHTS = 16;
+	unsigned int lightCount;
+	RenderSceneObjectComponent sceneLights[MAX_LIGHTS];
+
+	static const int MAX_CAMERAS = 8;
+	unsigned int cameraCount;
+	RenderSceneObjectComponent sceneCameras[MAX_CAMERAS];
 
 	void RenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;
@@ -39,14 +58,17 @@ class RenderManager
     void SendTransformUniformsToShader(const Transform * modelView, const Transform * projection);
     void SendCustomUniformsToShader();
 
+    void ProcessScene(SceneObject * parent, Transform * viewTransform);
+    void RenderSceneFromCamera(unsigned int cameraIndex);
+
     public:
 
 	RenderManager(Graphics * graphics, EngineObjectManager * objectManager);
     ~RenderManager();
 
-    void RenderAll();
-    void RenderFromCameras(SceneObject * parent, Transform * viewTransform);
+    bool Init();
 
+    void RenderAll();
 };
 
 #endif

@@ -31,6 +31,9 @@ class Vector3 : public BaseVector4
     Vector3(const float * data);
     ~Vector3();
 
+    Vector3 & operator= (const Vector3 & source);
+    void Set(float x, float y, float z);
+
     void Add(const Vector3 * v);
     static void Add(const Vector3 * v1, const Vector3 * v2, Vector3 * result);
     static void Subtract(const Vector3 * v1, const Vector3 * p2, Vector3 * result);
@@ -47,10 +50,8 @@ class Vector3 : public BaseVector4
     static float Dot(const Vector3 * a,const Vector3 * b);
     static float AngleBetween(const Vector3 * a,const Vector3 * b,const Vector3 * refRightNormal);
 
-    virtual void AttachTo(float * data);
-    virtual void Detach();
-
-    void Set(float x, float y, float z);
+    void AttachTo(float * data);
+    void Detach();
 };
 
 #endif

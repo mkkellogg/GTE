@@ -1,3 +1,24 @@
+/*
+ * class: ShaderGL
+ *
+ * Author: Mark Kellogg
+ *
+ * This class is the OpenGL specific implementation of Shader. It does not contain any
+ * shader code; it contains functions to load, compile, and link GLSL shaders from source code
+ * as well as functions to examine compiled shaders to determine variable information,
+ * and set the values for those variables.
+ *
+ * An instance of a ShaderGL object actually means the combination of a vertex and fragment
+ * shader. A shader is not complete unless it has both of those components.
+ *
+ * UniformDescriptor and AttributeDescriptor objects are created to describe each of the
+ * uniforms and attributes exposed by the shader. These can be referred to "by index" and
+ * "by shader var ID/location" and the distinction can be confusing. The 'index' of an attribute
+ * or uniform is its index in [attributes] or [uniforms] respectively. These are the arrays of
+ * AttributeDescriptor and UniformDescriptor objects. The 'shader var ID/location' of an attribute
+ * or uniform is the unique identifier assigned by OpenGL.
+ */
+
 #ifndef _SHADER_GL_H_
 #define _SHADER_GL_H_
 
@@ -18,18 +39,34 @@ class ShaderGL : public Shader
 {
     friend class GraphicsGL;
 
+    // is this shader loaded, compiled and linked?
     bool ready;
+
     char * name;
+
+    // pointers to the source code for each type of shader
     ShaderSource * vertexShaderSource;
     ShaderSource * fragmentShaderSource;
 
+    // OpenGL identifier for the linked shader program
     GLuint programID;
+
+    // OpenGL identifier for the loaded and compiled vertex shader
     GLuint vertexShaderID;
+
+    // OpenGL identifier for the loaded and compiled fragment shader
     GLuint fragmentShaderID;
 
+    // number of attributes exposed by this shader
     unsigned int attributeCount;
+
+    // number of uniforms exposed by this shader
     unsigned int uniformCount;
+
+    // descriptors for this shader's attributes
     AttributeDescriptor ** attributes;
+
+    // descriptors for this shader's uniforms
     UniformDescriptor ** uniforms;
 
     void DestroyShaders();

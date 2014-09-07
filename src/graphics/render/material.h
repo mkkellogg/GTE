@@ -22,11 +22,12 @@
 class Graphics;
 class Shader;
 class VertexAttrBuffer;
+class Light;
+class Texture;
 
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
 #include "object/engineobject.h"
-#include "graphics/texture/texture.h"
 #include "graphics/shader/uniformdesc.h"
 #include <vector>
 #include <map>
@@ -122,11 +123,11 @@ class Material : public EngineObject
     void SendAllSetUniformsToShader();
     void SetTexture(Texture * texture, const std::string& varName);
     unsigned int GetSetUniformCount() const ;
-    UniformDescriptor * GetSetUniform(unsigned int index);
 
     void SendModelViewMatrixToShader(const Matrix4x4 * mat);
     void SendProjectionMatrixToShader(const Matrix4x4 * mat);
     void SendMVPMatrixToShader(const Matrix4x4 * mat);
+    void SendLightToShader(Light * light);
 
     bool VerifySetVars(int vertexCount);
 };

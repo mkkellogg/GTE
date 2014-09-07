@@ -9,11 +9,12 @@
 UniformDescriptor::UniformDescriptor()
 {
 	ShaderVarID = -1;
+	Size = -1;
 	Type = UniformType::Float;
 	ExtendedFloatData = NULL;
 	SamplerData = NULL;
 	MatrixData = NULL;
-
+	IsSet = false;
 	memset(BasicFloatData, 0, sizeof(float) * 4);
 }
 

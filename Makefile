@@ -1,5 +1,5 @@
-LIBS= -L/usr/lib/nvidia-331-updates/ -lm -lGL -lglut -lGLU -lGLEW 
-CFLAGS=-I src -std=c++11 -Wall 
+LIBS= -L/usr/lib/nvidia-331-updates/ -L../assimp/lib -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp
+CFLAGS=-Isrc -I../assimp/include  -std=c++11 -Wall 
 CC=g++
 
 GLOBALSRC = src/global
@@ -8,6 +8,7 @@ GTEMATHSRC = src/gtemath
 GEOMETRYSRC= src/geometry
 UTILSRC= src/util
 GRAPHICSSRC= src/graphics
+LIGHTSRC= $(GRAPHICSSRC)/light
 SHADERSRC= $(GRAPHICSSRC)/shader
 TEXTURESRC= $(GRAPHICSSRC)/texture
 VIEWSYSSRC= $(GRAPHICSSRC)/view
@@ -27,6 +28,7 @@ UIOBJ= obj/debug.o
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
+LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
@@ -35,7 +37,7 @@ UTILOBJ= obj/datastack.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
+OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
 
 all: gtemain graphics ui geometry gtemath base global engineobjects util image
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
@@ -106,7 +108,7 @@ obj/imageloader.o: $(IMAGESRC)/imageloader.cpp $(IMAGESRC)/imageloader.h
 # ==================================
 
 
-graphics: $(GRAPHICSOBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject
+graphics: $(GRAPHICSOBJ) $(LIGHTOBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject
 
 obj/graphics.o: $(GRAPHICSSRC)/graphics.cpp  $(GRAPHICSSRC)/graphics.h 
 	$(CC) $(CFLAGS) -o obj/graphics.o -c $(GRAPHICSSRC)/graphics.cpp
@@ -120,6 +122,9 @@ obj/screendesc.o: $(GRAPHICSSRC)/screendesc.cpp  $(GRAPHICSSRC)/screendesc.h
 obj/camera.o: $(GRAPHICSSRC)/view/camera.cpp  $(GRAPHICSSRC)/view/camera.h 
 	$(CC) $(CFLAGS) -o obj/camera.o -c $(GRAPHICSSRC)/view/camera.cpp
 
+obj/light.o: $(LIGHTSRC)/light.cpp $(LIGHTSRC)/light.h 
+	$(CC) $(CFLAGS) -o obj/light.o -c $(LIGHTSRC)/light.cpp
+	
 obj/shadersource.o: $(SHADERSRC)/shadersource.cpp  $(SHADERSRC)/shadersource.h 
 	$(CC) $(CFLAGS) -o obj/shadersource.o -c $(SHADERSRC)/shadersource.cpp
 	

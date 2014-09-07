@@ -17,7 +17,8 @@ class BaseVector4
     void Init(float x, float y, float z, float w, float *target, bool permAttach);
 
     float * data;
-    float * baseData;
+   // float * baseData;
+    float baseData[4];
     bool attached;
     bool canDetach;
 
@@ -30,9 +31,8 @@ class BaseVector4
     BaseVector4(const float * copyData);
     virtual ~BaseVector4();
 
-    BaseVector4 & operator= (const BaseVector4 & source);
     float * GetDataPtr();
-    void Set(float x, float y, float z, float w);
+    virtual void Set(float x, float y, float z, float w);
     void Get(BaseVector4 * baseVector) const;
 
     virtual void AttachTo(float * data);

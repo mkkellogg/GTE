@@ -141,10 +141,10 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 		{
 			int componentCount = 4;
 			if(attr == StandardAttribute::UV1 || attr == StandardAttribute::UV2)componentCount = 2;
-			if(attr == StandardAttribute::Normal)componentCount = 3;
+		//	if(attr == StandardAttribute::Normal)componentCount = 3;
 
 			int stride =0;
-			if(attr == StandardAttribute::Normal)stride = 1;
+		//	if(attr == StandardAttribute::Normal)stride = 1;
 
 			int initSuccess = InitAttributeData(attr, componentCount, stride);
 			if(!initSuccess)StandardAttributes::AddAttribute(&err,attr);

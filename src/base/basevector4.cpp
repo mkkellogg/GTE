@@ -19,7 +19,8 @@
  */
 void BaseVector4::Init(float x, float y, float z, float w, float *target, bool permAttach)
 {
-	data = baseData = NULL;
+	//data = baseData = NULL;
+	data = baseData;
 
 	if(target == NULL && permAttach == true)
 	{
@@ -32,7 +33,8 @@ void BaseVector4::Init(float x, float y, float z, float w, float *target, bool p
 	}
 	else
 	{
-		data = baseData = new float[4];
+		//data = baseData = new float[4];
+		data = baseData;
 		canDetach = true;
 	}
 
@@ -85,20 +87,11 @@ BaseVector4::BaseVector4(const BaseVector4 * baseVector)
  */
 BaseVector4::~BaseVector4()
 {   
-	SAFE_DELETE(baseData);
+	//SAFE_DELETE(baseData);
 
     if(!attached)data = NULL;
 }
 
-/*
- * Assignment operator
- */
-BaseVector4 & BaseVector4::operator= (const BaseVector4 & source)
-{
-    if(this == &source)return *this;
-    memcpy((void*)source.data, (void*)data, sizeof(float) * 4); 
-    return *this;
-}
 
 /*
  * Set this bas vector's data

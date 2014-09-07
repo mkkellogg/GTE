@@ -13,8 +13,11 @@
 #include "graphics/render/vertexattrbuffer.h"
 #include "graphics/render/vertexattrbufferGL.h"
 #include "geometry/matrix4x4.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
 #include "graphics/texture/texture.h"
 #include "graphics/texture/textureGL.h"
+#include "graphics/color/color4.h"
 #include "ui/debug.h"
 #include "global/global.h"
 #include "gte.h"
@@ -22,7 +25,12 @@
 #include "attributedesc.h"
 #include <string>
 
-
+/*
+ * Only constructor.
+ *
+ * [vertexShaderPath] - Full or relative path to the source code for the vertex shader.
+ * [fragmentShaderPath] - Full or relative path to the source code for the fragment shader.
+ */
 ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
 {
     ready = false;
@@ -42,6 +50,9 @@ ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPat
     uniforms = NULL;
 }
 
+/*
+ * Clean up
+ */
 ShaderGL::~ShaderGL() 
 {
     if(vertexShaderSource != NULL)
@@ -59,6 +70,9 @@ ShaderGL::~ShaderGL()
     DestroyComponents();
 }
 
+/*
+ * Use OpenGL functions to delete the compiled vertex and fragment shaders.
+ */
 void ShaderGL::DestroyShaders()
 {
     if(vertexShaderID > 0)
@@ -74,6 +88,9 @@ void ShaderGL::DestroyShaders()
     }
 }
 
+/*
+ * Use OpenGL to delete the linked program.
+ */
 void ShaderGL::DestroyProgram()
 {
     if(programID > 0)
@@ -83,6 +100,10 @@ void ShaderGL::DestroyProgram()
     }
 }
 
+/*
+ * Destroy everything associated with this shader: vertex and fragment shaders, the program object,
+ * and all uniform and attribute descriptors
+ */
 void ShaderGL::DestroyComponents()
 {
     DestroyShaders();
@@ -90,6 +111,9 @@ void ShaderGL::DestroyComponents()
     DestroyUniformAndAttributeInfo();
 }
 
+/*
+ * Destroy all uniform and attribute descriptors
+ */
 void ShaderGL::DestroyUniformAndAttributeInfo()
 {
 	if(attributes != NULL)
@@ -117,8 +141,18 @@ void ShaderGL::DestroyUniformAndAttributeInfo()
 	}
 }
 
+/*
+ * This method performs all the work of loading shader source, compiling
+ * the shaders, and linking them to form the final program. It also calls
+ * functions to analyze the compiled shader to get information about all
+ * attributes and uniforms.
+ *
+ * The function will return true if the loading, compilation, and linking
+ * are successful. Otherwise it will return false.
+ */
 bool ShaderGL::Load()
 {
+	// attempt to load the shaders' source code
     bool vertexSrcLoaded = vertexShaderSource->Load();
     bool fragmentSrcLoaded = fragmentShaderSource->Load();
 
@@ -134,6 +168,7 @@ bool ShaderGL::Load()
         return false;
     }
 
+    // Create the OpenGL objects that will hold each shader
     vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
     fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -153,9 +188,11 @@ bool ShaderGL::Load()
     const char * vertexSourceString = (const char *)vertexShaderSource->GetSourceString();
     const char * fragmentSourceString = (const char *)fragmentShaderSource->GetSourceString();
  
+    // point OpenGL to the source for each shader
     glShaderSource(vertexShaderID, 1, &vertexSourceString,NULL);
     glShaderSource(fragmentShaderID, 1, &fragmentSourceString,NULL);
 
+    // compile vertex shader
     glCompileShader(vertexShaderID);
     if(!CheckCompilation(vertexShaderID, ShaderType::Vertex))
     {
@@ -163,6 +200,7 @@ bool ShaderGL::Load()
         return false;
     }
 
+    // compile fragment shader
     glCompileShader(fragmentShaderID);
     if(!CheckCompilation(fragmentShaderID, ShaderType::Fragment))
     {
@@ -170,6 +208,7 @@ bool ShaderGL::Load()
         return false;
     }
 
+    // create the OpenGL program object
     programID = glCreateProgram();
     if(programID == 0)
     {
@@ -178,9 +217,9 @@ bool ShaderGL::Load()
         return false;
     }
 
+    // attach shaders to the OpenGL program and link them together
     glAttachShader(programID,vertexShaderID);
     glAttachShader(programID,fragmentShaderID);
- 
     glLinkProgram(programID);
 
     GLint programLinked;
@@ -198,6 +237,7 @@ bool ShaderGL::Load()
         Debug::PrintMessage("Program linked successfully!");
     }
 
+    // get information about all uniforms and attributes in the shaders
     if(!StoreUniformAndAttributeInfo())
     {
     	return false;
@@ -207,11 +247,20 @@ bool ShaderGL::Load()
     return true;
 }
 
+/*
+ * Are the vertex and fragment shaders successfully loaded, compiled, and linked?
+ */
 bool ShaderGL::IsLoaded()
 {
 	return ready;
 }
 
+/*
+ * Check the compilation status of a vertex or fragment shader.
+ *
+ * [shaderID] - The OpenGL shader object id.
+ * [shaderType] - Type of shader (either vertex or fragment)
+ */
 bool ShaderGL::CheckCompilation(int shaderID, ShaderType shaderType)
 {
     GLint shaderCompiled;
@@ -238,19 +287,24 @@ bool ShaderGL::CheckCompilation(int shaderID, ShaderType shaderType)
     return true;
 } 
 
-char * ShaderGL::GetProgramLog(GLuint obj)
+/*
+ * Get a detailed description about the status of a program.
+ *
+ * [program] - The OpenGL program to retrieve status for.
+ */
+char * ShaderGL::GetProgramLog(GLuint program)
 {
     int infologLength = 0;
 
     int charsWritten  = 0;
     char *infoLog;
 
-    glGetProgramiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH,&infologLength);
 
     if (infologLength > 0)
     {
         infoLog = (char *)malloc(infologLength);
-        glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
+        glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
 
         return infoLog;
     }
@@ -258,20 +312,24 @@ char * ShaderGL::GetProgramLog(GLuint obj)
     return NULL;
 }
  
-
-char * ShaderGL::GetShaderLog(GLuint obj)
+/*
+ * Get a detailed description about the status of a shader.
+ *
+ * [shader] - The OpenGL shader to retrieve status for.
+ */
+char * ShaderGL::GetShaderLog(GLuint shader)
 {
     int infologLength = 0;
 
     int charsWritten  = 0;
     char *infoLog;
 
-    glGetShaderiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH,&infologLength);
 
     if (infologLength > 0)
     {
         infoLog = (char *)malloc(infologLength);
-        glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
+        glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
 
         return infoLog;
     }
@@ -279,19 +337,30 @@ char * ShaderGL::GetShaderLog(GLuint obj)
     return NULL;
 }
 
+/*
+ * Create UniformDescriptor objects for each uniform exposed by
+ * either shader, and AttributeDescriptor objects for each attribute
+ * exposed by the vertex shader.
+ */
 bool ShaderGL::StoreUniformAndAttributeInfo()
 {
 	int totalUniforms = -1;
 	glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &totalUniforms);
 	if(totalUniforms > 0)
 	{
+		// allocate array for UniformDescriptor objects
 		uniforms = new UniformDescriptor*[totalUniforms];
 		if(uniforms == NULL)
 		{
 			Debug::PrintError("Unable to allocate shader uniform descriptors.");
 			return false;
 		}
+
+		// initialize UniformDescriptor array
 		memset(uniforms, 0, sizeof(UniformDescriptor*)*totalUniforms);
+
+		// loop through each uniform and query OpenGL for information
+		// about that uniform
 		for(int i=0; i < totalUniforms; i++)
 		{
 			int nameLen = -1;
@@ -309,6 +378,7 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 			desc->Size = size;
 			desc->Type = UniformType::Unknown;
 
+			// convert OpenGL uniform type to our own definition (UniformType)
 			switch(type)
 			{
 				case GL_SAMPLER_2D:
@@ -341,14 +411,20 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 	glGetProgramiv(programID, GL_ACTIVE_ATTRIBUTES, &totalAttributes);
 	if(totalAttributes > 0)
 	{
+		// allocate array for AttributeDescriptor objects
 		attributes = new AttributeDescriptor*[totalAttributes];
 		if(attributes == NULL)
 		{
 			Debug::PrintError("Unable to allocate shader attribute descriptors.");
 			return false;
 		}
+
+		// initialize AttributeDescriptor array
 		memset(attributes, 0, sizeof(AttributeDescriptor*)*totalAttributes);
-		for(int i=0; i < totalUniforms; i++)
+
+		// loop through each attribute and query OpenGL for information
+		// about that attribute
+		for(int i=0; i < totalAttributes; i++)
 		{
 			int nameLen = -1;
 			int size = -1;
@@ -365,6 +441,7 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 			desc->Size = size;
 			desc->Type = AttributeType::Unknown;
 
+			// convert OpenGL attribute type to our own definition (AttributeType)
 			switch(type)
 			{
 				case GL_FLOAT_MAT4:
@@ -393,23 +470,38 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 	return true;
 }
 
+/*
+ * Get the shader var ID/location of attribute corresponding to [varName]
+ */
 int ShaderGL::GetAttributeVarID(const std::string& varName) const
 {
 	GLint varID = glGetAttribLocation(programID, varName.c_str());
 	return (int)varID;
 }
 
+/*
+ * Get the shader var ID/location of uniform corresponding to [varName]
+ */
 int ShaderGL::GetUniformVarID(const std::string& varName) const
 {
 	GLint varID = glGetUniformLocation(programID, varName.c_str());
 	return (int)varID;
 }
 
+/*
+ * Get the OpengGL program ID for this shader
+ */
 GLuint ShaderGL::GetProgramID()
 {
 	return programID;
 }
 
+/*
+ * Set the value for a shader attribute.
+ *
+ * [varID] - shader var ID/location of the attribute for which the value is to be set.
+ * [buffer] - attribute data to be sent
+ */
 void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
 {
 	if(varID < 0)return;
@@ -436,6 +528,12 @@ void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
 	}
 }
 
+/*
+ * Set the value for a uniform texture.
+ *
+ * [varID] - shader var ID/location of the uniform for which the value is to be set.
+ * [texture] - Holds sampler data to be sent
+ */
 void ShaderGL::SendUniformToShader(int varID, const Texture * texture)
 {
 	NULL_CHECK_RTRN(texture, "ShaderGL::SendUniformToShader(int, Texture *) -> NULL texture passed");
@@ -454,9 +552,14 @@ void ShaderGL::SendUniformToShader(int varID, const Texture * texture)
 		Debug::PrintError("ShaderGL::SendUniformToShader(int, Texture *) -> could not find sampler location for texture");
 		return;
 	}
-
 }
 
+/*
+ * Set the value for a uniform 4x4 matrix.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [mat] - Holds 4x4 matrix data to be sent
+ */
 void ShaderGL::SendUniformToShader(int varID, const Matrix4x4 * mat)
 {
 	glUniformMatrix4fv(varID,1, GL_FALSE, mat->GetDataPtr());
@@ -464,17 +567,17 @@ void ShaderGL::SendUniformToShader(int varID, const Matrix4x4 * mat)
 
 void ShaderGL::SendUniformToShader(int varID, const Point3 * point)
 {
-
+	glUniform4f(varID, point->x, point->y, point->z, 1);
 }
 
 void ShaderGL::SendUniformToShader(int varID, const Vector3 * vector)
 {
-
+	glUniform4f(varID, vector->x, vector->y, vector->z, 0);
 }
 
 void ShaderGL::SendUniformToShader(int varID, const Color4 * color)
 {
-
+	glUniform4f(varID, color->r, color->g, color->b, color->a);
 }
 
 
@@ -513,11 +616,22 @@ void ShaderGL::SendUniformToShader(int varID, float  data)
 
 }
 
+/*
+ * Get number of uniforms exposed by this shader
+ */
 unsigned int ShaderGL::GetUniformCount() const
 {
 	return uniformCount;
 }
 
+/*
+ * Get UniformDescriptor object at a specific index in [uniforms].
+ * [index] is not the same as a shader variable ID/location. It is just
+ * the index in [uniforms], which is an array of UniformDescriptor objects.
+ *
+ * A variable ID/location is the unique identifier assigned to a uniform by OpengL.
+ * The field [ShaderVarID] in UniformDescriptor holds that value.
+ */
 const UniformDescriptor * ShaderGL::GetUniformDescriptor(unsigned int index) const
 {
 	if(index >=0 && index < uniformCount)
@@ -528,17 +642,28 @@ const UniformDescriptor * ShaderGL::GetUniformDescriptor(unsigned int index) con
 	return NULL;
 }
 
+/*
+ * Get number of attributes exposed by this shader
+ */
 unsigned int ShaderGL::GetAttributeCount() const
 {
 	return attributeCount;
 }
 
+/*
+ * Get AttributeDescriptor object at a specific index in [attributes].
+ * [index] is not the same as a shader variable ID/location. It is just
+ * the index in [attributes], which is an array of AttributeDescriptor objects.
+ *
+ * A shader variable ID/location is the unique identifier assigned to an attribute by OpengL.
+ * The field [ShaderVarID] in AttributeDescriptor holds that value.
+ */
 const AttributeDescriptor * ShaderGL::GetAttributeDescriptor(unsigned int index) const
 {
 	if(index >=0 && index < attributeCount)
 	{
-		return (const AttributeDescriptor *)attributes[index];
+		const AttributeDescriptor * desc = (const AttributeDescriptor *)attributes[index];
+		return desc;
 	}
-
 	return NULL;
 }

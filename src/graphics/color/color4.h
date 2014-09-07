@@ -23,8 +23,12 @@ class Color4 : public BaseVector4
     Color4(const float * data);
     ~Color4();
 
-    virtual void AttachTo(float * data);
-    virtual void Detach();
+    Color4 & operator= (const Color4 & source);
+
+    void Set(float r, float g, float b, float a);
+
+    void AttachTo(float * data);
+    void Detach();
 };
 
 #endif

@@ -12,6 +12,7 @@ class Material;
 class Camera;
 class TextureAttributes;
 class Texture;
+class Light;
 
 #include <vector>
 #include "graphics/stdattributes.h"
@@ -47,6 +48,8 @@ class EngineObjectManager
     void DestroyMaterial(Material * material);
     Camera * CreateCamera();
     void DestroyCamera(Camera * camera);
+    Light * CreateLight();
+    void DestroyLight(Light * light);
 
     const SceneObject * GetSceneRoot() const;
 };

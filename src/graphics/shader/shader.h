@@ -1,3 +1,16 @@
+/*
+ * class: Shader
+ *
+ * Author: Mark Kellogg
+ *
+ * This class is the base class for host-side shader descriptors. Platform specific shader
+ * descriptors should derive from this one one (e.g. ShaderGL for OpenGL). This is only
+ * a descriptor; it is not meant to contain any shader code. It is only meant to hold
+ * information about a shader.
+ *
+ * An instance of a Shader object actually means the combination of a vertex and fragment
+ * shader. A Shader is not complete unless it has both of those components.
+ */
 
 #ifndef _SHADER_H_
 #define _SHADER_H_
@@ -21,7 +34,7 @@ enum class ShaderType
     Fragment
 };
 
-class Shader : EngineObject
+class Shader : public EngineObject
 {
     protected: 
 

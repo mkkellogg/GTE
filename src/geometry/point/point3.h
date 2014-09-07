@@ -38,10 +38,12 @@ class Point3 : public BaseVector4
     static void Add(const Point3 * point, const Vector3 * v, Point3 * result);
     static void Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result);
 
+    Point3 & operator= (const Point3 & source);
+
     void Set(float x, float y, float z);
 
-    virtual void AttachTo(float * data);
-    virtual void Detach();
+    void AttachTo(float * data);
+    void Detach();
 };
 
 #endif

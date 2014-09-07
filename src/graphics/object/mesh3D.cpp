@@ -79,7 +79,7 @@ void Mesh3D::Destroy()
 	}
 }
 
-int Mesh3D::GetVertexCount()
+unsigned int Mesh3D::GetVertexCount()
 {
 	return vertexCount;
 }
@@ -89,7 +89,7 @@ StandardAttributeSet Mesh3D::GetAttributeSet()
 	return attributeSet;
 }
 
-bool Mesh3D::Init(int vertexCount)
+bool Mesh3D::Init(unsigned int vertexCount)
 {
 	this->vertexCount = vertexCount;
 
@@ -135,6 +135,29 @@ bool Mesh3D::Init(int vertexCount)
 	}
 
 	return true;
+}
+
+void Mesh3D::CalculateNormals(float smoothingThreshhold)
+{
+	// TODO: implement smoothing!!
+
+	for(unsigned int v =0; v < vertexCount-2; v+=3)
+	{
+		Point3 pa = positions->GetPoint(v);
+		Point3 pb = positions->GetPoint(v+1);
+		Point3 pc = positions->GetPoint(v+2);
+
+		Vector3 a,b,c;
+
+		Point3::Subtract(&pb, &pa, &b);
+		Point3::Subtract(&pc, &pa, &a);
+
+		Vector3::Cross(&a, &b, &c);
+
+		normals->GetVector(v)->Set(c.x,c.y,c.z);
+		normals->GetVector(v+1)->Set(c.x,c.y,c.z);
+		normals->GetVector(v+2)->Set(c.x,c.y,c.z);
+	}
 }
 
 Point3Array * Mesh3D::GetPostions()

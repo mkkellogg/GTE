@@ -6,7 +6,9 @@ enum class StandardUniformMaskComponent
     ModelViewMatrix=1,
     ModelViewProjectionMatrix=2,
     ProjectionMatrix=4,
-    Light=8
+    LightPosition=8,
+    LightDirection=16,
+    LightColor=32
 };
 
 enum class StandardUniform
@@ -14,8 +16,10 @@ enum class StandardUniform
 	ModelViewMatrix=0,
 	ModelViewProjectionMatrix=1,
 	ProjectionMatrix=2,
-	Light=3,
-    _Last=4 // always keep as last entry
+	LightPosition=3,
+	LightDirection=4,
+	LightColor=5,
+    _Last=6 // always keep as last entry
 };
 
 typedef unsigned int StandardUniformSet;

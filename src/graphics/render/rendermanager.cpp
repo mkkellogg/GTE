@@ -30,16 +30,12 @@ RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectMa
 	this->activeMaterial = NULL;
 	this->graphics = graphics;
 	this->objectManager = objectManager;
-	viewTransformStack = new DataStack<float>(Constants::MaxObjectRecursionDepth, 16);
-	if(!viewTransformStack->Init())
-	{
-		SAFE_DELETE(viewTransformStack);
-	}
-	modelTransformStack = new DataStack<float>(Constants::MaxObjectRecursionDepth, 16);
-	if(!modelTransformStack->Init())
-	{
-		SAFE_DELETE(modelTransformStack);
-	}
+
+	lightCount = 0;
+	cameraCount = 0;
+
+	viewTransformStack = NULL;
+	modelTransformStack = NULL;
 }
 
 /*
@@ -49,6 +45,29 @@ RenderManager::~RenderManager()
 {
 	SAFE_DELETE(viewTransformStack);
 	SAFE_DELETE(modelTransformStack);
+}
+
+/*
+ * Initialize. Return false if initialization false, true if it succeeds.
+ */
+bool RenderManager::Init()
+{
+	viewTransformStack = new DataStack<float>(Constants::MaxObjectRecursionDepth, 16);
+	if(!viewTransformStack->Init())
+	{
+		Debug::PrintError("RenderManager::Init -> unable to allocate view transform stack.");
+		return false;
+	}
+
+	modelTransformStack = new DataStack<float>(Constants::MaxObjectRecursionDepth, 16);
+	if(!modelTransformStack->Init())
+	{
+		Debug::PrintError("RenderManager::Init -> unable to allocate model transform stack.");
+		SAFE_DELETE(viewTransformStack);
+		return false;
+	}
+
+	return true;
 }
 
 /*
@@ -121,6 +140,9 @@ int RenderManager::RenderDepth(const DataStack<float> * transformStack) const
  */
 void RenderManager::RenderAll()
 {
+	lightCount = 0;
+	cameraCount = 0;
+
 	Transform cameraModelView;
 	const SceneObject * sceneRoot = objectManager->GetSceneRoot();
 	if(sceneRoot == NULL)
@@ -128,19 +150,27 @@ void RenderManager::RenderAll()
 		Debug::PrintError("RenderManager::RenderAll -> sceneRoot is NULL.");
 		return;
 	}
-	RenderFromCameras(const_cast<SceneObject*>(sceneRoot), &cameraModelView);
+
+	// gather information about the cameras & lights in the scene
+	ProcessScene(const_cast<SceneObject*>(sceneRoot), &cameraModelView);
+
+	// render the scene from the perspective of each camera found in ProcessScene()
+	for(unsigned int i=0; i < cameraCount; i ++)
+	{
+		RenderSceneFromCamera(i);
+	}
 }
 
 /*
  * Recursively visits each object in the scene that is reachable from 'parent'. Whenever an object
- * that contains a Camera component is encountered, the entire scene is rendered from the perspective
- * of that camera via RenderScene().
+ * that contains a Camera component, store that camera in [sceneCameras]. Later, the entire scene is
+ * rendered from the perspective of each camera in that list via RenderSceneFromCamera().
  *
  * The transforms of each scene object are concatenated as progress moves down the scene object tree
  * and passed to the current invocation via 'viewTransform', since they will ultimately form position
  * from which the scene is rendered. The transform stored in 'viewTransform' is passed to RenderScene();
  */
-void RenderManager::RenderFromCameras(SceneObject * parent, Transform * viewTransform)
+void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform)
 {
 	Transform viewInverse;
 	Transform identity;
@@ -148,7 +178,7 @@ void RenderManager::RenderFromCameras(SceneObject * parent, Transform * viewTran
 	// enforce max recursion depth
 	if(RenderDepth(viewTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
-	for(std::vector<SceneObject *>::size_type i = 0; i != parent->GetChildrenCount(); i++)
+	for(unsigned int i = 0; i < parent->GetChildrenCount(); i++)
 	{
 		SceneObject * child = parent->GetChildAt(i);
 
@@ -156,28 +186,37 @@ void RenderManager::RenderFromCameras(SceneObject * parent, Transform * viewTran
 		{
 			// save the existing view transform
 			PushTransformData(viewTransform, viewTransformStack);
+
 			// concatenate the current view transform with that of the current scene object
 			viewTransform->TransformBy(child->GetTransform());
+
 			Camera * camera = child->GetCamera();
-			if(camera != NULL)
+			if(camera != NULL && cameraCount < MAX_CAMERAS)
 			{
-				// clear the appropriate render buffers this camera
-				ClearBuffersForCamera(camera);
-				const SceneObject * sceneRoot = objectManager->GetSceneRoot();
-
-				identity.SetIdentity();
-
 				// we invert the viewTransform because the viewTransform is really moving the world
 				// relative to the camera, rather than moving the camera in the world
 				viewInverse.SetTo(viewTransform);
 				viewInverse.Invert();
 
-				// render the scene using the view transform of the current camera
-				RenderScene(const_cast<SceneObject*>(sceneRoot),&identity, &viewInverse, camera);
+				// add a scene camera from which to render the scene
+				sceneCameras[cameraCount].transform.SetTo(&viewInverse);
+				sceneCameras[cameraCount].component = camera;
+
+				cameraCount++;
+			}
+
+			Light * light = child->GetLight();
+			if(light != NULL && lightCount < MAX_LIGHTS)
+			{
+				// add a scene light
+				sceneLights[lightCount].transform.SetTo(viewTransform);
+				sceneLights[lightCount].component = light;
+
+				lightCount++;
 			}
 
 			// continue recursion through child object
-			RenderFromCameras(child, viewTransform);
+			ProcessScene(child, viewTransform);
 
 			// restore previous view transform
 			PopTransformData(viewTransform, viewTransformStack);
@@ -187,6 +226,34 @@ void RenderManager::RenderFromCameras(SceneObject * parent, Transform * viewTran
 			Debug::PrintError("RenderManager::RenderAll -> NULL scene object encountered.");
 		}
 	}
+}
+
+/*
+ * Render the entire scene from the perspective of a single camera. Uses [cameraIndex]
+ * as an index into the array of cameras that has been found by processing the scene
+ * [sceneCameras].
+ */
+void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
+{
+	if(cameraIndex >= cameraCount)
+	{
+		Debug::PrintError("RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds");
+		return;
+	}
+
+	Camera * camera = dynamic_cast<Camera *>(sceneCameras[cameraIndex].component);
+
+	NULL_CHECK_RTRN(camera,"RenderManager::RenderSceneFromCamera -> camera in NULL");
+
+	// clear the appropriate render buffers this camera
+	ClearBuffersForCamera(camera);
+	const SceneObject * sceneRoot = objectManager->GetSceneRoot();
+
+	Transform identity;
+	identity.SetIdentity();
+
+	// render the scene using the view transform of the current camera
+	RenderScene(const_cast<SceneObject*>(sceneRoot),&identity, &(sceneCameras[cameraIndex].transform), camera);
 }
 
 /*
@@ -205,7 +272,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 	// enforce max recursion depth
 	if(RenderDepth(modelTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
-	for(std::vector<SceneObject *>::size_type i = 0; i != parent->GetChildrenCount(); i++)
+	for(unsigned int i = 0; i < parent->GetChildrenCount(); i++)
 	{
 		SceneObject * child = parent->GetChildAt(i);
 
@@ -213,10 +280,13 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 		{
 			// save existing model transform
 			PushTransformData(modelTransform, modelTransformStack);
+
 			// concatenate the current model transform with that of the current scene object
 			modelTransform->TransformBy(child->GetTransform());
+
 			// check if current scene object has a mesh renderer
 			Mesh3DRenderer * renderer = child->GetRenderer3D();
+
 			if(renderer != NULL)
 			{
 				// make sure mesh renderer has a material set
@@ -234,7 +304,30 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 					// pass concatenated modelViewTransform and projection transforms to shader
 					SendTransformUniformsToShader(&modelView, camera->GetProjectionTransform());
 					SendCustomUniformsToShader();
-					renderer->Render();
+
+					for(unsigned int l = 0; l < lightCount; l++)
+					{
+						if(sceneLights[l].component != NULL)
+						{
+							Light * light = dynamic_cast<Light *>(sceneLights[l].component);
+							if(light != NULL)
+							{
+								Point3 lightPosition;
+								sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
+								light->SetPosition(lightPosition);
+								currentMaterial->SendLightToShader(light);
+							}
+							else
+							{
+								Debug::PrintError("RenderManager::RenderScene -> light is NULL");
+							}
+						}
+						else
+						{
+							Debug::PrintError("RenderManager::RenderScene -> sceneLights[l].component is NULL");
+						}
+						renderer->Render();
+					}
 				}
 				else
 				{

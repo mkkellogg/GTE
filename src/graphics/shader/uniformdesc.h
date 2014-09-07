@@ -48,6 +48,8 @@ class UniformDescriptor
 	char Name [128];
 	unsigned int ShaderVarID;
 	UniformType Type;
+	bool IsSet;
+
 	Texture * SamplerData;
 	Matrix4x4 * MatrixData;
 	float BasicFloatData[4];

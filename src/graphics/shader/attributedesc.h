@@ -35,6 +35,7 @@ class AttributeDescriptor
 	~AttributeDescriptor();
 
 	int Size;
+	bool IsSet;
 	AttributeType Type;
 	unsigned int ShaderVarID;
 	char Name [128];

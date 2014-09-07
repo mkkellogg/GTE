@@ -43,6 +43,16 @@ Vector3::Vector3(const Vector3 * vector) : BaseVector4(vector),  x(data[0]), y(d
 }
 
 /*
+ * Assignment operator
+ */
+Vector3 & Vector3::operator= (const Vector3 & source)
+{
+    if(this == &source)return *this;
+    memcpy((void*)baseData, (void*)source.baseData, sizeof(float) * 4);
+    return *this;
+}
+
+/*
  * Set the values of this vector
  */
 void Vector3::Set(float x, float y, float z)

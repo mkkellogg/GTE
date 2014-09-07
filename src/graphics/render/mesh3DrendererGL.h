@@ -24,7 +24,7 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
     VertexAttrBuffer * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
 
-	int storedVertexCount;
+	unsigned int storedVertexCount;
 	StandardAttributeSet storedAttributes;
     bool buffersOnGPU;
 

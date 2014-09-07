@@ -32,6 +32,21 @@ Color4::~Color4()
     
 }
 
+/*
+ * Assignment operator
+ */
+Color4 & Color4::operator= (const Color4 & source)
+{
+    if(this == &source)return *this;
+    memcpy((void*)source.baseData, (void*)baseData, sizeof(float) * 4);
+    return *this;
+}
+
+void Color4::Set(float r, float g, float b, float a)
+{
+	BaseVector4::Set(r,g,b,a);
+}
+
 void Color4::AttachTo(float * data)
 {
 	BaseVector4::AttachTo(data);

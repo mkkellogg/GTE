@@ -14,7 +14,7 @@
  */
 Point3::Point3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
 {
-
+	data[3] = 1;
 }
 
 /*
@@ -22,7 +22,7 @@ Point3::Point3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
  */
 Point3::Point3(bool permAttached, float * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
 {
-
+	data[3] = 1;
 }
 
 /*
@@ -117,6 +117,18 @@ void Point3::UpdateComponentPointers()
     rPtr = (float **)&z;
     *rPtr = data+2;
 }
+
+/*
+ * Assignment operator
+ */
+Point3 & Point3::operator= (const Point3 & source)
+{
+    if(this == &source)return *this;
+    memcpy((void*)baseData, (void*)source.baseData, sizeof(float) * 4);
+
+    return *this;
+}
+
 
 /*
  * Set the values of this point

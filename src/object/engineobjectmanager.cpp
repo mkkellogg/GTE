@@ -8,6 +8,7 @@
 #include "sceneobject.h"
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"
+#include "graphics/light/light.h"
 #include "graphics/render/material.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/mesh3D.h"
@@ -101,11 +102,13 @@ Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader
 
 Material * EngineObjectManager::CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
 {
+
 	Shader * shader = CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
 	if(shader == NULL)return NULL;
 
 	Material * m = new Material(name);
 	bool initSuccess = m->Init(shader);
+
 	if(!initSuccess)
 	{
 		Debug::PrintError("EngineObjectManager::CreateMaterial(const char *, const char *) -> could not Init material");
@@ -135,6 +138,17 @@ Camera * EngineObjectManager::CreateCamera()
 void EngineObjectManager::DestroyCamera(Camera * camera)
 {
 	delete camera;
+}
+
+Light * EngineObjectManager::CreateLight()
+{
+	Light * light = new Light();
+	return light;
+}
+
+void EngineObjectManager::DestroyLight(Light * light)
+{
+	delete light;
 }
 
 const SceneObject * EngineObjectManager::GetSceneRoot() const

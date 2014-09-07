@@ -84,7 +84,7 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     glutIdleFunc(&_glutIdleFunc);
 
     glEnable(GL_DEPTH_TEST);
-    glClearColor(1.0,1.0,1.0,1.0);
+    glClearColor(0,0,0,0);
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);

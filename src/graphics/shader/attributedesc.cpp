@@ -10,7 +10,8 @@ AttributeDescriptor::AttributeDescriptor()
 {
 	ShaderVarID = -1;
 	FloatData = NULL;
-	Size = 0;
+	Size = -1;
+	IsSet = false;
 	Type = AttributeType::Unknown;
 }
 

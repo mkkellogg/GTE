@@ -22,8 +22,8 @@ class UV2 : public BaseVector2
     UV2(const float * data);
     ~UV2();
 
-    virtual void AttachTo(float * data);
-    virtual void Detach();
+    void AttachTo(float * data);
+    void Detach();
 };
 
 #endif
