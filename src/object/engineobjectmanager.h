@@ -18,6 +18,13 @@ class Light;
 #include "graphics/stdattributes.h"
 #include "object/sceneobject.h"
 #include "graphics/texture/textureattr.h"
+#include "graphics/shader/shadercatalog.h"
+
+enum class BuiltInShader
+{
+	Diffuse,
+	DiffuseTextured
+};
 
 class EngineObjectManager
 {
@@ -25,6 +32,9 @@ class EngineObjectManager
 
     protected:
 
+	const char* builtinPath ="resources/builtin/";
+
+	ShaderCatalog builtinShaders;
 	std::vector<EngineObject *> engineObjects;
 	SceneObject sceneRoot;
 
@@ -35,6 +45,7 @@ class EngineObjectManager
 
     static EngineObjectManager * Instance();
     SceneObject * CreateSceneObject();
+    bool InitBuiltinShaders();
 
     Mesh3D * CreateMesh3D(StandardAttributeSet attributes);
     void DestroyMesh3D(Mesh3D * mesh);

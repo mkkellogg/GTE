@@ -52,11 +52,26 @@ GraphicsCallbacks::~GraphicsCallbacks()
 
 bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
-	renderManager = new RenderManager(this, EngineObjectManager::Instance());
+	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
+	renderManager = new RenderManager(this, engineObjectManager);
 	NULL_CHECK(renderManager, "Graphics::Init -> Unable to allocate render manager", false);
 
 	bool renderInitSuccess = renderManager->Init();
 	if(!renderInitSuccess)return false;
+
+	bool builtinShadersInitSuccess = engineObjectManager->InitBuiltinShaders();
+	if(!builtinShadersInitSuccess)
+	{
+		Debug::PrintError("Graphics::Init -> could not init built-in shaders");
+		return false;
+	}
+
+	return true;
+}
+
+bool Graphics::Run()
+{
+
 	return true;
 }
 

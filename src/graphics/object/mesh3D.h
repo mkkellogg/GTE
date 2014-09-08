@@ -5,7 +5,7 @@
 class Point3;
 class Vector3;
 class color4;
-class uv2;
+class UV2;
 class Point3Array;
 class Vector3Array;
 class Color4Array;
@@ -44,7 +44,6 @@ class Mesh3D : public SceneObjectComponent
     bool Init(unsigned int vertexCount);
     unsigned int GetVertexCount();
     StandardAttributeSet GetAttributeSet();
-
     void CalculateNormals(float smoothingThreshhold);
 
     Point3Array * GetPostions();

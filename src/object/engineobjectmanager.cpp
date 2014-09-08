@@ -15,6 +15,7 @@
 #include "graphics/texture/texture.h"
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
+#include <string>
 
 EngineObjectManager * EngineObjectManager::theInstance = NULL;
 
@@ -44,6 +45,25 @@ SceneObject * EngineObjectManager::CreateSceneObject()
 	SceneObject *obj = new SceneObject();
 	sceneRoot.AddChild(obj);
 	return obj;
+}
+
+bool EngineObjectManager::InitBuiltinShaders()
+{
+	Graphics * graphics = Graphics::Instance();
+	std::string vertexSource;
+	std::string fragmentSource;
+	Shader * shader = NULL;
+
+	vertexSource = std::string(builtinPath) + std::string("diffuse.vertex.shader");
+	fragmentSource = std::string(builtinPath) + std::string("diffuse.fragment.shader");
+	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	if(shader == NULL)
+	{
+		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: Diffuse");
+		return false;
+	}
+
+	return true;
 }
 
 Mesh3D * EngineObjectManager::CreateMesh3D(StandardAttributeSet attributes)

@@ -50,6 +50,7 @@ class GraphicsGL : public Graphics
     public :
 
     bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
+    bool Run();
     unsigned int GetOpenGLVersion();
 };
 

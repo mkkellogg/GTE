@@ -34,9 +34,6 @@ GraphicsCallbacks * _instanceCallbacks;
 
 bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
 {
-	// call base method
-	Graphics::Init(windowWidth, windowHeight, callbacks, windowTitle);
-
 	_instanceCallbacks = this->callbacks = callbacks;
 	_thisInstance = this;
 
@@ -78,6 +75,9 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     	 return false;
     }
 
+	// call base method
+	Graphics::Init(windowWidth, windowHeight, callbacks, windowTitle);
+
     screenDescriptor = new ScreenDescriptor(windowWidth, windowHeight);
 
     glutDisplayFunc(&_glutDisplayFunc);
@@ -94,14 +94,21 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
         callbacks->OnInit(this);
     }
 
-    glutMainLoop(); 
-
-    if(callbacks != NULL)
-    {
-        callbacks->OnQuit(this);
-    }
-
     return true;
+}
+
+bool GraphicsGL::Run()
+{
+	Graphics::Run();
+
+	glutMainLoop();
+
+	if(callbacks != NULL)
+	{
+		callbacks->OnQuit(this);
+	}
+
+	return true;
 }
 
 GraphicsGL::~GraphicsGL() 

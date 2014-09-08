@@ -232,10 +232,6 @@ bool ShaderGL::Load()
         Debug::PrintError(info != NULL ? info : "(no error info provided).");
         return false;
     }
-    else
-    {
-        Debug::PrintMessage("Program linked successfully!");
-    }
 
     // get information about all uniforms and attributes in the shaders
     if(!StoreUniformAndAttributeInfo())
@@ -275,13 +271,6 @@ bool ShaderGL::CheckCompilation(int shaderID, ShaderType shaderType)
     	char * info = GetShaderLog(shaderID);
         Debug::PrintError(info != NULL ? info : "(no error info provided).");
         return false;
-    }
-    else
-    { 
-        if(shaderType == ShaderType::Vertex)
-	        Debug::PrintMessage("Vertex shader compiled successfully!");
-        else if(shaderType == ShaderType::Fragment)
-	        Debug::PrintMessage("Fragment shader compiled successfully!");
     }
 
     return true;

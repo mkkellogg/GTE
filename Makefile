@@ -23,13 +23,13 @@ BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/baseve
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
-GRAPHICSOBJECTOBJ= obj/mesh3D.o 
+GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/assetimporter.o obj/importutil.o
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
 LIGHTOBJ= obj/light.o
-SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o
+SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o obj/shadercatalog.o
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
@@ -103,12 +103,13 @@ obj/rawimage.o: $(IMAGESRC)/rawimage.cpp $(IMAGESRC)/rawimage.h
 obj/imageloader.o: $(IMAGESRC)/imageloader.cpp $(IMAGESRC)/imageloader.h
 	$(CC) $(CFLAGS) -o obj/imageloader.o -c $(IMAGESRC)/imageloader.cpp 
 	
+	
 # ==================================
 # Graphics
 # ==================================
 
 
-graphics: $(GRAPHICSOBJ) $(LIGHTOBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject
+graphics: $(GRAPHICSOBJ) $(LIGHTOBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject shader
 
 obj/graphics.o: $(GRAPHICSSRC)/graphics.cpp  $(GRAPHICSSRC)/graphics.h 
 	$(CC) $(CFLAGS) -o obj/graphics.o -c $(GRAPHICSSRC)/graphics.cpp
@@ -125,21 +126,6 @@ obj/camera.o: $(GRAPHICSSRC)/view/camera.cpp  $(GRAPHICSSRC)/view/camera.h
 obj/light.o: $(LIGHTSRC)/light.cpp $(LIGHTSRC)/light.h 
 	$(CC) $(CFLAGS) -o obj/light.o -c $(LIGHTSRC)/light.cpp
 	
-obj/shadersource.o: $(SHADERSRC)/shadersource.cpp  $(SHADERSRC)/shadersource.h 
-	$(CC) $(CFLAGS) -o obj/shadersource.o -c $(SHADERSRC)/shadersource.cpp
-	
-obj/shader.o: $(SHADERSRC)/shader.cpp $(SHADERSRC)/shader.h 
-	$(CC) $(CFLAGS) -o obj/shader.o -c $(SHADERSRC)/shader.cpp
-		
-obj/shaderGL.o: $(SHADERSRC)/shaderGL.cpp $(SHADERSRC)/shaderGL.h
-	$(CC) $(CFLAGS) -o obj/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
-	
-obj/uniformdesc.o: $(SHADERSRC)/uniformdesc.cpp $(SHADERSRC)/uniformdesc.h
-	$(CC) $(CFLAGS) -o obj/uniformdesc.o -c $(SHADERSRC)/uniformdesc.cpp
-	
-obj/attributedesc.o: $(SHADERSRC)/attributedesc.cpp $(SHADERSRC)/attributedesc.h
-	$(CC) $(CFLAGS) -o obj/attributedesc.o -c $(SHADERSRC)/attributedesc.cpp
-
 obj/texture.o: $(TEXTURESRC)/texture.cpp $(TEXTURESRC)/texture.h 
 	$(CC) $(CFLAGS) -o obj/texture.o -c $(TEXTURESRC)/texture.cpp
 	
@@ -173,6 +159,31 @@ obj/stdattributes.o: $(GRAPHICSSRC)/stdattributes.cpp $(GRAPHICSSRC)/stdattribut
 obj/stduniforms.o: $(GRAPHICSSRC)/stduniforms.cpp $(GRAPHICSSRC)/stduniforms.h
 	$(CC) $(CFLAGS) -o obj/stduniforms.o -c $(GRAPHICSSRC)/stduniforms.cpp
 	
+	
+# ==================================
+# Shader
+# ==================================	
+
+shader: $(SHADEROBJ)
+
+obj/shadersource.o: $(SHADERSRC)/shadersource.cpp  $(SHADERSRC)/shadersource.h 
+	$(CC) $(CFLAGS) -o obj/shadersource.o -c $(SHADERSRC)/shadersource.cpp
+	
+obj/shader.o: $(SHADERSRC)/shader.cpp $(SHADERSRC)/shader.h 
+	$(CC) $(CFLAGS) -o obj/shader.o -c $(SHADERSRC)/shader.cpp
+		
+obj/shaderGL.o: $(SHADERSRC)/shaderGL.cpp $(SHADERSRC)/shaderGL.h
+	$(CC) $(CFLAGS) -o obj/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
+	
+obj/shadercatalog.o: $(SHADERSRC)/shadercatalog.cpp $(SHADERSRC)/shadercatalog.h 
+	$(CC) $(CFLAGS) -o obj/shadercatalog.o -c $(SHADERSRC)/shadercatalog.cpp
+	
+obj/uniformdesc.o: $(SHADERSRC)/uniformdesc.cpp $(SHADERSRC)/uniformdesc.h
+	$(CC) $(CFLAGS) -o obj/uniformdesc.o -c $(SHADERSRC)/uniformdesc.cpp
+	
+obj/attributedesc.o: $(SHADERSRC)/attributedesc.cpp $(SHADERSRC)/attributedesc.h
+	$(CC) $(CFLAGS) -o obj/attributedesc.o -c $(SHADERSRC)/attributedesc.cpp
+
 	
 # ==================================
 # Render
@@ -210,6 +221,12 @@ graphicsobject: $(GRAPHICSOBJECTOBJ)
 	
 obj/mesh3D.o: $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/mesh3D.h 
 	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(GRAPHICSOBJECTSRC)/mesh3D.cpp
+	
+obj/assetimporter.o: $(GRAPHICSOBJECTSRC)/import/assetimporter.cpp $(GRAPHICSOBJECTSRC)/import/assetimporter.h 
+	$(CC) $(CFLAGS) -o obj/assetimporter.o -c $(GRAPHICSOBJECTSRC)/import/assetimporter.cpp
+	
+obj/importutil.o: $(GRAPHICSOBJECTSRC)/import/importutil.cpp $(GRAPHICSOBJECTSRC)/import/importutil.h 
+	$(CC) $(CFLAGS) -o obj/importutil.o -c $(GRAPHICSOBJECTSRC)/import/importutil.cpp
 	
 	
 # ==================================

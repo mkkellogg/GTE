@@ -251,7 +251,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,1);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.01);
 	}
 
 	void OnQuit(Graphics * graphics)
@@ -268,8 +268,15 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 int main(int argc, char** argv)
 {
 	CustomGraphicsCallbacks graphicsCallbacks;
-	Graphics::Instance()->Init(640, 480,
-			(CustomGraphicsCallbacks*) (&graphicsCallbacks), "GTE Test");
+	bool initSuccess = Graphics::Instance()->Init(640, 480,(CustomGraphicsCallbacks*) (&graphicsCallbacks), "GTE Test");
+	if(initSuccess)
+	{
+		Graphics::Instance()->Run();
+	}
+	else
+	{
+		Debug::PrintError("Error occurred while initializing engine.");
+	}
 
 	return EXIT_SUCCESS;
 }
