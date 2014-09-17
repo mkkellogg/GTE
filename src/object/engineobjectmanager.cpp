@@ -62,8 +62,13 @@ bool EngineObjectManager::InitBuiltinShaders()
 		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: Diffuse");
 		return false;
 	}
-
+	builtinShaders.AddShader((int)BuiltinShader::Diffuse,shader);
 	return true;
+}
+
+Shader *  EngineObjectManager::GetBuiltinShader(BuiltinShader builtin)
+{
+	return builtinShaders.GetShader((int)builtin);
 }
 
 Mesh3D * EngineObjectManager::CreateMesh3D(StandardAttributeSet attributes)

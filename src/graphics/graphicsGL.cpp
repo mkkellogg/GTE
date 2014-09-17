@@ -245,6 +245,10 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
 	}
 
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+	glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+	glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0 );
+	glPixelStorei( GL_UNPACK_SKIP_ROWS, 0 );
 
 	TextureGL * texture = new TextureGL(attributes, tex, sourcePath);
 	return texture;

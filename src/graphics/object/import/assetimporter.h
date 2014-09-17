@@ -6,11 +6,13 @@ class Matrix4x4;
 class EngineObjectManager;
 class SceneObject;
 class Mesh3D;
+class Material;
 
 #include "object/sceneobjectcomponent.h"
 #include "graphics/stdattributes.h"
 #include "assimp/scene.h"
 #include <string>
+#include <vector>
 
 class AssetImporter
 {
@@ -19,7 +21,8 @@ class AssetImporter
 	protected :
 
 	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform);
-	 SceneObject * ProcessModelScene(const aiScene* scene, float importScale);
+	SceneObject * ProcessModelScene(const aiScene* scene, float importScale);
+	bool ProcessMaterials(std::vector<Material *>& materials);
 
 	public:
 

@@ -9,6 +9,7 @@ class EngineObject
 	friend class EngineObjectManager;
 
 	int objectID;
+	bool isActive;
 
     protected:
 
@@ -18,6 +19,8 @@ class EngineObject
     public:
 
     virtual int GetObjectID();
+    bool IsActive();
+    void SetActive(bool active);
 };
 
 #endif

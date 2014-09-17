@@ -1,5 +1,5 @@
-LIBS= -L/usr/lib/nvidia-331-updates/ -L../assimp/lib -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp
-CFLAGS=-Isrc -I../assimp/include  -std=c++11 -Wall 
+LIBS= -L/usr/lib/nvidia-331-updates/ -L../assimp/lib -L../DevIL/DevIL/lib -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL
+CFLAGS=-Isrc -I../assimp/include -I../DevIL/DevIL  -std=c++11 -Wall 
 CC=g++
 
 GLOBALSRC = src/global

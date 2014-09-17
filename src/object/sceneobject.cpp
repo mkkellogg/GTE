@@ -104,32 +104,30 @@ void SceneObject::AddChild(SceneObject * child)
 
 	if(child->parent != NULL)
 	{
-		parent->RemoveChild(child);
+		child->parent->RemoveChild(child);
 	}
-
 	child->parent = this;
+
 	children.push_back(child);
 }
 
 void SceneObject::RemoveChild(SceneObject * child)
 {
-	if(child != NULL)
-	{
-		for(std::vector<SceneObject *>::iterator it = children.begin(); it != children.end(); ++it)
-		{
-			if (*it == child)
-			{
-				children.erase(it);
-				break;
-			}
-		}
+	NULL_CHECK_RTRN(child,"SceneObject::RemoveChild -> adding NULL child.");
 
-		child->parent = NULL;
-	}
-	else
+	int foundIndex = -1;
+	for(unsigned int i =0; i < children.size(); i++)
 	{
-		Debug::PrintError("SceneObject::RemoveChild -> adding NULL child.");
+		if (children[i] == child)
+		{
+			foundIndex = (int)i;
+			break;
+		}
 	}
+
+	if(foundIndex >=0)children.erase(children.begin() + foundIndex);
+
+	child->parent = NULL;
 }
 
 unsigned int SceneObject::GetChildrenCount() const

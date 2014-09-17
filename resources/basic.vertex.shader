@@ -17,7 +17,7 @@ void main()
 {
    	vColor = COLOR;
    	vUV1 = UV1;
-   	vNormal = MODELVIEW_MATRIX * NORMAL;
+   	vNormal = vec3(MODELVIEW_MATRIX * NORMAL);
    	vPosition = MODELVIEW_MATRIX * POSITION;
     gl_Position = PROJECTION_MATRIX * MODELVIEW_MATRIX * POSITION ;
 }

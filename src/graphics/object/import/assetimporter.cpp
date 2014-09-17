@@ -8,6 +8,9 @@
 #include <string>
 #include <map>
 
+#include "graphics/stdattributes.h"
+
+#include <IL/il.h>
 #include "assimp/cimport.h"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
@@ -21,6 +24,10 @@
 #include "object/engineobjectmanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
+#include "graphics/render/mesh3Drenderer.h"
+#include "graphics/object/mesh3D.h"
+#include "geometry/sceneobjecttransform.h"
+#include "graphics/render/material.h"
 
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -32,6 +39,7 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
 
+#include "global/global.h"
 #include "ui/debug.h"
 
 AssetImporter::AssetImporter()
@@ -68,6 +76,7 @@ SceneObject * AssetImporter::LoadModel(const std::string& filePath, float import
 
 	if( !scene)
 	{
+		Debug::PrintError(importer.GetErrorString());
 		return NULL;
 	}
 
@@ -79,16 +88,20 @@ SceneObject * AssetImporter::ProcessModelScene(const aiScene* scene, float impor
 {
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
+	std::vector<Material *> materials;
+	ProcessMaterials(materials);
+
 	SceneObject * root = objectManager->CreateSceneObject();
 	NULL_CHECK(root,"AssetImporter::ProcessModelScene -> could not create root object", NULL);
 
+	root->SetActive(false);
 	Matrix4x4 baseTransform;
 	RecursiveProcessModelScene(scene, scene->mRootNode, importScale, root, &baseTransform);
 
-	return NULL;
+	return root;
 }
 
-void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform)
+void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform)
 {
 	unsigned int i;
 	unsigned int n=0, t;
@@ -101,28 +114,90 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 	m = m * m2;
 	ImportUtil::ConvertAssimpMatrix(&m,&mat);
 
+	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+	Graphics * graphics = Graphics::Instance();
+
 	for (n=0; n < nd->mNumMeshes; n++)
 	{
 		const aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
+		Mesh3D * mesh3D = ConvertAssimpMesh(mesh);
+		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
+
+		mesh3D->CalculateNormals(90);
+
+		SceneObject * sceneObject = engineObjectManager->CreateSceneObject();
+		NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
+
+		Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
+		NULL_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create mesh renderer.");
+
+		Shader * defaultShader = engineObjectManager->GetBuiltinShader(BuiltinShader::Diffuse);
+		Material * material =engineObjectManager->CreateMaterial("_Default", defaultShader);
+		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> Could not create material.");
+
+		meshRenderer->SetMaterial(material);
+
+		sceneObject->SetMesh(mesh3D);
+		sceneObject->SetMeshRenderer(meshRenderer);
+		sceneObject->GetTransform()->SetTo(&mat);
+		current->AddChild(sceneObject);
+	}
+
+	for(int i=0; i <nd->mNumChildren; i++)
+	{
+		SceneObject * child = engineObjectManager->CreateSceneObject();
+		NULL_CHECK_RTRN(child,"AssetImporter::RecursiveProcessModelScene -> Could not create child scene object.");
+		current->AddChild(child);
+
+		const aiNode *node = nd->mChildren[i];
+		if(node != NULL)RecursiveProcessModelScene(scene, node, scale, child, &mat);
 	}
 }
 
 Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 {
-	int faceCount = 0;
-	int vertexCount = 0;
-	for (int faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++)
+	unsigned int faceCount = 0;
+	unsigned int vertexCount = 0;
+
+	for (unsigned int faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++)
 	{
 		const aiFace* face = &mesh->mFaces[faceIndex];
 		vertexCount += face->mNumIndices;
 		faceCount++;
 	}
 
-	bool hasNormals = false;
+	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+
+	if(mesh->HasTextureCoords(0))	//HasTextureCoords(texture_coordinates_set)
+	{
+		//StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
+	}
+
+	if(mesh->mNormals != NULL)
+	{
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	}
+
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Color);
+
+	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+	Mesh3D * mesh3D = engineObjectManager->CreateMesh3D(meshAttributes);
+
+	NULL_CHECK(mesh3D,"AssetImporter::ConvertAssimpMesh -> Could not create Mesh3D object.",NULL);
+
+	bool initSuccess = mesh3D->Init(vertexCount);
+
+	if(!initSuccess)
+	{
+		engineObjectManager->DestroyMesh3D(mesh3D);
+		Debug::PrintError("AssetImporter::ConvertAssimpMesh -> Could not init mesh.");
+		return NULL;
+	}
 
 	int vertexComponentIndex = 0;
 	int vertexIndex = 0;
-	for (int faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++)
+	for (unsigned int faceIndex = 0; faceIndex < mesh->mNumFaces; faceIndex++)
 	{
 		const aiFace* face = &mesh->mFaces[faceIndex];
 
@@ -136,7 +211,7 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 		}
 		glBegin(face_mode);*/
 
-		for(int i = face->mNumIndices; i >=0; i--)	// go through all vertices in face
+		for( int i = face->mNumIndices-1; i >=0; i--)	// go through all vertices in face
 		{
 			int vIndex = face->mIndices[i];	// get group index for current index
 
@@ -156,11 +231,126 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 			vertices[vertexComponentIndex+1] = mesh->mVertices[vIndex].y;
 			vertices[vertexComponentIndex+2] = mesh->mVertices[vIndex].z;*/
 
+			aiVector3D srcPosition = mesh->mVertices[vIndex];
+
+			mesh3D->GetPostions()->GetPoint(vertexIndex)->Set(srcPosition.x,srcPosition.y,srcPosition.z);
+			if(mesh->mNormals != NULL)
+			{
+				aiVector3D srcNormal = mesh->mNormals[vIndex];
+				mesh3D->GetNormals()->GetVector(vertexIndex)->Set(srcNormal.x,srcNormal.y,srcNormal.z);
+			}
+			mesh3D->GetColors()->GetColor(vertexIndex)->Set(1,1,1,1);
+
 			vertexComponentIndex+=3;
 			vertexIndex++;
 		}
 
 		//glEnd();
 	}
-	return NULL;
+
+	return mesh3D;
+}
+
+bool AssetImporter::ProcessMaterials(std::vector<Material *>& materials)
+{
+	ILboolean success;
+
+	if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
+	{
+		/// wrong DevIL version ///
+		std::string err_msg = "Wrong DevIL version. Old devil.dll in system32/SysWow64?";
+		char* cErr_msg = (char *) err_msg.c_str();
+		//abortGLInit(cErr_msg);
+		return false;
+	}
+
+	/*int LoadGLTextures(const aiScene* scene)
+	{
+	ILboolean success;
+	// Before calling ilInit() version should be checked.
+	if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
+	{
+	/// wrong DevIL version ///
+	std::string err_msg = "Wrong DevIL version. Old devil.dll in system32/SysWow64?";
+	char* cErr_msg = (char *) err_msg.c_str();
+	abortGLInit(cErr_msg);
+	return -1;
+	}
+	ilInit(); /// Initialization of DevIL
+	if (scene->HasTextures()) abortGLInit("Support for meshes with embedded textures is not implemented");
+	// getTexture Filenames and Numb of Textures
+	for (unsigned int m=0; m<scene->mNumMaterials; m++)
+	{
+	int texIndex = 0;
+	aiReturn texFound = AI_SUCCESS;
+	aiString path;	// filename
+	while (texFound == AI_SUCCESS)
+	{
+	texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
+	textureIdMap[path.data] = NULL; //fill map with textures, pointers still NULL yet
+	texIndex++;
+	}
+	}
+	int numTextures = textureIdMap.size();
+	// array with DevIL image IDs
+	ILuint* imageIds = NULL;
+	imageIds = new ILuint[numTextures];
+	// generate DevIL Image IDs
+	ilGenImages(numTextures, imageIds); //Generation of numTextures image names
+	// create and fill array with GL texture ids
+	textureIds = new GLuint[numTextures];
+	glGenTextures(numTextures, textureIds); // Texture name generation
+	// get iterator
+	std::map<std::string, GLuint*>::iterator itr = textureIdMap.begin();
+	std::string basepath = getBasePath(modelpath);
+	for (int i=0; i<numTextures; i++)
+	{
+	//save IL image ID
+	std::string filename = (*itr).first; // get filename
+	(*itr).second = &textureIds[i];	// save texture id for filename in map
+	itr++;	// next texture
+	ilBindImage(imageIds[i]); // Binding of DevIL image name
+	std::string fileloc = basepath + filename;	// Loading of image
+	success = ilLoadImage(fileloc.c_str());
+	if (success) // If no error occured:
+	{
+	// Convert every colour component into unsigned byte.If your image contains
+	// alpha channel you can replace IL_RGB with IL_RGBA
+	success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+	if (!success)
+	{
+	// Error occured
+	abortGLInit("Couldn't convert image");
+	return -1;
+	}
+	// Binding of texture name
+	glBindTexture(GL_TEXTURE_2D, textureIds[i]);
+	// redefine standard texture values
+	// We will use linear interpolation for magnification filter
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	// We will use linear interpolation for minifying filter
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	// Texture specification
+	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
+	ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
+	ilGetData());
+	// we also want to be able to deal with odd texture dimensions
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+	glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+	glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0 );
+	glPixelStorei( GL_UNPACK_SKIP_ROWS, 0 );
+	}
+	else
+	{
+	// Error occured
+	MessageBox(NULL, ("Couldn't load Image: " + fileloc).c_str() , "ERROR", MB_OK | MB_ICONEXCLAMATION);
+	}
+	}
+	// Because we have already copied image data into texture data we can release memory used by image.
+	ilDeleteImages(numTextures, imageIds);
+	// Cleanup
+	delete [] imageIds;
+	imageIds = NULL;
+	return TRUE;
+	}*/
 }

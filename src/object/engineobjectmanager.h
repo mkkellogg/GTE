@@ -20,7 +20,7 @@ class Light;
 #include "graphics/texture/textureattr.h"
 #include "graphics/shader/shadercatalog.h"
 
-enum class BuiltInShader
+enum class BuiltinShader
 {
 	Diffuse,
 	DiffuseTextured
@@ -46,6 +46,7 @@ class EngineObjectManager
     static EngineObjectManager * Instance();
     SceneObject * CreateSceneObject();
     bool InitBuiltinShaders();
+    Shader * GetBuiltinShader(BuiltinShader builtin);
 
     Mesh3D * CreateMesh3D(StandardAttributeSet attributes);
     void DestroyMesh3D(Mesh3D * mesh);

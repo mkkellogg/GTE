@@ -8,6 +8,7 @@
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/mesh3D.h"
+#include "graphics/object/import/assetimporter.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/renderbuffer.h"
 #include "graphics/render/material.h"
@@ -88,7 +89,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		cameraObject = objectManager->CreateSceneObject();
 		Camera * camera = objectManager->CreateCamera();
-		cameraObject->GetTransform()->Translate(0, 5, 5, true);
+		cameraObject->GetTransform()->Translate(0, 5, 9, true);
 		// cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
 		camera->AddClearBuffer(RenderBufferType::Color);
 		camera->AddClearBuffer(RenderBufferType::Depth);
@@ -97,7 +98,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		SceneObject * sceneObject = objectManager->CreateSceneObject();
 		sceneObject->GetTransform()->Scale(3,3,3, true);
 		sceneObject->GetTransform()->RotateAround(0, 0, 0, 0, 1, 0, 45);
-		sceneObject->GetTransform()->Translate(0, 0, -12, false);
+		sceneObject->GetTransform()->Translate(-15, 0, -12, false);
 
 		TextureAttributes texAttributes;
 		texAttributes.FilterMode = TextureFilter::TriLinear;
@@ -234,7 +235,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		// cube back, triangle 2
 		uvs->GetCoordinate(27)->Set(1,0);
 		uvs->GetCoordinate(28)->Set(1,1);
-		uvs->GetCoordinate(29)->Set(0,1);
+		uvs-> GetCoordinate(29)->Set(0,1);
 
 		mesh->CalculateNormals(65);
 
@@ -244,14 +245,30 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		sceneObject->AddChild(childSceneObject);
 		childSceneObject->SetMesh(mesh);
 		childSceneObject->SetMeshRenderer(meshRenderer);
-		childSceneObject->GetTransform()->Scale(3,3,3, true);
-		childSceneObject->GetTransform()->Translate(5, 2, 0, true);
-		childSceneObject->GetTransform()->Translate(9, 0, 0, false);
+		childSceneObject->GetTransform()->Translate(-2, 3, 0, true);
+		childSceneObject->GetTransform()->Scale(1.5,1.5,1.5, true);
+		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
+
+
+		AssetImporter * importer = new AssetImporter();
+		SceneObject * modelSceneObject = importer->LoadModel("/home/dev/Downloads/houseA/houseA_obj.obj", 1 );
+		if(modelSceneObject != NULL)
+		{
+			modelSceneObject->SetActive(true);
+			Debug::PrintError("Model loaded!!\n");
+		}
+		else
+		{
+			Debug::PrintError(" >> could not load model!\n");
+			return;
+		}
+		modelSceneObject->GetTransform()->Translate(0,0,-12,false);
+		modelSceneObject->GetTransform()->Scale(.15,.15,.15, true);
 	}
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.01);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.05);
 	}
 
 	void OnQuit(Graphics * graphics)

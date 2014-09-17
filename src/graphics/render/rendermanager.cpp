@@ -182,7 +182,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 	{
 		SceneObject * child = parent->GetChildAt(i);
 
-		if(child != NULL)
+		if(child != NULL && child->IsActive())
 		{
 			// save the existing view transform
 			PushTransformData(viewTransform, viewTransformStack);
@@ -276,7 +276,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 	{
 		SceneObject * child = parent->GetChildAt(i);
 
-		if(child != NULL && child->GetTransform() != NULL)
+		if(child != NULL && child->IsActive() && child->GetTransform() != NULL)
 		{
 			// save existing model transform
 			PushTransformData(modelTransform, modelTransformStack);

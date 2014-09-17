@@ -8,7 +8,7 @@
 
 EngineObject::EngineObject() : objectID(-1)
 {
-
+	isActive = true;
 }
 
 EngineObject::~EngineObject()
@@ -19,4 +19,14 @@ EngineObject::~EngineObject()
 int EngineObject::GetObjectID()
 {
 	return objectID;
+}
+
+bool EngineObject::IsActive()
+{
+	return isActive;
+}
+
+void EngineObject::SetActive(bool active)
+{
+	this->isActive = active;
 }
