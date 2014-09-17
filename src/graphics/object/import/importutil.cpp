@@ -6,12 +6,14 @@
 
 #include <string>
 
+#include <IL/il.h>
 #include "importutil.h"
 #include "assimp/cimport.h"
 #include "assimp/scene.h"
 #include "geometry/matrix4x4.h"
 #include "ui/debug.h"
 #include "global/global.h"
+#include "graphics/image/rawimage.h"
 
 void ImportUtil::ConvertAssimpMatrix(const aiMatrix4x4 * source, Matrix4x4 * dest)
 {
@@ -41,4 +43,24 @@ void ImportUtil::ConvertAssimpMatrix(const aiMatrix4x4 * source, Matrix4x4 * des
 	data[15] = source->d4;
 
 	dest->SetTo(data);
+}
+
+RawImage * ImportUtil::GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height)
+{
+	RawImage * rawImage = new RawImage(width, height);
+	NULL_CHECK(rawImage,"ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.",NULL);
+
+	bool initSuccess = rawImage->Init();
+	if(!initSuccess)
+	{
+		Debug::PrintError("ImportUtil::GetRawImageFromILData -> Could not init RawImage.");
+		return NULL;
+	}
+
+	for(unsigned int i=0; i < width * height * 4; i++)
+	{
+		rawImage->SetByte(i,(BYTE)data[i]);
+	}
+
+	return rawImage;
 }

@@ -251,7 +251,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		AssetImporter * importer = new AssetImporter();
-		SceneObject * modelSceneObject = importer->LoadModel("/home/dev/Downloads/houseA/houseA_obj.obj", 1 );
+		SceneObject * modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
 		if(modelSceneObject != NULL)
 		{
 			modelSceneObject->SetActive(true);
@@ -268,7 +268,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.05);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.005);
 	}
 
 	void OnQuit(Graphics * graphics)

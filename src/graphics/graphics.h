@@ -15,6 +15,7 @@ class Transform;
 class ScreenDescriptor;
 class VertexAttrBuffer;
 class TextureAttributes;
+class RawImage;
 
 class GraphicsCallbacks
 {
@@ -55,6 +56,7 @@ class Graphics
     virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
     virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
     virtual Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes) = 0;
+    virtual Texture * CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes) = 0;
     virtual void DestroyTexture(Texture * texture) = 0;
     virtual void ClearBuffers(unsigned int bufferMask) const = 0;
 

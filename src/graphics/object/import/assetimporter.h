@@ -21,8 +21,9 @@ class AssetImporter
 	protected :
 
 	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform);
-	SceneObject * ProcessModelScene(const aiScene* scene, float importScale);
-	bool ProcessMaterials(std::vector<Material *>& materials);
+	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene* scene, float importScale);
+	bool ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials);
+	std::string GetBasePath(const std::string& path);
 
 	public:
 

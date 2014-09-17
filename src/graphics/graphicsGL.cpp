@@ -177,13 +177,9 @@ void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 	delete buffer;
 }
 
-Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes attributes)
+Texture * GraphicsGL::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
 {
-	NULL_CHECK(sourcePath, "GraphicsGL::CreateTexture -> sourcePath is NULL", NULL);
-
-	RawImage * raw = ImageLoader::LoadPNG(sourcePath);
-
-	NULL_CHECK(raw, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
+	NULL_CHECK(imageData, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
 
 	glEnable(GL_TEXTURE_2D);
 	GLuint tex;
@@ -232,6 +228,8 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_FLOAT, raw->GetPixels());
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
 
+	RawImage * raw = const_cast<RawImage *>(imageData);
+
 	if(openGLVersion >= 3)
 	{
 		glTexStorage2D(GL_TEXTURE_2D, attributes.MipMapLevel, GL_RGBA8, raw->GetWidth(), raw->GetHeight());
@@ -252,6 +250,17 @@ Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes a
 
 	TextureGL * texture = new TextureGL(attributes, tex, sourcePath);
 	return texture;
+}
+
+Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes attributes)
+{
+	NULL_CHECK(sourcePath, "GraphicsGL::CreateTexture -> sourcePath is NULL", NULL);
+
+	RawImage * raw = ImageLoader::LoadPNG(sourcePath);
+
+	NULL_CHECK(raw, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
+
+	return CreateTexture(raw, sourcePath, attributes);
 }
 
 void GraphicsGL::DestroyTexture(Texture * texture)

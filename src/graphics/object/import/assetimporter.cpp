@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
 #include <map>
 
 #include "graphics/stdattributes.h"
@@ -28,6 +29,7 @@
 #include "graphics/object/mesh3D.h"
 #include "geometry/sceneobjecttransform.h"
 #include "graphics/render/material.h"
+#include "graphics/image/rawimage.h"
 
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -81,15 +83,15 @@ SceneObject * AssetImporter::LoadModel(const std::string& filePath, float import
 	}
 
 	// We're done. Everything will be cleaned up by the importer destructor
-	return ProcessModelScene(scene, importScale);
+	return ProcessModelScene(filePath, scene, importScale);
 }
 
-SceneObject * AssetImporter::ProcessModelScene(const aiScene* scene, float importScale)
+SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, const aiScene* scene, float importScale)
 {
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
 	std::vector<Material *> materials;
-	ProcessMaterials(materials);
+	ProcessMaterials(modelPath, scene, materials);
 
 	SceneObject * root = objectManager->CreateSceneObject();
 	NULL_CHECK(root,"AssetImporter::ProcessModelScene -> could not create root object", NULL);
@@ -251,46 +253,86 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 	return mesh3D;
 }
 
-bool AssetImporter::ProcessMaterials(std::vector<Material *>& materials)
+bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials)
 {
 	ILboolean success;
 
 	if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
 	{
 		/// wrong DevIL version ///
-		std::string err_msg = "Wrong DevIL version. Old devil.dll in system32/SysWow64?";
-		char* cErr_msg = (char *) err_msg.c_str();
-		//abortGLInit(cErr_msg);
+		std::string msg = "AssetImporter::ProcessMaterials -> wrong DevIL version";
+		Debug::PrintError(msg);
 		return false;
 	}
 
-	/*int LoadGLTextures(const aiScene* scene)
-	{
-	ILboolean success;
-	// Before calling ilInit() version should be checked.
-	if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
-	{
-	/// wrong DevIL version ///
-	std::string err_msg = "Wrong DevIL version. Old devil.dll in system32/SysWow64?";
-	char* cErr_msg = (char *) err_msg.c_str();
-	abortGLInit(cErr_msg);
-	return -1;
-	}
 	ilInit(); /// Initialization of DevIL
-	if (scene->HasTextures()) abortGLInit("Support for meshes with embedded textures is not implemented");
+	if (scene->HasTextures())
+	{
+		Debug::PrintError("AssetImporter::ProcessMaterials -> Support for meshes with embedded textures is not implemented");
+		return false;
+	}
+
+	int textureCount = 0;
+	std::vector<std::string> texturePaths;
 	// getTexture Filenames and Numb of Textures
 	for (unsigned int m=0; m<scene->mNumMaterials; m++)
 	{
-	int texIndex = 0;
-	aiReturn texFound = AI_SUCCESS;
-	aiString path;	// filename
-	while (texFound == AI_SUCCESS)
+		int texIndex = 0;
+		aiReturn texFound = AI_SUCCESS;
+		aiString path;	// filename
+
+		// TODO: enable multiple textures per material here!!
+		//while (texFound == AI_SUCCESS)
+		//{
+			texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
+			texturePaths.push_back(std::string(path.data));
+			textureCount++;
+			texIndex++;
+		//}
+	}
+
+	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+
+	std::vector<std::string>::iterator itr = texturePaths.begin();
+	std::string basepath = GetBasePath(modelPath);
+	for (int i=0; i<textureCount; i++)
 	{
-	texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
-	textureIdMap[path.data] = NULL; //fill map with textures, pointers still NULL yet
-	texIndex++;
+		//save IL image ID
+		std::string filename = *itr; // get filename
+
+		itr++;	// next texture
+
+		// Convert every colour component into unsigned byte.If your image contains
+		// alpha channel you can replace IL_RGB with IL_RGBA
+		success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+		if (!success)
+		{
+			// Error occured
+			Debug::PrintError("AssetImporter::ProcessMaterials -> Couldn't convert image");
+			return false;
+		}
+
+		/*
+		ilGetInteger(IL_IMAGE_BPP),
+		ilGetInteger(IL_IMAGE_WIDTH),
+		ilGetInteger(IL_IMAGE_HEIGHT),
+		ilGetInteger(IL_IMAGE_FORMAT),
+		ilGetData()
+		*/
+
+		TextureAttributes texAttributes;
+		texAttributes.FilterMode = TextureFilter::TriLinear;
+		texAttributes.MipMapLevel = 4;
+
+		engineObjectManager->CreateTexture(modelPath.c_str(),texAttributes);
+
+		Shader * defaultShader = engineObjectManager->GetBuiltinShader(BuiltinShader::Diffuse);
+		Material * material = engineObjectManager->CreateMaterial("Default",defaultShader);
+
+		materials.push_back(material);
 	}
-	}
+
+	/*
 	int numTextures = textureIdMap.size();
 	// array with DevIL image IDs
 	ILuint* imageIds = NULL;
@@ -353,4 +395,12 @@ bool AssetImporter::ProcessMaterials(std::vector<Material *>& materials)
 	imageIds = NULL;
 	return TRUE;
 	}*/
+
+	return true;
+}
+
+std::string AssetImporter::GetBasePath(const std::string& path)
+{
+	size_t pos = path.find_last_of("\\/");
+	return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
 }

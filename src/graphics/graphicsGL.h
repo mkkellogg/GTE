@@ -39,6 +39,7 @@ class GraphicsGL : public Graphics
     VertexAttrBuffer * CreateVertexAttributeBuffer();
     void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
     Texture * CreateTexture(const char * sourcePath,  TextureAttributes attributes);
+    Texture * CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
     void DestroyTexture(Texture * texture);
     void ClearBuffers(unsigned int bufferMask) const;
 

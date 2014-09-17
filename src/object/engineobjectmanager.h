@@ -13,6 +13,7 @@ class Camera;
 class TextureAttributes;
 class Texture;
 class Light;
+class RawImage;
 
 #include <vector>
 #include "graphics/stdattributes.h"
@@ -55,6 +56,7 @@ class EngineObjectManager
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(Shader * shader);
     Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes);
+    Texture * CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
     Material * CreateMaterial(const char *name,Shader * shader);
     Material * CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
     void DestroyMaterial(Material * material);

@@ -13,6 +13,7 @@
 #include "graphics/stdattributes.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/texture/texture.h"
+#include "graphics/image/rawimage.h"
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
 #include <string>
@@ -110,6 +111,12 @@ Texture * EngineObjectManager::CreateTexture(const char * sourcePath, TextureAtt
 {
 	Graphics * graphics = Graphics::Instance();
 	return graphics->CreateTexture(sourcePath, attributes);
+}
+
+Texture * EngineObjectManager::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
+{
+	Graphics * graphics = Graphics::Instance();
+	return graphics->CreateTexture(imageData, sourcePath, attributes);
 }
 
 Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader)
