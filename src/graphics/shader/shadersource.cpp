@@ -10,10 +10,11 @@
 #include "shadersource.h"
 #include "gte.h"
 
-ShaderSource::ShaderSource(const char *filePath)
+ShaderSource::ShaderSource(const std::string& filePath)
 {
     loaded = false;
     sourcePath = filePath;
+    sourceString = NULL;
 }
 
 ShaderSource::~ShaderSource()
@@ -27,7 +28,7 @@ ShaderSource::~ShaderSource()
 
 bool ShaderSource::Load()
 {
-    sourceString = ReadShaderSource(sourcePath);
+    sourceString = ReadShaderSource(sourcePath.c_str());
     loaded = sourceString != NULL ? true : false;
     return loaded;
 }

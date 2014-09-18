@@ -18,8 +18,6 @@ bool ImageLoader::Initialize()
 {
 	if(!ImageLoader::ilInitialized)
 	{
-		ILboolean success;
-
 		if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
 		{
 			/// wrong DevIL version ///
@@ -50,10 +48,8 @@ RawImage * ImageLoader::LoadPNG(const std::string& fullPath)
 
 	if(error)
 	{
-		char msg[64];
-		const char * loadErr = lodepng_error_text(error);
-		sprintf(msg, "Error loading PNG: %s", loadErr);
-		Debug::PrintError(msg);
+		std::string loadErr = std::string("Error loading PNG: ") + lodepng_error_text(error);
+		Debug::PrintError(loadErr);
 		return NULL;
 	}
 
@@ -82,13 +78,11 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 		return NULL;
 	}
 
-	int dotIndex = fullPath.find_last_of(".");
-	if(dotIndex <0)dotIndex=0;
-	std::string extension = fullPath.substr(dotIndex,4);
-	if(extension.compare(".png")==0)
+	std::string extension = GetFileExtension(fullPath);
+	/*if(extension.compare(".png")==0)
 	{
-	//	return LoadPNG(fullPath);
-	}
+		return LoadPNG(fullPath);
+	}*/
 
 	ILuint imageIds[1];
 	ilGenImages(1, imageIds); //Generation of numTextures image names
@@ -98,26 +92,18 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 
 	ILboolean success = ilLoadImage(fullPath.c_str());
 
-	if (success) // If no error occured:
+	if (success) // If no error occurred:
 	{
-		// Convert every colour component into unsigned byte.If your image contains
+		// Convert every color component into unsigned byte.If your image contains
 		// alpha channel you can replace IL_RGB with IL_RGBA
 		success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 		if (!success)
 		{
-			// Error occured
+			// Error occurred
 			Debug::PrintError("ImageLoader::LoadImage -> Couldn't convert image");
 			ilDeleteImages(1, imageIds);
 			return NULL;
 		}
-
-		/*
-		ilGetInteger(IL_IMAGE_BPP),
-		ilGetInteger(IL_IMAGE_WIDTH),
-		ilGetInteger(IL_IMAGE_HEIGHT),
-		ilGetInteger(IL_IMAGE_FORMAT),
-		ilGetData()
-		*/
 
 		rawImage = GetRawImageFromILData(ilGetData(), ilGetInteger(IL_IMAGE_WIDTH),ilGetInteger(IL_IMAGE_HEIGHT));
 	}
@@ -138,12 +124,13 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 
 	// Because we have already copied image data into texture data we can release memory used by image.
 	ilDeleteImages(1, imageIds);
-
 	return rawImage;
 }
 
 RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height)
 {
+	NULL_CHECK(data,"ImportUtil::GetRawImageFromILData -> data is NULL.",NULL);
+
 	RawImage * rawImage = new RawImage(width, height);
 	NULL_CHECK(rawImage,"ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.",NULL);
 
@@ -151,6 +138,7 @@ RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, unsigned int width
 	if(!initSuccess)
 	{
 		Debug::PrintError("ImportUtil::GetRawImageFromILData -> Could not init RawImage.");
+		delete rawImage;
 		return NULL;
 	}
 
@@ -160,4 +148,18 @@ RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, unsigned int width
 	}
 
 	return rawImage;
+}
+
+void ImageLoader::DestroyRawImage(RawImage * image)
+{
+	NULL_CHECK_RTRN(image,"ImageLoader::DestroyRawImage -> image is NULL.");
+	delete image;
+}
+
+std::string ImageLoader::GetFileExtension(const std::string& filePath)
+{
+	int dotIndex = filePath.find_last_of(".");
+	if(dotIndex <0)dotIndex=0;
+	std::string extension = filePath.substr(dotIndex,filePath.size()-dotIndex);
+	return extension;
 }

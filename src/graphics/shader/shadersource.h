@@ -3,17 +3,18 @@
 
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <string>
 
 class ShaderSource
 {
     bool loaded;
     char * sourceString;
-    const char * sourcePath;
+    std::string sourcePath;
     char * ReadShaderSource(const char *fn);
 
     public :
 
-    ShaderSource(const char *filePath);
+    ShaderSource(const std::string& filePath);
     ~ShaderSource();
     char * GetSourceString();
     bool Load();

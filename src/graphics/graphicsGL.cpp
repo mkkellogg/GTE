@@ -261,11 +261,11 @@ Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, TextureAttrib
 	if(tex == NULL)
 	{
 		Debug::PrintError("GraphicsGL::CreateTexture -> Unable to create texture.");
-		delete raw;
+		ImageLoader::DestroyRawImage(raw);
 		return NULL;
 	}
 
-	delete raw;
+	ImageLoader::DestroyRawImage(raw);
 	return tex;
 }
 

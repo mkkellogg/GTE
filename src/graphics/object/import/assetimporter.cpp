@@ -268,10 +268,13 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		return false;
 	}
 
+	NULL_CHECK(scene,"AssetImporter::ProcessMaterials -> scene is NULL.", false);
+
 	int textureCount = 0;
 	std::vector<std::string> texturePaths;
-	// getTexture Filenames and Numb of Textures
-	for (unsigned int m=0; m<scene->mNumMaterials; m++)
+
+	// count textures in scene and get file paths
+	for (unsigned int m=0; m < scene->mNumMaterials; m++)
 	{
 		int texIndex = 0;
 		aiReturn texFound = AI_SUCCESS;
@@ -281,9 +284,10 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		//while (texFound == AI_SUCCESS)
 		//{
 			texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
-			texturePaths.push_back(std::string(path.data));
+
 			if(texFound == AI_SUCCESS)
 			{
+				texturePaths.push_back(std::string(path.data));
 				textureCount++;
 			}
 			texIndex++;
@@ -294,14 +298,11 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 
 	std::vector<std::string>::iterator itr = texturePaths.begin();
 	std::string basepath = GetBasePath(modelPath);
-	//printf("base path: %s\n", basepath.c_str());
-	//printf("model path: %s\n", modelPath.c_str());
+
 	for (int i=0; i<textureCount; i++)
 	{
 		//save IL image ID
 		std::string filename = basepath + *itr; // get filename
-
-		//printf("filename: %s\n", filename.c_str());
 
 		itr++;	// next texture
 
@@ -316,70 +317,6 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 
 		materials.push_back(material);
 	}
-
-	/*
-	int numTextures = textureIdMap.size();
-	// array with DevIL image IDs
-	ILuint* imageIds = NULL;
-	imageIds = new ILuint[numTextures];
-	// generate DevIL Image IDs
-	ilGenImages(numTextures, imageIds); //Generation of numTextures image names
-	// create and fill array with GL texture ids
-	textureIds = new GLuint[numTextures];
-	glGenTextures(numTextures, textureIds); // Texture name generation
-	// get iterator
-	std::map<std::string, GLuint*>::iterator itr = textureIdMap.begin();
-	std::string basepath = getBasePath(modelpath);
-	for (int i=0; i<numTextures; i++)
-	{
-	//save IL image ID
-	std::string filename = (*itr).first; // get filename
-	(*itr).second = &textureIds[i];	// save texture id for filename in map
-	itr++;	// next texture
-	ilBindImage(imageIds[i]); // Binding of DevIL image name
-	std::string fileloc = basepath + filename;	// Loading of image
-	success = ilLoadImage(fileloc.c_str());
-	if (success) // If no error occured:
-	{
-	// Convert every colour component into unsigned byte.If your image contains
-	// alpha channel you can replace IL_RGB with IL_RGBA
-	success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-	if (!success)
-	{
-	// Error occured
-	abortGLInit("Couldn't convert image");
-	return -1;
-	}
-	// Binding of texture name
-	glBindTexture(GL_TEXTURE_2D, textureIds[i]);
-	// redefine standard texture values
-	// We will use linear interpolation for magnification filter
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	// We will use linear interpolation for minifying filter
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	// Texture specification
-	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
-	ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
-	ilGetData());
-	// we also want to be able to deal with odd texture dimensions
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-	glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
-	glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0 );
-	glPixelStorei( GL_UNPACK_SKIP_ROWS, 0 );
-	}
-	else
-	{
-	// Error occured
-	MessageBox(NULL, ("Couldn't load Image: " + fileloc).c_str() , "ERROR", MB_OK | MB_ICONEXCLAMATION);
-	}
-	}
-	// Because we have already copied image data into texture data we can release memory used by image.
-	ilDeleteImages(numTextures, imageIds);
-	// Cleanup
-	delete [] imageIds;
-	imageIds = NULL;
-	return TRUE;
-	}*/
 
 	return true;
 }

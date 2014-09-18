@@ -268,7 +268,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.05);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.005);
 	}
 
 	void OnQuit(Graphics * graphics)
