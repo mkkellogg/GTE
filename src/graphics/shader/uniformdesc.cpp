@@ -8,6 +8,7 @@
 
 UniformDescriptor::UniformDescriptor()
 {
+	SamplerUnitIndex = 0;
 	ShaderVarID = -1;
 	Size = -1;
 	Type = UniformType::Float;

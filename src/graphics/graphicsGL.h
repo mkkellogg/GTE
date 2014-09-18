@@ -14,7 +14,7 @@ class VertexAttrBuffer;
 class TextureAttributes;
 
 #include "graphics.h"
-
+#include <string>
 
 class GraphicsGL : public Graphics
 {
@@ -32,14 +32,14 @@ class GraphicsGL : public Graphics
 
     unsigned int openGLVersion;
 
-    Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath);
+    Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
     void DestroyShader(Shader * shader);
     Mesh3DRenderer * CreateMeshRenderer();
     void DestroyMeshRenderer(Mesh3DRenderer * buffer);
     VertexAttrBuffer * CreateVertexAttributeBuffer();
     void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
-    Texture * CreateTexture(const char * sourcePath,  TextureAttributes attributes);
-    Texture * CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
+    Texture * CreateTexture(const std::string& sourcePath,  TextureAttributes attributes);
+    Texture * CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes);
     void DestroyTexture(Texture * texture);
     void ClearBuffers(unsigned int bufferMask) const;
 
@@ -50,7 +50,7 @@ class GraphicsGL : public Graphics
 
     public :
 
-    bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
+    bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle);
     bool Run();
     unsigned int GetOpenGLVersion();
 };

@@ -64,6 +64,17 @@ bool EngineObjectManager::InitBuiltinShaders()
 		return false;
 	}
 	builtinShaders.AddShader((int)BuiltinShader::Diffuse,shader);
+
+	vertexSource = std::string(builtinPath) + std::string("diffuse_texture.vertex.shader");
+	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture.fragment.shader");
+	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	if(shader == NULL)
+	{
+		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured");
+		return false;
+	}
+	builtinShaders.AddShader((int)BuiltinShader::DiffuseTextured,shader);
+
 	return true;
 }
 

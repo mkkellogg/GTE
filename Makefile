@@ -1,5 +1,11 @@
-LIBS= -L/usr/lib/nvidia-331-updates/ -L../assimp/lib -L../DevIL/DevIL/lib -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL
-CFLAGS=-Isrc -I../assimp/include -I../DevIL/DevIL  -std=c++11 -Wall 
+ASSIMP_LIB=../assimp/lib
+ASSIMP_INC=../assimp/include
+DEVIL_LIB=/usr/locl/lib
+DEVIL_INC=../DevIL/DevIL/include
+OPENGL_LIB=/usr/lib/nvidia-331-updates/
+
+LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -L$(DEVIL_LIB) -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL 
+CFLAGS=-Isrc -I$(ASSIMP_INC) -I$(DEVIL_INC)  -std=c++11 -Wall 
 CC=g++
 
 GLOBALSRC = src/global

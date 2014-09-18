@@ -15,6 +15,7 @@ class Graphics;
 class TextureAttributes;
 
 #include "textureattr.h"
+#include <string>
 
 class Texture
 {
@@ -22,13 +23,13 @@ class Texture
 
 	protected:
 
-	char * sourcePath;
+	std::string sourcePath;
 	TextureAttributes attributes;
 
 	public:
 
 	Texture(TextureAttributes attributes);
-	Texture(TextureAttributes attributes, const char * sourcePath);
+	Texture(TextureAttributes attributes, const std::string& sourcePath);
 	virtual ~Texture();
 };
 

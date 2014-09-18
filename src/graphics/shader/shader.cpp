@@ -8,7 +8,7 @@
 #include "shader.h"
 #include "gte.h"
 
-Shader::Shader(const char * vertexSourcePath, const char * fragmentSourcePath)
+Shader::Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath)
 {
 
 }

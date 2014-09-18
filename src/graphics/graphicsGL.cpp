@@ -5,6 +5,7 @@
 #include <math.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <string>
  
 #include "graphicsGL.h"
 #include "graphics/screendesc.h"
@@ -32,7 +33,7 @@
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
 
-bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
+bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle)
 {
 	_instanceCallbacks = this->callbacks = callbacks;
 	_thisInstance = this;
@@ -50,7 +51,7 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
        exit(1);
     }
 
-    (void)glutCreateWindow(windowTitle);
+    (void)glutCreateWindow(windowTitle.c_str());
 
     glewExperimental = GL_TRUE; 
     glewInit();
@@ -83,6 +84,7 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     glutDisplayFunc(&_glutDisplayFunc);
     glutIdleFunc(&_glutIdleFunc);
 
+    // TODO: think of a better place for these calls
     glEnable(GL_DEPTH_TEST);
     glClearColor(0,0,0,0);
     glFrontFace(GL_CW);
@@ -121,17 +123,15 @@ GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
 	openGLVersion = 0;
 }
 
-Shader * GraphicsGL::CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath)
+Shader * GraphicsGL::CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
 {
-	NULL_CHECK(vertexShaderPath, "GraphicsGL::CreateShader -> NULL vertexShaderPath", NULL);
-	NULL_CHECK(fragmentShaderPath, "GraphicsGL::CreateShader -> NULL fragmentShaderPath", NULL);
-
     Shader * shader = new ShaderGL(vertexShaderPath, fragmentShaderPath);
     bool loadSuccess = shader->Load();
 	if(!loadSuccess)
 	{
-		char msg[64];
-		sprintf(msg, "GraphicsGL::CreateShader -> could not load shader: '%s' or '%s' ", vertexShaderPath, fragmentShaderPath);
+		std::string msg = "GraphicsGL::CreateShader -> could not load shader: ";
+		std::string singleQuote = std::string("'");
+		msg += singleQuote + vertexShaderPath + singleQuote + std::string(" or ") + singleQuote +fragmentShaderPath + singleQuote;
 		Debug::PrintError(msg);
 		return NULL;
     }
@@ -177,7 +177,7 @@ void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 	delete buffer;
 }
 
-Texture * GraphicsGL::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
+Texture * GraphicsGL::CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes)
 {
 	NULL_CHECK(imageData, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
 
@@ -252,15 +252,21 @@ Texture * GraphicsGL::CreateTexture(const RawImage * imageData, const char * sou
 	return texture;
 }
 
-Texture * GraphicsGL::CreateTexture(const char * sourcePath, TextureAttributes attributes)
+Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, TextureAttributes attributes)
 {
-	NULL_CHECK(sourcePath, "GraphicsGL::CreateTexture -> sourcePath is NULL", NULL);
-
-	RawImage * raw = ImageLoader::LoadPNG(sourcePath);
-
+	RawImage * raw = ImageLoader::LoadImage(sourcePath);
 	NULL_CHECK(raw, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
 
-	return CreateTexture(raw, sourcePath, attributes);
+	TextureGL * tex = (TextureGL*)CreateTexture(raw, sourcePath, attributes);
+	if(tex == NULL)
+	{
+		Debug::PrintError("GraphicsGL::CreateTexture -> Unable to create texture.");
+		delete raw;
+		return NULL;
+	}
+
+	delete raw;
+	return tex;
 }
 
 void GraphicsGL::DestroyTexture(Texture * texture)

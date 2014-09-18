@@ -16,6 +16,7 @@ class TextureGL;
 #include "texture.h"
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <string>
 
 class TextureGL : public Texture
 {
@@ -26,7 +27,7 @@ class TextureGL : public Texture
 	GLuint textureID;
 
 	TextureGL(TextureAttributes attributes, GLuint textureID);
-	TextureGL(TextureAttributes attributes, GLuint textureID, const char * sourcePath);
+	TextureGL(TextureAttributes attributes, GLuint textureID, const std::string& sourcePath);
 	~TextureGL();
 
 	public:

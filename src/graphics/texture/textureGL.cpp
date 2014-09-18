@@ -3,6 +3,7 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
+#include <string>
 
 #include "textureGL.h"
 #include "textureattr.h"
@@ -16,7 +17,7 @@ TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID) : Texture(a
 	this->textureID = textureID;
 }
 
-TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID, const char * sourcePath) : Texture(attributes, sourcePath)
+TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID, const std::string& sourcePath) : Texture(attributes, sourcePath)
 {
 	this->textureID = textureID;
 }

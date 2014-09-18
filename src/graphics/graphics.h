@@ -17,6 +17,8 @@ class VertexAttrBuffer;
 class TextureAttributes;
 class RawImage;
 
+#include <string>
+
 class GraphicsCallbacks
 {
     public:
@@ -46,17 +48,17 @@ class Graphics
 
     RenderManager * GetRenderManager();
 
-    virtual bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle);
+    virtual bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle);
     virtual bool Run();
 
-    virtual Shader * CreateShader(const char * vertexShaderPath, const char * fragmentShaderPath) = 0;
+    virtual Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) = 0;
     virtual void DestroyShader(Shader * shader) = 0;
     virtual Mesh3DRenderer * CreateMeshRenderer()  = 0;
     virtual void DestroyMeshRenderer(Mesh3DRenderer * buffer) = 0;
     virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
     virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
-    virtual Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes) = 0;
-    virtual Texture * CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes) = 0;
+    virtual Texture * CreateTexture(const std::string& sourcePath, TextureAttributes attributes) = 0;
+    virtual Texture * CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes) = 0;
     virtual void DestroyTexture(Texture * texture) = 0;
     virtual void ClearBuffers(unsigned int bufferMask) const = 0;
 

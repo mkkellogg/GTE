@@ -8,24 +8,20 @@
 #include "textureattr.h"
 #include "global/global.h"
 #include "ui/debug.h"
+#include <string>
 
 
 Texture::Texture(TextureAttributes attributes)
 {
-	sourcePath = NULL;
 	this->attributes = attributes;
 }
 
-Texture::Texture(TextureAttributes attributes, const char * sourcePath) : Texture(attributes)
+Texture::Texture(TextureAttributes attributes, const std::string& sourcePath) : Texture(attributes)
 {
-	if(sourcePath != NULL)
-	{
-		this->sourcePath = new char[strlen(sourcePath)+1];
-		strcpy(this->sourcePath, sourcePath);
-	}
+	this->sourcePath = sourcePath;
 }
 
 Texture::~Texture()
 {
-	SAFE_DELETE(sourcePath);
+
 }

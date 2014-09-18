@@ -82,7 +82,7 @@ class ShaderGL : public Shader
 
     protected:
 
-    ShaderGL(const char * vertexSourcePath, const char * fragmentSourcePath);
+    ShaderGL(const std::string& vertexSourcePath, const std::string& fragmentSourcePath);
     virtual ~ShaderGL();
 
     public :
@@ -95,7 +95,7 @@ class ShaderGL : public Shader
 
     void SendBufferToShader(int varID, VertexAttrBuffer * buffer);
 
-    void SendUniformToShader(int varID, const Texture * texture);
+    void SendUniformToShader(unsigned int samplerUnitIndex, const Texture * texture);
     void SendUniformToShader(int varID, const Matrix4x4 * mat);
     void SendUniformToShader(int varID, const Point3 * point);
     void SendUniformToShader(int varID, const Vector3 * vector);

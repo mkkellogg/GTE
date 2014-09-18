@@ -12,8 +12,36 @@
 #include "ui/debug.h"
 #include <IL/il.h>
 
-RawImage * ImageLoader::LoadPNG(const char * fullPath)
+bool ImageLoader::ilInitialized = false;
+
+bool ImageLoader::Initialize()
 {
+	if(!ImageLoader::ilInitialized)
+	{
+		ILboolean success;
+
+		if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
+		{
+			/// wrong DevIL version ///
+			Debug::PrintError("AssetImporter::ProcessMaterials -> wrong DevIL version");
+			return false;
+		}
+
+		ilInit(); /// Initialization of DevIL
+		ImageLoader::ilInitialized = true;
+	}
+
+	return true;
+}
+
+RawImage * ImageLoader::LoadPNG(const std::string& fullPath)
+{
+	if(!Initialize())
+	{
+		Debug::PrintError(" ImageLoader::LoadPNG -> Error occurred while initializing image loader.");
+		return NULL;
+	}
+
 	std::vector<unsigned char> image; // raw pixels
 	unsigned width, height;
 
@@ -46,18 +74,30 @@ RawImage * ImageLoader::LoadPNG(const char * fullPath)
 	return raw;
 }
 
-RawImage * ImageLoader::LoadImage(const char * fullPath)
+RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 {
+	if(!Initialize())
+	{
+		Debug::PrintError(" ImageLoader::LoadImage -> Error occurred while initializing image loader.");
+		return NULL;
+	}
+
+	int dotIndex = fullPath.find_last_of(".");
+	if(dotIndex <0)dotIndex=0;
+	std::string extension = fullPath.substr(dotIndex,4);
+	if(extension.compare(".png")==0)
+	{
+	//	return LoadPNG(fullPath);
+	}
+
 	ILuint imageIds[1];
 	ilGenImages(1, imageIds); //Generation of numTextures image names
 
-	//save IL image ID
-	std::string filename = fullPath; // get filename
-
 	ilBindImage(imageIds[0]); // Binding of DevIL image name
-	std::string fileloc = fullPath;	// Loading of image
 	RawImage * rawImage = NULL;
-	ILboolean success = ilLoadImage(fileloc.c_str());
+
+	ILboolean success = ilLoadImage(fullPath.c_str());
+
 	if (success) // If no error occured:
 	{
 		// Convert every colour component into unsigned byte.If your image contains
@@ -66,7 +106,7 @@ RawImage * ImageLoader::LoadImage(const char * fullPath)
 		if (!success)
 		{
 			// Error occured
-			Debug::PrintError("AssetImporter::ProcessMaterials -> Couldn't convert image");
+			Debug::PrintError("ImageLoader::LoadImage -> Couldn't convert image");
 			ilDeleteImages(1, imageIds);
 			return NULL;
 		}
@@ -80,6 +120,20 @@ RawImage * ImageLoader::LoadImage(const char * fullPath)
 		*/
 
 		rawImage = GetRawImageFromILData(ilGetData(), ilGetInteger(IL_IMAGE_WIDTH),ilGetInteger(IL_IMAGE_HEIGHT));
+	}
+	else
+	{
+		ILenum i = ilGetError();
+		std::string msg = "ImageLoader::LoadImage -> Couldn't load image.";
+		if(i == IL_INVALID_EXTENSION)
+		{
+			msg = std::string("ImageLoader::LoadImage -> Couldn't load image (invalid extension). ");
+			msg += std::string("Is DevIL configured to load extension: ") + extension + std::string(" ?");
+		}
+
+		Debug::PrintError(msg);
+		ilDeleteImages(1, imageIds);
+		return NULL;
 	}
 
 	// Because we have already copied image data into texture data we can release memory used by image.

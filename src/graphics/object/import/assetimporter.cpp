@@ -98,12 +98,12 @@ SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, con
 
 	root->SetActive(false);
 	Matrix4x4 baseTransform;
-	RecursiveProcessModelScene(scene, scene->mRootNode, importScale, root, &baseTransform);
+	RecursiveProcessModelScene(scene, scene->mRootNode, importScale, root, &baseTransform, materials);
 
 	return root;
 }
 
-void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform)
+void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform, std::vector<Material *>& materials)
 {
 	unsigned int i;
 	unsigned int n=0, t;
@@ -133,8 +133,8 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 		Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
 		NULL_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create mesh renderer.");
 
-		Shader * defaultShader = engineObjectManager->GetBuiltinShader(BuiltinShader::Diffuse);
-		Material * material =engineObjectManager->CreateMaterial("_Default", defaultShader);
+		int materialIndex = mesh->mMaterialIndex;
+		Material * material = materials[materialIndex]; //engineObjectManager->CreateMaterial("_Default", defaultShader);
 		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> Could not create material.");
 
 		meshRenderer->SetMaterial(material);
@@ -152,7 +152,7 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 		current->AddChild(child);
 
 		const aiNode *node = nd->mChildren[i];
-		if(node != NULL)RecursiveProcessModelScene(scene, node, scale, child, &mat);
+		if(node != NULL)RecursiveProcessModelScene(scene, node, scale, child, &mat, materials);
 	}
 }
 
@@ -171,9 +171,10 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 
+	//TODO: add support for multiple textures!!
 	if(mesh->HasTextureCoords(0))	//HasTextureCoords(texture_coordinates_set)
 	{
-		//StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
 	}
 
 	if(mesh->mNormals != NULL)
@@ -243,6 +244,12 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 			}
 			mesh3D->GetColors()->GetColor(vertexIndex)->Set(1,1,1,1);
 
+			//TODO: add support for multiple textures!!
+			if(mesh->HasTextureCoords(0))
+			{
+				mesh3D->GetUVs1()->GetCoordinate(vertexIndex)->Set(mesh->mTextureCoords[0][vIndex].x, 1 - mesh->mTextureCoords[0][vIndex].y);
+			}
+
 			vertexComponentIndex+=3;
 			vertexIndex++;
 		}
@@ -255,17 +262,6 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 
 bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials)
 {
-	ILboolean success;
-
-	if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
-	{
-		/// wrong DevIL version ///
-		std::string msg = "AssetImporter::ProcessMaterials -> wrong DevIL version";
-		Debug::PrintError(msg);
-		return false;
-	}
-
-	ilInit(); /// Initialization of DevIL
 	if (scene->HasTextures())
 	{
 		Debug::PrintError("AssetImporter::ProcessMaterials -> Support for meshes with embedded textures is not implemented");
@@ -286,7 +282,10 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		//{
 			texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
 			texturePaths.push_back(std::string(path.data));
-			textureCount++;
+			if(texFound == AI_SUCCESS)
+			{
+				textureCount++;
+			}
 			texIndex++;
 		//}
 	}
@@ -295,39 +294,25 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 
 	std::vector<std::string>::iterator itr = texturePaths.begin();
 	std::string basepath = GetBasePath(modelPath);
+	//printf("base path: %s\n", basepath.c_str());
+	//printf("model path: %s\n", modelPath.c_str());
 	for (int i=0; i<textureCount; i++)
 	{
 		//save IL image ID
-		std::string filename = *itr; // get filename
+		std::string filename = basepath + *itr; // get filename
+
+		//printf("filename: %s\n", filename.c_str());
 
 		itr++;	// next texture
-
-		// Convert every colour component into unsigned byte.If your image contains
-		// alpha channel you can replace IL_RGB with IL_RGBA
-		success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-		if (!success)
-		{
-			// Error occured
-			Debug::PrintError("AssetImporter::ProcessMaterials -> Couldn't convert image");
-			return false;
-		}
-
-		/*
-		ilGetInteger(IL_IMAGE_BPP),
-		ilGetInteger(IL_IMAGE_WIDTH),
-		ilGetInteger(IL_IMAGE_HEIGHT),
-		ilGetInteger(IL_IMAGE_FORMAT),
-		ilGetData()
-		*/
 
 		TextureAttributes texAttributes;
 		texAttributes.FilterMode = TextureFilter::TriLinear;
 		texAttributes.MipMapLevel = 4;
+		Texture *tex = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
 
-		engineObjectManager->CreateTexture(modelPath.c_str(),texAttributes);
-
-		Shader * defaultShader = engineObjectManager->GetBuiltinShader(BuiltinShader::Diffuse);
+		Shader * defaultShader = engineObjectManager->GetBuiltinShader(BuiltinShader::DiffuseTextured);
 		Material * material = engineObjectManager->CreateMaterial("Default",defaultShader);
+		material->SetTexture(tex, "Texture");
 
 		materials.push_back(material);
 	}

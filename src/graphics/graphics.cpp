@@ -50,7 +50,7 @@ GraphicsCallbacks::~GraphicsCallbacks()
 
 }
 
-bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const char * windowTitle)
+bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle)
 {
 	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
 	renderManager = new RenderManager(this, engineObjectManager);

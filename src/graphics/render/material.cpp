@@ -417,7 +417,7 @@ void Material::SendSetUniformToShader(unsigned int index)
 		{
 			if(desc->Type == UniformType::Sampler2D)
 			{
-				shader->SendUniformToShader(desc->ShaderVarID, desc->SamplerData);
+				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->SamplerData);
 				SetUniformSetValue(desc->ShaderVarID, SAMPLER_2D_DATA_SIZE);
 			}
 		}

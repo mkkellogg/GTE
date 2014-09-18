@@ -47,6 +47,7 @@ class UniformDescriptor
 	int Size;
 	char Name [128];
 	unsigned int ShaderVarID;
+	unsigned int SamplerUnitIndex;
 	UniformType Type;
 	bool IsSet;
 

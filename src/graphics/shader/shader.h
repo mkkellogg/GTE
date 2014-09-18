@@ -40,7 +40,7 @@ class Shader : public EngineObject
 
     public :
 
-    Shader(const char * vertexSourcePath, const char * fragmentSourcePath);
+    Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath);
     virtual ~Shader();
     virtual bool Load() = 0;
     virtual bool IsLoaded() = 0;
@@ -48,7 +48,7 @@ class Shader : public EngineObject
     virtual int GetUniformVarID(const std::string& varName) const = 0;
     virtual void SendBufferToShader(int varID, VertexAttrBuffer * buffer) = 0;
 
-    virtual void SendUniformToShader(int varID, const Texture * texture) = 0;
+    virtual void SendUniformToShader(unsigned int samplerUnitIndex, const Texture * texture) = 0;
     virtual void SendUniformToShader(int varID, const Matrix4x4 * mat) = 0;
     virtual void SendUniformToShader(int varID, const Point3 * point) = 0;
     virtual void SendUniformToShader(int varID, const Vector3 * vector) = 0;

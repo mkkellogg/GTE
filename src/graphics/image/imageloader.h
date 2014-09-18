@@ -14,13 +14,17 @@
 class RawImage;
 
 #include <IL/il.h>
+#include <string>
 
 class ImageLoader
 {
+	static bool ilInitialized;
+	static bool Initialize();
+
 	public:
 
-	static RawImage * LoadPNG(const char * fullPath);
-	static RawImage * LoadImage(const char * fullPath);
+	static RawImage * LoadPNG(const std::string& fullPath);
+	static RawImage * LoadImage(const std::string& fullPath);
 	static RawImage * GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height);
 };
 

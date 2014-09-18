@@ -31,7 +31,7 @@
  * [vertexShaderPath] - Full or relative path to the source code for the vertex shader.
  * [fragmentShaderPath] - Full or relative path to the source code for the fragment shader.
  */
-ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
+ShaderGL::ShaderGL(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
 {
     ready = false;
     name = NULL;
@@ -40,8 +40,8 @@ ShaderGL::ShaderGL(const char * vertexShaderPath, const char * fragmentShaderPat
     vertexShaderID = 0;
     fragmentShaderID = 0;
 
-    vertexShaderSource = new ShaderSource(vertexShaderPath);
-    fragmentShaderSource = new ShaderSource(fragmentShaderPath);
+    vertexShaderSource = new ShaderSource(vertexShaderPath.c_str());
+    fragmentShaderSource = new ShaderSource(fragmentShaderPath.c_str());
 
     attributeCount = 0;
     uniformCount = 0;
@@ -348,6 +348,7 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 		// initialize UniformDescriptor array
 		memset(uniforms, 0, sizeof(UniformDescriptor*)*totalUniforms);
 
+		unsigned int samplerUnitIndex = 0;
 		// loop through each uniform and query OpenGL for information
 		// about that uniform
 		for(int i=0; i < totalUniforms; i++)
@@ -372,6 +373,8 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 			{
 				case GL_SAMPLER_2D:
 					desc->Type = UniformType::Sampler2D;
+					desc->SamplerUnitIndex = samplerUnitIndex;
+					samplerUnitIndex++;
 				break;
 				case GL_FLOAT_MAT4:
 					desc->Type = UniformType::Matrix4x4;
@@ -523,24 +526,16 @@ void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
  * [varID] - shader var ID/location of the uniform for which the value is to be set.
  * [texture] - Holds sampler data to be sent
  */
-void ShaderGL::SendUniformToShader(int varID, const Texture * texture)
+void ShaderGL::SendUniformToShader(unsigned int samplerUnitIndex, const Texture * texture)
 {
-	NULL_CHECK_RTRN(texture, "ShaderGL::SendUniformToShader(int, Texture *) -> NULL texture passed");
+	NULL_CHECK_RTRN(texture, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> NULL texture passed");
 
 	const TextureGL * texGL = dynamic_cast<const TextureGL *>(texture);
 
-	NULL_CHECK_RTRN(texGL, "ShaderGL::SendUniformToShader(int, Texture *) -> texture is not TextureGL !!");
+	NULL_CHECK_RTRN(texGL, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> texture is not TextureGL !!");
 
-	if(varID >= 0)
-	{
-		glActiveTexture(GL_TEXTURE0 + varID);
-		glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
-	}
-	else
-	{
-		Debug::PrintError("ShaderGL::SendUniformToShader(int, Texture *) -> could not find sampler location for texture");
-		return;
-	}
+	glActiveTexture(GL_TEXTURE0 + samplerUnitIndex);
+	glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
 }
 
 /*
