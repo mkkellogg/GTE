@@ -24,7 +24,20 @@ class RawImage;
 enum class BuiltinShader
 {
 	Diffuse,
-	DiffuseTextured
+	DiffuseTextured,
+	DiffuseBumped,
+	Specular,
+	SpecularTextured,
+	SpecularBumped,
+	Emissive,
+	TexturedEmissive,
+
+	MobileDiffuse,
+	MobileDiffuseTextured,
+	MobileDiffuseBumped,
+	MobileSpecular,
+	MobileSpecularTextured,
+	MobileSpecularBumped
 };
 
 class EngineObjectManager

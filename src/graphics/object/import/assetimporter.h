@@ -14,6 +14,16 @@ class Material;
 #include <string>
 #include <vector>
 
+enum class MaterialImportFlags
+{
+	Textured = 0,
+	Bumped = 1 << 0,
+	Emissive = 1 << 1,
+	Diffuse = 1 << 2,
+	Specular = 1 << 3,
+	Mobile = 1 << 4
+};
+
 class AssetImporter
 {
 	friend EngineObjectManager;
@@ -23,6 +33,8 @@ class AssetImporter
 	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform, std::vector<Material *>& materials);
 	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene* scene, float importScale);
 	bool ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials);
+	unsigned long GetImportFlags(const aiMaterial * mat);
+	std::string GetShaderFromImportFlags(unsigned long flags);
 
 	public:
 
