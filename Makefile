@@ -23,6 +23,7 @@ GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
 IMAGESRC= $(GRAPHICSSRC)/image
 ENGINEOBJECTSRC= src/object
 UTILSRC= src/util
+FILESYSTEMSRC= src/filesys
 
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o
@@ -39,13 +40,14 @@ SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
-UTILOBJ= obj/datastack.o
+UTILOBJ= obj/datastack.o obj/util.o
+FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(BASEOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ)
+OBJECTFILES= $(BASEOBJ) $(UTILOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(FILESYSTEMOBJ)
 
-all: gtemain graphics ui geometry gtemath base global engineobjects util image
+all: gtemain graphics ui geometry gtemath base global engineobjects util image filesystem
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -70,6 +72,19 @@ global: $(GLOBALOBJ)
 
 obj/constants.o: $(GLOBALSRC)/constants.cpp $(GLOBALSRC)/constants.h
 	$(CC) $(CFLAGS) -o obj/constants.o -c $(GLOBALSRC)/constants.cpp 
+	
+
+# ==================================
+# FileSystem
+# ==================================	
+
+filesystem: $(FILESYSTEMOBJ)
+
+obj/filesystem.o: $(FILESYSTEMSRC)/filesystem.cpp $(FILESYSTEMSRC)/filesystem.h
+	$(CC) $(CFLAGS) -o obj/filesystem.o -c $(FILESYSTEMSRC)/filesystem.cpp 
+	
+obj/filesystemIX.o: $(FILESYSTEMSRC)/filesystemIX.cpp $(FILESYSTEMSRC)/filesystemIX.h
+	$(CC) $(CFLAGS) -o obj/filesystemIX.o -c $(FILESYSTEMSRC)/filesystemIX.cpp 
 	
 	
 # ==================================
@@ -319,6 +334,8 @@ util: $(UTILOBJ)
 obj/datastack.o: $(UTILSRC)/datastack.cpp $(UTILSRC)/datastack.h
 	$(CC) $(CFLAGS) -o obj/datastack.o -c $(UTILSRC)/datastack.cpp 
 
+obj/util.o: $(UTILSRC)/util.cpp $(UTILSRC)/util.h
+	$(CC) $(CFLAGS) -o obj/util.o -c $(UTILSRC)/util.cpp 
 
 # ==================================
 # Math

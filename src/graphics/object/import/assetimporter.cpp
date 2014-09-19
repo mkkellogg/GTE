@@ -30,6 +30,7 @@
 #include "geometry/sceneobjecttransform.h"
 #include "graphics/render/material.h"
 #include "graphics/image/rawimage.h"
+#include "filesys/filesystem.h"
 
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -105,8 +106,6 @@ SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, con
 
 void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform, std::vector<Material *>& materials)
 {
-	unsigned int i;
-	unsigned int n=0, t;
 	Matrix4x4 mat;
 
 	aiMatrix4x4 m = nd->mTransformation;
@@ -117,9 +116,8 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 	ImportUtil::ConvertAssimpMatrix(&m,&mat);
 
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
-	Graphics * graphics = Graphics::Instance();
 
-	for (n=0; n < nd->mNumMeshes; n++)
+	for (unsigned int n=0; n < nd->mNumMeshes; n++)
 	{
 		const aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
 		Mesh3D * mesh3D = ConvertAssimpMesh(mesh);
@@ -145,7 +143,7 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 		current->AddChild(sceneObject);
 	}
 
-	for(int i=0; i <nd->mNumChildren; i++)
+	for(unsigned int i=0; i <nd->mNumChildren; i++)
 	{
 		SceneObject * child = engineObjectManager->CreateSceneObject();
 		NULL_CHECK_RTRN(child,"AssetImporter::RecursiveProcessModelScene -> Could not create child scene object.");
@@ -295,14 +293,15 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	}
 
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+	FileSystem * fileSystem = FileSystem::Instance();
 
 	std::vector<std::string>::iterator itr = texturePaths.begin();
-	std::string basepath = GetBasePath(modelPath);
+	std::string basepath = fileSystem->GetBasePath(modelPath);
 
 	for (int i=0; i<textureCount; i++)
 	{
 		//save IL image ID
-		std::string filename = basepath + *itr; // get filename
+		std::string filename = fileSystem->ConcatenatePaths(basepath, *itr); // get filename
 
 		itr++;	// next texture
 
@@ -321,8 +320,3 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	return true;
 }
 
-std::string AssetImporter::GetBasePath(const std::string& path)
-{
-	size_t pos = path.find_last_of("\\/");
-	return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
-}

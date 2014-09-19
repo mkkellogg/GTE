@@ -3,7 +3,8 @@
  *
  * author: Mark Kellogg
  *
- * The OpenGL implementation of a texture.
+ * Utility functions for loading 2D images. Mostly this acts as a
+ * middleman for the DevIL image loading library.
  *
  */
 

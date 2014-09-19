@@ -249,7 +249,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		childSceneObject->GetTransform()->Scale(1.5,1.5,1.5, true);
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 
-
 		AssetImporter * importer = new AssetImporter();
 		SceneObject * modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
 		if(modelSceneObject != NULL)
@@ -268,7 +267,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.005);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.05);
 	}
 
 	void OnQuit(Graphics * graphics)
