@@ -16,6 +16,7 @@
 #include "graphics/image/rawimage.h"
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
+#include "base/longmask.h"
 #include <string>
 
 EngineObjectManager * EngineObjectManager::theInstance = NULL;
@@ -55,6 +56,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	std::string fragmentSource;
 	Shader * shader = NULL;
 
+	LongMask shaderProperties;
 	vertexSource = std::string(builtinPath) + std::string("diffuse.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse.fragment.shader");
 	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
@@ -63,7 +65,9 @@ bool EngineObjectManager::InitBuiltinShaders()
 		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: Diffuse");
 		return false;
 	}
-	builtinShaders.AddShader((int)BuiltinShader::Diffuse,shader);
+	shaderProperties = LongMaskUtil::CreateLongMask();
+	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialProperty::DiffuseColored);
+	loadedShaders.AddShader(shaderProperties,shader);
 
 	vertexSource = std::string(builtinPath) + std::string("diffuse_texture.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture.fragment.shader");
@@ -73,14 +77,16 @@ bool EngineObjectManager::InitBuiltinShaders()
 		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured");
 		return false;
 	}
-	builtinShaders.AddShader((int)BuiltinShader::DiffuseTextured,shader);
+	shaderProperties = LongMaskUtil::CreateLongMask();
+	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialProperty::DiffuseTextured);
+	loadedShaders.AddShader(shaderProperties,shader);
 
 	return true;
 }
 
-Shader *  EngineObjectManager::GetBuiltinShader(BuiltinShader builtin)
+Shader *  EngineObjectManager::GetLoadedShader(LongMask properties)
 {
-	return builtinShaders.GetShader((int)builtin);
+	return loadedShaders.GetShader(properties);
 }
 
 Mesh3D * EngineObjectManager::CreateMesh3D(StandardAttributeSet attributes)
@@ -145,7 +151,6 @@ Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader
 
 Material * EngineObjectManager::CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
 {
-
 	Shader * shader = CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
 	if(shader == NULL)return NULL;
 

@@ -12,35 +12,35 @@ const char* const StandardAttributes::attributeNames[] = {"POSITION","NORMAL","C
 
 const char * StandardAttributes::GetAttributeName(StandardAttribute attr)
 {
-	return attributeNames[(int)attr];
+	return attributeNames[(IntMask)attr];
 }
 
 StandardAttribute StandardAttributes::AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component)
 {
-	return (StandardAttribute)IntMask::MaskValueToIndex((unsigned int)component);
+	return (StandardAttribute)IntMaskUtil::MaskValueToIndex((IntMask)component);
 }
 
 StandardAttributeMaskComponent StandardAttributes::AttributeToAttributeMaskComponent(StandardAttribute attr)
 {
-	return (StandardAttributeMaskComponent)IntMask::IndexToMaskValue((unsigned int)attr);
+	return (StandardAttributeMaskComponent)IntMaskUtil::IndexToMaskValue((IntMask)attr);
 }
 
 void StandardAttributes::AddAttribute(StandardAttributeSet * set, StandardAttribute attr)
 {
-	IntMask::SetBitForIndexMask((unsigned int *)set, (unsigned int )attr);
+	IntMaskUtil::SetBit((IntMask *)set, (IntMask )attr);
 }
 
 void StandardAttributes::RemoveAttribute(StandardAttributeSet * set, StandardAttribute attr)
 {
-	IntMask::ClearBitForIndexMask((unsigned int *)set, (unsigned int )attr);
+	IntMaskUtil::ClearBit((IntMask *)set, (IntMask )attr);
 }
 
 bool StandardAttributes::HasAttribute(StandardAttributeSet set, StandardAttribute attr)
 {
-	return IntMask::IsBitSet((unsigned int)set, (unsigned int)attr);
+	return IntMaskUtil::IsBitSet((IntMask)set, (IntMask)attr);
 }
 
 StandardAttributeSet StandardAttributes::CreateAttributeSet()
 {
-	return (unsigned int)0;
+	return (StandardAttributeSet)IntMaskUtil::CreateIntMask();
 }

@@ -7,16 +7,16 @@
 #include "intmask.h"
 #include "ui/debug.h"
 
-unsigned int IntMask::InvertBitsForIndexMask(unsigned int index)
+IntMask IntMaskUtil::InvertBitsForIndexMask(IntMask index)
 {
-	unsigned int maskValue = IndexToMaskValue(index);
+	IntMask maskValue = IndexToMaskValue(index);
 	return InvertBits(maskValue);
 }
 
-unsigned int IntMask::InvertBits(unsigned int a)
+IntMask IntMaskUtil::InvertBits(IntMask a)
 {
-	unsigned int result = 0;
-	unsigned int mask = 0x80000000;
+	IntMask result = 0;
+	IntMask mask = 0x80000000;
 
 	for(int i=0; i < 32; i++)
 	{
@@ -32,11 +32,11 @@ unsigned int IntMask::InvertBits(unsigned int a)
 	return result;
 }
 
-unsigned int IntMask::MaskValueToIndex(unsigned int maskValue)
+IntMask IntMaskUtil::MaskValueToIndex(IntMask maskValue)
 {
 	if(maskValue == 0) return 0;
 
-	unsigned int index=0x00000001;
+	IntMask index=0x00000001;
 	int count = 0;
 	while(!(maskValue & index) && count < 64)
 	{
@@ -47,51 +47,56 @@ unsigned int IntMask::MaskValueToIndex(unsigned int maskValue)
 	return index;
 }
 
-unsigned int IntMask::IndexToMaskValue(unsigned int index)
+IntMask IntMaskUtil::IndexToMaskValue(IntMask index)
 {
 	return 0x00000001 << index;
 }
 
-void IntMask::SetBitForIndexMask(unsigned int * target, unsigned short index)
+void IntMaskUtil::SetBit(IntMask * target, unsigned short index)
 {
-	unsigned int maskValue = IndexToMaskValue(index);
-	unsigned int uPtr = (unsigned int)*target;
-	uPtr |= (unsigned int)maskValue;
+	IntMask maskValue = IndexToMaskValue(index);
+	IntMask uPtr = (IntMask)*target;
+	uPtr |= (IntMask)maskValue;
 	*target = uPtr;
 }
 
-void IntMask::ClearBitForIndexMask(unsigned int * target, unsigned short index)
+void IntMaskUtil::ClearBit(IntMask * target, unsigned short index)
 {
-	unsigned int uPtr = (unsigned int)*target;
-	unsigned int mask = InvertBitsForIndexMask(index);
+	IntMask uPtr = (IntMask)*target;
+	IntMask mask = InvertBitsForIndexMask(index);
 
 	uPtr &= mask;
 	*target = uPtr;
 }
 
-void IntMask::SetBit(unsigned int * target, unsigned int mask)
+void IntMaskUtil::SetBitForMask(IntMask * target, IntMask mask)
 {
-	unsigned int uPtr = (unsigned int)*target;
+	IntMask uPtr = (IntMask)*target;
 	uPtr |= mask;
 	*target = uPtr;
 }
 
-void IntMask::ClearBit(unsigned int * target, unsigned int mask)
+void IntMaskUtil::ClearBitForMask(IntMask * target, IntMask mask)
 {
-	unsigned int uPtr = (unsigned int)*target;
-	unsigned int iMask = InvertBits(mask);
+	IntMask uPtr = (IntMask)*target;
+	IntMask iMask = InvertBits(mask);
 
 	uPtr &= iMask;
 	*target = uPtr;
 }
 
-bool IntMask::IsBitSet(unsigned int target, unsigned short index)
+bool IntMaskUtil::IsBitSet(IntMask target, unsigned short index)
 {
-	unsigned int mask = IndexToMaskValue(index);
+	IntMask mask = IndexToMaskValue(index);
 	return target & mask;
 }
 
-bool IntMask::IsBitSetForMask(unsigned int target,unsigned int mask)
+bool IntMaskUtil::IsBitSetForMask(IntMask target,IntMask mask)
 {
 	return target & mask;
+}
+
+IntMask IntMaskUtil::CreateIntMask()
+{
+	return 0;
 }

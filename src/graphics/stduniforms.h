@@ -22,7 +22,9 @@ enum class StandardUniform
     _Last=6 // always keep as last entry
 };
 
-typedef unsigned int StandardUniformSet;
+#include "base/intmask.h"
+
+typedef IntMask StandardUniformSet;
 
 class StandardUniforms
 {

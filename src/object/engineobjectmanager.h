@@ -19,26 +19,9 @@ class RawImage;
 #include "graphics/stdattributes.h"
 #include "object/sceneobject.h"
 #include "graphics/texture/textureattr.h"
-#include "graphics/shader/shadercatalog.h"
+#include "shadermanager.h"
+#include "base/longmask.h"
 
-enum class BuiltinShader
-{
-	Diffuse,
-	DiffuseTextured,
-	DiffuseBumped,
-	Specular,
-	SpecularTextured,
-	SpecularBumped,
-	Emissive,
-	TexturedEmissive,
-
-	MobileDiffuse,
-	MobileDiffuseTextured,
-	MobileDiffuseBumped,
-	MobileSpecular,
-	MobileSpecularTextured,
-	MobileSpecularBumped
-};
 
 class EngineObjectManager
 {
@@ -48,7 +31,7 @@ class EngineObjectManager
 
 	const char* builtinPath ="resources/builtin/";
 
-	ShaderCatalog builtinShaders;
+	ShaderManager loadedShaders;
 	std::vector<EngineObject *> engineObjects;
 	SceneObject sceneRoot;
 
@@ -60,7 +43,7 @@ class EngineObjectManager
     static EngineObjectManager * Instance();
     SceneObject * CreateSceneObject();
     bool InitBuiltinShaders();
-    Shader * GetBuiltinShader(BuiltinShader builtin);
+    Shader * GetLoadedShader(LongMask properties);
 
     Mesh3D * CreateMesh3D(StandardAttributeSet attributes);
     void DestroyMesh3D(Mesh3D * mesh);

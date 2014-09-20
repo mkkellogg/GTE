@@ -37,12 +37,12 @@ Camera::~Camera()
 
 void Camera::AddClearBuffer(RenderBufferType buffer)
 {
-	IntMask::SetBit(&clearBufferMask, (unsigned int)buffer);
+	IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)buffer);
 }
 
 void Camera::RemoveClearBuffer(RenderBufferType buffer)
 {
-	IntMask::ClearBit(&clearBufferMask, (unsigned int)buffer);
+	IntMaskUtil::ClearBitForMask(&clearBufferMask, (unsigned int)buffer);
 }
 
 unsigned int Camera::GetClearBufferMask() const

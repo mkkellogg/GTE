@@ -147,9 +147,9 @@ void GraphicsGL::DestroyShader(Shader * shader)
 void GraphicsGL::ClearBuffers(unsigned int bufferMask) const
 {
 	GLbitfield glClearMask = 0;
-	if(IntMask::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Color))
+	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Color))
 		glClearMask |= GL_COLOR_BUFFER_BIT;
-	if(IntMask::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Depth))
+	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Depth))
 		glClearMask |= GL_DEPTH_BUFFER_BIT;
 
 	glClear(glClearMask);

@@ -20,7 +20,9 @@ enum class StandardAttribute
     _Last=5 // always keep as last entry
 };
 
-typedef unsigned int StandardAttributeSet;
+#include "base/intmask.h"
+
+typedef IntMask StandardAttributeSet;
 
 class StandardAttributes
 {

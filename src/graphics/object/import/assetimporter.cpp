@@ -23,6 +23,7 @@
 #include "importutil.h"
 #include "geometry/matrix4x4.h"
 #include "object/engineobjectmanager.h"
+#include "object/shadermanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
 #include "graphics/render/mesh3Drenderer.h"
@@ -42,6 +43,7 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
 
+#include "base/longmask.h"
 #include "global/global.h"
 #include "ui/debug.h"
 
@@ -271,6 +273,10 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	int textureCount = 0;
 	std::vector<std::string> texturePaths;
 
+	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+	FileSystem * fileSystem = FileSystem::Instance();
+	std::string basepath = fileSystem->GetBasePath(modelPath);
+
 	// count textures in scene and get file paths
 	for (unsigned int m=0; m < scene->mNumMaterials; m++)
 	{
@@ -279,89 +285,37 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		aiString path;	// filename
 
 		aiMaterial * material = scene->mMaterials[m];
+		LongMask shaderProperties = ShaderManager::GetImportFlags(material);
+		Texture * diffuseTexture = NULL;
+		Texture * bumpTexture = NULL;
 
-		/*
-		 *  if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, texIndex, &texPath))
-			{
-			//bind texture
-			unsigned int texId = *textureIdMap[texPath.data];
-			}
+		texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
+		std::string filename;
+		if(texFound == AI_SUCCESS)
+		{
+			filename = fileSystem->ConcatenatePaths(basepath, std::string(path.data));
+			TextureAttributes texAttributes;
+			texAttributes.FilterMode = TextureFilter::TriLinear;
+			texAttributes.MipMapLevel = 4;
+			diffuseTexture = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
+		}
 
-			if(AI_SUCCESS == mtl->GetTexture(aiTextureType_SPECULAR, texIndex, &texPath))
-			{
-			//bind texture
-			unsigned int texId = *textureIdMap[texPath.data];
-			}
 
-			if(AI_SUCCESS == mtl->GetTexture(aiTextureType_NORMALS, texIndex, &texPath))
-			{
-			//bind texture
-			unsigned int texId = *textureIdMap[texPath.data];
-			}
-
-			if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
-			color4_to_float4(&diffuse, c);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, c);
-			set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-
-			if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular))
-			color4_to_float4(&specular, c);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
-			set_float4(c, 0.2f, 0.2f, 0.2f, 1.0f);
-
-			if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission))
-			color4_to_float4(&emission, c);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, c);
-		 */
-
-		// TODO: enable multiple textures per material here!!
-		//while (texFound == AI_SUCCESS)
-		//{
-			texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
-
-			if(texFound == AI_SUCCESS)
-			{
-				texturePaths.push_back(std::string(path.data));
-				textureCount++;
-			}
-			texIndex++;
-		//}
-	}
-
-	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
-	FileSystem * fileSystem = FileSystem::Instance();
-
-	std::vector<std::string>::iterator itr = texturePaths.begin();
-	std::string basepath = fileSystem->GetBasePath(modelPath);
-
-	for (int i=0; i<textureCount; i++)
-	{
-		//save IL image ID
-		std::string filename = fileSystem->ConcatenatePaths(basepath, *itr); // get filename
-
-		itr++;	// next texture
-
-		TextureAttributes texAttributes;
-		texAttributes.FilterMode = TextureFilter::TriLinear;
-		texAttributes.MipMapLevel = 4;
-		Texture *tex = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
-
-		Shader * defaultShader = engineObjectManager->GetBuiltinShader(BuiltinShader::DiffuseTextured);
-		Material * material = engineObjectManager->CreateMaterial("Default",defaultShader);
-		material->SetTexture(tex, "Texture");
-
-		materials.push_back(material);
+		Shader * loadedShader = engineObjectManager->GetLoadedShader(shaderProperties);
+		if(loadedShader != NULL)
+		{
+			Material * newMaterial = engineObjectManager->CreateMaterial("Default",loadedShader);
+			if(diffuseTexture != NULL)newMaterial->SetTexture(diffuseTexture, "Texture");
+			materials.push_back(newMaterial);
+		}
+		else
+		{
+			std::string msg = "Could not find loaded shader for: ";
+			msg += std::to_string(shaderProperties);
+			Debug::PrintError(msg);
+			return false;
+		}
 	}
 
 	return true;
-}
-
-unsigned long GetImportFlags(const aiMaterial * mat)
-{
-	return 0;
-}
-
-std::string GetShaderFromImportFlags(unsigned long flags)
-{
-	return "";
 }

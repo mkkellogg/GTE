@@ -32,6 +32,7 @@ class Texture;
 #include <vector>
 #include <map>
 
+
 class Material : public EngineObject
 {
 	friend class EngineObjectManager;

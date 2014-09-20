@@ -12,35 +12,35 @@ const char* const StandardUniforms::uniformNames[] = {"MODELVIEW_MATRIX","MODELV
 
 const char * StandardUniforms::GetUniformName(StandardUniform uniform)
 {
-	return uniformNames[(int)uniform];
+	return uniformNames[(IntMask)uniform];
 }
 
 StandardUniform StandardUniforms::UniformMaskComponentToUniform(StandardUniformMaskComponent component)
 {
-	return (StandardUniform)IntMask::MaskValueToIndex((unsigned int)component);
+	return (StandardUniform)IntMaskUtil::MaskValueToIndex((IntMask)component);
 }
 
 StandardUniformMaskComponent StandardUniforms::UniformToUniformMaskComponent(StandardUniform uniform)
 {
-	return (StandardUniformMaskComponent)IntMask::IndexToMaskValue((unsigned int)uniform);
+	return (StandardUniformMaskComponent)IntMaskUtil::IndexToMaskValue((IntMask)uniform);
 }
 
 void StandardUniforms::AddUniform(StandardUniformSet * set, StandardUniform uniform)
 {
-	IntMask::SetBitForIndexMask((unsigned int *)set, (unsigned int )uniform);
+	IntMaskUtil::SetBit((IntMask *)set, (IntMask )uniform);
 }
 
 void StandardUniforms::RemoveUniform(StandardUniformSet * set, StandardUniform uniform)
 {
-	IntMask::ClearBitForIndexMask((unsigned int *)set, (unsigned int )uniform);
+	IntMaskUtil::ClearBit((IntMask *)set, (IntMask )uniform);
 }
 
 bool StandardUniforms::HasUniform(StandardUniformSet set, StandardUniform uniform)
 {
-	return IntMask::IsBitSet((unsigned int)set, (unsigned int)uniform);
+	return IntMaskUtil::IsBitSet((IntMask)set, (IntMask)uniform);
 }
 
 StandardUniformSet StandardUniforms::CreateUniformSet()
 {
-	return (unsigned int)0;
+	return (StandardUniformSet)IntMaskUtil::CreateIntMask();
 }

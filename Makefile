@@ -26,7 +26,7 @@ UTILSRC= src/util
 FILESYSTEMSRC= src/filesys
 
 GLOBALOBJ = obj/constants.o
-BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o
+BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o obj/longmask.o
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
@@ -36,10 +36,10 @@ VIEWSYSOBJ= obj/camera.o
 RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
 LIGHTOBJ= obj/light.o
-SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o obj/shadercatalog.o
+SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
-ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o
+ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shadermanager.o
 UTILOBJ= obj/datastack.o obj/util.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 
@@ -92,6 +92,9 @@ obj/filesystemIX.o: $(FILESYSTEMSRC)/filesystemIX.cpp $(FILESYSTEMSRC)/filesyste
 # ==================================
 
 engineobjects: $(ENGINEOBJECTOBJ)
+	
+obj/shadermanager.o: $(ENGINEOBJECTSRC)/shadermanager.cpp $(ENGINEOBJECTSRC)/shadermanager.h 
+	$(CC) $(CFLAGS) -o obj/shadermanager.o -c $(ENGINEOBJECTSRC)/shadermanager.cpp
 	
 obj/sceneobjectcomponent.o: $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp $(ENGINEOBJECTSRC)/sceneobjectcomponent.h 
 	$(CC) $(CFLAGS) -o obj/sceneobjectcomponent.o -c $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp
@@ -195,9 +198,6 @@ obj/shader.o: $(SHADERSRC)/shader.cpp $(SHADERSRC)/shader.h
 		
 obj/shaderGL.o: $(SHADERSRC)/shaderGL.cpp $(SHADERSRC)/shaderGL.h
 	$(CC) $(CFLAGS) -o obj/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
-	
-obj/shadercatalog.o: $(SHADERSRC)/shadercatalog.cpp $(SHADERSRC)/shadercatalog.h 
-	$(CC) $(CFLAGS) -o obj/shadercatalog.o -c $(SHADERSRC)/shadercatalog.cpp
 	
 obj/uniformdesc.o: $(SHADERSRC)/uniformdesc.cpp $(SHADERSRC)/uniformdesc.h
 	$(CC) $(CFLAGS) -o obj/uniformdesc.o -c $(SHADERSRC)/uniformdesc.cpp
@@ -305,6 +305,9 @@ base: $(BASEOBJ)
 
 obj/intmask.o: $(BASESRC)/intmask.cpp $(BASESRC)/intmask.h 
 	$(CC) $(CFLAGS) -o obj/intmask.o -c $(BASESRC)/intmask.cpp
+	
+obj/longmask.o: $(BASESRC)/longmask.cpp $(BASESRC)/longmask.h 
+	$(CC) $(CFLAGS) -o obj/longmask.o -c $(BASESRC)/longmask.cpp
 	
 obj/basevector4.o: $(BASESRC)/basevector4.cpp $(BASESRC)/basevector4.h 
 	$(CC) $(CFLAGS) -o obj/basevector4.o -c $(BASESRC)/basevector4.cpp

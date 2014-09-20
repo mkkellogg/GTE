@@ -17,9 +17,9 @@
 
 class FileSystem
 {
-	protected:
-
 	static FileSystem * theInstance;
+
+	protected:
 
 	FileSystem();
 	virtual ~FileSystem();
