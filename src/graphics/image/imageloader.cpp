@@ -26,6 +26,8 @@ bool ImageLoader::Initialize()
 		}
 
 		ilInit(); /// Initialization of DevIL
+		ilEnable(IL_ORIGIN_SET);
+		ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 		ImageLoader::ilInitialized = true;
 	}
 
@@ -79,14 +81,9 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 	}
 
 	std::string extension = GetFileExtension(fullPath);
-	/*if(extension.compare(".png")==0)
-	{
-		return LoadPNG(fullPath);
-	}*/
 
 	ILuint imageIds[1];
 	ilGenImages(1, imageIds); //Generation of numTextures image names
-
 	ilBindImage(imageIds[0]); // Binding of DevIL image name
 	RawImage * rawImage = NULL;
 

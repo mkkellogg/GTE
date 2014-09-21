@@ -24,28 +24,34 @@ class AssetImporter
 
 	protected :
 
-	class TextureUVMap
+	class MaterialImportDescriptor
 	{
 		public:
 
-		std::map<ShaderMaterialCharacteristic, int> mapping;
+		bool invertVCoords;
+		std::map<ShaderMaterialCharacteristic, int> uvMapping;
 
-		bool HasKey(ShaderMaterialCharacteristic key)
+		bool UVMappingHasKey(ShaderMaterialCharacteristic key)
 		{
-			if(mapping.find(key) != mapping.end())
+			if(uvMapping.find(key) != uvMapping.end())
 			{
 				return true;
 			}
 
 			return false;
 		}
+
+		MaterialImportDescriptor()
+		{
+			invertVCoords = true;
+		}
 	};
 
-	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<TextureUVMap *>& textureUVMaps);
+	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor *>& materialImportDescriptors);
 	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene* scene, float importScale);
-	bool ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<TextureUVMap *>& textureUVMaps);
+	bool ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor *>& materialImportDescriptors);
 	static LongMask GetImportFlags(const aiMaterial * mat);
-	Mesh3D * ConvertAssimpMesh(const aiMesh* mesh, Material * material, TextureUVMap * textureUVMap);
+	Mesh3D * ConvertAssimpMesh(const aiMesh* mesh, Material * material, MaterialImportDescriptor * materialImportDescriptor);
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);
 	static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(Mesh3D * mesh, ShaderMaterialCharacteristic property);

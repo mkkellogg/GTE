@@ -80,7 +80,7 @@ SceneObject * AssetImporter::LoadModel(const std::string& filePath, float import
 		return NULL;
 	}
 
-	scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_Quality);
+	scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_Quality  );
 	// If the import failed, report it
 
 	if( !scene)
@@ -98,7 +98,7 @@ SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, con
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
 	std::vector<Material *> materials;
-	std::vector<TextureUVMap *> textureUVMaps;
+	std::vector<MaterialImportDescriptor *> textureUVMaps;
 	ProcessMaterials(modelPath, scene, materials, textureUVMaps);
 
 	SceneObject * root = objectManager->CreateSceneObject();
@@ -111,7 +111,7 @@ SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, con
 	return root;
 }
 
-void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<TextureUVMap *>& textureUVMaps)
+void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor *>& materialImportDescriptors)
 {
 	Matrix4x4 mat;
 
@@ -132,13 +132,13 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 		Material * material = materials[materialIndex];
 		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL material encountered.");
 
-		TextureUVMap * textureUVMap = textureUVMaps[materialIndex];
+		MaterialImportDescriptor * textureUVMap = materialImportDescriptors[materialIndex];
 		NULL_CHECK_RTRN(textureUVMap,"AssetImporter::RecursiveProcessModelScene -> NULL textureUVMap encountered.");
 
 		Mesh3D * mesh3D = ConvertAssimpMesh(mesh, material, textureUVMap);
 		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
-		mesh3D->CalculateNormals(90);
+		mesh3D->CalculateNormals(70);
 
 		SceneObject * sceneObject = engineObjectManager->CreateSceneObject();
 		NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
@@ -161,11 +161,11 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 		current->AddChild(child);
 
 		const aiNode *node = nd->mChildren[i];
-		if(node != NULL)RecursiveProcessModelScene(scene, node, scale, child, &mat, materials, textureUVMaps);
+		if(node != NULL)RecursiveProcessModelScene(scene, node, scale, child, &mat, materials, materialImportDescriptors);
 	}
 }
 
-Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * material, TextureUVMap * textureUVMap)
+Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * material, MaterialImportDescriptor * materialImportDescriptor)
 {
 	unsigned int faceCount = 0;
 	unsigned int vertexCount = 0;
@@ -181,10 +181,10 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * materia
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 
 	int diffuseTextureUVIndex = -1;
-	if(textureUVMap->HasKey(ShaderMaterialCharacteristic::DiffuseTextured))
+	if(materialImportDescriptor->UVMappingHasKey(ShaderMaterialCharacteristic::DiffuseTextured))
 	{
 		StandardAttributes::AddAttribute(&meshAttributes, MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic::DiffuseTextured));
-		diffuseTextureUVIndex = textureUVMap->mapping[ShaderMaterialCharacteristic::DiffuseTextured];
+		diffuseTextureUVIndex = materialImportDescriptor->uvMapping[ShaderMaterialCharacteristic::DiffuseTextured];
 	}
 
 	if(mesh->mNormals != NULL)
@@ -257,7 +257,8 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * materia
 			if(diffuseTextureUVIndex >= 0)
 			{
 				UV2Array *uvs = GetMeshUVArrayForShaderMaterialCharacteristic(mesh3D,ShaderMaterialCharacteristic::DiffuseTextured);
-				uvs->GetCoordinate(vertexIndex)->Set(mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1 - mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].y);
+				if(materialImportDescriptor->invertVCoords)uvs->GetCoordinate(vertexIndex)->Set(mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1-mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].y);
+				else uvs->GetCoordinate(vertexIndex)->Set(mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].x, mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 			}
 
 			vertexComponentIndex+=3;
@@ -270,7 +271,7 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * materia
 	return mesh3D;
 }
 
-bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<TextureUVMap *>& textureUVMaps)
+bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor *>& materialImportDescriptors)
 {
 	if (scene->HasTextures())
 	{
@@ -286,6 +287,9 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 	FileSystem * fileSystem = FileSystem::Instance();
 	std::string basepath = fileSystem->GetBasePath(modelPath);
+
+	//printf("num materials: %d\n", scene->mNumMaterials);
+
 
 	// count textures in scene and get file paths
 	for (unsigned int m=0; m < scene->mNumMaterials; m++)
@@ -303,17 +307,24 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		std::string filename;
 		if(texFound == AI_SUCCESS)
 		{
-			filename = fileSystem->ConcatenatePaths(basepath, std::string(path.data));
+			aiString mtName;
+			material->Get(AI_MATKEY_NAME,mtName);
+			std::string texPath = fileSystem->FixupPath(std::string(path.data));
+
+			//printf("material name: %s, path: %s\n", mtName.C_Str(), texPath.c_str());
+
+			filename = fileSystem->ConcatenatePaths(basepath, texPath);
 			TextureAttributes texAttributes;
 			texAttributes.FilterMode = TextureFilter::TriLinear;
 			texAttributes.MipMapLevel = 4;
 			diffuseTexture = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
 		}
+		else printf("no texture!\n");
 
 		Shader * loadedShader = engineObjectManager->GetLoadedShader(shaderProperties);
 		if(loadedShader != NULL)
 		{
-			TextureUVMap * textureUVMap = new TextureUVMap();
+			MaterialImportDescriptor * textureUVMap = new MaterialImportDescriptor();
 			Material * newMaterial = engineObjectManager->CreateMaterial("_Default",loadedShader);
 			if(diffuseTexture != NULL)
 			{
@@ -323,12 +334,12 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 				int mappedIndex;
 				if(AI_SUCCESS==aiGetMaterialInteger(material,AI_MATKEY_UVWSRC(aiTextureType_DIFFUSE,0),&mappedIndex))
 				{
-					textureUVMap->mapping[ShaderMaterialCharacteristic::DiffuseTextured] = mappedIndex;
+					textureUVMap->uvMapping[ShaderMaterialCharacteristic::DiffuseTextured] = mappedIndex;
 				}
-				textureUVMap->mapping[ShaderMaterialCharacteristic::DiffuseTextured] = 0;
+				else textureUVMap->uvMapping[ShaderMaterialCharacteristic::DiffuseTextured] = 0;
 			}
 			materials.push_back(newMaterial);
-			textureUVMaps.push_back(textureUVMap);
+			materialImportDescriptors.push_back(textureUVMap);
 		}
 		else
 		{

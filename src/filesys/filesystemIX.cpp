@@ -48,3 +48,18 @@ std::string FileSystemIX::GetPathFromIXPath(const std::string& path) const
 	return path;
 }
 
+std::string FileSystemIX::FixupPath(const std::string& path) const
+{
+	char chars[path.size()+1];
+	strcpy(chars, path.c_str());
+
+	for(unsigned int i=0; i< path.size(); i++)
+	{
+		if(chars[i] == '\\')chars[i] = '/';
+	}
+
+	std::string newPath = std::string(chars);
+	//newPath.replace(newPath.begin(),newPath.end(), "\\", "/");
+	return newPath;
+}
+

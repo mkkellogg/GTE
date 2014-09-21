@@ -148,7 +148,7 @@ void Vector3::QuickNormlize()
  */
 float Vector3::Magnitude()
 {
-    return Magnitude(x,y,x);
+    return Magnitude(x,y,z);
 }
 
 /*

@@ -242,7 +242,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		uvs->GetCoordinate(28)->Set(1,1);
 		uvs-> GetCoordinate(29)->Set(0,1);
 
-		mesh->CalculateNormals(65);
+		mesh->CalculateNormals(85);
 
 		meshRenderer->UpdateFromMesh();
 
@@ -264,7 +264,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		if(modelSceneObject != NULL)
 		{
 			modelSceneObject->SetActive(true);
-			Debug::PrintError("Model loaded!!\n");
 		}
 		else
 		{
@@ -281,7 +280,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		if(modelSceneObject != NULL)
 		{
 			modelSceneObject->SetActive(true);
-			Debug::PrintError("Model loaded!!\n");
 		}
 		else
 		{
@@ -289,6 +287,23 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			return;
 		}
 		modelSceneObject->GetTransform()->Translate(0,0,-12,false);
+		modelSceneObject->GetTransform()->Scale(.15,.15,.15, true);
+
+
+
+		modelSceneObject = importer->LoadModel("../../models/koopa/model/koopa.fbx", 1 );
+		if(modelSceneObject != NULL)
+		{
+			modelSceneObject->SetActive(true);
+		}
+		else
+		{
+			Debug::PrintError(" >> could not load model!\n");
+			return;
+		}
+		modelSceneObject->GetTransform()->RotateAround(0,0,0,1,0,0,-90);
+		modelSceneObject->GetTransform()->RotateAround(0,0,0,0,1,0,-90);
+		modelSceneObject->GetTransform()->Translate(0,-8,-3,false);
 		modelSceneObject->GetTransform()->Scale(.15,.15,.15, true);
 
 

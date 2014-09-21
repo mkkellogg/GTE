@@ -22,8 +22,9 @@
 #include "geometry/vector/vector3array.h"
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
-
+#include "gtemath/gtemath.h"
 #include "ui/debug.h"
+#include "global/constants.h"
 
 Mesh3D::Mesh3D() : Mesh3D (StandardAttributes::CreateAttributeSet())
 {
@@ -178,23 +179,57 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 
 	for(unsigned int v =0; v < vertexCount; v++)
 	{
+		Vector3 oNormal = *normals->GetVector(v);
+		oNormal.Normalize();
+
 		Point3 * point = positions->GetPoint(v);
 		std::vector<Vector3*>* list = normalGroups[*point];
 
 		Vector3 avg(0,0,0);
+		float divisor = 0;
 		for(unsigned int i=0; i < list->size(); i++)
 		{
-			Vector3 * current = (*list)[i];
-			avg.x += current->x;
-			avg.y += current->y;
-			avg.z += current->z;
+			Vector3 current(*((*list)[i]));
+			Vector3 currentNormalized(&current);
+			currentNormalized.Normalize();
+
+			float dot = Vector3::Dot(&currentNormalized, &oNormal);
+			float angle = acos(dot);
+			if(angle <0)angle = -angle;
+
+			angle /= Constants::TwoPIOver360;
+
+			if(angle < smoothingThreshhold)
+			{
+				avg.x += current.x;
+				avg.y += current.y;
+				avg.z += current.z;
+				divisor++;
+			}
 		}
 
-		float divisor = 1;
-		divisor = (float)list->size();
+		if(divisor < 1)
+	    {
+			divisor = 1;
+			avg.x = oNormal.x;
+			avg.y = oNormal.y;
+			avg.z = oNormal.z;
+	    }
+
 		float scaleFactor = (float)1.0/divisor;
 		avg.Scale(scaleFactor);
 		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
+	}
+
+	for(unsigned int v =0; v < vertexCount; v++)
+	{
+		Point3 * point = positions->GetPoint(v);
+		std::vector<Vector3*>* list = normalGroups[*point];
+		if(list != NULL)
+		{
+			delete list;
+			normalGroups[*point] = NULL;
+		}
 	}
 }
 
