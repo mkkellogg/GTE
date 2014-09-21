@@ -20,7 +20,6 @@ class Light : public SceneObjectComponent
 	friend class EngineObjectManager;
 
 	Color4 color;
-	Point3 position;
 	Vector3 direction;
 	LightType type;
 
@@ -35,11 +34,6 @@ class Light : public SceneObjectComponent
 	const Color4 * GetColorPtr();
 	void SetColor(Color4 color);
 	void SetColor(float r, float g, float b, float a);
-
-	Point3 GetPosition();
-	const Point3 * GetPositionPtr();
-	void SetPosition(Point3 position);
-	void SetPosition(float x, float y, float z);
 
 	Vector3 GetDirection();
 	const Vector3 * GetDirectionPtr();

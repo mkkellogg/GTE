@@ -27,8 +27,8 @@ class Mesh3D : public SceneObjectComponent
     Point3Array * positions;
     Vector3Array * normals;
     Color4Array * colors;
-    UV2Array * uvs1;
-    UV2Array * uvs2;
+    UV2Array * uvsTexture0;
+    UV2Array * uvsTexture1;
 
     void Destroy();
 
@@ -49,8 +49,8 @@ class Mesh3D : public SceneObjectComponent
     Point3Array * GetPostions();
     Vector3Array * GetNormals();
     Color4Array * GetColors();
-    UV2Array * GetUVs1();
-    UV2Array * GetUVs2();
+    UV2Array * GetUVsTexture0();
+    UV2Array * GetUVsTexture1();
 };
 
 #endif

@@ -3,23 +3,34 @@
 
 enum class StandardUniformMaskComponent
 {
-    ModelViewMatrix=1,
-    ModelViewProjectionMatrix=2,
-    ProjectionMatrix=4,
-    LightPosition=8,
-    LightDirection=16,
-    LightColor=32
+	ModelMatrix=1,
+    ModelViewMatrix=2,
+    ModelViewProjectionMatrix=4,
+    ProjectionMatrix=8,
+    LightPosition=16,
+    LightDirection=32,
+    LightColor=64,
+    EmissiveColor=128,
+    Texture0=256,
+    Texture1=512,
+    NormalMap=1024
 };
 
 enum class StandardUniform
 {
-	ModelViewMatrix=0,
-	ModelViewProjectionMatrix=1,
-	ProjectionMatrix=2,
-	LightPosition=3,
-	LightDirection=4,
-	LightColor=5,
-    _Last=6 // always keep as last entry
+	ModelMatrix=0,
+	ModelViewMatrix=1,
+	ModelViewProjectionMatrix=2,
+	ProjectionMatrix=3,
+	LightPosition=4,
+	LightDirection=5,
+	LightColor=6,
+	EmissiveColor=7,
+	Texture0=8,
+	Texture1=9,
+	NormalMap=10,
+    _Last=11, // always keep as last entry
+    _None=12
 };
 
 #include "base/intmask.h"

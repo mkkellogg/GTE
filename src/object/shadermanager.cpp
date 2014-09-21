@@ -6,6 +6,7 @@
 #include <string>
 
 #include "shadermanager.h"
+#include "graphics/stduniforms.h"
 #include "assimp/scene.h"
 #include "assimp/cimport.h"
 #include "assimp/scene.h"
@@ -29,45 +30,6 @@ ShaderManager::~ShaderManager()
 
 }
 
-LongMask ShaderManager::GetImportFlags(const aiMaterial * mtl)
-{
-	LongMask flags = LongMaskUtil::CreateLongMask();
-	aiString path;
-	aiColor4t<float> color;
-
-	if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &path))
-	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::DiffuseTextured);
-	}
-
-	/*if(AI_SUCCESS == mtl->GetTexture(aiTextureType_SPECULAR, 0, &path))
-	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::SpecularTextured);
-	}*/
-
-	if(AI_SUCCESS == mtl->GetTexture(aiTextureType_NORMALS, 0, &path))
-	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::Bumped);
-	}
-
-	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &color))
-	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::DiffuseColored);
-	}
-
-	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &color))
-	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::SpecularColored);
-	}
-
-	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &color))
-	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::EmissiveColored);
-	}
-
-	return flags;
-}
-
 void ShaderManager::AddShader(LongMask properties, Shader * shader)
 {
 	NULL_CHECK_RTRN(shader,"ShaderManager::AddShader -> shader is NULL.");
@@ -81,6 +43,10 @@ void ShaderManager::AddShader(LongMask properties, Shader * shader)
 	loadedShaders[properties] = shader;
 }
 
+// TODO: improve this function to move beyond exact matching of shader property flags.
+// Ultimately we want it to return shader that doesn't have any ADDITIONAL properties
+// beyond what is specified by [flags], but it's ok to have less. However, EXACT
+// matching is preferred for best results.
 Shader * ShaderManager::GetShader(LongMask flags)
 {
 	if(loadedShaders.find(flags) != loadedShaders.end())
@@ -90,3 +56,5 @@ Shader * ShaderManager::GetShader(LongMask flags)
 
 	return NULL;
 }
+
+

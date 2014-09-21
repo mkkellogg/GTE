@@ -1,9 +1,9 @@
  
 varying vec3 vColor;
-varying vec2 vUV1;
+varying vec2 vUVTexture0;
 
 vec4 outputF;
-uniform sampler2D Texture;
+uniform sampler2D TEXTURE0;
 
 uniform vec4 LIGHT_POSITION;
 uniform vec4 LIGHT_DIRECTION;
@@ -16,7 +16,7 @@ varying vec4 vPosition;
 
 void main()
 {
-	texColor = texture2D(Texture, vUV1);
+	texColor = texture2D(TEXTURE0, vUVTexture0);
 	
 	vec3 normalized_normal = normalize(vNormal);
 	vec3 vertex_to_light_vector = vec3(LIGHT_POSITION - vPosition); 

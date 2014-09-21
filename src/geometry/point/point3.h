@@ -12,8 +12,14 @@
 
 //forward declarations
 class Vector3;
+class Point3;
 
 #include "base/basevector4.h"
+#include <functional>
+#include <unordered_map>
+#include <iostream>
+#include <string>
+
 
 class Point3 : public BaseVector4
 {
@@ -44,6 +50,25 @@ class Point3 : public BaseVector4
 
     void AttachTo(float * data);
     void Detach();
+
+    typedef struct
+    {
+    	 int operator()(const Point3& p) const
+    	 {
+			  return (int)p.x;
+    	 }
+    }Point3Hasher;
+
+    typedef struct
+    {
+      bool operator() (const Point3& a, const Point3& b) const { return a==b; }
+    } Point3Eq;
+
+
+    bool operator==(const Point3& p) const
+    {
+		return p.x == this->x && p.y == this->y && p.z == this->z;
+    }
 };
 
 #endif

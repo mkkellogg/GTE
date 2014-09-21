@@ -40,7 +40,7 @@ SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shadermanager.o
-UTILOBJ= obj/datastack.o obj/util.o
+UTILOBJ= obj/datastack.o obj/util.o obj/time.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o obj/textureGL.o
@@ -339,6 +339,9 @@ obj/datastack.o: $(UTILSRC)/datastack.cpp $(UTILSRC)/datastack.h
 
 obj/util.o: $(UTILSRC)/util.cpp $(UTILSRC)/util.h
 	$(CC) $(CFLAGS) -o obj/util.o -c $(UTILSRC)/util.cpp 
+	
+obj/time.o: $(UTILSRC)/time.cpp $(UTILSRC)/time.h
+	$(CC) $(CFLAGS) -o obj/time.o -c $(UTILSRC)/time.cpp 
 
 # ==================================
 # Math

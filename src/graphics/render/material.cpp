@@ -473,11 +473,25 @@ void Material::SetTexture(Texture * texture, const std::string& varName)
 
 /*
  * Get the number of set uniforms...this should for the most part be
- * equals to the total number of uniforms exposed by this material's shader.
+ * equal to the total number of uniforms exposed by this material's shader.
  */
 unsigned int Material::GetSetUniformCount() const
 {
 	return setUniforms.size();
+}
+
+/*
+ * Send the 4x4 matrix data in [mat] to this material's shader via the
+ * standard uniform ModelMatrix.
+ */
+void Material::SendModelMatrixToShader(const Matrix4x4 * mat)
+{
+	int varID = GetStandardUniformBinding(StandardUniform::ModelMatrix);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, mat);
+		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+	}
 }
 
 /*
@@ -526,12 +540,12 @@ void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
  * Send the light data in [light] to this material's shader using
  * several standard uniforms: LIGHT_POSITION, LIGHT_DIRECTION, and LIGHT_COLOR
  */
-void Material::SendLightToShader(Light * light)
+void Material::SendLightToShader(Light * light, Point3 * position)
 {
 	int varID = GetStandardUniformBinding(StandardUniform::LightPosition);
 	if(varID >=0 )
 	{
-		shader->SendUniformToShader(varID, light->GetPositionPtr());
+		shader->SendUniformToShader(varID, position);
 		SetUniformSetValue(varID, 4);
 	}
 

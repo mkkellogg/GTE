@@ -31,6 +31,7 @@
 #include "ui/debug.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
+#include "util/time.h"
 #include "gte.h"
 
 class CustomGraphicsCallbacks: public GraphicsCallbacks
@@ -82,18 +83,22 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
 		SceneObject * lightObject = objectManager->CreateSceneObject();
-		lightObject->GetTransform()->Translate(-5, 10, -5, false);
+		lightObject->GetTransform()->Translate(0, 15, 5, false);
 		Light * light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		lightObject->SetLight(light);
 
+
+
 		cameraObject = objectManager->CreateSceneObject();
 		Camera * camera = objectManager->CreateCamera();
-		cameraObject->GetTransform()->Translate(0, 5, 9, true);
+		cameraObject->GetTransform()->Translate(0, 5, 15, true);
 		// cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
 		camera->AddClearBuffer(RenderBufferType::Color);
 		camera->AddClearBuffer(RenderBufferType::Depth);
 		cameraObject->SetCamera(camera);
+
+
 
 		SceneObject * sceneObject = objectManager->CreateSceneObject();
 		sceneObject->GetTransform()->Scale(3,3,3, true);
@@ -106,11 +111,11 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		Texture * texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
 
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
-		material->SetTexture(texture, "Texture");
+		material->SetTexture(texture, "TEXTURE0");
 
 		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Color);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
@@ -125,7 +130,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		Point3Array * points = mesh->GetPostions();
 		Color4Array * colors = mesh->GetColors();
-		UV2Array *uvs = mesh->GetUVs1();
+		UV2Array *uvs = mesh->GetUVsTexture0();
 
 		// --- Cube vertices -------
 		// cube front, triangle 1
@@ -249,6 +254,11 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		childSceneObject->GetTransform()->Scale(1.5,1.5,1.5, true);
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 
+
+
+
+
+
 		AssetImporter * importer = new AssetImporter();
 		SceneObject * modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
 		if(modelSceneObject != NULL)
@@ -261,13 +271,35 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			Debug::PrintError(" >> could not load model!\n");
 			return;
 		}
+		modelSceneObject->GetTransform()->RotateAround(0,0,0,0,1,0, 90);
+		modelSceneObject->GetTransform()->Translate(10,0,-12,false);
+		modelSceneObject->GetTransform()->Scale(.10,.10,.10, true);
+
+
+
+		modelSceneObject = importer->LoadModel("../../models/Rck-Wtrfll_dae/Rck-Wtrfll_dae.dae", 1 );
+		if(modelSceneObject != NULL)
+		{
+			modelSceneObject->SetActive(true);
+			Debug::PrintError("Model loaded!!\n");
+		}
+		else
+		{
+			Debug::PrintError(" >> could not load model!\n");
+			return;
+		}
 		modelSceneObject->GetTransform()->Translate(0,0,-12,false);
 		modelSceneObject->GetTransform()->Scale(.15,.15,.15, true);
+
+
+
+
 	}
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,.05);
+		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
+		 //printf("total time: %f\n", Time::GetRealTimeSinceStartup());
 	}
 
 	void OnQuit(Graphics * graphics)

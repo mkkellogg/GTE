@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <bitset>
 
 #include "graphics/stdattributes.h"
 
@@ -29,6 +30,7 @@
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "geometry/sceneobjecttransform.h"
+#include "graphics/uv/uv2array.h"
 #include "graphics/render/material.h"
 #include "graphics/image/rawimage.h"
 #include "filesys/filesystem.h"
@@ -46,6 +48,8 @@
 #include "base/longmask.h"
 #include "global/global.h"
 #include "ui/debug.h"
+
+
 
 AssetImporter::AssetImporter()
 {
@@ -94,19 +98,20 @@ SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, con
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
 	std::vector<Material *> materials;
-	ProcessMaterials(modelPath, scene, materials);
+	std::vector<TextureUVMap *> textureUVMaps;
+	ProcessMaterials(modelPath, scene, materials, textureUVMaps);
 
 	SceneObject * root = objectManager->CreateSceneObject();
 	NULL_CHECK(root,"AssetImporter::ProcessModelScene -> could not create root object", NULL);
 
 	root->SetActive(false);
 	Matrix4x4 baseTransform;
-	RecursiveProcessModelScene(scene, scene->mRootNode, importScale, root, &baseTransform, materials);
+	RecursiveProcessModelScene(scene, scene->mRootNode, importScale, root, &baseTransform, materials, textureUVMaps);
 
 	return root;
 }
 
-void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform, std::vector<Material *>& materials)
+void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNode* nd, float scale, SceneObject * current, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<TextureUVMap *>& textureUVMaps)
 {
 	Matrix4x4 mat;
 
@@ -122,7 +127,15 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 	for (unsigned int n=0; n < nd->mNumMeshes; n++)
 	{
 		const aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
-		Mesh3D * mesh3D = ConvertAssimpMesh(mesh);
+
+		int materialIndex = mesh->mMaterialIndex;
+		Material * material = materials[materialIndex];
+		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL material encountered.");
+
+		TextureUVMap * textureUVMap = textureUVMaps[materialIndex];
+		NULL_CHECK_RTRN(textureUVMap,"AssetImporter::RecursiveProcessModelScene -> NULL textureUVMap encountered.");
+
+		Mesh3D * mesh3D = ConvertAssimpMesh(mesh, material, textureUVMap);
 		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 		mesh3D->CalculateNormals(90);
@@ -132,10 +145,6 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 
 		Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
 		NULL_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create mesh renderer.");
-
-		int materialIndex = mesh->mMaterialIndex;
-		Material * material = materials[materialIndex]; //engineObjectManager->CreateMaterial("_Default", defaultShader);
-		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> Could not create material.");
 
 		meshRenderer->SetMaterial(material);
 
@@ -152,11 +161,11 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 		current->AddChild(child);
 
 		const aiNode *node = nd->mChildren[i];
-		if(node != NULL)RecursiveProcessModelScene(scene, node, scale, child, &mat, materials);
+		if(node != NULL)RecursiveProcessModelScene(scene, node, scale, child, &mat, materials, textureUVMaps);
 	}
 }
 
-Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
+Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * material, TextureUVMap * textureUVMap)
 {
 	unsigned int faceCount = 0;
 	unsigned int vertexCount = 0;
@@ -171,10 +180,11 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 
-	//TODO: add support for multiple textures!!
-	if(mesh->HasTextureCoords(0))	//HasTextureCoords(texture_coordinates_set)
+	int diffuseTextureUVIndex = -1;
+	if(textureUVMap->HasKey(ShaderMaterialCharacteristic::DiffuseTextured))
 	{
-		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UV1);
+		StandardAttributes::AddAttribute(&meshAttributes, MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic::DiffuseTextured));
+		diffuseTextureUVIndex = textureUVMap->mapping[ShaderMaterialCharacteristic::DiffuseTextured];
 	}
 
 	if(mesh->mNormals != NULL)
@@ -244,10 +254,10 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 			}
 			mesh3D->GetColors()->GetColor(vertexIndex)->Set(1,1,1,1);
 
-			//TODO: add support for multiple textures!!
-			if(mesh->HasTextureCoords(0))
+			if(diffuseTextureUVIndex >= 0)
 			{
-				mesh3D->GetUVs1()->GetCoordinate(vertexIndex)->Set(mesh->mTextureCoords[0][vIndex].x, 1 - mesh->mTextureCoords[0][vIndex].y);
+				UV2Array *uvs = GetMeshUVArrayForShaderMaterialCharacteristic(mesh3D,ShaderMaterialCharacteristic::DiffuseTextured);
+				uvs->GetCoordinate(vertexIndex)->Set(mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1 - mesh->mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 			}
 
 			vertexComponentIndex+=3;
@@ -260,7 +270,7 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh)
 	return mesh3D;
 }
 
-bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials)
+bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<TextureUVMap *>& textureUVMaps)
 {
 	if (scene->HasTextures())
 	{
@@ -270,7 +280,7 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 
 	NULL_CHECK(scene,"AssetImporter::ProcessMaterials -> scene is NULL.", false);
 
-	int textureCount = 0;
+	//int textureCount = 0;
 	std::vector<std::string> texturePaths;
 
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
@@ -285,11 +295,11 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		aiString path;	// filename
 
 		aiMaterial * material = scene->mMaterials[m];
-		LongMask shaderProperties = ShaderManager::GetImportFlags(material);
+		LongMask shaderProperties = GetImportFlags(material);
 		Texture * diffuseTexture = NULL;
-		Texture * bumpTexture = NULL;
+	//	Texture * bumpTexture = NULL;
 
-		texFound = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
+		texFound = material->GetTexture(aiTextureType_DIFFUSE, texIndex, &path);
 		std::string filename;
 		if(texFound == AI_SUCCESS)
 		{
@@ -300,22 +310,131 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 			diffuseTexture = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
 		}
 
-
 		Shader * loadedShader = engineObjectManager->GetLoadedShader(shaderProperties);
 		if(loadedShader != NULL)
 		{
-			Material * newMaterial = engineObjectManager->CreateMaterial("Default",loadedShader);
-			if(diffuseTexture != NULL)newMaterial->SetTexture(diffuseTexture, "Texture");
+			TextureUVMap * textureUVMap = new TextureUVMap();
+			Material * newMaterial = engineObjectManager->CreateMaterial("_Default",loadedShader);
+			if(diffuseTexture != NULL)
+			{
+				std::string diffuseTextureName = GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic::DiffuseTextured);
+				if(!diffuseTextureName.empty())newMaterial->SetTexture(diffuseTexture, diffuseTextureName);
+
+				int mappedIndex;
+				if(AI_SUCCESS==aiGetMaterialInteger(material,AI_MATKEY_UVWSRC(aiTextureType_DIFFUSE,0),&mappedIndex))
+				{
+					textureUVMap->mapping[ShaderMaterialCharacteristic::DiffuseTextured] = mappedIndex;
+				}
+				textureUVMap->mapping[ShaderMaterialCharacteristic::DiffuseTextured] = 0;
+			}
 			materials.push_back(newMaterial);
+			textureUVMaps.push_back(textureUVMap);
 		}
 		else
 		{
 			std::string msg = "Could not find loaded shader for: ";
-			msg += std::to_string(shaderProperties);
+			msg += std::bitset< 64 >(shaderProperties).to_string();
 			Debug::PrintError(msg);
 			return false;
 		}
 	}
 
 	return true;
+}
+
+LongMask AssetImporter::GetImportFlags(const aiMaterial * mtl)
+{
+	LongMask flags = LongMaskUtil::CreateLongMask();
+	aiString path;
+	aiColor4t<float> color;
+
+	if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &path))
+	{
+		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialCharacteristic::DiffuseTextured);
+	}
+
+	/*if(AI_SUCCESS == mtl->GetTexture(aiTextureType_SPECULAR, 0, &path))
+	{
+		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::SpecularTextured);
+	}*/
+
+	/*if(AI_SUCCESS == mtl->GetTexture(aiTextureType_NORMALS, 0, &path))
+	{
+		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::Bumped);
+	}
+
+	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &color))
+	{
+		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::DiffuseColored);
+	}
+
+	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &color))
+	{
+		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::SpecularColored);
+	}
+
+	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &color))
+	{
+		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::EmissiveColored);
+	}*/
+
+	return flags;
+}
+
+UV2Array* AssetImporter::GetMeshUVArrayForShaderMaterialCharacteristic(Mesh3D * mesh, ShaderMaterialCharacteristic property)
+{
+	switch(property)
+	{
+		case ShaderMaterialCharacteristic::DiffuseTextured:
+			return mesh->GetUVsTexture0();
+		break;
+		default:
+			return NULL;
+		break;
+	}
+
+	return NULL;
+}
+
+StandardUniform AssetImporter::MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property)
+{
+	switch(property)
+	{
+		case ShaderMaterialCharacteristic::DiffuseTextured:
+			return StandardUniform::Texture0;
+		break;
+		default:
+			return StandardUniform::_None;
+		break;
+	}
+
+	return StandardUniform::_None;
+}
+
+StandardAttribute AssetImporter::MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property)
+{
+	switch(property)
+	{
+		case ShaderMaterialCharacteristic::DiffuseTextured:
+			return StandardAttribute::UVTexture0;
+		break;
+		default:
+			return StandardAttribute::_None;
+		break;
+	}
+
+	return StandardAttribute::_None;
+}
+
+std::string AssetImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property)
+{
+
+	StandardUniform uniform = MapShaderMaterialCharacteristicToUniform(property);
+
+	if(uniform != StandardUniform::_None)
+	{
+		return StandardUniforms::GetUniformName(uniform);
+	}
+
+	return "";
 }

@@ -50,8 +50,8 @@ void Mesh3DRendererGL::DestroyBuffers()
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Position]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Normal]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Color]);
-	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UV1]);
-	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UV2]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture0]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture1]);
 }
 
 void Mesh3DRendererGL::DestroyBuffer(VertexAttrBuffer ** buffer)
@@ -114,12 +114,12 @@ void Mesh3DRendererGL::SetColorData(Color4Array * colors)
 
 void Mesh3DRendererGL::SetUV1Data(UV2Array * uvs)
 {
-	attributeBuffers[(int)StandardAttribute::UV1]->SetData(uvs->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::UVTexture0]->SetData(uvs->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetUV2Data(UV2Array * uvs)
 {
-	attributeBuffers[(int)StandardAttribute::UV2]->SetData(uvs->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::UVTexture1]->SetData(uvs->GetDataPtr());
 }
 
 bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
@@ -140,7 +140,7 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 		if(StandardAttributes::HasAttribute(meshAttributes, attr))
 		{
 			int componentCount = 4;
-			if(attr == StandardAttribute::UV1 || attr == StandardAttribute::UV2)componentCount = 2;
+			if(attr == StandardAttribute::UVTexture0 || attr == StandardAttribute::UVTexture1)componentCount = 2;
 		//	if(attr == StandardAttribute::Normal)componentCount = 3;
 
 			int stride =0;
@@ -180,8 +180,8 @@ void Mesh3DRendererGL::CopyMeshData()
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Color))SetColorData(mesh->GetColors());
-	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UV1))SetUV1Data(mesh->GetUVs1());
-	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UV2))SetUV2Data(mesh->GetUVs2());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVsTexture0());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVsTexture1());
 }
 
 void Mesh3DRendererGL::UpdateFromMesh()

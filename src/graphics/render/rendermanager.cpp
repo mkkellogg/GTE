@@ -302,7 +302,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 					ActivateMaterial(currentMaterial);
 					currentMaterial->ResetVerificationState();
 					// pass concatenated modelViewTransform and projection transforms to shader
-					SendTransformUniformsToShader(&modelView, camera->GetProjectionTransform());
+					SendTransformUniformsToShader(modelTransform, &modelView, camera->GetProjectionTransform());
 					SendCustomUniformsToShader();
 
 					for(unsigned int l = 0; l < lightCount; l++)
@@ -314,8 +314,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 							{
 								Point3 lightPosition;
 								sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
-								light->SetPosition(lightPosition);
-								currentMaterial->SendLightToShader(light);
+								currentMaterial->SendLightToShader(light, &lightPosition);
 							}
 							else
 							{
@@ -352,7 +351,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
  * Send the ModelView matrix in [modelView] and Projection matrix in [projection] to the active shader.
  * The binding information stored in the active material holds the shader variable locations for these matrices.
  */
-void RenderManager::SendTransformUniformsToShader(const Transform * modelView, const Transform * projection)
+void RenderManager::SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection)
 {
 	if(activeMaterial != NULL)
 	{
@@ -363,6 +362,7 @@ void RenderManager::SendTransformUniformsToShader(const Transform * modelView, c
 			mvpTransform.TransformBy(modelView);
 			mvpTransform.TransformBy(projection);
 
+			activeMaterial->SendModelMatrixToShader(model->GetMatrix());
 			activeMaterial->SendModelViewMatrixToShader(modelView->GetMatrix());
 			activeMaterial->SendProjectionMatrixToShader(projection->GetMatrix());
 			activeMaterial->SendMVPMatrixToShader(mvpTransform.GetMatrix());

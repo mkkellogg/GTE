@@ -110,7 +110,8 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 	else
 	{
 		ILenum i = ilGetError();
-		std::string msg = "ImageLoader::LoadImage -> Couldn't load image.";
+		std::string msg = "ImageLoader::LoadImage -> Couldn't load image: ";
+		msg += fullPath.c_str();
 		if(i == IL_INVALID_EXTENSION)
 		{
 			msg = std::string("ImageLoader::LoadImage -> Couldn't load image (invalid extension). ");

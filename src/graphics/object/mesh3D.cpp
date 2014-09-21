@@ -3,6 +3,9 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
+#include <unordered_map>
+#include <functional>
+#include <vector>
 
 #include "object/sceneobjectcomponent.h"
 #include "mesh3D.h"
@@ -35,8 +38,8 @@ Mesh3D::Mesh3D(StandardAttributeSet attributes) : SceneObjectComponent()
 	positions = new Point3Array();
 	normals = new Vector3Array();
 	colors = new Color4Array();
-	uvs1 = new UV2Array();
-	uvs2 = new UV2Array();
+	uvsTexture0 = new UV2Array();
+	uvsTexture1 = new UV2Array();
 
 	renderer = NULL;
 }
@@ -66,16 +69,16 @@ void Mesh3D::Destroy()
 		colors = NULL;
 	}
 
-	if(uvs1 != NULL)
+	if(uvsTexture0 != NULL)
 	{
-		delete uvs1;
-		uvs1 = NULL;
+		delete uvsTexture0;
+		uvsTexture0 = NULL;
 	}
 
-	if(uvs2 != NULL)
+	if(uvsTexture1 != NULL)
 	{
-		delete uvs2;
-		uvs2 = NULL;
+		delete uvsTexture1;
+		uvsTexture1 = NULL;
 	}
 }
 
@@ -114,16 +117,16 @@ bool Mesh3D::Init(unsigned int vertexCount)
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Color;
 	}
 
-	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UV1))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture0))
 	{
-		initSuccess = uvs1->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UV1;
+		initSuccess = uvsTexture0->Init(vertexCount) && initSuccess;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture0;
 	}
 
-	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UV2))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture1))
 	{
-		initSuccess = uvs2->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UV2;
+		initSuccess = uvsTexture1->Init(vertexCount) && initSuccess;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture1;
 	}
 	if(!initSuccess)
 	{
@@ -139,8 +142,6 @@ bool Mesh3D::Init(unsigned int vertexCount)
 
 void Mesh3D::CalculateNormals(float smoothingThreshhold)
 {
-	// TODO: implement smoothing!!
-
 	for(unsigned int v =0; v < vertexCount-2; v+=3)
 	{
 		Point3 pa = positions->GetPoint(v);
@@ -157,6 +158,43 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 		normals->GetVector(v)->Set(c.x,c.y,c.z);
 		normals->GetVector(v+1)->Set(c.x,c.y,c.z);
 		normals->GetVector(v+2)->Set(c.x,c.y,c.z);
+	}
+
+	std::unordered_map<Point3, std::vector<Vector3*>*, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
+	for(unsigned int v =0; v < vertexCount; v++)
+	{
+		Point3 * point = positions->GetPoint(v);
+
+		if(normalGroups.find(*point) == normalGroups.end())
+		{
+			normalGroups[*point] = new std::vector<Vector3*>();
+		}
+
+		std::vector<Vector3*>* list = normalGroups[*point];
+		Vector3 * normal = normals->GetVector(v);
+		list->push_back(normal);
+		//printf("list size: %d\n", normalGroups[*point]->size());
+	}
+
+	for(unsigned int v =0; v < vertexCount; v++)
+	{
+		Point3 * point = positions->GetPoint(v);
+		std::vector<Vector3*>* list = normalGroups[*point];
+
+		Vector3 avg(0,0,0);
+		for(unsigned int i=0; i < list->size(); i++)
+		{
+			Vector3 * current = (*list)[i];
+			avg.x += current->x;
+			avg.y += current->y;
+			avg.z += current->z;
+		}
+
+		float divisor = 1;
+		divisor = (float)list->size();
+		float scaleFactor = (float)1.0/divisor;
+		avg.Scale(scaleFactor);
+		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
 	}
 }
 
@@ -175,14 +213,14 @@ Color4Array * Mesh3D::GetColors()
 	return colors;
 }
 
-UV2Array * Mesh3D::GetUVs1()
+UV2Array * Mesh3D::GetUVsTexture0()
 {
-	return uvs1;
+	return uvsTexture0;
 }
 
-UV2Array * Mesh3D::GetUVs2()
+UV2Array * Mesh3D::GetUVsTexture1()
 {
-	return uvs2;
+	return uvsTexture1;
 }
 
 void Mesh3D::SetRenderer(Mesh3DRenderer * renderer)

@@ -21,7 +21,7 @@ class Shader;
 #include "base/longmask.h"
 #include <map>
 
-enum class ShaderMaterialProperty
+enum class ShaderMaterialCharacteristic
 {
 	DiffuseColored = 0,
 	SpecularColored = 1,
@@ -43,7 +43,6 @@ class ShaderManager
 	ShaderManager();
 	~ShaderManager();
 
-	static LongMask GetImportFlags(const aiMaterial * mat);
 	void AddShader(LongMask properties, Shader * shader);
 	Shader * GetShader(LongMask flags);
 };

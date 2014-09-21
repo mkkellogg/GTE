@@ -29,9 +29,13 @@
 #include "object/sceneobject.h"
 #include "geometry/transform.h"
 #include "global/global.h"
+#include "util/time.h"
 
 GraphicsGL * _thisInstance;
 GraphicsCallbacks * _instanceCallbacks;
+
+//TODO: Right now, GLUT callbacks drive the engine loop. This is not ideal,
+// so eventually we need to move the loop driver somewhere else
 
 bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle)
 {
@@ -311,6 +315,10 @@ unsigned int GraphicsGL::GetOpenGLVersion()
 void GraphicsGL::_glutDisplayFunc()
 {
 	_instanceCallbacks->OnUpdate(_thisInstance);
+
+	// update timer before rendering scene so that calls to Time::GetDeltaTime() within
+	// _instanceCallbacks->OnUpdate reflect rendering time
+	Time::Update();
 
 	_thisInstance->RenderScene();
 }

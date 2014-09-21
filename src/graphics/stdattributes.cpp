@@ -8,7 +8,7 @@
 #include "stdattributes.h"
 #include "ui/debug.h"
 
-const char* const StandardAttributes::attributeNames[] = {"POSITION","NORMAL","COLOR","UV1","UV2"};
+const char* const StandardAttributes::attributeNames[] = {"POSITION","NORMAL","COLOR","UVTEXTURE0","UVTEXTURE1", "UVNORMALMAP"};
 
 const char * StandardAttributes::GetAttributeName(StandardAttribute attr)
 {

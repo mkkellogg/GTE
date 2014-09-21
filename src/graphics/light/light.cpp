@@ -43,26 +43,6 @@ void Light::SetColor(float r, float g, float b, float a)
 	color.Set(r,g,b,a);
 }
 
-Point3 Light::GetPosition()
-{
-	return position;
-}
-
-const Point3 * Light::GetPositionPtr()
-{
-	return &position;
-}
-
-void Light::SetPosition(Point3 position)
-{
-	this->position = position;
-}
-
-void Light::SetPosition(float x, float y, float z)
-{
-	position.Set(x,y,z);
-}
-
 Vector3 Light::GetDirection()
 {
 	return direction;

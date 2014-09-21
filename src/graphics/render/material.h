@@ -24,6 +24,7 @@ class Shader;
 class VertexAttrBuffer;
 class Light;
 class Texture;
+class Point3;
 
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
@@ -125,10 +126,11 @@ class Material : public EngineObject
     void SetTexture(Texture * texture, const std::string& varName);
     unsigned int GetSetUniformCount() const ;
 
+    void SendModelMatrixToShader(const Matrix4x4 * mat);
     void SendModelViewMatrixToShader(const Matrix4x4 * mat);
     void SendProjectionMatrixToShader(const Matrix4x4 * mat);
     void SendMVPMatrixToShader(const Matrix4x4 * mat);
-    void SendLightToShader(Light * light);
+    void SendLightToShader(Light * light, Point3 * position);
 
     bool VerifySetVars(int vertexCount);
 };
