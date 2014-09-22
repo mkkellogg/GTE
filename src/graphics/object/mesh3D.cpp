@@ -155,6 +155,7 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 		Point3::Subtract(&pc, &pa, &a);
 
 		Vector3::Cross(&a, &b, &c);
+		c.Normalize();
 
 		normals->GetVector(v)->Set(c.x,c.y,c.z);
 		normals->GetVector(v+1)->Set(c.x,c.y,c.z);
@@ -189,11 +190,9 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 		float divisor = 0;
 		for(unsigned int i=0; i < list->size(); i++)
 		{
-			Vector3 current(*((*list)[i]));
-			Vector3 currentNormalized(&current);
-			currentNormalized.Normalize();
+			Vector3 current = (*((*list)[i]));
 
-			float dot = Vector3::Dot(&currentNormalized, &oNormal);
+			float dot = Vector3::Dot(&current, &oNormal);
 			float angle = acos(dot);
 			if(angle <0)angle = -angle;
 

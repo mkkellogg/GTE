@@ -22,6 +22,8 @@ class Light : public SceneObjectComponent
 	Color4 color;
 	Vector3 direction;
 	LightType type;
+	float intensity;
+	float attenuation;
 
 	protected:
 
@@ -42,6 +44,12 @@ class Light : public SceneObjectComponent
 
 	LightType GetType();
 	void SetType(LightType type);
+
+	void SetIntensity(float intensity);
+	float GetIntensity();
+
+	void SetAttenuation(float attenuation);
+	float GetAttenuation();
 };
 
 #endif

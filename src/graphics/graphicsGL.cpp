@@ -93,6 +93,7 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     glClearColor(0,0,0,0);
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
+    glDepthFunc(GL_LEQUAL);
     glCullFace(GL_BACK);
 
     if(callbacks != NULL)
@@ -278,6 +279,44 @@ void GraphicsGL::DestroyTexture(Texture * texture)
 	delete texture;
 }
 
+void GraphicsGL::EnableBlending(bool enabled)
+{
+	if(enabled)glEnable(GL_BLEND);
+	else glDisable(GL_BLEND);
+}
+
+void GraphicsGL::SetBlendingFunction(BlendingProperty source, BlendingProperty dest)
+{
+	glBlendFunc(GetGLBlendProperty(source),GetGLBlendProperty(dest));
+}
+
+GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property)
+{
+	switch(property)
+	{
+		case BlendingProperty::SrcAlpha:
+			return GL_SRC_ALPHA;
+		break;
+		case BlendingProperty::OneMinusSrcAlpha:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		break;
+		case BlendingProperty::DstAlpha:
+			return GL_DST_ALPHA;
+		break;
+		case BlendingProperty::OneMinusDstAlpha:
+			return GL_ONE_MINUS_DST_ALPHA;
+		break;
+		case BlendingProperty::One:
+			return GL_ONE;
+		break;
+		default:
+			return (GLenum)0xFFFFFFFF;
+		break;
+	}
+
+	return (GLenum)0xFFFFFFFF;
+}
+
 void GraphicsGL::ActivateMaterial(Material * material)
 {
 	NULL_CHECK_RTRN(material,"GraphicsGL::ActivateMaterial -> material is NULL");
@@ -286,17 +325,33 @@ void GraphicsGL::ActivateMaterial(Material * material)
 	// a comparison of memory addresses
 	if(Graphics::GetActiveMaterial() != material)
 	{
+		GLuint oldActiveProgramID = (GLuint)0xFFFFFFF0;
+		if(this->activeMaterial != NULL)
+		{
+			Shader * currentShader = this->activeMaterial->GetShader();
+			if(currentShader != NULL)
+			{
+				ShaderGL * currentShaderGL = dynamic_cast<ShaderGL *>(currentShader);
+				if(currentShaderGL != NULL)
+				{
+					oldActiveProgramID = currentShaderGL->GetProgramID();
+				}
+			}
+		}
+
 		Graphics::ActivateMaterial(material);
 
 		Shader * shader = material->GetShader();
-
 		NULL_CHECK_RTRN(shader,"GraphicsGL::ActivateMaterial -> shader is NULL");
 
 		ShaderGL * shaderGL = dynamic_cast<ShaderGL *>(shader);
-
 		NULL_CHECK_RTRN(shaderGL,"GraphicsGL::ActivateMaterial -> material's shader is not ShaderGL !!");
 
-		glUseProgram(shaderGL->GetProgramID());
+		// only active the new shader if it is different from the currently active one
+		if(oldActiveProgramID != shaderGL->GetProgramID())
+		{
+			glUseProgram(shaderGL->GetProgramID());
+		}
 	}
 }
 

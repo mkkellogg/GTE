@@ -29,6 +29,15 @@ class GraphicsCallbacks
     virtual ~GraphicsCallbacks();
 };
 
+enum class BlendingProperty
+{
+	One,
+	SrcAlpha,
+	OneMinusSrcAlpha,
+	DstAlpha,
+	OneMinusDstAlpha
+};
+
 class Graphics
 {
 	static Graphics * theInstance;
@@ -62,7 +71,8 @@ class Graphics
     virtual void DestroyTexture(Texture * texture) = 0;
     virtual void ClearBuffers(unsigned int bufferMask) const = 0;
 
-
+    virtual void EnableBlending(bool enabled) = 0;
+    virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
     virtual void ActivateMaterial(Material * material);
     Material * GetActiveMaterial() const;
 

@@ -16,6 +16,8 @@ Light::Light()
 	type = LightType::Directional;
 	color.Set(1,1,1,1);
 	direction.Set(1,-1,0);
+	intensity = 1;
+	attenuation = .98;
 }
 
 Light::~Light()
@@ -71,5 +73,25 @@ LightType Light::GetType()
 void Light::SetType(LightType type)
 {
 	this->type = type;
+}
+
+void Light::SetIntensity(float intensity)
+{
+	this->intensity = intensity;
+}
+
+float Light::GetIntensity()
+{
+	return intensity;
+}
+
+void Light::SetAttenuation(float attenuation)
+{
+	this->attenuation = attenuation;
+}
+
+float Light::GetAttenuation()
+{
+	return attenuation;
 }
 

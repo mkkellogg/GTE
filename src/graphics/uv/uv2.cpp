@@ -32,6 +32,16 @@ UV2::~UV2()
     
 }
 
+/*
+ * Assignment operator
+ */
+UV2 & UV2::operator= (const UV2 & source)
+{
+    if(this == &source)return *this;
+    memcpy((void*)source.data, (void*)data, sizeof(float) * 2);
+    memcpy((void*)source.baseData, (void*)baseData, sizeof(float) * 2);
+    return *this;
+}
 
 void UV2::AttachTo(float * data)
 {

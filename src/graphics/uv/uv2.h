@@ -24,6 +24,8 @@ class UV2 : public BaseVector2
 
     void AttachTo(float * data);
     void Detach();
+
+    UV2 & operator= (const UV2 & source);
 };
 
 #endif

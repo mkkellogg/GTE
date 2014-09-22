@@ -307,6 +307,16 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 
 					for(unsigned int l = 0; l < lightCount; l++)
 					{
+						if(l ==0)
+						{
+							graphics->EnableBlending(false);
+						}
+						else
+						{
+							graphics->EnableBlending(true);
+							graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+						}
+
 						if(sceneLights[l].component != NULL)
 						{
 							Light * light = dynamic_cast<Light *>(sceneLights[l].component);

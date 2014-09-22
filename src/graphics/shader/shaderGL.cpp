@@ -597,7 +597,7 @@ void ShaderGL::SendUniformToShader2(int varID, float x, float y)
 
 void ShaderGL::SendUniformToShader(int varID, float  data)
 {
-
+	glUniform1f(varID,data);
 }
 
 /*

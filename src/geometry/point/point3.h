@@ -64,7 +64,6 @@ class Point3 : public BaseVector4
       bool operator() (const Point3& a, const Point3& b) const { return a==b; }
     } Point3Eq;
 
-
     bool operator==(const Point3& p) const
     {
 		return p.x == this->x && p.y == this->y && p.z == this->z;

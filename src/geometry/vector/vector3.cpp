@@ -48,6 +48,7 @@ Vector3::Vector3(const Vector3 * vector) : BaseVector4(vector),  x(data[0]), y(d
 Vector3 & Vector3::operator= (const Vector3 & source)
 {
     if(this == &source)return *this;
+    memcpy((void*)data, (void*)source.data, sizeof(float) * 4);
     memcpy((void*)baseData, (void*)source.baseData, sizeof(float) * 4);
     return *this;
 }

@@ -81,6 +81,11 @@ unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
 		case UniformType::Float3:
 			return 3;
 		break;
+		case UniformType::Float2:
+			return 2;
+		break;
+		case UniformType::Float:
+			return 1;
 		default:
 			return -1;
 		break;
@@ -561,6 +566,20 @@ void Material::SendLightToShader(Light * light, Point3 * position)
 	{
 		shader->SendUniformToShader(varID, light->GetColorPtr());
 		SetUniformSetValue(varID, 4);
+	}
+
+	varID = GetStandardUniformBinding(StandardUniform::LightIntensity);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, light->GetIntensity());
+		SetUniformSetValue(varID, 1);
+	}
+
+	varID = GetStandardUniformBinding(StandardUniform::LightAttenuation);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, light->GetAttenuation());
+		SetUniformSetValue(varID, 1);
 	}
 }
 

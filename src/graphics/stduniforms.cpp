@@ -8,7 +8,7 @@
 #include "stduniforms.h"
 #include "ui/debug.h"
 
-const char* const StandardUniforms::uniformNames[] = {"MODEL_MATRIX","MODELVIEW_MATRIX","MODELVIEWPROJECTION_MATRIX","PROJECTION_MATRIX","LIGHT_POSITION", "LIGHT_DIRECTION", "LIGHT_COLOR", "EMISSIVECOLOR", "TEXTURE0", "TEXTURE1", "NORMALMAP"};
+const char* const StandardUniforms::uniformNames[] = {"MODEL_MATRIX","MODELVIEW_MATRIX","MODELVIEWPROJECTION_MATRIX","PROJECTION_MATRIX","LIGHT_POSITION", "LIGHT_DIRECTION", "LIGHT_COLOR", "LIGHT_INTENSITY", "LIGHT_ATTENUATION", "EMISSIVECOLOR", "TEXTURE0", "TEXTURE1", "NORMALMAP"};
 
 const char * StandardUniforms::GetUniformName(StandardUniform uniform)
 {

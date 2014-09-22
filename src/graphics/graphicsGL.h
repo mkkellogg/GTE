@@ -43,6 +43,9 @@ class GraphicsGL : public Graphics
     void DestroyTexture(Texture * texture);
     void ClearBuffers(unsigned int bufferMask) const;
 
+    void EnableBlending(bool enabled);
+    void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
+    GLenum GetGLBlendProperty(BlendingProperty property);
     void ActivateMaterial(Material * material);
     Material * GetActiveMaterial();
 

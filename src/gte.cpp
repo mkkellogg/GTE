@@ -82,12 +82,31 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
-		SceneObject * lightObject = objectManager->CreateSceneObject();
-		lightObject->GetTransform()->Translate(0, 15, 5, false);
-		Light * light = objectManager->CreateLight();
+		SceneObject * lightObject = NULL;
+		Light * light = NULL;
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetTransform()->Translate(0, 25, 15, false);
+		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		lightObject->SetLight(light);
 
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetTransform()->Translate(0, 15, -10, false);
+		light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		lightObject->SetLight(light);
+
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetTransform()->Translate(-15, -3, 5, false);
+		light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		lightObject->SetLight(light);
+
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetTransform()->Translate(15, -3, 5, false);
+		light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		lightObject->SetLight(light);
 
 
 		cameraObject = objectManager->CreateSceneObject();

@@ -124,8 +124,8 @@ void Point3::UpdateComponentPointers()
 Point3 & Point3::operator= (const Point3 & source)
 {
     if(this == &source)return *this;
+    memcpy((void*)data, (void*)source.data, sizeof(float) * 4);
     memcpy((void*)baseData, (void*)source.baseData, sizeof(float) * 4);
-
     return *this;
 }
 

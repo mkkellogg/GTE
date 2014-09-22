@@ -38,6 +38,7 @@ Color4::~Color4()
 Color4 & Color4::operator= (const Color4 & source)
 {
     if(this == &source)return *this;
+    memcpy((void*)source.data, (void*)data, sizeof(float) * 4);
     memcpy((void*)source.baseData, (void*)baseData, sizeof(float) * 4);
     return *this;
 }

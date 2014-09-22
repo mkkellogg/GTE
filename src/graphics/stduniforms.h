@@ -10,10 +10,12 @@ enum class StandardUniformMaskComponent
     LightPosition=16,
     LightDirection=32,
     LightColor=64,
-    EmissiveColor=128,
-    Texture0=256,
-    Texture1=512,
-    NormalMap=1024
+    LightIntensity=128,
+    LightAttenuation=256,
+    EmissiveColor=512,
+    Texture0=1024,
+    Texture1=2048,
+    NormalMap=4096
 };
 
 enum class StandardUniform
@@ -25,12 +27,14 @@ enum class StandardUniform
 	LightPosition=4,
 	LightDirection=5,
 	LightColor=6,
-	EmissiveColor=7,
-	Texture0=8,
-	Texture1=9,
-	NormalMap=10,
-    _Last=11, // always keep as last entry
-    _None=12
+	LightIntensity=7,
+	LightAttenuation=8,
+	EmissiveColor=9,
+	Texture0=10,
+	Texture1=11,
+	NormalMap=12,
+    _Last=13, // always keep as last entry
+    _None=14
 };
 
 #include "base/intmask.h"
