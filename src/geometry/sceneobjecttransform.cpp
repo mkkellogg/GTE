@@ -45,6 +45,20 @@ SceneObjectTransform::~SceneObjectTransform()
 }
 
 /*
+ * Get the full transform represented by this transform and all
+ * its ancestor, and store in [transform]
+ */
+void SceneObjectTransform::GetFullTransform(Transform * transform)
+{
+	NULL_CHECK_RTRN(transform, "SceneObjectTransform::GetFullTransform -> NULL transform passed.");
+
+	Transform full;
+	GetInheritedTransform(&full, false);
+	full.TransformBy(this);
+	transform->SetTo(&full);
+}
+
+/*
  * This method is used to make transformations relative to the transformations of
  * all ancestors of the connected scene object.
  *

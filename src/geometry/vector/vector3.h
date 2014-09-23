@@ -41,9 +41,9 @@ class Vector3 : public BaseVector4
     void Scale(float magnitude);
     void Normalize();
     void QuickNormlize();
-    float Magnitude();
+    float Magnitude() const ;
     static float Magnitude(float x, float y, float z);
-    float QuickMagnitude();
+    float QuickMagnitude() const;
     void Invert();
     static void Cross(const Vector3 * a, const Vector3 * b, Vector3 * results);
     static void CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result);

@@ -37,11 +37,12 @@ class SceneObject : public EngineObject
 
     SceneObjectTransform * GetTransform() const ;
 
-    bool SetMeshRenderer(Mesh3DRenderer *renderer);
-    bool SetMesh(Mesh3D *mesh);
+    bool SetMeshRenderer3D(Mesh3DRenderer *renderer);
+    bool SetMesh3D(Mesh3D *mesh);
     bool SetCamera(Camera * camera);
     bool SetLight(Light * light);
 
+    Mesh3D * GetMesh3D();
     Mesh3DRenderer * GetRenderer3D();
     Camera * GetCamera();
     Light * GetLight();

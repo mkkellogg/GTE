@@ -61,6 +61,10 @@ class RenderManager
     void ProcessScene(SceneObject * parent, Transform * viewTransform);
     void RenderSceneFromCamera(unsigned int cameraIndex);
 
+    bool ShouldCullFromLight(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject);
+    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject);
+    bool ShouldCullByTile(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject);
+
     public:
 
 	RenderManager(Graphics * graphics, EngineObjectManager * objectManager);

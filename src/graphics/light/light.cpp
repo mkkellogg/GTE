@@ -18,6 +18,7 @@ Light::Light()
 	direction.Set(1,-1,0);
 	intensity = 1;
 	attenuation = .98;
+	range = 10;
 }
 
 Light::~Light()
@@ -25,7 +26,7 @@ Light::~Light()
 
 }
 
-Color4 Light::GetColor()
+Color4 Light::GetColor() const
 {
 	return color;
 }
@@ -45,7 +46,7 @@ void Light::SetColor(float r, float g, float b, float a)
 	color.Set(r,g,b,a);
 }
 
-Vector3 Light::GetDirection()
+Vector3 Light::GetDirection() const
 {
 	return direction;
 }
@@ -65,7 +66,7 @@ void Light:: SetDirection(float x, float y, float z)
 	direction.Set(x,y,z);
 }
 
-LightType Light::GetType()
+LightType Light::GetType() const
 {
 	return type;
 }
@@ -75,12 +76,22 @@ void Light::SetType(LightType type)
 	this->type = type;
 }
 
+float Light::GetRange() const
+{
+	return range;
+}
+
+void Light::SetRange(float range)
+{
+	this->range = range;
+}
+
 void Light::SetIntensity(float intensity)
 {
 	this->intensity = intensity;
 }
 
-float Light::GetIntensity()
+float Light::GetIntensity() const
 {
 	return intensity;
 }
@@ -90,7 +101,7 @@ void Light::SetAttenuation(float attenuation)
 	this->attenuation = attenuation;
 }
 
-float Light::GetAttenuation()
+float Light::GetAttenuation() const
 {
 	return attenuation;
 }

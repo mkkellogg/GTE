@@ -37,7 +37,7 @@ SceneObjectTransform * SceneObject::GetTransform() const
 	return transform;
 }
 
-bool SceneObject::SetMeshRenderer(Mesh3DRenderer *renderer)
+bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer *renderer)
 {
 	if(renderer != NULL && renderer3D != renderer)
 	{
@@ -54,7 +54,7 @@ bool SceneObject::SetMeshRenderer(Mesh3DRenderer *renderer)
 	return true;
 }
 
-bool SceneObject::SetMesh(Mesh3D *mesh)
+bool SceneObject::SetMesh3D(Mesh3D *mesh)
 {
 	if(mesh != NULL)
 	{
@@ -81,6 +81,11 @@ bool SceneObject::SetLight(Light * light)
 {
 	this->light = light;
 	return true;
+}
+
+Mesh3D * SceneObject::GetMesh3D()
+{
+	return mesh3D;
 }
 
 Mesh3DRenderer * SceneObject::GetRenderer3D()

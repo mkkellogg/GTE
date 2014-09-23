@@ -138,8 +138,6 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 		Mesh3D * mesh3D = ConvertAssimpMesh(mesh, material, textureUVMap);
 		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
-		mesh3D->CalculateNormals(70);
-
 		SceneObject * sceneObject = engineObjectManager->CreateSceneObject();
 		NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
@@ -148,8 +146,8 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 
 		meshRenderer->SetMaterial(material);
 
-		sceneObject->SetMesh(mesh3D);
-		sceneObject->SetMeshRenderer(meshRenderer);
+		sceneObject->SetMesh3D(mesh3D);
+		sceneObject->SetMeshRenderer3D(meshRenderer);
 		sceneObject->GetTransform()->SetTo(&mat);
 		current->AddChild(sceneObject);
 	}
@@ -268,6 +266,8 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * materia
 		//glEnd();
 	}
 
+	mesh3D->SetNormalsSmoothingThreshold(70);
+	mesh3D->Update();
 	return mesh3D;
 }
 

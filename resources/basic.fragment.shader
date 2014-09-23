@@ -23,7 +23,7 @@ void main()
 	vec3 normalized_normal = normalize(vNormal);
 	vec3 vertex_to_light_vector = vec3(LIGHT_POSITION - vPosition); 
 	float light_dist = length(vertex_to_light_vector);
-	float attenuationFactor = max(pow(LIGHT_ATTENUATION,light_dist),0);
+	float attenuationFactor = max(pow(LIGHT_ATTENUATION,light_dist),0.0);
     vec3 normalized_vertex_to_light_vector = normalize(vertex_to_light_vector);
  
     // Calculating The Diffuse Term And Clamping It To [0;1]

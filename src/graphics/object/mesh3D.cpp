@@ -23,6 +23,7 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
 #include "gtemath/gtemath.h"
+#include "graphics/light/light.h"
 #include "ui/debug.h"
 #include "global/constants.h"
 
@@ -35,6 +36,7 @@ Mesh3D::Mesh3D(StandardAttributeSet attributes) : SceneObjectComponent()
 {
 	attributeSet = attributes;
 	vertexCount = 0;
+	normalsSmoothingThreshold = 90;
 
 	positions = new Point3Array();
 	normals = new Vector3Array();
@@ -43,11 +45,139 @@ Mesh3D::Mesh3D(StandardAttributeSet attributes) : SceneObjectComponent()
 	uvsTexture1 = new UV2Array();
 
 	renderer = NULL;
+
+	lightCullType = LightCullType::SphereOfInfluence;
 }
 
 Mesh3D::~Mesh3D()
 {
 	Destroy();
+}
+
+void Mesh3D::CalcSphereOfInfluence()
+{
+	float maxX=0;
+	float maxY=0;
+	float maxZ=0;
+	float minX=0;
+	float minY=0;
+	float minZ=0;
+
+	for(unsigned int v=0; v < vertexCount; v++)
+	{
+		Point3 * point = positions->GetPoint(v);
+		if(point->x > maxX)maxX = point->x;
+		if(point->x < minX)minX = point->x;
+		if(point->y > maxY)maxY = point->y;
+		if(point->y < minY)minY = point->y;
+		if(point->z > maxZ)maxZ = point->z;
+		if(point->z < minZ)minZ = point->z;
+	}
+
+	float width = maxX-minX;
+	float height = maxY-minY;
+	float depth = maxZ-minZ;
+
+	center.x = width/2 + minX;
+	center.y = height/2 + minY;
+	center.z = depth/2 + minZ;
+
+	sphereOfInfluenceX.Set(width * .6125,0,0);
+	sphereOfInfluenceY.Set(0,height * .6125, 0);
+	sphereOfInfluenceZ.Set(0,0,depth * .6125);
+
+}
+
+void Mesh3D::CalculateNormals(float smoothingThreshhold)
+{
+	for(unsigned int v =0; v < vertexCount-2; v+=3)
+	{
+		Point3 pa = positions->GetPoint(v);
+		Point3 pb = positions->GetPoint(v+1);
+		Point3 pc = positions->GetPoint(v+2);
+
+		Vector3 a,b,c;
+
+		Point3::Subtract(&pb, &pa, &b);
+		Point3::Subtract(&pc, &pa, &a);
+
+		Vector3::Cross(&a, &b, &c);
+		c.Normalize();
+
+		normals->GetVector(v)->Set(c.x,c.y,c.z);
+		normals->GetVector(v+1)->Set(c.x,c.y,c.z);
+		normals->GetVector(v+2)->Set(c.x,c.y,c.z);
+	}
+
+	std::unordered_map<Point3, std::vector<Vector3*>*, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
+	for(unsigned int v =0; v < vertexCount; v++)
+	{
+		Point3 * point = positions->GetPoint(v);
+
+		if(normalGroups.find(*point) == normalGroups.end())
+		{
+			normalGroups[*point] = new std::vector<Vector3*>();
+		}
+
+		std::vector<Vector3*>* list = normalGroups[*point];
+		Vector3 * normal = normals->GetVector(v);
+		list->push_back(normal);
+	}
+
+	for(unsigned int v =0; v < vertexCount; v++)
+	{
+		Vector3 oNormal = *normals->GetVector(v);
+		oNormal.Normalize();
+
+		Point3 * point = positions->GetPoint(v);
+		std::vector<Vector3*>* list = normalGroups[*point];
+
+		Vector3 avg(0,0,0);
+		float divisor = 0;
+		for(unsigned int i=0; i < list->size(); i++)
+		{
+			Vector3 current = (*((*list)[i]));
+
+			float dot = Vector3::Dot(&current, &oNormal);
+			float angle = acos(dot);
+			if(angle <0)angle = -angle;
+
+			angle /= Constants::TwoPIOver360;
+
+			if(angle < smoothingThreshhold)
+			{
+				avg.x += current.x;
+				avg.y += current.y;
+				avg.z += current.z;
+				divisor++;
+			}
+		}
+
+		if(divisor < 1)
+	    {
+			avg.x = oNormal.x;
+			avg.y = oNormal.y;
+			avg.z = oNormal.z;
+	    }
+		else
+		{
+			float scaleFactor = (float)1.0/divisor;
+			avg.Scale(scaleFactor);
+		}
+
+		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
+	}
+
+	for(unsigned int v =0; v < vertexCount; v++)
+	{
+		Point3 * point = positions->GetPoint(v);
+		std::vector<Vector3*>* list = normalGroups[*point];
+		if(list != NULL)
+		{
+			delete list;
+			normalGroups[*point] = NULL;
+		}
+	}
 }
 
 void Mesh3D::Destroy()
@@ -83,12 +213,44 @@ void Mesh3D::Destroy()
 	}
 }
 
-unsigned int Mesh3D::GetVertexCount()
+const Point3 * Mesh3D::GetCenter() const
+{
+	return (const Point3 *)(&center);
+}
+
+const Vector3 * Mesh3D::GetSphereOfInfluenceX() const
+{
+	return (const Vector3 *)(&sphereOfInfluenceX);
+}
+
+const Vector3 * Mesh3D::GetSphereOfInfluenceY() const
+{
+	return (const Vector3 *)(&sphereOfInfluenceY);
+}
+
+const Vector3 * Mesh3D::GetSphereOfInfluenceZ() const
+{
+	return (const Vector3 *)(&sphereOfInfluenceZ);
+}
+
+LightCullType Mesh3D::GetLightCullType() const
+{
+	return lightCullType;
+}
+
+void Mesh3D::Update()
+{
+	CalcSphereOfInfluence();
+	CalculateNormals(normalsSmoothingThreshold);
+	if(renderer != NULL)renderer->UpdateFromMesh();
+}
+
+unsigned int Mesh3D::GetVertexCount() const
 {
 	return vertexCount;
 }
 
-StandardAttributeSet Mesh3D::GetAttributeSet()
+StandardAttributeSet Mesh3D::GetAttributeSet() const
 {
 	return attributeSet;
 }
@@ -141,95 +303,10 @@ bool Mesh3D::Init(unsigned int vertexCount)
 	return true;
 }
 
-void Mesh3D::CalculateNormals(float smoothingThreshhold)
+void Mesh3D::SetNormalsSmoothingThreshold(unsigned int threshhold)
 {
-	for(unsigned int v =0; v < vertexCount-2; v+=3)
-	{
-		Point3 pa = positions->GetPoint(v);
-		Point3 pb = positions->GetPoint(v+1);
-		Point3 pc = positions->GetPoint(v+2);
-
-		Vector3 a,b,c;
-
-		Point3::Subtract(&pb, &pa, &b);
-		Point3::Subtract(&pc, &pa, &a);
-
-		Vector3::Cross(&a, &b, &c);
-		c.Normalize();
-
-		normals->GetVector(v)->Set(c.x,c.y,c.z);
-		normals->GetVector(v+1)->Set(c.x,c.y,c.z);
-		normals->GetVector(v+2)->Set(c.x,c.y,c.z);
-	}
-
-	std::unordered_map<Point3, std::vector<Vector3*>*, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
-	for(unsigned int v =0; v < vertexCount; v++)
-	{
-		Point3 * point = positions->GetPoint(v);
-
-		if(normalGroups.find(*point) == normalGroups.end())
-		{
-			normalGroups[*point] = new std::vector<Vector3*>();
-		}
-
-		std::vector<Vector3*>* list = normalGroups[*point];
-		Vector3 * normal = normals->GetVector(v);
-		list->push_back(normal);
-		//printf("list size: %d\n", normalGroups[*point]->size());
-	}
-
-	for(unsigned int v =0; v < vertexCount; v++)
-	{
-		Vector3 oNormal = *normals->GetVector(v);
-		oNormal.Normalize();
-
-		Point3 * point = positions->GetPoint(v);
-		std::vector<Vector3*>* list = normalGroups[*point];
-
-		Vector3 avg(0,0,0);
-		float divisor = 0;
-		for(unsigned int i=0; i < list->size(); i++)
-		{
-			Vector3 current = (*((*list)[i]));
-
-			float dot = Vector3::Dot(&current, &oNormal);
-			float angle = acos(dot);
-			if(angle <0)angle = -angle;
-
-			angle /= Constants::TwoPIOver360;
-
-			if(angle < smoothingThreshhold)
-			{
-				avg.x += current.x;
-				avg.y += current.y;
-				avg.z += current.z;
-				divisor++;
-			}
-		}
-
-		if(divisor < 1)
-	    {
-			divisor = 1;
-			avg.x = oNormal.x;
-			avg.y = oNormal.y;
-			avg.z = oNormal.z;
-	    }
-
-		float scaleFactor = (float)1.0/divisor;
-		avg.Scale(scaleFactor);
-		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
-	}
-
-	for(unsigned int v =0; v < vertexCount; v++)
-	{
-		Point3 * point = positions->GetPoint(v);
-		std::vector<Vector3*>* list = normalGroups[*point];
-		if(list != NULL)
-		{
-			delete list;
-			normalGroups[*point] = NULL;
-		}
-	}
+	if(threshhold > 180)threshhold = 180;
+	this->normalsSmoothingThreshold = threshhold;
 }
 
 Point3Array * Mesh3D::GetPostions()
@@ -261,4 +338,6 @@ void Mesh3D::SetRenderer(Mesh3DRenderer * renderer)
 {
 	this->renderer = renderer;
 }
+
+
 

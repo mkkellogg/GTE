@@ -142,8 +142,8 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
 
 		meshRenderer->SetMaterial(material);
-		sceneObject->SetMesh(mesh);
-		sceneObject->SetMeshRenderer(meshRenderer);
+		sceneObject->SetMesh3D(mesh);
+		sceneObject->SetMeshRenderer3D(meshRenderer);
 
 		mesh->Init(36);
 
@@ -261,14 +261,13 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		uvs->GetCoordinate(28)->Set(1,1);
 		uvs-> GetCoordinate(29)->Set(0,1);
 
-		mesh->CalculateNormals(85);
-
-		meshRenderer->UpdateFromMesh();
+		mesh->SetNormalsSmoothingThreshold(85);
+		mesh->Update();
 
 		SceneObject * childSceneObject = objectManager->CreateSceneObject();
 		sceneObject->AddChild(childSceneObject);
-		childSceneObject->SetMesh(mesh);
-		childSceneObject->SetMeshRenderer(meshRenderer);
+		childSceneObject->SetMesh3D(mesh);
+		childSceneObject->SetMeshRenderer3D(meshRenderer);
 		childSceneObject->GetTransform()->Translate(-2, 3, 0, true);
 		childSceneObject->GetTransform()->Scale(1.5,1.5,1.5, true);
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);

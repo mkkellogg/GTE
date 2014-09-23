@@ -15,6 +15,9 @@ class Mesh3DRenderer;
 
 #include "object/sceneobjectcomponent.h"
 #include "graphics/stdattributes.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
+#include "graphics/light/light.h"
 
 class Mesh3D : public SceneObjectComponent
 {
@@ -30,6 +33,14 @@ class Mesh3D : public SceneObjectComponent
     UV2Array * uvsTexture0;
     UV2Array * uvsTexture1;
 
+    int normalsSmoothingThreshold;
+    Vector3 sphereOfInfluenceX;
+    Vector3 sphereOfInfluenceY;
+    Vector3 sphereOfInfluenceZ;
+    Point3 center;
+
+    LightCullType lightCullType;
+
     void Destroy();
 
 	protected :
@@ -37,14 +48,23 @@ class Mesh3D : public SceneObjectComponent
     Mesh3D();
     Mesh3D(StandardAttributeSet attributes);
     virtual ~Mesh3D();
+    void CalcSphereOfInfluence();
+    void CalculateNormals(float smoothingThreshhold);
 
 	public:
 
+    const Point3 * GetCenter() const;
+    const Vector3 * GetSphereOfInfluenceX() const;
+    const Vector3 * GetSphereOfInfluenceY() const;
+    const Vector3 * GetSphereOfInfluenceZ() const;
+    LightCullType GetLightCullType() const;
+    void SetNormalsSmoothingThreshold(unsigned int threshhold);
+    void Update();
+
     void SetRenderer(Mesh3DRenderer * render);
     bool Init(unsigned int vertexCount);
-    unsigned int GetVertexCount();
-    StandardAttributeSet GetAttributeSet();
-    void CalculateNormals(float smoothingThreshhold);
+    unsigned int GetVertexCount() const;
+    StandardAttributeSet GetAttributeSet() const ;
 
     Point3Array * GetPostions();
     Vector3Array * GetNormals();

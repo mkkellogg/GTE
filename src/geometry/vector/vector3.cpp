@@ -147,7 +147,7 @@ void Vector3::QuickNormlize()
 /*
  * Get the length of this vector
  */
-float Vector3::Magnitude()
+float Vector3::Magnitude() const
 {
     return Magnitude(x,y,z);
 }
@@ -165,7 +165,7 @@ float Vector3::Magnitude(float x, float y, float z)
  * Instead of using a standard square root, it uses the cheat square root, which is not
  * correct, but is often "good enough", and is much faster than the correct square root.
  */
-float Vector3::QuickMagnitude()
+float Vector3::QuickMagnitude() const
 {
     return GTEMath::QuickSquareRoot(x*x + y*y + z*z);
 }

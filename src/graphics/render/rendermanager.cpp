@@ -16,6 +16,8 @@
 #include "graphics/graphics.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/view/camera.h"
+#include "graphics/light/light.h"
+#include "graphics/object/mesh3D.h"
 #include <vector>
 #include "util/datastack.h"
 #include "global/global.h"
@@ -324,7 +326,11 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 							{
 								Point3 lightPosition;
 								sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
-								currentMaterial->SendLightToShader(light, &lightPosition);
+								if(!ShouldCullFromLight(*light, lightPosition, *child))
+								{
+									currentMaterial->SendLightToShader(light, &lightPosition);
+									renderer->Render();
+								}
 							}
 							else
 							{
@@ -335,7 +341,6 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 						{
 							Debug::PrintError("RenderManager::RenderScene -> sceneLights[l].component is NULL");
 						}
-						renderer->Render();
 					}
 				}
 				else
@@ -355,6 +360,58 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 			Debug::PrintError("RenderManager::RenderScene -> NULL scene object encountered.");
 		}
 	}
+}
+
+bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
+{
+	Mesh3D * mesh = mesh3DSceneObject.GetMesh3D();
+	NULL_CHECK(mesh, "RenderManager::ShouldCullFromLight -> NULL mesh.", false);
+
+	switch(mesh->GetLightCullType())
+	{
+		case LightCullType::None:
+			return false;
+		break;
+		case LightCullType::SphereOfInfluence:
+			return ShouldCullBySphereOfInfluence(light, lightPosition, mesh3DSceneObject);
+		break;
+		case LightCullType::Tiled:
+			return ShouldCullByTile(light, lightPosition, mesh3DSceneObject);
+		break;
+		default:
+			return false;
+		break;
+	}
+
+	return false;
+}
+
+bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
+{
+	Mesh3D * mesh = mesh3DSceneObject.GetMesh3D();
+	Vector3 soiX = *mesh->GetSphereOfInfluenceX();
+	Vector3 soiY = *mesh->GetSphereOfInfluenceY();
+	Vector3 soiZ = *mesh->GetSphereOfInfluenceZ();
+
+	mesh3DSceneObject.GetTransform()->GetMatrix()->Transform(&soiX);
+	mesh3DSceneObject.GetTransform()->GetMatrix()->Transform(&soiY);
+	mesh3DSceneObject.GetTransform()->GetMatrix()->Transform(&soiZ);
+
+
+	float xMag = soiX.QuickMagnitude();
+	float yMag = soiY.QuickMagnitude();
+	float zMag = soiZ.QuickMagnitude();
+
+	float meshMag = xMag;
+	if(yMag > xMag)meshMag = yMag;
+	if(zMag > yMag)meshMag = zMag;
+
+	return false;
+}
+
+bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
+{
+	return false;
 }
 
 /*

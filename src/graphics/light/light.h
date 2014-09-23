@@ -15,6 +15,13 @@ enum class LightType
 	Spot
 };
 
+enum class LightCullType
+{
+	None,
+	SphereOfInfluence,
+	Tiled
+};
+
 class Light : public SceneObjectComponent
 {
 	friend class EngineObjectManager;
@@ -24,6 +31,7 @@ class Light : public SceneObjectComponent
 	LightType type;
 	float intensity;
 	float attenuation;
+	float range;
 
 	protected:
 
@@ -32,24 +40,27 @@ class Light : public SceneObjectComponent
 
 	public:
 
-	Color4 GetColor();
+	Color4 GetColor() const;
 	const Color4 * GetColorPtr();
 	void SetColor(Color4 color);
 	void SetColor(float r, float g, float b, float a);
 
-	Vector3 GetDirection();
+	Vector3 GetDirection() const;
 	const Vector3 * GetDirectionPtr();
 	void SetDirection(Vector3  direction);
 	void SetDirection(float x, float y, float z);
 
-	LightType GetType();
+	LightType GetType() const;
 	void SetType(LightType type);
 
+	float GetRange() const ;
+	void SetRange(float range);
+
 	void SetIntensity(float intensity);
-	float GetIntensity();
+	float GetIntensity() const;
 
 	void SetAttenuation(float attenuation);
-	float GetAttenuation();
+	float GetAttenuation() const ;
 };
 
 #endif
