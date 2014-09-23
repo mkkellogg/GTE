@@ -35,7 +35,8 @@ class SceneObject : public EngineObject
 
 	public:
 
-    SceneObjectTransform * GetTransform() const ;
+    Transform * GetLocalTransform() const ;
+    void GetFullTransform(Transform * transform);
 
     bool SetMeshRenderer3D(Mesh3DRenderer *renderer);
     bool SetMesh3D(Mesh3D *mesh);

@@ -77,7 +77,7 @@ void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool inv
 		// Since we are processing the ancestors in reverse order (going up the tree)
 		// we pre-multiply, to have the end effect of post-multiplication in
 		// the normal order
-		full.PreTransformBy(parent->GetTransform());
+		full.PreTransformBy(parent->GetLocalTransform());
 		parent = parent->GetParent();
 	}
 	// optionally invert

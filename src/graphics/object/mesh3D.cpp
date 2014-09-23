@@ -66,12 +66,12 @@ void Mesh3D::CalcSphereOfInfluence()
 	for(unsigned int v=0; v < vertexCount; v++)
 	{
 		Point3 * point = positions->GetPoint(v);
-		if(point->x > maxX)maxX = point->x;
-		if(point->x < minX)minX = point->x;
-		if(point->y > maxY)maxY = point->y;
-		if(point->y < minY)minY = point->y;
-		if(point->z > maxZ)maxZ = point->z;
-		if(point->z < minZ)minZ = point->z;
+		if(point->x > maxX || v == 0)maxX = point->x;
+		if(point->x < minX || v == 0)minX = point->x;
+		if(point->y > maxY || v == 0)maxY = point->y;
+		if(point->y < minY || v == 0)minY = point->y;
+		if(point->z > maxZ || v == 0)maxZ = point->z;
+		if(point->z < minZ || v == 0)minZ = point->z;
 	}
 
 	float width = maxX-minX;
@@ -85,7 +85,6 @@ void Mesh3D::CalcSphereOfInfluence()
 	sphereOfInfluenceX.Set(width * .6125,0,0);
 	sphereOfInfluenceY.Set(0,height * .6125, 0);
 	sphereOfInfluenceZ.Set(0,0,depth * .6125);
-
 }
 
 void Mesh3D::CalculateNormals(float smoothingThreshhold)

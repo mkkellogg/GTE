@@ -85,25 +85,25 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		SceneObject * lightObject = NULL;
 		Light * light = NULL;
 		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetTransform()->Translate(0, 25, 15, false);
+		lightObject->GetLocalTransform()->Translate(0, 25, 15, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		lightObject->SetLight(light);
 
 		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetTransform()->Translate(0, 15, -10, false);
+		lightObject->GetLocalTransform()->Translate(0, 15, -10, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		lightObject->SetLight(light);
 
 		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetTransform()->Translate(-15, -3, 5, false);
+		lightObject->GetLocalTransform()->Translate(-15, -3, 5, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		lightObject->SetLight(light);
 
 		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetTransform()->Translate(15, -3, 5, false);
+		lightObject->GetLocalTransform()->Translate(15, -3, 5, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		lightObject->SetLight(light);
@@ -111,7 +111,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		cameraObject = objectManager->CreateSceneObject();
 		Camera * camera = objectManager->CreateCamera();
-		cameraObject->GetTransform()->Translate(0, 5, 15, true);
+		cameraObject->GetLocalTransform()->Translate(0, 5, 15, true);
 		// cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
 		camera->AddClearBuffer(RenderBufferType::Color);
 		camera->AddClearBuffer(RenderBufferType::Depth);
@@ -120,9 +120,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		SceneObject * sceneObject = objectManager->CreateSceneObject();
-		sceneObject->GetTransform()->Scale(3,3,3, true);
-		sceneObject->GetTransform()->RotateAround(0, 0, 0, 0, 1, 0, 45);
-		sceneObject->GetTransform()->Translate(-15, 0, -12, false);
+		sceneObject->GetLocalTransform()->Scale(3,3,3, true);
+		sceneObject->GetLocalTransform()->RotateAround(0, 0, 0, 0, 1, 0, 45);
+		sceneObject->GetLocalTransform()->Translate(-15, 0, -12, false);
 
 		TextureAttributes texAttributes;
 		texAttributes.FilterMode = TextureFilter::TriLinear;
@@ -268,8 +268,8 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		sceneObject->AddChild(childSceneObject);
 		childSceneObject->SetMesh3D(mesh);
 		childSceneObject->SetMeshRenderer3D(meshRenderer);
-		childSceneObject->GetTransform()->Translate(-2, 3, 0, true);
-		childSceneObject->GetTransform()->Scale(1.5,1.5,1.5, true);
+		childSceneObject->GetLocalTransform()->Translate(-2, 3, 0, true);
+		childSceneObject->GetLocalTransform()->Scale(1.5,1.5,1.5, true);
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 
 
@@ -288,9 +288,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			Debug::PrintError(" >> could not load model!\n");
 			return;
 		}
-		modelSceneObject->GetTransform()->RotateAround(0,0,0,0,1,0, 90);
-		modelSceneObject->GetTransform()->Translate(10,0,-12,false);
-		modelSceneObject->GetTransform()->Scale(.10,.10,.10, true);
+		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,0,1,0, 90);
+		modelSceneObject->GetLocalTransform()->Translate(10,0,-12,false);
+		modelSceneObject->GetLocalTransform()->Scale(.10,.10,.10, true);
 
 
 
@@ -304,8 +304,8 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			Debug::PrintError(" >> could not load model!\n");
 			return;
 		}
-		modelSceneObject->GetTransform()->Translate(0,0,-12,false);
-		modelSceneObject->GetTransform()->Scale(.15,.15,.15, true);
+		modelSceneObject->GetLocalTransform()->Translate(0,0,-12,false);
+		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);
 
 
 
@@ -319,10 +319,10 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			Debug::PrintError(" >> could not load model!\n");
 			return;
 		}
-		modelSceneObject->GetTransform()->RotateAround(0,0,0,1,0,0,-90);
-		modelSceneObject->GetTransform()->RotateAround(0,0,0,0,1,0,-90);
-		modelSceneObject->GetTransform()->Translate(0,-8,-3,false);
-		modelSceneObject->GetTransform()->Scale(.15,.15,.15, true);
+		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,1,0,0,-90);
+		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,0,1,0,-90);
+		modelSceneObject->GetLocalTransform()->Translate(0,-8,-3,false);
+		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);
 
 
 
@@ -331,7 +331,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
+		 cameraObject->GetLocalTransform()->RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
 		 //printf("total time: %f\n", Time::GetRealTimeSinceStartup());
 	}
 

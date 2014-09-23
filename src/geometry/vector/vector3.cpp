@@ -37,6 +37,14 @@ Vector3::Vector3(float x, float y, float z) : BaseVector4(x,y,z,0), x(data[0]), 
 /*
  * Copy constructor
  */
+Vector3::Vector3(const Vector3& vector) : BaseVector4(&vector), x(data[0]), y(data[1]), z(data[2])
+{
+
+}
+
+/*
+ * Copy constructor
+ */
 Vector3::Vector3(const Vector3 * vector) : BaseVector4(vector),  x(data[0]), y(data[1]), z(data[2])
 {
     
@@ -45,7 +53,7 @@ Vector3::Vector3(const Vector3 * vector) : BaseVector4(vector),  x(data[0]), y(d
 /*
  * Assignment operator
  */
-Vector3 & Vector3::operator= (const Vector3 & source)
+Vector3& Vector3::operator=(const Vector3& source)
 {
     if(this == &source)return *this;
     memcpy((void*)data, (void*)source.data, sizeof(float) * 4);

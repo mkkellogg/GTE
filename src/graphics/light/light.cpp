@@ -18,7 +18,7 @@ Light::Light()
 	direction.Set(1,-1,0);
 	intensity = 1;
 	attenuation = .98;
-	range = 10;
+	range = 30;
 }
 
 Light::~Light()

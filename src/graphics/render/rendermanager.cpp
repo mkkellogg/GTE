@@ -190,7 +190,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 			PushTransformData(viewTransform, viewTransformStack);
 
 			// concatenate the current view transform with that of the current scene object
-			viewTransform->TransformBy(child->GetTransform());
+			viewTransform->TransformBy(child->GetLocalTransform());
 
 			Camera * camera = child->GetCamera();
 			if(camera != NULL && cameraCount < MAX_CAMERAS)
@@ -278,13 +278,13 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 	{
 		SceneObject * child = parent->GetChildAt(i);
 
-		if(child != NULL && child->IsActive() && child->GetTransform() != NULL)
+		if(child != NULL && child->IsActive() && child->GetLocalTransform() != NULL)
 		{
 			// save existing model transform
 			PushTransformData(modelTransform, modelTransformStack);
 
 			// concatenate the current model transform with that of the current scene object
-			modelTransform->TransformBy(child->GetTransform());
+			modelTransform->TransformBy(child->GetLocalTransform());
 
 			// check if current scene object has a mesh renderer
 			Mesh3DRenderer * renderer = child->GetRenderer3D();
@@ -389,22 +389,36 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Sce
 bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
 {
 	Mesh3D * mesh = mesh3DSceneObject.GetMesh3D();
-	Vector3 soiX = *mesh->GetSphereOfInfluenceX();
-	Vector3 soiY = *mesh->GetSphereOfInfluenceY();
-	Vector3 soiZ = *mesh->GetSphereOfInfluenceZ();
 
-	mesh3DSceneObject.GetTransform()->GetMatrix()->Transform(&soiX);
-	mesh3DSceneObject.GetTransform()->GetMatrix()->Transform(&soiY);
-	mesh3DSceneObject.GetTransform()->GetMatrix()->Transform(&soiZ);
+	Vector3 soiX = *(mesh->GetSphereOfInfluenceX());
+	Vector3 soiY = *(mesh->GetSphereOfInfluenceY());
+	Vector3 soiZ = *(mesh->GetSphereOfInfluenceZ());
 
+	Transform full;
+	mesh3DSceneObject.GetFullTransform(&full);
+
+	full.GetMatrix()->Transform(&soiX);
+	full.GetMatrix()->Transform(&soiY);
+	full.GetMatrix()->Transform(&soiZ);
 
 	float xMag = soiX.QuickMagnitude();
 	float yMag = soiY.QuickMagnitude();
 	float zMag = soiZ.QuickMagnitude();
 
+	//printf("x: %f,%f,%f, %f, %f\n",soiX.x,soiX.y,soiX.z,soiX.Magnitude(),xMag);
+
 	float meshMag = xMag;
-	if(yMag > xMag)meshMag = yMag;
-	if(zMag > yMag)meshMag = zMag;
+	if(yMag > meshMag)meshMag = yMag;
+	if(zMag > meshMag)meshMag = zMag;
+
+	Vector3 toLight;
+	Point3 meshCenter = *(mesh->GetCenter());
+	full.GetMatrix()->Transform(&meshCenter);
+	Point3::Subtract(&lightPosition, &meshCenter, &toLight);
+
+	//printf("x: %f,%f,%f, == %f,%f,%f\n",lightPosition.x,lightPosition.y,lightPosition.z,meshCenter.x,meshCenter.y,meshCenter.z);
+	//printf("meshMag: %f, lightRange: %f, toLight: %f\n", meshMag, light.GetRange(), toLight.QuickMagnitude());
+	if(toLight.QuickMagnitude() > meshMag + light.GetRange())return true;
 
 	return false;
 }

@@ -32,9 +32,16 @@ SceneObject::~SceneObject()
 	SAFE_DELETE(transform);
 }
 
-SceneObjectTransform * SceneObject::GetTransform() const
+Transform * SceneObject::GetLocalTransform() const
 {
 	return transform;
+}
+
+void SceneObject::GetFullTransform(Transform * transform)
+{
+	NULL_CHECK_RTRN(transform,"SceneObject::GetFullTransform -> transform is NULL.");
+
+	this->transform->GetFullTransform(transform);
 }
 
 bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer *renderer)

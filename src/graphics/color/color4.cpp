@@ -22,9 +22,14 @@ Color4::Color4(float r, float g, float b, float a) : BaseVector4(r,g,b,a), r(dat
    
 }
 
-Color4::Color4(const Color4 * color) : BaseVector4(color), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+Color4::Color4(const Color4& color) : BaseVector4(&color), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 {
    
+}
+
+Color4::Color4(const Color4 * color) : BaseVector4(color), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+{
+
 }
 
 Color4::~Color4()

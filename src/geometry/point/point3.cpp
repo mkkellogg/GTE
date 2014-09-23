@@ -36,6 +36,14 @@ Point3::Point3(float x, float y, float z) : BaseVector4(x,y,z,1), x(data[0]), y(
 /*
  * Copy constructor
  */
+Point3::Point3(const Point3& point) : BaseVector4(&point), x(data[0]), y(data[1]), z(data[2])
+{
+
+}
+
+/*
+ * Copy constructor
+ */
 Point3::Point3(const Point3 * point) : BaseVector4(point), x(data[0]), y(data[1]), z(data[2])
 {
 

@@ -36,6 +36,7 @@ class Point3 : public BaseVector4
     Point3();
     Point3(bool permAttached, float * target);
     Point3(float x, float y, float z);
+    Point3(const Point3& point);
     Point3(const Point3 * point);
     Point3(const float * data);
     ~Point3();

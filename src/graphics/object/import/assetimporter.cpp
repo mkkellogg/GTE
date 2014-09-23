@@ -148,7 +148,7 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 
 		sceneObject->SetMesh3D(mesh3D);
 		sceneObject->SetMeshRenderer3D(meshRenderer);
-		sceneObject->GetTransform()->SetTo(&mat);
+		sceneObject->GetLocalTransform()->SetTo(&mat);
 		current->AddChild(sceneObject);
 	}
 
@@ -268,6 +268,7 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * materia
 
 	mesh3D->SetNormalsSmoothingThreshold(70);
 	mesh3D->Update();
+
 	return mesh3D;
 }
 

@@ -19,6 +19,7 @@ class Color4 : public BaseVector4
     Color4();
     Color4(bool permAttached, float * target);
     Color4(float r, float g, float b, float a);
+    Color4(const Color4& point);
     Color4(const Color4 * point);
     Color4(const float * data);
     ~Color4();
