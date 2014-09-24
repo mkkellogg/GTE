@@ -124,7 +124,8 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene *scene, const aiNod
 
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 
-	for (unsigned int n=0; n < nd->mNumMeshes; n++)
+	unsigned int meshCount = nd->mNumMeshes;
+	for (unsigned int n=0; n < meshCount; n++)
 	{
 		const aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
 

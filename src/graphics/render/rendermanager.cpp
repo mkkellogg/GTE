@@ -255,7 +255,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 	identity.SetIdentity();
 
 	// render the scene using the view transform of the current camera
-	RenderScene(const_cast<SceneObject*>(sceneRoot),&identity, &(sceneCameras[cameraIndex].transform), camera);
+	ForwardRenderScene(const_cast<SceneObject*>(sceneRoot),&identity, &(sceneCameras[cameraIndex].transform), camera);
 }
 
 /*
@@ -266,10 +266,15 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
  *
  * The transforms of each scene are concatenated as progress moves down the scene object tree and passed
  * to the current invocation via [modelTransform].
+ *
+ * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
+ * each pass is combined with the others using additive blending.
  */
-void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera)
+void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera)
 {
 	Transform modelView;
+
+	renderedObjects.clear();
 
 	// enforce max recursion depth
 	if(RenderDepth(modelTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
@@ -309,27 +314,44 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 
 					for(unsigned int l = 0; l < lightCount; l++)
 					{
-						if(l ==0)
-						{
-							graphics->EnableBlending(false);
-						}
-						else
-						{
-							graphics->EnableBlending(true);
-							graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
-						}
-
+						// Loop through each light in the scene and render each object that is in range
 						if(sceneLights[l].component != NULL)
 						{
 							Light * light = dynamic_cast<Light *>(sceneLights[l].component);
 							if(light != NULL)
 							{
-								Point3 lightPosition;
-								sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
-								if(!ShouldCullFromLight(*light, lightPosition, *child))
+								// we know current scene object has a mesh renderer, but also verify is has a mesh
+								Mesh3D * childMesh = child->GetMesh3D();
+								if(childMesh != NULL)
 								{
-									currentMaterial->SendLightToShader(light, &lightPosition);
-									renderer->Render();
+									// if this mesh has already been rendered by this camera, then we want to use
+									// additive blending to combine it with the output from other lights. Otherwise
+									// turn off blending and render.
+									bool rendered = renderedObjects[childMesh->GetObjectID()];
+									if(rendered)
+									{
+										graphics->EnableBlending(true);
+										graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+									}
+									else
+									{
+										graphics->EnableBlending(false);
+									}
+
+									Point3 lightPosition;
+									sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
+
+									// check if this mesh should be culled from this light.
+									if(!ShouldCullFromLight(*light, lightPosition, *child))
+									{
+										currentMaterial->SendLightToShader(light, &lightPosition);
+										renderer->Render();
+										renderedObjects[childMesh->GetObjectID()] = true;
+									}
+								}
+								else
+								{
+									Debug::PrintError("RenderManager::RenderScene -> mesh is NULL");
 								}
 							}
 							else
@@ -350,7 +372,7 @@ void RenderManager::RenderScene(SceneObject * parent, Transform * modelTransform
 			}
 
 			// continue recursion through child
-			RenderScene(child, modelTransform, viewTransformInverse,camera);
+			ForwardRenderScene(child, modelTransform, viewTransformInverse,camera);
 
 			// restore previous modelTransform
 			PopTransformData(modelTransform,modelTransformStack);

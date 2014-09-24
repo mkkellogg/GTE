@@ -20,6 +20,7 @@ class Material;
 class SceneObjectComponent;
 
 #include <vector>
+#include <map>
 #include "util/datastack.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
@@ -49,7 +50,9 @@ class RenderManager
 	unsigned int cameraCount;
 	RenderSceneObjectComponent sceneCameras[MAX_CAMERAS];
 
-	void RenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera);
+	std::map<unsigned long, bool> renderedObjects;
+
+	void ForwardRenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;
     void PushTransformData(const Transform * transform, DataStack<float> * transformStack);
     void PopTransformData(const Transform * transform, DataStack<float> * transformStack);

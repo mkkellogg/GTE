@@ -4,7 +4,9 @@
 // forward declaration
 class SceneObjectComponent;
 
-class SceneObjectComponent
+#include "object/engineobject.h"
+
+class SceneObjectComponent : public EngineObject
 {
 	friend class EngineObjectManager;
 

@@ -82,33 +82,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
-		SceneObject * lightObject = NULL;
-		Light * light = NULL;
-		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetLocalTransform()->Translate(0, 25, 15, false);
-		light = objectManager->CreateLight();
-		light->SetDirection(1,-1,-1);
-		lightObject->SetLight(light);
-
-		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetLocalTransform()->Translate(0, 15, -10, false);
-		light = objectManager->CreateLight();
-		light->SetDirection(1,-1,-1);
-		lightObject->SetLight(light);
-
-		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetLocalTransform()->Translate(-15, -3, 5, false);
-		light = objectManager->CreateLight();
-		light->SetDirection(1,-1,-1);
-		lightObject->SetLight(light);
-
-		lightObject = objectManager->CreateSceneObject();
-		lightObject->GetLocalTransform()->Translate(15, -3, 5, false);
-		light = objectManager->CreateLight();
-		light->SetDirection(1,-1,-1);
-		lightObject->SetLight(light);
-
-
 		cameraObject = objectManager->CreateSceneObject();
 		Camera * camera = objectManager->CreateCamera();
 		cameraObject->GetLocalTransform()->Translate(0, 5, 15, true);
@@ -116,8 +89,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		camera->AddClearBuffer(RenderBufferType::Color);
 		camera->AddClearBuffer(RenderBufferType::Depth);
 		cameraObject->SetCamera(camera);
-
-
 
 		SceneObject * sceneObject = objectManager->CreateSceneObject();
 		sceneObject->GetLocalTransform()->Scale(3,3,3, true);
@@ -278,7 +249,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		AssetImporter * importer = new AssetImporter();
-		SceneObject * modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
+		SceneObject * modelSceneObject = NULL;
+
+		modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
 		if(modelSceneObject != NULL)
 		{
 			modelSceneObject->SetActive(true);
@@ -326,7 +299,36 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
+		SceneObject * lightObject = NULL;
+		Light * light = NULL;
 
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetLocalTransform()->Translate(0, 25, 15, false);
+		light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		light->SetIntensity(2);
+		lightObject->SetLight(light);
+
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetLocalTransform()->Translate(0, 15, -10, false);
+		light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		light->SetIntensity(2);
+		lightObject->SetLight(light);
+
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetLocalTransform()->Translate(-15, -3, 5, false);
+		light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		light->SetIntensity(2);
+		lightObject->SetLight(light);
+
+		lightObject = objectManager->CreateSceneObject();
+		lightObject->GetLocalTransform()->Translate(15, -3, 5, false);
+		light = objectManager->CreateLight();
+		light->SetDirection(1,-1,-1);
+		light->SetIntensity(2);
+		lightObject->SetLight(light);
 	}
 
 	void OnUpdate(Graphics * graphics)

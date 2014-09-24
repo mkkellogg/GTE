@@ -17,8 +17,8 @@ Light::Light()
 	color.Set(1,1,1,1);
 	direction.Set(1,-1,0);
 	intensity = 1;
-	attenuation = .98;
-	range = 30;
+	attenuation = 1;
+	SetRange(30);
 }
 
 Light::~Light()
@@ -29,6 +29,11 @@ Light::~Light()
 Color4 Light::GetColor() const
 {
 	return color;
+}
+
+void Light::CalcAttentuationForCurrentRange()
+{
+	attenuation = 1.0/range;
 }
 
 const Color4 * Light::GetColorPtr()
@@ -84,6 +89,7 @@ float Light::GetRange() const
 void Light::SetRange(float range)
 {
 	this->range = range;
+	CalcAttentuationForCurrentRange();
 }
 
 void Light::SetIntensity(float intensity)

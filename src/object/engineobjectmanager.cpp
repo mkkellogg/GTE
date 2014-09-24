@@ -10,6 +10,7 @@
 #include "graphics/shader/shader.h"
 #include "graphics/light/light.h"
 #include "graphics/render/material.h"
+#include "graphics/render/mesh3Drenderer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/texture/texture.h"
@@ -34,7 +35,7 @@ EngineObjectManager * EngineObjectManager::Instance()
 
 EngineObjectManager::EngineObjectManager()
 {
-
+	currentEngineObjectID = 0L;
 }
 
 EngineObjectManager::~EngineObjectManager()
@@ -42,9 +43,16 @@ EngineObjectManager::~EngineObjectManager()
 
 }
 
+unsigned long EngineObjectManager::GetNextObjectID()
+{
+	return ++currentEngineObjectID;
+}
+
 SceneObject * EngineObjectManager::CreateSceneObject()
 {
 	SceneObject *obj = new SceneObject();
+	NULL_CHECK(obj,"EngineObjectManager::CreateSceneObject -> could not allocate new scene object.",NULL);
+	obj->SetObjectID(GetNextObjectID());
 	sceneRoot.AddChild(obj);
 	return obj;
 }
@@ -91,7 +99,10 @@ Shader *  EngineObjectManager::GetLoadedShader(LongMask properties)
 
 Mesh3D * EngineObjectManager::CreateMesh3D(StandardAttributeSet attributes)
 {
-	return new Mesh3D(attributes);
+	Mesh3D * mesh = new Mesh3D(attributes);
+	NULL_CHECK(mesh,"EngineObjectManager::CreateMesh3D -> could create new Mesh3D object.",NULL);
+	mesh->SetObjectID(GetNextObjectID());
+	return mesh;
 }
 
 void EngineObjectManager::DestroyMesh3D(Mesh3D * mesh)
@@ -102,7 +113,10 @@ void EngineObjectManager::DestroyMesh3D(Mesh3D * mesh)
 Mesh3DRenderer * EngineObjectManager::CreateMesh3DRenderer()
 {
 	Graphics * graphics = Graphics::Instance();
-	return graphics->CreateMeshRenderer();
+	Mesh3DRenderer * renderer = graphics->CreateMeshRenderer();
+	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could create new Mesh3DRenderer object.",NULL);
+	renderer->SetObjectID(GetNextObjectID());
+	return renderer;
 }
 
 void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRenderer * renderer)
@@ -115,6 +129,8 @@ Shader * EngineObjectManager::CreateShader(const char * vertexSourcePath, const 
 {
 	Graphics * graphics = Graphics::Instance();
 	Shader * shader = graphics->CreateShader(vertexSourcePath,fragmentSourcePath);
+	NULL_CHECK(shader,"EngineObjectManager::CreateShader -> could create new Shader object.",NULL);
+	shader->SetObjectID(GetNextObjectID());
 	return shader;
 }
 
@@ -127,13 +143,19 @@ void EngineObjectManager::DestroyShader(Shader * shader)
 Texture * EngineObjectManager::CreateTexture(const char * sourcePath, TextureAttributes attributes)
 {
 	Graphics * graphics = Graphics::Instance();
-	return graphics->CreateTexture(sourcePath, attributes);
+	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
+	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> could create new Texture object.",NULL);
+	texture->SetObjectID(GetNextObjectID());
+	return texture;
 }
 
 Texture * EngineObjectManager::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
 {
 	Graphics * graphics = Graphics::Instance();
-	return graphics->CreateTexture(imageData, sourcePath, attributes);
+	Texture * texture = graphics->CreateTexture(imageData, sourcePath, attributes);
+	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const RawImage*, const char *, TextureAttributes) -> could create new Texture object.",NULL);
+	texture->SetObjectID(GetNextObjectID());
+	return texture;
 }
 
 Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader)
@@ -146,6 +168,7 @@ Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader
 		delete m;
 		return NULL;
 	}
+	m->SetObjectID(GetNextObjectID());
 	return m;
 }
 
@@ -163,6 +186,7 @@ Material * EngineObjectManager::CreateMaterial(const char *name, const char * sh
 		delete m;
 		return NULL;
 	}
+	m->SetObjectID(GetNextObjectID());
 	return m;
 }
 
@@ -180,7 +204,10 @@ void EngineObjectManager::DestroyMaterial(Material * material)
 Camera * EngineObjectManager::CreateCamera()
 {
 	Graphics * graphics = Graphics::Instance();
-	return new Camera(graphics);
+	Camera * camera = new Camera(graphics);
+	NULL_CHECK(camera, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", NULL);
+	camera->SetObjectID(GetNextObjectID());
+	return camera;
 }
 
 void EngineObjectManager::DestroyCamera(Camera * camera)
@@ -191,6 +218,8 @@ void EngineObjectManager::DestroyCamera(Camera * camera)
 Light * EngineObjectManager::CreateLight()
 {
 	Light * light = new Light();
+	NULL_CHECK(light, "EngineObjectManager::CreateLight -> Could not create new Light object.", NULL);
+	light->SetObjectID(GetNextObjectID());
 	return light;
 }
 

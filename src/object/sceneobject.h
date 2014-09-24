@@ -20,6 +20,7 @@ class SceneObject : public EngineObject
 
 	protected:
 
+	bool isActive;
 	std::vector<SceneObject * > children;
 	SceneObject * parent;
 
@@ -34,6 +35,9 @@ class SceneObject : public EngineObject
     virtual ~SceneObject();
 
 	public:
+
+    bool IsActive();
+    void SetActive(bool active);
 
     Transform * GetLocalTransform() const ;
     void GetFullTransform(Transform * transform);

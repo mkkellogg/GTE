@@ -15,9 +15,10 @@ class Graphics;
 class TextureAttributes;
 
 #include "textureattr.h"
+#include "object/engineobject.h"
 #include <string>
 
-class Texture
+class Texture : public EngineObject
 {
 	friend class Graphics;
 

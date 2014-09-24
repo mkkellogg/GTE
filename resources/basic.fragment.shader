@@ -23,11 +23,12 @@ void main()
 	vec3 normalized_normal = normalize(vNormal);
 	vec3 vertex_to_light_vector = vec3(LIGHT_POSITION - vPosition); 
 	float light_dist = length(vertex_to_light_vector);
-	float attenuationFactor = max(pow(LIGHT_ATTENUATION,light_dist),0.0);
+	float attenForLength = LIGHT_ATTENUATION * light_dist;
+	float attenuationFactor = max(1.0-attenForLength,0.0);
     vec3 normalized_vertex_to_light_vector = normalize(vertex_to_light_vector);
  
     // Calculating The Diffuse Term And Clamping It To [0;1]
-    float DiffuseTerm = clamp(dot(normalized_normal, normalized_vertex_to_light_vector), 0.0, 1.0) * attenuationFactor;
+    float DiffuseTerm = clamp(dot(normalized_normal, normalized_vertex_to_light_vector), 0.0, 1.0) * attenuationFactor * LIGHT_INTENSITY;
 	
     outputF = vec4(vColor,1.0) * texColor * DiffuseTerm;
     gl_FragColor = outputF;

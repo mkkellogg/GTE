@@ -8,19 +8,17 @@ class EngineObject
 {
 	friend class EngineObjectManager;
 
-	int objectID;
-	bool isActive;
+	unsigned long objectID;
+	void SetObjectID(unsigned long id);
 
     protected:
 
 	EngineObject();
-    virtual ~EngineObject();
+	virtual ~EngineObject();
 
     public:
 
-    virtual int GetObjectID();
-    bool IsActive();
-    void SetActive(bool active);
+	unsigned long GetObjectID();
 };
 
 #endif

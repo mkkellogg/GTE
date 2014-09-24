@@ -35,6 +35,7 @@ class Light : public SceneObjectComponent
 
 	protected:
 
+	void CalcAttentuationForCurrentRange();
 	Light();
 	virtual ~Light();
 

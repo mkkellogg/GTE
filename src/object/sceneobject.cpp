@@ -18,6 +18,7 @@
 
 SceneObject::SceneObject() : EngineObject()
 {
+	isActive = true;
 	renderer3D = NULL;
 	mesh3D = NULL;
 	camera = NULL;
@@ -30,6 +31,16 @@ SceneObject::SceneObject() : EngineObject()
 SceneObject::~SceneObject()
 {
 	SAFE_DELETE(transform);
+}
+
+bool SceneObject::IsActive()
+{
+	return isActive;
+}
+
+void SceneObject::SetActive(bool active)
+{
+	this->isActive = active;
 }
 
 Transform * SceneObject::GetLocalTransform() const

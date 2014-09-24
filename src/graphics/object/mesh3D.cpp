@@ -82,6 +82,8 @@ void Mesh3D::CalcSphereOfInfluence()
 	center.y = height/2 + minY;
 	center.z = depth/2 + minZ;
 
+	//printf("center: %f,%f,%f == %f,%f,%f == %f, %f, %f\n", center.x, center.y, center.z, maxX, maxY, maxZ, minX, minY,minZ);
+
 	sphereOfInfluenceX.Set(width * .6125,0,0);
 	sphereOfInfluenceY.Set(0,height * .6125, 0);
 	sphereOfInfluenceZ.Set(0,0,depth * .6125);

@@ -27,16 +27,16 @@ class EngineObjectManager
 {
 	static EngineObjectManager * theInstance;
 
-    protected:
-
 	const char* builtinPath ="resources/builtin/";
 
 	ShaderManager loadedShaders;
 	std::vector<EngineObject *> engineObjects;
 	SceneObject sceneRoot;
+	unsigned long currentEngineObjectID;
 
+	unsigned long GetNextObjectID();
 	EngineObjectManager();
-    virtual ~EngineObjectManager();
+	virtual ~EngineObjectManager();
 
     public :
 

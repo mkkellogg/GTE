@@ -6,9 +6,9 @@
 
 #include "engineobject.h"
 
-EngineObject::EngineObject() : objectID(-1)
+EngineObject::EngineObject() : objectID((unsigned long)-1L)
 {
-	isActive = true;
+
 }
 
 EngineObject::~EngineObject()
@@ -16,17 +16,13 @@ EngineObject::~EngineObject()
 
 }
 
-int EngineObject::GetObjectID()
+unsigned long EngineObject::GetObjectID()
 {
 	return objectID;
 }
 
-bool EngineObject::IsActive()
+void EngineObject::SetObjectID(unsigned long id)
 {
-	return isActive;
+	objectID = id;
 }
 
-void EngineObject::SetActive(bool active)
-{
-	this->isActive = active;
-}
