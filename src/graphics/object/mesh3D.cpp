@@ -56,13 +56,11 @@ Mesh3D::~Mesh3D()
 
 void Mesh3D::CalcSphereOfInfluence()
 {
-	float maxX=0;
-	float maxY=0;
-	float maxZ=0;
-	float minX=0;
-	float minY=0;
-	float minZ=0;
+	float maxX,maxY,maxZ,minX,minY,minZ;
+	maxX=maxY=maxZ=minX=minY=minZ=0;
 
+	// get the maximum and minimum extents of the mesh
+	// along each axis.
 	for(unsigned int v=0; v < vertexCount; v++)
 	{
 		Point3 * point = positions->GetPoint(v);
@@ -74,16 +72,18 @@ void Mesh3D::CalcSphereOfInfluence()
 		if(point->z < minZ || v == 0)minZ = point->z;
 	}
 
+	// get the dimensions of the rectangular volume formed by the
+	// maximum extents
 	float width = maxX-minX;
 	float height = maxY-minY;
 	float depth = maxZ-minZ;
 
+	// calculate the mesh's center
 	center.x = width/2 + minX;
 	center.y = height/2 + minY;
 	center.z = depth/2 + minZ;
 
-	//printf("center: %f,%f,%f == %f,%f,%f == %f, %f, %f\n", center.x, center.y, center.z, maxX, maxY, maxZ, minX, minY,minZ);
-
+	// form the sphere of influence vectors for each axis
 	sphereOfInfluenceX.Set(width * .6125,0,0);
 	sphereOfInfluenceY.Set(0,height * .6125, 0);
 	sphereOfInfluenceZ.Set(0,0,depth * .6125);
@@ -91,17 +91,22 @@ void Mesh3D::CalcSphereOfInfluence()
 
 void Mesh3D::CalculateNormals(float smoothingThreshhold)
 {
+	// loop through each triangle in this mesh's vertices
+	// and calculate normals for each
 	for(unsigned int v =0; v < vertexCount-2; v+=3)
 	{
+		// get Point3 objects for each vertex
 		Point3 pa = positions->GetPoint(v);
 		Point3 pb = positions->GetPoint(v+1);
 		Point3 pc = positions->GetPoint(v+2);
 
 		Vector3 a,b,c;
 
+		// form 2 vectors based on triangle's vertices
 		Point3::Subtract(&pb, &pa, &b);
 		Point3::Subtract(&pc, &pa, &a);
 
+		// calculate cross product
 		Vector3::Cross(&a, &b, &c);
 		c.Normalize();
 
@@ -110,11 +115,18 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 		normals->GetVector(v+2)->Set(c.x,c.y,c.z);
 	}
 
+	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
+	// vertices, so this structure is used to store all the normals for those vertices, so they can later
+	// be used to calculate average (smoothed) normals
 	std::unordered_map<Point3, std::vector<Vector3*>*, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
+
+	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
+	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
 	for(unsigned int v =0; v < vertexCount; v++)
 	{
 		Point3 * point = positions->GetPoint(v);
 
+		// create a normal list for a vertex if one does not exist
 		if(normalGroups.find(*point) == normalGroups.end())
 		{
 			normalGroups[*point] = new std::vector<Vector3*>();
@@ -125,12 +137,19 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 		list->push_back(normal);
 	}
 
+	// loop through each vertex and lookup the associated list of
+	// normals associated with that vertex, and then calculate the
+	// average normal from that list and assign it to the vertex
 	for(unsigned int v =0; v < vertexCount; v++)
 	{
+		// get existing normal for this vertex
 		Vector3 oNormal = *normals->GetVector(v);
 		oNormal.Normalize();
 
+		// get vertex position
 		Point3 * point = positions->GetPoint(v);
+
+		// lookup normal list associated with vertex
 		std::vector<Vector3*>* list = normalGroups[*point];
 
 		Vector3 avg(0,0,0);
@@ -139,12 +158,15 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 		{
 			Vector3 current = (*((*list)[i]));
 
+			// calculate angle between the normal that exists for this vertex,
+			// and the current normal in the last.
 			float dot = Vector3::Dot(&current, &oNormal);
 			float angle = acos(dot);
 			if(angle <0)angle = -angle;
 
 			angle /= Constants::TwoPIOver360;
 
+			// if the angle is less than [smoothingThreshhold], factor into the average
 			if(angle < smoothingThreshhold)
 			{
 				avg.x += current.x;
@@ -154,6 +176,8 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 			}
 		}
 
+		// if divisor < 1, then no valid normals were found to include in the average,
+		// so just use the existing one
 		if(divisor < 1)
 	    {
 			avg.x = oNormal.x;
@@ -166,9 +190,11 @@ void Mesh3D::CalculateNormals(float smoothingThreshhold)
 			avg.Scale(scaleFactor);
 		}
 
+		// set the normal for this vertex to the averaged normal
 		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
 	}
 
+	// clean up dynamically allocated lists
 	for(unsigned int v =0; v < vertexCount; v++)
 	{
 		Point3 * point = positions->GetPoint(v);

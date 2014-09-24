@@ -213,35 +213,9 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * materia
 	{
 		const aiFace* face = &mesh->mFaces[faceIndex];
 
-		/*GLenum face_mode;
-		switch(face->mNumIndices)
-		{
-			case 1: face_mode = GL_POINTS; break;
-			case 2: face_mode = GL_LINES; break;
-			case 3: face_mode = GL_TRIANGLES; break;
-			default: face_mode = GL_POLYGON; break;
-		}
-		glBegin(face_mode);*/
-
 		for( int i = face->mNumIndices-1; i >=0; i--)	// go through all vertices in face
 		{
 			int vIndex = face->mIndices[i];	// get group index for current index
-
-			//if(mesh->mColors[0] != NULL)
-			//Color4f(&mesh->mColors[0][vertexIndex]);
-
-			/*if(mesh->mNormals != NULL)
-			if(mesh->HasTextureCoords(0))	//HasTextureCoords(texture_coordinates_set)
-			{
-				glTexCoord2f(mesh->mTextureCoords[0][vertexIndex].x, 1 - mesh->mTextureCoords[0][vertexIndex].y); //mTextureCoords[channel][vertex]
-			}*/
-
-			//glNormal3fv(&mesh->mNormals[vertexIndex].x);
-			//glVertex3fv(&mesh->mVertices[vertexIndex].x);
-
-			/*vertices[vertexComponentIndex] = mesh->mVertices[vIndex].x;
-			vertices[vertexComponentIndex+1] = mesh->mVertices[vIndex].y;
-			vertices[vertexComponentIndex+2] = mesh->mVertices[vIndex].z;*/
 
 			aiVector3D srcPosition = mesh->mVertices[vIndex];
 
@@ -263,8 +237,6 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh* mesh, Material * materia
 			vertexComponentIndex+=3;
 			vertexIndex++;
 		}
-
-		//glEnd();
 	}
 
 	mesh3D->SetNormalsSmoothingThreshold(70);

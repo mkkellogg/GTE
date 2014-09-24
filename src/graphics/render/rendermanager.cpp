@@ -344,8 +344,11 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 									// check if this mesh should be culled from this light.
 									if(!ShouldCullFromLight(*light, lightPosition, *child))
 									{
+										// send light data to the active shader
 										currentMaterial->SendLightToShader(light, &lightPosition);
+										// render the current mesh
 										renderer->Render();
+										// flag the current mesh as being rendered
 										renderedObjects[childMesh->GetObjectID()] = true;
 									}
 								}
@@ -384,6 +387,10 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 	}
 }
 
+/*
+ * Check if the mesh(es) attached to [mesh3DSceneObject] should be rendered with [light], based
+ * on their distance from [lightPosition].
+ */
 bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
 {
 	Mesh3D * mesh = mesh3DSceneObject.GetMesh3D();
@@ -408,10 +415,18 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Sce
 	return false;
 }
 
+/*
+ * Cull light based on distance of mesh(es) attached to [mesh3DSceneObject] from [light]. Each mesh has
+ * a sphere of influence based on maximum distance of the mesh's vertices from the mesh's center. If that
+ * sphere does not intersect with the sphere that is formed by the light's range, then the light should
+ * be culled from the meshes.
+ */
 bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
 {
+	// for now we assume scene object's only have one mesh
 	Mesh3D * mesh = mesh3DSceneObject.GetMesh3D();
 
+	// get the maximum distances from mesh center along each axis
 	Vector3 soiX = *(mesh->GetSphereOfInfluenceX());
 	Vector3 soiY = *(mesh->GetSphereOfInfluenceY());
 	Vector3 soiZ = *(mesh->GetSphereOfInfluenceZ());
@@ -419,16 +434,20 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 	Transform full;
 	mesh3DSceneObject.GetFullTransform(&full);
 
+	// transform each distance vector by the full transform made up of
+	// the transforms of each ancestor of [mesh3DSceneObject], as well as
+	// the transform belonging to [mesh3DSceneObject]
 	full.GetMatrix()->Transform(&soiX);
 	full.GetMatrix()->Transform(&soiY);
 	full.GetMatrix()->Transform(&soiZ);
 
+	// get length of each transformed vector
 	float xMag = soiX.QuickMagnitude();
 	float yMag = soiY.QuickMagnitude();
 	float zMag = soiZ.QuickMagnitude();
 
-	//printf("x: %f,%f,%f, %f, %f\n",soiX.x,soiX.y,soiX.z,soiX.Magnitude(),xMag);
-
+	// find maximum distance, which will be used as the radius for
+	// the sphere of influence
 	float meshMag = xMag;
 	if(yMag > meshMag)meshMag = yMag;
 	if(zMag > meshMag)meshMag = zMag;
@@ -436,15 +455,21 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 	Vector3 toLight;
 	Point3 meshCenter = *(mesh->GetCenter());
 	full.GetMatrix()->Transform(&meshCenter);
+
+	// get the distance from the light to the mesh's center
 	Point3::Subtract(&lightPosition, &meshCenter, &toLight);
 
-	//printf("x: %f,%f,%f, == %f,%f,%f\n",lightPosition.x,lightPosition.y,lightPosition.z,meshCenter.x,meshCenter.y,meshCenter.z);
-	//printf("meshMag: %f, lightRange: %f, toLight: %f\n", meshMag, light.GetRange(), toLight.QuickMagnitude());
+	// if the distance from the mesh's center to the light is bigger
+	// than the radius of the sphere of influence + the light's range,
+	// the the mesh should be culled for the light.
 	if(toLight.QuickMagnitude() > meshMag + light.GetRange())return true;
 
 	return false;
 }
 
+/*
+ * Tile-based culling - needs to be implemented!
+ */
 bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
 {
 	return false;
