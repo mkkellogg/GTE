@@ -1,4 +1,5 @@
  
+varying vec3 vColor;
 varying vec2 vUVTexture0;
 
 vec4 outputF;
@@ -29,6 +30,6 @@ void main()
     // Calculating The Diffuse Term And Clamping It To [0;1]
     float DiffuseTerm = clamp(dot(normalized_normal, normalized_vertex_to_light_vector), 0.0, 1.0) * attenuationFactor * LIGHT_INTENSITY;
 	
-    outputF = texColor * DiffuseTerm;
+    outputF = vec4(vColor,1.0) * texColor * DiffuseTerm;
     gl_FragColor = outputF;
 }

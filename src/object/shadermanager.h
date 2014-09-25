@@ -26,7 +26,8 @@ enum class ShaderMaterialCharacteristic
 	SpecularTextured = 3,
 	Bumped = 4,
 	EmissiveColored = 5,
-	EmissiveTextured = 6
+	EmissiveTextured = 6,
+	VertexColors=7
 };
 
 class ShaderManager

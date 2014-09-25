@@ -70,7 +70,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
 	if(shader == NULL)
 	{
-		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: Diffuse");
+		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored");
 		return false;
 	}
 	shaderProperties = LongMaskUtil::CreateLongMask();
@@ -87,6 +87,19 @@ bool EngineObjectManager::InitBuiltinShaders()
 	}
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
+	loadedShaders.AddShader(shaderProperties,shader);
+
+	vertexSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.vertex.shader");
+	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.fragment.shader");
+	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	if(shader == NULL)
+	{
+		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors");
+		return false;
+	}
+	shaderProperties = LongMaskUtil::CreateLongMask();
+	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
+	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexColors);
 	loadedShaders.AddShader(shaderProperties,shader);
 
 	return true;

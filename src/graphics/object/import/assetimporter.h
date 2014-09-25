@@ -47,10 +47,11 @@ class AssetImporter
 		}
 	};
 
-	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor *>& materialImportDescriptors);
+	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
 	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene* scene, float importScale);
-	bool ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor *>& materialImportDescriptors);
+	bool ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
 	static LongMask GetImportFlags(const aiMaterial * mat);
+	static void UpdateImportFlags(LongMask * flags, const aiMesh* mesh);
 	Mesh3D * ConvertAssimpMesh(const aiMesh* mesh, Material * material, MaterialImportDescriptor * materialImportDescriptor);
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);
@@ -63,8 +64,6 @@ class AssetImporter
 	~AssetImporter();
 
 	SceneObject * LoadModel(const std::string& filePath, float importScale);
-
-
 };
 
 #endif
