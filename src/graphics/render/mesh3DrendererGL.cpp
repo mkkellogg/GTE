@@ -34,7 +34,7 @@ Mesh3DRendererGL::Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics) : Mes
 	memset(attributeBuffers,0,sizeof(VertexAttrBuffer*) * MAX_ATTRIBUTE_BUFFERS);
 
 	attributeBuffers[(int)StandardAttribute::Position]= NULL;
-	attributeBuffers[(int)StandardAttribute::Color]= NULL;
+	attributeBuffers[(int)StandardAttribute::VertexColor]= NULL;
 
 	storedVertexCount = 0;
 	storedAttributes = StandardAttributes::CreateAttributeSet();
@@ -49,7 +49,7 @@ void Mesh3DRendererGL::DestroyBuffers()
 {
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Position]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Normal]);
-	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Color]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::VertexColor]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture0]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture1]);
 }
@@ -109,7 +109,7 @@ void Mesh3DRendererGL::SetNormalData(Vector3Array * normals)
 
 void Mesh3DRendererGL::SetColorData(Color4Array * colors)
 {
-	attributeBuffers[(int)StandardAttribute::Color]->SetData(colors->GetDataPtr());
+	attributeBuffers[(int)StandardAttribute::VertexColor]->SetData(colors->GetDataPtr());
 }
 
 void Mesh3DRendererGL::SetUV1Data(UV2Array * uvs)
@@ -179,7 +179,7 @@ void Mesh3DRendererGL::CopyMeshData()
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
-	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Color))SetColorData(mesh->GetColors());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetColorData(mesh->GetColors());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVsTexture0());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVsTexture1());
 }

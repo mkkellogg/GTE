@@ -75,6 +75,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	}
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseColored);
+	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
 	loadedShaders.AddShader(shaderProperties,shader);
 
 	vertexSource = std::string(builtinPath) + std::string("diffuse_texture.vertex.shader");
@@ -87,6 +88,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	}
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
+	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
 	loadedShaders.AddShader(shaderProperties,shader);
 
 	vertexSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.vertex.shader");
@@ -100,6 +102,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexColors);
+	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
 	loadedShaders.AddShader(shaderProperties,shader);
 
 	return true;

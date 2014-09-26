@@ -27,7 +27,8 @@ enum class ShaderMaterialCharacteristic
 	Bumped = 4,
 	EmissiveColored = 5,
 	EmissiveTextured = 6,
-	VertexColors=7
+	VertexColors=7,
+	VertexNormals=8
 };
 
 class ShaderManager

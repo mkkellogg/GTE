@@ -301,10 +301,10 @@ bool Mesh3D::Init(unsigned int vertexCount)
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
 	}
 
-	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Color))
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::VertexColor))
 	{
 		initSuccess = colors->Init(vertexCount) && initSuccess;
-		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Color;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::VertexColor;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture0))

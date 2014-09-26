@@ -106,7 +106,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
-		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Color);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
 		Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);

@@ -5,7 +5,7 @@ enum class StandardAttributeMaskComponent
 {
     Position=1,
     Normal=2,
-    Color=4,
+    VertexColor=4,
     UVTexture0=8,
     UVTexture1=16,
     UVNormalMap=32
@@ -15,7 +15,7 @@ enum class StandardAttribute
 {
     Position=0,
     Normal=1,
-    Color=2,
+    VertexColor=2,
     UVTexture0=3,
     UVTexture1=4,
     UVNormalMap=5,

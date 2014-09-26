@@ -24,20 +24,40 @@ class AssetImporter
 
 	protected :
 
+	class MeshSpecificMaterialDescriptor
+	{
+		public:
+
+		int vertexColorsIndex;
+		LongMask shaderProperties;
+		Material * material;
+
+		MeshSpecificMaterialDescriptor()
+		{
+			vertexColorsIndex = -1;
+			shaderProperties = 0L;
+			material = NULL;
+		}
+	};
+
 	class MaterialImportDescriptor
 	{
 		public:
+
+		std::map<int,MeshSpecificMaterialDescriptor> meshSpecificProperties;
 
 		bool invertVCoords;
 		std::map<ShaderMaterialCharacteristic, int> uvMapping;
 
 		bool UVMappingHasKey(ShaderMaterialCharacteristic key)
 		{
-			if(uvMapping.find(key) != uvMapping.end())
-			{
-				return true;
-			}
+			if(uvMapping.find(key) != uvMapping.end())return true;
+			return false;
+		}
 
+		bool UsedByMesh(int index)
+		{
+			if(meshSpecificProperties.find(index) != meshSpecificProperties.end())return true;
 			return false;
 		}
 
@@ -47,15 +67,14 @@ class AssetImporter
 		}
 	};
 
-	void RecursiveProcessModelScene(const aiScene *sc, const aiNode* nd, float scale, SceneObject * parent, Matrix4x4 * currentTransform, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
-	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene* scene, float importScale);
-	bool ProcessMaterials(const std::string& modelPath, const aiScene *scene, std::vector<Material *>& materials, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
-	static LongMask GetImportFlags(const aiMaterial * mat);
-	static void UpdateImportFlags(LongMask * flags, const aiMesh* mesh);
-	Mesh3D * ConvertAssimpMesh(const aiMesh* mesh, Material * material, MaterialImportDescriptor * materialImportDescriptor);
+	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObject& parent, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors);
+	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
+	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
+	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
+	Mesh3D * ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);
-	static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(Mesh3D * mesh, ShaderMaterialCharacteristic property);
+	static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(Mesh3D& mesh, ShaderMaterialCharacteristic property);
 	static std::string GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property);
 
 	public:
