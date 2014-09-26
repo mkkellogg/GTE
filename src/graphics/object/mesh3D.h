@@ -23,7 +23,6 @@ class Mesh3D : public SceneObjectComponent
 {
 	friend EngineObjectManager;
 
-	Mesh3DRenderer * renderer;
 	StandardAttributeSet attributeSet;
 	unsigned int vertexCount;
 
@@ -61,7 +60,6 @@ class Mesh3D : public SceneObjectComponent
     void SetNormalsSmoothingThreshold(unsigned int threshhold);
     void Update();
 
-    void SetRenderer(Mesh3DRenderer * render);
     bool Init(unsigned int vertexCount);
     unsigned int GetVertexCount() const;
     StandardAttributeSet GetAttributeSet() const ;

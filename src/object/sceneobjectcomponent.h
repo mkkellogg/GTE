@@ -3,14 +3,18 @@
 
 // forward declaration
 class SceneObjectComponent;
+class SceneObject;
 
 #include "object/engineobject.h"
 
 class SceneObjectComponent : public EngineObject
 {
 	friend class EngineObjectManager;
+	friend class SceneObject;
 
     protected:
+
+	SceneObject * sceneObject;
 
 	SceneObjectComponent();
     virtual ~SceneObjectComponent();

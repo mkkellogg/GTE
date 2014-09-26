@@ -115,7 +115,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		meshRenderer->SetMaterial(material);
 		sceneObject->SetMesh3D(mesh);
 		sceneObject->SetMeshRenderer3D(meshRenderer);
-
 		mesh->Init(36);
 
 		Point3Array * points = mesh->GetPostions();
@@ -243,15 +242,11 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		childSceneObject->GetLocalTransform()->Scale(1.5,1.5,1.5, true);
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 
-
-
-
-
-
 		AssetImporter * importer = new AssetImporter();
 		SceneObject * modelSceneObject = NULL;
 
 		modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
+
 		if(modelSceneObject != NULL)
 		{
 			modelSceneObject->SetActive(true);
@@ -264,7 +259,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,0,1,0, 90);
 		modelSceneObject->GetLocalTransform()->Translate(10,0,-12,false);
 		modelSceneObject->GetLocalTransform()->Scale(.10,.10,.10, true);
-
 
 
 		modelSceneObject = importer->LoadModel("../../models/Rck-Wtrfll_dae/Rck-Wtrfll_dae.dae", 1 );
@@ -296,7 +290,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,0,1,0,-90);
 		modelSceneObject->GetLocalTransform()->Translate(0,-8,-3,false);
 		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);
-
 
 
 		SceneObject * lightObject = NULL;

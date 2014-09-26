@@ -21,6 +21,8 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2.h"
 #include "graphics/uv/uv2array.h"
+#include "object/sceneobject.h"
+#include "global/global.h"
 #include "ui/debug.h"
 
 
@@ -90,9 +92,13 @@ bool Mesh3DRendererGL::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, i
 
 bool Mesh3DRendererGL::InitAttributeData(StandardAttribute attr, int componentCount,  int stride)
 {
-	DestroyBuffer(&attributeBuffers[(int)attr]);
-	bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], mesh->GetVertexCount(), componentCount, stride);
-	if(!initSuccess)return false;
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	if(mesh != NULL)
+	{
+		DestroyBuffer(&attributeBuffers[(int)attr]);
+		bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], mesh->GetVertexCount(), componentCount, stride);
+		if(!initSuccess)return false;
+	}
 	return true;
 }
 
@@ -122,14 +128,16 @@ void Mesh3DRendererGL::SetUV2Data(UV2Array * uvs)
 	attributeBuffers[(int)StandardAttribute::UVTexture1]->SetData(uvs->GetDataPtr());
 }
 
-bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
+bool Mesh3DRendererGL::UpdateMesh()
 {
-	mesh = NULL;
-
 	DestroyBuffers();
 
-	Mesh3DRenderer::UseMesh(newMesh);
-	mesh->SetRenderer(this);
+	NULL_CHECK(sceneObject,"Mesh3DRendererGL::UpdateMesh -> Scene object is NULL.", false);
+
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	NULL_CHECK(mesh,"Mesh3DRendererGL::UseMesh -> Scene object returned NULL mesh.",false);
+
+	Mesh3DRenderer::UpdateMesh();
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
@@ -153,10 +161,9 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 
 	if(err != 0)
 	{
-		Mesh3DRenderer::UseMesh(NULL);
-		char errorStr[64];
-		sprintf(errorStr, "Error initializing attribute buffer(s) for Mesh3DRenderer: %d\n",err);
-		Debug::PrintError(errorStr);
+		std::string msg("Error initializing attribute buffer(s) for Mesh3DRenderer: ");
+		msg += std::to_string(err);
+		Debug::PrintError(msg);
 		DestroyBuffers();
 		return false;
 	}
@@ -169,13 +176,16 @@ bool Mesh3DRendererGL::UseMesh(Mesh3D * newMesh)
 		return UseMaterial(material);
 	}
 
-	//storedAttributes = meshAttributes;
-
 	return true;
 }
 
 void Mesh3DRendererGL::CopyMeshData()
 {
+	NULL_CHECK_RTRN(sceneObject,"Mesh3DRendererGL::CopyMeshData -> Scene object is NULL.");
+
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	NULL_CHECK_RTRN(mesh,"Mesh3DRendererGL::CopyMeshData -> Scene object has NULL mesh.");
+
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
@@ -186,16 +196,18 @@ void Mesh3DRendererGL::CopyMeshData()
 
 void Mesh3DRendererGL::UpdateFromMesh()
 {
-	if(mesh != NULL)
+	NULL_CHECK_RTRN(sceneObject,"Mesh3DRendererGL::UpdateFromMesh -> Scene object is NULL.");
+
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	NULL_CHECK_RTRN(mesh,"Mesh3DRendererGL::UpdateFromMesh -> Scene object has NULL mesh.");
+
+	if(mesh->GetVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
 	{
-		if(mesh->GetVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
-		{
-			UseMesh(mesh);
-		}
-		else
-		{
-			CopyMeshData();
-		}
+		UpdateMesh();
+	}
+	else
+	{
+		CopyMeshData();
 	}
 }
 
@@ -205,23 +217,23 @@ bool Mesh3DRendererGL::UseMaterial(Material * material)
 
 	Mesh3DRenderer::UseMaterial(material);
 
-	if(mesh != NULL)
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	NULL_CHECK(mesh,"Mesh3DRendererGL::UseMaterial -> Scene object has NULL mesh.", false);
+
+	StandardAttributeSet materialAttributes = material->GetStandardAttributes();
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
-		StandardAttributeSet materialAttributes = material->GetStandardAttributes();
-		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttribute attr = (StandardAttribute)i;
 
-		for(int i=0; i<(int)StandardAttribute::_Last; i++)
+		if(StandardAttributes::HasAttribute(materialAttributes, attr))
 		{
-			StandardAttribute attr = (StandardAttribute)i;
-
-			if(StandardAttributes::HasAttribute(materialAttributes, attr))
+			if(!StandardAttributes::HasAttribute(meshAttributes, attr))
 			{
-				if(!StandardAttributes::HasAttribute(meshAttributes, attr))
-				{
-					char msg[64];
-					sprintf(msg, "Shader was expecting attribute %s, but mesh does not have it.", StandardAttributes::GetAttributeName(attr));
-					Debug::PrintWarning(msg);
-				}
+				char msg[64];
+				sprintf(msg, "Shader was expecting attribute %s, but mesh does not have it.", StandardAttributes::GetAttributeName(attr));
+				Debug::PrintWarning(msg);
 			}
 		}
 	}
@@ -233,6 +245,9 @@ void Mesh3DRendererGL::Render()
 {
 	Material * currentMaterial = graphics->GetActiveMaterial();
 	UseMaterial(currentMaterial);
+
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	NULL_CHECK_RTRN(mesh,"Mesh3DRendererGL::Render -> Scene object has NULL mesh.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 

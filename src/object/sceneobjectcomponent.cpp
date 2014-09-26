@@ -8,7 +8,7 @@
 
 SceneObjectComponent::SceneObjectComponent()
 {
-
+	sceneObject = NULL;
 }
 
 SceneObjectComponent::~SceneObjectComponent()

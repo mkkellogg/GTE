@@ -51,7 +51,7 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
     public:
 
-    bool UseMesh(Mesh3D * newMesh);
+    bool UpdateMesh();
     void CopyMeshData();
     void UpdateFromMesh();
     void Render();

@@ -8,10 +8,12 @@
 #include <vector>
 
 #include "object/sceneobjectcomponent.h"
+#include "object/sceneobject.h"
 #include "mesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/graphics.h"
+#include "graphics/render/mesh3Drenderer.h"
 
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -24,6 +26,7 @@
 #include "graphics/uv/uv2array.h"
 #include "gtemath/gtemath.h"
 #include "graphics/light/light.h"
+#include "global/global.h"
 #include "ui/debug.h"
 #include "global/constants.h"
 
@@ -43,8 +46,6 @@ Mesh3D::Mesh3D(StandardAttributeSet attributes) : SceneObjectComponent()
 	colors = new Color4Array();
 	uvsTexture0 = new UV2Array();
 	uvsTexture1 = new UV2Array();
-
-	renderer = NULL;
 
 	lightCullType = LightCullType::SphereOfInfluence;
 }
@@ -269,7 +270,12 @@ void Mesh3D::Update()
 {
 	CalcSphereOfInfluence();
 	CalculateNormals(normalsSmoothingThreshold);
-	if(renderer != NULL)renderer->UpdateFromMesh();
+
+	if(sceneObject != NULL)
+	{
+		Mesh3DRenderer * renderer = sceneObject->GetRenderer3D();
+		if(renderer != NULL)renderer->UpdateFromMesh();
+	}
 }
 
 unsigned int Mesh3D::GetVertexCount() const
@@ -359,11 +365,6 @@ UV2Array * Mesh3D::GetUVsTexture0()
 UV2Array * Mesh3D::GetUVsTexture1()
 {
 	return uvsTexture1;
-}
-
-void Mesh3D::SetRenderer(Mesh3DRenderer * renderer)
-{
-	this->renderer = renderer;
 }
 
 

@@ -160,11 +160,19 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 		Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
 		NULL_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create mesh renderer.");
 
+		// set the material for the mesh renderer
 		meshRenderer->SetMaterial(material);
 
+		// add the mesh to the newly created scene object
 		sceneObject->SetMesh3D(mesh3D);
+
+		// add the mesh renderer to the newly created scene object
 		sceneObject->SetMeshRenderer3D(meshRenderer);
+
+		// update the scene object's local transform
 		sceneObject->GetLocalTransform()->SetTo(&mat);
+
+		// add the new scene object as a child of [current]
 		current.AddChild(sceneObject);
 	}
 

@@ -19,7 +19,6 @@
 
 Mesh3DRenderer::Mesh3DRenderer(Graphics * graphics) : SceneObjectComponent()
 {
-	this->mesh = NULL;
 	this->material = NULL;
 	this->activeMaterial = NULL;
 	this->graphics = graphics;
@@ -30,16 +29,9 @@ Mesh3DRenderer::~Mesh3DRenderer()
 
 }
 
-bool Mesh3DRenderer::UseMesh(Mesh3D * newMesh)
+bool Mesh3DRenderer::UpdateMesh()
 {
-	this->mesh = newMesh;
-
 	return true;
-}
-
-Mesh3D * Mesh3DRenderer::GetMesh()
-{
-	return mesh;
 }
 
 bool Mesh3DRenderer::UseMaterial(Material * material)

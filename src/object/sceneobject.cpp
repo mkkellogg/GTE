@@ -10,6 +10,7 @@
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/object/mesh3D.h"
 #include "graphics/render/rendermanager.h"
 #include "ui/debug.h"
 #include "global/global.h"
@@ -59,11 +60,9 @@ bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer *renderer)
 {
 	if(renderer != NULL && renderer3D != renderer)
 	{
-		this->renderer3D = renderer;
-		if(mesh3D != NULL)
-		{
-			renderer3D->UseMesh(mesh3D);
-		}
+		renderer->sceneObject = this;
+		renderer3D = renderer;
+		renderer3D->UpdateMesh();
 	}
 	else
 	{
@@ -76,10 +75,11 @@ bool SceneObject::SetMesh3D(Mesh3D *mesh)
 {
 	if(mesh != NULL)
 	{
+		mesh->sceneObject = this;
 		this->mesh3D = mesh;
-		if(renderer3D != NULL)
+		if(renderer3D !=NULL)
 		{
-			renderer3D->UseMesh(mesh);
+			renderer3D->UpdateMesh();
 		}
 	}
 	else
@@ -92,12 +92,14 @@ bool SceneObject::SetMesh3D(Mesh3D *mesh)
 bool SceneObject::SetCamera(Camera * camera)
 {
 	this->camera = camera;
+	camera->sceneObject = this;
 	return true;
 }
 
 bool SceneObject::SetLight(Light * light)
 {
 	this->light = light;
+	light->sceneObject = this;
 	return true;
 }
 

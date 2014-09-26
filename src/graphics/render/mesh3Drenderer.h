@@ -15,12 +15,11 @@ class Mesh3DRenderer : public SceneObjectComponent
 
 	protected:
 
-	Mesh3D * mesh;
 	Material * material;
 	Material * activeMaterial;
 	Graphics * graphics;
 
-	virtual bool UseMesh(Mesh3D * newMesh);
+	virtual bool UpdateMesh();
 	virtual bool UseMaterial(Material * material);
 
     public:
@@ -29,7 +28,6 @@ class Mesh3DRenderer : public SceneObjectComponent
     virtual ~Mesh3DRenderer();
 
     virtual void Render() = 0;
-    Mesh3D * GetMesh();
     virtual void UpdateFromMesh() = 0;
     Material * GetMaterial();
     void SetMaterial(Material * material);
