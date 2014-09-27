@@ -76,6 +76,26 @@ bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer * renderer)
 	return true;
 }
 
+
+bool SceneObject::SetMesh3D(Mesh3D *mesh)
+{
+	if(mesh != NULL)
+	{
+		mesh->sceneObject = this;
+		this->mesh3D = mesh;
+		if(renderer3D !=NULL)
+		{
+			renderer3D->UpdateFromMeshes();
+		}
+	}
+	else
+	{
+		Debug::PrintError("SceneObject::SetMesh3D -> attempted to add NULL mesh.");
+	}
+
+	return true;
+}
+
 bool SceneObject::SetSubMeshRenderer3D(SubMesh3DRenderer *renderer)
 {
 	if(subrenderer3D == renderer)return true;
@@ -89,25 +109,6 @@ bool SceneObject::SetSubMeshRenderer3D(SubMesh3DRenderer *renderer)
 	{
 		Debug::PrintError("SceneObject::SetSubMeshRenderer3D -> attempted to add NULL renderer.");
 	}
-	return true;
-}
-
-bool SceneObject::SetMesh3D(Mesh3D *mesh)
-{
-	if(mesh != NULL)
-	{
-		mesh->sceneObject = this;
-		this->mesh3D = mesh;
-		if(renderer3D !=NULL)
-		{
-			//renderer3D->UpdateMesh();
-		}
-	}
-	else
-	{
-		Debug::PrintError("SceneObject::SetMesh3D -> attempted to add NULL mesh.");
-	}
-
 	return true;
 }
 

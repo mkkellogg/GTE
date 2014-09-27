@@ -8,7 +8,7 @@ class Graphics;
 
 #include "object/sceneobjectcomponent.h"
 
-class SubMesh3DRenderer : public SceneObjectComponent
+class SubMesh3DRenderer : public EngineObject
 {
 	friend class SceneObject;
 	friend class SubMesh3D;

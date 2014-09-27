@@ -109,17 +109,17 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
-		SubMesh3D * mesh = objectManager->CreateSubMesh3D(meshAttributes);
-		SubMesh3DRenderer * meshRenderer = objectManager->CreateSubMesh3DRenderer();
+		SubMesh3D * subMesh = objectManager->CreateSubMesh3D(meshAttributes);
+		SubMesh3DRenderer * subMeshRenderer = objectManager->CreateSubMesh3DRenderer();
 
-		meshRenderer->SetMaterial(material);
-		sceneObject->SetSubMesh3D(mesh);
-		sceneObject->SetSubMeshRenderer3D(meshRenderer);
-		mesh->Init(36);
+		subMeshRenderer->SetMaterial(material);
+		sceneObject->SetSubMesh3D(subMesh);
+		sceneObject->SetSubMeshRenderer3D(subMeshRenderer);
+		subMesh->Init(36);
 
-		Point3Array * points = mesh->GetPostions();
-		Color4Array * colors = mesh->GetColors();
-		UV2Array *uvs = mesh->GetUVsTexture0();
+		Point3Array * points = subMesh->GetPostions();
+		Color4Array * colors = subMesh->GetColors();
+		UV2Array *uvs = subMesh->GetUVsTexture0();
 
 		// --- Cube vertices -------
 		// cube front, triangle 1
@@ -231,18 +231,18 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		uvs->GetCoordinate(28)->Set(1,1);
 		uvs-> GetCoordinate(29)->Set(0,1);
 
-		mesh->SetNormalsSmoothingThreshold(85);
-		mesh->Update();
+		subMesh->SetNormalsSmoothingThreshold(85);
+		subMesh->Update();
 
 		SceneObject * childSceneObject = objectManager->CreateSceneObject();
 		sceneObject->AddChild(childSceneObject);
-		childSceneObject->SetSubMesh3D(mesh);
-		childSceneObject->SetSubMeshRenderer3D(meshRenderer);
+		childSceneObject->SetSubMesh3D(subMesh);
+		childSceneObject->SetSubMeshRenderer3D(subMeshRenderer);
 		childSceneObject->GetLocalTransform()->Translate(-2, 3, 0, true);
 		childSceneObject->GetLocalTransform()->Scale(1.5,1.5,1.5, true);
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 
-		AssetImporter * importer = new AssetImporter();
+		/*AssetImporter * importer = new AssetImporter();
 		SceneObject * modelSceneObject = NULL;
 
 		modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
@@ -289,7 +289,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,1,0,0,-90);
 		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,0,1,0,-90);
 		modelSceneObject->GetLocalTransform()->Translate(0,-8,-3,false);
-		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);
+		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);*/
 
 
 		SceneObject * lightObject = NULL;

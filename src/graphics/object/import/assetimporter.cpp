@@ -27,6 +27,8 @@
 #include "object/sceneobject.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
+#include "graphics/render/mesh3Drenderer.h"
+#include "graphics/object/mesh3D.h"
 #include "geometry/sceneobjecttransform.h"
 #include "graphics/uv/uv2array.h"
 #include "graphics/render/material.h"
@@ -131,6 +133,31 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 
+	Mesh3D * mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
+	NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
+
+	bool meshInitSuccess = mesh3D->Init();
+	if(!meshInitSuccess)
+	{
+		Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
+		engineObjectManager->DestroyMesh3D(mesh3D);
+		return;
+	}
+
+	Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
+	if(meshRenderer == NULL)
+	{
+		Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
+		return;
+	}
+
+	// create new scene object to hold the Mesh3D object and its renderer
+	SceneObject * sceneObject = engineObjectManager->CreateSceneObject();
+	NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
+
+	// update the scene object's local transform
+	sceneObject->GetLocalTransform()->SetTo(&mat);
+
 	for (unsigned int n=0; n <  node.mNumMeshes; n++)
 	{
 		unsigned int sceneMeshIndex = node.mMeshes[n];
@@ -148,33 +175,20 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 		Material * material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
 		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL material encountered.");
 
+		// add the material to the mesh renderer
+		meshRenderer->AddMaterial(material);
+
 		// convert Assimp mesh to a Mesh3D object
-		SubMesh3D * mesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
-		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
-
-		// create new scene object to hold the Mesh3D object and its renderer
-		SceneObject * sceneObject = engineObjectManager->CreateSceneObject();
-		NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
-
-		// create renderer for the Mesh3D object
-		SubMesh3DRenderer * meshRenderer = engineObjectManager->CreateSubMesh3DRenderer();
-		NULL_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create mesh renderer.");
-
-		// set the material for the mesh renderer
-		meshRenderer->SetMaterial(material);
+		SubMesh3D * subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
+		NULL_CHECK_RTRN(subMesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 		// add the mesh to the newly created scene object
-		sceneObject->SetSubMesh3D(mesh3D);
-
-		// add the mesh renderer to the newly created scene object
-		sceneObject->SetSubMeshRenderer3D(meshRenderer);
-
-		// update the scene object's local transform
-		sceneObject->GetLocalTransform()->SetTo(&mat);
-
-		// add the new scene object as a child of [current]
-		current.AddChild(sceneObject);
+		mesh3D->SetSubMesh(subMesh3D, n);
 	}
+
+	sceneObject->SetMesh3D(mesh3D);
+	sceneObject->SetMeshRenderer3D(meshRenderer);
+	current.AddChild(sceneObject);
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{
