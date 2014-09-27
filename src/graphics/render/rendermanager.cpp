@@ -15,9 +15,12 @@
 #include "base/intmask.h"
 #include "graphics/graphics.h"
 #include "graphics/render/submesh3Drenderer.h"
+#include "graphics/render/mesh3Drenderer.h"
+#include "graphics/object/mesh3D.h"
+#include "graphics/object/submesh3D.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
-#include "graphics/object/submesh3D.h"
+
 #include <vector>
 #include "util/datastack.h"
 #include "global/global.h"
@@ -292,84 +295,116 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 			modelTransform->TransformBy(child->GetLocalTransform());
 
 			// check if current scene object has a mesh renderer
-			SubMesh3DRenderer * renderer = child->GetSubRenderer3D();
+			Mesh3DRenderer * renderer = child->GetRenderer3D();
+			Mesh3D * mesh = child->GetMesh3D();
 
-			if(renderer != NULL)
+			if(renderer != NULL && mesh != NULL)
 			{
-				// make sure mesh renderer has a material set
-				Material * currentMaterial = renderer->GetMaterial();
-				if(currentMaterial != NULL)
+				if(renderer->GetMaterialCount() > 0)
 				{
-					modelView.SetTo(modelTransform);
-					// concatenate modelTransform with inverted viewTransform
-					modelView.PreTransformBy(viewTransformInverse);
-
-					// activate the material, which will switch the GPU's active shader to
-					// the one associated with the material
-					ActivateMaterial(currentMaterial);
-					// pass concatenated modelViewTransform and projection transforms to shader
-					SendTransformUniformsToShader(modelTransform, &modelView, camera->GetProjectionTransform());
-					SendCustomUniformsToShader();
-
-					for(unsigned int l = 0; l < lightCount; l++)
+					unsigned int materialIndex = 0;
+					for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 					{
-						// Loop through each light in the scene and render each object that is in range
-						if(sceneLights[l].component != NULL)
+						Material * currentMaterial = renderer->GetMaterial(materialIndex);
+						if(currentMaterial == NULL)
 						{
-							Light * light = dynamic_cast<Light *>(sceneLights[l].component);
-							if(light != NULL)
+							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub material encountered.");
+							continue;
+						}
+
+						materialIndex++;
+						if(materialIndex >= renderer->GetMaterialCount())
+						{
+							materialIndex = 0;
+						}
+
+						SubMesh3DRenderer * subRenderer = renderer->GetSubRenderer(i);
+						if(subRenderer == NULL)
+						{
+							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
+							continue;
+						}
+
+						SubMesh3D * subMesh = mesh->GetSubMesh(i);
+						if(subMesh == NULL)
+						{
+							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
+							continue;
+						}
+
+						modelView.SetTo(modelTransform);
+						// concatenate modelTransform with inverted viewTransform
+						modelView.PreTransformBy(viewTransformInverse);
+
+						// activate the material, which will switch the GPU's active shader to
+						// the one associated with the material
+						ActivateMaterial(currentMaterial);
+						// pass concatenated modelViewTransform and projection transforms to shader
+						SendTransformUniformsToShader(modelTransform, &modelView, camera->GetProjectionTransform());
+						SendCustomUniformsToShader();
+
+						for(unsigned int l = 0; l < lightCount; l++)
+						{
+							// Loop through each light in the scene and render each object that is in range
+							if(sceneLights[l].component != NULL)
 							{
-								// we know current scene object has a mesh renderer, but also verify is has a mesh
-								SubMesh3D * childMesh = child->GetSubMesh3D();
-								if(childMesh != NULL)
+								Light * light = dynamic_cast<Light *>(sceneLights[l].component);
+								if(light != NULL)
 								{
-									// if this mesh has already been rendered by this camera, then we want to use
-									// additive blending to combine it with the output from other lights. Otherwise
-									// turn off blending and render.
-									bool rendered = renderedObjects[childMesh->GetObjectID()];
-									if(rendered)
+									// we know current scene object has a mesh renderer, but also verify is has a mesh
+									if(subMesh != NULL)
 									{
-										graphics->EnableBlending(true);
-										graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+										// if this mesh has already been rendered by this camera, then we want to use
+										// additive blending to combine it with the output from other lights. Otherwise
+										// turn off blending and render.
+										bool rendered = renderedObjects[subMesh->GetObjectID()];
+										if(rendered)
+										{
+											graphics->EnableBlending(true);
+											graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+										}
+										else
+										{
+											graphics->EnableBlending(false);
+										}
+
+										Point3 lightPosition;
+										sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
+
+										Transform full;
+										child->GetFullTransform(&full);
+
+										// check if this mesh should be culled from this light.
+										if(!ShouldCullFromLight(*light, lightPosition, full, *subMesh))
+										{
+											// send light data to the active shader
+											currentMaterial->SendLightToShader(light, &lightPosition);
+											// render the current mesh
+											subRenderer->Render();
+											// flag the current mesh as being rendered
+											renderedObjects[subMesh->GetObjectID()] = true;
+										}
 									}
 									else
 									{
-										graphics->EnableBlending(false);
-									}
-
-									Point3 lightPosition;
-									sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
-
-									// check if this mesh should be culled from this light.
-									if(!ShouldCullFromLight(*light, lightPosition, *child))
-									{
-										// send light data to the active shader
-										currentMaterial->SendLightToShader(light, &lightPosition);
-										// render the current mesh
-										renderer->Render();
-										// flag the current mesh as being rendered
-										renderedObjects[childMesh->GetObjectID()] = true;
+										Debug::PrintError("RenderManager::ForwardRenderScene -> sub mesh is NULL");
 									}
 								}
 								else
 								{
-									Debug::PrintError("RenderManager::RenderScene -> mesh is NULL");
+									Debug::PrintError("RenderManager::ForwardRenderScene -> light is NULL");
 								}
 							}
 							else
 							{
-								Debug::PrintError("RenderManager::RenderScene -> light is NULL");
+								Debug::PrintError("RenderManager::ForwardRenderScene -> sceneLights[l].component is NULL");
 							}
-						}
-						else
-						{
-							Debug::PrintError("RenderManager::RenderScene -> sceneLights[l].component is NULL");
 						}
 					}
 				}
 				else
 				{
-					Debug::PrintError("RenderManager::RenderScene -> renderer has NULL material.");
+					Debug::PrintError("RenderManager::ForwardRenderScene -> renderer has no materials.");
 				}
 			}
 
@@ -381,7 +416,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 		}
 		else
 		{
-			Debug::PrintError("RenderManager::RenderScene -> NULL scene object encountered.");
+			Debug::PrintError("RenderManager::ForwardRenderScene -> NULL scene object encountered.");
 		}
 	}
 }
@@ -390,21 +425,18 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
  * Check if the mesh(es) attached to [mesh3DSceneObject] should be rendered with [light], based
  * on their distance from [lightPosition].
  */
-bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
+bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh)
 {
-	SubMesh3D * mesh = mesh3DSceneObject.GetSubMesh3D();
-	NULL_CHECK(mesh, "RenderManager::ShouldCullFromLight -> NULL mesh.", false);
-
-	switch(mesh->GetLightCullType())
+	switch(mesh.GetLightCullType())
 	{
 		case LightCullType::None:
 			return false;
 		break;
 		case LightCullType::SphereOfInfluence:
-			return ShouldCullBySphereOfInfluence(light, lightPosition, mesh3DSceneObject);
+			return ShouldCullBySphereOfInfluence(light, lightPosition, fullTransform, mesh);
 		break;
 		case LightCullType::Tiled:
-			return ShouldCullByTile(light, lightPosition, mesh3DSceneObject);
+			return ShouldCullByTile(light, lightPosition, fullTransform, mesh);
 		break;
 		default:
 			return false;
@@ -420,25 +452,19 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Sce
  * sphere does not intersect with the sphere that is formed by the light's range, then the light should
  * be culled from the meshes.
  */
-bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
+bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh)
 {
-	// for now we assume scene object's only have one mesh
-	SubMesh3D * mesh = mesh3DSceneObject.GetSubMesh3D();
-
 	// get the maximum distances from mesh center along each axis
-	Vector3 soiX = *(mesh->GetSphereOfInfluenceX());
-	Vector3 soiY = *(mesh->GetSphereOfInfluenceY());
-	Vector3 soiZ = *(mesh->GetSphereOfInfluenceZ());
-
-	Transform full;
-	mesh3DSceneObject.GetFullTransform(&full);
+	Vector3 soiX = *(mesh.GetSphereOfInfluenceX());
+	Vector3 soiY = *(mesh.GetSphereOfInfluenceY());
+	Vector3 soiZ = *(mesh.GetSphereOfInfluenceZ());
 
 	// transform each distance vector by the full transform made up of
 	// the transforms of each ancestor of [mesh3DSceneObject], as well as
 	// the transform belonging to [mesh3DSceneObject]
-	full.GetMatrix()->Transform(&soiX);
-	full.GetMatrix()->Transform(&soiY);
-	full.GetMatrix()->Transform(&soiZ);
+	fullTransform.GetMatrix()->Transform(&soiX);
+	fullTransform.GetMatrix()->Transform(&soiY);
+	fullTransform.GetMatrix()->Transform(&soiZ);
 
 	// get length of each transformed vector
 	float xMag = soiX.QuickMagnitude();
@@ -452,8 +478,8 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 	if(zMag > meshMag)meshMag = zMag;
 
 	Vector3 toLight;
-	Point3 meshCenter = *(mesh->GetCenter());
-	full.GetMatrix()->Transform(&meshCenter);
+	Point3 meshCenter = *(mesh.GetCenter());
+	fullTransform.GetMatrix()->Transform(&meshCenter);
 
 	// get the distance from the light to the mesh's center
 	Point3::Subtract(&lightPosition, &meshCenter, &toLight);
@@ -469,7 +495,7 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 /*
  * Tile-based culling - needs to be implemented!
  */
-bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
+bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh)
 {
 	return false;
 }

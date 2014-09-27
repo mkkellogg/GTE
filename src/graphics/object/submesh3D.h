@@ -20,7 +20,7 @@ class SubMesh3DRenderer;
 #include "geometry/vector/vector3.h"
 #include "graphics/light/light.h"
 
-class SubMesh3D : public SceneObjectComponent
+class SubMesh3D : public EngineObject
 {
 	friend EngineObjectManager;
 	friend Mesh3D;

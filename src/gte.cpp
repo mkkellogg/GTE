@@ -10,6 +10,7 @@
 #include "graphics/object/submesh3D.h"
 #include "graphics/object/import/assetimporter.h"
 #include "graphics/render/submesh3Drenderer.h"
+#include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/renderbuffer.h"
 #include "graphics/render/material.h"
 #include "graphics/shader/shader.h"
@@ -110,11 +111,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
 		SubMesh3D * subMesh = objectManager->CreateSubMesh3D(meshAttributes);
-		SubMesh3DRenderer * subMeshRenderer = objectManager->CreateSubMesh3DRenderer();
-
-		subMeshRenderer->SetMaterial(material);
-		sceneObject->SetSubMesh3D(subMesh);
-		sceneObject->SetSubMeshRenderer3D(subMeshRenderer);
 		subMesh->Init(36);
 
 		Point3Array * points = subMesh->GetPostions();
@@ -232,14 +228,30 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		uvs-> GetCoordinate(29)->Set(0,1);
 
 		subMesh->SetNormalsSmoothingThreshold(85);
-		subMesh->Update();
+
+		Mesh3D * mesh = objectManager->CreateMesh3D(1);
+		mesh->Init();
+		mesh->SetSubMesh(subMesh, 0);
+
+
+		Mesh3DRenderer * renderer = objectManager->CreateMesh3DRenderer();
+		renderer->AddMaterial(material);
+
+		sceneObject->SetMesh3D(mesh);
+		sceneObject->SetMeshRenderer3D(renderer);
+
+
 
 		SceneObject * childSceneObject = objectManager->CreateSceneObject();
 		sceneObject->AddChild(childSceneObject);
-		childSceneObject->SetSubMesh3D(subMesh);
-		childSceneObject->SetSubMeshRenderer3D(subMeshRenderer);
+
+		childSceneObject->SetMesh3D(mesh);
+		childSceneObject->SetMeshRenderer3D(renderer);
+
 		childSceneObject->GetLocalTransform()->Translate(-2, 3, 0, true);
 		childSceneObject->GetLocalTransform()->Scale(1.5,1.5,1.5, true);
+
+
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 
 		/*AssetImporter * importer = new AssetImporter();

@@ -4,6 +4,8 @@
 //forward declarations
 class EngineObjectManager;
 class SubMesh3D;
+class SceneObject;
+class SceneObjectComponent;
 
 #include "object/engineobject.h"
 #include "object/sceneobjectcomponent.h"
@@ -26,6 +28,7 @@ class Mesh3D : public SceneObjectComponent
     void SetSubMesh(SubMesh3D * mesh, unsigned int index);
     SubMesh3D * GetSubMesh(unsigned int index);
     bool Init();
+
     void Update(SubMesh3D * subMesh);
     void Update();
 };

@@ -10,6 +10,7 @@
 #include "graphics/graphicsGL.h"
 #include "graphics/shader/shaderGL.h"
 #include "submesh3Drenderer.h"
+#include "mesh3Drenderer.h"
 #include "material.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/graphics.h"
@@ -92,7 +93,7 @@ bool SubMesh3DRendererGL::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount
 
 bool SubMesh3DRendererGL::InitAttributeData(StandardAttribute attr, int componentCount,  int stride)
 {
-	SubMesh3D * mesh = sceneObject->GetSubMesh3D();
+	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
 	if(mesh != NULL)
 	{
 		DestroyBuffer(&attributeBuffers[(int)attr]);
@@ -131,11 +132,10 @@ void SubMesh3DRendererGL::SetUV2Data(UV2Array * uvs)
 bool SubMesh3DRendererGL::UpdateMeshData()
 {
 	DestroyBuffers();
+	NULL_CHECK(containerRenderer,"SubMesh3DRendererGL::UpdateMeshData -> containerRenderer is NULL.",false);
 
-	NULL_CHECK(sceneObject,"Mesh3DRendererGL::UpdateMesh -> Scene object is NULL.", false);
-
-	SubMesh3D * mesh = sceneObject->GetSubMesh3D();
-	NULL_CHECK(mesh,"Mesh3DRendererGL::UseMesh -> Scene object returned NULL mesh.",false);
+	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
+	NULL_CHECK(mesh,"SubMesh3DRendererGL::UpdateMeshData -> Could not find matching sub mesh for sub renderer.",false);
 
 	SubMesh3DRenderer::UpdateMeshData();
 
@@ -161,7 +161,7 @@ bool SubMesh3DRendererGL::UpdateMeshData()
 
 	if(err != 0)
 	{
-		std::string msg("Error initializing attribute buffer(s) for Mesh3DRenderer: ");
+		std::string msg("Error initializing attribute buffer(s) for SubMesh3DRendererGL: ");
 		msg += std::to_string(err);
 		Debug::PrintError(msg);
 		DestroyBuffers();
@@ -181,10 +181,11 @@ bool SubMesh3DRendererGL::UpdateMeshData()
 
 void SubMesh3DRendererGL::CopyMeshData()
 {
-	NULL_CHECK_RTRN(sceneObject,"Mesh3DRendererGL::CopyMeshData -> Scene object is NULL.");
+	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::CopyMeshData -> containerRenderer is NULL.");
 
-	SubMesh3D * mesh = sceneObject->GetSubMesh3D();
-	NULL_CHECK_RTRN(mesh,"Mesh3DRendererGL::CopyMeshData -> Scene object has NULL mesh.");
+	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
+	NULL_CHECK_RTRN(mesh,"SubMesh3DRendererGL::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
+
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
@@ -196,10 +197,11 @@ void SubMesh3DRendererGL::CopyMeshData()
 
 void SubMesh3DRendererGL::UpdateFromMesh()
 {
-	NULL_CHECK_RTRN(sceneObject,"Mesh3DRendererGL::UpdateFromMesh -> Scene object is NULL.");
+	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::UpdateFromMesh -> containerRenderer is NULL.");
 
-	SubMesh3D * mesh = sceneObject->GetSubMesh3D();
-	NULL_CHECK_RTRN(mesh,"Mesh3DRendererGL::UpdateFromMesh -> Scene object has NULL mesh.");
+	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
+	NULL_CHECK_RTRN(mesh,"SubMesh3DRendererGL::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
+
 
 	if(mesh->GetVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
 	{
@@ -217,8 +219,10 @@ bool SubMesh3DRendererGL::UseMaterial(Material * material)
 
 	SubMesh3DRenderer::UseMaterial(material);
 
-	SubMesh3D * mesh = sceneObject->GetSubMesh3D();
-	NULL_CHECK(mesh,"Mesh3DRendererGL::UseMaterial -> Scene object has NULL mesh.", false);
+	NULL_CHECK(containerRenderer,"SubMesh3DRendererGL::UseMaterial -> containerRenderer is NULL.", false);
+
+	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
+	NULL_CHECK(mesh,"SubMesh3DRendererGL::UseMaterial -> Could not find matching sub mesh for sub renderer.", false);
 
 	StandardAttributeSet materialAttributes = material->GetStandardAttributes();
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
@@ -246,8 +250,10 @@ void SubMesh3DRendererGL::Render()
 	Material * currentMaterial = graphics->GetActiveMaterial();
 	UseMaterial(currentMaterial);
 
-	SubMesh3D * mesh = sceneObject->GetSubMesh3D();
-	NULL_CHECK_RTRN(mesh,"Mesh3DRendererGL::Render -> Scene object has NULL mesh.");
+	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
+
+	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
+	NULL_CHECK_RTRN(mesh,"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 

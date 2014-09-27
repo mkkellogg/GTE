@@ -36,7 +36,7 @@ SubMesh3D::SubMesh3D() : SubMesh3D (StandardAttributes::CreateAttributeSet())
 
 }
 
-SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : SceneObjectComponent()
+SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 {
 	attributeSet = attributes;
 	vertexCount = 0;
@@ -279,10 +279,9 @@ void SubMesh3D::Update()
 	CalcSphereOfInfluence();
 	CalculateNormals(normalsSmoothingThreshold);
 
-	if(sceneObject != NULL)
+	if(containerMesh != NULL)
 	{
-		SubMesh3DRenderer * renderer = sceneObject->GetSubRenderer3D();
-		if(renderer != NULL)renderer->UpdateFromMesh();
+		containerMesh->Update(this);
 	}
 }
 
@@ -335,7 +334,7 @@ bool SubMesh3D::Init(unsigned int vertexCount)
 	if(!initSuccess)
 	{
 		char errStr[64];
-		sprintf(errStr, "Error initializing attribute array(s) for Mesh3D: %d\n",errorMask);
+		sprintf(errStr, "Error initializing attribute array(s) for SubMesh3D: %d\n",errorMask);
 		Debug::PrintError(errStr);
 		Destroy();
 		return false;

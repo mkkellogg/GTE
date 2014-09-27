@@ -18,6 +18,8 @@ class EngineObjectManager;
 class Transform;
 class Material;
 class SceneObjectComponent;
+class SubMesh3D;
+class Transform;
 
 #include <vector>
 #include <map>
@@ -64,9 +66,9 @@ class RenderManager
     void ProcessScene(SceneObject * parent, Transform * viewTransform);
     void RenderSceneFromCamera(unsigned int cameraIndex);
 
-    bool ShouldCullFromLight(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject);
-    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject);
-    bool ShouldCullByTile(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject);
+    bool ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh);
+    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh);
+    bool ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh);
 
     public:
 

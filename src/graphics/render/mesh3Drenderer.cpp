@@ -26,20 +26,20 @@ Mesh3DRenderer::~Mesh3DRenderer()
 
 void Mesh3DRenderer::DestroyRenderers()
 {
-	for(unsigned int i =0; i< renderers.size(); i++)
+	for(unsigned int i =0; i< subRenderers.size(); i++)
 	{
 		DestroyRenderer(i);
 	}
-	renderers.clear();
+	subRenderers.clear();
 }
 
 void Mesh3DRenderer::DestroyRenderer(unsigned int index)
 {
-	if(index < renderers.size())
+	if(index < subRenderers.size())
 	{
-		SubMesh3DRenderer * renderer = renderers[index];
+		SubMesh3DRenderer * renderer = subRenderers[index];
 		SAFE_DELETE(renderer);
-		renderers.erase(renderers.begin() + index);
+		subRenderers.erase(subRenderers.begin() + index);
 	}
 }
 
@@ -75,6 +75,7 @@ void Mesh3DRenderer::SetMaterial(unsigned int index, Material * material)
 void Mesh3DRenderer::AddMaterial(Material * material)
 {
 	NULL_CHECK_RTRN(material, "Mesh3DRenderer::AddMaterial -> material is NULL.");
+	materials.push_back(material);
 }
 
 void Mesh3DRenderer::UpdateFromMeshes()
@@ -87,21 +88,22 @@ void Mesh3DRenderer::UpdateFromMeshes()
 	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
 	unsigned int subMeshCount =  mesh->GetSubMeshCount();
 
-	if(subMeshCount < renderers.size())
+	if(subMeshCount < subRenderers.size())
 	{
-		for(unsigned int i = renderers.size(); i > subMeshCount; i--)
+		for(unsigned int i = subRenderers.size(); i > subMeshCount; i--)
 		{
 			DestroyRenderer(i-1);
 		}
 	}
-	else if(subMeshCount > renderers.size())
+	else if(subMeshCount > subRenderers.size())
 	{
-		for(unsigned int i = subMeshCount; i <= renderers.size(); i++)
+		for(unsigned int i = subRenderers.size(); i < subMeshCount; i++)
 		{
 			SubMesh3DRenderer * renderer = engineObjectManager->CreateSubMesh3DRenderer();
 			NULL_CHECK_RTRN(mesh,"Mesh3DRenderer::UpdateFromMeshes -> could not create new SubMesh3DRenderer.");
 
-			renderers.push_back(renderer);
+			renderer->SetContainerRenderer(this);
+			subRenderers.push_back(renderer);
 		}
 	}
 
@@ -113,12 +115,51 @@ void Mesh3DRenderer::UpdateFromMeshes()
 
 void Mesh3DRenderer::UpdateFromMesh(unsigned int index)
 {
-	if(index > renderers.size())
+	if(index >= subRenderers.size())
 	{
+		printf("ooo %d\n", index);
 		Debug::PrintError("Mesh3DRenderer::UpdateFromMesh -> Index is out of range.");
 		return;
 	}
 
-	SubMesh3DRenderer * renderer = renderers[index];
+	SubMesh3DRenderer * renderer = subRenderers[index];
 	renderer->UpdateFromMesh();
+}
+
+SubMesh3D * Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer)
+{
+	NULL_CHECK(subRenderer,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subRenderer is NULL.", NULL);
+	NULL_CHECK(sceneObject,"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", NULL);
+
+	for(unsigned int i=0; i < subRenderers.size(); i++)
+	{
+		if(subRenderers[i] == subRenderer)
+		{
+			Mesh3D * mesh = sceneObject->GetMesh3D();
+			NULL_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
+
+			SubMesh3D * subMesh = mesh->GetSubMesh(i);
+			NULL_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", NULL);
+
+			return subMesh;
+		}
+	}
+
+	return NULL;
+}
+
+SubMesh3DRenderer * Mesh3DRenderer::GetSubRenderer(unsigned int index)
+{
+	if(index >= subRenderers.size())
+	{
+		Debug::PrintError("Mesh3DRenderer::GetSubRenderer -> Index is out of range.");
+		return NULL;
+	}
+
+	return subRenderers[index];
+}
+
+unsigned int Mesh3DRenderer::GetSubRendererCount()
+{
+	return subRenderers.size();
 }

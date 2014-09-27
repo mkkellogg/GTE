@@ -101,7 +101,6 @@ bool SceneObject::SetSubMeshRenderer3D(SubMesh3DRenderer *renderer)
 	if(subrenderer3D == renderer)return true;
 	if(renderer != NULL)
 	{
-		renderer->sceneObject = this;
 		subrenderer3D = renderer;
 		subrenderer3D->UpdateMeshData();
 	}
@@ -116,7 +115,6 @@ bool SceneObject::SetSubMesh3D(SubMesh3D *mesh)
 {
 	if(mesh != NULL)
 	{
-		mesh->sceneObject = this;
 		this->submesh3D = mesh;
 		if(subrenderer3D !=NULL)
 		{

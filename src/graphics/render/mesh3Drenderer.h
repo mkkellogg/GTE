@@ -4,6 +4,7 @@
 //forward declarations
 class EngineObjectManager;
 class SubMesh3DRenderer;
+class SubMesh3D;
 class Material;
 
 #include "object/engineobject.h"
@@ -16,7 +17,7 @@ class Mesh3DRenderer : public SceneObjectComponent
 	protected :
 
 	std::vector <Material *> materials;
-	std::vector <SubMesh3DRenderer *> renderers;
+	std::vector <SubMesh3DRenderer *> subRenderers;
 
 	Mesh3DRenderer();
     ~Mesh3DRenderer();
@@ -32,6 +33,10 @@ class Mesh3DRenderer : public SceneObjectComponent
 
     void UpdateFromMeshes();
     void UpdateFromMesh(unsigned int index);
+
+    SubMesh3D * GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer);
+    SubMesh3DRenderer * GetSubRenderer(unsigned int index);
+    unsigned int GetSubRendererCount();
 };
 
 #endif

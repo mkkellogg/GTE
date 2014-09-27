@@ -17,16 +17,23 @@
 #include "global/global.h"
 
 
-SubMesh3DRenderer::SubMesh3DRenderer(Graphics * graphics) : SceneObjectComponent()
+SubMesh3DRenderer::SubMesh3DRenderer(Graphics * graphics) : EngineObject()
 {
 	this->material = NULL;
 	this->activeMaterial = NULL;
 	this->graphics = graphics;
+	this->containerRenderer = NULL;
 }
 
 SubMesh3DRenderer::~SubMesh3DRenderer()
 {
 
+}
+
+void SubMesh3DRenderer::SetContainerRenderer(Mesh3DRenderer * renderer)
+{
+	NULL_CHECK_RTRN(renderer, "SubMesh3DRenderer::SetContainerRenderer -> renderer is NULL");
+	this->containerRenderer = renderer;
 }
 
 bool SubMesh3DRenderer::UpdateMeshData()
@@ -36,7 +43,7 @@ bool SubMesh3DRenderer::UpdateMeshData()
 
 bool SubMesh3DRenderer::UseMaterial(Material * material)
 {
-	NULL_CHECK(material, "Mesh3DRenderer::UseMaterial -> material is NULL", false);
+	NULL_CHECK(material, "SubMesh3DRenderer::UseMaterial -> material is NULL", false);
 	this->activeMaterial = material;
 
 	return true;
@@ -49,7 +56,7 @@ Material * SubMesh3DRenderer::GetMaterial()
 
 void SubMesh3DRenderer::SetMaterial(Material * material)
 {
-	NULL_CHECK_RTRN(material, "Mesh3DRenderer::SetMaterial -> material is NULL");
+	NULL_CHECK_RTRN(material, "SubMesh3DRenderer::SetMaterial -> material is NULL");
 	this->material = material;
 }
 
