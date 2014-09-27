@@ -6,8 +6,8 @@
 
 //forward declarations
 class Shader;
-class Mesh3DRenderer;
-class Mesh3DRendererGL;
+class SubMesh3DRenderer;
+class SubMesh3DRendererGL;
 class Material;
 class Camera;
 class VertexAttrBuffer;
@@ -19,7 +19,7 @@ class TextureAttributes;
 class GraphicsGL : public Graphics
 {
     friend class Graphics;
-    friend class Mesh3DRendererGL;
+    friend class SubMesh3DRendererGL;
 
     static void _glutDisplayFunc();
     static void _glutIdleFunc();
@@ -34,8 +34,8 @@ class GraphicsGL : public Graphics
 
     Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
     void DestroyShader(Shader * shader);
-    Mesh3DRenderer * CreateMeshRenderer();
-    void DestroyMeshRenderer(Mesh3DRenderer * buffer);
+    SubMesh3DRenderer * CreateMeshRenderer();
+    void DestroyMeshRenderer(SubMesh3DRenderer * buffer);
     VertexAttrBuffer * CreateVertexAttributeBuffer();
     void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
     Texture * CreateTexture(const std::string& sourcePath,  TextureAttributes attributes);

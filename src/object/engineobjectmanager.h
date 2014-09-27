@@ -5,7 +5,9 @@
 class EngineObject;
 class SceneObject;
 class Shader;
+class SubMesh3D;
 class Mesh3D;
+class SubMesh3DRenderer;
 class Mesh3DRenderer;
 class EngineObjectManager;
 class Material;
@@ -45,10 +47,15 @@ class EngineObjectManager
     bool InitBuiltinShaders();
     Shader * GetLoadedShader(LongMask properties);
 
-    Mesh3D * CreateMesh3D(StandardAttributeSet attributes);
+    Mesh3D * CreateMesh3D(unsigned int subMeshCount);
     void DestroyMesh3D(Mesh3D * mesh);
     Mesh3DRenderer * CreateMesh3DRenderer();
     void DestroyMesh3DRenderer(Mesh3DRenderer * renderer);
+
+    SubMesh3D * CreateSubMesh3D(StandardAttributeSet attributes);
+    void DestroySubMesh3D(SubMesh3D * mesh);
+    SubMesh3DRenderer * CreateSubMesh3DRenderer();
+    void DestroySubMesh3DRenderer(SubMesh3DRenderer * renderer);
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(Shader * shader);
     Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes);

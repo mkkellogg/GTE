@@ -7,9 +7,9 @@
 
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
-#include "graphics/object/mesh3D.h"
+#include "graphics/object/submesh3D.h"
 #include "graphics/object/import/assetimporter.h"
-#include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/renderbuffer.h"
 #include "graphics/render/material.h"
 #include "graphics/shader/shader.h"
@@ -109,12 +109,12 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
-		Mesh3D * mesh = objectManager->CreateMesh3D(meshAttributes);
-		Mesh3DRenderer * meshRenderer = objectManager->CreateMesh3DRenderer();
+		SubMesh3D * mesh = objectManager->CreateSubMesh3D(meshAttributes);
+		SubMesh3DRenderer * meshRenderer = objectManager->CreateSubMesh3DRenderer();
 
 		meshRenderer->SetMaterial(material);
-		sceneObject->SetMesh3D(mesh);
-		sceneObject->SetMeshRenderer3D(meshRenderer);
+		sceneObject->SetSubMesh3D(mesh);
+		sceneObject->SetSubMeshRenderer3D(meshRenderer);
 		mesh->Init(36);
 
 		Point3Array * points = mesh->GetPostions();
@@ -236,8 +236,8 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		SceneObject * childSceneObject = objectManager->CreateSceneObject();
 		sceneObject->AddChild(childSceneObject);
-		childSceneObject->SetMesh3D(mesh);
-		childSceneObject->SetMeshRenderer3D(meshRenderer);
+		childSceneObject->SetSubMesh3D(mesh);
+		childSceneObject->SetSubMeshRenderer3D(meshRenderer);
 		childSceneObject->GetLocalTransform()->Translate(-2, 3, 0, true);
 		childSceneObject->GetLocalTransform()->Scale(1.5,1.5,1.5, true);
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);

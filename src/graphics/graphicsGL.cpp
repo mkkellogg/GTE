@@ -19,8 +19,8 @@
 #include "render/rendermanager.h"
 #include "render/vertexattrbuffer.h"
 #include "render/vertexattrbufferGL.h"
-#include "render/mesh3Drenderer.h"
-#include "render/mesh3DrendererGL.h"
+#include "render/submesh3Drenderer.h"
+#include "render/submesh3DrendererGL.h"
 #include "render/renderbuffer.h"
 #include "image/imageloader.h"
 #include "image/rawimage.h"
@@ -160,12 +160,12 @@ void GraphicsGL::ClearBuffers(unsigned int bufferMask) const
 	glClear(glClearMask);
 }
 
-Mesh3DRenderer * GraphicsGL::CreateMeshRenderer()
+SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer()
 {
-	return new Mesh3DRendererGL(this);
+	return new SubMesh3DRendererGL(this);
 }
 
-void GraphicsGL::DestroyMeshRenderer(Mesh3DRenderer * renderer)
+void GraphicsGL::DestroyMeshRenderer(SubMesh3DRenderer * renderer)
 {
 	NULL_CHECK_RTRN(renderer, "GraphicsGL::DestroyMeshRenderer -> renderer is NULL");
 	delete renderer;

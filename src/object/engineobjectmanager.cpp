@@ -10,9 +10,11 @@
 #include "graphics/shader/shader.h"
 #include "graphics/light/light.h"
 #include "graphics/render/material.h"
+#include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
-#include "graphics/stdattributes.h"
+#include "graphics/object/submesh3D.h"
 #include "graphics/object/mesh3D.h"
+#include "graphics/stdattributes.h"
 #include "graphics/texture/texture.h"
 #include "graphics/image/rawimage.h"
 #include "ui/debug.h"
@@ -113,9 +115,9 @@ Shader *  EngineObjectManager::GetLoadedShader(LongMask properties)
 	return loadedShaders.GetShader(properties);
 }
 
-Mesh3D * EngineObjectManager::CreateMesh3D(StandardAttributeSet attributes)
+Mesh3D * EngineObjectManager::CreateMesh3D(unsigned int subMeshCount)
 {
-	Mesh3D * mesh = new Mesh3D(attributes);
+	Mesh3D * mesh =  new Mesh3D(subMeshCount);
 	NULL_CHECK(mesh,"EngineObjectManager::CreateMesh3D -> could create new Mesh3D object.",NULL);
 	mesh->SetObjectID(GetNextObjectID());
 	return mesh;
@@ -123,13 +125,13 @@ Mesh3D * EngineObjectManager::CreateMesh3D(StandardAttributeSet attributes)
 
 void EngineObjectManager::DestroyMesh3D(Mesh3D * mesh)
 {
+	NULL_CHECK_RTRN(mesh,"EngineObjectManager::DestroyMesh3D -> mesh is NULL.");
 	delete mesh;
 }
 
 Mesh3DRenderer * EngineObjectManager::CreateMesh3DRenderer()
 {
-	Graphics * graphics = Graphics::Instance();
-	Mesh3DRenderer * renderer = graphics->CreateMeshRenderer();
+	Mesh3DRenderer * renderer =  new Mesh3DRenderer();
 	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could create new Mesh3DRenderer object.",NULL);
 	renderer->SetObjectID(GetNextObjectID());
 	return renderer;
@@ -137,7 +139,37 @@ Mesh3DRenderer * EngineObjectManager::CreateMesh3DRenderer()
 
 void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRenderer * renderer)
 {
+	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DestroyMesh3DRenderer -> renderer is NULL.");
+	delete renderer;
+}
+
+SubMesh3D * EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
+{
+	SubMesh3D * mesh = new SubMesh3D(attributes);
+	NULL_CHECK(mesh,"EngineObjectManager::CreateSubMesh3D -> could create new Mesh3D object.",NULL);
+	mesh->SetObjectID(GetNextObjectID());
+	return mesh;
+}
+
+void EngineObjectManager::DestroySubMesh3D(SubMesh3D * mesh)
+{
+	NULL_CHECK_RTRN(mesh,"EngineObjectManager::DestroySubMesh3D -> mesh is NULL.");
+	delete mesh;
+}
+
+SubMesh3DRenderer * EngineObjectManager::CreateSubMesh3DRenderer()
+{
 	Graphics * graphics = Graphics::Instance();
+	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer();
+	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could create new Mesh3DRenderer object.",NULL);
+	renderer->SetObjectID(GetNextObjectID());
+	return renderer;
+}
+
+void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRenderer * renderer)
+{
+	Graphics * graphics = Graphics::Instance();
+	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DestroySubMesh3DRenderer -> renderer is NULL.");
 	graphics->DestroyMeshRenderer(renderer);
 }
 
@@ -153,6 +185,7 @@ Shader * EngineObjectManager::CreateShader(const char * vertexSourcePath, const 
 void EngineObjectManager::DestroyShader(Shader * shader)
 {
 	Graphics * graphics = Graphics::Instance();
+	NULL_CHECK_RTRN(shader,"EngineObjectManager::DestroyShader -> shader is NULL.");
 	graphics->DestroyShader(shader);
 }
 
@@ -208,11 +241,11 @@ Material * EngineObjectManager::CreateMaterial(const char *name, const char * sh
 
 void EngineObjectManager::DestroyMaterial(Material * material)
 {
+	NULL_CHECK_RTRN(material,"EngineObjectManager::DestroyMaterial -> material is NULL.");
 	Shader * shader = material->GetShader();
-	if(shader != NULL)
-	{
-		DestroyShader(shader);
-	}
+
+	NULL_CHECK_RTRN(shader,"EngineObjectManager::DestroyMaterial -> shader is NULL.");
+	DestroyShader(shader);
 
 	delete material;
 }
@@ -228,6 +261,7 @@ Camera * EngineObjectManager::CreateCamera()
 
 void EngineObjectManager::DestroyCamera(Camera * camera)
 {
+	NULL_CHECK_RTRN(camera, "EngineObjectManager::DestroyCamera -> camera is NULL.");
 	delete camera;
 }
 
@@ -241,6 +275,7 @@ Light * EngineObjectManager::CreateLight()
 
 void EngineObjectManager::DestroyLight(Light * light)
 {
+	NULL_CHECK_RTRN(light, "EngineObjectManager::DestroyLight -> light is NULL.");
 	delete light;
 }
 

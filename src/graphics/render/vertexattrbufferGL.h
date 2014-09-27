@@ -8,7 +8,7 @@
 
 class VertexAttrBufferGL : public VertexAttrBuffer
 {
-    friend class Mesh3DRendererGL;
+    friend class SubMesh3DRendererGL;
     friend class GraphicsGL;
 
     float * data;

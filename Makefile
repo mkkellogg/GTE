@@ -30,10 +30,10 @@ BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/baseve
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
-GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/assetimporter.o obj/importutil.o
+GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/assetimporter.o obj/importutil.o
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/submesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
@@ -43,7 +43,7 @@ ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engine
 UTILOBJ= obj/datastack.o obj/util.o obj/time.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 
-OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/mesh3DrendererGL.o obj/textureGL.o
+OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
 
 OBJECTFILES= $(BASEOBJ) $(UTILOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(FILESYSTEMOBJ)
 
@@ -218,8 +218,11 @@ obj/rendermanager.o: $(RENDERSRC)/rendermanager.cpp $(RENDERSRC)/rendermanager.h
 obj/mesh3Drenderer.o: $(RENDERSRC)/mesh3Drenderer.cpp $(RENDERSRC)/mesh3Drenderer.h
 	$(CC) $(CFLAGS) -o obj/mesh3Drenderer.o -c $(RENDERSRC)/mesh3Drenderer.cpp
 	
-obj/mesh3DrendererGL.o: $(RENDERSRC)/mesh3DrendererGL.cpp $(RENDERSRC)/mesh3DrendererGL.h
-	$(CC) $(CFLAGS) -o obj/mesh3DrendererGL.o -c $(RENDERSRC)/mesh3DrendererGL.cpp
+obj/submesh3Drenderer.o: $(RENDERSRC)/submesh3Drenderer.cpp $(RENDERSRC)/submesh3Drenderer.h
+	$(CC) $(CFLAGS) -o obj/submesh3Drenderer.o -c $(RENDERSRC)/submesh3Drenderer.cpp
+	
+obj/submesh3DrendererGL.o: $(RENDERSRC)/submesh3DrendererGL.cpp $(RENDERSRC)/submesh3DrendererGL.h
+	$(CC) $(CFLAGS) -o obj/submesh3DrendererGL.o -c $(RENDERSRC)/submesh3DrendererGL.cpp
 	
 obj/material.o: $(RENDERSRC)/material.cpp $(RENDERSRC)/material.h
 	$(CC) $(CFLAGS) -o obj/material.o -c $(RENDERSRC)/material.cpp
@@ -242,6 +245,9 @@ graphicsobject: $(GRAPHICSOBJECTOBJ)
 	
 obj/mesh3D.o: $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/mesh3D.h 
 	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(GRAPHICSOBJECTSRC)/mesh3D.cpp
+	
+obj/submesh3D.o: $(GRAPHICSOBJECTSRC)/submesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3D.h 
+	$(CC) $(CFLAGS) -o obj/submesh3D.o -c $(GRAPHICSOBJECTSRC)/submesh3D.cpp
 	
 obj/assetimporter.o: $(GRAPHICSOBJECTSRC)/import/assetimporter.cpp $(GRAPHICSOBJECTSRC)/import/assetimporter.h 
 	$(CC) $(CFLAGS) -o obj/assetimporter.o -c $(GRAPHICSOBJECTSRC)/import/assetimporter.cpp

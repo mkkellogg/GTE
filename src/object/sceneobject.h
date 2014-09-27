@@ -3,6 +3,8 @@
 
 //forward declarations
 class EngineObjectManager;
+class SubMesh3DRenderer;
+class SubMesh3D;
 class Mesh3DRenderer;
 class Mesh3D;
 class Transform;
@@ -26,10 +28,13 @@ class SceneObject : public EngineObject
 
 	SceneObjectTransform * transform;
 
-	Mesh3DRenderer * renderer3D;
-	Mesh3D * mesh3D;
+	SubMesh3DRenderer * subrenderer3D;
+	SubMesh3D * submesh3D;
 	Camera * camera;
 	Light * light;
+
+	Mesh3DRenderer * renderer3D;
+	Mesh3D * mesh3D;
 
 	SceneObject();
     virtual ~SceneObject();
@@ -42,13 +47,19 @@ class SceneObject : public EngineObject
     Transform * GetLocalTransform() const ;
     void GetFullTransform(Transform * transform);
 
+    bool SetSubMeshRenderer3D(SubMesh3DRenderer *renderer);
+    bool SetSubMesh3D(SubMesh3D *mesh);
     bool SetMeshRenderer3D(Mesh3DRenderer *renderer);
     bool SetMesh3D(Mesh3D *mesh);
+
     bool SetCamera(Camera * camera);
     bool SetLight(Light * light);
 
+    SubMesh3D * GetSubMesh3D();
+    SubMesh3DRenderer * GetSubRenderer3D();
     Mesh3D * GetMesh3D();
     Mesh3DRenderer * GetRenderer3D();
+
     Camera * GetCamera();
     Light * GetLight();
 

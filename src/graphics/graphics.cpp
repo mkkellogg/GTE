@@ -10,7 +10,7 @@
 #include "shader/shader.h"
 #include "render/material.h"
 #include "geometry/transform.h"
-#include "render/mesh3Drenderer.h"
+#include "render/submesh3Drenderer.h"
 #include "render/rendermanager.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
@@ -78,6 +78,7 @@ bool Graphics::Run()
 void Graphics::ActivateMaterial(Material * material)
 {
 	activeMaterial = material;
+	material->ResetVerificationState();
 }
 
 Material * Graphics::GetActiveMaterial() const

@@ -1,5 +1,5 @@
-#ifndef _MESH3D_RENDERER_GL_H_
-#define _MESH3D_RENDERER_GL_H_
+#ifndef _SUBMESH3D_RENDERER_GL_H_
+#define _SUBMESH3D_RENDERER_GL_H_
 
 // forward declarations
 class GraphicsGL;
@@ -10,13 +10,13 @@ class Point3Array;
 class Vector3Array;
 class Color4Array;
 class UV2Array;
-class Mesh3D;
+class SubMesh3D;
 class Material;
 
-#include "mesh3Drenderer.h"
+#include "submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
 
-class Mesh3DRendererGL : public Mesh3DRenderer
+class SubMesh3DRendererGL : public SubMesh3DRenderer
 {
 	friend class GraphicsGL;
 
@@ -43,15 +43,15 @@ class Mesh3DRendererGL : public Mesh3DRenderer
 
     protected:
 
-    Mesh3DRendererGL(Graphics * graphics);
-    Mesh3DRendererGL(bool buffersOnGPU, Graphics * graphics);
-    virtual ~Mesh3DRendererGL();
+    SubMesh3DRendererGL(Graphics * graphics);
+    SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics);
+    virtual ~SubMesh3DRendererGL();
 
     bool UseMaterial(Material * material);
 
     public:
 
-    bool UpdateMesh();
+    bool UpdateMeshData();
     void CopyMeshData();
     void UpdateFromMesh();
     void Render();

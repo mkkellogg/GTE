@@ -14,10 +14,10 @@
 #include "ui/debug.h"
 #include "base/intmask.h"
 #include "graphics/graphics.h"
-#include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/submesh3Drenderer.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
-#include "graphics/object/mesh3D.h"
+#include "graphics/object/submesh3D.h"
 #include <vector>
 #include "util/datastack.h"
 #include "global/global.h"
@@ -292,7 +292,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 			modelTransform->TransformBy(child->GetLocalTransform());
 
 			// check if current scene object has a mesh renderer
-			Mesh3DRenderer * renderer = child->GetRenderer3D();
+			SubMesh3DRenderer * renderer = child->GetSubRenderer3D();
 
 			if(renderer != NULL)
 			{
@@ -307,7 +307,6 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 					// activate the material, which will switch the GPU's active shader to
 					// the one associated with the material
 					ActivateMaterial(currentMaterial);
-					currentMaterial->ResetVerificationState();
 					// pass concatenated modelViewTransform and projection transforms to shader
 					SendTransformUniformsToShader(modelTransform, &modelView, camera->GetProjectionTransform());
 					SendCustomUniformsToShader();
@@ -321,7 +320,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 							if(light != NULL)
 							{
 								// we know current scene object has a mesh renderer, but also verify is has a mesh
-								Mesh3D * childMesh = child->GetMesh3D();
+								SubMesh3D * childMesh = child->GetSubMesh3D();
 								if(childMesh != NULL)
 								{
 									// if this mesh has already been rendered by this camera, then we want to use
@@ -393,7 +392,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
  */
 bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
 {
-	Mesh3D * mesh = mesh3DSceneObject.GetMesh3D();
+	SubMesh3D * mesh = mesh3DSceneObject.GetSubMesh3D();
 	NULL_CHECK(mesh, "RenderManager::ShouldCullFromLight -> NULL mesh.", false);
 
 	switch(mesh->GetLightCullType())
@@ -424,7 +423,7 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Sce
 bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, SceneObject& mesh3DSceneObject)
 {
 	// for now we assume scene object's only have one mesh
-	Mesh3D * mesh = mesh3DSceneObject.GetMesh3D();
+	SubMesh3D * mesh = mesh3DSceneObject.GetSubMesh3D();
 
 	// get the maximum distances from mesh center along each axis
 	Vector3 soiX = *(mesh->GetSphereOfInfluenceX());

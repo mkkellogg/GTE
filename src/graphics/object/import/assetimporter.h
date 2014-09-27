@@ -5,7 +5,7 @@
 class Matrix4x4;
 class EngineObjectManager;
 class SceneObject;
-class Mesh3D;
+class SubMesh3D;
 class Material;
 class UV2Array;
 
@@ -71,10 +71,10 @@ class AssetImporter
 	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
-	Mesh3D * ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
+	SubMesh3D * ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);
-	static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(Mesh3D& mesh, ShaderMaterialCharacteristic property);
+	static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property);
 	static std::string GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property);
 
 	public:

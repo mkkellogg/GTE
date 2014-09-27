@@ -6,7 +6,7 @@ class ViewSystem;
 class Shader;
 class Material;
 class Texture;
-class Mesh3DRenderer;
+class SubMesh3DRenderer;
 class RenderManager;
 class Camera;
 class Graphics;
@@ -62,8 +62,8 @@ class Graphics
 
     virtual Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) = 0;
     virtual void DestroyShader(Shader * shader) = 0;
-    virtual Mesh3DRenderer * CreateMeshRenderer()  = 0;
-    virtual void DestroyMeshRenderer(Mesh3DRenderer * buffer) = 0;
+    virtual SubMesh3DRenderer * CreateMeshRenderer()  = 0;
+    virtual void DestroyMeshRenderer(SubMesh3DRenderer * buffer) = 0;
     virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
     virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
     virtual Texture * CreateTexture(const std::string& sourcePath, TextureAttributes attributes) = 0;

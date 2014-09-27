@@ -25,8 +25,8 @@
 #include "object/shadermanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
-#include "graphics/render/mesh3Drenderer.h"
-#include "graphics/object/mesh3D.h"
+#include "graphics/render/submesh3Drenderer.h"
+#include "graphics/object/submesh3D.h"
 #include "geometry/sceneobjecttransform.h"
 #include "graphics/uv/uv2array.h"
 #include "graphics/render/material.h"
@@ -149,7 +149,7 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL material encountered.");
 
 		// convert Assimp mesh to a Mesh3D object
-		Mesh3D * mesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
+		SubMesh3D * mesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
 		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 		// create new scene object to hold the Mesh3D object and its renderer
@@ -157,17 +157,17 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 		NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
 		// create renderer for the Mesh3D object
-		Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
+		SubMesh3DRenderer * meshRenderer = engineObjectManager->CreateSubMesh3DRenderer();
 		NULL_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create mesh renderer.");
 
 		// set the material for the mesh renderer
 		meshRenderer->SetMaterial(material);
 
 		// add the mesh to the newly created scene object
-		sceneObject->SetMesh3D(mesh3D);
+		sceneObject->SetSubMesh3D(mesh3D);
 
 		// add the mesh renderer to the newly created scene object
-		sceneObject->SetMeshRenderer3D(meshRenderer);
+		sceneObject->SetSubMeshRenderer3D(meshRenderer);
 
 		// update the scene object's local transform
 		sceneObject->GetLocalTransform()->SetTo(&mat);
@@ -186,7 +186,7 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 	}
 }
 
-Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor)
+SubMesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor)
 {
 	unsigned int vertexCount = 0;
 
@@ -231,7 +231,7 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int mesh
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 
 	// create Mesh3D object with the constructed StandardAttributeSet
-	Mesh3D * mesh3D = engineObjectManager->CreateMesh3D(meshAttributes);
+	SubMesh3D * mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
 	NULL_CHECK(mesh3D,"AssetImporter::ConvertAssimpMesh -> Could not create Mesh3D object.",NULL);
 
 	bool initSuccess = mesh3D->Init(vertexCount);
@@ -239,7 +239,7 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int mesh
 	// make sure allocation of required number of vertex attributes is successful
 	if(!initSuccess)
 	{
-		engineObjectManager->DestroyMesh3D(mesh3D);
+		engineObjectManager->DestroySubMesh3D(mesh3D);
 		Debug::PrintError("AssetImporter::ConvertAssimpMesh -> Could not init mesh.");
 		return NULL;
 	}
@@ -265,7 +265,7 @@ Mesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int mesh
 			// copy mesh normals
 			if(mesh.mNormals != NULL)
 			{
-				aiVector3D srcNormal = mesh.mNormals[vIndex];
+				aiVector3D& srcNormal = mesh.mNormals[vIndex];
 				mesh3D->GetNormals()->GetVector(vertexIndex)->Set(srcNormal.x,srcNormal.y,srcNormal.z);
 			}
 
@@ -468,7 +468,7 @@ void AssetImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	}
 }
 
-UV2Array* AssetImporter::GetMeshUVArrayForShaderMaterialCharacteristic(Mesh3D& mesh, ShaderMaterialCharacteristic property)
+UV2Array* AssetImporter::GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property)
 {
 	switch(property)
 	{

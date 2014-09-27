@@ -1,37 +1,37 @@
 #ifndef _MESH3D_RENDERER_H_
 #define _MESH3D_RENDERER_H_
 
-// forward declarations
-class Mesh3D;
+//forward declarations
+class EngineObjectManager;
+class SubMesh3DRenderer;
 class Material;
-class Graphics;
 
-#include "object/sceneobjectcomponent.h"
+#include "object/engineobject.h"
+#include <vector>
 
 class Mesh3DRenderer : public SceneObjectComponent
 {
-	friend class SceneObject;
-	friend class Mesh3D;
+	friend EngineObjectManager;
 
-	protected:
+	protected :
 
-	Material * material;
-	Material * activeMaterial;
-	Graphics * graphics;
+	std::vector <Material *> materials;
+	std::vector <SubMesh3DRenderer *> renderers;
 
-	virtual bool UpdateMesh();
-	virtual bool UseMaterial(Material * material);
+	Mesh3DRenderer();
+    ~Mesh3DRenderer();
+    void DestroyRenderers();
+    void DestroyRenderer(unsigned int index);
 
-    public:
+	public:
 
-    Mesh3DRenderer(Graphics * graphics);
-    virtual ~Mesh3DRenderer();
+    unsigned int GetMaterialCount();
+    Material * GetMaterial(unsigned int index);
+    void SetMaterial(unsigned int index, Material * material);
+    void AddMaterial(Material * material);
 
-    virtual void Render() = 0;
-    virtual void UpdateFromMesh() = 0;
-    Material * GetMaterial();
-    void SetMaterial(Material * material);
+    void UpdateFromMeshes();
+    void UpdateFromMesh(unsigned int index);
 };
 
 #endif
-
