@@ -16,6 +16,7 @@ class ScreenDescriptor;
 class VertexAttrBuffer;
 class TextureAttributes;
 class RawImage;
+class AttributeTransformer;
 
 #include <string>
 
@@ -62,7 +63,7 @@ class Graphics
 
     virtual Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) = 0;
     virtual void DestroyShader(Shader * shader) = 0;
-    virtual SubMesh3DRenderer * CreateMeshRenderer()  = 0;
+    virtual SubMesh3DRenderer * CreateMeshRenderer(AttributeTransformer * attrTransformer)  = 0;
     virtual void DestroyMeshRenderer(SubMesh3DRenderer * buffer) = 0;
     virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
     virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;

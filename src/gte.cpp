@@ -104,6 +104,10 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 		material->SetTexture(texture, "TEXTURE0");
 
+		Mesh3DRenderer * renderer = objectManager->CreateMesh3DRenderer();
+		renderer->AddMaterial(material);
+		sceneObject->SetMeshRenderer3D(renderer);
+
 		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
@@ -112,6 +116,10 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		SubMesh3D * subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 		subMesh->Init(36);
+
+		Mesh3D * mesh = objectManager->CreateMesh3D(1);
+		mesh->Init();
+		mesh->SetSubMesh(subMesh, 0);
 
 		Point3Array * points = subMesh->GetPostions();
 		Color4Array * colors = subMesh->GetColors();
@@ -228,17 +236,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		uvs-> GetCoordinate(29)->Set(0,1);
 
 		subMesh->SetNormalsSmoothingThreshold(85);
-
-		Mesh3D * mesh = objectManager->CreateMesh3D(1);
-		mesh->Init();
-		mesh->SetSubMesh(subMesh, 0);
-
-
-		Mesh3DRenderer * renderer = objectManager->CreateMesh3DRenderer();
-		renderer->AddMaterial(material);
-
+		subMesh->Update();
 		sceneObject->SetMesh3D(mesh);
-		sceneObject->SetMeshRenderer3D(renderer);
+
 
 
 
@@ -250,11 +250,11 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		childSceneObject->GetLocalTransform()->Translate(-2, 3, 0, true);
 		childSceneObject->GetLocalTransform()->Scale(1.5,1.5,1.5, true);
-
-
 		//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
 
-		/*AssetImporter * importer = new AssetImporter();
+
+
+		AssetImporter * importer = new AssetImporter();
 		SceneObject * modelSceneObject = NULL;
 
 		modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
@@ -301,7 +301,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,1,0,0,-90);
 		modelSceneObject->GetLocalTransform()->RotateAround(0,0,0,0,1,0,-90);
 		modelSceneObject->GetLocalTransform()->Translate(0,-8,-3,false);
-		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);*/
+		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);
 
 
 		SceneObject * lightObject = NULL;
@@ -356,7 +356,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 int main(int argc, char** argv)
 {
 	CustomGraphicsCallbacks graphicsCallbacks;
-	bool initSuccess = Graphics::Instance()->Init(640, 480,(CustomGraphicsCallbacks*) (&graphicsCallbacks), "GTE Test");
+	bool initSuccess = Graphics::Instance()->Init(1280, 800,(CustomGraphicsCallbacks*) (&graphicsCallbacks), "GTE Test");
 	if(initSuccess)
 	{
 		Graphics::Instance()->Run();

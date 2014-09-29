@@ -6,6 +6,7 @@ class EngineObjectManager;
 class SubMesh3DRenderer;
 class SubMesh3D;
 class Material;
+class Mesh3D;
 
 #include "object/engineobject.h"
 #include <vector>
@@ -13,6 +14,7 @@ class Material;
 class Mesh3DRenderer : public SceneObjectComponent
 {
 	friend EngineObjectManager;
+	friend SubMesh3DRenderer;
 
 	protected :
 
@@ -34,7 +36,9 @@ class Mesh3DRenderer : public SceneObjectComponent
     void UpdateFromMeshes();
     void UpdateFromMesh(unsigned int index);
 
+    Mesh3D * GetMesh();
     SubMesh3D * GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer);
+    SubMesh3D * GetSubMesh(unsigned int index);
     SubMesh3DRenderer * GetSubRenderer(unsigned int index);
     unsigned int GetSubRendererCount();
 };

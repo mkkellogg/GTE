@@ -20,10 +20,12 @@ TEXTURESRC= $(GRAPHICSSRC)/texture
 VIEWSYSSRC= $(GRAPHICSSRC)/view
 RENDERSRC= $(GRAPHICSSRC)/render
 GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
+ANIMATIONSRC= $(GRAPHICSSRC)/animation
 IMAGESRC= $(GRAPHICSSRC)/image
 ENGINEOBJECTSRC= src/object
 UTILSRC= src/util
 FILESYSTEMSRC= src/filesys
+
 
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o obj/longmask.o
@@ -33,8 +35,9 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/assetimporter.o obj/importutil.o
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/submesh3Drenderer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmeshattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
+ANIMATIONOBJ= obj/animationtarget.o obj/bone.o
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
@@ -45,9 +48,9 @@ FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(BASEOBJ) $(UTILOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(FILESYSTEMOBJ)
+OBJECTFILES= $(BASEOBJ) $(UTILOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(FILESYSTEMOBJ)
 
-all: gtemain graphics ui geometry gtemath base global engineobjects util image filesystem
+all: gtemain graphics animation ui geometry gtemath base global engineobjects util image filesystem
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -183,6 +186,19 @@ obj/stdattributes.o: $(GRAPHICSSRC)/stdattributes.cpp $(GRAPHICSSRC)/stdattribut
 obj/stduniforms.o: $(GRAPHICSSRC)/stduniforms.cpp $(GRAPHICSSRC)/stduniforms.h
 	$(CC) $(CFLAGS) -o obj/stduniforms.o -c $(GRAPHICSSRC)/stduniforms.cpp
 	
+
+# ==================================
+# Animation
+# ==================================	
+
+animation: $(ANIMATIONOBJ)
+
+obj/animationtarget.o: $(ANIMATIONSRC)/animationtarget.cpp $(ANIMATIONSRC)/animationtarget.h
+	$(CC) $(CFLAGS) -o obj/animationtarget.o -c $(ANIMATIONSRC)/animationtarget.cpp 
+	
+obj/bone.o: $(ANIMATIONSRC)/bone.cpp $(ANIMATIONSRC)/bone.h
+	$(CC) $(CFLAGS) -o obj/bone.o -c $(ANIMATIONSRC)/bone.cpp 
+	
 	
 # ==================================
 # Shader
@@ -236,7 +252,12 @@ obj/renderbuffer.o: $(RENDERSRC)/renderbuffer.cpp  $(RENDERSRC)/renderbuffer.h
 obj/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexattrbuffer.h
 	$(CC) $(CFLAGS) -o obj/vertexattrbuffer.o -c $(RENDERSRC)/vertexattrbuffer.cpp
 	
-
+obj/attributetransformer.o: $(RENDERSRC)/attributetransformer.cpp $(RENDERSRC)/attributetransformer.h
+	$(CC) $(CFLAGS) -o obj/attributetransformer.o -c $(RENDERSRC)/attributetransformer.cpp
+	
+obj/skinnedmeshattrtransformer.o: $(RENDERSRC)/skinnedmeshattrtransformer.cpp $(RENDERSRC)/skinnedmeshattrtransformer.h
+	$(CC) $(CFLAGS) -o obj/skinnedmeshattrtransformer.o -c $(RENDERSRC)/skinnedmeshattrtransformer.cpp
+	
 # ==================================
 # GraphicsObject
 # ==================================

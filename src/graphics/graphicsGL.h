@@ -12,6 +12,7 @@ class Material;
 class Camera;
 class VertexAttrBuffer;
 class TextureAttributes;
+class AttributeTransformer;
 
 #include "graphics.h"
 #include <string>
@@ -34,7 +35,7 @@ class GraphicsGL : public Graphics
 
     Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
     void DestroyShader(Shader * shader);
-    SubMesh3DRenderer * CreateMeshRenderer();
+    SubMesh3DRenderer * CreateMeshRenderer(AttributeTransformer * attrTransformer);
     void DestroyMeshRenderer(SubMesh3DRenderer * buffer);
     VertexAttrBuffer * CreateVertexAttributeBuffer();
     void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);

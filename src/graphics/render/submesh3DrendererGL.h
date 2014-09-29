@@ -6,8 +6,6 @@ class GraphicsGL;
 class Graphics;
 class VertexAttrBufferGL;
 class VertexAttrBuffer;
-class Point3Array;
-class Vector3Array;
 class Color4Array;
 class UV2Array;
 class SubMesh3D;
@@ -15,6 +13,9 @@ class Material;
 
 #include "submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
+#include "attributetransformer.h"
+#include "geometry/vector/vector3array.h"
+#include "geometry/point/point3array.h"
 
 class SubMesh3DRendererGL : public SubMesh3DRenderer
 {
@@ -27,6 +28,10 @@ class SubMesh3DRendererGL : public SubMesh3DRenderer
 	unsigned int storedVertexCount;
 	StandardAttributeSet storedAttributes;
     bool buffersOnGPU;
+    AttributeTransformer * attributeTransformer;
+    bool doAttributeTransform;
+    Point3Array positionsCopy, transformedPositions;
+    Vector3Array normalsCopy, transformedNormals;
 
     bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount,  int stride);
     void DestroyBuffers();
@@ -37,14 +42,14 @@ class SubMesh3DRendererGL : public SubMesh3DRenderer
 
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);
-    void SetColorData(Color4Array * colors);
+    void SetVertexColorData(Color4Array * colors);
     void SetUV1Data(UV2Array * uvs);
     void SetUV2Data(UV2Array * uvs);
 
     protected:
 
-    SubMesh3DRendererGL(Graphics * graphics);
-    SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics);
+    SubMesh3DRendererGL(Graphics * graphics, AttributeTransformer * attributeTransformer);
+    SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer);
     virtual ~SubMesh3DRendererGL();
 
     bool UseMaterial(Material * material);

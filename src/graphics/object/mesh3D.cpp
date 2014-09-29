@@ -52,7 +52,7 @@ bool Mesh3D::Init()
 	return true;
 }
 
-void Mesh3D::Update(SubMesh3D * subMesh)
+void Mesh3D::SendDataToRenderer(SubMesh3D * subMesh)
 {
 	NULL_CHECK_RTRN(subMesh," Mesh3D::Update -> subMesh is NULL.");
 

@@ -9,7 +9,7 @@ class BaseVector4Array
 {
 	protected:
 
-	int count;
+	unsigned int count;
 	float * data;
 	BaseVector4 ** objects;
 	BaseVector4Factory * baseFactory;
@@ -22,7 +22,9 @@ class BaseVector4Array
     virtual ~BaseVector4Array();
 
     const float * GetDataPtr() const;
-    bool Init(int count);
+    bool Init(unsigned int count);
+    unsigned int GetCount();
+    bool CopyTo(BaseVector4Array * dest) const;
 };
 
 #endif

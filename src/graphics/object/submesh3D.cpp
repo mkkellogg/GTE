@@ -281,7 +281,7 @@ void SubMesh3D::Update()
 
 	if(containerMesh != NULL)
 	{
-		containerMesh->Update(this);
+		containerMesh->SendDataToRenderer(this);
 	}
 }
 

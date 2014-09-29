@@ -16,6 +16,7 @@ class TextureAttributes;
 class Texture;
 class Light;
 class RawImage;
+class AttributeTransformer;
 
 #include <vector>
 #include "graphics/stdattributes.h"
@@ -54,6 +55,7 @@ class EngineObjectManager
 
     SubMesh3D * CreateSubMesh3D(StandardAttributeSet attributes);
     void DestroySubMesh3D(SubMesh3D * mesh);
+    SubMesh3DRenderer * CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer);
     SubMesh3DRenderer * CreateSubMesh3DRenderer();
     void DestroySubMesh3DRenderer(SubMesh3DRenderer * renderer);
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);

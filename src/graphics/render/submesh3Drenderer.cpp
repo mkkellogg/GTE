@@ -19,7 +19,6 @@
 
 SubMesh3DRenderer::SubMesh3DRenderer(Graphics * graphics) : EngineObject()
 {
-	this->material = NULL;
 	this->activeMaterial = NULL;
 	this->graphics = graphics;
 	this->containerRenderer = NULL;
@@ -47,16 +46,5 @@ bool SubMesh3DRenderer::UseMaterial(Material * material)
 	this->activeMaterial = material;
 
 	return true;
-}
-
-Material * SubMesh3DRenderer::GetMaterial()
-{
-	return material;
-}
-
-void SubMesh3DRenderer::SetMaterial(Material * material)
-{
-	NULL_CHECK_RTRN(material, "SubMesh3DRenderer::SetMaterial -> material is NULL");
-	this->material = material;
 }
 

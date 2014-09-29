@@ -22,8 +22,6 @@
 SceneObject::SceneObject() : EngineObject()
 {
 	isActive = true;
-	subrenderer3D = NULL;
-	submesh3D = NULL;
 	renderer3D = NULL;
 	mesh3D = NULL;
 	camera = NULL;
@@ -62,12 +60,15 @@ void SceneObject::GetFullTransform(Transform * transform)
 
 bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer * renderer)
 {
-	if(renderer3D == renderer)return true;
+	if(this->renderer3D == renderer)return true;
 	if(renderer != NULL)
 	{
 		renderer->sceneObject = this;
-		renderer3D = renderer;
-		renderer3D->UpdateFromMeshes();
+		this->renderer3D = renderer;
+		if(this->mesh3D != NULL)
+		{
+			this->renderer3D->UpdateFromMeshes();
+		}
 	}
 	else
 	{
@@ -79,13 +80,14 @@ bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer * renderer)
 
 bool SceneObject::SetMesh3D(Mesh3D *mesh)
 {
+	if(this->mesh3D == mesh)return true;
 	if(mesh != NULL)
 	{
 		mesh->sceneObject = this;
 		this->mesh3D = mesh;
-		if(renderer3D !=NULL)
+		if(this->renderer3D !=NULL)
 		{
-			renderer3D->UpdateFromMeshes();
+			this->renderer3D->UpdateFromMeshes();
 		}
 	}
 	else
@@ -93,38 +95,6 @@ bool SceneObject::SetMesh3D(Mesh3D *mesh)
 		Debug::PrintError("SceneObject::SetMesh3D -> attempted to add NULL mesh.");
 	}
 
-	return true;
-}
-
-bool SceneObject::SetSubMeshRenderer3D(SubMesh3DRenderer *renderer)
-{
-	if(subrenderer3D == renderer)return true;
-	if(renderer != NULL)
-	{
-		subrenderer3D = renderer;
-		subrenderer3D->UpdateMeshData();
-	}
-	else
-	{
-		Debug::PrintError("SceneObject::SetSubMeshRenderer3D -> attempted to add NULL renderer.");
-	}
-	return true;
-}
-
-bool SceneObject::SetSubMesh3D(SubMesh3D *mesh)
-{
-	if(mesh != NULL)
-	{
-		this->submesh3D = mesh;
-		if(subrenderer3D !=NULL)
-		{
-			subrenderer3D->UpdateMeshData();
-		}
-	}
-	else
-	{
-		Debug::PrintError("SceneObject::SetSubMesh3D -> attempted to add NULL mesh.");
-	}
 	return true;
 }
 
@@ -140,16 +110,6 @@ bool SceneObject::SetLight(Light * light)
 	this->light = light;
 	light->sceneObject = this;
 	return true;
-}
-
-SubMesh3D * SceneObject::GetSubMesh3D()
-{
-	return submesh3D;
-}
-
-SubMesh3DRenderer * SceneObject::GetSubRenderer3D()
-{
-	return subrenderer3D;
 }
 
 Mesh3D * SceneObject::GetMesh3D()

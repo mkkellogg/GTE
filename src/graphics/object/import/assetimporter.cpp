@@ -43,6 +43,7 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
 #include "base/longmask.h"
+#include "graphics/render/skinnedmeshattrtransformer.h"
 #include "global/global.h"
 #include "ui/debug.h"
 
@@ -133,62 +134,64 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 
-	Mesh3D * mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
-	NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
-
-	bool meshInitSuccess = mesh3D->Init();
-	if(!meshInitSuccess)
-	{
-		Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
-		engineObjectManager->DestroyMesh3D(mesh3D);
-		return;
-	}
-
-	Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
-	if(meshRenderer == NULL)
-	{
-		Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
-		return;
-	}
-
 	// create new scene object to hold the Mesh3D object and its renderer
 	SceneObject * sceneObject = engineObjectManager->CreateSceneObject();
 	NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
-	// update the scene object's local transform
-	sceneObject->GetLocalTransform()->SetTo(&mat);
-
-	for (unsigned int n=0; n <  node.mNumMeshes; n++)
+	if(node.mNumMeshes > 0)
 	{
-		unsigned int sceneMeshIndex = node.mMeshes[n];
-		const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
-		if(mesh == NULL)
+		Mesh3D * mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
+		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
+
+		bool meshInitSuccess = mesh3D->Init();
+		if(!meshInitSuccess)
 		{
-			std::string msg("AssetImporter::RecursiveProcessModelScene -> Mesh is NULL at index: ");
-			msg += std::to_string(sceneMeshIndex);
-			Debug::PrintError(msg);
+			Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
 			return;
 		}
 
-		int materialIndex = mesh->mMaterialIndex;
-		MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
-		Material * material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
-		NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL material encountered.");
+		Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
+		if(meshRenderer == NULL)
+		{
+			Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
+			return;
+		}
 
-		// add the material to the mesh renderer
-		meshRenderer->AddMaterial(material);
+		// update the scene object's local transform
+		sceneObject->GetLocalTransform()->SetTo(&mat);
 
-		// convert Assimp mesh to a Mesh3D object
-		SubMesh3D * subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
-		NULL_CHECK_RTRN(subMesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
+		for (unsigned int n=0; n < node.mNumMeshes; n++)
+		{
+			unsigned int sceneMeshIndex = node.mMeshes[n];
+			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
+			if(mesh == NULL)
+			{
+				std::string msg("AssetImporter::RecursiveProcessModelScene -> Mesh is NULL at index: ");
+				msg += std::to_string(sceneMeshIndex);
+				Debug::PrintError(msg);
+				return;
+			}
 
-		// add the mesh to the newly created scene object
-		mesh3D->SetSubMesh(subMesh3D, n);
+			int materialIndex = mesh->mMaterialIndex;
+			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
+			Material * material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
+			NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
+
+			// add the material to the mesh renderer
+			meshRenderer->AddMaterial(material);
+
+			// convert Assimp mesh to a Mesh3D object
+			SubMesh3D * subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
+			NULL_CHECK_RTRN(subMesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
+
+			// add the mesh to the newly created scene object
+			mesh3D->SetSubMesh(subMesh3D, n);
+		}
+
+		sceneObject->SetMeshRenderer3D(meshRenderer);
+		sceneObject->SetMesh3D(mesh3D);
+		current.AddChild(sceneObject);
 	}
-
-	sceneObject->SetMesh3D(mesh3D);
-	sceneObject->SetMeshRenderer3D(meshRenderer);
-	current.AddChild(sceneObject);
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{

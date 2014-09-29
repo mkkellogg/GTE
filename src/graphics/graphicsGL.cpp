@@ -22,6 +22,7 @@
 #include "render/submesh3Drenderer.h"
 #include "render/submesh3DrendererGL.h"
 #include "render/renderbuffer.h"
+#include "render/attributetransformer.h"
 #include "image/imageloader.h"
 #include "image/rawimage.h"
 #include "view/camera.h"
@@ -160,9 +161,9 @@ void GraphicsGL::ClearBuffers(unsigned int bufferMask) const
 	glClear(glClearMask);
 }
 
-SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer()
+SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer(AttributeTransformer * attrTransformer)
 {
-	return new SubMesh3DRendererGL(this);
+	return new SubMesh3DRendererGL(this, attrTransformer);
 }
 
 void GraphicsGL::DestroyMeshRenderer(SubMesh3DRenderer * renderer)

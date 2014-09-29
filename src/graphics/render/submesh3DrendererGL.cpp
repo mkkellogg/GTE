@@ -23,16 +23,17 @@
 #include "graphics/uv/uv2.h"
 #include "graphics/uv/uv2array.h"
 #include "object/sceneobject.h"
+#include "attributetransformer.h"
 #include "global/global.h"
 #include "ui/debug.h"
 
 
-SubMesh3DRendererGL::SubMesh3DRendererGL(Graphics * graphics) : SubMesh3DRendererGL(false, graphics)
+SubMesh3DRendererGL::SubMesh3DRendererGL(Graphics * graphics, AttributeTransformer * attributeTransformer) : SubMesh3DRendererGL(false, graphics, attributeTransformer)
 {
 
 }
 
-SubMesh3DRendererGL::SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics) : SubMesh3DRenderer(graphics), buffersOnGPU(false)
+SubMesh3DRendererGL::SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer) : SubMesh3DRenderer(graphics)
 {
 	memset(attributeBuffers,0,sizeof(VertexAttrBuffer*) * MAX_ATTRIBUTE_BUFFERS);
 
@@ -41,11 +42,16 @@ SubMesh3DRendererGL::SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics)
 
 	storedVertexCount = 0;
 	storedAttributes = StandardAttributes::CreateAttributeSet();
+
+	this->buffersOnGPU = buffersOnGPU;
+	this->attributeTransformer = attributeTransformer;
+	doAttributeTransform = attributeTransformer == NULL ? false : true;
 }
 
 SubMesh3DRendererGL::~SubMesh3DRendererGL()
 {
 	DestroyBuffers();
+	SAFE_DELETE(attributeTransformer);
 }
 
 void SubMesh3DRendererGL::DestroyBuffers()
@@ -114,7 +120,7 @@ void SubMesh3DRendererGL::SetNormalData(Vector3Array * normals)
 	attributeBuffers[(int)StandardAttribute::Normal]->SetData(normals->GetDataPtr());
 }
 
-void SubMesh3DRendererGL::SetColorData(Color4Array * colors)
+void SubMesh3DRendererGL::SetVertexColorData(Color4Array * colors)
 {
 	attributeBuffers[(int)StandardAttribute::VertexColor]->SetData(colors->GetDataPtr());
 }
@@ -168,13 +174,47 @@ bool SubMesh3DRendererGL::UpdateMeshData()
 		return false;
 	}
 
+	if(doAttributeTransform)
+	{
+		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
+
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
+		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+		{
+			Point3Array * positions = mesh->GetPostions();
+			if(positions->GetCount() != positionsCopy.GetCount())
+			{
+				unsigned int positionCount = positions->GetCount();
+				if(!positionsCopy.Init(positionCount) || !transformedPositions.Init(positionCount))
+				{
+					doAttributeTransform = false;
+					Debug::PrintError("SubMesh3DRendererGL::UpdateMeshData -> Unable to init local positions copy.");
+					DestroyBuffers();
+					return false;
+				}
+			}
+		}
+
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
+		StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+		{
+			Vector3Array * normals = mesh->GetNormals();
+			if(normals->GetCount() != normalsCopy.GetCount())
+			{
+				unsigned int normalCount = normals->GetCount();
+				if(!normalsCopy.Init(normalCount) || !transformedNormals.Init(normalCount))
+				{
+					doAttributeTransform = false;
+					Debug::PrintError("SubMesh3DRendererGL::UpdateMeshData -> Unable to init local normals copy.");
+					DestroyBuffers();
+					return false;
+				}
+			}
+		}
+	}
+
 	storedVertexCount = mesh->GetVertexCount();
 	CopyMeshData();
-
-	if(material != NULL)
-	{
-		return UseMaterial(material);
-	}
 
 	return true;
 }
@@ -186,11 +226,50 @@ void SubMesh3DRendererGL::CopyMeshData()
 	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
 	NULL_CHECK_RTRN(mesh,"SubMesh3DRendererGL::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
 
-
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	if(doAttributeTransform)
+	{
+		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
+
+		if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+		{
+			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position))
+			{
+				Point3Array * positions = mesh->GetPostions();
+				if(positions->GetCount() == positionsCopy.GetCount())
+				{
+					positions->CopyTo(&positionsCopy);
+				}
+			}
+			else SetPositionData(mesh->GetPostions());
+		}
+
+		if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+		{
+			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal))
+			{
+				Vector3Array * normals = mesh->GetNormals();
+				if(normals->GetCount() == normalsCopy.GetCount())
+				{
+					normals->CopyTo(&normalsCopy);
+				}
+			}
+			else SetNormalData(mesh->GetNormals());
+		}
+	}
+	else
+	{
+		if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
+		if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
+	}
+
+
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
-	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetColorData(mesh->GetColors());
+
+
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetVertexColorData(mesh->GetColors());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVsTexture0());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVsTexture1());
 }
@@ -201,7 +280,6 @@ void SubMesh3DRendererGL::UpdateFromMesh()
 
 	SubMesh3D * mesh = containerRenderer->GetSubMeshForSubRenderer(this);
 	NULL_CHECK_RTRN(mesh,"SubMesh3DRendererGL::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
-
 
 	if(mesh->GetVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
 	{
@@ -256,6 +334,25 @@ void SubMesh3DRendererGL::Render()
 	NULL_CHECK_RTRN(mesh,"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	if(doAttributeTransform)
+	{
+		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
+
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
+		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+		{
+			attributeTransformer->TransformPositions(positionsCopy, transformedPositions);
+			SetPositionData(&transformedPositions);
+		}
+
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
+		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+		{
+			attributeTransformer->TransformNormals(normalsCopy, transformedNormals);
+			SetNormalData(&transformedNormals);
+		}
+	}
 
 	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{

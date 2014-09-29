@@ -13,6 +13,7 @@ class SceneObjectComponent;
 class Mesh3D : public SceneObjectComponent
 {
 	friend EngineObjectManager;
+	friend SubMesh3D;
 
 	protected :
 
@@ -21,6 +22,7 @@ class Mesh3D : public SceneObjectComponent
 
     Mesh3D(unsigned int subMeshCount);
     ~Mesh3D();
+    void SendDataToRenderer(SubMesh3D * subMesh);
 
 	public:
 
@@ -28,8 +30,6 @@ class Mesh3D : public SceneObjectComponent
     void SetSubMesh(SubMesh3D * mesh, unsigned int index);
     SubMesh3D * GetSubMesh(unsigned int index);
     bool Init();
-
-    void Update(SubMesh3D * subMesh);
     void Update();
 };
 

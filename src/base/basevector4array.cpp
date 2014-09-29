@@ -7,6 +7,7 @@
 #include "basevector4array.h"
 #include "basevector4.h"
 #include "basevector4factory.h"
+#include "global/global.h"
 #include "ui/debug.h"
 
 BaseVector4Array::BaseVector4Array(BaseVector4Factory * factory) : count(0), data(NULL), objects(NULL), baseFactory(factory)
@@ -23,7 +24,7 @@ void BaseVector4Array::Destroy()
 {
 	if(objects != NULL)
 	{
-		for(int i=0; i < count; i++)
+		for(unsigned int i=0; i < count; i++)
 		{
 			BaseVector4 * baseObj = objects[i];
 			if(baseObj != NULL)
@@ -43,7 +44,7 @@ void BaseVector4Array::Destroy()
 	}
 }
 
-bool BaseVector4Array::Init(int count)
+bool BaseVector4Array::Init(unsigned int count)
 {
 	Destroy();
 
@@ -68,7 +69,7 @@ bool BaseVector4Array::Init(int count)
 
 	float *dataPtr = data;
 
-	int index = 0;
+	unsigned int index = 0;
 	while(index < count)
 	{
 		BaseVector4 * currentObject = (BaseVector4*)baseFactory->CreatePermAttached(dataPtr);
@@ -77,7 +78,7 @@ bool BaseVector4Array::Init(int count)
 		{
 			Debug::PrintError("Could not allocate BaseVector4 for BaseVector4Array");
 
-			for(int i=0; i< index; i++)delete objects[i];
+			for(unsigned int i=0; i< index; i++)delete objects[i];
 			delete objects;
 			objects = NULL;
 
@@ -102,3 +103,22 @@ const float * BaseVector4Array::GetDataPtr() const
 	return (const float *)data;
 }
 
+unsigned int BaseVector4Array::GetCount()
+{
+	return count;
+}
+
+bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
+{
+	NULL_CHECK(dest," BaseVector4Array::CopyTo -> Destination is NULL.",false);
+
+	if(dest->GetCount() != count)
+	{
+		Debug::PrintError("BaseVector4Array::CopyTo -> Source count does not match destination count.");
+		return false;
+	}
+
+	memcpy(dest->data, data, count * sizeof(float) * 4);
+
+	return true;
+}

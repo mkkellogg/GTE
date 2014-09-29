@@ -11,13 +11,10 @@ class Mesh3DRenderer;
 
 class SubMesh3DRenderer : public EngineObject
 {
-	friend class SceneObject;
-	friend class SubMesh3D;
 	friend class Mesh3DRenderer;
 
 	protected:
 
-	Material * material;
 	Material * activeMaterial;
 	Graphics * graphics;
 	Mesh3DRenderer * containerRenderer;
@@ -33,8 +30,6 @@ class SubMesh3DRenderer : public EngineObject
 
     virtual void Render() = 0;
     virtual void UpdateFromMesh() = 0;
-    Material * GetMaterial();
-    void SetMaterial(Material * material);
 };
 
 #endif

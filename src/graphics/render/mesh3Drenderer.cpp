@@ -11,6 +11,7 @@
 #include "graphics/object/mesh3D.h"
 #include "submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
+#include "graphics/render/skinnedmeshattrtransformer.h"
 #include "global/global.h"
 #include "ui/debug.h"
 
@@ -117,13 +118,22 @@ void Mesh3DRenderer::UpdateFromMesh(unsigned int index)
 {
 	if(index >= subRenderers.size())
 	{
-		printf("ooo %d\n", index);
 		Debug::PrintError("Mesh3DRenderer::UpdateFromMesh -> Index is out of range.");
 		return;
 	}
 
 	SubMesh3DRenderer * renderer = subRenderers[index];
 	renderer->UpdateFromMesh();
+}
+
+Mesh3D * Mesh3DRenderer::GetMesh()
+{
+	NULL_CHECK(sceneObject,"Mesh3DRenderer::GetMesh -> sceneObject is NULL.", NULL);
+
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	NULL_CHECK(mesh,"Mesh3DRenderer::GetMesh -> mesh is NULL.", NULL);
+
+	return mesh;
 }
 
 SubMesh3D * Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer)
@@ -146,6 +156,19 @@ SubMesh3D * Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRenderer * subRend
 	}
 
 	return NULL;
+}
+
+SubMesh3D * Mesh3DRenderer::GetSubMesh(unsigned int index)
+{
+	NULL_CHECK(sceneObject,"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", NULL);
+
+	Mesh3D * mesh = sceneObject->GetMesh3D();
+	NULL_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
+
+	SubMesh3D * subMesh = mesh->GetSubMesh(index);
+	NULL_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", NULL);
+
+	return subMesh;
 }
 
 SubMesh3DRenderer * Mesh3DRenderer::GetSubRenderer(unsigned int index)

@@ -12,6 +12,7 @@
 #include "graphics/render/material.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/attributetransformer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/stdattributes.h"
@@ -157,10 +158,15 @@ void EngineObjectManager::DestroySubMesh3D(SubMesh3D * mesh)
 	delete mesh;
 }
 
-SubMesh3DRenderer * EngineObjectManager::CreateSubMesh3DRenderer()
+SubMesh3DRenderer *  EngineObjectManager::CreateSubMesh3DRenderer()
+{
+	return CreateSubMesh3DRenderer(NULL);
+}
+
+SubMesh3DRenderer * EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
 {
 	Graphics * graphics = Graphics::Instance();
-	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer();
+	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer(attrTransformer);
 	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could create new Mesh3DRenderer object.",NULL);
 	renderer->SetObjectID(GetNextObjectID());
 	return renderer;
