@@ -14,7 +14,9 @@ class SceneObjectTransform;
 class Light;
 
 #include "engineobject.h"
+#include "enginetypes.h"
 #include <vector>
+#include <memory>
 
 class SceneObject : public EngineObject
 {
@@ -27,7 +29,7 @@ class SceneObject : public EngineObject
 	SceneObject * parent;
 	SceneObjectTransform * transform;
 	Camera * camera;
-	Light * light;
+	LightHandle light;
 	Mesh3DRenderer * renderer3D;
 	Mesh3D * mesh3D;
 
@@ -46,13 +48,13 @@ class SceneObject : public EngineObject
     bool SetMesh3D(Mesh3D *mesh);
 
     bool SetCamera(Camera * camera);
-    bool SetLight(Light * light);
+    bool SetLight(LightHandle light);
 
     Mesh3D * GetMesh3D();
     Mesh3DRenderer * GetRenderer3D();
 
     Camera * GetCamera();
-    Light * GetLight();
+    LightHandle GetLight();
 
     void AddChild(SceneObject * child);
     void RemoveChild(SceneObject * child);

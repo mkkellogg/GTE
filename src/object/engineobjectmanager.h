@@ -22,6 +22,7 @@ class AttributeTransformer;
 #include <memory>
 #include "graphics/stdattributes.h"
 #include "object/sceneobject.h"
+#include "object/enginetypes.h"
 #include "graphics/texture/textureattr.h"
 #include "shadermanager.h"
 #include "base/longmask.h"
@@ -41,6 +42,8 @@ class EngineObjectManager
 	unsigned long GetNextObjectID();
 	EngineObjectManager();
 	virtual ~EngineObjectManager();
+
+	void DestroyLight(Light * light);
 
     public :
 
@@ -68,8 +71,8 @@ class EngineObjectManager
     void DestroyMaterial(Material * material);
     Camera * CreateCamera();
     void DestroyCamera(Camera * camera);
-    std::shared_ptr<Light> CreateLight();
-    void DestroyLight(Light * light);
+    LightHandle CreateLight();
+    void DestroyLight(LightHandle light);
 
     const SceneObject * GetSceneRoot() const;
 };

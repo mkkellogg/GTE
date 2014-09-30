@@ -33,6 +33,7 @@
 #include "ui/debug.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
+#include "object/enginetypes.h"
 #include "util/time.h"
 #include "gte.h"
 
@@ -306,16 +307,17 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		SceneObject * lightObject = NULL;
-		std::shared_ptr<Light> light;
+		LightHandle light;
 
 		lightObject = objectManager->CreateSceneObject();
 		lightObject->GetLocalTransform()->Translate(0, 25, 15, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		light->SetIntensity(2);
-		//lightObject->SetLight(light);
+		light->SetRange(30);
+		lightObject->SetLight(light);
 
-	/*	lightObject = objectManager->CreateSceneObject();
+		lightObject = objectManager->CreateSceneObject();
 		lightObject->GetLocalTransform()->Translate(0, 15, -10, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
@@ -334,7 +336,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		light->SetIntensity(2);
-		lightObject->SetLight(light);*/
+		lightObject->SetLight(light);
 	}
 
 	void OnUpdate(Graphics * graphics)

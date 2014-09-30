@@ -3,6 +3,7 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
+#include <memory>
 
 #include "sceneobject.h"
 #include "engineobject.h"
@@ -18,6 +19,7 @@
 #include "global/global.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
+#include "object/enginetypes.h"
 
 SceneObject::SceneObject() : EngineObject()
 {
@@ -105,7 +107,7 @@ bool SceneObject::SetCamera(Camera * camera)
 	return true;
 }
 
-bool SceneObject::SetLight(Light * light)
+bool SceneObject::SetLight(LightHandle light)
 {
 	this->light = light;
 	light->sceneObject = this;
@@ -127,7 +129,7 @@ Camera * SceneObject::GetCamera()
 	return camera;
 }
 
-Light *  SceneObject::GetLight()
+LightHandle SceneObject::GetLight()
 {
 	return light;
 }

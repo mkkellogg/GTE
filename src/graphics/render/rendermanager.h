@@ -23,6 +23,7 @@ class Transform;
 
 #include <vector>
 #include <map>
+#include <memory>
 #include "util/datastack.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"

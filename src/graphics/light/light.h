@@ -27,7 +27,6 @@ enum class LightCullType
 class Light : public SceneObjectComponent
 {
 	friend class EngineObjectManager;
-	friend class std::shared_ptr<Light>;
 
 	Color4 color;
 	Vector3 direction;

@@ -210,12 +210,12 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 				cameraCount++;
 			}
 
-			Light * light = child->GetLight();
-			if(light != NULL && lightCount < MAX_LIGHTS)
+			LightHandle light = child->GetLight();
+			if(light && lightCount < MAX_LIGHTS)
 			{
 				// add a scene light
 				sceneLights[lightCount].transform.SetTo(viewTransform);
-				sceneLights[lightCount].component = light;
+				sceneLights[lightCount].component = &*light;
 
 				lightCount++;
 			}

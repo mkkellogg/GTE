@@ -6,6 +6,7 @@
 
 #include "engineobjectmanager.h"
 #include "sceneobject.h"
+#include "enginetypes.h"
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"
 #include "graphics/light/light.h"
@@ -271,19 +272,28 @@ void EngineObjectManager::DestroyCamera(Camera * camera)
 	delete camera;
 }
 
-std::shared_ptr<Light> EngineObjectManager::CreateLight()
+LightHandle EngineObjectManager::CreateLight()
 {
 	Light * light = new Light();
 	NULL_CHECK(light, "EngineObjectManager::CreateLight -> Could not create new Light object.", NULL);
 	light->SetObjectID(GetNextObjectID());
-	return std::shared_ptr<Light>(light) ;
+	return LightHandle(light, [=](Light * light)
+	{
+		  DestroyLight(light);
+	});
+}
+
+void EngineObjectManager::DestroyLight(LightHandle light)
+{
+	DestroyLight(&*light);
 }
 
 void EngineObjectManager::DestroyLight(Light * light)
 {
 	NULL_CHECK_RTRN(light, "EngineObjectManager::DestroyLight -> light is NULL.");
-	delete light;
+	delete &*light;
 }
+
 
 const SceneObject * EngineObjectManager::GetSceneRoot() const
 {
