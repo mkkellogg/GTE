@@ -27,11 +27,12 @@ Mesh3D::Mesh3D(unsigned int subMeshCount)
 
 Mesh3D::~Mesh3D()
 {
+	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 	if(subMeshes != NULL)
 	{
 		for(unsigned int i =0; i < subMeshCount; i++)
 		{
-			SAFE_DELETE(subMeshes[i]);
+			objectManager->DestroySubMesh3D(subMeshes[i]);
 		}
 		SAFE_DELETE(subMeshes);
 	}

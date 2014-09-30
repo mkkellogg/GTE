@@ -5,10 +5,11 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
+#include <memory>
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/submesh3D.h"
-#include "graphics/object/import/assetimporter.h"
+#include "asset/assetimporter.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/renderbuffer.h"
@@ -257,7 +258,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		AssetImporter * importer = new AssetImporter();
 		SceneObject * modelSceneObject = NULL;
 
-		modelSceneObject = importer->LoadModel("../../models/houseA/houseA_obj.obj", 1 );
+		modelSceneObject = importer->LoadModelDirect("../../models/houseA/houseA_obj.obj", 1 );
 
 		if(modelSceneObject != NULL)
 		{
@@ -273,7 +274,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		modelSceneObject->GetLocalTransform()->Scale(.10,.10,.10, true);
 
 
-		modelSceneObject = importer->LoadModel("../../models/Rck-Wtrfll_dae/Rck-Wtrfll_dae.dae", 1 );
+		modelSceneObject = importer->LoadModelDirect("../../models/Rck-Wtrfll_dae/Rck-Wtrfll_dae.dae", 1 );
 		if(modelSceneObject != NULL)
 		{
 			modelSceneObject->SetActive(true);
@@ -288,7 +289,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
-		modelSceneObject = importer->LoadModel("../../models/koopa/model/koopa.fbx", 1 );
+		modelSceneObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
 		if(modelSceneObject != NULL)
 		{
 			modelSceneObject->SetActive(true);
@@ -305,16 +306,16 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		SceneObject * lightObject = NULL;
-		Light * light = NULL;
+		std::shared_ptr<Light> light;
 
 		lightObject = objectManager->CreateSceneObject();
 		lightObject->GetLocalTransform()->Translate(0, 25, 15, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		light->SetIntensity(2);
-		lightObject->SetLight(light);
+		//lightObject->SetLight(light);
 
-		lightObject = objectManager->CreateSceneObject();
+	/*	lightObject = objectManager->CreateSceneObject();
 		lightObject->GetLocalTransform()->Translate(0, 15, -10, false);
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
@@ -333,7 +334,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		light = objectManager->CreateLight();
 		light->SetDirection(1,-1,-1);
 		light->SetIntensity(2);
-		lightObject->SetLight(light);
+		lightObject->SetLight(light);*/
 	}
 
 	void OnUpdate(Graphics * graphics)

@@ -4,10 +4,21 @@
 
 #include "animationtarget.h"
 
+AnimationTarget::SkeletalNode::SkeletalNode()
+{
+	bone = NULL;
+}
+
+AnimationTarget::SkeletalNode::~SkeletalNode()
+{
+
+}
+
 AnimationTarget::AnimationTarget(unsigned int boneCount)
 {
 	this->boneCount = boneCount;
 	bones = NULL;
+	structureRoot = NULL;
 }
 
 AnimationTarget::~AnimationTarget()

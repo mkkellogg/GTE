@@ -18,7 +18,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/DefaultLogger.hpp"
 #include "assimp/LogStream.hpp"
-#include "assetimporter.h"
+#include "modelimporter.h"
 #include "importutil.h"
 #include "geometry/matrix4x4.h"
 #include "object/engineobjectmanager.h"
@@ -47,17 +47,17 @@
 #include "global/global.h"
 #include "ui/debug.h"
 
-AssetImporter::AssetImporter()
+ModelImporter::ModelImporter()
 {
 
 }
 
-AssetImporter::~AssetImporter()
+ModelImporter::~ModelImporter()
 {
 
 }
 
-SceneObject * AssetImporter::LoadModel(const std::string& filePath, float importScale)
+SceneObject * ModelImporter::LoadModelDirect(const std::string& filePath, float importScale)
 {
 	// the global Assimp scene object
 	const aiScene* scene = NULL;
@@ -93,7 +93,7 @@ SceneObject * AssetImporter::LoadModel(const std::string& filePath, float import
 	return ProcessModelScene(filePath, *scene, importScale);
 }
 
-SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale)
+SceneObject * ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale)
 {
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
@@ -121,7 +121,7 @@ SceneObject * AssetImporter::ProcessModelScene(const std::string& modelPath, con
 	return root;
 }
 
-void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObject& current, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors)
+void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObject& current, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors)
 {
 	Matrix4x4 mat;
 
@@ -203,7 +203,7 @@ void AssetImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 	}
 }
 
-SubMesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor)
+SubMesh3D * ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor)
 {
 	unsigned int vertexCount = 0;
 
@@ -312,7 +312,7 @@ SubMesh3D * AssetImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int m
 	return mesh3D;
 }
 
-bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors)
+bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors)
 {
 	// TODO: Implement support for embedded textures
 	if (scene.HasTextures())
@@ -411,7 +411,7 @@ bool AssetImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	return true;
 }
 
-void AssetImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene)
+void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene)
 {
 	LongMask flags = LongMaskUtil::CreateLongMask();
 	aiString path;
@@ -485,7 +485,7 @@ void AssetImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	}
 }
 
-UV2Array* AssetImporter::GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property)
+UV2Array* ModelImporter::GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property)
 {
 	switch(property)
 	{
@@ -500,7 +500,7 @@ UV2Array* AssetImporter::GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D
 	return NULL;
 }
 
-StandardUniform AssetImporter::MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property)
+StandardUniform ModelImporter::MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property)
 {
 	switch(property)
 	{
@@ -515,7 +515,7 @@ StandardUniform AssetImporter::MapShaderMaterialCharacteristicToUniform(ShaderMa
 	return StandardUniform::_None;
 }
 
-StandardAttribute AssetImporter::MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property)
+StandardAttribute ModelImporter::MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property)
 {
 	switch(property)
 	{
@@ -530,7 +530,7 @@ StandardAttribute AssetImporter::MapShaderMaterialCharacteristicToAttribute(Shad
 	return StandardAttribute::_None;
 }
 
-std::string AssetImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property)
+std::string ModelImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property)
 {
 
 	StandardUniform uniform = MapShaderMaterialCharacteristicToUniform(property);

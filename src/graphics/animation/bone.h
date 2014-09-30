@@ -5,14 +5,18 @@
 class Transform;
 
 #include <vector>
+#include <string>
 
 class Bone
 {
 	Transform * target;
+	std::string name;
+	unsigned int id;
 
 	public :
 
-	Bone();
+	Bone(std::string& name);
+	Bone(std::string& name, unsigned int id);
     ~Bone();
 };
 

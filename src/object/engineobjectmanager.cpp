@@ -271,12 +271,12 @@ void EngineObjectManager::DestroyCamera(Camera * camera)
 	delete camera;
 }
 
-Light * EngineObjectManager::CreateLight()
+std::shared_ptr<Light> EngineObjectManager::CreateLight()
 {
 	Light * light = new Light();
 	NULL_CHECK(light, "EngineObjectManager::CreateLight -> Could not create new Light object.", NULL);
 	light->SetObjectID(GetNextObjectID());
-	return light;
+	return std::shared_ptr<Light>(light) ;
 }
 
 void EngineObjectManager::DestroyLight(Light * light)

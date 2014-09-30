@@ -19,6 +19,7 @@ class RawImage;
 class AttributeTransformer;
 
 #include <vector>
+#include <memory>
 #include "graphics/stdattributes.h"
 #include "object/sceneobject.h"
 #include "graphics/texture/textureattr.h"
@@ -67,7 +68,7 @@ class EngineObjectManager
     void DestroyMaterial(Material * material);
     Camera * CreateCamera();
     void DestroyCamera(Camera * camera);
-    Light * CreateLight();
+    std::shared_ptr<Light> CreateLight();
     void DestroyLight(Light * light);
 
     const SceneObject * GetSceneRoot() const;

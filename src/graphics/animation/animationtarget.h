@@ -5,6 +5,7 @@
 class Point3Array;
 class Vector3Array;
 class VertexAttrBuffer;
+class Bone;
 
 #include <vector>
 
@@ -12,21 +13,17 @@ class AnimationTarget
 {
 	class SkeletalNode
 	{
+		Bone * bone;
+
 		public:
 
 		std::vector <SkeletalNode * > children;
 
-		SkeletalNode()
-		{
-
-		}
-
-		~SkeletalNode()
-		{
-
-		}
+		SkeletalNode();
+		~SkeletalNode();
 	};
 
+	SkeletalNode * structureRoot;
 	unsigned int boneCount;
 	Bone ** bones;
 

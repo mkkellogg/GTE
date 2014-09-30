@@ -2,11 +2,13 @@
 #define _LIGHT_H_
 
 //forward declarations
+class Light;
 
 #include "object/sceneobjectcomponent.h"
 #include "graphics/color/color4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
+#include <memory>
 
 enum class LightType
 {
@@ -25,6 +27,7 @@ enum class LightCullType
 class Light : public SceneObjectComponent
 {
 	friend class EngineObjectManager;
+	friend class std::shared_ptr<Light>;
 
 	Color4 color;
 	Vector3 direction;
@@ -36,6 +39,7 @@ class Light : public SceneObjectComponent
 	protected:
 
 	void CalcAttentuationForCurrentRange();
+
 	Light();
 	virtual ~Light();
 

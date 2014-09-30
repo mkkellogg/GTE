@@ -36,10 +36,14 @@ void Mesh3DRenderer::DestroyRenderers()
 
 void Mesh3DRenderer::DestroyRenderer(unsigned int index)
 {
+	EngineObjectManager *objectManager = EngineObjectManager::Instance();
 	if(index < subRenderers.size())
 	{
 		SubMesh3DRenderer * renderer = subRenderers[index];
-		SAFE_DELETE(renderer);
+		if(renderer != NULL)
+		{
+			objectManager->DestroySubMesh3DRenderer(renderer);
+		}
 		subRenderers.erase(subRenderers.begin() + index);
 	}
 }

@@ -23,6 +23,7 @@ GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
 ANIMATIONSRC= $(GRAPHICSSRC)/animation
 IMAGESRC= $(GRAPHICSSRC)/image
 ENGINEOBJECTSRC= src/object
+ASSETSRC= src/asset
 UTILSRC= src/util
 FILESYSTEMSRC= src/filesys
 
@@ -32,7 +33,7 @@ BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/baseve
 GTEMAINOBJ= obj/gte.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
-GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/assetimporter.o obj/importutil.o
+GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmeshattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
@@ -43,14 +44,15 @@ SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shadermanager.o
+ASSETOBJ= obj/assetimporter.o obj/importutil.o obj/modelimporter.o
 UTILOBJ= obj/datastack.o obj/util.o obj/time.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(BASEOBJ) $(UTILOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(FILESYSTEMOBJ)
+OBJECTFILES= $(BASEOBJ) $(UTILOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ)
 
-all: gtemain graphics animation ui geometry gtemath base global engineobjects util image filesystem
+all: gtemain graphics animation ui geometry gtemath base global engineobjects asset util image filesystem
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -111,7 +113,23 @@ obj/engineobject.o: $(ENGINEOBJECTSRC)/engineobject.cpp $(ENGINEOBJECTSRC)/engin
 obj/engineobjectmanager.o: $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOBJECTSRC)/engineobjectmanager.h 
 	$(CC) $(CFLAGS) -o obj/engineobjectmanager.o -c $(ENGINEOBJECTSRC)/engineobjectmanager.cpp
 	
+
+# ==================================
+# Asset
+# ==================================
+
+asset: $(ASSETOBJ)
 	
+obj/assetimporter.o: $(ASSETSRC)/assetimporter.cpp $(ASSETSRC)/assetimporter.h 
+	$(CC) $(CFLAGS) -o obj/assetimporter.o -c $(ASSETSRC)/assetimporter.cpp
+	
+obj/modelimporter.o: $(ASSETSRC)/modelimporter.cpp $(ASSETSRC)/modelimporter.h 
+	$(CC) $(CFLAGS) -o obj/modelimporter.o -c $(ASSETSRC)/modelimporter.cpp
+	
+obj/importutil.o: $(ASSETSRC)/importutil.cpp $(ASSETSRC)/importutil.h 
+	$(CC) $(CFLAGS) -o obj/importutil.o -c $(ASSETSRC)/importutil.cpp
+	
+		
 # ==================================
 # Image processing
 # ==================================	
@@ -258,6 +276,7 @@ obj/attributetransformer.o: $(RENDERSRC)/attributetransformer.cpp $(RENDERSRC)/a
 obj/skinnedmeshattrtransformer.o: $(RENDERSRC)/skinnedmeshattrtransformer.cpp $(RENDERSRC)/skinnedmeshattrtransformer.h
 	$(CC) $(CFLAGS) -o obj/skinnedmeshattrtransformer.o -c $(RENDERSRC)/skinnedmeshattrtransformer.cpp
 	
+	
 # ==================================
 # GraphicsObject
 # ==================================
@@ -270,12 +289,7 @@ obj/mesh3D.o: $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/mesh3D.h
 obj/submesh3D.o: $(GRAPHICSOBJECTSRC)/submesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3D.h 
 	$(CC) $(CFLAGS) -o obj/submesh3D.o -c $(GRAPHICSOBJECTSRC)/submesh3D.cpp
 	
-obj/assetimporter.o: $(GRAPHICSOBJECTSRC)/import/assetimporter.cpp $(GRAPHICSOBJECTSRC)/import/assetimporter.h 
-	$(CC) $(CFLAGS) -o obj/assetimporter.o -c $(GRAPHICSOBJECTSRC)/import/assetimporter.cpp
-	
-obj/importutil.o: $(GRAPHICSOBJECTSRC)/import/importutil.cpp $(GRAPHICSOBJECTSRC)/import/importutil.h 
-	$(CC) $(CFLAGS) -o obj/importutil.o -c $(GRAPHICSOBJECTSRC)/import/importutil.cpp
-	
+
 	
 # ==================================
 # UI

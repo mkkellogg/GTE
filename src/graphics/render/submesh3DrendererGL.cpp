@@ -23,6 +23,7 @@
 #include "graphics/uv/uv2.h"
 #include "graphics/uv/uv2array.h"
 #include "object/sceneobject.h"
+#include "object/engineobjectmanager.h"
 #include "attributetransformer.h"
 #include "global/global.h"
 #include "ui/debug.h"
@@ -65,7 +66,10 @@ void SubMesh3DRendererGL::DestroyBuffers()
 
 void SubMesh3DRendererGL::DestroyBuffer(VertexAttrBuffer ** buffer)
 {
-	if((*buffer) != NULL)delete (*buffer);
+	if((*buffer) != NULL)
+	{
+		graphics->DestroyVertexAttributeBuffer(*buffer);
+	}
 	*buffer = NULL;
 }
 

@@ -1,5 +1,5 @@
-#ifndef _ASSET_IMPORTER_H_
-#define _ASSET_IMPORTER_H_
+#ifndef _MODEL_IMPORTER_H_
+#define _MODEL_IMPORTER_H_
 
 //forward declarations
 class Matrix4x4;
@@ -18,7 +18,7 @@ class UV2Array;
 #include <string>
 #include <vector>
 
-class AssetImporter
+class ModelImporter
 {
 	friend EngineObjectManager;
 
@@ -79,10 +79,10 @@ class AssetImporter
 
 	public:
 
-	AssetImporter();
-	~AssetImporter();
+	ModelImporter();
+	~ModelImporter();
 
-	SceneObject * LoadModel(const std::string& filePath, float importScale);
+	SceneObject * LoadModelDirect(const std::string& filePath, float importScale);
 };
 
 #endif
