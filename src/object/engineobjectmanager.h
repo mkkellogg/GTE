@@ -71,8 +71,8 @@ class EngineObjectManager
     void DestroyMaterial(Material * material);
     Camera * CreateCamera();
     void DestroyCamera(Camera * camera);
-    LightHandle CreateLight();
-    void DestroyLight(LightHandle light);
+    LightRef CreateLight();
+    void DestroyLight(LightRef light);
 
     const SceneObject * GetSceneRoot() const;
 };

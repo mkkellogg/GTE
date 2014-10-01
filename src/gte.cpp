@@ -307,7 +307,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		SceneObject * lightObject = NULL;
-		LightHandle light;
+		LightRef light;
 
 		lightObject = objectManager->CreateSceneObject();
 		lightObject->GetLocalTransform()->Translate(0, 25, 15, false);

@@ -107,7 +107,7 @@ bool SceneObject::SetCamera(Camera * camera)
 	return true;
 }
 
-bool SceneObject::SetLight(LightHandle light)
+bool SceneObject::SetLight(LightRef light)
 {
 	this->light = light;
 	light->sceneObject = this;
@@ -129,7 +129,7 @@ Camera * SceneObject::GetCamera()
 	return camera;
 }
 
-LightHandle SceneObject::GetLight()
+LightRef SceneObject::GetLight()
 {
 	return light;
 }
