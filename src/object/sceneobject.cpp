@@ -26,9 +26,7 @@ SceneObject::SceneObject() : EngineObject()
 	isActive = true;
 	renderer3D = NULL;
 	mesh3D = NULL;
-	camera = NULL;
 	parent = NULL;
-	light = NULL;
 
 	transform = new SceneObjectTransform(this);
 }
@@ -56,7 +54,6 @@ Transform * SceneObject::GetLocalTransform() const
 void SceneObject::GetFullTransform(Transform * transform)
 {
 	NULL_CHECK_RTRN(transform,"SceneObject::GetFullTransform -> transform is NULL.");
-
 	this->transform->GetFullTransform(transform);
 }
 
@@ -100,7 +97,7 @@ bool SceneObject::SetMesh3D(Mesh3D *mesh)
 	return true;
 }
 
-bool SceneObject::SetCamera(Camera * camera)
+bool SceneObject::SetCamera(CameraRef camera)
 {
 	this->camera = camera;
 	camera->sceneObject = this;
@@ -124,7 +121,7 @@ Mesh3DRenderer * SceneObject::GetRenderer3D()
 	return renderer3D;
 }
 
-Camera * SceneObject::GetCamera()
+CameraRef SceneObject::GetCamera()
 {
 	return camera;
 }

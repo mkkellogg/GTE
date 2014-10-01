@@ -86,7 +86,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
 		cameraObject = objectManager->CreateSceneObject();
-		Camera * camera = objectManager->CreateCamera();
+		CameraRef camera = objectManager->CreateCamera();
 		cameraObject->GetLocalTransform()->Translate(0, 5, 15, true);
 		// cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
 		camera->AddClearBuffer(RenderBufferType::Color);

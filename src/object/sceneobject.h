@@ -28,7 +28,7 @@ class SceneObject : public EngineObject
 	std::vector<SceneObject * > children;
 	SceneObject * parent;
 	SceneObjectTransform * transform;
-	Camera * camera;
+	CameraRef camera;
 	LightRef light;
 	Mesh3DRenderer * renderer3D;
 	Mesh3D * mesh3D;
@@ -47,13 +47,13 @@ class SceneObject : public EngineObject
     bool SetMeshRenderer3D(Mesh3DRenderer *renderer);
     bool SetMesh3D(Mesh3D *mesh);
 
-    bool SetCamera(Camera * camera);
+    bool SetCamera(CameraRef camera);
     bool SetLight(LightRef light);
 
     Mesh3D * GetMesh3D();
     Mesh3DRenderer * GetRenderer3D();
 
-    Camera * GetCamera();
+    CameraRef GetCamera();
     LightRef GetLight();
 
     void AddChild(SceneObject * child);

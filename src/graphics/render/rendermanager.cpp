@@ -195,8 +195,8 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 			// concatenate the current view transform with that of the current scene object
 			viewTransform->TransformBy(child->GetLocalTransform());
 
-			Camera * camera = child->GetCamera();
-			if(camera != NULL && cameraCount < MAX_CAMERAS)
+			CameraRef camera = child->GetCamera();
+			if(camera.IsValid() && cameraCount < MAX_CAMERAS)
 			{
 				// we invert the viewTransform because the viewTransform is really moving the world
 				// relative to the camera, rather than moving the camera in the world
@@ -205,7 +205,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 
 				// add a scene camera from which to render the scene
 				sceneCameras[cameraCount].transform.SetTo(&viewInverse);
-				sceneCameras[cameraCount].component = camera;
+				sceneCameras[cameraCount].component = camera.GetPtr();
 
 				cameraCount++;
 			}

@@ -43,7 +43,8 @@ class EngineObjectManager
 	EngineObjectManager();
 	virtual ~EngineObjectManager();
 
-	void DestroyLight(Light * light);
+	void DeleteLight(Light * light);
+	void DeleteCamera(Camera * light);
 
     public :
 
@@ -69,8 +70,8 @@ class EngineObjectManager
     Material * CreateMaterial(const char *name,Shader * shader);
     Material * CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
     void DestroyMaterial(Material * material);
-    Camera * CreateCamera();
-    void DestroyCamera(Camera * camera);
+    CameraRef CreateCamera();
+    void DestroyCamera(CameraRef camera);
     LightRef CreateLight();
     void DestroyLight(LightRef light);
 

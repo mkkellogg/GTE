@@ -2,6 +2,7 @@
 #define _ENGINE_TYPES_H_
 
 //forward declarations
+class Shader;
 class SubMesh3DRenderer;
 class SubMesh3D;
 class Mesh3DRenderer;
@@ -9,57 +10,31 @@ class Mesh3D;
 class Camera;
 class SceneObject;
 class Light;
+class EngineObjectManager;
 
 #include <memory>
 
 template <typename T> class EngineObjectRef
 {
+	friend class EngineObjectManager;
+
 	std::shared_ptr<T> sharedPtr;
 	std::function<void(T*)> deleter;
 
+	void InvokeDeleter(T* p)
+	{
+		if(deleter)deleter(p);
+	}
+
 	public:
 
-	EngineObjectRef() : sharedPtr(NULL)
-	{
-
-	}
-
-	EngineObjectRef(T * ptr) : sharedPtr(ptr, [=](T*p){DoDelete(p);})
-	{
-
-	}
-
-	EngineObjectRef(const EngineObjectRef<T>& ref) : sharedPtr(ref.sharedPtr)
-	{
-
-	}
-
-	EngineObjectRef(const std::shared_ptr<T>& ref) : sharedPtr(ref)
-	{
-
-	}
-
-	EngineObjectRef( std::shared_ptr<T>& ref) : sharedPtr(ref)
-	{
-
-	}
-
-	EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : sharedPtr(ptr, [=](T*p){DoDelete(p);})
+	EngineObjectRef() : sharedPtr(NULL) {}
+	EngineObjectRef(const EngineObjectRef<T>& ref) : sharedPtr(ref.sharedPtr) {}
+	EngineObjectRef(const std::shared_ptr<T>& ref) : sharedPtr(ref) {}
+	EngineObjectRef( std::shared_ptr<T>& ref) : sharedPtr(ref) {}
+	EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : sharedPtr(ptr, [=](T*p){InvokeDeleter(p);})
 	{
 		this->deleter = deleter;
-	}
-
-	void DoDelete(T* p)
-	{
-		if(deleter)
-		{
-			deleter(p);
-		}
-		else
-		{
-			EngineObjectManager * objectManager = EngineObjectManager::Instance();
-
-		}
 	}
 
 	EngineObjectRef<T>& operator=(const EngineObjectRef<T>& other)
@@ -104,10 +79,21 @@ template <typename T> class EngineObjectRef
 		if(sharedPtr)return true;
 		return false;
 	}
+
+	void ForceDelete()
+	{
+		sharedPtr.reset();
+	}
 };
 
 //typedef std::shared_ptr<Light> LightRef;
 
+typedef EngineObjectRef<Shader> ShaderRef;
+typedef EngineObjectRef<SubMesh3DRenderer> SubMesh3DRendererRef;
+typedef EngineObjectRef<SubMesh3D> SubMesh3DRef;
+typedef EngineObjectRef<Mesh3DRenderer> Mesh3DRendererRef;
+typedef EngineObjectRef<Mesh3D> Mesh3DRef;
+typedef EngineObjectRef<Camera> CameraRef;
 typedef EngineObjectRef<Light> LightRef;
 typedef EngineObjectRef<SceneObject> SceneObjectRef;
 

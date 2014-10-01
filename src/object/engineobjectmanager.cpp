@@ -257,18 +257,27 @@ void EngineObjectManager::DestroyMaterial(Material * material)
 	delete material;
 }
 
-Camera * EngineObjectManager::CreateCamera()
+CameraRef EngineObjectManager::CreateCamera()
 {
 	Graphics * graphics = Graphics::Instance();
 	Camera * camera = new Camera(graphics);
-	NULL_CHECK(camera, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", NULL);
+	NULL_CHECK(camera, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef());
 	camera->SetObjectID(GetNextObjectID());
-	return camera;
+
+	return CameraRef(camera, [=](Camera * camera)
+	{
+		  DeleteCamera(camera);
+	});
 }
 
-void EngineObjectManager::DestroyCamera(Camera * camera)
+void EngineObjectManager::DestroyCamera(CameraRef camera)
 {
-	NULL_CHECK_RTRN(camera, "EngineObjectManager::DestroyCamera -> camera is NULL.");
+	camera.ForceDelete();
+}
+
+void EngineObjectManager::DeleteCamera(Camera * camera)
+{
+	NULL_CHECK_RTRN(camera, "EngineObjectManager::DeleteCamera -> camera is NULL.");
 	delete camera;
 }
 
@@ -278,30 +287,20 @@ LightRef EngineObjectManager::CreateLight()
 	NULL_CHECK(light, "EngineObjectManager::CreateLight -> Could not create new Light object.", LightRef());
 	light->SetObjectID(GetNextObjectID());
 
-	/*SharedRef<Light> lref(light, [=](Light * light2)
+	return LightRef(light, [=](Light * light)
 	{
-		  DestroyLight(light2);
-	});
-
-	TestRef tref(light, [=](Light * light2)
-	{
-		  DestroyLight(light2);
-	});*/
-
-	return LightRef(light, [=](Light * light2)
-	{
-		  DestroyLight(light2);
+		  DeleteLight(light);
 	});
 }
 
 void EngineObjectManager::DestroyLight(LightRef light)
 {
-	DestroyLight(light.GetPtr());
+	light.ForceDelete();
 }
 
-void EngineObjectManager::DestroyLight(Light * light)
+void EngineObjectManager::DeleteLight(Light * light)
 {
-	NULL_CHECK_RTRN(light, "EngineObjectManager::DestroyLight -> light is NULL.");
+	NULL_CHECK_RTRN(light, "EngineObjectManager::DeleteLight -> light is NULL.");
 	delete light;
 }
 
