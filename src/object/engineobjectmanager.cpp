@@ -40,6 +40,13 @@ EngineObjectManager * EngineObjectManager::Instance()
 EngineObjectManager::EngineObjectManager()
 {
 	currentEngineObjectID = 0L;
+
+	sceneRoot.SetObjectID(GetNextObjectID());
+	sceneRootRef = 	SceneObjectRef(&sceneRoot, [=](SceneObject * sceneObject)
+	{
+
+	});
+	AddSceneObjectToDirectory(sceneRoot.GetObjectID(), sceneRootRef);
 }
 
 EngineObjectManager::~EngineObjectManager()
@@ -49,16 +56,7 @@ EngineObjectManager::~EngineObjectManager()
 
 unsigned long EngineObjectManager::GetNextObjectID()
 {
-	return ++currentEngineObjectID;
-}
-
-SceneObject * EngineObjectManager::CreateSceneObject()
-{
-	SceneObject *obj = new SceneObject();
-	NULL_CHECK(obj,"EngineObjectManager::CreateSceneObject -> could not allocate new scene object.",NULL);
-	obj->SetObjectID(GetNextObjectID());
-	sceneRoot.AddChild(obj);
-	return obj;
+	return currentEngineObjectID++;
 }
 
 bool EngineObjectManager::InitBuiltinShaders()
@@ -112,29 +110,90 @@ bool EngineObjectManager::InitBuiltinShaders()
 	return true;
 }
 
+SceneObjectRef EngineObjectManager::FindSceneObjectInDirectory(unsigned long objectID)
+{
+	if(sceneObjectDirectory.find(objectID) != sceneObjectDirectory.end())
+	{
+		SceneObjectRef ref = sceneObjectDirectory[objectID];
+		return ref;
+	}
+
+	return SceneObjectRef::Null();
+}
+
+void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref)
+{
+	SHARED_REF_CHECK_RTRN(ref, "EngineObjectManager::AddSceneObjectToDirectory -> Tried to add NULL scene object reference.");
+
+	sceneObjectDirectory[objectID] = ref;
+}
+
 Shader *  EngineObjectManager::GetLoadedShader(LongMask properties)
 {
 	return loadedShaders.GetShader(properties);
 }
 
-Mesh3D * EngineObjectManager::CreateMesh3D(unsigned int subMeshCount)
+SceneObjectRef EngineObjectManager::CreateSceneObject()
 {
-	Mesh3D * mesh =  new Mesh3D(subMeshCount);
-	NULL_CHECK(mesh,"EngineObjectManager::CreateMesh3D -> could create new Mesh3D object.",NULL);
-	mesh->SetObjectID(GetNextObjectID());
-	return mesh;
+	SceneObject *sceneObject = new SceneObject();
+	NULL_CHECK(sceneObject,"EngineObjectManager::CreateSceneObject -> could not allocate new scene object.", SceneObjectRef::Null());
+	sceneObject->SetObjectID(GetNextObjectID());
+
+	SceneObjectRef ref(sceneObject, [=](SceneObject * sceneObject)
+	{
+		  DeleteSceneObject(sceneObject);
+	});
+
+	AddSceneObjectToDirectory(ref->GetObjectID(), ref);
+
+	sceneRootRef->AddChild(ref);
+	return ref;
 }
 
-void EngineObjectManager::DestroyMesh3D(Mesh3D * mesh)
+void EngineObjectManager::DestroySceneObject(SceneObjectRef sceneObject)
 {
-	NULL_CHECK_RTRN(mesh,"EngineObjectManager::DestroyMesh3D -> mesh is NULL.");
+	sceneObject.ForceDelete();
+}
+
+void EngineObjectManager::DeleteSceneObject(SceneObject * sceneObject)
+{
+	NULL_CHECK_RTRN(sceneObject, "EngineObjectManager::DeleteSceneObject -> sceneObject is NULL.");
+	delete sceneObject;
+}
+
+const SceneObjectRef EngineObjectManager::GetSceneRoot() const
+{
+	return (const SceneObjectRef)sceneRootRef;
+}
+
+Mesh3DRef EngineObjectManager::CreateMesh3D(unsigned int subMeshCount)
+{
+	Mesh3D * mesh =  new Mesh3D(subMeshCount);
+	NULL_CHECK(mesh,"EngineObjectManager::CreateMesh3D -> could not create new Mesh3D object.", Mesh3DRef::Null());
+	mesh->SetObjectID(GetNextObjectID());
+
+	return Mesh3DRef(mesh, [=](Mesh3D * mesh)
+	{
+		  DeleteMesh3D(mesh);
+	});
+}
+
+
+void EngineObjectManager::DestroyMesh3D(Mesh3DRef mesh)
+{
+	mesh.ForceDelete();
+}
+
+void EngineObjectManager::DeleteMesh3D(Mesh3D * mesh)
+{
+	NULL_CHECK_RTRN(mesh, "EngineObjectManager::DeleteMesh -> mesh is NULL.");
 	delete mesh;
 }
 
 Mesh3DRenderer * EngineObjectManager::CreateMesh3DRenderer()
 {
 	Mesh3DRenderer * renderer =  new Mesh3DRenderer();
-	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could create new Mesh3DRenderer object.",NULL);
+	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could not create new Mesh3DRenderer object.",NULL);
 	renderer->SetObjectID(GetNextObjectID());
 	return renderer;
 }
@@ -148,7 +207,7 @@ void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRenderer * renderer)
 SubMesh3D * EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
 {
 	SubMesh3D * mesh = new SubMesh3D(attributes);
-	NULL_CHECK(mesh,"EngineObjectManager::CreateSubMesh3D -> could create new Mesh3D object.",NULL);
+	NULL_CHECK(mesh,"EngineObjectManager::CreateSubMesh3D -> could not create new SubMesh3D object.",NULL);
 	mesh->SetObjectID(GetNextObjectID());
 	return mesh;
 }
@@ -168,7 +227,7 @@ SubMesh3DRenderer * EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransf
 {
 	Graphics * graphics = Graphics::Instance();
 	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer(attrTransformer);
-	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could create new Mesh3DRenderer object.",NULL);
+	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.",NULL);
 	renderer->SetObjectID(GetNextObjectID());
 	return renderer;
 }
@@ -184,7 +243,7 @@ Shader * EngineObjectManager::CreateShader(const char * vertexSourcePath, const 
 {
 	Graphics * graphics = Graphics::Instance();
 	Shader * shader = graphics->CreateShader(vertexSourcePath,fragmentSourcePath);
-	NULL_CHECK(shader,"EngineObjectManager::CreateShader -> could create new Shader object.",NULL);
+	NULL_CHECK(shader,"EngineObjectManager::CreateShader -> could not create new Shader object.",NULL);
 	shader->SetObjectID(GetNextObjectID());
 	return shader;
 }
@@ -261,7 +320,7 @@ CameraRef EngineObjectManager::CreateCamera()
 {
 	Graphics * graphics = Graphics::Instance();
 	Camera * camera = new Camera(graphics);
-	NULL_CHECK(camera, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef());
+	NULL_CHECK(camera, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef::Null());
 	camera->SetObjectID(GetNextObjectID());
 
 	return CameraRef(camera, [=](Camera * camera)
@@ -284,7 +343,7 @@ void EngineObjectManager::DeleteCamera(Camera * camera)
 LightRef EngineObjectManager::CreateLight()
 {
 	Light * light = new Light();
-	NULL_CHECK(light, "EngineObjectManager::CreateLight -> Could not create new Light object.", LightRef());
+	NULL_CHECK(light, "EngineObjectManager::CreateLight -> Could not create new Light object.", LightRef::Null());
 	light->SetObjectID(GetNextObjectID());
 
 	return LightRef(light, [=](Light * light)
@@ -304,8 +363,3 @@ void EngineObjectManager::DeleteLight(Light * light)
 	delete light;
 }
 
-
-const SceneObject * EngineObjectManager::GetSceneRoot() const
-{
-	return &sceneRoot;
-}

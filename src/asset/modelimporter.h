@@ -11,6 +11,7 @@ class UV2Array;
 
 #include "object/sceneobjectcomponent.h"
 #include "object/shadermanager.h"
+#include "object/enginetypes.h"
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
 #include "assimp/scene.h"
@@ -67,8 +68,8 @@ class ModelImporter
 		}
 	};
 
-	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObject& parent, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors);
-	SceneObject * ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
+	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors);
+	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3D * ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
@@ -82,7 +83,7 @@ class ModelImporter
 	ModelImporter();
 	~ModelImporter();
 
-	SceneObject * LoadModelDirect(const std::string& filePath, float importScale);
+	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale);
 };
 
 #endif

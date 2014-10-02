@@ -20,6 +20,7 @@ class AttributeTransformer;
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
 #include "graphics/stdattributes.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
@@ -34,27 +35,38 @@ class EngineObjectManager
 
 	const char* builtinPath ="resources/builtin/";
 
+	std::unordered_map<unsigned long, SceneObjectRef> sceneObjectDirectory;
+
 	ShaderManager loadedShaders;
 	std::vector<EngineObject *> engineObjects;
 	SceneObject sceneRoot;
+	SceneObjectRef sceneRootRef;
 	unsigned long currentEngineObjectID;
 
 	unsigned long GetNextObjectID();
 	EngineObjectManager();
 	virtual ~EngineObjectManager();
 
+	void AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref);
+
+	void DeleteSceneObject(SceneObject * sceneObject);
 	void DeleteLight(Light * light);
 	void DeleteCamera(Camera * light);
+	void DeleteMesh3D(Mesh3D * mesh);
 
     public :
 
     static EngineObjectManager * Instance();
-    SceneObject * CreateSceneObject();
     bool InitBuiltinShaders();
     Shader * GetLoadedShader(LongMask properties);
 
-    Mesh3D * CreateMesh3D(unsigned int subMeshCount);
-    void DestroyMesh3D(Mesh3D * mesh);
+    SceneObjectRef FindSceneObjectInDirectory(unsigned long objectID);
+    const SceneObjectRef GetSceneRoot() const;
+    SceneObjectRef CreateSceneObject();
+    void DestroySceneObject(SceneObjectRef sceneObject);
+
+    Mesh3DRef CreateMesh3D(unsigned int subMeshCount);
+    void DestroyMesh3D(Mesh3DRef mesh);
     Mesh3DRenderer * CreateMesh3DRenderer();
     void DestroyMesh3DRenderer(Mesh3DRenderer * renderer);
 
@@ -74,8 +86,6 @@ class EngineObjectManager
     void DestroyCamera(CameraRef camera);
     LightRef CreateLight();
     void DestroyLight(LightRef light);
-
-    const SceneObject * GetSceneRoot() const;
 };
 
 #endif

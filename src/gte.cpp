@@ -41,10 +41,10 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 {
 	public:
 
-	SceneObject * cameraObject;
+	SceneObjectRef cameraObject;
 	CustomGraphicsCallbacks()
 	{
-		cameraObject = NULL;
+
 	}
 
 	void PrintMatrix(Matrix4x4 *m)
@@ -83,6 +83,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		test.y = 5;
 		test.x = 5;
 
+
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
 		cameraObject = objectManager->CreateSceneObject();
@@ -93,7 +94,8 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		camera->AddClearBuffer(RenderBufferType::Depth);
 		cameraObject->SetCamera(camera);
 
-		SceneObject * sceneObject = objectManager->CreateSceneObject();
+
+		SceneObjectRef sceneObject = objectManager->CreateSceneObject();
 		sceneObject->GetLocalTransform()->Scale(3,3,3, true);
 		sceneObject->GetLocalTransform()->RotateAround(0, 0, 0, 0, 1, 0, 45);
 		sceneObject->GetLocalTransform()->Translate(-15, 0, -12, false);
@@ -116,10 +118,12 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
+
+
 		SubMesh3D * subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 		subMesh->Init(36);
 
-		Mesh3D * mesh = objectManager->CreateMesh3D(1);
+		Mesh3DRef mesh = objectManager->CreateMesh3D(1);
 		mesh->Init();
 		mesh->SetSubMesh(subMesh, 0);
 
@@ -244,7 +248,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
-		SceneObject * childSceneObject = objectManager->CreateSceneObject();
+		SceneObjectRef childSceneObject = objectManager->CreateSceneObject();
 		sceneObject->AddChild(childSceneObject);
 
 		childSceneObject->SetMesh3D(mesh);
@@ -257,11 +261,11 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		AssetImporter * importer = new AssetImporter();
-		SceneObject * modelSceneObject = NULL;
+		SceneObjectRef modelSceneObject;
 
 		modelSceneObject = importer->LoadModelDirect("../../models/houseA/houseA_obj.obj", 1 );
 
-		if(modelSceneObject != NULL)
+		if(modelSceneObject.IsValid())
 		{
 			modelSceneObject->SetActive(true);
 		}
@@ -276,7 +280,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		modelSceneObject = importer->LoadModelDirect("../../models/Rck-Wtrfll_dae/Rck-Wtrfll_dae.dae", 1 );
-		if(modelSceneObject != NULL)
+		if(modelSceneObject.IsValid())
 		{
 			modelSceneObject->SetActive(true);
 		}
@@ -291,7 +295,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 		modelSceneObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
-		if(modelSceneObject != NULL)
+		if(modelSceneObject.IsValid())
 		{
 			modelSceneObject->SetActive(true);
 		}
@@ -305,8 +309,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		modelSceneObject->GetLocalTransform()->Translate(0,-8,-3,false);
 		modelSceneObject->GetLocalTransform()->Scale(.15,.15,.15, true);
 
-
-		SceneObject * lightObject = NULL;
+		SceneObjectRef lightObject;
 		LightRef light;
 
 		lightObject = objectManager->CreateSceneObject();

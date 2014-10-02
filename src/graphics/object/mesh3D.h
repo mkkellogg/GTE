@@ -9,6 +9,7 @@ class SceneObjectComponent;
 
 #include "object/engineobject.h"
 #include "object/sceneobjectcomponent.h"
+#include "object/enginetypes.h"
 
 class Mesh3D : public SceneObjectComponent
 {

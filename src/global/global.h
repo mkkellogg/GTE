@@ -41,6 +41,24 @@
 	}									   \
 }
 
+#define SHARED_REF_CHECK_RTRN(ref, msg)    		\
+{										   		\
+	if(!(ref).IsValid())					   		\
+	{									   		\
+		Debug::PrintError((msg));  		   		\
+		return;			       					\
+	}									   		\
+}
+
+#define SHARED_REF_CHECK(ref, msg, returnExp)    \
+{										   		 \
+	if(!(ref).IsValid())					   		 \
+	{									   		 \
+		Debug::PrintError((msg));  		   		 \
+		return (returnExp);			       		 \
+	}									   		 \
+}
+
 typedef unsigned char BYTE;
 
 #endif

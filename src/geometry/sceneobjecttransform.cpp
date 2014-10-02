@@ -3,6 +3,7 @@
 #include <memory.h>
 #include "sceneobjecttransform.h"
 #include "object/sceneobject.h"
+#include "object/enginetypes.h"
 #include "transform.h"
 #include "matrix4x4.h"
 #include "ui/debug.h"
@@ -71,8 +72,8 @@ void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool inv
 	NULL_CHECK_RTRN(transform, "SceneObjectTransform::GetInheritedTransform -> NULL transform passed.");
 
 	Transform full;
-	SceneObject * parent = sceneObject->GetParent();
-	while(parent != NULL)
+	SceneObjectRef parent = sceneObject->GetParent();
+	while(parent.IsValid())
 	{
 		// Since we are processing the ancestors in reverse order (going up the tree)
 		// we pre-multiply, to have the end effect of post-multiplication in

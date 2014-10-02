@@ -5,6 +5,7 @@
 class SceneObject;
 
 #include "object/engineobjectmanager.h"
+#include "object/enginetypes.h"
 #include <string>
 
 class AssetImporter
@@ -18,7 +19,7 @@ class AssetImporter
 	AssetImporter();
 	~AssetImporter();
 
-	SceneObject * LoadModelDirect(const std::string& filePath, float importScale);
+	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale);
 };
 
 #endif

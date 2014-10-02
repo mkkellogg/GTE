@@ -55,19 +55,19 @@ bool Mesh3D::Init()
 
 void Mesh3D::SendDataToRenderer(SubMesh3D * subMesh)
 {
-	NULL_CHECK_RTRN(subMesh," Mesh3D::Update -> subMesh is NULL.");
+	// silently return if not attached to a scene object
+	if(!sceneObject.IsValid())return;
+
+	NULL_CHECK_RTRN(subMesh," Mesh3D::SendDataToRenderer -> subMesh is NULL.");
+
+	Mesh3DRenderer * renderer = sceneObject->GetRenderer3D();
+	NULL_CHECK_RTRN(renderer," Mesh3D::SendDataToRenderer -> renderer is NULL.");
 
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
 		if(subMeshes[i] == subMesh)
 		{
-			if(sceneObject != NULL)
-			{
-				Mesh3DRenderer * renderer = sceneObject->GetRenderer3D();
-				NULL_CHECK_RTRN(renderer," Mesh3D::Update -> renderer is NULL.");
-
-				renderer->UpdateFromMesh(i);
-			}
+			renderer->UpdateFromMesh(i);
 		}
 	}
 }

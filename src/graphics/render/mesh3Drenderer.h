@@ -36,7 +36,7 @@ class Mesh3DRenderer : public SceneObjectComponent
     void UpdateFromMeshes();
     void UpdateFromMesh(unsigned int index);
 
-    Mesh3D * GetMesh();
+    Mesh3DRef GetMesh();
     SubMesh3D * GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer);
     SubMesh3D * GetSubMesh(unsigned int index);
     SubMesh3DRenderer * GetSubRenderer(unsigned int index);

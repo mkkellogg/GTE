@@ -16,7 +16,7 @@ EngineObject::~EngineObject()
 
 }
 
-unsigned long EngineObject::GetObjectID()
+unsigned long EngineObject::GetObjectID() const
 {
 	return objectID;
 }

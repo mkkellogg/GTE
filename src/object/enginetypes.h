@@ -74,6 +74,11 @@ template <typename T> class EngineObjectRef
 		return *sharedPtr;
 	}
 
+	bool operator==(const EngineObjectRef<T> & other)
+	{
+		return sharedPtr == other.sharedPtr;
+	}
+
 	bool IsValid()
 	{
 		if(sharedPtr)return true;
@@ -83,6 +88,11 @@ template <typename T> class EngineObjectRef
 	void ForceDelete()
 	{
 		sharedPtr.reset();
+	}
+
+	static EngineObjectRef<T> Null()
+	{
+		return EngineObjectRef<T>();
 	}
 };
 

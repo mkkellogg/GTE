@@ -18,7 +18,7 @@ class EngineObject
 
     public:
 
-	unsigned long GetObjectID();
+	unsigned long GetObjectID() const;
 };
 
 #endif

@@ -52,11 +52,12 @@ class Point3 : public BaseVector4
     void AttachTo(float * data);
     void Detach();
 
+    // TODO: optimize this hashing function (implement correctly)
     typedef struct
     {
     	 int operator()(const Point3& p) const
     	 {
-			  return (int)p.x;
+			  return (int)p.x + (((int)p.y) << 1) + (((int)p.z) << 2);
     	 }
     }Point3Hasher;
 

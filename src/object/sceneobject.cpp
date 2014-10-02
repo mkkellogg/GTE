@@ -7,6 +7,8 @@
 
 #include "sceneobject.h"
 #include "engineobject.h"
+#include "enginetypes.h"
+#include "engineobjectmanager.h"
 #include "graphics/graphics.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
@@ -19,14 +21,11 @@
 #include "global/global.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
-#include "object/enginetypes.h"
 
 SceneObject::SceneObject() : EngineObject()
 {
 	isActive = true;
 	renderer3D = NULL;
-	mesh3D = NULL;
-	parent = NULL;
 
 	transform = new SceneObjectTransform(this);
 }
@@ -60,38 +59,29 @@ void SceneObject::GetFullTransform(Transform * transform)
 bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer * renderer)
 {
 	if(this->renderer3D == renderer)return true;
-	if(renderer != NULL)
+	NULL_CHECK(renderer,"SceneObject::SetMeshRenderer3D -> attempted to add NULL renderer.", false);
+
+	renderer->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	this->renderer3D = renderer;
+	if(this->mesh3D.IsValid())
 	{
-		renderer->sceneObject = this;
-		this->renderer3D = renderer;
-		if(this->mesh3D != NULL)
-		{
-			this->renderer3D->UpdateFromMeshes();
-		}
+		this->renderer3D->UpdateFromMeshes();
 	}
-	else
-	{
-		Debug::PrintError("SceneObject::SetMeshRenderer3D -> attempted to add NULL renderer.");
-	}
+
 	return true;
 }
 
 
-bool SceneObject::SetMesh3D(Mesh3D *mesh)
+bool SceneObject::SetMesh3D(Mesh3DRef mesh)
 {
 	if(this->mesh3D == mesh)return true;
-	if(mesh != NULL)
+	SHARED_REF_CHECK(mesh,"SceneObject::SetMesh3D -> attempted to add NULL mesh.", false);
+
+	mesh->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	this->mesh3D = mesh;
+	if(this->renderer3D !=NULL)
 	{
-		mesh->sceneObject = this;
-		this->mesh3D = mesh;
-		if(this->renderer3D !=NULL)
-		{
-			this->renderer3D->UpdateFromMeshes();
-		}
-	}
-	else
-	{
-		Debug::PrintError("SceneObject::SetMesh3D -> attempted to add NULL mesh.");
+		this->renderer3D->UpdateFromMeshes();
 	}
 
 	return true;
@@ -99,19 +89,23 @@ bool SceneObject::SetMesh3D(Mesh3D *mesh)
 
 bool SceneObject::SetCamera(CameraRef camera)
 {
+	SHARED_REF_CHECK(camera,"SceneObject::SetCamera -> attempted to add NULL camera.", false);
+
 	this->camera = camera;
-	camera->sceneObject = this;
+	camera->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
 	return true;
 }
 
 bool SceneObject::SetLight(LightRef light)
 {
+	SHARED_REF_CHECK(light,"SceneObject::SetLight -> attempted to add NULL light.", false);
+
 	this->light = light;
-	light->sceneObject = this;
+	light->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
 	return true;
 }
 
-Mesh3D * SceneObject::GetMesh3D()
+Mesh3DRef SceneObject::GetMesh3D()
 {
 	return mesh3D;
 }
@@ -131,22 +125,28 @@ LightRef SceneObject::GetLight()
 	return light;
 }
 
-void SceneObject::AddChild(SceneObject * child)
+void SceneObject::AddChild(SceneObjectRef child)
 {
-	//TODO: add check for duplicate children
+	SHARED_REF_CHECK_RTRN(child,"SceneObject::AddChild -> child is NULL.");
 
-	if(child->parent != NULL)
+	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+
+	SceneObjectRef sceneObjectRef = objectManager->FindSceneObjectInDirectory(this->GetObjectID());
+	SHARED_REF_CHECK_RTRN(sceneObjectRef,"SceneObject::AddChild -> sceneObjectRef is NULL.");
+
+	//TODO: add check for duplicate children
+	if(child->parent.IsValid())
 	{
 		child->parent->RemoveChild(child);
 	}
-	child->parent = this;
 
+	child->parent = sceneObjectRef;
 	children.push_back(child);
 }
 
-void SceneObject::RemoveChild(SceneObject * child)
+void SceneObject::RemoveChild(SceneObjectRef child)
 {
-	NULL_CHECK_RTRN(child,"SceneObject::RemoveChild -> adding NULL child.");
+	SHARED_REF_CHECK_RTRN(child,"SceneObject::RemoveChild -> child is NULL.");
 
 	int foundIndex = -1;
 	for(unsigned int i =0; i < children.size(); i++)
@@ -158,9 +158,11 @@ void SceneObject::RemoveChild(SceneObject * child)
 		}
 	}
 
-	if(foundIndex >=0)children.erase(children.begin() + foundIndex);
-
-	child->parent = NULL;
+	if(foundIndex >=0)
+	{
+		children.erase(children.begin() + foundIndex);
+		child->parent = SceneObjectRef::Null();
+	}
 }
 
 unsigned int SceneObject::GetChildrenCount() const
@@ -168,7 +170,7 @@ unsigned int SceneObject::GetChildrenCount() const
 	return children.size();
 }
 
-SceneObject * SceneObject::GetChildAt(unsigned int index) const
+SceneObjectRef SceneObject::GetChildAt(unsigned int index) const
 {
 	if(index < children.size())
 	{
@@ -177,11 +179,11 @@ SceneObject * SceneObject::GetChildAt(unsigned int index) const
 	else
 	{
 		Debug::PrintError("SceneObject::GetChildAt -> index out of range.");
-		return NULL;
+		return SceneObjectRef::Null();
 	}
 }
 
-SceneObject * SceneObject::GetParent()
+SceneObjectRef SceneObject::GetParent()
 {
 	return parent;
 }

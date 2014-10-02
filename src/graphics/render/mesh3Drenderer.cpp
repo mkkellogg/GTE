@@ -85,10 +85,10 @@ void Mesh3DRenderer::AddMaterial(Material * material)
 
 void Mesh3DRenderer::UpdateFromMeshes()
 {
-	NULL_CHECK_RTRN(sceneObject,"Mesh3DRenderer::UpdateFromMeshes -> sceneObject is NULL.");
+	SHARED_REF_CHECK_RTRN(sceneObject,"Mesh3DRenderer::UpdateFromMeshes -> sceneObject is NULL.");
 
-	Mesh3D * mesh = sceneObject->GetMesh3D();
-	NULL_CHECK_RTRN(mesh,"Mesh3DRenderer::UpdateFromMeshes -> mesh is NULL.");
+	Mesh3DRef mesh = sceneObject->GetMesh3D();
+	SHARED_REF_CHECK_RTRN(mesh,"Mesh3DRenderer::UpdateFromMeshes -> mesh is NULL.");
 
 	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
 	unsigned int subMeshCount =  mesh->GetSubMeshCount();
@@ -105,7 +105,7 @@ void Mesh3DRenderer::UpdateFromMeshes()
 		for(unsigned int i = subRenderers.size(); i < subMeshCount; i++)
 		{
 			SubMesh3DRenderer * renderer = engineObjectManager->CreateSubMesh3DRenderer();
-			NULL_CHECK_RTRN(mesh,"Mesh3DRenderer::UpdateFromMeshes -> could not create new SubMesh3DRenderer.");
+			NULL_CHECK_RTRN(renderer,"Mesh3DRenderer::UpdateFromMeshes -> could not create new SubMesh3DRenderer.");
 
 			renderer->SetContainerRenderer(this);
 			subRenderers.push_back(renderer);
@@ -130,12 +130,12 @@ void Mesh3DRenderer::UpdateFromMesh(unsigned int index)
 	renderer->UpdateFromMesh();
 }
 
-Mesh3D * Mesh3DRenderer::GetMesh()
+Mesh3DRef Mesh3DRenderer::GetMesh()
 {
-	NULL_CHECK(sceneObject,"Mesh3DRenderer::GetMesh -> sceneObject is NULL.", NULL);
+	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetMesh -> sceneObject is NULL.", Mesh3DRef::Null());
 
-	Mesh3D * mesh = sceneObject->GetMesh3D();
-	NULL_CHECK(mesh,"Mesh3DRenderer::GetMesh -> mesh is NULL.", NULL);
+	Mesh3DRef mesh = sceneObject->GetMesh3D();
+	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetMesh -> mesh is NULL.", Mesh3DRef::Null());
 
 	return mesh;
 }
@@ -143,14 +143,14 @@ Mesh3D * Mesh3DRenderer::GetMesh()
 SubMesh3D * Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer)
 {
 	NULL_CHECK(subRenderer,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subRenderer is NULL.", NULL);
-	NULL_CHECK(sceneObject,"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", NULL);
+	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", NULL);
 
 	for(unsigned int i=0; i < subRenderers.size(); i++)
 	{
 		if(subRenderers[i] == subRenderer)
 		{
-			Mesh3D * mesh = sceneObject->GetMesh3D();
-			NULL_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
+			Mesh3DRef mesh = sceneObject->GetMesh3D();
+			SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
 
 			SubMesh3D * subMesh = mesh->GetSubMesh(i);
 			NULL_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", NULL);
@@ -164,10 +164,10 @@ SubMesh3D * Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRenderer * subRend
 
 SubMesh3D * Mesh3DRenderer::GetSubMesh(unsigned int index)
 {
-	NULL_CHECK(sceneObject,"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", NULL);
+	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", NULL);
 
-	Mesh3D * mesh = sceneObject->GetMesh3D();
-	NULL_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
+	Mesh3DRef mesh = sceneObject->GetMesh3D();
+	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
 
 	SubMesh3D * subMesh = mesh->GetSubMesh(index);
 	NULL_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", NULL);

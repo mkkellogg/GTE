@@ -25,13 +25,13 @@ class SceneObject : public EngineObject
 	protected:
 
 	bool isActive;
-	std::vector<SceneObject * > children;
-	SceneObject * parent;
 	SceneObjectTransform * transform;
+	std::vector<SceneObjectRef > children;
+	SceneObjectRef parent;
 	CameraRef camera;
 	LightRef light;
 	Mesh3DRenderer * renderer3D;
-	Mesh3D * mesh3D;
+	Mesh3DRef mesh3D;
 
 	SceneObject();
     virtual ~SceneObject();
@@ -45,22 +45,41 @@ class SceneObject : public EngineObject
     void GetFullTransform(Transform * transform);
 
     bool SetMeshRenderer3D(Mesh3DRenderer *renderer);
-    bool SetMesh3D(Mesh3D *mesh);
+    bool SetMesh3D(Mesh3DRef mesh);
 
     bool SetCamera(CameraRef camera);
     bool SetLight(LightRef light);
 
-    Mesh3D * GetMesh3D();
+    Mesh3DRef GetMesh3D();
     Mesh3DRenderer * GetRenderer3D();
 
     CameraRef GetCamera();
     LightRef GetLight();
 
-    void AddChild(SceneObject * child);
-    void RemoveChild(SceneObject * child);
+    void AddChild(SceneObjectRef child);
+    void RemoveChild(SceneObjectRef child);
     unsigned int GetChildrenCount() const;
-    SceneObject * GetChildAt(unsigned int index) const;
-    SceneObject * GetParent();
+    SceneObjectRef GetChildAt(unsigned int index) const;
+    SceneObjectRef GetParent();
+
+    // TODO: optimize this hashing function (implement correctly)
+    typedef struct
+	{
+		 int operator()(const SceneObject& s) const
+		 {
+			  return (int)s.GetObjectID() << 1;
+		 }
+	}SceneObjectHasher;
+
+	typedef struct
+	{
+	  bool operator() (const SceneObject& a, const SceneObject& b) const { return a==b; }
+	} SceneObjectEq;
+
+	bool operator==(const SceneObject& s) const
+	{
+		return s.GetObjectID() == this->GetObjectID();
+	}
 };
 
 #endif

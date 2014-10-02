@@ -25,6 +25,7 @@
 #include "object/shadermanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
+#include "object/enginetypes.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
@@ -57,7 +58,7 @@ ModelImporter::~ModelImporter()
 
 }
 
-SceneObject * ModelImporter::LoadModelDirect(const std::string& filePath, float importScale)
+SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float importScale)
 {
 	// the global Assimp scene object
 	const aiScene* scene = NULL;
@@ -75,7 +76,7 @@ SceneObject * ModelImporter::LoadModelDirect(const std::string& filePath, float 
 	{
 		std::string msg = std::string("AssetImporter::LoadModel -> Could not find file: ") + filePath;
 		Debug::PrintError(msg);
-		return NULL;
+		return SceneObjectRef::Null();
 	}
 
 	// read the model file in from disk
@@ -86,32 +87,32 @@ SceneObject * ModelImporter::LoadModelDirect(const std::string& filePath, float 
 	{
 		std::string msg = std::string("AssetImporter::LoadModel -> Could not import file: ") + std::string(importer.GetErrorString());
 		Debug::PrintError(msg);
-		return NULL;
+		return SceneObjectRef::Null();
 	}
 
 	// We're done. Everything will be cleaned up by the importer destructor
 	return ProcessModelScene(filePath, *scene, importScale);
 }
 
-SceneObject * ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale)
+SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale)
 {
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
 	std::vector<MaterialImportDescriptor> materialImportDescriptors;
 	if(!ProcessMaterials(modelPath, scene, materialImportDescriptors))
 	{
-		return NULL;
+		return SceneObjectRef::Null();
 	}
 
-	SceneObject * root = objectManager->CreateSceneObject();
-	NULL_CHECK(root,"AssetImporter::ProcessModelScene -> could not create root object", NULL);
+	SceneObjectRef root = objectManager->CreateSceneObject();
+	SHARED_REF_CHECK(root,"AssetImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
 
 	root->SetActive(false);
 	Matrix4x4 baseTransform;
 
 	if(scene.mRootNode != NULL)
 	{
-		RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, *root, baseTransform, materialImportDescriptors);
+		RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root, baseTransform, materialImportDescriptors);
 	}
 	else
 	{
@@ -121,7 +122,7 @@ SceneObject * ModelImporter::ProcessModelScene(const std::string& modelPath, con
 	return root;
 }
 
-void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObject& current, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors)
+void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObjectRef current, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors)
 {
 	Matrix4x4 mat;
 
@@ -135,13 +136,13 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 
 	// create new scene object to hold the Mesh3D object and its renderer
-	SceneObject * sceneObject = engineObjectManager->CreateSceneObject();
-	NULL_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
+	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
+	SHARED_REF_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
 	if(node.mNumMeshes > 0)
 	{
-		Mesh3D * mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
-		NULL_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
+		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
+		SHARED_REF_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
 
 		bool meshInitSuccess = mesh3D->Init();
 		if(!meshInitSuccess)
@@ -190,16 +191,17 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 		sceneObject->SetMeshRenderer3D(meshRenderer);
 		sceneObject->SetMesh3D(mesh3D);
-		current.AddChild(sceneObject);
+		current->AddChild(sceneObject);
 	}
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{
-		SceneObject * child = engineObjectManager->CreateSceneObject();
-		NULL_CHECK_RTRN(child,"AssetImporter::RecursiveProcessModelScene -> Could not create child scene object.");
-		current.AddChild(child);
+		SceneObjectRef child = engineObjectManager->CreateSceneObject();
+		SHARED_REF_CHECK_RTRN(child,"AssetImporter::RecursiveProcessModelScene -> Could not create child object.");
+
+		current->AddChild(child);
 		const aiNode *childNode = node.mChildren[i];
-		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, *child, mat, materialImportDescriptors);
+		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, child, mat, materialImportDescriptors);
 	}
 }
 

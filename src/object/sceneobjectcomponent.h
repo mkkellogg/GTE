@@ -6,6 +6,7 @@ class SceneObjectComponent;
 class SceneObject;
 
 #include "object/engineobject.h"
+#include "object/enginetypes.h"
 
 class SceneObjectComponent : public EngineObject
 {
@@ -14,7 +15,7 @@ class SceneObjectComponent : public EngineObject
 
     protected:
 
-	SceneObject * sceneObject;
+	SceneObjectRef sceneObject;
 
 	SceneObjectComponent();
     virtual ~SceneObjectComponent();

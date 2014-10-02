@@ -11,6 +11,7 @@
 #include "geometry/sceneobjecttransform.h"
 #include "object/sceneobject.h"
 #include "object/engineobjectmanager.h"
+#include "object/enginetypes.h"
 #include "ui/debug.h"
 #include "base/intmask.h"
 #include "graphics/graphics.h"
@@ -149,15 +150,12 @@ void RenderManager::RenderAll()
 	cameraCount = 0;
 
 	Transform cameraModelView;
-	const SceneObject * sceneRoot = objectManager->GetSceneRoot();
-	if(sceneRoot == NULL)
-	{
-		Debug::PrintError("RenderManager::RenderAll -> sceneRoot is NULL.");
-		return;
-	}
+
+	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
+	SHARED_REF_CHECK_RTRN(sceneRoot,"RenderManager::RenderAll -> sceneRoot is NULL.");
 
 	// gather information about the cameras & lights in the scene
-	ProcessScene(const_cast<SceneObject*>(sceneRoot), &cameraModelView);
+	ProcessScene(sceneRoot.GetPtr(), &cameraModelView);
 
 	// render the scene from the perspective of each camera found in ProcessScene()
 	for(unsigned int i=0; i < cameraCount; i ++)
@@ -185,9 +183,9 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 
 	for(unsigned int i = 0; i < parent->GetChildrenCount(); i++)
 	{
-		SceneObject * child = parent->GetChildAt(i);
+		SceneObjectRef child = parent->GetChildAt(i);
 
-		if(child != NULL && child->IsActive())
+		if(child.IsValid() && child->IsActive())
 		{
 			// save the existing view transform
 			PushTransformData(viewTransform, viewTransformStack);
@@ -221,7 +219,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 			}
 
 			// continue recursion through child object
-			ProcessScene(child, viewTransform);
+			ProcessScene(child.GetPtr(), viewTransform);
 
 			// restore previous view transform
 			PopTransformData(viewTransform, viewTransformStack);
@@ -252,13 +250,14 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 
 	// clear the appropriate render buffers this camera
 	ClearBuffersForCamera(camera);
-	const SceneObject * sceneRoot = objectManager->GetSceneRoot();
+	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
+	SHARED_REF_CHECK_RTRN(sceneRoot,"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
 	Transform identity;
 	identity.SetIdentity();
 
 	// render the scene using the view transform of the current camera
-	ForwardRenderScene(const_cast<SceneObject*>(sceneRoot),&identity, &(sceneCameras[cameraIndex].transform), camera);
+	ForwardRenderScene(sceneRoot.GetPtr(),&identity, &(sceneCameras[cameraIndex].transform), camera);
 }
 
 /*
@@ -285,9 +284,9 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 	// loop through each child scene object
 	for(unsigned int i = 0; i < parent->GetChildrenCount(); i++)
 	{
-		SceneObject * child = parent->GetChildAt(i);
+		SceneObjectRef child = parent->GetChildAt(i);
 
-		if(child == NULL ||  child->GetLocalTransform() == NULL)
+		if(!child.IsValid() ||  child->GetLocalTransform() == NULL)
 		{
 			Debug::PrintError("RenderManager::ForwardRenderScene -> NULL scene object encountered.");
 		}
@@ -304,9 +303,9 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 
 			if(renderer != NULL)
 			{
-				Mesh3D * mesh = renderer->GetMesh();
+				Mesh3DRef mesh = renderer->GetMesh();
 
-				if(mesh == NULL)
+				if(!mesh.IsValid())
 				{
 					Debug::PrintError("RenderManager::ForwardRenderScene -> renderer returned NULL mesh.");
 				}
@@ -417,7 +416,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 			}
 
 			// continue recursion through child
-			ForwardRenderScene(child, modelTransform, viewTransformInverse,camera);
+			ForwardRenderScene(child.GetPtr(), modelTransform, viewTransformInverse,camera);
 
 			// restore previous modelTransform
 			PopTransformData(modelTransform,modelTransformStack);

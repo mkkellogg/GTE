@@ -25,6 +25,7 @@
 #include "object/shadermanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
+#include "object/enginetypes.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
@@ -58,7 +59,7 @@ AssetImporter::~AssetImporter()
 
 }
 
-SceneObject * AssetImporter::LoadModelDirect(const std::string& filePath, float importScale)
+SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float importScale)
 {
 	ModelImporter importer;
 	return importer.LoadModelDirect(filePath, importScale);
