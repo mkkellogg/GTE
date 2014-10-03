@@ -178,7 +178,6 @@ Mesh3DRef EngineObjectManager::CreateMesh3D(unsigned int subMeshCount)
 	});
 }
 
-
 void EngineObjectManager::DestroyMesh3D(Mesh3DRef mesh)
 {
 	mesh.ForceDelete();
@@ -190,52 +189,81 @@ void EngineObjectManager::DeleteMesh3D(Mesh3D * mesh)
 	delete mesh;
 }
 
-Mesh3DRenderer * EngineObjectManager::CreateMesh3DRenderer()
+Mesh3DRendererRef EngineObjectManager::CreateMesh3DRenderer()
 {
 	Mesh3DRenderer * renderer =  new Mesh3DRenderer();
-	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could not create new Mesh3DRenderer object.",NULL);
+	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could not create new Mesh3DRenderer object.", Mesh3DRendererRef::Null());
 	renderer->SetObjectID(GetNextObjectID());
-	return renderer;
+
+	return Mesh3DRendererRef(renderer, [=](Mesh3DRenderer * renderer)
+	{
+		  DeleteMesh3DRenderer(renderer);
+	});
 }
 
-void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRenderer * renderer)
+void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRendererRef renderer)
 {
-	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DestroyMesh3DRenderer -> renderer is NULL.");
+	renderer.ForceDelete();
+}
+
+void EngineObjectManager::DeleteMesh3DRenderer(Mesh3DRenderer* renderer)
+{
+	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteMesh3DRenderer -> renderer is NULL.");
 	delete renderer;
 }
 
-SubMesh3D * EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
+SubMesh3DRef EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
 {
 	SubMesh3D * mesh = new SubMesh3D(attributes);
-	NULL_CHECK(mesh,"EngineObjectManager::CreateSubMesh3D -> could not create new SubMesh3D object.",NULL);
+	NULL_CHECK(mesh,"EngineObjectManager::CreateSubMesh3D -> could not create new SubMesh3D object.", SubMesh3DRef::Null());
 	mesh->SetObjectID(GetNextObjectID());
-	return mesh;
+
+	return SubMesh3DRef(mesh, [=](SubMesh3D * mesh)
+	{
+		  DeleteSubMesh3D(mesh);
+	});
 }
 
-void EngineObjectManager::DestroySubMesh3D(SubMesh3D * mesh)
+void EngineObjectManager::DestroySubMesh3D(SubMesh3DRef mesh)
 {
-	NULL_CHECK_RTRN(mesh,"EngineObjectManager::DestroySubMesh3D -> mesh is NULL.");
+	mesh.ForceDelete();
+}
+
+void EngineObjectManager::DeleteSubMesh3D(SubMesh3D * mesh)
+{
+	NULL_CHECK_RTRN(mesh,"EngineObjectManager::DeleteSubMesh3D -> mesh is NULL.");
 	delete mesh;
 }
 
-SubMesh3DRenderer *  EngineObjectManager::CreateSubMesh3DRenderer()
+SubMesh3DRendererRef  EngineObjectManager::CreateSubMesh3DRenderer()
 {
 	return CreateSubMesh3DRenderer(NULL);
 }
 
-SubMesh3DRenderer * EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
+SubMesh3DRendererRef EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
 {
 	Graphics * graphics = Graphics::Instance();
+
 	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer(attrTransformer);
-	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.",NULL);
+
+	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.", SubMesh3DRendererRef::Null());
 	renderer->SetObjectID(GetNextObjectID());
-	return renderer;
+
+	return SubMesh3DRendererRef(renderer, [=](SubMesh3DRenderer * renderer)
+	{
+		  DeleteSubMesh3DRenderer(renderer);
+	});
 }
 
-void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRenderer * renderer)
+void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer)
+{
+	renderer.ForceDelete();
+}
+
+void EngineObjectManager::DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer)
 {
 	Graphics * graphics = Graphics::Instance();
-	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DestroySubMesh3DRenderer -> renderer is NULL.");
+	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteSubMesh3DRenderer -> renderer is NULL.");
 	graphics->DestroyMeshRenderer(renderer);
 }
 

@@ -22,11 +22,17 @@ SubMesh3DRenderer::SubMesh3DRenderer(Graphics * graphics) : EngineObject()
 	this->activeMaterial = NULL;
 	this->graphics = graphics;
 	this->containerRenderer = NULL;
+	this->subIndex = -1;
 }
 
 SubMesh3DRenderer::~SubMesh3DRenderer()
 {
 
+}
+
+void SubMesh3DRenderer::SetSubIndex(unsigned int index)
+{
+	subIndex = index;
 }
 
 void SubMesh3DRenderer::SetContainerRenderer(Mesh3DRenderer * renderer)

@@ -108,7 +108,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 		material->SetTexture(texture, "TEXTURE0");
 
-		Mesh3DRenderer * renderer = objectManager->CreateMesh3DRenderer();
+		Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 		renderer->AddMaterial(material);
 		sceneObject->SetMeshRenderer3D(renderer);
 
@@ -120,7 +120,8 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
-		SubMesh3D * subMesh = objectManager->CreateSubMesh3D(meshAttributes);
+
+		SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 		subMesh->Init(36);
 
 		Mesh3DRef mesh = objectManager->CreateMesh3D(1);
@@ -244,9 +245,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		subMesh->SetNormalsSmoothingThreshold(85);
 		subMesh->Update();
 		sceneObject->SetMesh3D(mesh);
-
-
-
 
 		SceneObjectRef childSceneObject = objectManager->CreateSceneObject();
 		sceneObject->AddChild(childSceneObject);

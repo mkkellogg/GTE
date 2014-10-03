@@ -7,6 +7,7 @@
 #include "object/engineobjectmanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
+#include "object/enginetypes.h"
 #include "mesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "submesh3Drenderer.h"
@@ -39,8 +40,8 @@ void Mesh3DRenderer::DestroyRenderer(unsigned int index)
 	EngineObjectManager *objectManager = EngineObjectManager::Instance();
 	if(index < subRenderers.size())
 	{
-		SubMesh3DRenderer * renderer = subRenderers[index];
-		if(renderer != NULL)
+		SubMesh3DRendererRef renderer = subRenderers[index];
+		if(renderer.IsValid())
 		{
 			objectManager->DestroySubMesh3DRenderer(renderer);
 		}
@@ -104,9 +105,10 @@ void Mesh3DRenderer::UpdateFromMeshes()
 	{
 		for(unsigned int i = subRenderers.size(); i < subMeshCount; i++)
 		{
-			SubMesh3DRenderer * renderer = engineObjectManager->CreateSubMesh3DRenderer();
-			NULL_CHECK_RTRN(renderer,"Mesh3DRenderer::UpdateFromMeshes -> could not create new SubMesh3DRenderer.");
+			SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
+			SHARED_REF_CHECK_RTRN(renderer,"Mesh3DRenderer::UpdateFromMeshes -> could not create new SubMesh3DRenderer.");
 
+			renderer->SetSubIndex(i);
 			renderer->SetContainerRenderer(this);
 			subRenderers.push_back(renderer);
 		}
@@ -126,7 +128,7 @@ void Mesh3DRenderer::UpdateFromMesh(unsigned int index)
 		return;
 	}
 
-	SubMesh3DRenderer * renderer = subRenderers[index];
+	SubMesh3DRendererRef renderer = subRenderers[index];
 	renderer->UpdateFromMesh();
 }
 
@@ -140,47 +142,47 @@ Mesh3DRef Mesh3DRenderer::GetMesh()
 	return mesh;
 }
 
-SubMesh3D * Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer)
+SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer)
 {
-	NULL_CHECK(subRenderer,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subRenderer is NULL.", NULL);
-	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", NULL);
+	SHARED_REF_CHECK(subRenderer,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subRenderer is NULL.", SubMesh3DRef::Null());
+	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", SubMesh3DRef::Null());
 
 	for(unsigned int i=0; i < subRenderers.size(); i++)
 	{
 		if(subRenderers[i] == subRenderer)
 		{
 			Mesh3DRef mesh = sceneObject->GetMesh3D();
-			SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
+			SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", SubMesh3DRef::Null());
 
-			SubMesh3D * subMesh = mesh->GetSubMesh(i);
-			NULL_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", NULL);
+			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
+			SHARED_REF_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", SubMesh3DRef::Null());
 
 			return subMesh;
 		}
 	}
 
-	return NULL;
+	return SubMesh3DRef::Null();
 }
 
-SubMesh3D * Mesh3DRenderer::GetSubMesh(unsigned int index)
+SubMesh3DRef Mesh3DRenderer::GetSubMesh(unsigned int index)
 {
-	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", NULL);
+	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
 
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
-	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", NULL);
+	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", SubMesh3DRef::Null());
 
-	SubMesh3D * subMesh = mesh->GetSubMesh(index);
-	NULL_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", NULL);
+	SubMesh3DRef subMesh = mesh->GetSubMesh(index);
+	SHARED_REF_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", SubMesh3DRef::Null());
 
 	return subMesh;
 }
 
-SubMesh3DRenderer * Mesh3DRenderer::GetSubRenderer(unsigned int index)
+SubMesh3DRendererRef Mesh3DRenderer::GetSubRenderer(unsigned int index)
 {
 	if(index >= subRenderers.size())
 	{
 		Debug::PrintError("Mesh3DRenderer::GetSubRenderer -> Index is out of range.");
-		return NULL;
+		return SubMesh3DRendererRef::Null();
 	}
 
 	return subRenderers[index];

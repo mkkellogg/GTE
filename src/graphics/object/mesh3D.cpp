@@ -45,7 +45,7 @@ unsigned int Mesh3D::GetSubMeshCount()
 
 bool Mesh3D::Init()
 {
-	subMeshes = new SubMesh3D*[subMeshCount];
+	subMeshes = new SubMesh3DRef[subMeshCount];
 	NULL_CHECK(subMeshes," Mesh3D::Init -> Could not allocate sub meshes.",false);
 
 	memset(subMeshes, 0, sizeof(SubMesh3D*) * subMeshCount);
@@ -53,23 +53,23 @@ bool Mesh3D::Init()
 	return true;
 }
 
-void Mesh3D::SendDataToRenderer(SubMesh3D * subMesh)
+void Mesh3D::SendDataToRenderer(unsigned int index)
 {
-	// silently return if not attached to a scene object
-	if(!sceneObject.IsValid())return;
-
-	NULL_CHECK_RTRN(subMesh," Mesh3D::SendDataToRenderer -> subMesh is NULL.");
-
-	Mesh3DRenderer * renderer = sceneObject->GetRenderer3D();
-	NULL_CHECK_RTRN(renderer," Mesh3D::SendDataToRenderer -> renderer is NULL.");
-
-	for(unsigned int i = 0; i < subMeshCount; i++)
+	if( index >= subMeshCount)
 	{
-		if(subMeshes[i] == subMesh)
-		{
-			renderer->UpdateFromMesh(i);
-		}
+		Debug::PrintError("Mesh3D::SendDataToRenderer -> Index out of range.");
+		return;
 	}
+
+	SHARED_REF_CHECK_RTRN(sceneObject," Mesh3D::SendDataToRenderer -> sceneObject is NULL.");
+
+	SubMesh3DRef subMesh = subMeshes[index];
+	SHARED_REF_CHECK_RTRN(subMesh," Mesh3D::SendDataToRenderer -> subMesh is NULL.");
+
+	Mesh3DRendererRef renderer = sceneObject->GetRenderer3D();
+	SHARED_REF_CHECK_RTRN(renderer," Mesh3D::SendDataToRenderer -> renderer is NULL.");
+
+	renderer->UpdateFromMesh(index);
 }
 
 void Mesh3D::Update()
@@ -78,22 +78,23 @@ void Mesh3D::Update()
 
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
-		if(subMeshes[i] != NULL)
+		if(subMeshes[i].IsValid())
 		{
 			subMeshes[i]->Update();
 		}
 	}
 }
 
-void Mesh3D::SetSubMesh(SubMesh3D * mesh, unsigned int index)
+void Mesh3D::SetSubMesh(SubMesh3DRef mesh, unsigned int index)
 {
-	NULL_CHECK_RTRN(mesh,"Mesh3D::SetSubMesh -> mesh is NULL.");
+	SHARED_REF_CHECK_RTRN(mesh,"Mesh3D::SetSubMesh -> mesh is NULL.");
 	NULL_CHECK_RTRN(subMeshes,"Mesh3D::SetSubMesh -> subMeshes is NULL.");
 
 	if(index < subMeshCount)
 	{
 		subMeshes[index] = mesh;
 		mesh->SetContainerMesh(this);
+		mesh->SetSubIndex(index);
 		mesh->Update();
 	}
 	else
@@ -103,9 +104,9 @@ void Mesh3D::SetSubMesh(SubMesh3D * mesh, unsigned int index)
 	}
 }
 
-SubMesh3D * Mesh3D::GetSubMesh(unsigned int index)
+SubMesh3DRef Mesh3D::GetSubMesh(unsigned int index)
 {
-	NULL_CHECK(subMeshes,"Mesh3D::GetSubMesh -> subMeshes is NULL.", NULL);
+	NULL_CHECK(subMeshes,"Mesh3D::GetSubMesh -> subMeshes is NULL.", SubMesh3DRef::Null());
 
 	if(index < subMeshCount)
 	{
@@ -114,6 +115,18 @@ SubMesh3D * Mesh3D::GetSubMesh(unsigned int index)
 	else
 	{
 		Debug::PrintError("Mesh3D::GetSubMesh -> Index out of range.");
-		return NULL;
+		return SubMesh3DRef::Null();
 	}
+}
+
+bool Mesh3D::IsAttachedToSceneObject()
+{
+	return sceneObject.IsValid();
+}
+
+bool Mesh3D::SceneObjectHasRenderer()
+{
+	if(!IsAttachedToSceneObject())return false;
+	if(!sceneObject->GetRenderer3D().IsValid())return false;
+	return true;
 }

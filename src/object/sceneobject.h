@@ -30,7 +30,7 @@ class SceneObject : public EngineObject
 	SceneObjectRef parent;
 	CameraRef camera;
 	LightRef light;
-	Mesh3DRenderer * renderer3D;
+	Mesh3DRendererRef renderer3D;
 	Mesh3DRef mesh3D;
 
 	SceneObject();
@@ -44,14 +44,14 @@ class SceneObject : public EngineObject
     Transform * GetLocalTransform() const ;
     void GetFullTransform(Transform * transform);
 
-    bool SetMeshRenderer3D(Mesh3DRenderer *renderer);
+    bool SetMeshRenderer3D(Mesh3DRendererRef renderer);
     bool SetMesh3D(Mesh3DRef mesh);
 
     bool SetCamera(CameraRef camera);
     bool SetLight(LightRef light);
 
     Mesh3DRef GetMesh3D();
-    Mesh3DRenderer * GetRenderer3D();
+    Mesh3DRendererRef GetRenderer3D();
 
     CameraRef GetCamera();
     LightRef GetLight();

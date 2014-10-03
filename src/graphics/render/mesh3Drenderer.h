@@ -19,7 +19,7 @@ class Mesh3DRenderer : public SceneObjectComponent
 	protected :
 
 	std::vector <Material *> materials;
-	std::vector <SubMesh3DRenderer *> subRenderers;
+	std::vector <SubMesh3DRendererRef> subRenderers;
 
 	Mesh3DRenderer();
     ~Mesh3DRenderer();
@@ -37,9 +37,9 @@ class Mesh3DRenderer : public SceneObjectComponent
     void UpdateFromMesh(unsigned int index);
 
     Mesh3DRef GetMesh();
-    SubMesh3D * GetSubMeshForSubRenderer(SubMesh3DRenderer * subRenderer);
-    SubMesh3D * GetSubMesh(unsigned int index);
-    SubMesh3DRenderer * GetSubRenderer(unsigned int index);
+    SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer);
+    SubMesh3DRef GetSubMesh(unsigned int index);
+    SubMesh3DRendererRef GetSubRenderer(unsigned int index);
     unsigned int GetSubRendererCount();
 };
 

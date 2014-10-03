@@ -151,12 +151,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			return;
 		}
 
-		Mesh3DRenderer * meshRenderer = engineObjectManager->CreateMesh3DRenderer();
-		if(meshRenderer == NULL)
-		{
-			Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
-			return;
-		}
+		Mesh3DRendererRef meshRenderer = engineObjectManager->CreateMesh3DRenderer();
+		SHARED_REF_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
 
 		// update the scene object's local transform
 		sceneObject->GetLocalTransform()->SetTo(&mat);
@@ -182,8 +178,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			meshRenderer->AddMaterial(material);
 
 			// convert Assimp mesh to a Mesh3D object
-			SubMesh3D * subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
-			NULL_CHECK_RTRN(subMesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
+			SubMesh3DRef subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
+			SHARED_REF_CHECK_RTRN(subMesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 			// add the mesh to the newly created scene object
 			mesh3D->SetSubMesh(subMesh3D, n);
@@ -205,7 +201,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 	}
 }
 
-SubMesh3D * ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor)
+SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor)
 {
 	unsigned int vertexCount = 0;
 
@@ -216,7 +212,7 @@ SubMesh3D * ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int m
 		if(face == NULL)
 		{
 			Debug::PrintError("AssetImporter::ConvertAssimpMesh -> For some reason, mesh has a NULL face!");
-			return NULL;
+			return SubMesh3DRef::Null();
 		}
 		vertexCount += face->mNumIndices;
 	}
@@ -250,8 +246,8 @@ SubMesh3D * ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int m
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 
 	// create Mesh3D object with the constructed StandardAttributeSet
-	SubMesh3D * mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
-	NULL_CHECK(mesh3D,"AssetImporter::ConvertAssimpMesh -> Could not create Mesh3D object.",NULL);
+	SubMesh3DRef mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
+	SHARED_REF_CHECK(mesh3D,"AssetImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null());
 
 	bool initSuccess = mesh3D->Init(vertexCount);
 
@@ -260,7 +256,7 @@ SubMesh3D * ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int m
 	{
 		engineObjectManager->DestroySubMesh3D(mesh3D);
 		Debug::PrintError("AssetImporter::ConvertAssimpMesh -> Could not init mesh.");
-		return NULL;
+		return SubMesh3DRef::Null();
 	}
 
 	int vertexComponentIndex = 0;

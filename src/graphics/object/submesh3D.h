@@ -27,6 +27,7 @@ class SubMesh3D : public EngineObject
 
 	StandardAttributeSet attributeSet;
 	unsigned int vertexCount;
+	int subIndex;
 
     Point3Array * positions;
     Vector3Array * normals;
@@ -54,6 +55,7 @@ class SubMesh3D : public EngineObject
     void CalcSphereOfInfluence();
     void CalculateNormals(float smoothingThreshhold);
     void SetContainerMesh(Mesh3D * mesh);
+    void SetSubIndex(int index);
 
 	public:
 

@@ -53,6 +53,9 @@ class EngineObjectManager
 	void DeleteLight(Light * light);
 	void DeleteCamera(Camera * light);
 	void DeleteMesh3D(Mesh3D * mesh);
+	void DeleteMesh3DRenderer(Mesh3DRenderer * renderer);
+	void DeleteSubMesh3D(SubMesh3D * mesh);
+	void DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer);
 
     public :
 
@@ -67,14 +70,14 @@ class EngineObjectManager
 
     Mesh3DRef CreateMesh3D(unsigned int subMeshCount);
     void DestroyMesh3D(Mesh3DRef mesh);
-    Mesh3DRenderer * CreateMesh3DRenderer();
-    void DestroyMesh3DRenderer(Mesh3DRenderer * renderer);
+    Mesh3DRendererRef CreateMesh3DRenderer();
+    void DestroyMesh3DRenderer(Mesh3DRendererRef renderer);
 
-    SubMesh3D * CreateSubMesh3D(StandardAttributeSet attributes);
-    void DestroySubMesh3D(SubMesh3D * mesh);
-    SubMesh3DRenderer * CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer);
-    SubMesh3DRenderer * CreateSubMesh3DRenderer();
-    void DestroySubMesh3DRenderer(SubMesh3DRenderer * renderer);
+    SubMesh3DRef CreateSubMesh3D(StandardAttributeSet attributes);
+    void DestroySubMesh3D(SubMesh3DRef mesh);
+    SubMesh3DRendererRef CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer);
+    SubMesh3DRendererRef CreateSubMesh3DRenderer();
+    void DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer);
     Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(Shader * shader);
     Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes);

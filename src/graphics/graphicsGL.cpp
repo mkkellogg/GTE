@@ -168,6 +168,7 @@ SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer(AttributeTransformer * attrTr
 
 void GraphicsGL::DestroyMeshRenderer(SubMesh3DRenderer * renderer)
 {
+	printf("deleteing\n");
 	NULL_CHECK_RTRN(renderer, "GraphicsGL::DestroyMeshRenderer -> renderer is NULL");
 	delete renderer;
 }

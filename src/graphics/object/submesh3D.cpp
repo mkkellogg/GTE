@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <functional>
 #include <vector>
+#include <memory>
 
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
@@ -51,6 +52,7 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 	lightCullType = LightCullType::SphereOfInfluence;
 
 	containerMesh = NULL;
+	subIndex = -1;
 }
 
 SubMesh3D::~SubMesh3D()
@@ -61,6 +63,11 @@ SubMesh3D::~SubMesh3D()
 void SubMesh3D::SetContainerMesh(Mesh3D * containerMesh)
 {
 	this->containerMesh = containerMesh;
+}
+
+void SubMesh3D::SetSubIndex(int index)
+{
+	subIndex = index;
 }
 
 void SubMesh3D::CalcSphereOfInfluence()
@@ -127,7 +134,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
 	// vertices, so this structure is used to store all the normals for those vertices, so they can later
 	// be used to calculate average (smoothed) normals
-	std::unordered_map<Point3, std::vector<Vector3*>*, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
+	std::unordered_map<Point3, std::shared_ptr<std::vector<Vector3*>>, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
 
 	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
 	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
@@ -138,10 +145,10 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		// create a normal list for a vertex if one does not exist
 		if(normalGroups.find(*point) == normalGroups.end())
 		{
-			normalGroups[*point] = new std::vector<Vector3*>();
+			normalGroups[*point] = std::shared_ptr<std::vector<Vector3*>>(new std::vector<Vector3*>());
 		}
 
-		std::vector<Vector3*>* list = normalGroups[*point];
+		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[*point];
 		Vector3 * normal = normals->GetVector(v);
 		list->push_back(normal);
 	}
@@ -159,7 +166,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		Point3 * point = positions->GetPoint(v);
 
 		// lookup normal list associated with vertex
-		std::vector<Vector3*>* list = normalGroups[*point];
+		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[*point];
 
 		Vector3 avg(0,0,0);
 		float divisor = 0;
@@ -201,18 +208,6 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 
 		// set the normal for this vertex to the averaged normal
 		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
-	}
-
-	// clean up dynamically allocated lists
-	for(unsigned int v =0; v < vertexCount; v++)
-	{
-		Point3 * point = positions->GetPoint(v);
-		std::vector<Vector3*>* list = normalGroups[*point];
-		if(list != NULL)
-		{
-			delete list;
-			normalGroups[*point] = NULL;
-		}
 	}
 }
 
@@ -279,9 +274,12 @@ void SubMesh3D::Update()
 	CalcSphereOfInfluence();
 	CalculateNormals(normalsSmoothingThreshold);
 
-	if(containerMesh != NULL)
+	if(containerMesh != NULL &&
+	   containerMesh->IsAttachedToSceneObject() &&
+	   containerMesh->SceneObjectHasRenderer())
 	{
-		containerMesh->SendDataToRenderer(this);
+		if(subIndex >=0)
+			containerMesh->SendDataToRenderer((unsigned int)subIndex);
 	}
 }
 

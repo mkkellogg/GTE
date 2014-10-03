@@ -19,19 +19,22 @@ class Mesh3D : public SceneObjectComponent
 	protected :
 
 	unsigned int subMeshCount;
-	SubMesh3D ** subMeshes;
+	SubMesh3DRef * subMeshes;
 
     Mesh3D(unsigned int subMeshCount);
     ~Mesh3D();
-    void SendDataToRenderer(SubMesh3D * subMesh);
+    void SendDataToRenderer(unsigned int subIndex);
 
 	public:
 
     unsigned int GetSubMeshCount();
-    void SetSubMesh(SubMesh3D * mesh, unsigned int index);
-    SubMesh3D * GetSubMesh(unsigned int index);
+    void SetSubMesh(SubMesh3DRef mesh, unsigned int index);
+    SubMesh3DRef GetSubMesh(unsigned int index);
     bool Init();
     void Update();
+
+    bool IsAttachedToSceneObject();
+    bool SceneObjectHasRenderer();
 };
 
 #endif

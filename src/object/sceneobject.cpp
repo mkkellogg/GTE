@@ -25,7 +25,6 @@
 SceneObject::SceneObject() : EngineObject()
 {
 	isActive = true;
-	renderer3D = NULL;
 
 	transform = new SceneObjectTransform(this);
 }
@@ -56,12 +55,15 @@ void SceneObject::GetFullTransform(Transform * transform)
 	this->transform->GetFullTransform(transform);
 }
 
-bool SceneObject::SetMeshRenderer3D(Mesh3DRenderer * renderer)
+bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)
 {
 	if(this->renderer3D == renderer)return true;
-	NULL_CHECK(renderer,"SceneObject::SetMeshRenderer3D -> attempted to add NULL renderer.", false);
+	SHARED_REF_CHECK(renderer,"SceneObject::SetMeshRenderer3D -> attempted to add NULL renderer.", false);
 
-	renderer->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SHARED_REF_CHECK(thisRef,"SceneObject::SetMeshRenderer3D -> Could not find matching reference for scene object", false);
+
+	renderer->sceneObject = thisRef;
 	this->renderer3D = renderer;
 	if(this->mesh3D.IsValid())
 	{
@@ -77,12 +79,16 @@ bool SceneObject::SetMesh3D(Mesh3DRef mesh)
 	if(this->mesh3D == mesh)return true;
 	SHARED_REF_CHECK(mesh,"SceneObject::SetMesh3D -> attempted to add NULL mesh.", false);
 
-	mesh->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SHARED_REF_CHECK(thisRef,"SceneObject::SetMesh3D -> Could not find matching reference for scene object", false);
+
+	mesh->sceneObject = thisRef;
 	this->mesh3D = mesh;
-	if(this->renderer3D !=NULL)
+	if(this->renderer3D.IsValid())
 	{
 		this->renderer3D->UpdateFromMeshes();
 	}
+
 
 	return true;
 }
@@ -91,8 +97,12 @@ bool SceneObject::SetCamera(CameraRef camera)
 {
 	SHARED_REF_CHECK(camera,"SceneObject::SetCamera -> attempted to add NULL camera.", false);
 
-	this->camera = camera;
+	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SHARED_REF_CHECK(thisRef,"SceneObject::SetCamera -> Could not find matching reference for scene object", false);
+
 	camera->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	this->camera = camera;
+
 	return true;
 }
 
@@ -100,8 +110,12 @@ bool SceneObject::SetLight(LightRef light)
 {
 	SHARED_REF_CHECK(light,"SceneObject::SetLight -> attempted to add NULL light.", false);
 
+	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SHARED_REF_CHECK(thisRef,"SceneObject::SetLight -> Could not find matching reference for scene object", false);
+
+	light->sceneObject = thisRef;
 	this->light = light;
-	light->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+
 	return true;
 }
 
@@ -110,7 +124,7 @@ Mesh3DRef SceneObject::GetMesh3D()
 	return mesh3D;
 }
 
-Mesh3DRenderer * SceneObject::GetRenderer3D()
+Mesh3DRendererRef SceneObject::GetRenderer3D()
 {
 	return renderer3D;
 }
@@ -128,6 +142,13 @@ LightRef SceneObject::GetLight()
 void SceneObject::AddChild(SceneObjectRef child)
 {
 	SHARED_REF_CHECK_RTRN(child,"SceneObject::AddChild -> child is NULL.");
+
+	// check for adding self as child (that's bad)
+	if(child.GetPtr() == this)
+	{
+		Debug::PrintError("SceneObject::AddChild -> Attempted to add self as a child scene object.");
+		return;
+	}
 
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 

@@ -299,9 +299,9 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 			modelTransform->TransformBy(child->GetLocalTransform());
 
 			// check if current scene object has a mesh & renderer
-			Mesh3DRenderer * renderer = child->GetRenderer3D();
+			Mesh3DRendererRef renderer = child->GetRenderer3D();
 
-			if(renderer != NULL)
+			if(renderer.IsValid())
 			{
 				Mesh3DRef mesh = renderer->GetMesh();
 
@@ -329,15 +329,15 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 							continue;
 						}
 
-						SubMesh3DRenderer * subRenderer = renderer->GetSubRenderer(i);
-						if(subRenderer == NULL)
+						SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
+						if(!subRenderer.IsValid())
 						{
 							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
 							continue;
 						}
 
-						SubMesh3D * subMesh = mesh->GetSubMesh(i);
-						if(subMesh == NULL)
+						SubMesh3DRef subMesh = mesh->GetSubMesh(i);
+						if(!subMesh.IsValid())
 						{
 							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
 							continue;
