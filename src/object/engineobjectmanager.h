@@ -56,6 +56,7 @@ class EngineObjectManager
 	void DeleteMesh3DRenderer(Mesh3DRenderer * renderer);
 	void DeleteSubMesh3D(SubMesh3D * mesh);
 	void DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer);
+	void DeleteMaterial(Material * material);
 
     public :
 
@@ -82,9 +83,9 @@ class EngineObjectManager
     void DestroyShader(Shader * shader);
     Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes);
     Texture * CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
-    Material * CreateMaterial(const char *name,Shader * shader);
-    Material * CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
-    void DestroyMaterial(Material * material);
+    MaterialRef CreateMaterial(const char *name,Shader * shader);
+    MaterialRef CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
+    void DestroyMaterial(MaterialRef material);
     CameraRef CreateCamera();
     void DestroyCamera(CameraRef camera);
     LightRef CreateLight();

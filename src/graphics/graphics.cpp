@@ -27,7 +27,6 @@ Graphics::~Graphics()
 
 Graphics::Graphics()
 {
-	activeMaterial= NULL;
 	renderManager = NULL;
 	screenDescriptor = NULL;
 }
@@ -75,13 +74,13 @@ bool Graphics::Run()
 	return true;
 }
 
-void Graphics::ActivateMaterial(Material * material)
+void Graphics::ActivateMaterial(MaterialRef material)
 {
 	activeMaterial = material;
 	material->ResetVerificationState();
 }
 
-Material * Graphics::GetActiveMaterial() const
+MaterialRef Graphics::GetActiveMaterial() const
 {
 	return activeMaterial;
 }

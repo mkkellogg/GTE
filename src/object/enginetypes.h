@@ -11,6 +11,8 @@ class Camera;
 class SceneObject;
 class Light;
 class EngineObjectManager;
+class Material;
+class Texture;
 
 #include <memory>
 
@@ -106,5 +108,7 @@ typedef EngineObjectRef<Mesh3D> Mesh3DRef;
 typedef EngineObjectRef<Camera> CameraRef;
 typedef EngineObjectRef<Light> LightRef;
 typedef EngineObjectRef<SceneObject> SceneObjectRef;
+typedef EngineObjectRef<Material> MaterialRef;
+typedef EngineObjectRef<Texture> TextureRef;
 
 #endif

@@ -19,6 +19,7 @@ class RawImage;
 class AttributeTransformer;
 
 #include <string>
+#include "object/enginetypes.h"
 
 class GraphicsCallbacks
 {
@@ -45,7 +46,7 @@ class Graphics
 
     protected:
 
-    Material * activeMaterial;
+	MaterialRef activeMaterial;
     RenderManager * renderManager;
     ScreenDescriptor * screenDescriptor;
 
@@ -74,8 +75,8 @@ class Graphics
 
     virtual void EnableBlending(bool enabled) = 0;
     virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
-    virtual void ActivateMaterial(Material * material);
-    Material * GetActiveMaterial() const;
+    virtual void ActivateMaterial(MaterialRef material);
+    MaterialRef GetActiveMaterial() const;
 
     virtual ScreenDescriptor * GetScreenDescriptor() const;
 };

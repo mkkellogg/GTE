@@ -31,13 +31,12 @@ class ModelImporter
 
 		int vertexColorsIndex;
 		LongMask shaderProperties;
-		Material * material;
+		MaterialRef material;
 
 		MeshSpecificMaterialDescriptor()
 		{
 			vertexColorsIndex = -1;
 			shaderProperties = 0L;
-			material = NULL;
 		}
 	};
 

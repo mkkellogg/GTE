@@ -268,10 +268,8 @@ void SubMesh3DRendererGL::CopyMeshData()
 		if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
 	}
 
-
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
-
 
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetVertexColorData(mesh->GetColors());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVsTexture0());
@@ -295,7 +293,7 @@ void SubMesh3DRendererGL::UpdateFromMesh()
 	}
 }
 
-bool SubMesh3DRendererGL::UseMaterial(Material * material)
+bool SubMesh3DRendererGL::UseMaterial(MaterialRef material)
 {
 	if(material == activeMaterial)return true;
 
@@ -329,7 +327,7 @@ bool SubMesh3DRendererGL::UseMaterial(Material * material)
 
 void SubMesh3DRendererGL::Render()
 {
-	Material * currentMaterial = graphics->GetActiveMaterial();
+	MaterialRef currentMaterial = graphics->GetActiveMaterial();
 	UseMaterial(currentMaterial);
 
 	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");

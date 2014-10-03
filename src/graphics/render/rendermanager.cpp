@@ -33,7 +33,6 @@
  */
 RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectManager)
 {
-	this->activeMaterial = NULL;
 	this->graphics = graphics;
 	this->objectManager = objectManager;
 
@@ -322,8 +321,8 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 					unsigned int materialIndex = 0;
 					for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 					{
-						Material * currentMaterial = renderer->GetMaterial(materialIndex);
-						if(currentMaterial == NULL)
+						MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
+						if(!currentMaterial.IsValid())
 						{
 							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL material encountered.");
 							continue;
@@ -508,7 +507,7 @@ bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transf
  */
 void RenderManager::SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection)
 {
-	if(activeMaterial != NULL)
+	if(activeMaterial.IsValid())
 	{
 		Shader * shader = activeMaterial->GetShader();
 		if(shader != NULL)
@@ -538,7 +537,7 @@ void RenderManager::SendTransformUniformsToShader(const Transform * model, const
  */
 void RenderManager::SendCustomUniformsToShader()
 {
-	if(activeMaterial != NULL)
+	if(activeMaterial.IsValid())
 	{
 		activeMaterial->SendAllSetUniformsToShader();
 	}
@@ -552,7 +551,7 @@ void RenderManager::SendCustomUniformsToShader()
  * Activate [material], which will switch the GPU's active shader to
  * the one associated with it.
  */
-void RenderManager::ActivateMaterial(Material * material)
+void RenderManager::ActivateMaterial(MaterialRef material)
 {
 	// We MUST notify the graphics system about the change in active material because other
 	// components (like Mesh3DRenderer) need to know about the active material

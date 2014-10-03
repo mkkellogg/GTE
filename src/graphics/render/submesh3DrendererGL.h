@@ -11,6 +11,7 @@ class UV2Array;
 class SubMesh3D;
 class Material;
 
+#include "object/enginetypes.h"
 #include "submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
 #include "attributetransformer.h"
@@ -52,7 +53,7 @@ class SubMesh3DRendererGL : public SubMesh3DRenderer
     SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer);
     virtual ~SubMesh3DRendererGL();
 
-    bool UseMaterial(Material * material);
+    bool UseMaterial(MaterialRef material);
 
     public:
 

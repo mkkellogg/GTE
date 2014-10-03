@@ -47,8 +47,8 @@ class GraphicsGL : public Graphics
     void EnableBlending(bool enabled);
     void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
     GLenum GetGLBlendProperty(BlendingProperty property);
-    void ActivateMaterial(Material * material);
-    Material * GetActiveMaterial();
+    void ActivateMaterial(MaterialRef material);
+    MaterialRef GetActiveMaterial();
 
     void RenderScene();
 

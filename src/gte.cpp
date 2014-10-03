@@ -105,7 +105,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		texAttributes.MipMapLevel = 4;
 		Texture * texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
 
-		Material * material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
+		MaterialRef material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 		material->SetTexture(texture, "TEXTURE0");
 
 		Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();

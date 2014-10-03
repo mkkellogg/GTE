@@ -171,8 +171,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 			int materialIndex = mesh->mMaterialIndex;
 			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
-			Material * material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
-			NULL_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
+			MaterialRef material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
+			SHARED_REF_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
 
 			// add the material to the mesh renderer
 			meshRenderer->AddMaterial(material);
@@ -370,8 +370,8 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 				if(loadedShader != NULL)
 				{
 					// create a new Material engine object
-					Material * newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
-					NULL_CHECK(newMaterial, "AssetImporter::ProcessMaterials -> Could not create new Material object.", false);
+					MaterialRef newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
+					SHARED_REF_CHECK(newMaterial, "AssetImporter::ProcessMaterials -> Could not create new Material object.", false);
 
 					// if there is a diffuse texture, set it and get the appropriate mapping
 					// to UV coordinates

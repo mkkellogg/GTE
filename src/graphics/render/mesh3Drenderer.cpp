@@ -54,20 +54,20 @@ unsigned int Mesh3DRenderer::GetMaterialCount()
 	return materials.size();
 }
 
-Material * Mesh3DRenderer::GetMaterial(unsigned int index)
+MaterialRef Mesh3DRenderer::GetMaterial(unsigned int index)
 {
 	if(index > GetMaterialCount())
 	{
 		Debug::PrintError("Mesh3DRenderer::SetMaterial -> Index is out of range.");
-		return NULL;
+		return MaterialRef::Null();
 	}
 
 	return materials[index];
 }
 
-void Mesh3DRenderer::SetMaterial(unsigned int index, Material * material)
+void Mesh3DRenderer::SetMaterial(unsigned int index, MaterialRef material)
 {
-	NULL_CHECK_RTRN(material, "Mesh3DRenderer::SetMaterial -> material is NULL.");
+	SHARED_REF_CHECK_RTRN(material, "Mesh3DRenderer::SetMaterial -> material is NULL.");
 
 	if(index > GetMaterialCount())
 	{
@@ -78,9 +78,9 @@ void Mesh3DRenderer::SetMaterial(unsigned int index, Material * material)
 	materials[index] = material;
 }
 
-void Mesh3DRenderer::AddMaterial(Material * material)
+void Mesh3DRenderer::AddMaterial(MaterialRef material)
 {
-	NULL_CHECK_RTRN(material, "Mesh3DRenderer::AddMaterial -> material is NULL.");
+	SHARED_REF_CHECK_RTRN(material, "Mesh3DRenderer::AddMaterial -> material is NULL.");
 	materials.push_back(material);
 }
 

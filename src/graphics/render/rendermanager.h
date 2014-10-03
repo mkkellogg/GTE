@@ -43,7 +43,7 @@ class RenderManager
 	EngineObjectManager * objectManager;
 	DataStack<float> * viewTransformStack;
 	DataStack<float> * modelTransformStack;
-	Material * activeMaterial;
+	MaterialRef activeMaterial;
 
 	static const int MAX_LIGHTS = 16;
 	unsigned int lightCount;
@@ -60,7 +60,7 @@ class RenderManager
     void PushTransformData(const Transform * transform, DataStack<float> * transformStack);
     void PopTransformData(const Transform * transform, DataStack<float> * transformStack);
     int RenderDepth(const DataStack<float> * transformStack) const;
-    void ActivateMaterial(Material * material);
+    void ActivateMaterial(MaterialRef material);
     void SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection);
     void SendCustomUniformsToShader();
 

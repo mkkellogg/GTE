@@ -19,7 +19,6 @@
 
 SubMesh3DRenderer::SubMesh3DRenderer(Graphics * graphics) : EngineObject()
 {
-	this->activeMaterial = NULL;
 	this->graphics = graphics;
 	this->containerRenderer = NULL;
 	this->subIndex = -1;
@@ -46,9 +45,9 @@ bool SubMesh3DRenderer::UpdateMeshData()
 	return true;
 }
 
-bool SubMesh3DRenderer::UseMaterial(Material * material)
+bool SubMesh3DRenderer::UseMaterial(MaterialRef material)
 {
-	NULL_CHECK(material, "SubMesh3DRenderer::UseMaterial -> material is NULL", false);
+	SHARED_REF_CHECK(material, "SubMesh3DRenderer::UseMaterial -> material is NULL", false);
 	this->activeMaterial = material;
 
 	return true;

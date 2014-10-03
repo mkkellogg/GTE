@@ -301,7 +301,7 @@ Texture * EngineObjectManager::CreateTexture(const RawImage * imageData, const c
 	return texture;
 }
 
-Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader)
+MaterialRef EngineObjectManager::CreateMaterial(const char *name, Shader * shader)
 {
 	Material * m = new Material(name);
 	bool initSuccess = m->Init(shader);
@@ -309,16 +309,20 @@ Material * EngineObjectManager::CreateMaterial(const char *name, Shader * shader
 	{
 		Debug::PrintError("EngineObjectManager::CreateMaterial(Shader *) -> could not Init material");
 		delete m;
-		return NULL;
+		return MaterialRef::Null();
 	}
 	m->SetObjectID(GetNextObjectID());
-	return m;
+
+	return MaterialRef(m, [=](Material * m)
+	{
+		  DeleteMaterial(m);
+	});
 }
 
-Material * EngineObjectManager::CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
+MaterialRef EngineObjectManager::CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
 {
 	Shader * shader = CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
-	if(shader == NULL)return NULL;
+	if(shader == NULL)return MaterialRef::Null();
 
 	Material * m = new Material(name);
 	bool initSuccess = m->Init(shader);
@@ -327,22 +331,32 @@ Material * EngineObjectManager::CreateMaterial(const char *name, const char * sh
 	{
 		Debug::PrintError("EngineObjectManager::CreateMaterial(const char *, const char *) -> could not Init material");
 		delete m;
-		return NULL;
+		return MaterialRef::Null();
 	}
 	m->SetObjectID(GetNextObjectID());
-	return m;
+
+	return MaterialRef(m, [=](Material * m)
+	{
+		  DeleteMaterial(m);
+	});
 }
 
-void EngineObjectManager::DestroyMaterial(Material * material)
+void EngineObjectManager::DestroyMaterial(MaterialRef material)
 {
-	NULL_CHECK_RTRN(material,"EngineObjectManager::DestroyMaterial -> material is NULL.");
+	material.ForceDelete();
+}
+
+void EngineObjectManager::DeleteMaterial(Material * material)
+{
+	NULL_CHECK_RTRN(material,"EngineObjectManager::DeleteMaterial -> material is NULL.");
 	Shader * shader = material->GetShader();
 
-	NULL_CHECK_RTRN(shader,"EngineObjectManager::DestroyMaterial -> shader is NULL.");
+	NULL_CHECK_RTRN(shader,"EngineObjectManager::DeleteMaterial -> shader is NULL.");
 	DestroyShader(shader);
 
 	delete material;
 }
+
 
 CameraRef EngineObjectManager::CreateCamera()
 {

@@ -18,7 +18,7 @@ class Mesh3DRenderer : public SceneObjectComponent
 
 	protected :
 
-	std::vector <Material *> materials;
+	std::vector <MaterialRef> materials;
 	std::vector <SubMesh3DRendererRef> subRenderers;
 
 	Mesh3DRenderer();
@@ -29,9 +29,9 @@ class Mesh3DRenderer : public SceneObjectComponent
 	public:
 
     unsigned int GetMaterialCount();
-    Material * GetMaterial(unsigned int index);
-    void SetMaterial(unsigned int index, Material * material);
-    void AddMaterial(Material * material);
+    MaterialRef GetMaterial(unsigned int index);
+    void SetMaterial(unsigned int index, MaterialRef material);
+    void AddMaterial(MaterialRef material);
 
     void UpdateFromMeshes();
     void UpdateFromMesh(unsigned int index);

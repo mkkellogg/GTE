@@ -16,12 +16,12 @@ class SubMesh3DRenderer : public EngineObject
 	protected:
 
 	int subIndex;
-	Material * activeMaterial;
+	MaterialRef activeMaterial;
 	Graphics * graphics;
 	Mesh3DRenderer * containerRenderer;
 
 	virtual bool UpdateMeshData();
-	virtual bool UseMaterial(Material * material);
+	virtual bool UseMaterial(MaterialRef material);
 	void SetContainerRenderer(Mesh3DRenderer * renderer);
 	void SetSubIndex(unsigned int index);
 

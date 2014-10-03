@@ -319,16 +319,16 @@ GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property)
 	return (GLenum)0xFFFFFFFF;
 }
 
-void GraphicsGL::ActivateMaterial(Material * material)
+void GraphicsGL::ActivateMaterial(MaterialRef material)
 {
-	NULL_CHECK_RTRN(material,"GraphicsGL::ActivateMaterial -> material is NULL");
+	SHARED_REF_CHECK_RTRN(material,"GraphicsGL::ActivateMaterial -> material is NULL");
 
 	// TODO: Change this to a proper comparison, and not just
 	// a comparison of memory addresses
-	if(Graphics::GetActiveMaterial() != material)
+	if(!(Graphics::GetActiveMaterial() == material))
 	{
 		GLuint oldActiveProgramID = (GLuint)0xFFFFFFF0;
-		if(this->activeMaterial != NULL)
+		if(this->activeMaterial.IsValid())
 		{
 			Shader * currentShader = this->activeMaterial->GetShader();
 			if(currentShader != NULL)
