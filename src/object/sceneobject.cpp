@@ -67,7 +67,7 @@ bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)
 	this->renderer3D = renderer;
 	if(this->mesh3D.IsValid())
 	{
-		this->renderer3D->UpdateFromMeshes();
+		this->renderer3D->UpdateFromMesh();
 	}
 
 	return true;
@@ -86,7 +86,7 @@ bool SceneObject::SetMesh3D(Mesh3DRef mesh)
 	this->mesh3D = mesh;
 	if(this->renderer3D.IsValid())
 	{
-		this->renderer3D->UpdateFromMeshes();
+		this->renderer3D->UpdateFromMesh();
 	}
 
 

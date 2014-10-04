@@ -9,12 +9,13 @@ class Material;
 class Mesh3D;
 
 #include "object/engineobject.h"
+#include "object/sceneobjectcomponent.h"
 #include <vector>
 
 class Mesh3DRenderer : public SceneObjectComponent
 {
-	friend EngineObjectManager;
-	friend SubMesh3DRenderer;
+	friend class EngineObjectManager;
+	friend class SubMesh3DRenderer;
 
 	protected :
 
@@ -22,7 +23,7 @@ class Mesh3DRenderer : public SceneObjectComponent
 	std::vector <SubMesh3DRendererRef> subRenderers;
 
 	Mesh3DRenderer();
-    ~Mesh3DRenderer();
+    virtual ~Mesh3DRenderer();
     void DestroyRenderers();
     void DestroyRenderer(unsigned int index);
 
@@ -33,9 +34,9 @@ class Mesh3DRenderer : public SceneObjectComponent
     void SetMaterial(unsigned int index, MaterialRef material);
     void AddMaterial(MaterialRef material);
 
-    virtual void UpdateFromMeshes();
-    void UpdateFromMeshes(Mesh3DRef mesh);
-    void UpdateFromMesh(unsigned int index);
+    virtual void UpdateFromMesh();
+    void UpdateFromMesh(Mesh3DRef mesh);
+    void UpdateFromSubMesh(unsigned int index);
 
     Mesh3DRef GetMesh();
     SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer);

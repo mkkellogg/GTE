@@ -69,7 +69,7 @@ void Mesh3D::SendDataToRenderer(unsigned int index)
 	Mesh3DRendererRef renderer = sceneObject->GetRenderer3D();
 	SHARED_REF_CHECK_RTRN(renderer," Mesh3D::SendDataToRenderer -> renderer is NULL.");
 
-	renderer->UpdateFromMesh(index);
+	renderer->UpdateFromSubMesh(index);
 }
 
 void Mesh3D::Update()

@@ -10,9 +10,19 @@ AttributeTransformer::AttributeTransformer(StandardAttributeSet attributes)
 	activeAttributes = attributes;
 }
 
+AttributeTransformer::AttributeTransformer()
+{
+	activeAttributes = StandardAttributes::CreateAttributeSet();
+}
+
 AttributeTransformer::~AttributeTransformer()
 {
 
+}
+
+void AttributeTransformer::SetActiveAttributes (StandardAttributeSet attributes)
+{
+	activeAttributes = attributes;
 }
 
 StandardAttributeSet AttributeTransformer::GetActiveAttributes()

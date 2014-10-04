@@ -36,7 +36,7 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmeshattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmeshattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
 ANIMATIONOBJ= obj/animationtarget.o obj/bone.o
 LIGHTOBJ= obj/light.o
@@ -251,6 +251,9 @@ obj/rendermanager.o: $(RENDERSRC)/rendermanager.cpp $(RENDERSRC)/rendermanager.h
 	
 obj/mesh3Drenderer.o: $(RENDERSRC)/mesh3Drenderer.cpp $(RENDERSRC)/mesh3Drenderer.h
 	$(CC) $(CFLAGS) -o obj/mesh3Drenderer.o -c $(RENDERSRC)/mesh3Drenderer.cpp
+	
+obj/skinnedmesh3Drenderer.o: $(RENDERSRC)/skinnedmesh3Drenderer.cpp $(RENDERSRC)/skinnedmesh3Drenderer.h
+	$(CC) $(CFLAGS) -o obj/skinnedmesh3Drenderer.o -c $(RENDERSRC)/skinnedmesh3Drenderer.cpp
 	
 obj/submesh3Drenderer.o: $(RENDERSRC)/submesh3Drenderer.cpp $(RENDERSRC)/submesh3Drenderer.h
 	$(CC) $(CFLAGS) -o obj/submesh3Drenderer.o -c $(RENDERSRC)/submesh3Drenderer.cpp

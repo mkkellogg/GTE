@@ -84,17 +84,17 @@ void Mesh3DRenderer::AddMaterial(MaterialRef material)
 	materials.push_back(material);
 }
 
-void Mesh3DRenderer::UpdateFromMeshes()
+void Mesh3DRenderer::UpdateFromMesh()
 {
 	SHARED_REF_CHECK_RTRN(sceneObject,"Mesh3DRenderer::UpdateFromMeshes -> sceneObject is NULL.");
 
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
 	SHARED_REF_CHECK_RTRN(mesh,"Mesh3DRenderer::UpdateFromMeshes -> mesh is NULL.");
 
-	UpdateFromMeshes(mesh);
+	UpdateFromMesh(mesh);
 }
 
-void Mesh3DRenderer::UpdateFromMeshes(Mesh3DRef mesh)
+void Mesh3DRenderer::UpdateFromMesh(Mesh3DRef mesh)
 {
 	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
 	unsigned int subMeshCount =  mesh->GetSubMeshCount();
@@ -121,11 +121,11 @@ void Mesh3DRenderer::UpdateFromMeshes(Mesh3DRef mesh)
 
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
-		UpdateFromMesh(i);
+		UpdateFromSubMesh(i);
 	}
 }
 
-void Mesh3DRenderer::UpdateFromMesh(unsigned int index)
+void Mesh3DRenderer::UpdateFromSubMesh(unsigned int index)
 {
 	if(index >= subRenderers.size())
 	{

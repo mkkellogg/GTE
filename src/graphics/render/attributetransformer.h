@@ -15,11 +15,13 @@ class AttributeTransformer
 	public :
 
 	AttributeTransformer(StandardAttributeSet attributes);
+	AttributeTransformer();
     virtual ~AttributeTransformer();
 
     virtual void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut) = 0;
     virtual void TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut) = 0;
 
+    void SetActiveAttributes (StandardAttributeSet attributes);
     StandardAttributeSet GetActiveAttributes();
 };
 

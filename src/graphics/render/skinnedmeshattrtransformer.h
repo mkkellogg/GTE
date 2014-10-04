@@ -16,7 +16,8 @@ class SkinnedMeshAttributeTransformer : public AttributeTransformer
 	public :
 
 	SkinnedMeshAttributeTransformer(StandardAttributeSet attributes);
-    virtual ~SkinnedMeshAttributeTransformer();
+	SkinnedMeshAttributeTransformer();
+    ~SkinnedMeshAttributeTransformer();
 
     void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut);
     void TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut);

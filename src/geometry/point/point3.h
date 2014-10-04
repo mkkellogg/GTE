@@ -68,7 +68,8 @@ class Point3 : public BaseVector4
 
     bool operator==(const Point3& p) const
     {
-		return p.x == this->x && p.y == this->y && p.z == this->z;
+    	float epsilon =.005;
+		return abs(p.x - this->x) < epsilon && abs(p.y - this->y) < epsilon && abs(p.z - this->z) < epsilon;
     }
 };
 

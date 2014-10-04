@@ -11,6 +11,11 @@
 #include "geometry/vector/vector3array.h"
 #include "util/time.h"
 
+SkinnedMeshAttributeTransformer::SkinnedMeshAttributeTransformer() : AttributeTransformer()
+{
+	offset = 0;
+}
+
 SkinnedMeshAttributeTransformer::SkinnedMeshAttributeTransformer(StandardAttributeSet attributes) : AttributeTransformer(attributes)
 {
 	offset = 0;

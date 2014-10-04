@@ -173,6 +173,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		for(unsigned int i=0; i < list->size(); i++)
 		{
 			Vector3 current = (*((*list)[i]));
+			current.Normalize();
 
 			// calculate angle between the normal that exists for this vertex,
 			// and the current normal in the last.
