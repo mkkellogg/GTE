@@ -27,7 +27,6 @@ Material::Material(const std::string& materialName)
 {
 	this->materialName = materialName;
 
-	shader = NULL;
 	ClearStandardBindings();
 
 	allSetUniformsandAttributesVerified = false;
@@ -101,9 +100,9 @@ unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
  *
  * This method will return true if initialization succeeds, otherwise it returns false.
  */
-bool Material::Init(Shader * shader)
+bool Material::Init(ShaderRef shader)
 {
-	NULL_CHECK(shader," Material::Init(Shader *) -> tried to Init with NULL shader.", false);
+	SHARED_REF_CHECK(shader," Material::Init(Shader *) -> tried to Init with NULL shader.", false);
 
 	if(!shader->IsLoaded())
 	{
@@ -134,7 +133,7 @@ bool Material::Init(Shader * shader)
  */
 bool Material::SetupSetVerifiers()
 {
-	NULL_CHECK(shader,"Material::SetupSetVerifiers -> shader is NULL", false);
+	SHARED_REF_CHECK(shader,"Material::SetupSetVerifiers -> shader is NULL", false);
 
 	unsigned int attributeCount = shader->GetAttributeCount();
 	unsigned int uniformCount = shader->GetUniformCount();
@@ -171,7 +170,7 @@ bool Material::SetupSetVerifiers()
  */
 bool Material::SetupSetUniforms()
 {
-	NULL_CHECK(shader,"Material::SetupSetUniforms -> shader is NULL", false);
+	SHARED_REF_CHECK(shader,"Material::SetupSetUniforms -> shader is NULL", false);
 
 	DestroySetUniforms();
 
@@ -228,8 +227,8 @@ void Material::SetUniformSetValue(int varID, int size)
  */
 void Material::ResetVerificationState()
 {
-	if(attributesSetValues != NULL && shader != NULL)memset(attributesSetValues, 0, sizeof(int) * shader->GetAttributeCount());
-	if(uniformsSetValues != NULL && shader != NULL)memset(uniformsSetValues, 0, sizeof(int) * shader->GetUniformCount());
+	if(attributesSetValues != NULL && shader.IsValid())memset(attributesSetValues, 0, sizeof(int) * shader->GetAttributeCount());
+	if(uniformsSetValues != NULL && shader.IsValid())memset(uniformsSetValues, 0, sizeof(int) * shader->GetUniformCount());
 	allSetUniformsandAttributesVerified = false;
 }
 
@@ -267,7 +266,7 @@ int Material::TestForStandardAttribute(StandardAttribute attr) const
  */
 int Material::GetUniformIndex(const std::string& uniformName)
 {
-	NULL_CHECK(shader,"Material::GetUniformIndex -> is NULL",-1);
+	SHARED_REF_CHECK(shader,"Material::GetUniformIndex -> is NULL",-1);
 
 	int foundIndex = -1;
 	for(unsigned int i=0; i< setUniforms.size(); i++)
@@ -365,7 +364,7 @@ void Material::ClearStandardBindings()
 /*
  * Get a pointer to the shader to which this material is connected.
  */
-Shader * Material::GetShader() const
+ShaderRef Material::GetShader() const
 {
 	return shader;
 }
@@ -413,6 +412,8 @@ StandardUniformSet Material::GetStandardUniforms() const
  */
 void Material::SendSetUniformToShader(unsigned int index)
 {
+	SHARED_REF_CHECK_RTRN(shader,"Material::SendSetUniformToShader -> shader is NULL");
+
 	if(index >=0 && index < setUniforms.size())
 	{
 		UniformDescriptor * desc = setUniforms[index];
@@ -444,8 +445,10 @@ void Material::SendAllSetUniformsToShader()
  * Find a uniform with the name specified by [shaderVarName] and set its
  * value to the sampler data held by [texture]
  */
-void Material::SetTexture(Texture * texture, const std::string& varName)
+void Material::SetTexture(TextureRef texture, const std::string& varName)
 {
+	SHARED_REF_CHECK_RTRN(shader,"Material::SetTexture -> shader is NULL");
+
 	int loc = shader->GetUniformVarID(varName);
 	if(loc < 0)
 	{
@@ -491,6 +494,8 @@ unsigned int Material::GetSetUniformCount() const
  */
 void Material::SendModelMatrixToShader(const Matrix4x4 * mat)
 {
+	SHARED_REF_CHECK_RTRN(shader,"Material::SendModelMatrixToShader -> shader is NULL");
+
 	int varID = GetStandardUniformBinding(StandardUniform::ModelMatrix);
 	if(varID >=0 )
 	{
@@ -505,6 +510,8 @@ void Material::SendModelMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
 {
+	SHARED_REF_CHECK_RTRN(shader,"Material::SendModelViewMatrixToShader -> shader is NULL");
+
 	int varID = GetStandardUniformBinding(StandardUniform::ModelViewMatrix);
 	if(varID >=0 )
 	{
@@ -519,6 +526,8 @@ void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
 {
+	SHARED_REF_CHECK_RTRN(shader,"Material::SendProjectionMatrixToShader -> shader is NULL");
+
 	int varID = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
 	if(varID)
 	{
@@ -533,6 +542,8 @@ void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
 {
+	SHARED_REF_CHECK_RTRN(shader,"Material::SendMVPMatrixToShader -> shader is NULL");
+
 	int varID = GetStandardUniformBinding(StandardUniform::ModelViewProjectionMatrix);
 	if(varID >=0 )
 	{
@@ -547,6 +558,8 @@ void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendLightToShader(Light * light, Point3 * position)
 {
+	SHARED_REF_CHECK_RTRN(shader,"Material::SendLightToShader -> shader is NULL");
+
 	int varID = GetStandardUniformBinding(StandardUniform::LightPosition);
 	if(varID >=0 )
 	{
@@ -589,7 +602,7 @@ void Material::SendLightToShader(Light * light, Point3 * position)
  */
 bool Material::VerifySetVars(int vertexCount)
 {
-	NULL_CHECK(shader, "Material::VerifySetVars -> shader is NULL", false);
+	SHARED_REF_CHECK(shader, "Material::VerifySetVars -> shader is NULL", false);
 	if(allSetUniformsandAttributesVerified == true)return true;
 
 	for(unsigned int i =0; i< shader->GetAttributeCount(); i++)

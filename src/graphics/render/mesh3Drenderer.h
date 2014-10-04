@@ -33,7 +33,8 @@ class Mesh3DRenderer : public SceneObjectComponent
     void SetMaterial(unsigned int index, MaterialRef material);
     void AddMaterial(MaterialRef material);
 
-    void UpdateFromMeshes();
+    virtual void UpdateFromMeshes();
+    void UpdateFromMeshes(Mesh3DRef mesh);
     void UpdateFromMesh(unsigned int index);
 
     Mesh3DRef GetMesh();

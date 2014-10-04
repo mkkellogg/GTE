@@ -61,20 +61,15 @@ unsigned long EngineObjectManager::GetNextObjectID()
 
 bool EngineObjectManager::InitBuiltinShaders()
 {
-	Graphics * graphics = Graphics::Instance();
 	std::string vertexSource;
 	std::string fragmentSource;
-	Shader * shader = NULL;
+	ShaderRef shader;
 
 	LongMask shaderProperties;
 	vertexSource = std::string(builtinPath) + std::string("diffuse.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse.fragment.shader");
-	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
-	if(shader == NULL)
-	{
-		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored");
-		return false;
-	}
+	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	SHARED_REF_CHECK(shader,"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseColored);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
@@ -82,12 +77,8 @@ bool EngineObjectManager::InitBuiltinShaders()
 
 	vertexSource = std::string(builtinPath) + std::string("diffuse_texture.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture.fragment.shader");
-	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
-	if(shader == NULL)
-	{
-		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured");
-		return false;
-	}
+	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	SHARED_REF_CHECK(shader,"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
@@ -95,12 +86,8 @@ bool EngineObjectManager::InitBuiltinShaders()
 
 	vertexSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.fragment.shader");
-	shader = graphics->CreateShader(vertexSource.c_str(),fragmentSource.c_str());
-	if(shader == NULL)
-	{
-		Debug::PrintError("EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors");
-		return false;
-	}
+	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	SHARED_REF_CHECK(shader,"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexColors);
@@ -128,7 +115,7 @@ void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, Scen
 	sceneObjectDirectory[objectID] = ref;
 }
 
-Shader *  EngineObjectManager::GetLoadedShader(LongMask properties)
+ShaderRef EngineObjectManager::GetLoadedShader(LongMask properties)
 {
 	return loadedShaders.GetShader(properties);
 }
@@ -267,41 +254,71 @@ void EngineObjectManager::DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer)
 	graphics->DestroyMeshRenderer(renderer);
 }
 
-Shader * EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)
+ShaderRef EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)
 {
 	Graphics * graphics = Graphics::Instance();
 	Shader * shader = graphics->CreateShader(vertexSourcePath,fragmentSourcePath);
-	NULL_CHECK(shader,"EngineObjectManager::CreateShader -> could not create new Shader object.",NULL);
+	NULL_CHECK(shader,"EngineObjectManager::CreateShader -> could not create new Shader object.", ShaderRef::Null());
 	shader->SetObjectID(GetNextObjectID());
-	return shader;
+
+	return ShaderRef(shader, [=](Shader * shader)
+	{
+		  DeleteShader(shader);
+	});
 }
 
-void EngineObjectManager::DestroyShader(Shader * shader)
+void EngineObjectManager::DestroyShader(ShaderRef shader)
+{
+	shader.ForceDelete();
+}
+
+void EngineObjectManager::DeleteShader(Shader * shader)
 {
 	Graphics * graphics = Graphics::Instance();
-	NULL_CHECK_RTRN(shader,"EngineObjectManager::DestroyShader -> shader is NULL.");
+	NULL_CHECK_RTRN(shader,"EngineObjectManager::DeleteShader -> shader is NULL.");
 	graphics->DestroyShader(shader);
 }
 
-Texture * EngineObjectManager::CreateTexture(const char * sourcePath, TextureAttributes attributes)
+TextureRef EngineObjectManager::CreateTexture(const char * sourcePath, TextureAttributes attributes)
 {
 	Graphics * graphics = Graphics::Instance();
 	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
-	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> could create new Texture object.",NULL);
+	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
-	return texture;
+
+	return TextureRef(texture, [=](Texture * texture)
+	{
+		  DeleteTexture(texture);
+	});
 }
 
-Texture * EngineObjectManager::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
+TextureRef EngineObjectManager::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
 {
 	Graphics * graphics = Graphics::Instance();
 	Texture * texture = graphics->CreateTexture(imageData, sourcePath, attributes);
-	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const RawImage*, const char *, TextureAttributes) -> could create new Texture object.",NULL);
+	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const RawImage*, const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
-	return texture;
+
+	return TextureRef(texture, [=](Texture * texture)
+	{
+		  DeleteTexture(texture);
+	});
 }
 
-MaterialRef EngineObjectManager::CreateMaterial(const char *name, Shader * shader)
+void EngineObjectManager::DestroyTexture(TextureRef texture)
+{
+	texture.ForceDelete();
+}
+
+void EngineObjectManager::DeleteTexture(Texture * texture)
+{
+	NULL_CHECK_RTRN(texture,"EngineObjectManager::DeleteTexture -> texture is NULL.");
+
+	Graphics * graphics = Graphics::Instance();
+	graphics->DestroyTexture(texture);
+}
+
+MaterialRef EngineObjectManager::CreateMaterial(const char *name, ShaderRef shader)
 {
 	Material * m = new Material(name);
 	bool initSuccess = m->Init(shader);
@@ -321,8 +338,8 @@ MaterialRef EngineObjectManager::CreateMaterial(const char *name, Shader * shade
 
 MaterialRef EngineObjectManager::CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
 {
-	Shader * shader = CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
-	if(shader == NULL)return MaterialRef::Null();
+	ShaderRef shader= CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
+	if(!shader.IsValid())return MaterialRef::Null();
 
 	Material * m = new Material(name);
 	bool initSuccess = m->Init(shader);
@@ -349,9 +366,9 @@ void EngineObjectManager::DestroyMaterial(MaterialRef material)
 void EngineObjectManager::DeleteMaterial(Material * material)
 {
 	NULL_CHECK_RTRN(material,"EngineObjectManager::DeleteMaterial -> material is NULL.");
-	Shader * shader = material->GetShader();
+	ShaderRef shader = material->GetShader();
 
-	NULL_CHECK_RTRN(shader,"EngineObjectManager::DeleteMaterial -> shader is NULL.");
+	SHARED_REF_CHECK_RTRN(shader,"EngineObjectManager::DeleteMaterial -> shader is NULL.");
 	DestroyShader(shader);
 
 	delete material;

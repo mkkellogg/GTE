@@ -29,9 +29,9 @@ ShaderManager::~ShaderManager()
 
 }
 
-void ShaderManager::AddShader(LongMask properties, Shader * shader)
+void ShaderManager::AddShader(LongMask properties, ShaderRef shader)
 {
-	NULL_CHECK_RTRN(shader,"ShaderManager::AddShader -> shader is NULL.");
+	SHARED_REF_CHECK_RTRN(shader,"ShaderManager::AddShader -> shader is NULL.");
 
 	if(!shader->IsLoaded())
 	{
@@ -46,14 +46,14 @@ void ShaderManager::AddShader(LongMask properties, Shader * shader)
 // Ultimately we want it to return a shader that doesn't have any ADDITIONAL properties
 // beyond what is specified by [flags], but it's ok to have less. However, EXACT
 // matching is preferred for best results.
-Shader * ShaderManager::GetShader(LongMask flags)
+ShaderRef ShaderManager::GetShader(LongMask flags)
 {
 	if(loadedShaders.find(flags) != loadedShaders.end())
 	{
 		return loadedShaders[flags];
 	}
 
-	return NULL;
+	return ShaderRef::Null();
 }
 
 

@@ -29,6 +29,7 @@ class Point3;
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
 #include "object/engineobject.h"
+#include "object/enginetypes.h"
 #include "graphics/shader/uniformdesc.h"
 #include <vector>
 #include <map>
@@ -49,7 +50,7 @@ class Material : public EngineObject
 	std::string materialName;
 
 	// pointer to this material's shader
-	Shader * shader;
+	ShaderRef shader;
 
 	// bit masks to hold binding status for standard uniforms and attributes
 	StandardAttributeSet standardAttributes;
@@ -108,13 +109,13 @@ class Material : public EngineObject
 
     Material(const std::string& materialName);
     virtual ~Material();
-    bool Init(Shader * shader);
+    bool Init(ShaderRef shader);
 
     public:
 
     void ResetVerificationState();
 
-    Shader * GetShader() const;
+    ShaderRef GetShader() const;
 
     StandardAttributeSet GetStandardAttributes() const;
     void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
@@ -123,7 +124,7 @@ class Material : public EngineObject
 
     void SendSetUniformToShader(unsigned int index);
     void SendAllSetUniformsToShader();
-    void SetTexture(Texture * texture, const std::string& varName);
+    void SetTexture(TextureRef texture, const std::string& varName);
     unsigned int GetSetUniformCount() const ;
 
     void SendModelMatrixToShader(const Matrix4x4 * mat);

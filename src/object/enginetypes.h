@@ -110,5 +110,6 @@ typedef EngineObjectRef<Light> LightRef;
 typedef EngineObjectRef<SceneObject> SceneObjectRef;
 typedef EngineObjectRef<Material> MaterialRef;
 typedef EngineObjectRef<Texture> TextureRef;
+typedef EngineObjectRef<Shader> ShaderRef;
 
 #endif

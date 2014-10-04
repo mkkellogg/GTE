@@ -91,6 +91,11 @@ void Mesh3DRenderer::UpdateFromMeshes()
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
 	SHARED_REF_CHECK_RTRN(mesh,"Mesh3DRenderer::UpdateFromMeshes -> mesh is NULL.");
 
+	UpdateFromMeshes(mesh);
+}
+
+void Mesh3DRenderer::UpdateFromMeshes(Mesh3DRef mesh)
+{
 	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
 	unsigned int subMeshCount =  mesh->GetSubMeshCount();
 
@@ -106,7 +111,7 @@ void Mesh3DRenderer::UpdateFromMeshes()
 		for(unsigned int i = subRenderers.size(); i < subMeshCount; i++)
 		{
 			SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
-			SHARED_REF_CHECK_RTRN(renderer,"Mesh3DRenderer::UpdateFromMeshes -> could not create new SubMesh3DRenderer.");
+			SHARED_REF_CHECK_RTRN(renderer,"Mesh3DRenderer::UpdateFromMeshes(Mesh3DRef) -> could not create new SubMesh3DRenderer.");
 
 			renderer->SetSubIndex(i);
 			renderer->SetContainerRenderer(this);

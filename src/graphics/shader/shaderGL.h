@@ -95,7 +95,7 @@ class ShaderGL : public Shader
 
     void SendBufferToShader(int varID, VertexAttrBuffer * buffer);
 
-    void SendUniformToShader(unsigned int samplerUnitIndex, const Texture * texture);
+    void SendUniformToShader(unsigned int samplerUnitIndex, const TextureRef texture);
     void SendUniformToShader(int varID, const Matrix4x4 * mat);
     void SendUniformToShader(int varID, const Point3 * point);
     void SendUniformToShader(int varID, const Vector3 * vector);

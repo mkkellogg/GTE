@@ -304,7 +304,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 		}
 	}
 
-	mesh3D->SetNormalsSmoothingThreshold(70);
+	mesh3D->SetNormalsSmoothingThreshold(80);
 	mesh3D->Update();
 
 	return mesh3D;
@@ -341,7 +341,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		MaterialImportDescriptor materialImportDescriptor;
 		GetImportDetails(material, materialImportDescriptor, scene);
 
-		Texture * diffuseTexture = NULL;
+		TextureRef diffuseTexture;
 	//	Texture * bumpTexture = NULL;
 
 		// get diffuse texture (for now support only 1)
@@ -366,8 +366,8 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 			{
 				// see if we can match a loaded shader to the properties of this material
 				// if we can't find one...well we can't really load this material
-				Shader * loadedShader = engineObjectManager->GetLoadedShader(materialImportDescriptor.meshSpecificProperties[i].shaderProperties);
-				if(loadedShader != NULL)
+				ShaderRef loadedShader = engineObjectManager->GetLoadedShader(materialImportDescriptor.meshSpecificProperties[i].shaderProperties);
+				if(loadedShader.IsValid())
 				{
 					// create a new Material engine object
 					MaterialRef newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
@@ -375,7 +375,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 
 					// if there is a diffuse texture, set it and get the appropriate mapping
 					// to UV coordinates
-					if(diffuseTexture != NULL)
+					if(diffuseTexture.IsValid())
 					{
 						// get the name of the shader uniform that handles diffuse textures
 						std::string diffuseTextureName = GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic::DiffuseTextured);

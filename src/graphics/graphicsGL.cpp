@@ -330,10 +330,10 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 		GLuint oldActiveProgramID = (GLuint)0xFFFFFFF0;
 		if(this->activeMaterial.IsValid())
 		{
-			Shader * currentShader = this->activeMaterial->GetShader();
-			if(currentShader != NULL)
+			ShaderRef currentShader = this->activeMaterial->GetShader();
+			if(currentShader.IsValid())
 			{
-				ShaderGL * currentShaderGL = dynamic_cast<ShaderGL *>(currentShader);
+				ShaderGL * currentShaderGL = dynamic_cast<ShaderGL *>(currentShader.GetPtr());
 				if(currentShaderGL != NULL)
 				{
 					oldActiveProgramID = currentShaderGL->GetProgramID();
@@ -343,10 +343,10 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 
 		Graphics::ActivateMaterial(material);
 
-		Shader * shader = material->GetShader();
-		NULL_CHECK_RTRN(shader,"GraphicsGL::ActivateMaterial -> shader is NULL");
+		ShaderRef shader = material->GetShader();
+		SHARED_REF_CHECK_RTRN(shader,"GraphicsGL::ActivateMaterial -> shader is NULL");
 
-		ShaderGL * shaderGL = dynamic_cast<ShaderGL *>(shader);
+		ShaderGL * shaderGL = dynamic_cast<ShaderGL *>(shader.GetPtr());
 		NULL_CHECK_RTRN(shaderGL,"GraphicsGL::ActivateMaterial -> material's shader is not ShaderGL !!");
 
 		// only active the new shader if it is different from the currently active one

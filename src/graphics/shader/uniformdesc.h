@@ -14,6 +14,8 @@
 class Texture;
 class Matrix4x4;
 
+#include "object/enginetypes.h"
+
 enum class UniformType
 {
 	Sampler2D,
@@ -51,7 +53,7 @@ class UniformDescriptor
 	UniformType Type;
 	bool IsSet;
 
-	Texture * SamplerData;
+	TextureRef SamplerData;
 	Matrix4x4 * MatrixData;
 	float BasicFloatData[4];
 	float * ExtendedFloatData;

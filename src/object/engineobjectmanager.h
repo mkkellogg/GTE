@@ -28,7 +28,6 @@ class AttributeTransformer;
 #include "shadermanager.h"
 #include "base/longmask.h"
 
-
 class EngineObjectManager
 {
 	static EngineObjectManager * theInstance;
@@ -57,12 +56,14 @@ class EngineObjectManager
 	void DeleteSubMesh3D(SubMesh3D * mesh);
 	void DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer);
 	void DeleteMaterial(Material * material);
+	void DeleteTexture(Texture * texture);
+	void DeleteShader(Shader * shader);
 
     public :
 
     static EngineObjectManager * Instance();
     bool InitBuiltinShaders();
-    Shader * GetLoadedShader(LongMask properties);
+    ShaderRef GetLoadedShader(LongMask properties);
 
     SceneObjectRef FindSceneObjectInDirectory(unsigned long objectID);
     const SceneObjectRef GetSceneRoot() const;
@@ -79,11 +80,12 @@ class EngineObjectManager
     SubMesh3DRendererRef CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer);
     SubMesh3DRendererRef CreateSubMesh3DRenderer();
     void DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer);
-    Shader * CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
-    void DestroyShader(Shader * shader);
-    Texture * CreateTexture(const char * sourcePath, TextureAttributes attributes);
-    Texture * CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
-    MaterialRef CreateMaterial(const char *name,Shader * shader);
+    ShaderRef CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
+    void DestroyShader(ShaderRef shader);
+    TextureRef CreateTexture(const char * sourcePath, TextureAttributes attributes);
+    TextureRef CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
+    void DestroyTexture(TextureRef texture);
+    MaterialRef CreateMaterial(const char *name, ShaderRef shader);
     MaterialRef CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
     void DestroyMaterial(MaterialRef material);
     CameraRef CreateCamera();

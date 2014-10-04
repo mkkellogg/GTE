@@ -13,6 +13,7 @@
 //forward declarations
 class Shader;
 
+#include "object/enginetypes.h"
 #include "assimp/scene.h"
 #include <string>
 #include "base/longmask.h"
@@ -33,7 +34,7 @@ enum class ShaderMaterialCharacteristic
 
 class ShaderManager
 {
-	std::map<LongMask, Shader*> loadedShaders;
+	std::map<LongMask, ShaderRef> loadedShaders;
 
 	protected:
 
@@ -42,8 +43,8 @@ class ShaderManager
 	ShaderManager();
 	~ShaderManager();
 
-	void AddShader(LongMask properties, Shader * shader);
-	Shader * GetShader(LongMask flags);
+	void AddShader(LongMask properties, ShaderRef shader);
+	ShaderRef GetShader(LongMask flags);
 };
 
 #endif

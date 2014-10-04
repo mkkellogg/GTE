@@ -7,6 +7,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
  
+#include "object/enginetypes.h"
 #include "shader.h"
 #include "shaderGL.h"
 #include "shadersource.h"
@@ -526,11 +527,12 @@ void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
  * [varID] - shader var ID/location of the uniform for which the value is to be set.
  * [texture] - Holds sampler data to be sent
  */
-void ShaderGL::SendUniformToShader(unsigned int samplerUnitIndex, const Texture * texture)
+void ShaderGL::SendUniformToShader(unsigned int samplerUnitIndex, const TextureRef texture)
 {
-	NULL_CHECK_RTRN(texture, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> NULL texture passed");
+	SHARED_REF_CHECK_RTRN((TextureRef)texture, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> NULL texture passed");
 
-	const TextureGL * texGL = dynamic_cast<const TextureGL *>(texture);
+	Texture* texturePtr = ((TextureRef)texture).GetPtr();
+	TextureGL * texGL = dynamic_cast<TextureGL *>(texturePtr);
 
 	NULL_CHECK_RTRN(texGL, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> texture is not TextureGL !!");
 

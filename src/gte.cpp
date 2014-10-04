@@ -103,7 +103,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		TextureAttributes texAttributes;
 		texAttributes.FilterMode = TextureFilter::TriLinear;
 		texAttributes.MipMapLevel = 4;
-		Texture * texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
+		TextureRef texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
 
 		MaterialRef material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 		material->SetTexture(texture, "TEXTURE0");

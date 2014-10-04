@@ -507,29 +507,19 @@ bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transf
  */
 void RenderManager::SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection)
 {
-	if(activeMaterial.IsValid())
-	{
-		Shader * shader = activeMaterial->GetShader();
-		if(shader != NULL)
-		{
-			Transform mvpTransform;
-			mvpTransform.TransformBy(modelView);
-			mvpTransform.TransformBy(projection);
+	SHARED_REF_CHECK_RTRN(activeMaterial,"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
 
-			activeMaterial->SendModelMatrixToShader(model->GetMatrix());
-			activeMaterial->SendModelViewMatrixToShader(modelView->GetMatrix());
-			activeMaterial->SendProjectionMatrixToShader(projection->GetMatrix());
-			activeMaterial->SendMVPMatrixToShader(mvpTransform.GetMatrix());
-		}
-		else
-		{
-			Debug::PrintError("RenderManager::SendTransformUniformsToShader -> material contains NULL shader.");
-		}
-	}
-	else
-	{
-		Debug::PrintError("RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
-	}
+	ShaderRef shader = activeMaterial->GetShader();
+	SHARED_REF_CHECK_RTRN(shader,"RenderManager::SendTransformUniformsToShader -> material contains NULL shader.");
+
+	Transform mvpTransform;
+	mvpTransform.TransformBy(modelView);
+	mvpTransform.TransformBy(projection);
+
+	activeMaterial->SendModelMatrixToShader(model->GetMatrix());
+	activeMaterial->SendModelViewMatrixToShader(modelView->GetMatrix());
+	activeMaterial->SendProjectionMatrixToShader(projection->GetMatrix());
+	activeMaterial->SendMVPMatrixToShader(mvpTransform.GetMatrix());
 }
 
 /*
