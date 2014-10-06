@@ -44,7 +44,7 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
 #include "base/longmask.h"
-#include "graphics/render/skinnedmeshattrtransformer.h"
+#include "graphics/render/skinnedmesh3Dattrtransformer.h"
 #include "global/global.h"
 #include "ui/debug.h"
 

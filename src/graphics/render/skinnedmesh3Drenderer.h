@@ -4,13 +4,13 @@
 // forward declarations
 
 #include "mesh3Drenderer.h"
-#include "skinnedmeshattrtransformer.h"
+#include "skinnedmesh3Dattrtransformer.h"
 
 class SkinnedMesh3DRenderer : public Mesh3DRenderer
 {
 	protected:
 
-	SkinnedMeshAttributeTransformer meshTransformer;
+	SkinnedMesh3DAttributeTransformer meshTransformer;
 	Mesh3DRef mesh;
 	SkinnedMesh3DRenderer();
 	~SkinnedMesh3DRenderer();

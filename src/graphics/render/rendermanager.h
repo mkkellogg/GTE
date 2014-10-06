@@ -59,7 +59,7 @@ class RenderManager
     void ClearBuffersForCamera(const Camera * camera) const;
     void PushTransformData(const Transform * transform, DataStack<float> * transformStack);
     void PopTransformData(const Transform * transform, DataStack<float> * transformStack);
-    int RenderDepth(const DataStack<float> * transformStack) const;
+    unsigned int RenderDepth(const DataStack<float> * transformStack) const;
     void ActivateMaterial(MaterialRef material);
     void SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection);
     void SendCustomUniformsToShader();

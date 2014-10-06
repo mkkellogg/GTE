@@ -8,24 +8,29 @@ class VertexAttrBuffer;
 class Bone;
 
 #include <vector>
+#include "util/tree.h"
 
 class AnimationTarget
 {
-	class SkeletalNode
+	public:
+
+	class AnimationSkeletalNode
 	{
-		Bone * bone;
+		int boneIndex;
 
 		public:
 
-		std::vector <SkeletalNode * > children;
-
-		SkeletalNode();
-		~SkeletalNode();
+		AnimationSkeletalNode();
+		~AnimationSkeletalNode();
 	};
 
-	SkeletalNode * structureRoot;
+	private:
+
 	unsigned int boneCount;
-	Bone ** bones;
+	Bone * bones;
+	Tree<AnimationSkeletalNode> skeleton;
+
+	void Destroy();
 
 	public :
 
@@ -33,6 +38,8 @@ class AnimationTarget
     ~AnimationTarget();
 
     bool Init();
+    //void SetSkeletonRoot(AnimationSkeletalNode * root);
+    Bone * GetBone(unsigned int boneIndex);
 };
 
 #endif

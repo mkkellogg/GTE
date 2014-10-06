@@ -36,7 +36,7 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmeshattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/skinnedmesh3Dvertexmap.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
 ANIMATIONOBJ= obj/animationtarget.o obj/bone.o
 LIGHTOBJ= obj/light.o
@@ -276,8 +276,11 @@ obj/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexa
 obj/attributetransformer.o: $(RENDERSRC)/attributetransformer.cpp $(RENDERSRC)/attributetransformer.h
 	$(CC) $(CFLAGS) -o obj/attributetransformer.o -c $(RENDERSRC)/attributetransformer.cpp
 	
-obj/skinnedmeshattrtransformer.o: $(RENDERSRC)/skinnedmeshattrtransformer.cpp $(RENDERSRC)/skinnedmeshattrtransformer.h
-	$(CC) $(CFLAGS) -o obj/skinnedmeshattrtransformer.o -c $(RENDERSRC)/skinnedmeshattrtransformer.cpp
+obj/skinnedmesh3Dattrtransformer.o: $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp $(RENDERSRC)/skinnedmesh3Dattrtransformer.h
+	$(CC) $(CFLAGS) -o obj/skinnedmesh3Dattrtransformer.o -c $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp
+	
+obj/skinnedmesh3Dvertexmap.o: $(RENDERSRC)/skinnedmesh3Dvertexmap.cpp $(RENDERSRC)/skinnedmesh3Dvertexmap.h
+	$(CC) $(CFLAGS) -o obj/skinnedmesh3Dvertexmap.o -c $(RENDERSRC)/skinnedmesh3Dvertexmap.cpp
 	
 	
 # ==================================

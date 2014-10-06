@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "attributetransformer.h"
-#include "skinnedmeshattrtransformer.h"
+#include "skinnedmesh3Dattrtransformer.h"
 #include "graphics/stdattributes.h"
 #include "geometry/transform.h"
 #include "base/basevector4array.h"
@@ -11,22 +11,22 @@
 #include "geometry/vector/vector3array.h"
 #include "util/time.h"
 
-SkinnedMeshAttributeTransformer::SkinnedMeshAttributeTransformer() : AttributeTransformer()
+SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer() : AttributeTransformer()
 {
 	offset = 0;
 }
 
-SkinnedMeshAttributeTransformer::SkinnedMeshAttributeTransformer(StandardAttributeSet attributes) : AttributeTransformer(attributes)
+SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer(StandardAttributeSet attributes) : AttributeTransformer(attributes)
 {
 	offset = 0;
 }
 
-SkinnedMeshAttributeTransformer::~SkinnedMeshAttributeTransformer()
+SkinnedMesh3DAttributeTransformer::~SkinnedMesh3DAttributeTransformer()
 {
 
 }
 
-void SkinnedMeshAttributeTransformer::TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut)
+void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut)
 {
 	float realTime = Time::GetRealTimeSinceStartup();
 	unsigned int intTime = (unsigned int)Time::GetRealTimeSinceStartup();
@@ -58,7 +58,7 @@ void SkinnedMeshAttributeTransformer::TransformPositions(const Point3Array& posi
 	}
 }
 
-void SkinnedMeshAttributeTransformer::TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut)
+void SkinnedMesh3DAttributeTransformer::TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut)
 {
 	normalsIn.CopyTo(&normalsOut);
 }

@@ -132,7 +132,7 @@ void RenderManager::PopTransformData(const Transform * transform, DataStack<floa
 /*
  * Get the number of entries stored on the transform stack.
  */
-int RenderManager::RenderDepth(const DataStack<float> * transformStack) const
+unsigned int RenderManager::RenderDepth(const DataStack<float> * transformStack) const
 {
 	if(transformStack == NULL)return Constants::MaxObjectRecursionDepth;
 	return transformStack->GetEntryCount();

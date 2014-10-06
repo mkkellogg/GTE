@@ -3,9 +3,9 @@
 
 template <typename T> class DataStack
 {
-	int maxEntryCount;
-	int elementsPerEntry;
-	int entries;
+	unsigned int maxEntryCount;
+	unsigned int elementsPerEntry;
+	unsigned int entries;
 	T * data;
 
 	T * stackPointer;
@@ -71,7 +71,7 @@ template <typename T> class DataStack
 		return maxEntryCount;
 	}
 
-	int GetEntryCount() const
+	unsigned int GetEntryCount() const
 	{
 		return entries;
 	}
