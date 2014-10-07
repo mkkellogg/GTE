@@ -145,6 +145,8 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		// create a normal list for a vertex if one does not exist
 		if(normalGroups.find(*point) == normalGroups.end())
 		{
+			// we use a shared_ptr so that the vector will automatically be
+			// deallocated when the containing map goes out of scope
 			normalGroups[*point] = std::shared_ptr<std::vector<Vector3*>>(new std::vector<Vector3*>());
 		}
 

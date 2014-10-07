@@ -10,9 +10,9 @@
 #include "global/global.h"
 #include "ui/debug.h"
 
-AnimationTarget::AnimationSkeletalNode::AnimationSkeletalNode()
+AnimationTarget::AnimationSkeletalNode::AnimationSkeletalNode(int boneIndex)
 {
-	boneIndex = -1;
+	this->boneIndex = boneIndex;
 }
 
 AnimationTarget::AnimationSkeletalNode::~AnimationSkeletalNode()
@@ -41,10 +41,7 @@ void AnimationTarget::Destroy()
 
 	skeleton.SetTraversalCallback([](AnimationSkeletalNode * node) -> bool
 	{
-		AnimationTarget::AnimationSkeletalNode * lastNode = node;
-
-		delete lastNode;
-
+		delete node;
 		return false;
 	});
 
@@ -59,11 +56,17 @@ bool AnimationTarget::Init()
 	return true;
 }
 
-/*void AnimationTarget::SetSkeletonRoot(AnimationSkeletalNode * root)
+AnimationTarget::AnimationSkeletalNode * AnimationTarget::CreateSkeletonRoot(unsigned int boneIndex)
 {
-	NULL_CHECK_RTRN(root,"AnimationTarget::SetSkeletonRoot -> root is NULL.");
-	this->skeletonRoot = root;
-}*/
+	if(!skeleton.GetRoot())
+	{
+		AnimationTarget::AnimationSkeletalNode * tempRoot = new AnimationTarget::AnimationSkeletalNode(boneIndex);
+		NULL_CHECK(tempRoot,"AnimationTarget::SetSkeletonRoot -> Unable to allocate new AnimationSkeletalNode.", NULL);
+
+		skeleton.AddRoot(tempRoot);
+	}
+	return skeleton.GetRoot();
+}
 
 Bone * AnimationTarget::GetBone(unsigned int boneIndex)
 {

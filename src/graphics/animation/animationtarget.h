@@ -20,7 +20,7 @@ class AnimationTarget
 
 		public:
 
-		AnimationSkeletalNode();
+		AnimationSkeletalNode(int boneIndex);
 		~AnimationSkeletalNode();
 	};
 
@@ -38,7 +38,7 @@ class AnimationTarget
     ~AnimationTarget();
 
     bool Init();
-    //void SetSkeletonRoot(AnimationSkeletalNode * root);
+    AnimationSkeletalNode * CreateSkeletonRoot(unsigned int boneIndex);
     Bone * GetBone(unsigned int boneIndex);
 };
 
