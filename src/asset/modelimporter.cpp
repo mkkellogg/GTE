@@ -310,6 +310,15 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	return mesh3D;
 }
 
+Skeleton * ModelImporter::LoadAnimationTargetFromAssimpMesh(const aiScene& scene, const aiMesh& mesh, unsigned int meshIndex)
+{
+	Skeleton * target = NULL;
+
+	//mesh.
+
+	return target;
+}
+
 bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors)
 {
 	// TODO: Implement support for embedded textures

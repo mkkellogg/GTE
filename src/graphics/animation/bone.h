@@ -6,10 +6,11 @@ class Transform;
 
 #include <vector>
 #include <string>
+#include "object/enginetypes.h"
 
 class Bone
 {
-	Transform * target;
+	TransformRef target;
 	std::string name;
 	unsigned int id;
 

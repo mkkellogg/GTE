@@ -22,16 +22,16 @@
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
 
-SceneObject::SceneObject() : EngineObject()
+SceneObject::SceneObject() : EngineObject(), transform(this)
 {
 	isActive = true;
 
-	transform = new SceneObjectTransform(this);
+	transform.SetIdentity();
 }
 
 SceneObject::~SceneObject()
 {
-	SAFE_DELETE(transform);
+
 }
 
 bool SceneObject::IsActive()
@@ -46,13 +46,14 @@ void SceneObject::SetActive(bool active)
 
 Transform * SceneObject::GetLocalTransform() const
 {
-	return transform;
+	const Transform * ptr = &transform;
+	return const_cast<Transform*>(ptr);
 }
 
 void SceneObject::GetFullTransform(Transform * transform)
 {
 	NULL_CHECK_RTRN(transform,"SceneObject::GetFullTransform -> transform is NULL.");
-	this->transform->GetFullTransform(transform);
+	this->transform.GetFullTransform(transform);
 }
 
 bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)

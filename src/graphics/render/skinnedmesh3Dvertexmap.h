@@ -2,7 +2,7 @@
 #define _SKINNED_MESH3D_VERTEX_MAP_H_
 
 // forward declarations
-class AnimationTarget;
+class Skeleton;
 
 #include "object/enginetypes.h"
 #include "global/constants.h"
@@ -18,7 +18,7 @@ class SkinnedMesh3DVertexMap
 		float weight[Constants::MaxBonesPerVertex];
 	};
 
-	AnimationTarget * animationTarget;
+	Skeleton * animationTarget;
 	Mesh3DRef targetMesh;
 	VertexMappingDescriptor ** mappingDescriptors;
 

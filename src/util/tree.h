@@ -23,10 +23,10 @@ template <class T> class Tree
 
 		T * Data = NULL;
 
-		std::weak_ptr<TreeNode> GetChild(unsigned int index)
+		TreeNode* GetChild(unsigned int index)
 		{
 			if(index >= GetChildCount)return NULL;
-			return children[index];
+			return children[index].get();
 		}
 
 		unsigned int GetChildCount()
@@ -34,7 +34,7 @@ template <class T> class Tree
 			return children.size();
 		}
 
-		std::weak_ptr<TreeNode> AddChild(T * data)
+		TreeNode* AddChild(T * data)
 		{
 			TreeNode * newNode = new TreeNode();
 			NULL_CHECK(newNode,"Tree::AddChild -> Could not allocate new node", NULL);
@@ -42,7 +42,7 @@ template <class T> class Tree
 			newNode->Data = data;
 			std::shared_ptr<TreeNode> sharedRef(newNode);
 			children.push_back(sharedRef);
-			return sharedRef;
+			return sharedRef.get();
 		}
 	};
 
@@ -66,14 +66,14 @@ template <class T> class Tree
 
     }
 
-    std::weak_ptr<TreeNode> GetRoot()
+    TreeNode* GetRoot()
 	{
-    	return root;
+    	return root.get();
 	}
 
-    std::weak_ptr<TreeNode> AddRoot(T* data)
+    TreeNode* AddRoot(T* data)
     {
-    	if(root == NULL)
+    	if(!root)
     	{
 			TreeNode * newNode = new TreeNode();
 			NULL_CHECK(newNode,"Tree::AddChild -> Could not allocate new node", NULL);
@@ -82,7 +82,7 @@ template <class T> class Tree
 			root = std::shared_ptr<TreeNode>(newNode);
     	}
 
-		return root;
+		return root.get();
     }
 
     void SetTraversalCallback(std::function<bool(T*)> callback)

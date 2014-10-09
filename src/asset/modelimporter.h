@@ -8,7 +8,7 @@ class SceneObject;
 class SubMesh3D;
 class Material;
 class UV2Array;
-class AnimationTarget;
+class Skeleton;
 
 #include "object/sceneobjectcomponent.h"
 #include "object/shadermanager.h"
@@ -74,7 +74,7 @@ class ModelImporter
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
 
-	AnimationTarget *
+	Skeleton * LoadAnimationTargetFromAssimpMesh(const aiScene& scene, const aiMesh& mesh, unsigned int meshIndex);
 
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);

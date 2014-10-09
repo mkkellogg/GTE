@@ -10,9 +10,9 @@ class Mesh3D;
 class Transform;
 class Camera;
 class SceneObject;
-class SceneObjectTransform;
 class Light;
 
+#include "geometry/sceneobjecttransform.h"
 #include "engineobject.h"
 #include "enginetypes.h"
 #include <vector>
@@ -25,7 +25,7 @@ class SceneObject : public EngineObject
 	protected:
 
 	bool isActive;
-	SceneObjectTransform * transform;
+	SceneObjectTransform transform;
 	std::vector<SceneObjectRef > children;
 	SceneObjectRef parent;
 	CameraRef camera;

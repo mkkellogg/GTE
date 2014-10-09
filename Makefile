@@ -2,7 +2,7 @@ ASSIMP_LIB=../assimp/lib
 ASSIMP_INC=../assimp/include
 DEVIL_LIB=/usr/locl/lib
 DEVIL_INC=../DevIL/DevIL/include
-OPENGL_LIB=/usr/lib/nvidia-331-updates/
+OPENGL_LIB=/usr/lib/nvidia-331-updates/ #this needs to be changed to your own OpenGl lib path
 
 LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -L$(DEVIL_LIB) -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL 
 CFLAGS=-Isrc -I$(ASSIMP_INC) -I$(DEVIL_INC)  -std=c++11 -Wall 
@@ -38,7 +38,7 @@ UIOBJ= obj/debug.o
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/skinnedmesh3Dvertexmap.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
-ANIMATIONOBJ= obj/animationtarget.o obj/bone.o
+ANIMATIONOBJ= obj/skeleton.o obj/skeletonnode.o obj/bone.o
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
@@ -211,8 +211,11 @@ obj/stduniforms.o: $(GRAPHICSSRC)/stduniforms.cpp $(GRAPHICSSRC)/stduniforms.h
 
 animation: $(ANIMATIONOBJ)
 
-obj/animationtarget.o: $(ANIMATIONSRC)/animationtarget.cpp $(ANIMATIONSRC)/animationtarget.h
-	$(CC) $(CFLAGS) -o obj/animationtarget.o -c $(ANIMATIONSRC)/animationtarget.cpp 
+obj/skeleton.o: $(ANIMATIONSRC)/skeleton.cpp $(ANIMATIONSRC)/skeleton.h
+	$(CC) $(CFLAGS) -o obj/skeleton.o -c $(ANIMATIONSRC)/skeleton.cpp 
+	
+obj/skeletonnode.o: $(ANIMATIONSRC)/skeletonnode.cpp $(ANIMATIONSRC)/skeletonnode.h
+	$(CC) $(CFLAGS) -o obj/skeletonnode.o -c $(ANIMATIONSRC)/skeletonnode.cpp 
 	
 obj/bone.o: $(ANIMATIONSRC)/bone.cpp $(ANIMATIONSRC)/bone.h
 	$(CC) $(CFLAGS) -o obj/bone.o -c $(ANIMATIONSRC)/bone.cpp 

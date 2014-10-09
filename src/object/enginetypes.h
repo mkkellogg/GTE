@@ -13,6 +13,7 @@ class Light;
 class EngineObjectManager;
 class Material;
 class Texture;
+class Transform;
 
 #include <memory>
 
@@ -111,5 +112,7 @@ typedef EngineObjectRef<SceneObject> SceneObjectRef;
 typedef EngineObjectRef<Material> MaterialRef;
 typedef EngineObjectRef<Texture> TextureRef;
 typedef EngineObjectRef<Shader> ShaderRef;
+
+typedef std::shared_ptr<Transform> TransformRef;
 
 #endif
