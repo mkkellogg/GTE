@@ -25,6 +25,7 @@ class SceneObject : public EngineObject
 	protected:
 
 	bool isActive;
+	Transform aggregateTransform;
 	SceneObjectTransform transform;
 	std::vector<SceneObjectRef > children;
 	SceneObjectRef parent;
@@ -43,6 +44,8 @@ class SceneObject : public EngineObject
 
     Transform * GetLocalTransform() const ;
     void GetFullTransform(Transform * transform);
+    void SetAggregateTransform(Transform * transform);
+    Transform * GetAggregateTransform();
 
     bool SetMeshRenderer3D(Mesh3DRendererRef renderer);
     bool SetMesh3D(Mesh3DRef mesh);

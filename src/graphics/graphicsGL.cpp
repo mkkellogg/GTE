@@ -357,6 +357,11 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 	}
 }
 
+void GraphicsGL::PreProcessScene()
+{
+	renderManager->ProcessScene();
+}
+
 void GraphicsGL::RenderScene()
 {
 	renderManager->RenderAll();
@@ -371,6 +376,8 @@ unsigned int GraphicsGL::GetOpenGLVersion()
 
 void GraphicsGL::_glutDisplayFunc()
 {
+	_thisInstance->PreProcessScene();
+
 	_instanceCallbacks->OnUpdate(_thisInstance);
 
 	// update timer before rendering scene so that calls to Time::GetDeltaTime() within

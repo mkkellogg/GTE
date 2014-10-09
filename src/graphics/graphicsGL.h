@@ -50,6 +50,7 @@ class GraphicsGL : public Graphics
     void ActivateMaterial(MaterialRef material);
     MaterialRef GetActiveMaterial();
 
+    void PreProcessScene();
     void RenderScene();
 
     public :

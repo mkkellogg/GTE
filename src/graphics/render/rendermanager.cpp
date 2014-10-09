@@ -145,6 +145,18 @@ unsigned int RenderManager::RenderDepth(const DataStack<float> * transformStack)
  */
 void RenderManager::RenderAll()
 {
+	// render the scene from the perspective of each camera found in ProcessScene()
+	for(unsigned int i=0; i < cameraCount; i ++)
+	{
+		RenderSceneFromCamera(i);
+	}
+}
+
+/*
+ * Kick off the scene processing from the root of the scene.
+ */
+void RenderManager::ProcessScene()
+{
 	lightCount = 0;
 	cameraCount = 0;
 
@@ -155,12 +167,6 @@ void RenderManager::RenderAll()
 
 	// gather information about the cameras & lights in the scene
 	ProcessScene(sceneRoot.GetPtr(), &cameraModelView);
-
-	// render the scene from the perspective of each camera found in ProcessScene()
-	for(unsigned int i=0; i < cameraCount; i ++)
-	{
-		RenderSceneFromCamera(i);
-	}
 }
 
 /*
@@ -172,7 +178,7 @@ void RenderManager::RenderAll()
  * and passed to the current invocation via 'viewTransform', since they will ultimately form position
  * from which the scene is rendered. The transform stored in 'viewTransform' is passed to RenderScene();
  */
-void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform)
+void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTransform)
 {
 	Transform viewInverse;
 	Transform identity;
@@ -187,17 +193,17 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 		if(child.IsValid() && child->IsActive())
 		{
 			// save the existing view transform
-			PushTransformData(viewTransform, viewTransformStack);
+			PushTransformData(aggregateTransform, viewTransformStack);
 
 			// concatenate the current view transform with that of the current scene object
-			viewTransform->TransformBy(child->GetLocalTransform());
+			aggregateTransform->TransformBy(child->GetLocalTransform());
 
 			CameraRef camera = child->GetCamera();
 			if(camera.IsValid() && cameraCount < MAX_CAMERAS)
 			{
 				// we invert the viewTransform because the viewTransform is really moving the world
 				// relative to the camera, rather than moving the camera in the world
-				viewInverse.SetTo(viewTransform);
+				viewInverse.SetTo(aggregateTransform);
 				viewInverse.Invert();
 
 				// add a scene camera from which to render the scene
@@ -211,17 +217,19 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * viewTransform
 			if(light.IsValid() && lightCount < MAX_LIGHTS)
 			{
 				// add a scene light
-				sceneLights[lightCount].transform.SetTo(viewTransform);
+				sceneLights[lightCount].transform.SetTo(aggregateTransform);
 				sceneLights[lightCount].component = light.GetPtr();
 
 				lightCount++;
 			}
 
+			child->SetAggregateTransform(aggregateTransform);
+
 			// continue recursion through child object
-			ProcessScene(child.GetPtr(), viewTransform);
+			ProcessScene(child.GetPtr(), aggregateTransform);
 
 			// restore previous view transform
-			PopTransformData(viewTransform, viewTransformStack);
+			PopTransformData(aggregateTransform, viewTransformStack);
 		}
 		else
 		{
@@ -256,7 +264,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 	identity.SetIdentity();
 
 	// render the scene using the view transform of the current camera
-	ForwardRenderScene(sceneRoot.GetPtr(),&identity, &(sceneCameras[cameraIndex].transform), camera);
+	ForwardRenderScene(sceneRoot.GetPtr(), &(sceneCameras[cameraIndex].transform), camera);
 }
 
 /*
@@ -271,7 +279,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
  * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
  * each pass is combined with the others using additive blending.
  */
-void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera)
+void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTransformInverse, Camera * camera)
 {
 	Transform modelView;
 
@@ -291,12 +299,6 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 		}
 		else if(child->IsActive())
 		{
-			// save existing model transform
-			PushTransformData(modelTransform, modelTransformStack);
-
-			// concatenate the current model transform with that of the current scene object
-			modelTransform->TransformBy(child->GetLocalTransform());
-
 			// check if current scene object has a mesh & renderer
 			Mesh3DRendererRef renderer = child->GetRenderer3D();
 
@@ -342,7 +344,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 							continue;
 						}
 
-						modelView.SetTo(modelTransform);
+						modelView.SetTo(child->GetAggregateTransform());
 						// concatenate modelTransform with inverted viewTransform
 						modelView.PreTransformBy(viewTransformInverse);
 
@@ -350,7 +352,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 						// the one associated with the material
 						ActivateMaterial(currentMaterial);
 						// pass concatenated modelViewTransform and projection transforms to shader
-						SendTransformUniformsToShader(modelTransform, &modelView, camera->GetProjectionTransform());
+						SendTransformUniformsToShader(child->GetAggregateTransform(), &modelView, camera->GetProjectionTransform());
 						SendCustomUniformsToShader();
 
 						// loop through each active light and render sub mesh for that light, if in range
@@ -415,10 +417,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * modelTr
 			}
 
 			// continue recursion through child
-			ForwardRenderScene(child.GetPtr(), modelTransform, viewTransformInverse,camera);
-
-			// restore previous modelTransform
-			PopTransformData(modelTransform,modelTransformStack);
+			ForwardRenderScene(child.GetPtr(), viewTransformInverse,camera);
 		}
 	}
 }

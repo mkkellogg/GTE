@@ -55,7 +55,7 @@ class RenderManager
 
 	std::map<unsigned long, bool> renderedObjects;
 
-	void ForwardRenderScene(SceneObject * parent, Transform * modelTransform, Transform * viewTransformInverse, Camera * camera);
+	void ForwardRenderScene(SceneObject * parent, Transform * viewTransformInverse, Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;
     void PushTransformData(const Transform * transform, DataStack<float> * transformStack);
     void PopTransformData(const Transform * transform, DataStack<float> * transformStack);
@@ -64,7 +64,7 @@ class RenderManager
     void SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection);
     void SendCustomUniformsToShader();
 
-    void ProcessScene(SceneObject * parent, Transform * viewTransform);
+    void ProcessScene(SceneObject * parent, Transform * aggregateTransform);
     void RenderSceneFromCamera(unsigned int cameraIndex);
 
     bool ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh);
@@ -78,6 +78,7 @@ class RenderManager
 
     bool Init();
 
+    void ProcessScene();
     void RenderAll();
 };
 

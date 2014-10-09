@@ -27,6 +27,7 @@ SceneObject::SceneObject() : EngineObject(), transform(this)
 	isActive = true;
 
 	transform.SetIdentity();
+	aggregateTransform.SetIdentity();
 }
 
 SceneObject::~SceneObject()
@@ -54,6 +55,18 @@ void SceneObject::GetFullTransform(Transform * transform)
 {
 	NULL_CHECK_RTRN(transform,"SceneObject::GetFullTransform -> transform is NULL.");
 	this->transform.GetFullTransform(transform);
+}
+
+void SceneObject::SetAggregateTransform(Transform * transform)
+{
+	NULL_CHECK_RTRN(transform,"SceneObject::SetAggregateTransform -> transform is NULL.");
+	aggregateTransform.SetTo(transform);
+}
+
+Transform * SceneObject::GetAggregateTransform()
+{
+	const Transform * ptr = &aggregateTransform;
+	return const_cast<Transform*>(ptr);
 }
 
 bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)
