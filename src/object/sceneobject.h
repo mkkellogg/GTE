@@ -21,12 +21,13 @@ class Light;
 class SceneObject : public EngineObject
 {
 	friend class EngineObjectManager;
+	friend class RenderManager;
 
 	protected:
 
 	bool isActive;
-	Transform aggregateTransform;
-	SceneObjectTransform transform;
+	Transform transform;
+	Transform processingTransform;
 	std::vector<SceneObjectRef > children;
 	SceneObjectRef parent;
 	CameraRef camera;
@@ -37,15 +38,16 @@ class SceneObject : public EngineObject
 	SceneObject();
     virtual ~SceneObject();
 
+    void SetProcessingTransform(Transform * transform);
+
 	public:
 
     bool IsActive();
     void SetActive(bool active);
 
     Transform * GetLocalTransform() const ;
-    void GetFullTransform(Transform * transform);
-    void SetAggregateTransform(Transform * transform);
-    Transform * GetAggregateTransform();
+    void GetFullTransform(SceneObjectTransform * transform);
+    const Transform * GetProcessingTransform() const;
 
     bool SetMeshRenderer3D(Mesh3DRendererRef renderer);
     bool SetMesh3D(Mesh3DRef mesh);

@@ -10,16 +10,20 @@ class Transform;
 
 class Bone
 {
-	TransformRef target;
+	protected:
+
 	std::string name;
 	unsigned int id;
 
 	public :
 
+	virtual const Transform * GetFullTransform() const = 0;
+	virtual Transform * GetLocalTransform() = 0;
+
 	Bone();
 	Bone(std::string& name);
 	Bone(std::string& name, unsigned int id);
-    ~Bone();
+    virtual ~Bone();
 
     void SetName(std::string& name);
     void SetID(unsigned int id);

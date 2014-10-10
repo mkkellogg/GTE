@@ -64,6 +64,7 @@ class RenderManager
     void SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection);
     void SendCustomUniformsToShader();
 
+    void ProcessScene();
     void ProcessScene(SceneObject * parent, Transform * aggregateTransform);
     void RenderSceneFromCamera(unsigned int cameraIndex);
 
@@ -78,7 +79,6 @@ class RenderManager
 
     bool Init();
 
-    void ProcessScene();
     void RenderAll();
 };
 

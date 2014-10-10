@@ -7,8 +7,6 @@
 
 Bone::Bone()
 {
-	target = NULL;
-
 	std::string name("");
 	SetName(name);
 	SetID((unsigned int)-1);
@@ -21,7 +19,6 @@ Bone::Bone(std::string& name) : Bone(name, (unsigned int)-1)
 
 Bone::Bone(std::string& name, unsigned int id)
 {
-	target = NULL;
 	SetName(name);
 	SetID(id);
 }

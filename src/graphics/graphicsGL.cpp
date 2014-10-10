@@ -357,9 +357,12 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 	}
 }
 
+/*
+ * For now, this method does nothing.
+ */
 void GraphicsGL::PreProcessScene()
 {
-	renderManager->ProcessScene();
+
 }
 
 void GraphicsGL::RenderScene()

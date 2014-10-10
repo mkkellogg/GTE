@@ -145,6 +145,8 @@ unsigned int RenderManager::RenderDepth(const DataStack<float> * transformStack)
  */
 void RenderManager::RenderAll()
 {
+	ProcessScene();
+
 	// render the scene from the perspective of each camera found in ProcessScene()
 	for(unsigned int i=0; i < cameraCount; i ++)
 	{
@@ -223,7 +225,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTran
 				lightCount++;
 			}
 
-			child->SetAggregateTransform(aggregateTransform);
+			child->SetProcessingTransform(aggregateTransform);
 
 			// continue recursion through child object
 			ProcessScene(child.GetPtr(), aggregateTransform);
@@ -344,7 +346,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 							continue;
 						}
 
-						modelView.SetTo(child->GetAggregateTransform());
+						modelView.SetTo(child->GetProcessingTransform());
 						// concatenate modelTransform with inverted viewTransform
 						modelView.PreTransformBy(viewTransformInverse);
 
@@ -352,7 +354,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 						// the one associated with the material
 						ActivateMaterial(currentMaterial);
 						// pass concatenated modelViewTransform and projection transforms to shader
-						SendTransformUniformsToShader(child->GetAggregateTransform(), &modelView, camera->GetProjectionTransform());
+						SendTransformUniformsToShader(child->GetProcessingTransform(), &modelView, camera->GetProjectionTransform());
 						SendCustomUniformsToShader();
 
 						// loop through each active light and render sub mesh for that light, if in range
@@ -388,7 +390,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 							Point3 lightPosition;
 							sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
 
-							Transform full;
+							SceneObjectTransform full;
 
 							// get the full transform of the scene object, including those of all ancestors
 							child->GetFullTransform(&full);

@@ -14,6 +14,14 @@
 #include "util/datastack.h"
 
 /*
+ * Default constructor
+ */
+SceneObjectTransform::SceneObjectTransform() : Transform()
+{
+	this->sceneObject = NULL;
+}
+
+/*
  * Base constructor
  */
 SceneObjectTransform::SceneObjectTransform(SceneObject * sceneObject) : Transform()
@@ -45,18 +53,30 @@ SceneObjectTransform::~SceneObjectTransform()
 
 }
 
+void SceneObjectTransform::AttachTo(SceneObject * sceneObject)
+{
+	this->sceneObject = sceneObject;
+}
+
 /*
  * Get the full transform represented by this transform and all
- * its ancestor, and store in [transform]
+ * its ancestors, and store in [transform]. Additionally, assign the sceneObject
+ * attached to this transform to [transform]
  */
-void SceneObjectTransform::GetFullTransform(Transform * transform)
+void SceneObjectTransform::GetFullTransform(SceneObjectTransform * transform)
 {
 	NULL_CHECK_RTRN(transform, "SceneObjectTransform::GetFullTransform -> NULL transform passed.");
 
+	transform->AttachTo(sceneObject);
+	transform->StoreFullTransform();
+}
+
+void SceneObjectTransform::StoreFullTransform()
+{
 	Transform full;
 	GetInheritedTransform(&full, false);
 	full.TransformBy(this);
-	transform->SetTo(&full);
+	SetTo(&full);
 }
 
 /*

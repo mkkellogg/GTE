@@ -38,7 +38,7 @@ UIOBJ= obj/debug.o
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/skinnedmesh3Dvertexmap.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
-ANIMATIONOBJ= obj/skeleton.o obj/skeletonnode.o obj/bone.o
+ANIMATIONOBJ= obj/skeleton.o obj/skeletonnode.o obj/bone.o obj/sceneobjectbone.o
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
@@ -218,7 +218,12 @@ obj/skeletonnode.o: $(ANIMATIONSRC)/skeletonnode.cpp $(ANIMATIONSRC)/skeletonnod
 	$(CC) $(CFLAGS) -o obj/skeletonnode.o -c $(ANIMATIONSRC)/skeletonnode.cpp 
 	
 obj/bone.o: $(ANIMATIONSRC)/bone.cpp $(ANIMATIONSRC)/bone.h
-	$(CC) $(CFLAGS) -o obj/bone.o -c $(ANIMATIONSRC)/bone.cpp 
+	$(CC) $(CFLAGS) -o obj/bone.o -c $(ANIMATIONSRC)/bone.cpp
+	
+obj/sceneobjectbone.o: $(ANIMATIONSRC)/sceneobjectbone.cpp $(ANIMATIONSRC)/sceneobjectbone.h
+	$(CC) $(CFLAGS) -o obj/sceneobjectbone.o -c $(ANIMATIONSRC)/sceneobjectbone.cpp 
+		
+ 
 	
 	
 # ==================================

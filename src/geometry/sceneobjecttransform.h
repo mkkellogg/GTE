@@ -22,18 +22,23 @@ class SceneObjectTransform;
 
 class SceneObjectTransform : public Transform
 {
+	friend class SceneObject;
+
 	SceneObject * sceneObject;
 
 	void GetInheritedTransform(Transform * transform, bool invert);
+	void StoreFullTransform();
 
     public:
 
+	SceneObjectTransform();
 	SceneObjectTransform(SceneObject * sceneObject);
 	SceneObjectTransform(SceneObject * sceneObject, Matrix4x4 * m);
 	SceneObjectTransform(SceneObject * sceneObject, SceneObjectTransform * sceneObjectTransform);
     ~SceneObjectTransform();
 
-    void GetFullTransform(Transform * transform);
+    void AttachTo(SceneObject * sceneObject);
+    void GetFullTransform(SceneObjectTransform * transform);
 
     void Translate(float x, float y, float z, bool local);
     void RotateAround(Point3 * point, Vector3 * axis, float angle);

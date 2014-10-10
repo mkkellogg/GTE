@@ -22,12 +22,12 @@
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
 
-SceneObject::SceneObject() : EngineObject(), transform(this)
+SceneObject::SceneObject() : EngineObject()
 {
 	isActive = true;
 
 	transform.SetIdentity();
-	aggregateTransform.SetIdentity();
+	processingTransform.SetIdentity();
 }
 
 SceneObject::~SceneObject()
@@ -51,22 +51,23 @@ Transform * SceneObject::GetLocalTransform() const
 	return const_cast<Transform*>(ptr);
 }
 
-void SceneObject::GetFullTransform(Transform * transform)
+void SceneObject::GetFullTransform(SceneObjectTransform * transform)
 {
 	NULL_CHECK_RTRN(transform,"SceneObject::GetFullTransform -> transform is NULL.");
-	this->transform.GetFullTransform(transform);
+	transform->AttachTo(this);
+	transform->StoreFullTransform();
 }
 
-void SceneObject::SetAggregateTransform(Transform * transform)
+void SceneObject::SetProcessingTransform(Transform * transform)
 {
 	NULL_CHECK_RTRN(transform,"SceneObject::SetAggregateTransform -> transform is NULL.");
-	aggregateTransform.SetTo(transform);
+	processingTransform.SetTo(transform);
 }
 
-Transform * SceneObject::GetAggregateTransform()
+const Transform * SceneObject::GetProcessingTransform() const
 {
-	const Transform * ptr = &aggregateTransform;
-	return const_cast<Transform*>(ptr);
+	const Transform * ptr = &processingTransform;
+	return ptr;
 }
 
 bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)
