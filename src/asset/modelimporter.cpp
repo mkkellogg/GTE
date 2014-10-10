@@ -310,7 +310,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	return mesh3D;
 }
 
-Skeleton * ModelImporter::LoadAnimationTargetFromAssimpMesh(const aiScene& scene, const aiMesh& mesh, unsigned int meshIndex)
+Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
 {
 	Skeleton * target = NULL;
 

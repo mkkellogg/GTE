@@ -74,7 +74,7 @@ class ModelImporter
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
 
-	Skeleton * LoadAnimationTargetFromAssimpMesh(const aiScene& scene, const aiMesh& mesh, unsigned int meshIndex);
+	Skeleton * LoadSkeleton(const aiScene& scene);
 
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);

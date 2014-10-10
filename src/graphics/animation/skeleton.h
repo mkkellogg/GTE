@@ -9,6 +9,7 @@ class Bone;
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include "skeletonnode.h"
 #include "util/tree.h"
 
@@ -16,6 +17,7 @@ class Skeleton
 {
 	private:
 
+	std::unordered_map<std::string, unsigned int> boneNameMap;
 	unsigned int boneCount;
 	std::vector<Bone *> bones;
 	Tree<SkeletonNode> skeleton;
