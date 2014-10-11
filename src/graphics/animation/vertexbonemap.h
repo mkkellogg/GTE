@@ -1,5 +1,5 @@
-#ifndef _SKINNED_MESH3D_VERTEX_MAP_H_
-#define _SKINNED_MESH3D_VERTEX_MAP_H_
+#ifndef _VERTEX_BONE_MAP_H_
+#define _VERTEX_BONE_MAP_H_
 
 // forward declarations
 class Skeleton;
@@ -7,7 +7,7 @@ class Skeleton;
 #include "object/enginetypes.h"
 #include "global/constants.h"
 
-class SkinnedMesh3DVertexMap
+class VertexBoneMap
 {
 	class VertexMappingDescriptor
 	{
@@ -18,17 +18,16 @@ class SkinnedMesh3DVertexMap
 		float weight[Constants::MaxBonesPerVertex];
 	};
 
-	Skeleton * animationTarget;
-	Mesh3DRef targetMesh;
-	VertexMappingDescriptor ** mappingDescriptors;
+	unsigned int vertexCount;
+	VertexMappingDescriptor * mappingDescriptors;
 
 	void Destroy();
 
 	public:
 
-	SkinnedMesh3DVertexMap();
-	~SkinnedMesh3DVertexMap();
-	void Init(Mesh3DRef targetMesh);
+	VertexBoneMap(unsigned int vertexCount);
+	~VertexBoneMap();
+	void Init();
 };
 
 

@@ -198,7 +198,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTran
 			PushTransformData(aggregateTransform, viewTransformStack);
 
 			// concatenate the current view transform with that of the current scene object
-			aggregateTransform->TransformBy(child->GetLocalTransform());
+			aggregateTransform->TransformBy(&(child->GetLocalTransform()));
 
 			CameraRef camera = child->GetCamera();
 			if(camera.IsValid() && cameraCount < MAX_CAMERAS)
@@ -295,7 +295,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 	{
 		SceneObjectRef child = parent->GetChildAt(i);
 
-		if(!child.IsValid() ||  child->GetLocalTransform() == NULL)
+		if(!child.IsValid())
 		{
 			Debug::PrintError("RenderManager::ForwardRenderScene -> NULL scene object encountered.");
 		}
@@ -354,7 +354,8 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 						// the one associated with the material
 						ActivateMaterial(currentMaterial);
 						// pass concatenated modelViewTransform and projection transforms to shader
-						SendTransformUniformsToShader(child->GetProcessingTransform(), &modelView, camera->GetProjectionTransform());
+						const Transform& modelTransform = child->GetProcessingTransform();
+						SendTransformUniformsToShader(&modelTransform, &modelView, camera->GetProjectionTransform());
 						SendCustomUniformsToShader();
 
 						// loop through each active light and render sub mesh for that light, if in range

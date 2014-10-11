@@ -17,6 +17,8 @@ class Skeleton;
 #include "graphics/stduniforms.h"
 #include "assimp/scene.h"
 #include "base/longmask.h"
+
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -25,6 +27,11 @@ class ModelImporter
 	friend EngineObjectManager;
 
 	protected :
+
+	enum class SceneTraverseOrder
+	{
+		PreOrder=0
+	};
 
 	class MeshSpecificMaterialDescriptor
 	{
@@ -75,6 +82,9 @@ class ModelImporter
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
 
 	Skeleton * LoadSkeleton(const aiScene& scene);
+
+	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<void(const aiNode&)> callback);
+	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<void(const aiNode&)> callback);
 
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);

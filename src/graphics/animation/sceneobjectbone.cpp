@@ -28,10 +28,10 @@ SceneObjectBone::~SceneObjectBone()
 
 const Transform * SceneObjectBone::GetFullTransform() const
 {
-	return target->GetProcessingTransform();
+	return &(target->GetProcessingTransform());
 }
 
 Transform * SceneObjectBone::GetLocalTransform()
 {
-	return target->GetLocalTransform();
+	return &(target->GetLocalTransform());
 }

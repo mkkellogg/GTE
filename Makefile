@@ -36,9 +36,9 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o 
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/skinnedmesh3Dvertexmap.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
-ANIMATIONOBJ= obj/skeleton.o obj/skeletonnode.o obj/bone.o obj/sceneobjectbone.o
+ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o obj/sceneobjectbone.o
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
@@ -223,7 +223,9 @@ obj/bone.o: $(ANIMATIONSRC)/bone.cpp $(ANIMATIONSRC)/bone.h
 obj/sceneobjectbone.o: $(ANIMATIONSRC)/sceneobjectbone.cpp $(ANIMATIONSRC)/sceneobjectbone.h
 	$(CC) $(CFLAGS) -o obj/sceneobjectbone.o -c $(ANIMATIONSRC)/sceneobjectbone.cpp 
 		
- 
+ obj/vertexbonemap.o: $(ANIMATIONSRC)/vertexbonemap.cpp $(ANIMATIONSRC)/vertexbonemap.h
+	$(CC) $(CFLAGS) -o obj/vertexbonemap.o -c $(ANIMATIONSRC)/vertexbonemap.cpp
+	
 	
 	
 # ==================================
@@ -286,9 +288,6 @@ obj/attributetransformer.o: $(RENDERSRC)/attributetransformer.cpp $(RENDERSRC)/a
 	
 obj/skinnedmesh3Dattrtransformer.o: $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp $(RENDERSRC)/skinnedmesh3Dattrtransformer.h
 	$(CC) $(CFLAGS) -o obj/skinnedmesh3Dattrtransformer.o -c $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp
-	
-obj/skinnedmesh3Dvertexmap.o: $(RENDERSRC)/skinnedmesh3Dvertexmap.cpp $(RENDERSRC)/skinnedmesh3Dvertexmap.h
-	$(CC) $(CFLAGS) -o obj/skinnedmesh3Dvertexmap.o -c $(RENDERSRC)/skinnedmesh3Dvertexmap.cpp
 	
 	
 # ==================================

@@ -45,10 +45,11 @@ void SceneObject::SetActive(bool active)
 	this->isActive = active;
 }
 
-Transform * SceneObject::GetLocalTransform() const
+Transform& SceneObject::GetLocalTransform()
 {
-	const Transform * ptr = &transform;
-	return const_cast<Transform*>(ptr);
+	//const Transform * ptr = &transform;
+	//return const_cast<Transform*>(ptr);
+	return transform;
 }
 
 void SceneObject::GetFullTransform(SceneObjectTransform * transform)
@@ -64,10 +65,10 @@ void SceneObject::SetProcessingTransform(Transform * transform)
 	processingTransform.SetTo(transform);
 }
 
-const Transform * SceneObject::GetProcessingTransform() const
+const Transform& SceneObject::GetProcessingTransform() const
 {
-	const Transform * ptr = &processingTransform;
-	return ptr;
+	//const Transform * ptr = &processingTransform;
+	return processingTransform;
 }
 
 bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)

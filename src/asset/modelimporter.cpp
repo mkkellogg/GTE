@@ -4,11 +4,13 @@
 #include <memory.h>
 #include <math.h>
 
+#include <memory>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <map>
 #include <bitset>
+#include <unordered_map>
 
 #include "graphics/stdattributes.h"
 #include <IL/il.h>
@@ -26,6 +28,7 @@
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
+#include "graphics/animation/skeleton.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
@@ -155,7 +158,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 		SHARED_REF_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
 
 		// update the scene object's local transform
-		sceneObject->GetLocalTransform()->SetTo(&mat);
+		sceneObject->GetLocalTransform().SetTo(&mat);
 
 		for (unsigned int n=0; n < node.mNumMeshes; n++)
 		{
@@ -308,15 +311,6 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	mesh3D->Update();
 
 	return mesh3D;
-}
-
-Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
-{
-	Skeleton * target = NULL;
-
-	//mesh.
-
-	return target;
 }
 
 bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors)
@@ -492,6 +486,65 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	}
 }
 
+Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
+{
+	std::unordered_map<std::string, unsigned int> boneMap;
+	unsigned int boneCount = 0;
+
+	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	{
+		aiMesh * cMesh = scene.mMeshes[m];
+		for(unsigned int b = 0; b < cMesh->mNumBones; m++)
+		{
+			aiBone * cBone = cMesh->mBones[b];
+			if(cBone != NULL)
+			{
+				std::string boneName = std::string(cBone->mName.C_Str());
+				if(boneMap.find(boneName) == boneMap.end())
+				{
+					boneMap[boneName] = boneCount;
+					boneCount++;
+				}
+			}
+		}
+	}
+
+	Skeleton * target = new Skeleton(boneCount);
+	NULL_CHECK(target,"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",NULL);
+
+	TraverseScene(scene, SceneTraverseOrder::PreOrder, [](const aiNode& node)
+	{
+		for(unsigned int i = 0; i< node.mNumMeshes; i++)
+		{
+			aiMesh * cMesh = NULL;
+			unsigned int meshIndex = node.mMeshes[i];
+		}
+	});
+
+
+
+	return target;
+}
+
+void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<void(const aiNode&)> callback)
+{
+	if(scene.mRootNode != NULL)
+	{
+		if(traverseOrder == SceneTraverseOrder::PreOrder)
+			PreOrderTraverseScene(scene, (const aiNode)(*scene.mRootNode), callback);
+	}
+}
+
+void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<void(const aiNode&)> callback)
+{
+	callback(node);
+
+	for(unsigned int i = 0; i < node.mNumChildren; i++)
+	{
+		PreOrderTraverseScene(scene, (const aiNode)(*node.mChildren[i]), callback);
+	}
+}
+
 UV2Array* ModelImporter::GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property)
 {
 	switch(property)
@@ -549,3 +602,4 @@ std::string ModelImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic
 
 	return "";
 }
+

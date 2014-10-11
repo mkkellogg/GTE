@@ -45,9 +45,9 @@ class SceneObject : public EngineObject
     bool IsActive();
     void SetActive(bool active);
 
-    Transform * GetLocalTransform() const ;
+    Transform& GetLocalTransform() ;
     void GetFullTransform(SceneObjectTransform * transform);
-    const Transform * GetProcessingTransform() const;
+    const Transform& GetProcessingTransform() const;
 
     bool SetMeshRenderer3D(Mesh3DRendererRef renderer);
     bool SetMesh3D(Mesh3DRef mesh);

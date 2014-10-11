@@ -2,10 +2,8 @@
 #define _SKELETON_H_
 
 //forward declarations
-class Point3Array;
-class Vector3Array;
-class VertexAttrBuffer;
 class Bone;
+class VertexBoneMap;
 
 #include <vector>
 #include <string>
@@ -20,6 +18,7 @@ class Skeleton
 	std::unordered_map<std::string, unsigned int> boneNameMap;
 	unsigned int boneCount;
 	std::vector<Bone *> bones;
+	std::vector<VertexBoneMap *> vertexBoneMap;
 	Tree<SkeletonNode> skeleton;
 
 	void Destroy();

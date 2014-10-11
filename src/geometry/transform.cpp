@@ -80,9 +80,33 @@ void Transform::SetTo(const Transform * transform)
 	SetTo(transform->GetMatrix());
 }
 
+/*
+ * Make this transform equal to [transform]
+ */
+void Transform::SetTo(const Transform& transform)
+{
+	SetTo(transform.GetMatrix());
+}
+
 void Transform::SetIdentity()
 {
 	matrix.SetIdentity();
+}
+
+/*
+ * Post-multiply this transform's matrix by the matrix contained in [transform]
+ */
+void Transform::TransformBy(const Transform& transform)
+{
+	TransformBy(&transform);
+}
+
+/*
+ * Pre-multiply this transform's matrix by the matrix contained in [transform]
+ */
+void Transform::PreTransformBy(const Transform& transform)
+{
+	PreTransformBy(&transform);
 }
 
 /*
