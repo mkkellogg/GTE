@@ -110,7 +110,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 		renderer->AddMaterial(material);
-		sceneObject->SetMeshRenderer3D(renderer);
+		sceneObject->SetMesh3DRenderer(renderer);
 
 		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
@@ -250,7 +250,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		sceneObject->AddChild(childSceneObject);
 
 		childSceneObject->SetMesh3D(mesh);
-		childSceneObject->SetMeshRenderer3D(renderer);
+		childSceneObject->SetMesh3DRenderer(renderer);
 
 		childSceneObject->GetLocalTransform().Translate(-2, 3, 0, true);
 		childSceneObject->GetLocalTransform().Scale(1.5,1.5,1.5, true);

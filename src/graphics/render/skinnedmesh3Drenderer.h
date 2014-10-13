@@ -8,6 +8,9 @@
 
 class SkinnedMesh3DRenderer : public Mesh3DRenderer
 {
+	friend class EngineObjectManager;
+	friend class SubMesh3DRenderer;
+
 	protected:
 
 	SkinnedMesh3DAttributeTransformer meshTransformer;
@@ -17,6 +20,8 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 
 	public:
 
+	Mesh3DRef GetMesh();
+	SubMesh3DRef GetSubMesh(unsigned int index);
 	void SetMesh(Mesh3DRef mesh);
 	void UpdateFromMesh();
 };

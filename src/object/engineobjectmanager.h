@@ -53,6 +53,7 @@ class EngineObjectManager
 	void DeleteCamera(Camera * light);
 	void DeleteMesh3D(Mesh3D * mesh);
 	void DeleteMesh3DRenderer(Mesh3DRenderer * renderer);
+	void DeleteSkinnedMesh3DRenderer(SkinnedMesh3DRenderer * renderer);
 	void DeleteSubMesh3D(SubMesh3D * mesh);
 	void DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer);
 	void DeleteMaterial(Material * material);
@@ -74,6 +75,8 @@ class EngineObjectManager
     void DestroyMesh3D(Mesh3DRef mesh);
     Mesh3DRendererRef CreateMesh3DRenderer();
     void DestroyMesh3DRenderer(Mesh3DRendererRef renderer);
+    SkinnedMesh3DRendererRef CreateSkinnedMesh3DRenderer();
+    void DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
 
     SubMesh3DRef CreateSubMesh3D(StandardAttributeSet attributes);
     void DestroySubMesh3D(SubMesh3DRef mesh);

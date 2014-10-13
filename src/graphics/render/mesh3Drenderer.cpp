@@ -174,10 +174,10 @@ SubMesh3DRef Mesh3DRenderer::GetSubMesh(unsigned int index)
 	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
 
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
-	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", SubMesh3DRef::Null());
+	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMesh -> mesh is NULL.", SubMesh3DRef::Null());
 
 	SubMesh3DRef subMesh = mesh->GetSubMesh(index);
-	SHARED_REF_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", SubMesh3DRef::Null());
+	SHARED_REF_CHECK(subMesh,"Mesh3DRenderer::GetSubMesh -> subMesh is NULL.", SubMesh3DRef::Null());
 
 	return subMesh;
 }

@@ -7,6 +7,7 @@
 #include "skeleton.h"
 #include "skeletonnode.h"
 #include "bone.h"
+#include "vertexbonemap.h"
 #include "util/tree.h"
 #include "global/global.h"
 #include "ui/debug.h"
@@ -14,6 +15,7 @@
 Skeleton::Skeleton(unsigned int boneCount)
 {
 	this->boneCount = boneCount;
+	bones = NULL;
 }
 
 Skeleton::~Skeleton()
@@ -23,51 +25,103 @@ Skeleton::~Skeleton()
 
 void Skeleton::Destroy()
 {
-	for(unsigned int i =0; i < bones.size(); i++)
+	for(unsigned int i = 0; i < vertexBoneMap.size(); i++)
 	{
-		if(bones[i] != NULL)
-		{
-			delete bones[i];
-		}
+		VertexBoneMap * map = vertexBoneMap[i];
+		SAFE_DELETE(map);
 	}
-	bones.clear();
+	vertexBoneMap.clear();
+
+	if(bones != NULL)
+	{
+		delete[] bones;
+		bones = NULL;
+	}
+	boneNameMap.clear();
 
 	skeleton.SetTraversalCallback([](SkeletonNode * node) -> bool
 	{
-		delete node;
-		return false;
+		if(node != NULL)
+		{
+			delete node;
+		}
+		return true;
 	});
 
 	skeleton.Traverse();
 }
 
+unsigned int Skeleton::GetBoneCount()
+{
+	return boneCount;
+}
+
 bool Skeleton::Init()
 {
-	//bones = new Bone[boneCount];
-	//NULL_CHECK(bones,"AnimationTarget::Init -> unable to allocate bones array.", false);
+	Destroy();
+
+	bones = new Bone[boneCount];
+	NULL_CHECK(bones,"Skeleton::Init -> Could not allocate bone array.", NULL);
 
 	return true;
 }
 
-SkeletonNode *  Skeleton::CreateSkeletonRoot(unsigned int boneIndex)
+Tree<SkeletonNode*>::TreeNode *  Skeleton::CreateRoot(SkeletonNode * node)
 {
 	if(skeleton.GetRoot() == NULL)
 	{
-		SkeletonNode * tempRoot = new SkeletonNode(boneIndex);
-		NULL_CHECK(tempRoot,"AnimationTarget::SetSkeletonRoot -> Unable to allocate new AnimationSkeletalNode.", NULL);
-
-		skeleton.AddRoot(tempRoot);
+		skeleton.AddRoot(node);
 	}
-	return skeleton.GetRoot()->Data;
+	return skeleton.GetRoot();
 }
 
-Bone * Skeleton::GetBone(unsigned int boneIndex)
+Tree<SkeletonNode*>::TreeNode *  Skeleton::AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode * node)
+{
+	NULL_CHECK(parent,"Skeleton::AddChild -> parent is NULL.", NULL);
+	Tree<SkeletonNode*>::TreeNode * childNode = parent->AddChild(node);
+
+	return childNode;
+}
+
+void Skeleton::MapBone(std::string& name, unsigned int boneIndex)
+{
+	boneNameMap[name] = boneIndex;
+}
+
+int Skeleton::GetBoneMapping(std::string& name)
+{
+	std::unordered_map<std::string,unsigned int>::const_iterator result = boneNameMap.find(name);
+	if(result != boneNameMap.end())
+	{
+		return (*result).second;
+	}
+
+	return -1;
+}
+
+Bone* Skeleton::GetBone(unsigned int boneIndex)
 {
 	if(boneIndex >= boneCount)
 	{
-		Debug::PrintError("AnimationTarget::GetBone -> Index is out of range.");
+		Debug::PrintError("Skeleton::GetBone -> Index is out of range.");
 		return NULL;
 	}
 
-	return bones[boneIndex];
+	return bones + boneIndex;
+}
+
+void Skeleton::AddVertexBoneMap(VertexBoneMap * map)
+{
+	vertexBoneMap.push_back(map);
+}
+
+VertexBoneMap * Skeleton::GetVertexBoneMap(unsigned int index)
+{
+	if(index >= vertexBoneMap.size())
+	{
+		Debug::PrintError("Skeleton::GetVertexBoneMap -> Index out of range.");
+		return NULL;
+	}
+
+	return vertexBoneMap[index];
 }

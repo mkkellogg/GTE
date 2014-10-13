@@ -23,8 +23,6 @@ VertexBoneMap::~VertexBoneMap()
 
 void VertexBoneMap::Destroy()
 {
-	NULL_CHECK_RTRN(mappingDescriptors, "VertexBoneMap::Destroy -> mappingDescriptors is NULL.");
-
 	if(mappingDescriptors != NULL)
 	{
 		delete[] mappingDescriptors;
@@ -32,10 +30,23 @@ void VertexBoneMap::Destroy()
 	}
 }
 
-void VertexBoneMap::Init()
+bool VertexBoneMap::Init()
 {
 	Destroy();
 
 	mappingDescriptors = new VertexMappingDescriptor[vertexCount];
-	NULL_CHECK_RTRN(mappingDescriptors, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.");
+	NULL_CHECK(mappingDescriptors, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.", false);
+
+	return true;
+}
+
+VertexBoneMap::VertexMappingDescriptor* VertexBoneMap::GetDescriptor(unsigned int index)
+{
+	if(index >= vertexCount)
+	{
+		Debug::PrintError("VertexBoneMap::GetDescriptor -> Index out of range.");
+		return NULL;
+	}
+
+	return mappingDescriptors + index;
 }

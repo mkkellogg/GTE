@@ -13,6 +13,7 @@
 #include "graphics/render/material.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/attributetransformer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/object/mesh3D.h"
@@ -184,7 +185,7 @@ Mesh3DRendererRef EngineObjectManager::CreateMesh3DRenderer()
 
 	return Mesh3DRendererRef(renderer, [=](Mesh3DRenderer * renderer)
 	{
-		  DeleteMesh3DRenderer(renderer);
+		DeleteMesh3DRenderer(renderer);
 	});
 }
 
@@ -196,6 +197,29 @@ void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRendererRef renderer)
 void EngineObjectManager::DeleteMesh3DRenderer(Mesh3DRenderer* renderer)
 {
 	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteMesh3DRenderer -> renderer is NULL.");
+	delete renderer;
+}
+
+SkinnedMesh3DRendererRef EngineObjectManager::CreateSkinnedMesh3DRenderer()
+{
+	SkinnedMesh3DRenderer * renderer =  new SkinnedMesh3DRenderer();
+	NULL_CHECK(renderer,"EngineObjectManager::CreateSkinnedMesh3DRenderer -> could not create new SkinnedMesh3DRenderer object.", SkinnedMesh3DRendererRef::Null());
+	renderer->SetObjectID(GetNextObjectID());
+
+	return SkinnedMesh3DRendererRef(renderer, [=](SkinnedMesh3DRenderer * renderer)
+	{
+		DeleteSkinnedMesh3DRenderer(renderer);
+	});
+}
+
+void EngineObjectManager::DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
+{
+	renderer.ForceDelete();
+}
+
+void EngineObjectManager::DeleteSkinnedMesh3DRenderer(SkinnedMesh3DRenderer* renderer)
+{
+	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteSkinnedMesh3DRenderer -> renderer is NULL.");
 	delete renderer;
 }
 

@@ -7,6 +7,7 @@
 
 Bone::Bone()
 {
+	node = NULL;
 	std::string name("");
 	SetName(name);
 	SetID((unsigned int)-1);
@@ -36,4 +37,14 @@ void Bone::SetName(std::string& name)
 void Bone::SetID(unsigned int id)
 {
 	this->id = id;
+}
+
+void Bone::SetOffsetMatrix(Matrix4x4& matrix)
+{
+	this->offsetMatrix.SetTo(&matrix);
+}
+
+void Bone::SetNode(SkeletonNode * node)
+{
+	this->node= node;
 }

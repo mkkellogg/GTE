@@ -198,7 +198,8 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTran
 			PushTransformData(aggregateTransform, viewTransformStack);
 
 			// concatenate the current view transform with that of the current scene object
-			aggregateTransform->TransformBy(&(child->GetLocalTransform()));
+			Transform& localTransform = child->GetLocalTransform();
+			aggregateTransform->TransformBy(&localTransform);
 
 			CameraRef camera = child->GetCamera();
 			if(camera.IsValid() && cameraCount < MAX_CAMERAS)
@@ -266,7 +267,8 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 	identity.SetIdentity();
 
 	// render the scene using the view transform of the current camera
-	ForwardRenderScene(sceneRoot.GetPtr(), &(sceneCameras[cameraIndex].transform), camera);
+	Transform& cameraTransform = sceneCameras[cameraIndex].transform;
+	ForwardRenderScene(sceneRoot.GetPtr(), &cameraTransform, camera);
 }
 
 /*
@@ -301,10 +303,19 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 		}
 		else if(child->IsActive())
 		{
-			// check if current scene object has a mesh & renderer
-			Mesh3DRendererRef renderer = child->GetRenderer3D();
+			Mesh3DRenderer * renderer = NULL;
 
-			if(renderer.IsValid())
+			// check if current scene object has a mesh & renderer
+			if(child->GetMesh3DRenderer().IsValid())
+			{
+				renderer = child->GetMesh3DRenderer().GetPtr();
+			}
+			else if(child->GetSkinnedMesh3DRenderer().IsValid())
+			{
+				renderer = (Mesh3DRenderer *)child->GetSkinnedMesh3DRenderer().GetPtr();
+			}
+
+			if(renderer != NULL)
 			{
 				Mesh3DRef mesh = renderer->GetMesh();
 

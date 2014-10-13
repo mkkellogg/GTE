@@ -22,32 +22,36 @@
 #include "assimp/LogStream.hpp"
 #include "modelimporter.h"
 #include "importutil.h"
-#include "geometry/matrix4x4.h"
 #include "object/engineobjectmanager.h"
 #include "object/shadermanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
 #include "graphics/animation/skeleton.h"
+#include "graphics/animation/bone.h"
+#include "graphics/animation/vertexbonemap.h"
+#include "graphics/animation/sceneobjectskeletonnode.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
-#include "geometry/sceneobjecttransform.h"
 #include "graphics/uv/uv2array.h"
 #include "graphics/render/material.h"
 #include "graphics/image/rawimage.h"
-#include "filesys/filesystem.h"
-#include "geometry/point/point3.h"
-#include "geometry/vector/vector3.h"
 #include "graphics/color/color4.h"
 #include "graphics/uv/uv2.h"
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
-#include "base/longmask.h"
 #include "graphics/render/skinnedmesh3Dattrtransformer.h"
+#include "filesys/filesystem.h"
+#include "geometry/sceneobjecttransform.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
+#include "geometry/point/point3array.h"
+#include "geometry/vector/vector3array.h"
+#include "geometry/matrix4x4.h"
+#include "base/longmask.h"
 #include "global/global.h"
 #include "ui/debug.h"
 
@@ -115,7 +119,8 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 
 	if(scene.mRootNode != NULL)
 	{
-		RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root, baseTransform, materialImportDescriptors);
+		Skeleton * skeleton = LoadSkeleton(scene);
+		RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root, baseTransform, materialImportDescriptors, skeleton);
 	}
 	else
 	{
@@ -125,7 +130,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	return root;
 }
 
-void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObjectRef current, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors)
+void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObjectRef current, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors,  Skeleton * skeleton)
 {
 	Matrix4x4 mat;
 
@@ -142,6 +147,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
 	SHARED_REF_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
+	bool hasSkeleton = skeleton != NULL && skeleton->GetBoneCount() ? true : false;
 	if(node.mNumMeshes > 0)
 	{
 		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
@@ -154,8 +160,22 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			return;
 		}
 
-		Mesh3DRendererRef meshRenderer = engineObjectManager->CreateMesh3DRenderer();
-		SHARED_REF_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
+		Mesh3DRenderer * rendererPtr = NULL;
+		SkinnedMesh3DRendererRef skinnedMeshRenderer;
+		Mesh3DRendererRef meshRenderer;
+
+		if(hasSkeleton)
+		{
+			skinnedMeshRenderer = engineObjectManager->CreateSkinnedMesh3DRenderer();
+			SHARED_REF_CHECK_RTRN(skinnedMeshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.");
+			rendererPtr = (Mesh3DRenderer*)skinnedMeshRenderer.GetPtr();
+		}
+		else
+		{
+			meshRenderer = engineObjectManager->CreateMesh3DRenderer();
+			SHARED_REF_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
+			rendererPtr = meshRenderer.GetPtr();
+		}
 
 		// update the scene object's local transform
 		sceneObject->GetLocalTransform().SetTo(&mat);
@@ -178,7 +198,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			SHARED_REF_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
 
 			// add the material to the mesh renderer
-			meshRenderer->AddMaterial(material);
+			rendererPtr->AddMaterial(material);
 
 			// convert Assimp mesh to a Mesh3D object
 			SubMesh3DRef subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
@@ -188,8 +208,17 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			mesh3D->SetSubMesh(subMesh3D, n);
 		}
 
-		sceneObject->SetMeshRenderer3D(meshRenderer);
-		sceneObject->SetMesh3D(mesh3D);
+		if(hasSkeleton)
+		{
+			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
+			skinnedMeshRenderer->SetMesh(mesh3D);
+		}
+		else
+		{
+			sceneObject->SetMesh3DRenderer(meshRenderer);
+			sceneObject->SetMesh3D(mesh3D);
+		}
+
 		current->AddChild(sceneObject);
 	}
 
@@ -200,7 +229,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 		current->AddChild(child);
 		const aiNode *childNode = node.mChildren[i];
-		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, child, mat, materialImportDescriptors);
+		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, child, mat, materialImportDescriptors, skeleton);
 	}
 }
 
@@ -211,7 +240,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	// loop through each face in the mesh to get a count of all the vertices
 	for (unsigned int faceIndex = 0; faceIndex < mesh.mNumFaces; faceIndex++)
 	{
-		const aiFace* face = &(mesh.mFaces[faceIndex]);
+		const aiFace* face = mesh.mFaces + faceIndex;
 		if(face == NULL)
 		{
 			Debug::PrintError("AssetImporter::ConvertAssimpMesh -> For some reason, mesh has a NULL face!");
@@ -269,7 +298,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	// into the newly created Mesh3D object
 	for (unsigned int faceIndex = 0; faceIndex < mesh.mNumFaces; faceIndex++)
 	{
-		const aiFace* face = &(mesh.mFaces[faceIndex]);
+		const aiFace* face = mesh.mFaces + faceIndex;
 
 		for( int i = face->mNumIndices-1; i >=0; i--)
 		{
@@ -488,60 +517,232 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 
 Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
 {
-	std::unordered_map<std::string, unsigned int> boneMap;
-	unsigned int boneCount = 0;
+	unsigned int boneCount = CountBones(scene);
+	if(boneCount <=0 )
+	{
+		return NULL;
+	}
 
+	Skeleton * target = new Skeleton(boneCount);
+	NULL_CHECK(target,"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",NULL);
+
+	bool skeletonInitSuccess = target->Init();
+	if(!skeletonInitSuccess)
+	{
+		Debug::PrintError("ModelImporter::LoadSkeleton -> Unable to initialize skeleton.");
+		return NULL;
+	}
+
+	unsigned int boneIndex = 0;
 	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
 	{
 		aiMesh * cMesh = scene.mMeshes[m];
-		for(unsigned int b = 0; b < cMesh->mNumBones; m++)
+		if( cMesh != NULL && cMesh->mNumBones > 0)
 		{
-			aiBone * cBone = cMesh->mBones[b];
-			if(cBone != NULL)
+
+			VertexBoneMap indexBoneMap(cMesh->mNumVertices);
+			bool mapInitSuccess = indexBoneMap.Init();
+			if(!mapInitSuccess)
 			{
-				std::string boneName = std::string(cBone->mName.C_Str());
-				if(boneMap.find(boneName) == boneMap.end())
+				Debug::PrintError("ModelImporter::LoadSkeleton -> Could not initialize index bone map.");
+				delete target;
+				return NULL;
+			}
+
+			AddBoneMappings(*target, *cMesh, boneIndex, indexBoneMap);
+			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping(*target, indexBoneMap, *cMesh);
+			if(fullBoneMap == NULL)
+			{
+				delete target;
+				return NULL;
+			}
+
+			target->AddVertexBoneMap(fullBoneMap);
+		}
+		else
+		{
+			target->AddVertexBoneMap(NULL);
+		}
+	}
+
+	bool hierarchysuccess = CreateAndMapNodeHierarchy(target, scene);
+	if(!hierarchysuccess)
+	{
+		delete target;
+		return NULL;
+	}
+
+	return target;
+}
+
+VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(Skeleton& skeleton, VertexBoneMap& indexBoneMap, const aiMesh& mesh)
+{
+	VertexBoneMap * fullBoneMap = new VertexBoneMap(mesh.mNumFaces * 3);
+	if(fullBoneMap == NULL)
+	{
+		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not allocate vertexBoneMap.");
+		return NULL;
+	}
+
+	bool mapInitSuccess = fullBoneMap->Init();
+	if(!mapInitSuccess)
+	{
+		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not initialize vertex bone map.");
+		return NULL;
+	}
+
+	unsigned fullIndex=0;
+	for(unsigned int f = 0; f < mesh.mNumFaces; f++)
+	{
+		aiFace& face = mesh.mFaces[f];
+		for(unsigned int i = 0; i < face.mNumIndices; i++)
+		{
+			unsigned int vertexIndex = face.mIndices[i];
+			fullBoneMap->GetDescriptor(fullIndex)->SetTo(indexBoneMap.GetDescriptor(vertexIndex));
+			fullIndex++;
+		}
+	}
+
+	return fullBoneMap;
+}
+
+void ModelImporter::AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap)
+{
+	for(unsigned int b = 0; b < mesh.mNumBones; b++)
+	{
+		aiBone * cBone = mesh.mBones[b];
+		if(cBone != NULL)
+		{
+			std::string boneName = std::string(cBone->mName.C_Str());
+			if(skeleton.GetBoneMapping(boneName) == -1)
+			{
+				skeleton.MapBone(boneName, currentBoneIndex);
+
+				for(unsigned int w = 0; w < cBone->mNumWeights; w++)
 				{
-					boneMap[boneName] = boneCount;
+					aiVertexWeight& weightDesc = cBone->mWeights[w];
+
+					unsigned int vertexID = weightDesc.mVertexId;
+					float weight = weightDesc.mWeight;
+
+					VertexBoneMap::VertexMappingDescriptor * desc = vertexIndexBoneMap.GetDescriptor(vertexID);
+					if(desc != NULL && desc->boneCount < Constants::MaxBonesPerVertex)
+					{
+						desc->boneIndex[desc->boneCount] = currentBoneIndex;
+						desc->weight[desc->boneCount] = weight;
+						desc->boneCount++;
+					}
+				}
+
+				Matrix4x4 offsetMatrix;
+				ImportUtil::ConvertAssimpMatrix(cBone->mOffsetMatrix, offsetMatrix);
+
+				skeleton.GetBone(currentBoneIndex)->SetName(boneName);
+				skeleton.GetBone(currentBoneIndex)->SetID(currentBoneIndex);
+				skeleton.GetBone(currentBoneIndex)->SetOffsetMatrix(offsetMatrix);
+
+				currentBoneIndex++;
+			}
+		}
+	}
+}
+
+unsigned ModelImporter::CountBones(const aiScene& scene)
+{
+	unsigned int boneCount = 0;
+	std::unordered_map<std::string, unsigned int> boneCountMap;
+	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	{
+		aiMesh * cMesh = scene.mMeshes[m];
+		if( cMesh != NULL && cMesh->mNumBones > 0)
+		{
+			for(unsigned int b = 0; b < cMesh->mNumBones; b++)
+			{
+				std::string boneName(cMesh->mBones[b]->mName.C_Str());
+				if(boneCountMap.find(boneName) == boneCountMap.end())
+				{
+					boneCountMap[boneName] = 1;
 					boneCount++;
 				}
 			}
 		}
 	}
 
-	Skeleton * target = new Skeleton(boneCount);
-	NULL_CHECK(target,"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",NULL);
-
-	TraverseScene(scene, SceneTraverseOrder::PreOrder, [](const aiNode& node)
-	{
-		for(unsigned int i = 0; i< node.mNumMeshes; i++)
-		{
-			aiMesh * cMesh = NULL;
-			unsigned int meshIndex = node.mMeshes[i];
-		}
-	});
-
-
-
-	return target;
+	return boneCount;
 }
 
-void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<void(const aiNode&)> callback)
+bool ModelImporter::CreateAndMapNodeHierarchy(Skeleton * skeleton, const aiScene& scene)
+{
+	SceneObjectSkeletonNode * skeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), -1);
+	if(skeletonNode == NULL)
+	{
+		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not allocate skeleton root node.");
+		return false;
+	}
+
+	Tree<SkeletonNode*>::TreeNode * lastNode = skeleton->CreateRoot(skeletonNode);
+	if(lastNode == NULL)
+	{
+		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not create skeleton root node.");
+		return false;
+	}
+
+	bool success = true;
+	TraverseScene(scene, SceneTraverseOrder::PreOrder, [skeleton, lastNode, &success](const aiNode& node) -> bool
+	{
+		std::string boneName(node.mName.C_Str());
+		int mappedBoneIndex = skeleton->GetBoneMapping(boneName);
+
+		SceneObjectSkeletonNode * childSkeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), mappedBoneIndex);
+		if(childSkeletonNode == NULL)
+		{
+			Debug::PrintError("ModelImporter::LoadSkeleton -> Could not allocate skeleton child node.");
+			success  = false;
+			return false;
+		}
+
+		Tree<SkeletonNode*>::TreeNode * childNode = skeleton->AddChild(lastNode, childSkeletonNode);
+		if(childNode == NULL)
+		{
+			Debug::PrintError("ModelImporter::LoadSkeleton -> Could not create skeleton child node.");
+			success  = false;
+			return false;
+		}
+
+		if(mappedBoneIndex >= 0)
+		{
+			Bone * bone = skeleton->GetBone(mappedBoneIndex);
+			bone->SetNode(childSkeletonNode);
+		}
+
+		return true;
+	});
+
+	return success;
+}
+
+void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback)
 {
 	if(scene.mRootNode != NULL)
 	{
+		const aiNode& sceneRef = (const aiNode&)(*(scene.mRootNode));
 		if(traverseOrder == SceneTraverseOrder::PreOrder)
-			PreOrderTraverseScene(scene, (const aiNode)(*scene.mRootNode), callback);
+			PreOrderTraverseScene(scene, sceneRef, callback);
 	}
 }
 
-void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<void(const aiNode&)> callback)
+void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback)
 {
-	callback(node);
+	bool doContinue = callback(node);
+	if(!doContinue)return;
 
 	for(unsigned int i = 0; i < node.mNumChildren; i++)
 	{
-		PreOrderTraverseScene(scene, (const aiNode)(*node.mChildren[i]), callback);
+		aiNode* childNode = node.mChildren[i];
+		if(childNode != NULL)
+		{
+			PreOrderTraverseScene(scene, (const aiNode&)(*(childNode)), callback);
+		}
 	}
 }
 

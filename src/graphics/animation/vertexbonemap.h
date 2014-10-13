@@ -9,6 +9,8 @@ class Skeleton;
 
 class VertexBoneMap
 {
+	public:
+
 	class VertexMappingDescriptor
 	{
 		public:
@@ -16,7 +18,16 @@ class VertexBoneMap
 		unsigned int boneCount=0;
 		unsigned int boneIndex[Constants::MaxBonesPerVertex];
 		float weight[Constants::MaxBonesPerVertex];
+
+		void SetTo(VertexMappingDescriptor * desc)
+		{
+			this->boneCount = desc->boneCount;
+			memcpy(this->boneIndex, desc->boneIndex, sizeof(unsigned int) * Constants::MaxBonesPerVertex);
+			memcpy(this->weight, desc->weight, sizeof(float) * Constants::MaxBonesPerVertex);
+		}
 	};
+
+	private:
 
 	unsigned int vertexCount;
 	VertexMappingDescriptor * mappingDescriptors;
@@ -27,7 +38,8 @@ class VertexBoneMap
 
 	VertexBoneMap(unsigned int vertexCount);
 	~VertexBoneMap();
-	void Init();
+	bool Init();
+	VertexMappingDescriptor* GetDescriptor(unsigned int index);
 };
 
 

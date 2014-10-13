@@ -4,12 +4,12 @@
 //forward declarations
 class Transform;
 
-#include "bone.h"
+#include "skeletonnode.h"
 #include <vector>
 #include <string>
 #include "object/enginetypes.h"
 
-class SceneObjectBone : public Bone
+class SceneObjectSkeletonNode : public SkeletonNode
 {
 	SceneObjectRef target;
 
@@ -18,10 +18,8 @@ class SceneObjectBone : public Bone
 	const Transform * GetFullTransform() const;
 	Transform * GetLocalTransform();
 
-	SceneObjectBone(SceneObjectRef target);
-	SceneObjectBone(SceneObjectRef target, std::string& name);
-	SceneObjectBone(SceneObjectRef target, std::string& name, unsigned int id);
-     ~SceneObjectBone();
+	SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex);
+     ~SceneObjectSkeletonNode();
 };
 
 #endif

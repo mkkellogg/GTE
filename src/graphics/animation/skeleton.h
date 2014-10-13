@@ -4,6 +4,7 @@
 //forward declarations
 class Bone;
 class VertexBoneMap;
+class Transform;
 
 #include <vector>
 #include <string>
@@ -17,9 +18,9 @@ class Skeleton
 
 	std::unordered_map<std::string, unsigned int> boneNameMap;
 	unsigned int boneCount;
-	std::vector<Bone *> bones;
+	Bone * bones;
 	std::vector<VertexBoneMap *> vertexBoneMap;
-	Tree<SkeletonNode> skeleton;
+	Tree<SkeletonNode*> skeleton;
 
 	void Destroy();
 
@@ -28,9 +29,19 @@ class Skeleton
 	Skeleton(unsigned int boneCount);
     ~Skeleton();
 
+    unsigned int GetBoneCount();
+
     bool Init();
-    SkeletonNode * CreateSkeletonRoot(unsigned int boneIndex);
-    Bone * GetBone(unsigned int boneIndex);
+    Tree<SkeletonNode*>::TreeNode * CreateRoot(SkeletonNode* node);
+    Tree<SkeletonNode*>::TreeNode * AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode* node);
+
+    void MapBone(std::string& name, unsigned int boneIndex);
+    int GetBoneMapping(std::string& name);
+
+    Bone* GetBone(unsigned int boneIndex);
+
+    void AddVertexBoneMap(VertexBoneMap * map);
+    VertexBoneMap * GetVertexBoneMap(unsigned int index);
 };
 
 #endif

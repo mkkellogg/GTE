@@ -15,6 +15,7 @@
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/render/rendermanager.h"
 #include "ui/debug.h"
@@ -71,7 +72,7 @@ const Transform& SceneObject::GetProcessingTransform() const
 	return processingTransform;
 }
 
-bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)
+bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 {
 	if(this->renderer3D == renderer)return true;
 	SHARED_REF_CHECK(renderer,"SceneObject::SetMeshRenderer3D -> attempted to add NULL renderer.", false);
@@ -89,6 +90,21 @@ bool SceneObject::SetMeshRenderer3D(Mesh3DRendererRef renderer)
 	return true;
 }
 
+bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
+{
+	if(this->skinnedRenderer3D == renderer)return true;
+	SHARED_REF_CHECK(renderer,"SceneObject::SkinnedMesh3DRendererRef -> attempted to add NULL renderer.", false);
+
+	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SHARED_REF_CHECK(thisRef,"SceneObject::SkinnedMesh3DRendererRef -> Could not find matching reference for scene object", false);
+
+	renderer->sceneObject = thisRef;
+	this->skinnedRenderer3D = renderer;
+
+	this->skinnedRenderer3D->UpdateFromMesh();
+
+	return true;
+}
 
 bool SceneObject::SetMesh3D(Mesh3DRef mesh)
 {
@@ -140,9 +156,14 @@ Mesh3DRef SceneObject::GetMesh3D()
 	return mesh3D;
 }
 
-Mesh3DRendererRef SceneObject::GetRenderer3D()
+Mesh3DRendererRef SceneObject::GetMesh3DRenderer()
 {
 	return renderer3D;
+}
+
+SkinnedMesh3DRendererRef SceneObject::GetSkinnedMesh3DRenderer()
+{
+	return skinnedRenderer3D;
 }
 
 CameraRef SceneObject::GetCamera()

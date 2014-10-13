@@ -13,8 +13,11 @@ class SkeletonNode
 
 	public:
 
+	virtual const Transform * GetFullTransform() const = 0;
+	virtual Transform * GetLocalTransform() = 0;
+
 	SkeletonNode(int boneIndex);
-	~SkeletonNode();
+	virtual ~SkeletonNode();
 };
 
 #endif

@@ -66,7 +66,7 @@ void Mesh3D::SendDataToRenderer(unsigned int index)
 	SubMesh3DRef subMesh = subMeshes[index];
 	SHARED_REF_CHECK_RTRN(subMesh," Mesh3D::SendDataToRenderer -> subMesh is NULL.");
 
-	Mesh3DRendererRef renderer = sceneObject->GetRenderer3D();
+	Mesh3DRendererRef renderer = sceneObject->GetMesh3DRenderer();
 	SHARED_REF_CHECK_RTRN(renderer," Mesh3D::SendDataToRenderer -> renderer is NULL.");
 
 	renderer->UpdateFromSubMesh(index);
@@ -127,6 +127,6 @@ bool Mesh3D::IsAttachedToSceneObject()
 bool Mesh3D::SceneObjectHasRenderer()
 {
 	if(!IsAttachedToSceneObject())return false;
-	if(!sceneObject->GetRenderer3D().IsValid())return false;
+	if(!sceneObject->GetMesh3DRenderer().IsValid())return false;
 	return true;
 }

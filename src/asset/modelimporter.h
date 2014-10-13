@@ -9,6 +9,7 @@ class SubMesh3D;
 class Material;
 class UV2Array;
 class Skeleton;
+class VertexBoneMap;
 
 #include "object/sceneobjectcomponent.h"
 #include "object/shadermanager.h"
@@ -75,16 +76,20 @@ class ModelImporter
 		}
 	};
 
-	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors);
+	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors, Skeleton * skeleton);
 	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
 
 	Skeleton * LoadSkeleton(const aiScene& scene);
+	VertexBoneMap * ExpandIndexBoneMapping(Skeleton& skeleton, VertexBoneMap& indexBoneMap, const aiMesh& mesh);
+	void AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap);
+	unsigned CountBones(const aiScene& scene);
+	bool CreateAndMapNodeHierarchy(Skeleton * skeleton, const aiScene& scene);
 
-	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<void(const aiNode&)> callback);
-	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<void(const aiNode&)> callback);
+	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback);
+	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback);
 
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);

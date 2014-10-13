@@ -6,6 +6,7 @@ class EngineObjectManager;
 class SubMesh3DRenderer;
 class SubMesh3D;
 class Mesh3DRenderer;
+class SkinnedMesh3DRenderer;
 class Mesh3D;
 class Transform;
 class Camera;
@@ -33,6 +34,7 @@ class SceneObject : public EngineObject
 	CameraRef camera;
 	LightRef light;
 	Mesh3DRendererRef renderer3D;
+	SkinnedMesh3DRendererRef skinnedRenderer3D;
 	Mesh3DRef mesh3D;
 
 	SceneObject();
@@ -49,14 +51,16 @@ class SceneObject : public EngineObject
     void GetFullTransform(SceneObjectTransform * transform);
     const Transform& GetProcessingTransform() const;
 
-    bool SetMeshRenderer3D(Mesh3DRendererRef renderer);
+    bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
+    bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
     bool SetMesh3D(Mesh3DRef mesh);
 
     bool SetCamera(CameraRef camera);
     bool SetLight(LightRef light);
 
     Mesh3DRef GetMesh3D();
-    Mesh3DRendererRef GetRenderer3D();
+    Mesh3DRendererRef GetMesh3DRenderer();
+    SkinnedMesh3DRendererRef GetSkinnedMesh3DRenderer();
 
     CameraRef GetCamera();
     LightRef GetLight();
