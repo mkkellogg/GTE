@@ -50,3 +50,33 @@ VertexBoneMap::VertexMappingDescriptor* VertexBoneMap::GetDescriptor(unsigned in
 
 	return mappingDescriptors + index;
 }
+
+unsigned int VertexBoneMap::GetVertexCount()
+{
+	return vertexCount;
+}
+
+VertexBoneMap * VertexBoneMap::FullClone()
+{
+	VertexBoneMap * clone = new VertexBoneMap(vertexCount);
+	if(clone == NULL)
+	{
+		Debug::PrintError("VertexBoneMap::FullClone -> Could not allocate vertex bone map.");
+		return NULL;
+	}
+
+	bool initSuccess = clone->Init();
+	if(!initSuccess)
+	{
+		Debug::PrintError("VertexBoneMap::FullClone -> Could not initialize vertex bone map.");
+		delete clone;
+		return NULL;
+	}
+
+	for(unsigned int v = 0; v < vertexCount; v++)
+	{
+		clone->GetDescriptor(v)->SetTo(GetDescriptor(v));
+	}
+
+	return clone;
+}

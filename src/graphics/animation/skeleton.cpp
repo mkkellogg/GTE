@@ -39,11 +39,11 @@ void Skeleton::Destroy()
 	}
 	boneNameMap.clear();
 
-	skeleton.SetTraversalCallback([](SkeletonNode * node) -> bool
+	skeleton.SetTraversalCallback([](Tree<SkeletonNode *>::TreeNode * node) -> bool
 	{
-		if(node != NULL)
+		if(node != NULL && node->Data != NULL)
 		{
-			delete node;
+			delete node->Data;
 		}
 		return true;
 	});
@@ -61,7 +61,7 @@ bool Skeleton::Init()
 	Destroy();
 
 	bones = new Bone[boneCount];
-	NULL_CHECK(bones,"Skeleton::Init -> Could not allocate bone array.", NULL);
+	NULL_CHECK(bones,"Skeleton::Init -> Could not allocate bone array.", false);
 
 	return true;
 }
@@ -124,4 +124,146 @@ VertexBoneMap * Skeleton::GetVertexBoneMap(unsigned int index)
 	}
 
 	return vertexBoneMap[index];
+}
+
+Skeleton * Skeleton::FullClone()
+{
+	Skeleton * newSkeleton = new Skeleton(boneCount);
+	NULL_CHECK(newSkeleton,"Skeleton::FullClone -> could not allocate skeleton",NULL);
+
+	bool initSuccess = newSkeleton->Init();
+	if(!initSuccess)
+	{
+		delete newSkeleton;
+		return NULL;
+	}
+
+	for(unsigned int i = 0; i < boneCount; i++)
+	{
+		newSkeleton->GetBone(i)->SetTo(GetBone(i));
+	}
+
+	for(unsigned int i = 0; i < vertexBoneMap.size(); i++)
+	{
+		VertexBoneMap * ptr = vertexBoneMap[i];
+		VertexBoneMap * clone = NULL;
+
+		if(ptr != NULL)
+		{
+			clone = ptr->FullClone();
+			if(clone == NULL)
+			{
+				Debug::PrintError("Skeleton::FullClone -> Could not clone vertex bone map.");
+				delete newSkeleton;
+				return NULL;
+			}
+		}
+
+		newSkeleton->vertexBoneMap.push_back(clone);
+	}
+
+	newSkeleton->boneNameMap = boneNameMap;
+
+	Tree<SkeletonNode *>::TreeNode * root = skeleton.GetRoot();
+
+	if(root != NULL)
+	{
+		SkeletonNode * rootClone = NULL;
+		if(root->Data != NULL)
+		{
+			rootClone = root->Data->FullClone();
+			if(rootClone == NULL)
+			{
+				Debug::PrintError("Skeleton::FullClone -> Could not clone root node.");
+				delete newSkeleton;
+				return NULL;
+			}
+		}
+
+		Tree<SkeletonNode *>::TreeNode * newRoot = newSkeleton->CreateRoot(rootClone);
+		if(newRoot == NULL)
+		{
+			Debug::PrintError("Skeleton::FullClone -> Could not create root node.");
+			delete newSkeleton;
+			return NULL;
+		}
+
+
+
+		std::unordered_map<Tree<SkeletonNode *>::TreeNode *, Tree<SkeletonNode *>::TreeNode *> newNodeMap;
+		newNodeMap[root] = newRoot;
+
+
+
+		bool allocateTreeSuccess = true;
+		skeleton.SetTraversalCallback([&allocateTreeSuccess, &newNodeMap](Tree<SkeletonNode *>::TreeNode * node) -> bool
+		{
+			Tree<SkeletonNode *>::TreeNode * newNode = new Tree<SkeletonNode *>::TreeNode();
+			if(newNode == NULL)
+			{
+				Debug::PrintError("Skeleton::FullClone -> Could not allocate new node.");
+				allocateTreeSuccess = false;
+				return NULL;
+			}
+			newNodeMap[node] = newNode;
+
+			return true;
+		});
+
+		skeleton.Traverse();
+
+		if(!allocateTreeSuccess)
+		{
+			Debug::PrintError("Skeleton::FullClone -> Could not allocate new nodes for skeleton clone.");
+			delete newSkeleton;
+			return NULL;
+		}
+
+
+
+		bool cloneTreeSuccess = true;
+		skeleton.SetTraversalCallback([&cloneTreeSuccess, &newNodeMap, newSkeleton](Tree<SkeletonNode *>::TreeNode * node) -> bool
+		{
+			SkeletonNode * clonedSkeletonNode = NULL;
+			if(node != NULL && node->Data != NULL)
+			{
+				clonedSkeletonNode = node->Data->FullClone();
+				if(clonedSkeletonNode == NULL)
+				{
+					Debug::PrintError("Skeleton::FullClone -> Could not clone node in skeletal tree.");
+					cloneTreeSuccess = false;
+					return NULL;
+				}
+			}
+
+			Tree<SkeletonNode *>::TreeNode * clonedTreeNode = newNodeMap[node];
+			clonedTreeNode->Data = clonedSkeletonNode;
+
+			Tree<SkeletonNode *>::TreeNode * originalParent = clonedTreeNode->GetParent();
+			if(originalParent != NULL)
+			{
+				Tree<SkeletonNode *>::TreeNode * clonedParentNode = newNodeMap[originalParent];
+				clonedParentNode->AddChild(clonedTreeNode);
+			}
+
+			int boneIndex = node->Data->GetBoneIndex();
+			if(boneIndex >= 0)
+			{
+				newSkeleton->GetBone(boneIndex)->Node = clonedSkeletonNode;
+			}
+
+			return true;
+		});
+
+		skeleton.Traverse();
+
+		if(!cloneTreeSuccess)
+		{
+			Debug::PrintError("Skeleton::FullClone -> Could not clone skeletal tree.");
+			delete newSkeleton;
+			return NULL;
+		}
+	}
+
+	return newSkeleton;
 }

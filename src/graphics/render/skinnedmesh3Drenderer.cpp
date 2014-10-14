@@ -5,12 +5,14 @@
 #include <math.h>
 
 #include "skinnedmesh3Drenderer.h"
+#include "submesh3Drenderer.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
+#include "graphics/stdattributes.h"
+#include "graphics/animation/skeleton.h"
 #include "graphics/object/mesh3D.h"
-#include "submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/skinnedmesh3Dattrtransformer.h"
 #include "global/global.h"
@@ -19,12 +21,31 @@
 
 SkinnedMesh3DRenderer::SkinnedMesh3DRenderer()
 {
-
+	skeleton = NULL;
 }
 
 SkinnedMesh3DRenderer::~SkinnedMesh3DRenderer()
 {
+	SAFE_DELETE(skeleton);
+}
 
+void SkinnedMesh3DRenderer::SetSkeleton(Skeleton * skeleton)
+{
+	this->skeleton = skeleton;
+
+	for(unsigned int i = 0; i< mesh->GetSubMeshCount(); i++)
+	{
+		SubMesh3DRendererRef subRenderer =  this->GetSubRenderer(i);
+
+		if(subRenderer->GetAttributeTransformer() != NULL)
+		{
+			SkinnedMesh3DAttributeTransformer * attrTransformer = dynamic_cast<SkinnedMesh3DAttributeTransformer*>(subRenderer->GetAttributeTransformer());
+			if(attrTransformer != NULL)
+			{
+				attrTransformer->SetSkeleton(skeleton);
+			}
+		}
+	}
 }
 
 Mesh3DRef SkinnedMesh3DRenderer::GetMesh()
@@ -55,5 +76,34 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 	if(mesh.IsValid())
 	{
 		Mesh3DRenderer::UpdateFromMesh(mesh);
+
+		for(unsigned int i = 0; i< mesh->GetSubMeshCount(); i++)
+		{
+			int vertexBoneMapIndex = -1;
+			if(subMeshIndexMap.find(i) != subMeshIndexMap.end())
+			{
+				vertexBoneMapIndex = subMeshIndexMap[i];
+				SubMesh3DRendererRef subRenderer =  this->GetSubRenderer(i);
+
+				if(subRenderer->GetAttributeTransformer() == NULL)
+				{
+					StandardAttributeSet attributes = StandardAttributes::CreateAttributeSet();
+					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Position);
+
+					SkinnedMesh3DAttributeTransformer *attributeTransformer = new SkinnedMesh3DAttributeTransformer(attributes);
+					NULL_CHECK_RTRN(attributeTransformer,"SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
+
+					attributeTransformer->SetSkeleton(skeleton);
+					attributeTransformer->SetVertexBoneMapIndex(vertexBoneMapIndex);
+
+					subRenderer->SetAttributeTransformer(attributeTransformer);
+				}
+			}
+		}
 	}
+}
+
+void SkinnedMesh3DRenderer::MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, unsigned int vertexBoneMapIndex)
+{
+	subMeshIndexMap[subMeshIndex] = vertexBoneMapIndex;
 }

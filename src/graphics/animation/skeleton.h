@@ -42,6 +42,8 @@ class Skeleton
 
     void AddVertexBoneMap(VertexBoneMap * map);
     VertexBoneMap * GetVertexBoneMap(unsigned int index);
+
+    Skeleton * FullClone();
 };
 
 #endif

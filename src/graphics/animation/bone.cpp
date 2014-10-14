@@ -7,10 +7,10 @@
 
 Bone::Bone()
 {
-	node = NULL;
+	Node = NULL;
 	std::string name("");
-	SetName(name);
-	SetID((unsigned int)-1);
+	this->Name = name;
+	this->ID = ID;
 }
 
 Bone::Bone(std::string& name) : Bone(name, (unsigned int)-1)
@@ -20,8 +20,8 @@ Bone::Bone(std::string& name) : Bone(name, (unsigned int)-1)
 
 Bone::Bone(std::string& name, unsigned int id)
 {
-	SetName(name);
-	SetID(id);
+	this->Name = name;
+	this->ID = id;
 }
 
 Bone::~Bone()
@@ -29,22 +29,13 @@ Bone::~Bone()
 
 }
 
-void Bone::SetName(std::string& name)
+void Bone::SetTo(Bone * bone)
 {
-	this->name = name;
+	Name = bone->Name;
+	ID = bone->ID;
+	OffsetMatrix.SetTo(&bone->OffsetMatrix);
+	Node = bone->Node;
 }
 
-void Bone::SetID(unsigned int id)
-{
-	this->id = id;
-}
 
-void Bone::SetOffsetMatrix(Matrix4x4& matrix)
-{
-	this->offsetMatrix.SetTo(&matrix);
-}
 
-void Bone::SetNode(SkeletonNode * node)
-{
-	this->node= node;
-}

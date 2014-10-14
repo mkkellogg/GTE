@@ -17,11 +17,17 @@ template <class T> class Tree
 	class TreeNode
 	{
 		friend class Tree;
-		std::vector<std::shared_ptr<TreeNode>> children;
+		std::vector<TreeNode *> children;
+		TreeNode * parent = NULL;
 
 		public:
 
 		T Data;
+
+		TreeNode()
+		{
+
+		}
 
 		TreeNode(T data) : Data(data)
 		{
@@ -31,7 +37,7 @@ template <class T> class Tree
 		TreeNode* GetChild(unsigned int index)
 		{
 			if(index >= GetChildCount)return NULL;
-			return children[index].get();
+			return children[index];
 		}
 
 		unsigned int GetChildCount()
@@ -43,19 +49,30 @@ template <class T> class Tree
 		{
 			TreeNode * newNode = new TreeNode(data);
 			NULL_CHECK(newNode,"Tree::AddChild -> Could not allocate new node", NULL);
+			newNode->parent = this;
+			children.push_back(newNode);
+			return newNode;
+		}
 
-			std::shared_ptr<TreeNode> sharedRef(newNode);
-			children.push_back(sharedRef);
-			return sharedRef.get();
+		TreeNode* AddChild(TreeNode * node)
+		{
+			node->parent = this;
+			children.push_back(node);
+			return node;
+		}
+
+		TreeNode* GetParent()
+		{
+			return parent;
 		}
 	};
 
 	private:
 
-	std::shared_ptr<TreeNode> root;
+	TreeNode* root;
 
 	bool fullTraversal;
-	std::function<bool(T)> traversalCallback;
+	std::function<bool(TreeNode*)> traversalCallback;
 	std::function<bool(TreeNode*)> fullTraversalCallback;
 
 
@@ -63,6 +80,7 @@ template <class T> class Tree
 
 	Tree()
 	{
+		root = NULL;
 		fullTraversal = false;
 	}
 
@@ -73,7 +91,7 @@ template <class T> class Tree
 
     TreeNode* GetRoot()
 	{
-    	return root.get();
+    	return root;
 	}
 
     TreeNode* AddRoot(T data)
@@ -83,13 +101,13 @@ template <class T> class Tree
 			TreeNode * newNode = new TreeNode(data);
 			NULL_CHECK(newNode,"Tree::AddChild -> Could not allocate new node", NULL);
 
-			root = std::shared_ptr<TreeNode>(newNode);
+			root = newNode;
     	}
 
-		return root.get();
+		return root;
     }
 
-    void SetTraversalCallback(std::function<bool(T)> callback)
+    void SetTraversalCallback(std::function<bool(TreeNode*)> callback)
     {
     	this->traversalCallback = callback;
     }
@@ -117,7 +135,7 @@ template <class T> class Tree
     // do post-order traversal
     void InternalTraverse()
     {
-    	std::stack<std::shared_ptr<TreeNode>> iterationStack;
+    	std::stack<TreeNode *> iterationStack;
     	std::stack<unsigned int> childIndexStack;
     	if(root != NULL)
     	{
@@ -126,12 +144,12 @@ template <class T> class Tree
 
     		while(iterationStack.size() > 0)
     		{
-    			std::shared_ptr<TreeNode> current = iterationStack.top();
+    			TreeNode * current = iterationStack.top();
     			unsigned int childIndex = childIndexStack.top();
 
     			if(childIndex < current->children.size())
     			{
-    				std::shared_ptr<TreeNode> next = current->children[childIndex];
+    				TreeNode * next = current->children[childIndex];
 
     				if(next)
     				{
@@ -153,14 +171,14 @@ template <class T> class Tree
     				{
     					if(fullTraversalCallback)
     					{
-    						continueTraversal = fullTraversalCallback(&*current);
+    						continueTraversal = fullTraversalCallback(current);
     					}
     				}
     				else
     				{
     					if(traversalCallback)
     					{
-    						continueTraversal = traversalCallback(current->Data);
+    						continueTraversal = traversalCallback(current);
     					}
     				}
     				if(!continueTraversal)break;

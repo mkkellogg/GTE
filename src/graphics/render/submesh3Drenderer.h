@@ -69,6 +69,9 @@ class SubMesh3DRenderer : public EngineObject
     void CopyMeshData();
     void UpdateFromMesh();
 
+    void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
+    AttributeTransformer * GetAttributeTransformer();
+
 
     virtual ~SubMesh3DRenderer();
 

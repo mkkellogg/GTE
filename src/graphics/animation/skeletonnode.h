@@ -9,6 +9,8 @@ class Bone;
 
 class SkeletonNode
 {
+	protected:
+
 	int boneIndex;
 
 	public:
@@ -18,6 +20,10 @@ class SkeletonNode
 
 	SkeletonNode(int boneIndex);
 	virtual ~SkeletonNode();
+
+	virtual SkeletonNode * FullClone() const = 0;
+
+	int GetBoneIndex();
 };
 
 #endif

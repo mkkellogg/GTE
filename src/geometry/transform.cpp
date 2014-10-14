@@ -94,6 +94,24 @@ void Transform::SetIdentity()
 }
 
 /*
+ * Post-multiply this transform's matrix by [matrix]
+ */
+void Transform::TransformBy(const Matrix4x4 * matrix)
+{
+	NULL_CHECK_RTRN(matrix, "Transform::TransformBy(Matrix*) -> NULL matrix passed.");
+	this->matrix.Multiply(matrix);
+}
+
+/*
+ * Pre-multiply this transform's matrix by [matrix]
+ */
+void Transform::PreTransformBy(const Matrix4x4 * matrix)
+{
+	NULL_CHECK_RTRN(matrix, "Transform::PreTransformBy(Matrix*) -> NULL matrix passed.");
+	this->matrix.PreMultiply(matrix);
+}
+
+/*
  * Post-multiply this transform's matrix by the matrix contained in [transform]
  */
 void Transform::TransformBy(const Transform& transform)
@@ -114,7 +132,7 @@ void Transform::PreTransformBy(const Transform& transform)
  */
 void Transform::TransformBy(const Transform * transform)
 {
-	NULL_CHECK_RTRN(transform, "Transform::TransformBy -> NULL transform passed.");
+	NULL_CHECK_RTRN(transform, "Transform::TransformBy(Transform *) -> NULL transform passed.");
 
 	matrix.Multiply(transform->GetMatrix());
 }
@@ -124,8 +142,7 @@ void Transform::TransformBy(const Transform * transform)
  */
 void Transform::PreTransformBy(const Transform * transform)
 {
-	NULL_CHECK_RTRN(transform, "Transform::PreTransformBy -> NULL transform passed.");
-
+	NULL_CHECK_RTRN(transform, "Transform::PreTransformBy(Transform *) -> NULL transform passed.");
 	matrix.PreMultiply(transform->GetMatrix());
 }
 

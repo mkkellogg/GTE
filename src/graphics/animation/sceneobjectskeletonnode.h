@@ -20,6 +20,9 @@ class SceneObjectSkeletonNode : public SkeletonNode
 
 	SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex);
      ~SceneObjectSkeletonNode();
+
+     void SetTarget(SceneObjectRef target);
+     SkeletonNode * FullClone() const;
 };
 
 #endif

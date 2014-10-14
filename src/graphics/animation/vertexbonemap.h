@@ -15,15 +15,15 @@ class VertexBoneMap
 	{
 		public:
 
-		unsigned int boneCount=0;
-		unsigned int boneIndex[Constants::MaxBonesPerVertex];
-		float weight[Constants::MaxBonesPerVertex];
+		unsigned int BoneCount=0;
+		unsigned int BoneIndex[Constants::MaxBonesPerVertex];
+		float Weight[Constants::MaxBonesPerVertex];
 
 		void SetTo(VertexMappingDescriptor * desc)
 		{
-			this->boneCount = desc->boneCount;
-			memcpy(this->boneIndex, desc->boneIndex, sizeof(unsigned int) * Constants::MaxBonesPerVertex);
-			memcpy(this->weight, desc->weight, sizeof(float) * Constants::MaxBonesPerVertex);
+			this->BoneCount = desc->BoneCount;
+			memcpy(this->BoneIndex, desc->BoneIndex, sizeof(unsigned int) * Constants::MaxBonesPerVertex);
+			memcpy(this->Weight, desc->Weight, sizeof(float) * Constants::MaxBonesPerVertex);
 		}
 	};
 
@@ -40,6 +40,8 @@ class VertexBoneMap
 	~VertexBoneMap();
 	bool Init();
 	VertexMappingDescriptor* GetDescriptor(unsigned int index);
+	unsigned int GetVertexCount();
+	VertexBoneMap * FullClone();
 };
 
 

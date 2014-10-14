@@ -4,6 +4,8 @@
 
 #include "object/sceneobject.h"
 #include "sceneobjectskeletonnode.h"
+#include "global/global.h"
+#include "ui/debug.h"
 #include <string>
 
 SceneObjectSkeletonNode::SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex) : SkeletonNode(boneIndex)
@@ -18,10 +20,25 @@ SceneObjectSkeletonNode::~SceneObjectSkeletonNode()
 
 const Transform * SceneObjectSkeletonNode::GetFullTransform() const
 {
-	return &(target->GetProcessingTransform());
+	const Transform& ref = target->GetProcessingTransform();
+	return &ref;
 }
 
 Transform * SceneObjectSkeletonNode::GetLocalTransform()
 {
-	return &(target->GetLocalTransform());
+	Transform& ref = target->GetLocalTransform();
+	return &ref;
+}
+
+void SceneObjectSkeletonNode::SetTarget(SceneObjectRef target)
+{
+	this->target = target;
+}
+
+SkeletonNode * SceneObjectSkeletonNode::FullClone() const
+{
+	SkeletonNode * newNode = new SceneObjectSkeletonNode(target, boneIndex);
+	NULL_CHECK(newNode,"SceneObjectSkeletonNode::FullClone -> Could not allocate new node",NULL);
+
+	return newNode;
 }

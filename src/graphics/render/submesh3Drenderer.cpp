@@ -128,7 +128,9 @@ bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int componentC
 
 void SubMesh3DRenderer::SetPositionData(Point3Array * points)
 {
-	attributeBuffers[(int)StandardAttribute::Position]->SetData(points->GetDataPtr());
+	VertexAttrBuffer * buf = attributeBuffers[(int)StandardAttribute::Position];
+	const float * ptr = points->GetDataPtr();
+	buf->SetData(ptr);
 }
 
 void SubMesh3DRenderer::SetNormalData(Vector3Array * normals)
@@ -334,4 +336,26 @@ bool SubMesh3DRenderer::UseMaterial(MaterialRef material)
 	}
 
 	return true;
+}
+
+void SubMesh3DRenderer::SetAttributeTransformer(AttributeTransformer * attributeTransformer)
+{
+	this->attributeTransformer = attributeTransformer;
+	if(attributeTransformer == NULL)
+	{
+		this->doAttributeTransform = false;
+	}
+	else
+	{
+		if(doAttributeTransform == false)
+		{
+			this->doAttributeTransform = true;
+			UpdateFromMesh();
+		}
+	}
+}
+
+AttributeTransformer * SubMesh3DRenderer::GetAttributeTransformer()
+{
+	return attributeTransformer;
 }

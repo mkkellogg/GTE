@@ -36,10 +36,15 @@ class Transform
 
     void SetIdentity();
     void Invert();
+
+    void TransformBy(const Matrix4x4 * matrix);
+    void PreTransformBy(const Matrix4x4 * matrix);
+
     void TransformBy(const Transform * transform);
     void PreTransformBy(const Transform * transform);
     void TransformBy(const Transform& transform);
     void PreTransformBy(const Transform& transform);
+
     virtual void Translate(float x, float y, float z, bool local);
     virtual void RotateAround(Point3 * point, Vector3 * axis, float angle);
     virtual void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);

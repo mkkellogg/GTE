@@ -50,6 +50,8 @@ class Matrix4x4
     void SetTo(const Matrix4x4 * src);
     void SetTo(const float * data);
 
+    void MultiplyByScalar(float scalar);
+
     void Transform(const Vector3 * vector, Vector3 * out) const;
     void Transform(Vector3 * vector) const;
     void Transform(const Point3 * point, Point3 * out) const;

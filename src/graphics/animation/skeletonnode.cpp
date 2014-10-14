@@ -20,3 +20,8 @@ SkeletonNode::~SkeletonNode()
 {
 
 }
+
+int SkeletonNode::GetBoneIndex()
+{
+	return boneIndex;
+}

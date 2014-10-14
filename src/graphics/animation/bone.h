@@ -14,11 +14,6 @@ class Bone
 {
 	protected:
 
-	std::string name;
-	unsigned int id;
-	Matrix4x4 offsetMatrix;
-	SkeletonNode * node;
-
 	public :
 
 	Bone();
@@ -26,10 +21,12 @@ class Bone
 	Bone(std::string& name, unsigned int id);
     ~Bone();
 
-    void SetName(std::string& name);
-    void SetID(unsigned int id);
-    void SetOffsetMatrix(Matrix4x4& matrix);
-    void SetNode(SkeletonNode * node);
+    std::string Name;
+    unsigned int ID;
+    Matrix4x4 OffsetMatrix;
+    SkeletonNode * Node;
+
+    void SetTo(Bone * bone);
 };
 
 #endif

@@ -180,9 +180,11 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 		// update the scene object's local transform
 		sceneObject->GetLocalTransform().SetTo(&mat);
 
+		std::unordered_map<unsigned int, unsigned int> subMeshInmdexToVertexBoneMap;
 		for (unsigned int n=0; n < node.mNumMeshes; n++)
 		{
 			unsigned int sceneMeshIndex = node.mMeshes[n];
+			subMeshInmdexToVertexBoneMap[n] = sceneMeshIndex;
 			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
 			if(mesh == NULL)
 			{
@@ -210,17 +212,49 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 		if(hasSkeleton)
 		{
+			for (unsigned int n=0; n < node.mNumMeshes; n++)
+			{
+				skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, subMeshInmdexToVertexBoneMap[n]);
+			}
+
 			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
 			skinnedMeshRenderer->SetMesh(mesh3D);
+			skinnedMeshRenderer->SetSkeleton(skeleton);
 		}
 		else
 		{
 			sceneObject->SetMesh3DRenderer(meshRenderer);
 			sceneObject->SetMesh3D(mesh3D);
 		}
-
-		current->AddChild(sceneObject);
 	}
+
+	if(skeleton != NULL)
+	{
+		Skeleton * clone = skeleton->FullClone();
+
+		if(node.mName.C_Str() != NULL)
+		{
+			std::string boneName(node.mName.C_Str());
+			int boneMapping = clone->GetBoneMapping(boneName);
+			if(boneMapping>=0)
+			{
+				Bone * bone = clone->GetBone(boneMapping);
+				if(bone != NULL)
+				{
+					SkeletonNode * skNode = bone->Node;
+					{
+						// if this skeleton node has a SceneObject target, then set it to [sceneObject]
+						SceneObjectSkeletonNode *soskNode = dynamic_cast<SceneObjectSkeletonNode*>(skNode);
+						if(soskNode != NULL)
+						{
+							soskNode->SetTarget(sceneObject);
+						}
+					}
+				}
+			}
+		}
+	}
+	current->AddChild(sceneObject);
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{
@@ -384,6 +418,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 			// load & create diffuse texture
 			std::string texPath = fileSystem->FixupPath(std::string(aiTexturePath.data));
 			filename = fileSystem->ConcatenatePaths(basepath, texPath);
+
 			TextureAttributes texAttributes;
 			texAttributes.FilterMode = TextureFilter::TriLinear;
 			texAttributes.MipMapLevel = 4;
@@ -539,7 +574,6 @@ Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
 		aiMesh * cMesh = scene.mMeshes[m];
 		if( cMesh != NULL && cMesh->mNumBones > 0)
 		{
-
 			VertexBoneMap indexBoneMap(cMesh->mNumVertices);
 			bool mapInitSuccess = indexBoneMap.Init();
 			if(!mapInitSuccess)
@@ -626,20 +660,20 @@ void ModelImporter::AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsi
 					float weight = weightDesc.mWeight;
 
 					VertexBoneMap::VertexMappingDescriptor * desc = vertexIndexBoneMap.GetDescriptor(vertexID);
-					if(desc != NULL && desc->boneCount < Constants::MaxBonesPerVertex)
+					if(desc != NULL && desc->BoneCount < Constants::MaxBonesPerVertex)
 					{
-						desc->boneIndex[desc->boneCount] = currentBoneIndex;
-						desc->weight[desc->boneCount] = weight;
-						desc->boneCount++;
+						desc->BoneIndex[desc->BoneCount] = currentBoneIndex;
+						desc->Weight[desc->BoneCount] = weight;
+						desc->BoneCount++;
 					}
 				}
 
 				Matrix4x4 offsetMatrix;
 				ImportUtil::ConvertAssimpMatrix(cBone->mOffsetMatrix, offsetMatrix);
 
-				skeleton.GetBone(currentBoneIndex)->SetName(boneName);
-				skeleton.GetBone(currentBoneIndex)->SetID(currentBoneIndex);
-				skeleton.GetBone(currentBoneIndex)->SetOffsetMatrix(offsetMatrix);
+				skeleton.GetBone(currentBoneIndex)->Name = boneName;
+				skeleton.GetBone(currentBoneIndex)->ID = currentBoneIndex;
+				skeleton.GetBone(currentBoneIndex)->OffsetMatrix = offsetMatrix;
 
 				currentBoneIndex++;
 			}
@@ -712,7 +746,7 @@ bool ModelImporter::CreateAndMapNodeHierarchy(Skeleton * skeleton, const aiScene
 		if(mappedBoneIndex >= 0)
 		{
 			Bone * bone = skeleton->GetBone(mappedBoneIndex);
-			bone->SetNode(childSkeletonNode);
+			bone->Node = childSkeletonNode;
 		}
 
 		return true;

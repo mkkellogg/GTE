@@ -109,6 +109,17 @@ void Matrix4x4::Init()
 }
 
 /*
+ * Multiply this matrix by the scalar [scalar]
+ */
+void Matrix4x4::MultiplyByScalar(float scalar)
+{
+	for(unsigned int i = 0; i < 16; i++)
+	{
+		data[i] *= scalar;
+	}
+}
+
+/*
  * Transform [vector] by this matrix, and store the result in [out]
  */
 void Matrix4x4::Transform(const Vector3 * vector, Vector3 * out) const
