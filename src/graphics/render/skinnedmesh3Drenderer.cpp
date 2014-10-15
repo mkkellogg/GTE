@@ -100,7 +100,7 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 					subRenderer->SetAttributeTransformer(attributeTransformer);
 				}
 			}
-			if(i != 0) subRenderer->SetAttributeTransformer(NULL);
+			if(i !=0)  subRenderer->SetAttributeTransformer(NULL);
 		}
 	}
 }

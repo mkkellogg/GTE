@@ -114,7 +114,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	SceneObjectRef root = objectManager->CreateSceneObject();
 	SHARED_REF_CHECK(root,"AssetImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
 
-	root->SetActive(false);
+	//root->SetActive(false);
 	Matrix4x4 baseTransform;
 
 	if(scene.mRootNode != NULL)
@@ -261,7 +261,6 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 						SceneObjectSkeletonNode *soskNode = dynamic_cast<SceneObjectSkeletonNode*>(skNode);
 						if(soskNode != NULL)
 						{
-							//printf("targeting: %s\n",node.mName.C_Str());
 							//const float * data = sceneObject->GetLocalTransform().GetMatrix()->GetDataPtr();
 							//printf("mapped: %s [%f,%f,%f,%f]\n",node.mName.C_Str(), data[0], data[5], data[10], data[15]);
 							soskNode->SetTarget(sceneObject);
