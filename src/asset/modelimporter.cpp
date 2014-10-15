@@ -120,7 +120,23 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	if(scene.mRootNode != NULL)
 	{
 		Skeleton * skeleton = LoadSkeleton(scene);
-		RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root, baseTransform, materialImportDescriptors, skeleton);
+		std::vector<SceneObjectRef> createdSceneObjects;
+		RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root,  materialImportDescriptors, skeleton, createdSceneObjects);
+
+		for(unsigned int s = 0; s < createdSceneObjects.size(); s++)
+		{
+			SkinnedMesh3DRendererRef renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
+			if(renderer.IsValid())
+			{
+				Skeleton * skeletonClone = skeleton->FullClone();
+				if(skeletonClone == NULL)
+				{
+					Debug::PrintWarning("ModelImporter::ProcessModelScene -> Could not clone scene skeleton.");
+					continue;
+				}
+				renderer->SetSkeleton(skeletonClone);
+			}
+		}
 	}
 	else
 	{
@@ -130,7 +146,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	return root;
 }
 
-void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObjectRef current, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors,  Skeleton * skeleton)
+void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObjectRef current,   std::vector<MaterialImportDescriptor>& materialImportDescriptors,  Skeleton * skeleton, std::vector<SceneObjectRef>& createdSceneObjects)
 {
 	Matrix4x4 mat;
 
@@ -141,6 +157,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 	matBaseTransformation = matBaseTransformation * matScaling;
 	ImportUtil::ConvertAssimpMatrix(matBaseTransformation,mat);
 
+	scale = 1;
+
 	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
 
 	// create new scene object to hold the Mesh3D object and its renderer
@@ -148,6 +166,12 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 	SHARED_REF_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
 	bool hasSkeleton = skeleton != NULL && skeleton->GetBoneCount() ? true : false;
+	Mesh3DRenderer * rendererPtr = NULL;
+	SkinnedMesh3DRendererRef skinnedMeshRenderer;
+	Mesh3DRendererRef meshRenderer;
+
+	//printf("node: %s\n",node.mName.C_Str());
+
 	if(node.mNumMeshes > 0)
 	{
 		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
@@ -159,10 +183,6 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
 			return;
 		}
-
-		Mesh3DRenderer * rendererPtr = NULL;
-		SkinnedMesh3DRendererRef skinnedMeshRenderer;
-		Mesh3DRendererRef meshRenderer;
 
 		if(hasSkeleton)
 		{
@@ -176,9 +196,6 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			SHARED_REF_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
 			rendererPtr = meshRenderer.GetPtr();
 		}
-
-		// update the scene object's local transform
-		sceneObject->GetLocalTransform().SetTo(&mat);
 
 		std::unordered_map<unsigned int, unsigned int> subMeshInmdexToVertexBoneMap;
 		for (unsigned int n=0; n < node.mNumMeshes; n++)
@@ -219,7 +236,6 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
 			skinnedMeshRenderer->SetMesh(mesh3D);
-			skinnedMeshRenderer->SetSkeleton(skeleton);
 		}
 		else
 		{
@@ -228,17 +244,15 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 		}
 	}
 
-	if(skeleton != NULL)
+	if(hasSkeleton)
 	{
-		Skeleton * clone = skeleton->FullClone();
-
 		if(node.mName.C_Str() != NULL)
 		{
 			std::string boneName(node.mName.C_Str());
-			int boneMapping = clone->GetBoneMapping(boneName);
+			int boneMapping = skeleton->GetBoneMapping(boneName);
 			if(boneMapping>=0)
 			{
-				Bone * bone = clone->GetBone(boneMapping);
+				Bone * bone = skeleton->GetBone(boneMapping);
 				if(bone != NULL)
 				{
 					SkeletonNode * skNode = bone->Node;
@@ -247,6 +261,9 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 						SceneObjectSkeletonNode *soskNode = dynamic_cast<SceneObjectSkeletonNode*>(skNode);
 						if(soskNode != NULL)
 						{
+							//printf("targeting: %s\n",node.mName.C_Str());
+							//const float * data = sceneObject->GetLocalTransform().GetMatrix()->GetDataPtr();
+							//printf("mapped: %s [%f,%f,%f,%f]\n",node.mName.C_Str(), data[0], data[5], data[10], data[15]);
 							soskNode->SetTarget(sceneObject);
 						}
 					}
@@ -254,16 +271,22 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 			}
 		}
 	}
+
+	// update the scene object's local transform
+	std::string name(node.mName.C_Str());
+	sceneObject->SetName(name);
+	sceneObject->GetLocalTransform().SetTo(&mat);
 	current->AddChild(sceneObject);
+	createdSceneObjects.push_back(sceneObject);
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{
-		SceneObjectRef child = engineObjectManager->CreateSceneObject();
-		SHARED_REF_CHECK_RTRN(child,"AssetImporter::RecursiveProcessModelScene -> Could not create child object.");
+		//SceneObjectRef child = engineObjectManager->CreateSceneObject();
+		//SHARED_REF_CHECK_RTRN(child,"AssetImporter::RecursiveProcessModelScene -> Could not create child object.");
 
-		current->AddChild(child);
+		//current->AddChild(child);
 		const aiNode *childNode = node.mChildren[i];
-		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, child, mat, materialImportDescriptors, skeleton);
+		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, sceneObject, materialImportDescriptors, skeleton, createdSceneObjects);
 	}
 }
 
@@ -673,7 +696,7 @@ void ModelImporter::AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsi
 
 				skeleton.GetBone(currentBoneIndex)->Name = boneName;
 				skeleton.GetBone(currentBoneIndex)->ID = currentBoneIndex;
-				skeleton.GetBone(currentBoneIndex)->OffsetMatrix = offsetMatrix;
+				skeleton.GetBone(currentBoneIndex)->OffsetMatrix.SetTo(&offsetMatrix);
 
 				currentBoneIndex++;
 			}

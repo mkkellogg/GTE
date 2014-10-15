@@ -41,6 +41,8 @@ RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectMa
 
 	viewTransformStack = NULL;
 	modelTransformStack = NULL;
+
+	cycleCount = 0;
 }
 
 /*
@@ -169,6 +171,8 @@ void RenderManager::ProcessScene()
 
 	// gather information about the cameras & lights in the scene
 	ProcessScene(sceneRoot.GetPtr(), &cameraModelView);
+
+	cycleCount++;
 }
 
 /*
@@ -194,6 +198,8 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTran
 
 		if(child.IsValid() && child->IsActive())
 		{
+			//if(cycleCount <= 0)printf("node: %s\n", child->GetName());
+
 			// save the existing view transform
 			PushTransformData(aggregateTransform, viewTransformStack);
 

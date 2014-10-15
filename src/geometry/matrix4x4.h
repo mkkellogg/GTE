@@ -57,6 +57,7 @@ class Matrix4x4
     void Transform(const Point3 * point, Point3 * out) const;
     void Transform(Point3 * point) const;
     void Transform(float * vector4f) const;
+    void Add(const Matrix4x4 * matrix);
     void Multiply(const Matrix4x4 * matrix);
     void PreMultiply(const Matrix4x4 * matrix);
     void Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const;

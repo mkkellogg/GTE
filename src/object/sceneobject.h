@@ -26,6 +26,7 @@ class SceneObject : public EngineObject
 
 	protected:
 
+	std::string name;
 	bool isActive;
 	Transform transform;
 	Transform processingTransform;
@@ -46,6 +47,8 @@ class SceneObject : public EngineObject
 
     bool IsActive();
     void SetActive(bool active);
+    void SetName(const std::string& name);
+    const char * GetName();
 
     Transform& GetLocalTransform() ;
     void GetFullTransform(SceneObjectTransform * transform);

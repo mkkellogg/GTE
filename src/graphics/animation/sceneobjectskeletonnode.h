@@ -22,6 +22,8 @@ class SceneObjectSkeletonNode : public SkeletonNode
      ~SceneObjectSkeletonNode();
 
      void SetTarget(SceneObjectRef target);
+     SceneObjectRef GetTarget();
+
      SkeletonNode * FullClone() const;
 };
 

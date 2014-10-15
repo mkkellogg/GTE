@@ -30,6 +30,11 @@ Transform * SceneObjectSkeletonNode::GetLocalTransform()
 	return &ref;
 }
 
+SceneObjectRef SceneObjectSkeletonNode::GetTarget()
+{
+	return target;
+}
+
 void SceneObjectSkeletonNode::SetTarget(SceneObjectRef target)
 {
 	this->target = target;

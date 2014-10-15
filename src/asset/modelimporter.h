@@ -76,7 +76,7 @@ class ModelImporter
 		}
 	};
 
-	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent, Matrix4x4& currentTransform,  std::vector<MaterialImportDescriptor>& materialImportDescriptors, Skeleton * skeleton);
+	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,   std::vector<MaterialImportDescriptor>& materialImportDescriptors, Skeleton * skeleton, std::vector<SceneObjectRef>& createdSceneObjects);
 	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);

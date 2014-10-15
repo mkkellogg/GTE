@@ -39,6 +39,8 @@ class RenderManager
 		SceneObjectComponent * component = NULL;
 	};
 
+	int cycleCount;
+
 	Graphics * graphics;
 	EngineObjectManager * objectManager;
 	DataStack<float> * viewTransformStack;

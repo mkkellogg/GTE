@@ -80,10 +80,11 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 		for(unsigned int i = 0; i< mesh->GetSubMeshCount(); i++)
 		{
 			int vertexBoneMapIndex = -1;
+			SubMesh3DRendererRef subRenderer =  this->GetSubRenderer(i);
+
 			if(subMeshIndexMap.find(i) != subMeshIndexMap.end())
 			{
 				vertexBoneMapIndex = subMeshIndexMap[i];
-				SubMesh3DRendererRef subRenderer =  this->GetSubRenderer(i);
 
 				if(subRenderer->GetAttributeTransformer() == NULL)
 				{
@@ -99,6 +100,7 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 					subRenderer->SetAttributeTransformer(attributeTransformer);
 				}
 			}
+			if(i != 0) subRenderer->SetAttributeTransformer(NULL);
 		}
 	}
 }

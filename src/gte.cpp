@@ -288,7 +288,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			return;
 		}
 		modelSceneObject->GetLocalTransform().Translate(0,0,-12,false);
-		modelSceneObject->GetLocalTransform().Scale(.15,.15,.15, true);
+		modelSceneObject->GetLocalTransform().Scale(13,13,13, true);
 
 
 
@@ -302,10 +302,10 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			Debug::PrintError(" >> could not load model!\n");
 			return;
 		}
-		modelSceneObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,-90);
+		//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,-90);
 		modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 		modelSceneObject->GetLocalTransform().Translate(0,-8,-3,false);
-		modelSceneObject->GetLocalTransform().Scale(.15,.15,.15, true);
+		modelSceneObject->GetLocalTransform().Scale(.5, .5, .5, true);
 
 		SceneObjectRef lightObject;
 		LightRef light;

@@ -46,6 +46,16 @@ void SceneObject::SetActive(bool active)
 	this->isActive = active;
 }
 
+void SceneObject::SetName(const std::string& name)
+{
+	this->name = name;
+}
+
+const char * SceneObject::GetName()
+{
+	return (const char *)name.c_str();
+}
+
 Transform& SceneObject::GetLocalTransform()
 {
 	//const Transform * ptr = &transform;

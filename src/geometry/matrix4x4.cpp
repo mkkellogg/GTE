@@ -170,6 +170,18 @@ void Matrix4x4::Transform(float * vector4f) const
 }
 
 /*
+ * Add [matrix] to this matrix
+ */
+void Matrix4x4::Add(const Matrix4x4 * matrix)
+{
+	NULL_CHECK_RTRN(matrix, "Matrix4x4::add -> matrix is NULL");
+	for(unsigned int i=0; i < 16; i++)
+	{
+		data[i] += matrix->data[i];
+	}
+}
+
+/*
  * Post-multiply this matrix by [matrix]
  */
 void Matrix4x4::Multiply(const Matrix4x4 * matrix)
