@@ -114,7 +114,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	SceneObjectRef root = objectManager->CreateSceneObject();
 	SHARED_REF_CHECK(root,"AssetImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
 
-	//root->SetActive(false);
+	root->SetActive(false);
 	Matrix4x4 baseTransform;
 
 	if(scene.mRootNode != NULL)
@@ -358,7 +358,12 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 
 		for( int i = face->mNumIndices-1; i >=0; i--)
 		{
-			int vIndex = face->mIndices[i];
+
+			int vIndex = 0;
+
+			vIndex = face->mIndices[i];
+
+			//vIndex = face->mIndices[2-i];
 
 			aiVector3D srcPosition = mesh.mVertices[vIndex];
 
@@ -609,6 +614,7 @@ Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
 			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping(*target, indexBoneMap, *cMesh);
 			if(fullBoneMap == NULL)
 			{
+				Debug::PrintError("ModelImporter::LoadSkeleton -> Could not create full vertex bone map.");
 				delete target;
 				return NULL;
 			}
@@ -624,6 +630,7 @@ Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
 	bool hierarchysuccess = CreateAndMapNodeHierarchy(target, scene);
 	if(!hierarchysuccess)
 	{
+		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not create node hierarchy.");
 		delete target;
 		return NULL;
 	}
@@ -651,7 +658,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(Skeleton& skeleton, Vertex
 	for(unsigned int f = 0; f < mesh.mNumFaces; f++)
 	{
 		aiFace& face = mesh.mFaces[f];
-		for(unsigned int i = 0; i < face.mNumIndices; i++)
+		for(int i = face.mNumIndices-1; i >=0; i--)
 		{
 			unsigned int vertexIndex = face.mIndices[i];
 			fullBoneMap->GetDescriptor(fullIndex)->SetTo(indexBoneMap.GetDescriptor(vertexIndex));
@@ -670,25 +677,10 @@ void ModelImporter::AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsi
 		if(cBone != NULL)
 		{
 			std::string boneName = std::string(cBone->mName.C_Str());
+
 			if(skeleton.GetBoneMapping(boneName) == -1)
 			{
 				skeleton.MapBone(boneName, currentBoneIndex);
-
-				for(unsigned int w = 0; w < cBone->mNumWeights; w++)
-				{
-					aiVertexWeight& weightDesc = cBone->mWeights[w];
-
-					unsigned int vertexID = weightDesc.mVertexId;
-					float weight = weightDesc.mWeight;
-
-					VertexBoneMap::VertexMappingDescriptor * desc = vertexIndexBoneMap.GetDescriptor(vertexID);
-					if(desc != NULL && desc->BoneCount < Constants::MaxBonesPerVertex)
-					{
-						desc->BoneIndex[desc->BoneCount] = currentBoneIndex;
-						desc->Weight[desc->BoneCount] = weight;
-						desc->BoneCount++;
-					}
-				}
 
 				Matrix4x4 offsetMatrix;
 				ImportUtil::ConvertAssimpMatrix(cBone->mOffsetMatrix, offsetMatrix);
@@ -698,6 +690,24 @@ void ModelImporter::AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsi
 				skeleton.GetBone(currentBoneIndex)->OffsetMatrix.SetTo(&offsetMatrix);
 
 				currentBoneIndex++;
+			}
+
+			unsigned int boneIndex = skeleton.GetBoneMapping(boneName);
+
+			for(unsigned int w = 0; w < cBone->mNumWeights; w++)
+			{
+				aiVertexWeight& weightDesc = cBone->mWeights[w];
+
+				unsigned int vertexID = weightDesc.mVertexId;
+				float weight = weightDesc.mWeight;
+
+				VertexBoneMap::VertexMappingDescriptor * desc = vertexIndexBoneMap.GetDescriptor(vertexID);
+				if(desc != NULL && desc->BoneCount < Constants::MaxBonesPerVertex)
+				{
+					desc->BoneIndex[desc->BoneCount] = boneIndex;
+					desc->Weight[desc->BoneCount] = weight;
+					desc->BoneCount++;
+				}
 			}
 		}
 	}

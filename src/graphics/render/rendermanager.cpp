@@ -342,86 +342,90 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 					unsigned int materialIndex = 0;
 					for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 					{
+						bool doRender = true;
 						MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
 						if(!currentMaterial.IsValid())
 						{
 							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL material encountered.");
-							continue;
+							doRender = false;
 						}
 
 						SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 						if(!subRenderer.IsValid())
 						{
 							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
-							continue;
+							doRender = false;
 						}
 
 						SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 						if(!subMesh.IsValid())
 						{
 							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
-							continue;
+							doRender = false;
 						}
 
-						modelView.SetTo(child->GetProcessingTransform());
-						// concatenate modelTransform with inverted viewTransform
-						modelView.PreTransformBy(viewTransformInverse);
-
-						// activate the material, which will switch the GPU's active shader to
-						// the one associated with the material
-						ActivateMaterial(currentMaterial);
-						// pass concatenated modelViewTransform and projection transforms to shader
-						const Transform& modelTransform = child->GetProcessingTransform();
-						SendTransformUniformsToShader(&modelTransform, &modelView, camera->GetProjectionTransform());
-						SendCustomUniformsToShader();
-
-						// loop through each active light and render sub mesh for that light, if in range
-						for(unsigned int l = 0; l < lightCount; l++)
+						if(doRender)
 						{
-							if(sceneLights[l].component == NULL)
+							modelView.SetTo(child->GetProcessingTransform());
+							// concatenate modelTransform with inverted viewTransform
+							modelView.PreTransformBy(viewTransformInverse);
+
+							// activate the material, which will switch the GPU's active shader to
+							// the one associated with the material
+							ActivateMaterial(currentMaterial);
+							// pass concatenated modelViewTransform and projection transforms to shader
+							const Transform& modelTransform = child->GetProcessingTransform();
+							SendTransformUniformsToShader(&modelTransform, &modelView, camera->GetProjectionTransform());
+							SendCustomUniformsToShader();
+
+							// loop through each active light and render sub mesh for that light, if in range
+							for(unsigned int l = 0; l < lightCount; l++)
 							{
-								Debug::PrintError("RenderManager::ForwardRenderScene -> sceneLights[l].component is NULL");
-								continue;
-							}
+								if(sceneLights[l].component == NULL)
+								{
+									Debug::PrintError("RenderManager::ForwardRenderScene -> sceneLights[l].component is NULL");
+									continue;
+								}
 
-							Light * light = dynamic_cast<Light *>(sceneLights[l].component);
-							if(light == NULL)
-							{
-								Debug::PrintError("RenderManager::ForwardRenderScene -> light is NULL");
-								continue;
-							}
+								Light * light = dynamic_cast<Light *>(sceneLights[l].component);
+								if(light == NULL)
+								{
+									Debug::PrintError("RenderManager::ForwardRenderScene -> light is NULL");
+									continue;
+								}
 
-							// if this sub mesh has already been rendered by this camera, then we want to use
-							// additive blending to combine it with the output from other lights. Otherwise
-							// turn off blending and render.
-							bool rendered = renderedObjects[subMesh->GetObjectID()];
-							if(rendered)
-							{
-								graphics->EnableBlending(true);
-								graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
-							}
-							else
-							{
-								graphics->EnableBlending(false);
-							}
+								// if this sub mesh has already been rendered by this camera, then we want to use
+								// additive blending to combine it with the output from other lights. Otherwise
+								// turn off blending and render.
+								bool rendered = renderedObjects[subMesh->GetObjectID()];
+								if(rendered)
+								{
+									graphics->EnableBlending(true);
+									graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+								}
+								else
+								{
+									graphics->EnableBlending(false);
+								}
 
-							Point3 lightPosition;
-							sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
+								Point3 lightPosition;
+								sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
 
-							SceneObjectTransform full;
+								SceneObjectTransform full;
 
-							// get the full transform of the scene object, including those of all ancestors
-							child->GetFullTransform(&full);
+								// get the full transform of the scene object, including those of all ancestors
+								child->GetFullTransform(&full);
 
-							// check if this mesh should be culled from this light.
-							if(!ShouldCullFromLight(*light, lightPosition, full, *subMesh))
-							{
-								// send light data to the active shader
-								currentMaterial->SendLightToShader(light, &lightPosition);
-								// render the current mesh
-								subRenderer->Render();
-								// flag the current mesh as being rendered (at least once)
-								renderedObjects[subMesh->GetObjectID()] = true;
+								// check if this mesh should be culled from this light.
+								if(!ShouldCullFromLight(*light, lightPosition, full, *subMesh))
+								{
+									// send light data to the active shader
+									currentMaterial->SendLightToShader(light, &lightPosition);
+									// render the current mesh
+									subRenderer->Render();
+									// flag the current mesh as being rendered (at least once)
+									renderedObjects[subMesh->GetObjectID()] = true;
+								}
 							}
 						}
 

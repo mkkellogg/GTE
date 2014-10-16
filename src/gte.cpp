@@ -9,8 +9,11 @@
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/submesh3D.h"
+#include "graphics/animation/skeleton.h"
+#include "graphics/animation/bone.h"
 #include "asset/assetimporter.h"
 #include "graphics/render/submesh3Drenderer.h"
+#include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/renderbuffer.h"
 #include "graphics/render/material.h"
@@ -41,10 +44,15 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 {
 	public:
 
+	float offset;
 	SceneObjectRef cameraObject;
+	SceneObjectRef koopaRoot;
+	SkinnedMesh3DRendererRef koopaRenderer;
+	int boneIndex ;
 	CustomGraphicsCallbacks()
 	{
-
+		offset = 0;
+		boneIndex = -1;
 	}
 
 	void PrintMatrix(Matrix4x4 *m)
@@ -292,20 +300,20 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
-		modelSceneObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
-		if(modelSceneObject.IsValid())
+		koopaRoot = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
+		if(koopaRoot.IsValid())
 		{
-			modelSceneObject->SetActive(true);
+			koopaRoot->SetActive(true);
 		}
 		else
 		{
 			Debug::PrintError(" >> could not load model!\n");
 			return;
 		}
-		//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,-90);
-		modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
-		modelSceneObject->GetLocalTransform().Translate(0,-8,-3,false);
-		modelSceneObject->GetLocalTransform().Scale(.5, .5, .5, true);
+		koopaRoot->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
+		//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
+		koopaRoot->GetLocalTransform().Translate(0,0,-3,false);
+		koopaRoot->GetLocalTransform().Scale(.35, .35, .35, true);
 
 		SceneObjectRef lightObject;
 		LightRef light;
@@ -342,8 +350,67 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
+		// cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
 		 //printf("total time: %f\n", Time::GetRealTimeSinceStartup());
+
+		 float realTime = Time::GetRealTimeSinceStartup();
+		 unsigned int intTime = (unsigned int)Time::GetRealTimeSinceStartup();
+		 unsigned int mod = intTime % 2;
+		 float fraction = realTime - (float)intTime;
+		 float mag = .001;
+
+		 float scaleFactor = 1;
+
+		 if(mod == 0)
+		 {
+			offset += Time::GetDeltaTime();
+			scaleFactor = 1 + offset;
+		 }
+		 else
+		 {
+			offset -= Time::GetDeltaTime();
+			scaleFactor = (1+mag) - offset;
+		 }
+
+		 if(!koopaRenderer.IsValid())
+			 koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
+
+		 Skeleton * skeleton = koopaRenderer->GetSkeleton();
+		 if(boneIndex < 0)
+		 {
+			 for(unsigned int i=0; i < skeleton->GetBoneCount(); i++)
+			 {
+				 Bone * bone = skeleton->GetBone(i);
+				// printf("%s\n", bone->Name.c_str());
+				 if(bone->Name == "LegR2")
+				 {
+					 boneIndex = i;
+					 break;
+				 }
+			 }
+		 }
+
+		 if(boneIndex >= 0)
+		 {
+			 Bone * bone = skeleton->GetBone(boneIndex);
+			 bone->Node->GetLocalTransform()->Translate(0,scaleFactor*.05,0,true);
+		 }
+	}
+
+	SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
+	{
+		if(!ref.IsValid())return SkinnedMesh3DRendererRef::Null();
+
+		if(ref->GetSkinnedMesh3DRenderer().IsValid())return ref->GetSkinnedMesh3DRenderer();
+
+		for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
+		{
+			SceneObjectRef childRef = ref->GetChildAt(i);
+			SkinnedMesh3DRendererRef subRef = FindFirstSkinnedMeshRenderer(childRef);
+			if(subRef.IsValid())return subRef;
+		}
+
+		return SkinnedMesh3DRendererRef::Null();
 	}
 
 	void OnQuit(Graphics * graphics)

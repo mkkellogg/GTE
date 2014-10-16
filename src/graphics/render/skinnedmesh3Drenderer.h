@@ -26,6 +26,7 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 	public:
 
 	void SetSkeleton(Skeleton * skeleton);
+	Skeleton * GetSkeleton();
 	Mesh3DRef GetMesh();
 	SubMesh3DRef GetSubMesh(unsigned int index);
 	void SetMesh(Mesh3DRef mesh);

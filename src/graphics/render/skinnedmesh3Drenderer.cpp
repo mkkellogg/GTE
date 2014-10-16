@@ -48,6 +48,11 @@ void SkinnedMesh3DRenderer::SetSkeleton(Skeleton * skeleton)
 	}
 }
 
+Skeleton * SkinnedMesh3DRenderer::GetSkeleton()
+{
+	return skeleton;
+}
+
 Mesh3DRef SkinnedMesh3DRenderer::GetMesh()
 {
 	return mesh;
@@ -100,7 +105,7 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 					subRenderer->SetAttributeTransformer(attributeTransformer);
 				}
 			}
-			if(i !=0)  subRenderer->SetAttributeTransformer(NULL);
+			else subRenderer->SetAttributeTransformer(NULL);
 		}
 	}
 }
