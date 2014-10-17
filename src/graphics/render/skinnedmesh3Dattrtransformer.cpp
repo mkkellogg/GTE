@@ -22,6 +22,7 @@ SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer() : Attribu
 	offset = 0;
 	skeleton = NULL;
 	vertexBoneMapIndex = -1;
+	boneTransformed = NULL;
 }
 
 SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer(StandardAttributeSet attributes) : AttributeTransformer(attributes)
@@ -29,16 +30,41 @@ SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer(StandardAtt
 	offset = 0;
 	skeleton = NULL;
 	vertexBoneMapIndex = -1;
+	boneTransformed = NULL;
 }
 
 SkinnedMesh3DAttributeTransformer::~SkinnedMesh3DAttributeTransformer()
 {
+	DestroyTransformedBoneCache();
+}
 
+void SkinnedMesh3DAttributeTransformer::DestroyTransformedBoneCache()
+{
+	SAFE_DELETE(boneTransformed);
+}
+
+bool SkinnedMesh3DAttributeTransformer::CreateTransformedBoneCache()
+{
+	if(skeleton != NULL)
+	{
+		boneTransformed = new unsigned char[skeleton->GetBoneCount()];
+		NULL_CHECK(boneTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneCache -> Unable to allocate bone transform cache.", false);
+		return true;
+	}
+
+	return false;
+}
+
+void SkinnedMesh3DAttributeTransformer::ClearTransformedBoneCache()
+{
+	memset(boneTransformed, 0, sizeof(unsigned char) * skeleton->GetBoneCount());
 }
 
 void SkinnedMesh3DAttributeTransformer::SetSkeleton(Skeleton * skeleton)
 {
 	this->skeleton = skeleton;
+	DestroyTransformedBoneCache();
+	CreateTransformedBoneCache();
 }
 void SkinnedMesh3DAttributeTransformer::SetVertexBoneMapIndex(int index)
 {
@@ -51,6 +77,8 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 
 	if(skeleton != NULL && vertexBoneMapIndex >= 0)
 	{
+		ClearTransformedBoneCache();
+
 		Matrix4x4 temp;
 		Matrix4x4 full;
 
@@ -64,14 +92,21 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 			for(unsigned int b = 0; b < desc->BoneCount; b++)
 			{
 				Bone * bone = skeleton->GetBone(desc->BoneIndex[b]);
-				temp.SetTo(&(bone->OffsetMatrix));
 
-				if(bone->Node->HasTarget())
+				if(boneTransformed[desc->BoneIndex[b]] == 0)
 				{
-					const Transform * targetFull = bone->Node->GetFullTransform();
-					temp.PreMultiply(targetFull->GetMatrix());
+					bone->TempFullMatrix.SetTo(&bone->OffsetMatrix);
+
+					if(bone->Node->HasTarget())
+					{
+						const Transform * targetFull = bone->Node->GetFullTransform();
+						bone->TempFullMatrix.PreMultiply(targetFull->GetMatrix());
+					}
+
+					boneTransformed[desc->BoneIndex[b]] = 1;
 				}
 
+				temp.SetTo(&bone->TempFullMatrix);
 				temp.MultiplyByScalar(desc->Weight[b]);
 				if(b==0)full.SetTo(&temp);
 				else full.Add(&temp);

@@ -24,6 +24,7 @@ class Bone
     std::string Name;
     unsigned int ID;
     Matrix4x4 OffsetMatrix;
+    Matrix4x4 TempFullMatrix;
     SkeletonNode * Node;
 
     void SetTo(Bone * bone);

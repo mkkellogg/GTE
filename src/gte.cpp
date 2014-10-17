@@ -362,17 +362,17 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		 float scaleFactor = 1;
 
-		 if(mod == 0)
+		 if(mod == 1)
 		 {
 			offset += Time::GetDeltaTime();
 			scaleFactor = offset;
-			translateFactor = -.7;
+			translateFactor = -.2;
 		 }
 		 else
 		 {
 			offset -= Time::GetDeltaTime();
 			scaleFactor = offset;
-			translateFactor = .7;
+			translateFactor = .2;
 		 }
 
 		 if(!koopaRenderer.IsValid())

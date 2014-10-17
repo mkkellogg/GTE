@@ -16,6 +16,11 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	float offset;
 	Skeleton * skeleton;
 	int vertexBoneMapIndex;
+	unsigned char * boneTransformed;
+
+	void DestroyTransformedBoneCache();
+	bool CreateTransformedBoneCache();
+	void ClearTransformedBoneCache();
 
 	public :
 
