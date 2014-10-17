@@ -358,18 +358,21 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		 unsigned int mod = intTime % 2;
 		 float fraction = realTime - (float)intTime;
 		 float mag = .001;
+		 float translateFactor = 0;
 
 		 float scaleFactor = 1;
 
 		 if(mod == 0)
 		 {
 			offset += Time::GetDeltaTime();
-			scaleFactor = 1 + offset;
+			scaleFactor = offset;
+			translateFactor = -.7;
 		 }
 		 else
 		 {
 			offset -= Time::GetDeltaTime();
-			scaleFactor = (1+mag) - offset;
+			scaleFactor = offset;
+			translateFactor = .7;
 		 }
 
 		 if(!koopaRenderer.IsValid())
@@ -393,7 +396,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		 if(boneIndex >= 0)
 		 {
 			 Bone * bone = skeleton->GetBone(boneIndex);
-			 bone->Node->GetLocalTransform()->Translate(0,scaleFactor*.05,0,true);
+			 bone->Node->GetLocalTransform()->Translate(0,translateFactor,0,true);
 		 }
 	}
 

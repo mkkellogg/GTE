@@ -27,6 +27,7 @@ class Bone
     SkeletonNode * Node;
 
     void SetTo(Bone * bone);
+
 };
 
 #endif

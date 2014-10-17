@@ -17,6 +17,7 @@ class SkeletonNode
 
 	virtual const Transform * GetFullTransform() const = 0;
 	virtual Transform * GetLocalTransform() = 0;
+	virtual bool HasTarget() const = 0;
 
 	SkeletonNode(int boneIndex);
 	virtual ~SkeletonNode();

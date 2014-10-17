@@ -356,6 +356,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	{
 		const aiFace* face = mesh.mFaces + faceIndex;
 
+		// ** IMPORTANT ** Iterate through face vertices in reverse order
 		for( int i = face->mNumIndices-1; i >=0; i--)
 		{
 
@@ -658,6 +659,8 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(Skeleton& skeleton, Vertex
 	for(unsigned int f = 0; f < mesh.mNumFaces; f++)
 	{
 		aiFace& face = mesh.mFaces[f];
+
+		// ** IMPORTANT ** Iterate through face vertices in reverse order
 		for(int i = face.mNumIndices-1; i >=0; i--)
 		{
 			unsigned int vertexIndex = face.mIndices[i];

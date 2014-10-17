@@ -30,6 +30,11 @@ Transform * SceneObjectSkeletonNode::GetLocalTransform()
 	return &ref;
 }
 
+bool SceneObjectSkeletonNode::HasTarget() const
+{
+	return target.IsValid();
+}
+
 SceneObjectRef SceneObjectSkeletonNode::GetTarget()
 {
 	return target;

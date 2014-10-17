@@ -17,6 +17,7 @@ class SceneObjectSkeletonNode : public SkeletonNode
 
 	const Transform * GetFullTransform() const;
 	Transform * GetLocalTransform();
+	bool HasTarget() const;
 
 	SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex);
      ~SceneObjectSkeletonNode();

@@ -78,12 +78,12 @@ template <typename T> class EngineObjectRef
 		return *sharedPtr;
 	}
 
-	bool operator==(const EngineObjectRef<T> & other)
+	bool operator==(const EngineObjectRef<T> & other) const
 	{
 		return sharedPtr == other.sharedPtr;
 	}
 
-	bool IsValid()
+	bool IsValid() const
 	{
 		if(sharedPtr)return true;
 		return false;

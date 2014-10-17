@@ -47,63 +47,36 @@ void SkinnedMesh3DAttributeTransformer::SetVertexBoneMapIndex(int index)
 
 void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut)
 {
-	float realTime = Time::GetRealTimeSinceStartup();
-	unsigned int intTime = (unsigned int)Time::GetRealTimeSinceStartup();
-	unsigned int mod = intTime % 2;
-	float fraction = realTime - (float)intTime;
-	float mag = .001;
-
-	float scaleFactor = 1;
-
-	if(mod == 0)
-	{
-		offset += Time::GetDeltaTime();
-		scaleFactor = 1 + offset;
-	}
-	else
-	{
-		offset -= Time::GetDeltaTime();
-		scaleFactor = (1+mag) - offset;
-	}
-
-	Transform transform;
-	//transform.Scale(scaleFactor,scaleFactor,scaleFactor, true);
-
 	positionsIn.CopyTo(&positionsOut);
 
 	if(skeleton != NULL && vertexBoneMapIndex >= 0)
 	{
 		Matrix4x4 temp;
 		Matrix4x4 full;
+
+		VertexBoneMap * vertexBoneMap = skeleton->GetVertexBoneMap(vertexBoneMapIndex);
+		NULL_CHECK_RTRN(vertexBoneMap,"SkinnedMesh3DAttributeTransformer::TransformPositions -> No valid vertex bone map found for sub mesh.");
+
 		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
 		{
-			float weightSum = 0;
-			full.SetIdentity();
-			VertexBoneMap::VertexMappingDescriptor *desc = skeleton->GetVertexBoneMap(vertexBoneMapIndex)->GetDescriptor(i);
+			VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
+			if(desc->BoneCount == 0)full.SetIdentity();
 			for(unsigned int b = 0; b < desc->BoneCount; b++)
 			{
 				Bone * bone = skeleton->GetBone(desc->BoneIndex[b]);
 				temp.SetTo(&(bone->OffsetMatrix));
-				if(((SceneObjectSkeletonNode*)(bone->Node))->GetTarget().IsValid())
-				{
-					//SceneObjectTransform preFull;
-					//((SceneObjectSkeletonNode*)(bone->Node))->GetTarget()->GetFullTransform(&preFull);
 
+				if(bone->Node->HasTarget())
+				{
 					const Transform * targetFull = bone->Node->GetFullTransform();
 					temp.PreMultiply(targetFull->GetMatrix());
+				}
 
-					//temp.PreMultiply(preFull.GetMatrix());
-				}
-				else
-				{
-					//printf("no target for: %s\n",bone->Name.c_str());
-				}
 				temp.MultiplyByScalar(desc->Weight[b]);
 				if(b==0)full.SetTo(&temp);
 				else full.Add(&temp);
-				weightSum+=desc->Weight[b];
 			}
-			//if(abs(weightSum - 1) > .05 && desc->BoneCount > 0)printf("weights are messed!\n");
+
 			full.Transform(positionsOut.GetPoint(i));
 		}
 	}
