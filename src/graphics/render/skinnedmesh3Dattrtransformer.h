@@ -2,13 +2,13 @@
 #define _SKINNEDMESH_ATTRIBUTE_TRANSFORMER_H
 
 //forward declarations
-class Point3Array;
 class Vector3Array;
 class VertexAttrBuffer;
 class Skeleton;
 
 #include "attributetransformer.h"
 #include "skinnedmesh3Dattrtransformer.h"
+#include "geometry/point/point3array.h"
 #include "graphics/stdattributes.h"
 
 class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
@@ -18,9 +18,17 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	int vertexBoneMapIndex;
 	unsigned char * boneTransformed;
 
-	void DestroyTransformedBoneCache();
-	bool CreateTransformedBoneCache();
-	void ClearTransformedBoneCache();
+	int vertexTransformedCount;
+	unsigned char * vertexTransformed;
+	Point3Array transformedVertices;
+
+	void DestroyTransformedBoneFlagsArray();
+	bool CreateTransformedBoneFlagsArray();
+	void ClearTransformedBoneFlagsArray();
+
+	void DestroyTransformedVertexFlagsArray();
+	bool CreateTransformedVertexFlagsArray(unsigned int vertexTransformedCount);
+	void ClearTransformedVertexFlagsArray();
 
 	public :
 

@@ -350,7 +350,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		// cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
+		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
 		 //printf("total time: %f\n", Time::GetRealTimeSinceStartup());
 
 		 float realTime = Time::GetRealTimeSinceStartup();

@@ -10,9 +10,10 @@
 #include "global/global.h"
 #include "ui/debug.h"
 
-VertexBoneMap::VertexBoneMap(unsigned int vertexCount)
+VertexBoneMap::VertexBoneMap(unsigned int vertexCount, unsigned int uVertexCount)
 {
 	this->vertexCount = vertexCount;
+	this->uVertexCount = uVertexCount;
 	mappingDescriptors = NULL;
 }
 
@@ -56,9 +57,14 @@ unsigned int VertexBoneMap::GetVertexCount()
 	return vertexCount;
 }
 
+unsigned int VertexBoneMap::GetUVertexCount()
+{
+	return uVertexCount;
+}
+
 VertexBoneMap * VertexBoneMap::FullClone()
 {
-	VertexBoneMap * clone = new VertexBoneMap(vertexCount);
+	VertexBoneMap * clone = new VertexBoneMap(vertexCount, uVertexCount);
 	if(clone == NULL)
 	{
 		Debug::PrintError("VertexBoneMap::FullClone -> Could not allocate vertex bone map.");

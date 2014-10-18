@@ -602,7 +602,7 @@ Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
 		aiMesh * cMesh = scene.mMeshes[m];
 		if( cMesh != NULL && cMesh->mNumBones > 0)
 		{
-			VertexBoneMap indexBoneMap(cMesh->mNumVertices);
+			VertexBoneMap indexBoneMap(cMesh->mNumVertices, cMesh->mNumVertices);
 			bool mapInitSuccess = indexBoneMap.Init();
 			if(!mapInitSuccess)
 			{
@@ -641,7 +641,7 @@ Skeleton * ModelImporter::LoadSkeleton(const aiScene& scene)
 
 VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(Skeleton& skeleton, VertexBoneMap& indexBoneMap, const aiMesh& mesh)
 {
-	VertexBoneMap * fullBoneMap = new VertexBoneMap(mesh.mNumFaces * 3);
+	VertexBoneMap * fullBoneMap = new VertexBoneMap(mesh.mNumFaces * 3, mesh.mNumVertices);
 	if(fullBoneMap == NULL)
 	{
 		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not allocate vertexBoneMap.");
@@ -707,6 +707,7 @@ void ModelImporter::AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsi
 				VertexBoneMap::VertexMappingDescriptor * desc = vertexIndexBoneMap.GetDescriptor(vertexID);
 				if(desc != NULL && desc->BoneCount < Constants::MaxBonesPerVertex)
 				{
+					desc->UVertexIndex = vertexID;
 					desc->BoneIndex[desc->BoneCount] = boneIndex;
 					desc->Weight[desc->BoneCount] = weight;
 					desc->BoneCount++;
