@@ -60,18 +60,31 @@ void SubMesh3DRendererGL::Render()
 	{
 		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
 
-		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
-		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
-		{
-			attributeTransformer->TransformPositions(positionsCopy, transformedPositions);
-			SetPositionData(&transformedPositions);
-		}
 
-		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
-		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
+				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position) &&
+				   StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
+				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
 		{
-			attributeTransformer->TransformNormals(normalsCopy, transformedNormals);
+			attributeTransformer->TransformPositionsAndNormals(positionsCopy, transformedPositions,normalsCopy, transformedNormals);
+			SetPositionData(&transformedPositions);
 			SetNormalData(&transformedNormals);
+		}
+		else
+		{
+			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
+			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+			{
+				attributeTransformer->TransformPositions(positionsCopy, transformedPositions);
+				SetPositionData(&transformedPositions);
+			}
+
+			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
+			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+			{
+				attributeTransformer->TransformNormals(normalsCopy, transformedNormals);
+				SetNormalData(&transformedNormals);
+			}
 		}
 	}
 

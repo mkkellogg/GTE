@@ -15,6 +15,7 @@
 #include "geometry/point/point3array.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3array.h"
+#include "geometry/vector/vector3.h"
 #include "object/sceneobject.h"
 #include "util/time.h"
 
@@ -23,9 +24,16 @@ SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer() : Attribu
 	offset = 0;
 	skeleton = NULL;
 	vertexBoneMapIndex = -1;
+
 	boneTransformed = NULL;
-	vertexTransformedCount = -1;
-	vertexTransformed = NULL;
+
+	positionTransformedCount = -1;
+	positionTransformed = NULL;
+
+	normalTransformedCount = -1;
+	normalTransformed = NULL;
+
+	savedTransforms = NULL;
 }
 
 SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer(StandardAttributeSet attributes) : AttributeTransformer(attributes)
@@ -34,14 +42,37 @@ SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer(StandardAtt
 	skeleton = NULL;
 	vertexBoneMapIndex = -1;
 	boneTransformed = NULL;
-	vertexTransformedCount = -1;
-	vertexTransformed = NULL;
+
+	positionTransformedCount = -1;
+	positionTransformed = NULL;
+
+	normalTransformedCount = -1;
+	normalTransformed = NULL;
+
+	savedTransforms = NULL;
 }
 
 SkinnedMesh3DAttributeTransformer::~SkinnedMesh3DAttributeTransformer()
 {
 	DestroyTransformedBoneFlagsArray();
-	DestroyTransformedVertexFlagsArray();
+	DestroyTransformedPositionFlagsArray();
+}
+
+void SkinnedMesh3DAttributeTransformer::DestroySavedTransformsArray()
+{
+	if(savedTransforms != NULL)
+	{
+		delete[] savedTransforms;
+		savedTransforms = NULL;
+	}
+}
+
+bool SkinnedMesh3DAttributeTransformer::CreateSavedTransformsArray(unsigned int saveCount)
+{
+
+	savedTransforms = new Matrix4x4[saveCount];
+	NULL_CHECK(savedTransforms,"SkinnedMesh3DAttributeTransformer::CreateSavedTransformsArray -> Unable to allocate saved transforms array.",false);
+	return true;
 }
 
 void SkinnedMesh3DAttributeTransformer::DestroyTransformedBoneFlagsArray()
@@ -66,31 +97,60 @@ void SkinnedMesh3DAttributeTransformer::ClearTransformedBoneFlagsArray()
 	memset(boneTransformed, 0, sizeof(unsigned char) * skeleton->GetBoneCount());
 }
 
-void SkinnedMesh3DAttributeTransformer::DestroyTransformedVertexFlagsArray()
+void SkinnedMesh3DAttributeTransformer::DestroyTransformedPositionFlagsArray()
 {
-	SAFE_DELETE(vertexTransformed);
+	SAFE_DELETE(positionTransformed);
 }
 
-bool SkinnedMesh3DAttributeTransformer::CreateTransformedVertexFlagsArray(unsigned int vertexTransformedCount)
+bool SkinnedMesh3DAttributeTransformer::CreateTransformedPositionFlagsArray(unsigned int positionTransformedCount)
 {
-	this->vertexTransformedCount = vertexTransformedCount;
-	vertexTransformed = new unsigned char[vertexTransformedCount];
-	NULL_CHECK(vertexTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedVertexFlagsArray -> Unable to allocate flags array.", false);
+	this->positionTransformedCount = positionTransformedCount;
+	positionTransformed = new unsigned char[positionTransformedCount];
+	NULL_CHECK(positionTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedPositionFlagsArray -> Unable to allocate flags array.", false);
 
-	bool initSuccess = transformedVertices.Init(vertexTransformedCount);
+	bool initSuccess = transformedPositions.Init(positionTransformedCount);
 	if(!initSuccess)
 	{
-		Debug::PrintError("SkinnedMesh3DAttributeTransformer::CreateTransformedVertexFlagsArray -> Could not init transformed vertex array.");
+		Debug::PrintError("SkinnedMesh3DAttributeTransformer::CreateTransformedPositionFlagsArray -> Could not init transformed vertex array.");
 		return false;
 	}
 
 	return true;
 }
 
-void SkinnedMesh3DAttributeTransformer::ClearTransformedVertexFlagsArray()
+void SkinnedMesh3DAttributeTransformer::ClearTransformedPositionFlagsArray()
 {
-	memset(vertexTransformed, 0, sizeof(unsigned char) * vertexTransformedCount);
+	memset(positionTransformed, 0, sizeof(unsigned char) * positionTransformedCount);
 }
+
+void SkinnedMesh3DAttributeTransformer::DestroyTransformedNormalFlagsArray()
+{
+	SAFE_DELETE(normalTransformed);
+}
+
+bool SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray(unsigned int normalTransformedCount)
+{
+	this->normalTransformedCount = normalTransformedCount;
+	normalTransformed = new unsigned char[normalTransformedCount];
+	NULL_CHECK(normalTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray -> Unable to allocate flags array.", false);
+
+	bool initSuccess = transformedNormals.Init(normalTransformedCount);
+	if(!initSuccess)
+	{
+		Debug::PrintError("SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray -> Could not init transformed vertex array.");
+		return false;
+	}
+
+	return true;
+}
+
+void SkinnedMesh3DAttributeTransformer::ClearTransformedNormalFlagsArray()
+{
+	memset(normalTransformed, 0, sizeof(unsigned char) * normalTransformedCount);
+}
+
+
+
 void SkinnedMesh3DAttributeTransformer::SetSkeleton(Skeleton * skeleton)
 {
 	this->skeleton = skeleton;
@@ -101,6 +161,97 @@ void SkinnedMesh3DAttributeTransformer::SetSkeleton(Skeleton * skeleton)
 void SkinnedMesh3DAttributeTransformer::SetVertexBoneMapIndex(int index)
 {
 	vertexBoneMapIndex = index;
+}
+
+void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut,
+																	 const Vector3Array& normalsIn, Vector3Array& normalsOut)
+{
+	positionsIn.CopyTo(&positionsOut);
+	normalsIn.CopyTo(&normalsOut);
+
+	if(skeleton != NULL && vertexBoneMapIndex >= 0)
+	{
+		ClearTransformedBoneFlagsArray();
+
+		Matrix4x4 temp;
+		Matrix4x4 full;
+
+		VertexBoneMap * vertexBoneMap = skeleton->GetVertexBoneMap(vertexBoneMapIndex);
+		NULL_CHECK_RTRN(vertexBoneMap,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> No valid vertex bone map found for sub mesh.");
+
+		unsigned int uniqueVertexCount = vertexBoneMap->GetUVertexCount();
+		if(uniqueVertexCount != positionTransformedCount)
+		{
+			DestroyTransformedPositionFlagsArray();
+			bool createSuccess = CreateTransformedPositionFlagsArray(uniqueVertexCount);
+
+			if(!createSuccess)
+			{
+				Debug::PrintError("SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Unable to create position transform flags array.");
+				return;
+			}
+
+			DestroyTransformedNormalFlagsArray();
+			createSuccess = CreateTransformedNormalFlagsArray(uniqueVertexCount);
+
+			if(!createSuccess)
+			{
+				Debug::PrintError("SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Unable to create normal transform flags array.");
+				return;
+			}
+		}
+
+		ClearTransformedPositionFlagsArray();
+
+		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
+		{
+			VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
+			if(positionTransformed[desc->UVertexIndex] == 1)
+			{
+				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);
+				positionsOut.GetPoint(i)->Set(p->x,p->y,p->z);
+
+				Vector3 * v = transformedNormals.GetVector(desc->UVertexIndex);
+				normalsOut.GetVector(i)->Set(v->x,v->y,v->z);
+			}
+			else
+			{
+				if(desc->BoneCount == 0)full.SetIdentity();
+				for(unsigned int b = 0; b < desc->BoneCount; b++)
+				{
+					Bone * bone = skeleton->GetBone(desc->BoneIndex[b]);
+
+					if(boneTransformed[desc->BoneIndex[b]] == 0)
+					{
+						bone->TempFullMatrix.SetTo(&bone->OffsetMatrix);
+
+						if(bone->Node->HasTarget())
+						{
+							const Transform * targetFull = bone->Node->GetFullTransform();
+							bone->TempFullMatrix.PreMultiply(targetFull->GetMatrix());
+						}
+
+						boneTransformed[desc->BoneIndex[b]] = 1;
+					}
+
+					temp.SetTo(&bone->TempFullMatrix);
+					temp.MultiplyByScalar(desc->Weight[b]);
+					if(b==0)full.SetTo(&temp);
+					else full.Add(&temp);
+				}
+
+				Point3 * p = positionsOut.GetPoint(i);
+				full.Transform(p);
+
+				Vector3 * v = normalsOut.GetVector(i);
+				full.Transform(v);
+
+				transformedPositions.GetPoint(desc->UVertexIndex)->Set(p->x,p->y,p->z);
+				transformedNormals.GetVector(desc->UVertexIndex)->Set(v->x,v->y,v->z);
+				positionTransformed[desc->UVertexIndex] = 1;
+			}
+		}
+	}
 }
 
 void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut)
@@ -118,26 +269,26 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 		NULL_CHECK_RTRN(vertexBoneMap,"SkinnedMesh3DAttributeTransformer::TransformPositions -> No valid vertex bone map found for sub mesh.");
 
 		unsigned int uniqueVertexCount = vertexBoneMap->GetUVertexCount();
-		if(uniqueVertexCount != vertexTransformedCount)
+		if(uniqueVertexCount != positionTransformedCount)
 		{
-			DestroyTransformedVertexFlagsArray();
-			bool createSuccess = CreateTransformedVertexFlagsArray(uniqueVertexCount);
+			DestroyTransformedPositionFlagsArray();
+			bool createSuccess = CreateTransformedPositionFlagsArray(uniqueVertexCount);
 
 			if(!createSuccess)
 			{
-				Debug::PrintError("SkinnedMesh3DAttributeTransformer::TransformPositions -> Unable to create vertex transform flags array.");
+				Debug::PrintError("SkinnedMesh3DAttributeTransformer::TransformPositions -> Unable to create position transform flags array.");
 				return;
 			}
 		}
 
-		ClearTransformedVertexFlagsArray();
+		ClearTransformedPositionFlagsArray();
 
 		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
 		{
 			VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
-			if(vertexTransformed[desc->UVertexIndex] == 1)
+			if(positionTransformed[desc->UVertexIndex] == 1)
 			{
-				Point3 * p = transformedVertices.GetPoint(desc->UVertexIndex);
+				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);
 				positionsOut.GetPoint(i)->Set(p->x,p->y,p->z);
 			}
 			else
@@ -169,8 +320,8 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 				Point3 * p = positionsOut.GetPoint(i);
 				full.Transform(p);
 
-				transformedVertices.GetPoint(desc->UVertexIndex)->Set(p->x,p->y,p->z);
-				vertexTransformed[desc->UVertexIndex] = 1;
+				transformedPositions.GetPoint(desc->UVertexIndex)->Set(p->x,p->y,p->z);
+				positionTransformed[desc->UVertexIndex] = 1;
 			}
 		}
 	}

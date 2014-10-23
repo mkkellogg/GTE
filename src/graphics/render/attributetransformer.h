@@ -18,6 +18,7 @@ class AttributeTransformer
 	AttributeTransformer();
     virtual ~AttributeTransformer();
 
+    virtual void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut, const Vector3Array& normalsIn, Vector3Array& normalsOut) = 0;
     virtual void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut) = 0;
     virtual void TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut) = 0;
 

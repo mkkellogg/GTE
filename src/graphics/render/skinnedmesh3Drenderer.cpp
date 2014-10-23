@@ -95,6 +95,7 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 				{
 					StandardAttributeSet attributes = StandardAttributes::CreateAttributeSet();
 					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Position);
+					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Normal);
 
 					SkinnedMesh3DAttributeTransformer *attributeTransformer = new SkinnedMesh3DAttributeTransformer(attributes);
 					NULL_CHECK_RTRN(attributeTransformer,"SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
