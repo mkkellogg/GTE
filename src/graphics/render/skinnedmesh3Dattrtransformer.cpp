@@ -22,7 +22,6 @@
 SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer() : AttributeTransformer()
 {
 	offset = 0;
-	skeleton = NULL;
 	vertexBoneMapIndex = -1;
 
 	boneTransformed = NULL;
@@ -39,7 +38,6 @@ SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer() : Attribu
 SkinnedMesh3DAttributeTransformer::SkinnedMesh3DAttributeTransformer(StandardAttributeSet attributes) : AttributeTransformer(attributes)
 {
 	offset = 0;
-	skeleton = NULL;
 	vertexBoneMapIndex = -1;
 	boneTransformed = NULL;
 
@@ -82,7 +80,7 @@ void SkinnedMesh3DAttributeTransformer::DestroyTransformedBoneFlagsArray()
 
 bool SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray()
 {
-	if(skeleton != NULL)
+	if(skeleton.IsValid())
 	{
 		boneTransformed = new unsigned char[skeleton->GetBoneCount()];
 		NULL_CHECK(boneTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneCache -> Unable to allocate flags array.", false);
@@ -151,7 +149,7 @@ void SkinnedMesh3DAttributeTransformer::ClearTransformedNormalFlagsArray()
 
 
 
-void SkinnedMesh3DAttributeTransformer::SetSkeleton(Skeleton * skeleton)
+void SkinnedMesh3DAttributeTransformer::SetSkeleton(SkeletonRef skeleton)
 {
 	this->skeleton = skeleton;
 	DestroyTransformedBoneFlagsArray();
@@ -169,7 +167,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 	positionsIn.CopyTo(&positionsOut);
 	normalsIn.CopyTo(&normalsOut);
 
-	if(skeleton != NULL && vertexBoneMapIndex >= 0)
+	if(skeleton.IsValid() && vertexBoneMapIndex >= 0)
 	{
 		ClearTransformedBoneFlagsArray();
 
@@ -180,7 +178,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		NULL_CHECK_RTRN(vertexBoneMap,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> No valid vertex bone map found for sub mesh.");
 
 		unsigned int uniqueVertexCount = vertexBoneMap->GetUVertexCount();
-		if(uniqueVertexCount != positionTransformedCount)
+		if(positionTransformedCount < 0 || uniqueVertexCount != (unsigned int)positionTransformedCount)
 		{
 			DestroyTransformedPositionFlagsArray();
 			bool createSuccess = CreateTransformedPositionFlagsArray(uniqueVertexCount);
@@ -258,7 +256,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 {
 	positionsIn.CopyTo(&positionsOut);
 
-	if(skeleton != NULL && vertexBoneMapIndex >= 0)
+	if(skeleton.IsValid() && vertexBoneMapIndex >= 0)
 	{
 		ClearTransformedBoneFlagsArray();
 
@@ -269,7 +267,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 		NULL_CHECK_RTRN(vertexBoneMap,"SkinnedMesh3DAttributeTransformer::TransformPositions -> No valid vertex bone map found for sub mesh.");
 
 		unsigned int uniqueVertexCount = vertexBoneMap->GetUVertexCount();
-		if(uniqueVertexCount != positionTransformedCount)
+		if(positionTransformedCount < 0 || uniqueVertexCount != (unsigned int)positionTransformedCount)
 		{
 			DestroyTransformedPositionFlagsArray();
 			bool createSuccess = CreateTransformedPositionFlagsArray(uniqueVertexCount);

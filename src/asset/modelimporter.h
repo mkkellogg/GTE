@@ -11,6 +11,11 @@ class UV2Array;
 class Skeleton;
 class VertexBoneMap;
 
+namespace Assimp
+{
+	class Importer;
+}
+
 #include "object/sceneobjectcomponent.h"
 #include "object/shadermanager.h"
 #include "object/enginetypes.h"
@@ -76,17 +81,23 @@ class ModelImporter
 		}
 	};
 
-	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,   std::vector<MaterialImportDescriptor>& materialImportDescriptors, Skeleton * skeleton, std::vector<SceneObjectRef>& createdSceneObjects);
+	Assimp::Importer * importer;
+
+	bool InitImporter();
+	const aiScene * LoadAIScene(const std::string& filePath);
+
+	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,   std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton, std::vector<SceneObjectRef>& createdSceneObjects);
 	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
 
-	Skeleton * LoadSkeleton(const aiScene& scene);
-	VertexBoneMap * ExpandIndexBoneMapping(Skeleton& skeleton, VertexBoneMap& indexBoneMap, const aiMesh& mesh);
-	void AddBoneMappings(Skeleton& skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap);
+	SkeletonRef LoadSkeleton(const aiScene& scene);
+	VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh);
+	void AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap);
 	unsigned CountBones(const aiScene& scene);
-	bool CreateAndMapNodeHierarchy(Skeleton * skeleton, const aiScene& scene);
+	bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene);
+	AnimationRef LoadAnimation (aiAnimation& animation, Skeleton& skeleton);
 
 	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback);
 	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback);
@@ -102,6 +113,8 @@ class ModelImporter
 	~ModelImporter();
 
 	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale);
+	AnimationRef LoadAnimation(const std::string& filePath);
+
 };
 
 #endif

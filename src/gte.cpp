@@ -378,7 +378,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		 if(!koopaRenderer.IsValid())
 			 koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
 
-		 Skeleton * skeleton = koopaRenderer->GetSkeleton();
+		 SkeletonRef skeleton = koopaRenderer->GetSkeleton();
 		 if(boneIndex < 0)
 		 {
 			 for(unsigned int i=0; i < skeleton->GetBoneCount(); i++)

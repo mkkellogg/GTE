@@ -2,7 +2,6 @@
 #define _ASSET_IMPORTER_H_
 
 //forward declarations
-class SceneObject;
 
 #include "object/engineobjectmanager.h"
 #include "object/enginetypes.h"
@@ -19,7 +18,8 @@ class AssetImporter
 	AssetImporter();
 	~AssetImporter();
 
-	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale);
+	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale) const;
+	AnimationRef LoadAnimation(const std::string& filePath) const;
 };
 
 #endif

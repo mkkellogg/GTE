@@ -21,15 +21,15 @@
 
 SkinnedMesh3DRenderer::SkinnedMesh3DRenderer()
 {
-	skeleton = NULL;
+
 }
 
 SkinnedMesh3DRenderer::~SkinnedMesh3DRenderer()
 {
-	SAFE_DELETE(skeleton);
+
 }
 
-void SkinnedMesh3DRenderer::SetSkeleton(Skeleton * skeleton)
+void SkinnedMesh3DRenderer::SetSkeleton(SkeletonRef skeleton)
 {
 	this->skeleton = skeleton;
 
@@ -48,7 +48,7 @@ void SkinnedMesh3DRenderer::SetSkeleton(Skeleton * skeleton)
 	}
 }
 
-Skeleton * SkinnedMesh3DRenderer::GetSkeleton()
+SkeletonRef SkinnedMesh3DRenderer::GetSkeleton()
 {
 	return skeleton;
 }

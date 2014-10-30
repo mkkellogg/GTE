@@ -12,11 +12,12 @@ class Matrix4x4;
 #include "geometry/point/point3array.h"
 #include "geometry/vector/vector3array.h"
 #include "graphics/stdattributes.h"
+#include "object/enginetypes.h"
 
 class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 {
 	float offset;
-	Skeleton * skeleton;
+	SkeletonRef skeleton;
 	int vertexBoneMapIndex;
 	unsigned char * boneTransformed;
 
@@ -51,7 +52,7 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	SkinnedMesh3DAttributeTransformer();
     ~SkinnedMesh3DAttributeTransformer();
 
-    void SetSkeleton(Skeleton * skeleton);
+    void SetSkeleton(SkeletonRef skeleton);
     void SetVertexBoneMapIndex(int index);
 
     void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut, const Vector3Array& normalsIn, Vector3Array& normalsOut);

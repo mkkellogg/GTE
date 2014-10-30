@@ -15,7 +15,7 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 
 	protected:
 
-	Skeleton * skeleton;
+	SkeletonRef skeleton;
 	SkinnedMesh3DAttributeTransformer meshTransformer;
 	Mesh3DRef mesh;
 	std::unordered_map<unsigned int, unsigned int>subMeshIndexMap;
@@ -25,8 +25,8 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 
 	public:
 
-	void SetSkeleton(Skeleton * skeleton);
-	Skeleton * GetSkeleton();
+	void SetSkeleton(SkeletonRef skeleton);
+	SkeletonRef GetSkeleton();
 	Mesh3DRef GetMesh();
 	SubMesh3DRef GetSubMesh(unsigned int index);
 	void SetMesh(Mesh3DRef mesh);

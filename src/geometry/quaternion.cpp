@@ -50,6 +50,14 @@ Quaternion::Quaternion(float x, float y, float z, float w)
     mData[3] = w;
 }
 
+void Quaternion::Set(float x, float y, float z, float w)
+{
+	mData[0] = x;
+	mData[1] = y;
+	mData[2] = z;
+	mData[3] = w;
+}
+
 float Quaternion::x() const
 {
     return mData[0];

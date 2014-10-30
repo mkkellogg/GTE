@@ -9,11 +9,14 @@ class Transform;
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include "object/engineobject.h"
 #include "skeletonnode.h"
 #include "util/tree.h"
 
-class Skeleton
+class Skeleton : public EngineObject
 {
+	friend class EngineObjectManager;
+
 	private:
 
 	std::unordered_map<std::string, unsigned int> boneNameMap;
@@ -22,12 +25,12 @@ class Skeleton
 	std::vector<VertexBoneMap *> vertexBoneMap;
 	Tree<SkeletonNode*> skeleton;
 
+	Skeleton(unsigned int boneCount);
+	~Skeleton();
+
 	void Destroy();
 
 	public :
-
-	Skeleton(unsigned int boneCount);
-    ~Skeleton();
 
     unsigned int GetBoneCount();
 

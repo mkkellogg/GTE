@@ -17,6 +17,8 @@ class Texture;
 class Light;
 class RawImage;
 class AttributeTransformer;
+class Skeleton;
+class Animation;
 
 #include <vector>
 #include <memory>
@@ -59,6 +61,8 @@ class EngineObjectManager
 	void DeleteMaterial(Material * material);
 	void DeleteTexture(Texture * texture);
 	void DeleteShader(Shader * shader);
+	void DeleteSkeleton(Skeleton * skeleton);
+	void DeleteAnimation(Animation * animation);
 
     public :
 
@@ -77,12 +81,19 @@ class EngineObjectManager
     void DestroyMesh3DRenderer(Mesh3DRendererRef renderer);
     SkinnedMesh3DRendererRef CreateSkinnedMesh3DRenderer();
     void DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
-
     SubMesh3DRef CreateSubMesh3D(StandardAttributeSet attributes);
     void DestroySubMesh3D(SubMesh3DRef mesh);
     SubMesh3DRendererRef CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer);
     SubMesh3DRendererRef CreateSubMesh3DRenderer();
     void DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer);
+
+    SkeletonRef CreateSkeleton(unsigned int boneCount);
+    SkeletonRef CloneSkeleton(SkeletonRef source);
+    void DestroySkeleton(SkeletonRef skeleton);
+
+    AnimationRef CreateAnimation(unsigned int boneCount, float duration, float ticksPerSecond);
+    void DestroyAnimation(AnimationRef animation);
+
     ShaderRef CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(ShaderRef shader);
     TextureRef CreateTexture(const char * sourcePath, TextureAttributes attributes);

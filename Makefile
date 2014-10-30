@@ -2,7 +2,7 @@ ASSIMP_LIB=../assimp/lib
 ASSIMP_INC=../assimp/include
 DEVIL_LIB=/usr/locl/lib
 DEVIL_INC=../DevIL/DevIL/include
-OPENGL_LIB=/usr/lib/nvidia-331-updates/ #this needs to be changed to your own OpenGl lib path
+OPENGL_LIB=/usr/lib/nvidia-331-updates/ #this needs to be changed to your own OpenGL lib path
 
 LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -L$(DEVIL_LIB) -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL 
 CFLAGS=-Isrc -I$(ASSIMP_INC) -I$(DEVIL_INC)  -std=c++11 -Wall 
@@ -38,7 +38,7 @@ UIOBJ= obj/debug.o
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
-ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o obj/sceneobjectskeletonnode.o
+ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o obj/sceneobjectskeletonnode.o obj/keyframeset.o obj/keyframe.o obj/translationkeyframe.o obj/scalekeyframe.o obj/rotationkeyframe.o obj/animation.o
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
@@ -225,6 +225,24 @@ obj/sceneobjectskeletonnode.o: $(ANIMATIONSRC)/sceneobjectskeletonnode.cpp $(ANI
 		
  obj/vertexbonemap.o: $(ANIMATIONSRC)/vertexbonemap.cpp $(ANIMATIONSRC)/vertexbonemap.h
 	$(CC) $(CFLAGS) -o obj/vertexbonemap.o -c $(ANIMATIONSRC)/vertexbonemap.cpp
+	
+ obj/keyframeset.o: $(ANIMATIONSRC)/keyframeset.cpp $(ANIMATIONSRC)/keyframeset.h
+	$(CC) $(CFLAGS) -o obj/keyframeset.o -c $(ANIMATIONSRC)/keyframeset.cpp
+	
+ obj/keyframe.o: $(ANIMATIONSRC)/keyframe.cpp $(ANIMATIONSRC)/keyframe.h
+	$(CC) $(CFLAGS) -o obj/keyframe.o -c $(ANIMATIONSRC)/keyframe.cpp
+	
+ obj/translationkeyframe.o: $(ANIMATIONSRC)/translationkeyframe.cpp $(ANIMATIONSRC)/translationkeyframe.h
+	$(CC) $(CFLAGS) -o obj/translationkeyframe.o -c $(ANIMATIONSRC)/translationkeyframe.cpp
+	
+ obj/scalekeyframe.o: $(ANIMATIONSRC)/scalekeyframe.cpp $(ANIMATIONSRC)/scalekeyframe.h
+	$(CC) $(CFLAGS) -o obj/scalekeyframe.o -c $(ANIMATIONSRC)/scalekeyframe.cpp
+	
+ obj/rotationkeyframe.o: $(ANIMATIONSRC)/rotationkeyframe.cpp $(ANIMATIONSRC)/rotationkeyframe.h
+	$(CC) $(CFLAGS) -o obj/rotationkeyframe.o -c $(ANIMATIONSRC)/rotationkeyframe.cpp
+	
+ obj/animation.o: $(ANIMATIONSRC)/animation.cpp $(ANIMATIONSRC)/animation.h
+	$(CC) $(CFLAGS) -o obj/animation.o -c $(ANIMATIONSRC)/animation.cpp
 	
 	
 	

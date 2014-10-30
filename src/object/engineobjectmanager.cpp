@@ -20,6 +20,8 @@
 #include "graphics/stdattributes.h"
 #include "graphics/texture/texture.h"
 #include "graphics/image/rawimage.h"
+#include "graphics/animation/skeleton.h"
+#include "graphics/animation/animation.h"
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
@@ -276,6 +278,64 @@ void EngineObjectManager::DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer)
 	Graphics * graphics = Graphics::Instance();
 	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteSubMesh3DRenderer -> renderer is NULL.");
 	graphics->DestroyMeshRenderer(renderer);
+}
+
+SkeletonRef EngineObjectManager::CreateSkeleton(unsigned int boneCount)
+{
+	Skeleton * skeleton = new Skeleton(boneCount);
+	NULL_CHECK(skeleton,"EngineObjectManager::CreateSkeleton -> Could not allocate new skeleton.", SkeletonRef::Null());
+
+	return SkeletonRef(skeleton, [=](Skeleton * skeleton)
+	{
+		DeleteSkeleton(skeleton);
+	});
+}
+
+SkeletonRef EngineObjectManager::CloneSkeleton(SkeletonRef source)
+{
+	SHARED_REF_CHECK(source,"EngineObjectManager::CloneSkeleton -> source is invalid.", SkeletonRef::Null());
+
+	Skeleton * skeleton = source->FullClone();
+	NULL_CHECK(skeleton,"EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonRef::Null());
+
+	return SkeletonRef(skeleton, [=](Skeleton * skeleton)
+	{
+		DeleteSkeleton(skeleton);
+	});
+}
+
+void EngineObjectManager::DestroySkeleton(SkeletonRef skeleton)
+{
+	skeleton.ForceDelete();
+}
+
+void EngineObjectManager::DeleteSkeleton(Skeleton * skeleton)
+{
+	NULL_CHECK_RTRN(skeleton, "EngineObjectManager::DeleteSkeleton -> skeleton is NULL.");
+	delete skeleton;
+}
+
+AnimationRef EngineObjectManager::CreateAnimation(unsigned int boneCount, float duration, float ticksPerSecond)
+{
+	Animation * animation = new Animation(boneCount,duration, ticksPerSecond);
+	NULL_CHECK(animation, "EngineObjectManager::CreateAnimation -> Could not create new Animation object.", AnimationRef::Null());
+	animation->SetObjectID(GetNextObjectID());
+
+	return AnimationRef(animation, [=](Animation * animation)
+	{
+		  DeleteAnimation(animation);
+	});
+}
+
+void EngineObjectManager::DestroyAnimation(AnimationRef animation)
+{
+	animation.ForceDelete();
+}
+
+void EngineObjectManager::DeleteAnimation(Animation * animation)
+{
+	NULL_CHECK_RTRN(animation, "EngineObjectManager::CreateAnimation -> animation is NULL.");
+	delete animation;
 }
 
 ShaderRef EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)

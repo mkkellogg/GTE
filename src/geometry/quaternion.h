@@ -20,6 +20,7 @@ class Quaternion
     Quaternion(const BaseVector4& v);
     Quaternion(const float* array);
     Quaternion(float x, float y, float z, float w);
+    void Set(float x, float y, float z, float w);
     float x() const;
     float y() const;
     float z() const;
