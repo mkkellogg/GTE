@@ -315,9 +315,9 @@ void EngineObjectManager::DeleteSkeleton(Skeleton * skeleton)
 	delete skeleton;
 }
 
-AnimationRef EngineObjectManager::CreateAnimation(unsigned int boneCount, float duration, float ticksPerSecond)
+AnimationRef EngineObjectManager::CreateAnimation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton)
 {
-	Animation * animation = new Animation(boneCount,duration, ticksPerSecond);
+	Animation * animation = new Animation(nodeCount, duration, ticksPerSecond, skeleton);
 	NULL_CHECK(animation, "EngineObjectManager::CreateAnimation -> Could not create new Animation object.", AnimationRef::Null());
 	animation->SetObjectID(GetNextObjectID());
 

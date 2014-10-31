@@ -4,6 +4,7 @@
 //forward declarations
 
 #include "object/engineobject.h"
+#include "object/enginetypes.h"
 #include "keyframeset.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
@@ -16,19 +17,20 @@ class Animation : public EngineObject
 	friend class ModelImporter;
 
 	KeyFrameSet * keyFrames;
-	unsigned int boneCount;
+	unsigned int nodeCount;
+	SkeletonRef skeleton;
 
 	float duration;
 	float ticksPerSecond;
 
-	Animation(unsigned int boneCount, float duration, float ticksPerSecond);
+	Animation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton);
 	~Animation();
 	void Destroy();
 	bool Init();
 
 	public:
 
-	KeyFrameSet * GetKeyFrameSet(unsigned int bone);
+	KeyFrameSet * GetKeyFrameSet(unsigned int node);
 	float GetDuration();
 	float GetTicksPerSecond();
 

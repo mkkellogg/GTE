@@ -56,6 +56,11 @@ unsigned int Skeleton::GetBoneCount()
 	return boneCount;
 }
 
+unsigned int Skeleton::GetNodeCount()
+{
+	return nodeList.size();
+}
+
 bool Skeleton::Init()
 {
 	Destroy();
@@ -108,6 +113,38 @@ Bone* Skeleton::GetBone(unsigned int boneIndex)
 	}
 
 	return bones + boneIndex;
+}
+
+void Skeleton::MapNode(std::string& name, unsigned int nodeIndex)
+{
+	nodeNameMap[name] = nodeIndex;
+}
+
+int Skeleton::GetNodeMapping(std::string& name)
+{
+	std::unordered_map<std::string,unsigned int>::const_iterator result = nodeNameMap.find(name);
+	if(result != nodeNameMap.end())
+	{
+		return (*result).second;
+	}
+
+	return -1;
+}
+
+SkeletonNode * Skeleton::GetNodeFromList(unsigned int nodeIndex)
+{
+	if(nodeIndex >= GetNodeCount())
+	{
+		Debug::PrintError("Skeleton::GetNodeFromList -> Index is out of range.");
+		return NULL;
+	}
+
+	return nodeList[nodeIndex];
+}
+
+void Skeleton::AddNodeToList(SkeletonNode * node)
+{
+	nodeList.push_back(node);
 }
 
 void Skeleton::AddVertexBoneMap(VertexBoneMap * map)
@@ -219,10 +256,12 @@ Skeleton * Skeleton::FullClone()
 			return NULL;
 		}
 
-
+		newSkeleton->nodeNameMap = nodeNameMap;
+		newSkeleton->nodeList.resize(nodeList.size());
 
 		bool cloneTreeSuccess = true;
-		skeleton.SetTraversalCallback([&cloneTreeSuccess, &newNodeMap, newSkeleton](Tree<SkeletonNode *>::TreeNode * node) -> bool
+		Skeleton * thisSkeleton = this;
+		skeleton.SetTraversalCallback([&cloneTreeSuccess, &newNodeMap, newSkeleton, thisSkeleton](Tree<SkeletonNode *>::TreeNode * node) -> bool
 		{
 			SkeletonNode * clonedSkeletonNode = NULL;
 			if(node != NULL && node->Data != NULL)
@@ -239,6 +278,9 @@ Skeleton * Skeleton::FullClone()
 			Tree<SkeletonNode *>::TreeNode * clonedTreeNode = newNodeMap[node];
 			clonedTreeNode->Data = clonedSkeletonNode;
 
+			int targetListIndex = thisSkeleton->GetNodeMapping(clonedSkeletonNode->Name);
+			if(targetListIndex >= 0)newSkeleton->nodeList[targetListIndex] = clonedSkeletonNode;
+
 			Tree<SkeletonNode *>::TreeNode * originalParent = clonedTreeNode->GetParent();
 			if(originalParent != NULL)
 			{
@@ -246,7 +288,7 @@ Skeleton * Skeleton::FullClone()
 				clonedParentNode->AddChild(clonedTreeNode);
 			}
 
-			int boneIndex = node->Data->GetBoneIndex();
+			int boneIndex = node->Data->BoneIndex;
 			if(boneIndex >= 0)
 			{
 				newSkeleton->GetBone(boneIndex)->Node = clonedSkeletonNode;

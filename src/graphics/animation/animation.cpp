@@ -2,17 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "object/enginetypes.h"
 #include "animation.h"
 #include "global/global.h"
 #include "ui/debug.h"
 #include <string>
 
-Animation::Animation(unsigned int boneCount, float duration, float ticksPerSecond)
+Animation::Animation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton)
 {
 	keyFrames = NULL;
-	this->boneCount = boneCount;
+
+	this->nodeCount = nodeCount;
 	this->duration = duration;
 	this->ticksPerSecond = ticksPerSecond;
+	this->skeleton = skeleton;
 }
 
 Animation::~Animation()
@@ -33,23 +36,23 @@ bool Animation::Init()
 {
 	Destroy();
 
-	if(boneCount == 0)return true;
+	if(nodeCount == 0)return true;
 
-	keyFrames = new KeyFrameSet[boneCount];
+	keyFrames = new KeyFrameSet[nodeCount];
 	NULL_CHECK(keyFrames,"Animation::Init -> Could not allocate key frames parent array", false);
 
 	return true;
 }
 
-KeyFrameSet * Animation::GetKeyFrameSet(unsigned int bone)
+KeyFrameSet * Animation::GetKeyFrameSet(unsigned int node)
 {
-	if(bone >= boneCount)
+	if(node >= nodeCount)
 	{
-		Debug::PrintError("Animation::GetKeyFrameSet -> Bone index is out of range.");
+		Debug::PrintError("Animation::GetKeyFrameSet -> Node index is out of range.");
 		return NULL;
 	}
 
-	return keyFrames + bone;
+	return keyFrames + node;
 }
 
 float Animation::GetDuration()

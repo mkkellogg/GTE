@@ -8,9 +8,9 @@
 #include "ui/debug.h"
 #include <string>
 
-SceneObjectSkeletonNode::SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex) : SkeletonNode(boneIndex)
+SceneObjectSkeletonNode::SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex, const std::string& name) : SkeletonNode(boneIndex, name)
 {
-	this->target = target;
+	this->Target = target;
 }
 
 SceneObjectSkeletonNode::~SceneObjectSkeletonNode()
@@ -20,34 +20,24 @@ SceneObjectSkeletonNode::~SceneObjectSkeletonNode()
 
 const Transform * SceneObjectSkeletonNode::GetFullTransform() const
 {
-	const Transform& ref = target->GetProcessingTransform();
+	const Transform& ref = Target->GetProcessingTransform();
 	return &ref;
 }
 
 Transform * SceneObjectSkeletonNode::GetLocalTransform()
 {
-	Transform& ref = target->GetLocalTransform();
+	Transform& ref = Target->GetLocalTransform();
 	return &ref;
 }
 
 bool SceneObjectSkeletonNode::HasTarget() const
 {
-	return target.IsValid();
-}
-
-SceneObjectRef SceneObjectSkeletonNode::GetTarget()
-{
-	return target;
-}
-
-void SceneObjectSkeletonNode::SetTarget(SceneObjectRef target)
-{
-	this->target = target;
+	return Target.IsValid();
 }
 
 SkeletonNode * SceneObjectSkeletonNode::FullClone() const
 {
-	SkeletonNode * newNode = new SceneObjectSkeletonNode(target, boneIndex);
+	SkeletonNode * newNode = new SceneObjectSkeletonNode(Target, BoneIndex, Name);
 	NULL_CHECK(newNode,"SceneObjectSkeletonNode::FullClone -> Could not allocate new node",NULL);
 
 	return newNode;

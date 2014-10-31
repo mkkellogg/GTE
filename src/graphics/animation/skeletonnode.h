@@ -9,22 +9,19 @@ class Bone;
 
 class SkeletonNode
 {
-	protected:
-
-	int boneIndex;
-
 	public:
+
+	int BoneIndex;
+	std::string Name;
 
 	virtual const Transform * GetFullTransform() const = 0;
 	virtual Transform * GetLocalTransform() = 0;
 	virtual bool HasTarget() const = 0;
 
-	SkeletonNode(int boneIndex);
+	SkeletonNode(int boneIndex, const std::string& name);
 	virtual ~SkeletonNode();
 
 	virtual SkeletonNode * FullClone() const = 0;
-
-	int GetBoneIndex();
 };
 
 #endif

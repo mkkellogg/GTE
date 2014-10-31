@@ -6,12 +6,14 @@
 #include <GL/glut.h>
 
 #include <memory>
+#include "asset/assetimporter.h"
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/animation/skeleton.h"
+#include "graphics/animation/animation.h"
+#include "graphics/animation/animationmanager.h"
 #include "graphics/animation/bone.h"
-#include "asset/assetimporter.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
@@ -22,6 +24,10 @@
 #include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
+#include "graphics/color/color4.h"
+#include "graphics/color/color4array.h"
+#include "graphics/uv/uv2.h"
+#include "graphics/uv/uv2array.h"
 #include "geometry/matrix4x4.h"
 #include "base/basevector4.h"
 #include "geometry/transform.h"
@@ -29,10 +35,6 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"
-#include "graphics/color/color4.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2.h"
-#include "graphics/uv/uv2array.h"
 #include "ui/debug.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
@@ -314,6 +316,14 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 		koopaRoot->GetLocalTransform().Translate(0,0,-3,false);
 		koopaRoot->GetLocalTransform().Scale(.35, .35, .35, true);
+
+		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/anim/koopa@walk.fbx");
+
+		koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
+		AnimationManager * animManager = new AnimationManager();
+		bool compatible = animManager->IsCompatible(koopaRenderer, koopaWalk);
+		if(compatible)printf("animation is compatible!! :)\n");
+		else printf("animation is not compatible! boooo!\n");
 
 		SceneObjectRef lightObject;
 		LightRef light;

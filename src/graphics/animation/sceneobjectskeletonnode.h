@@ -11,19 +11,16 @@ class Transform;
 
 class SceneObjectSkeletonNode : public SkeletonNode
 {
-	SceneObjectRef target;
-
 	public :
+
+	SceneObjectRef Target;
 
 	const Transform * GetFullTransform() const;
 	Transform * GetLocalTransform();
 	bool HasTarget() const;
 
-	SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex);
+	SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex, const std::string& name);
      ~SceneObjectSkeletonNode();
-
-     void SetTarget(SceneObjectRef target);
-     SceneObjectRef GetTarget();
 
      SkeletonNode * FullClone() const;
 };

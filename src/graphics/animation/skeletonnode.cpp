@@ -11,9 +11,10 @@
 #include "global/global.h"
 #include "ui/debug.h"
 
-SkeletonNode::SkeletonNode(int boneIndex)
+SkeletonNode::SkeletonNode(int boneIndex, const std::string& name)
 {
-	this->boneIndex = boneIndex;
+	this->BoneIndex = boneIndex;
+	this->Name = name;
 }
 
 SkeletonNode::~SkeletonNode()
@@ -21,7 +22,3 @@ SkeletonNode::~SkeletonNode()
 
 }
 
-int SkeletonNode::GetBoneIndex()
-{
-	return boneIndex;
-}

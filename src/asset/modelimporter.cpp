@@ -296,7 +296,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 						{
 							//const float * data = sceneObject->GetLocalTransform().GetMatrix()->GetDataPtr();
 							//printf("mapped: %s [%f,%f,%f,%f]\n",node.mName.C_Str(), data[0], data[5], data[10], data[15]);
-							soskNode->SetTarget(sceneObject);
+							soskNode->Target = sceneObject;
 						}
 					}
 				}
@@ -679,7 +679,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	VertexBoneMap * fullBoneMap = new VertexBoneMap(mesh.mNumFaces * 3, mesh.mNumVertices);
 	if(fullBoneMap == NULL)
 	{
-		Debug::PrintError("ModelImporter::ExpandIndexBoneMapping -> Could not allocate vertexBoneMap.");
+		Debug::PrintError("ModelImporter::ExpandIndexBoneMapping -> Could not allocate vertex bone map.");
 		return NULL;
 	}
 
@@ -780,7 +780,7 @@ unsigned ModelImporter::CountBones(const aiScene& scene)
 
 bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene)
 {
-	SceneObjectSkeletonNode * skeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), -1);
+	SceneObjectSkeletonNode * skeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), -1, "");
 	if(skeletonNode == NULL)
 	{
 		Debug::PrintError("ModelImporter::ExpandIndexBoneMapping -> Could not allocate skeleton root node.");
@@ -801,13 +801,16 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 		std::string boneName(node.mName.C_Str());
 		int mappedBoneIndex = skeletonPtr->GetBoneMapping(boneName);
 
-		SceneObjectSkeletonNode * childSkeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), mappedBoneIndex);
+		SceneObjectSkeletonNode * childSkeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), mappedBoneIndex, boneName);
 		if(childSkeletonNode == NULL)
 		{
 			Debug::PrintError("ModelImporter::ExpandIndexBoneMapping -> Could not allocate skeleton child node.");
 			success  = false;
 			return false;
 		}
+
+		skeletonPtr->MapNode(boneName, skeletonPtr->GetNodeCount());
+		skeletonPtr->AddNodeToList(childSkeletonNode);
 
 		Tree<SkeletonNode*>::TreeNode * childNode = skeletonPtr->AddChild(lastNode, childSkeletonNode);
 		if(childNode == NULL)
@@ -829,15 +832,16 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	return success;
 }
 
-AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Skeleton& skeleton)
+AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef skeleton)
 {
 	EngineObjectManager *objectManager = EngineObjectManager::Instance();
-	unsigned int boneCount = skeleton.GetBoneCount();
+	unsigned int boneCount = skeleton->GetBoneCount();
+	unsigned int nodeCount = skeleton->GetNodeCount();
 
 	float duration = (float)animation.mDuration;
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
 
-	AnimationRef animationRef = objectManager->CreateAnimation(boneCount, duration, ticksPerSecond);
+	AnimationRef animationRef = objectManager->CreateAnimation(nodeCount, duration, ticksPerSecond, skeleton);
 	if(!animationRef.IsValid())
 	{
 		Debug::PrintError("ModelImporter::LoadAnimation -> Unable to create Animation.");
@@ -857,7 +861,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Skeleton& ske
 		aiNodeAnim * nodeAnim = animation.mChannels[n];
 		std::string nodeName(nodeAnim->mNodeName.C_Str());
 
-		unsigned int boneIndex = skeleton.GetBoneMapping(nodeName);
+		unsigned int nodeIndex = skeleton->GetNodeMapping(nodeName);
 
 		for(unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++)
 		{
@@ -868,7 +872,13 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Skeleton& ske
 			keyFrame.RealTime = (float)quatKey.mTime;
 			keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w);
 
-			animationRef->GetKeyFrameSet(boneIndex)->RotationKeyFrames.push_back(keyFrame);
+			KeyFrameSet * keyFrameSet = animationRef->GetKeyFrameSet(nodeIndex);
+			if(keyFrameSet == NULL)
+			{
+				printf("key frame set is null @ %d for bone %s\n", nodeIndex, nodeName.c_str());
+			}
+
+			keyFrameSet->RotationKeyFrames.push_back(keyFrame);
 		}
 
 		for(unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++)
@@ -880,7 +890,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Skeleton& ske
 			keyFrame.RealTime = (float)vectorKey.mTime;
 			keyFrame.Scale.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
 
-			animationRef->GetKeyFrameSet(boneIndex)->ScaleKeyFrames.push_back(keyFrame);
+			animationRef->GetKeyFrameSet(nodeIndex)->ScaleKeyFrames.push_back(keyFrame);
 		}
 
 		for(unsigned int t = 0; t < nodeAnim->mNumPositionKeys; t++)
@@ -892,7 +902,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Skeleton& ske
 			keyFrame.RealTime = (float)vectorKey.mTime;
 			keyFrame.Translation.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
 
-			animationRef->GetKeyFrameSet(boneIndex)->TranslationKeyFrames.push_back(keyFrame);
+			animationRef->GetKeyFrameSet(nodeIndex)->TranslationKeyFrames.push_back(keyFrame);
 		}
 	}
 
@@ -916,6 +926,7 @@ AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
 	}
 
 	SkeletonRef skeleton = LoadSkeleton(*scene);
+
 	if(!skeleton.IsValid())
 	{
 		Debug::PrintError("ModelImporter::LoadAnimation -> Model file does not contain skeleton.");
@@ -928,7 +939,7 @@ AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
 		return AnimationRef::Null();
 	}
 
-	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), skeleton.GetRef());
+	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), skeleton);
 
 	return animation;
 }

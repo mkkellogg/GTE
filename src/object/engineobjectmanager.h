@@ -91,7 +91,7 @@ class EngineObjectManager
     SkeletonRef CloneSkeleton(SkeletonRef source);
     void DestroySkeleton(SkeletonRef skeleton);
 
-    AnimationRef CreateAnimation(unsigned int boneCount, float duration, float ticksPerSecond);
+    AnimationRef CreateAnimation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton);
     void DestroyAnimation(AnimationRef animation);
 
     ShaderRef CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);

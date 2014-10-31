@@ -97,7 +97,7 @@ class ModelImporter
 	void AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap);
 	unsigned CountBones(const aiScene& scene);
 	bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene);
-	AnimationRef LoadAnimation (aiAnimation& animation, Skeleton& skeleton);
+	AnimationRef LoadAnimation (aiAnimation& animation, SkeletonRef skeleton);
 
 	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback);
 	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback);
