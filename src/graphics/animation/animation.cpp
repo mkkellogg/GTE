@@ -64,3 +64,8 @@ float Animation::GetTicksPerSecond()
 {
 	return ticksPerSecond;
 }
+
+SkeletonRef Animation::GetSkeleton()
+{
+	return skeleton;
+}

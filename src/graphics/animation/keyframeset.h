@@ -13,8 +13,8 @@ class KeyFrameSet
 	public:
 
 	std::vector<TranslationKeyFrame> TranslationKeyFrames;
-	std::vector<RotationKeyFrame> RotationKeyFrames;
 	std::vector<ScaleKeyFrame> ScaleKeyFrames;
+	std::vector<RotationKeyFrame> RotationKeyFrames;
 
 	KeyFrameSet();
     ~KeyFrameSet();

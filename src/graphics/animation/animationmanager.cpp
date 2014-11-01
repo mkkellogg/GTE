@@ -21,30 +21,36 @@ AnimationManager::~AnimationManager()
 
 }
 
-bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation)
+bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation)
 {
-	SHARED_REF_CHECK(meshRenderer, "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false);
+	SHARED_REF_CHECK(skeleton, "AnimationManager::IsCompatible -> Skeleton is not valid.", false);
 	SHARED_REF_CHECK(animation, "AnimationManager::IsCompatible -> Animation is not valid.", false);
 
-	SkeletonRef meshSkeleton = meshRenderer->GetSkeleton();
-	SkeletonRef animationSkeleton = meshRenderer->GetSkeleton();
+	SkeletonRef animationSkeleton = animation->GetSkeleton();
 
-	SHARED_REF_CHECK(meshSkeleton, "AnimationManager::IsCompatible -> Mesh renderer does not have a valid skeleton.", false);
-	SHARED_REF_CHECK(animationSkeleton, "AnimationManager::IsCompatible -> Animation renderer does not have a valid skeleton.", false);
+	SHARED_REF_CHECK(animationSkeleton, "AnimationManager::IsCompatible -> Animation does not have a valid skeleton.", false);
 
-	unsigned int meshSkeletonNodeCount = meshSkeleton->GetNodeCount();
-	if(meshSkeletonNodeCount != animationSkeleton->GetNodeCount())
+	unsigned int skeletonNodeCount = skeleton->GetNodeCount();
+	for(unsigned int n = 0; n < skeletonNodeCount && n < animationSkeleton->GetNodeCount(); n++)
 	{
-		std::string msg = std::string("AnimationManager::IsCompatible -> Mismatched node count: ") + std::to_string(meshSkeletonNodeCount);
+		SkeletonNode * meshNode = skeleton->GetNodeFromList(n);
+		SkeletonNode * animationNode = animationSkeleton->GetNodeFromList(n);
+
+		printf("%s <==> %s\n", meshNode->Name.c_str(), animationNode->Name.c_str());
+	}
+
+	if(skeletonNodeCount != animationSkeleton->GetNodeCount())
+	{
+		std::string msg = std::string("AnimationManager::IsCompatible -> Mismatched node count: ") + std::to_string(skeletonNodeCount);
 		msg += std::string(", ") + std::to_string(animationSkeleton->GetNodeCount());
 		Debug::PrintError(msg);
 
 		return false;
 	}
 
-	for(unsigned int n = 0; n < meshSkeletonNodeCount; n++)
+	for(unsigned int n = 0; n < skeletonNodeCount; n++)
 	{
-		SkeletonNode * meshNode = meshSkeleton->GetNodeFromList(n);
+		SkeletonNode * meshNode = skeleton->GetNodeFromList(n);
 		SkeletonNode * animationNode = animationSkeleton->GetNodeFromList(n);
 
 		if(meshNode->Name != animationNode->Name)
@@ -55,6 +61,14 @@ bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, Anima
 	}
 
 	return true;
+}
+
+bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation)
+{
+	SHARED_REF_CHECK(meshRenderer, "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false);
+	SHARED_REF_CHECK(meshRenderer->GetSkeleton(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false);
+
+	return IsCompatible(meshRenderer->GetSkeleton(), animation);
 }
 
 

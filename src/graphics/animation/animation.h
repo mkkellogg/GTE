@@ -33,6 +33,7 @@ class Animation : public EngineObject
 	KeyFrameSet * GetKeyFrameSet(unsigned int node);
 	float GetDuration();
 	float GetTicksPerSecond();
+	SkeletonRef GetSkeleton();
 
 };
 

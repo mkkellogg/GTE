@@ -103,6 +103,8 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 		return NULL;
 	}
 
+	//importer->SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
+
 	// read the model file in from disk
 	scene = importer->ReadFile(filePath, aiProcessPreset_TargetRealtime_Quality  );
 
@@ -835,7 +837,6 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef skeleton)
 {
 	EngineObjectManager *objectManager = EngineObjectManager::Instance();
-	unsigned int boneCount = skeleton->GetBoneCount();
 	unsigned int nodeCount = skeleton->GetNodeCount();
 
 	float duration = (float)animation.mDuration;
@@ -863,6 +864,32 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 
 		unsigned int nodeIndex = skeleton->GetNodeMapping(nodeName);
 
+		printf("animation has node: %s\n", nodeName.c_str());
+
+		for(unsigned int t = 0; t < nodeAnim->mNumPositionKeys; t++)
+		{
+			aiVectorKey& vectorKey = *(nodeAnim->mPositionKeys + t);
+
+			TranslationKeyFrame keyFrame;
+			keyFrame.NormalizedTime = (float)vectorKey.mTime / duration;
+			keyFrame.RealTime = (float)vectorKey.mTime;
+			keyFrame.Translation.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
+
+			animationRef->GetKeyFrameSet(nodeIndex)->TranslationKeyFrames.push_back(keyFrame);
+		}
+
+		for(unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++)
+		{
+			aiVectorKey& vectorKey = *(nodeAnim->mScalingKeys + s);
+
+			ScaleKeyFrame keyFrame;
+			keyFrame.NormalizedTime = (float)vectorKey.mTime / duration;
+			keyFrame.RealTime = (float)vectorKey.mTime;
+			keyFrame.Scale.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
+
+			animationRef->GetKeyFrameSet(nodeIndex)->ScaleKeyFrames.push_back(keyFrame);
+		}
+
 		for(unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++)
 		{
 			aiQuatKey& quatKey = *(nodeAnim->mRotationKeys + r);
@@ -879,30 +906,6 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 			}
 
 			keyFrameSet->RotationKeyFrames.push_back(keyFrame);
-		}
-
-		for(unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++)
-		{
-			aiVectorKey& vectorKey = *(nodeAnim->mScalingKeys + s);
-
-			ScaleKeyFrame keyFrame;
-			keyFrame.NormalizedTime = (float)vectorKey.mTime / duration;
-			keyFrame.RealTime = (float)vectorKey.mTime;
-			keyFrame.Scale.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
-
-			animationRef->GetKeyFrameSet(nodeIndex)->ScaleKeyFrames.push_back(keyFrame);
-		}
-
-		for(unsigned int t = 0; t < nodeAnim->mNumPositionKeys; t++)
-		{
-			aiVectorKey& vectorKey = *(nodeAnim->mPositionKeys + t);
-
-			TranslationKeyFrame keyFrame;
-			keyFrame.NormalizedTime = (float)vectorKey.mTime / duration;
-			keyFrame.RealTime = (float)vectorKey.mTime;
-			keyFrame.Translation.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
-
-			animationRef->GetKeyFrameSet(nodeIndex)->TranslationKeyFrames.push_back(keyFrame);
 		}
 	}
 

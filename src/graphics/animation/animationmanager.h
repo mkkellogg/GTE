@@ -17,7 +17,9 @@ class AnimationManager
     ~AnimationManager();
 
     bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation);
+    bool IsCompatible(SkeletonRef skeleton, AnimationRef animation);
 
+   // AnimationInstanceRef CreateAnimationInstance()
 };
 
 #endif
