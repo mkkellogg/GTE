@@ -14,7 +14,7 @@ class TranslationKeyFrame : public KeyFrame
 	Vector3 Translation;
 
 	TranslationKeyFrame();
-	TranslationKeyFrame(float normalizedTime, float realTime, const Vector3& translation);
+	TranslationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Vector3& translation);
     ~TranslationKeyFrame();
 };
 

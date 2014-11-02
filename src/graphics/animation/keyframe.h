@@ -10,8 +10,10 @@ class KeyFrame
 	float NormalizedTime;
 	float RealTime;
 
+	float RealTimeTicks;
+
 	KeyFrame();
-	KeyFrame(float normalizedTime, float realTime);
+	KeyFrame(float normalizedTime, float realTime, float realTimeTicks);
     ~KeyFrame();
 };
 

@@ -204,6 +204,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
 		{
 			VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
+
 			if(positionTransformed[desc->UVertexIndex] == 1)
 			{
 				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);

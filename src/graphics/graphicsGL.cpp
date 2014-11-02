@@ -9,6 +9,7 @@
  
 #include "graphicsGL.h"
 #include "graphics/screendesc.h"
+#include "graphics/animation/animationmanager.h"
 #include "render/material.h"
 #include "ui/debug.h"
 #include "shader/shaderGL.h"
@@ -382,6 +383,7 @@ void GraphicsGL::_glutDisplayFunc()
 	_thisInstance->PreProcessScene();
 
 	_instanceCallbacks->OnUpdate(_thisInstance);
+	AnimationManager::Instance()->Drive();
 
 	// update timer before rendering scene so that calls to Time::GetDeltaTime() within
 	// _instanceCallbacks->OnUpdate reflect rendering time

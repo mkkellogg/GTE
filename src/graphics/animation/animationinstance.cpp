@@ -13,15 +13,20 @@
 
 AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
 {
-	this->target = target;
-	this->animation = animation;
+	this->Target = target;
+	this->Animation = animation;
 
-	stateCount = 0;
-	frameStates = NULL;
+	StateCount = 0;
+	FrameStates = NULL;
 
-	duration = 0;
-	startTime = 0;
-	lastTime = 0;
+	Duration = 0;
+	Progress = 0;
+
+	DurationTicks = 0L;
+	ProgressTicks = 0L;
+
+	Weight = 1;
+	Playing = false;
 }
 
 AnimationInstance::~AnimationInstance()
@@ -31,42 +36,79 @@ AnimationInstance::~AnimationInstance()
 
 void AnimationInstance::Destroy()
 {
-	if(frameStates != NULL)
+	if(FrameStates != NULL)
 	{
-		delete[] frameStates;
-		frameStates = NULL;
+		delete[] FrameStates;
+		FrameStates = NULL;
 	}
 }
 
 bool AnimationInstance::Init()
 {
-	SHARED_REF_CHECK(target, "AnimationInstance::Init -> Animation target is invalid.", false);
-	SHARED_REF_CHECK(animation, "AnimationInstance::Init -> Animation is invalid.", false);
+	SHARED_REF_CHECK(Target, "AnimationInstance::Init -> Animation target is invalid.", false);
+	SHARED_REF_CHECK(Animation, "AnimationInstance::Init -> Animation is invalid.", false);
 
 	Destroy();
 
-	unsigned int nodeCount = target->GetNodeCount();
+	unsigned int nodeCount = Target->GetNodeCount();
 	if(nodeCount <= 0)return true;
 
-	frameStates = new FrameState[nodeCount];
+	FrameStates = new FrameState[nodeCount];
 	for(unsigned int n = 0; n < nodeCount; n++)
 	{
 		FrameState state;
-		frameStates[n] = state;
+		FrameStates[n] = state;
 	}
-	stateCount = nodeCount;
+	StateCount = nodeCount;
+
+	DurationTicks = Animation->GetDurationTicks();
+	Duration = DurationTicks / Animation->GetTicksPerSecond();
+
+	Progress = 0;
+	ProgressTicks = 0L;
 
 	return true;
 }
 
-AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int nodeIndex)
+void AnimationInstance::Reset()
 {
-	if(nodeIndex >= stateCount)
+	for(unsigned int s = 0; s < StateCount; s++)
 	{
-		Debug::PrintError("AnimationInstance::GetFrameState -> Node index is out of bounds.");
+		FrameStates[s].Reset();
+	}
+
+	Progress = 0;
+	ProgressTicks = 0L;
+}
+
+AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int stateIndex)
+{
+	if(stateIndex >= StateCount)
+	{
+		Debug::PrintError("AnimationInstance::GetFrameState -> State index is out of bounds.");
 		return NULL;
 	}
 
-	return frameStates + nodeIndex;
+	return FrameStates + stateIndex;
 }
 
+bool AnimationInstance::IsPlaying()
+{
+	return Playing;
+}
+
+void AnimationInstance::Play()
+{
+	Playing = true;
+}
+
+void AnimationInstance::Stop()
+{
+	Playing = false;
+	Reset();
+}
+
+void AnimationInstance::Pause()
+{
+	Playing = false;
+}

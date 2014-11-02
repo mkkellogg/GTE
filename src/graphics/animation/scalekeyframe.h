@@ -14,7 +14,7 @@ class ScaleKeyFrame : public KeyFrame
 	Vector3 Scale;
 
 	ScaleKeyFrame();
-	ScaleKeyFrame(float normalizedTime, float realTime, const Vector3& scale);
+	ScaleKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Vector3& scale);
     ~ScaleKeyFrame();
 };
 

@@ -9,6 +9,9 @@
 
 class AnimationInstance
 {
+	friend class EngineObjectManager;
+	friend class AnimationManager;
+
 	public:
 
 	class FrameState
@@ -25,29 +28,47 @@ class AnimationInstance
 			ScaleKeyIndex = 0;
 			RotationKeyIndex = 0;
 		}
+
+		void Reset()
+		{
+			TranslationKeyIndex = 0;
+			ScaleKeyIndex = 0;
+			RotationKeyIndex = 0;
+		}
 	};
 
 	private:
 
-	SkeletonRef target;
-	AnimationRef animation;
+	SkeletonRef Target;
+	AnimationRef Animation;
 
-	unsigned int stateCount;
-	FrameState * frameStates;
+	unsigned int StateCount;
+	FrameState * FrameStates;
 
-	float duration;
-	float startTime;
-	float lastTime;
+	float Duration;
+	float Progress;
 
+	float DurationTicks;
+	float ProgressTicks;
+
+	float Weight;
+	bool Playing;
+
+	AnimationInstance(SkeletonRef target, AnimationRef animation);
+	 ~AnimationInstance();
 	void Destroy();
 
 	public:
 
-	AnimationInstance(SkeletonRef target, AnimationRef animation);
-    ~AnimationInstance();
-
     bool Init();
-    FrameState * GetFrameState(unsigned int nodeIndex);
+    void Reset();
+
+    FrameState * GetFrameState(unsigned int stateIndex);
+
+    bool IsPlaying();
+    void Play();
+    void Stop();
+    void Pause();
 };
 
 #endif

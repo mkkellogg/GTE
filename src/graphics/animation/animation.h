@@ -20,10 +20,10 @@ class Animation : public EngineObject
 	unsigned int nodeCount;
 	SkeletonRef skeleton;
 
-	float duration;
+	float durationTicks;
 	float ticksPerSecond;
 
-	Animation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton);
+	Animation(unsigned int nodeCount, float durationTicks, float ticksPerSecond, SkeletonRef skeleton);
 	~Animation();
 	void Destroy();
 	bool Init();
@@ -31,7 +31,7 @@ class Animation : public EngineObject
 	public:
 
 	KeyFrameSet * GetKeyFrameSet(unsigned int node);
-	float GetDuration();
+	float GetDurationTicks();
 	float GetTicksPerSecond();
 	SkeletonRef GetSkeleton();
 

@@ -12,6 +12,7 @@ class KeyFrameSet
 {
 	public:
 
+	bool Used;
 	std::vector<TranslationKeyFrame> TranslationKeyFrames;
 	std::vector<ScaleKeyFrame> ScaleKeyFrames;
 	std::vector<RotationKeyFrame> RotationKeyFrames;

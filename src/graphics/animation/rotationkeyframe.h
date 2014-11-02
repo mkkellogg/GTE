@@ -14,7 +14,7 @@ class RotationKeyFrame : public KeyFrame
 	Quaternion Rotation;
 
 	RotationKeyFrame();
-	RotationKeyFrame(float normalizedTime, float realTime, const Quaternion& rotation);
+	RotationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Quaternion& rotation);
     ~RotationKeyFrame();
 };
 

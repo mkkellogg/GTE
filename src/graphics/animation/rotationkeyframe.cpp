@@ -10,7 +10,7 @@ RotationKeyFrame::RotationKeyFrame() : KeyFrame()
 
 }
 
-RotationKeyFrame::RotationKeyFrame(float normalizedTime, float realTime,  const Quaternion& rotation) : KeyFrame(normalizedTime, realTime)
+RotationKeyFrame::RotationKeyFrame(float normalizedTime, float realTime,  float realTimeTicks, const Quaternion& rotation) : KeyFrame(normalizedTime, realTime, realTimeTicks)
 {
 	this->Rotation = rotation;
 }

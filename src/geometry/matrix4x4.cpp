@@ -86,7 +86,7 @@ void Matrix4x4::SetTo(const Matrix4x4 * src)
  */
 void Matrix4x4::SetTo(const float * srcData)
 {
-	NULL_CHECK_RTRN(srcData,"Matrix4x4::Set -> srcData is NULL");
+	NULL_CHECK_RTRN(srcData,"Matrix4x4::SetTo -> srcData is NULL");
 	memcpy(data, srcData, sizeof(float) * DATA_SIZE);
 }
 
@@ -563,7 +563,7 @@ void Matrix4x4::Translate(const Vector3 * vector)
 
     float x = vector->x;
     float y = vector->y;
-    float z = vector->x;
+    float z = vector->z;
     Translate(x,y,z);
 }
 
@@ -729,6 +729,15 @@ void Matrix4x4::PreRotate(float x, float y, float z, float a)
 void Matrix4x4::SetRotateEuler(float x, float y, float z)
 {
     SetRotateEuler(data, x, y, z);
+}
+
+/*
+ * Set the 4x4 matrix [m] to be a rotation matrix, around axis [x], [y], [z] by [a] degrees
+ */
+void Matrix4x4::SetRotate(Matrix4x4 * m, float x, float y, float z, float a)
+{
+	NULL_CHECK_RTRN(m, "Matrix4x4::SetRotate -> m is NULL");
+	SetRotate(m->data,x,y,z,a);
 }
 
 /*

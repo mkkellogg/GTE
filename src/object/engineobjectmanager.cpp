@@ -22,6 +22,7 @@
 #include "graphics/image/rawimage.h"
 #include "graphics/animation/skeleton.h"
 #include "graphics/animation/animation.h"
+#include "graphics/animation/animationinstance.h"
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
@@ -337,6 +338,32 @@ void EngineObjectManager::DeleteAnimation(Animation * animation)
 	NULL_CHECK_RTRN(animation, "EngineObjectManager::CreateAnimation -> animation is NULL.");
 	delete animation;
 }
+
+AnimationInstanceRef EngineObjectManager::CreateAnimationInstance(SkeletonRef skeleton, AnimationRef animation)
+{
+	SHARED_REF_CHECK(skeleton, "EngineObjectManager::CreateAnimationInstance -> skeleton is invalid.", AnimationInstanceRef::Null());
+	SHARED_REF_CHECK(animation, "EngineObjectManager::CreateAnimationInstance -> animation is invalid.", AnimationInstanceRef::Null());
+
+	AnimationInstance * instance = new AnimationInstance(skeleton, animation);
+	NULL_CHECK(instance, "EngineObjectManager::CreateAnimationInstance -> Could not create new AnimationInstance object.", AnimationInstanceRef::Null());
+
+	return AnimationInstanceRef(instance, [=](AnimationInstance * instance)
+	{
+		  DeleteAnimationInstance(instance);
+	});
+}
+
+void EngineObjectManager::DestroyAnimationInstance(AnimationInstanceRef instance)
+{
+	instance.ForceDelete();
+}
+
+void EngineObjectManager::DeleteAnimationInstance(AnimationInstance * instance)
+{
+	NULL_CHECK_RTRN(instance, "EngineObjectManager::DeleteAnimationInstance -> instance is NULL.");
+	delete instance;
+}
+
 
 ShaderRef EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)
 {

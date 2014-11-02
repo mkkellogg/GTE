@@ -7,7 +7,7 @@
 
 KeyFrameSet::KeyFrameSet()
 {
-
+	Used = false;
 }
 
 KeyFrameSet::~KeyFrameSet()

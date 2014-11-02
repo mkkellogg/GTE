@@ -8,12 +8,12 @@
 #include "ui/debug.h"
 #include <string>
 
-Animation::Animation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton)
+Animation::Animation(unsigned int nodeCount, float durationTicks, float ticksPerSecond, SkeletonRef skeleton)
 {
 	keyFrames = NULL;
 
 	this->nodeCount = nodeCount;
-	this->duration = duration;
+	this->durationTicks = durationTicks;
 	this->ticksPerSecond = ticksPerSecond;
 	this->skeleton = skeleton;
 }
@@ -55,9 +55,9 @@ KeyFrameSet * Animation::GetKeyFrameSet(unsigned int node)
 	return keyFrames + node;
 }
 
-float Animation::GetDuration()
+float Animation::GetDurationTicks()
 {
-	return duration;
+	return durationTicks;
 }
 
 float Animation::GetTicksPerSecond()

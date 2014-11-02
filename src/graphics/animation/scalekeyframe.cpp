@@ -11,7 +11,7 @@ ScaleKeyFrame::ScaleKeyFrame() : KeyFrame()
 
 }
 
-ScaleKeyFrame::ScaleKeyFrame(float normalizedTime, float realTime,  const Vector3& scale) : KeyFrame(normalizedTime, realTime)
+ScaleKeyFrame::ScaleKeyFrame(float normalizedTime, float realTime,  float realTimeTicks, const Vector3& scale) : KeyFrame(normalizedTime, realTime, realTimeTicks)
 {
 	this->Scale = scale;
 }

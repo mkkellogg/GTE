@@ -19,6 +19,7 @@ class RawImage;
 class AttributeTransformer;
 class Skeleton;
 class Animation;
+class AnimationInstance;
 
 #include <vector>
 #include <memory>
@@ -63,6 +64,7 @@ class EngineObjectManager
 	void DeleteShader(Shader * shader);
 	void DeleteSkeleton(Skeleton * skeleton);
 	void DeleteAnimation(Animation * animation);
+	void DeleteAnimationInstance(AnimationInstance * animation);
 
     public :
 
@@ -93,6 +95,8 @@ class EngineObjectManager
 
     AnimationRef CreateAnimation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton);
     void DestroyAnimation(AnimationRef animation);
+    AnimationInstanceRef CreateAnimationInstance(SkeletonRef skeleton, AnimationRef animation);
+    void DestroyAnimationInstance(AnimationInstanceRef instance);
 
     ShaderRef CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(ShaderRef shader);

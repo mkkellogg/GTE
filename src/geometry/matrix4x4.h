@@ -89,6 +89,7 @@ class Matrix4x4
     void PreRotate(float x, float y, float z, float a);
     void SetRotateEuler(float x, float y, float z);
     static void SetRotate(float * rm, float x, float y, float z, float a);
+    static void SetRotate(Matrix4x4 * m, float x, float y, float z, float a);
     static void SetRotateEuler(float * rm, float x, float y, float z);
 
     void Scale(float x, float y, float z);

@@ -103,10 +103,10 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 		return NULL;
 	}
 
-	//importer->SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
+	importer->SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
 
 	// read the model file in from disk
-	scene = importer->ReadFile(filePath, aiProcessPreset_TargetRealtime_Quality  );
+	scene = importer->ReadFile(filePath ,aiProcessPreset_TargetRealtime_Quality );
 
 	// If the import failed, report it
 	if(!scene)
@@ -394,7 +394,6 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 		// ** IMPORTANT ** Iterate through face vertices in reverse order
 		for( int i = face->mNumIndices-1; i >=0; i--)
 		{
-
 			int vIndex = 0;
 
 			vIndex = face->mIndices[i];
@@ -640,6 +639,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene)
 		if( cMesh != NULL && cMesh->mNumBones > 0)
 		{
 			VertexBoneMap indexBoneMap(cMesh->mNumVertices, cMesh->mNumVertices);
+
 			bool mapInitSuccess = indexBoneMap.Init();
 			if(!mapInitSuccess)
 			{
@@ -839,10 +839,11 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 	EngineObjectManager *objectManager = EngineObjectManager::Instance();
 	unsigned int nodeCount = skeleton->GetNodeCount();
 
-	float duration = (float)animation.mDuration;
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
+	float durationTicks = (float)animation.mDuration;
+	float duration = durationTicks / ticksPerSecond;
 
-	AnimationRef animationRef = objectManager->CreateAnimation(nodeCount, duration, ticksPerSecond, skeleton);
+	AnimationRef animationRef = objectManager->CreateAnimation(nodeCount, durationTicks, ticksPerSecond, skeleton);
 	if(!animationRef.IsValid())
 	{
 		Debug::PrintError("ModelImporter::LoadAnimation -> Unable to create Animation.");
@@ -862,56 +863,63 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 		aiNodeAnim * nodeAnim = animation.mChannels[n];
 		std::string nodeName(nodeAnim->mNodeName.C_Str());
 
-		unsigned int nodeIndex = skeleton->GetNodeMapping(nodeName);
+		int nodeIndex = skeleton->GetNodeMapping(nodeName);
 
-		printf("animation has node: %s\n", nodeName.c_str());
-
-		for(unsigned int t = 0; t < nodeAnim->mNumPositionKeys; t++)
+		if(nodeIndex >= 0)
 		{
-			aiVectorKey& vectorKey = *(nodeAnim->mPositionKeys + t);
-
-			TranslationKeyFrame keyFrame;
-			keyFrame.NormalizedTime = (float)vectorKey.mTime / duration;
-			keyFrame.RealTime = (float)vectorKey.mTime;
-			keyFrame.Translation.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
-
-			animationRef->GetKeyFrameSet(nodeIndex)->TranslationKeyFrames.push_back(keyFrame);
-		}
-
-		for(unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++)
-		{
-			aiVectorKey& vectorKey = *(nodeAnim->mScalingKeys + s);
-
-			ScaleKeyFrame keyFrame;
-			keyFrame.NormalizedTime = (float)vectorKey.mTime / duration;
-			keyFrame.RealTime = (float)vectorKey.mTime;
-			keyFrame.Scale.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
-
-			animationRef->GetKeyFrameSet(nodeIndex)->ScaleKeyFrames.push_back(keyFrame);
-		}
-
-		for(unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++)
-		{
-			aiQuatKey& quatKey = *(nodeAnim->mRotationKeys + r);
-
-			RotationKeyFrame keyFrame;
-			keyFrame.NormalizedTime = (float)quatKey.mTime / duration;
-			keyFrame.RealTime = (float)quatKey.mTime;
-			keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w);
+			//printf("animation has node: %s\n", nodeName.c_str());
 
 			KeyFrameSet * keyFrameSet = animationRef->GetKeyFrameSet(nodeIndex);
-			if(keyFrameSet == NULL)
+			keyFrameSet->Used = true;
+
+			for(unsigned int t = 0; t < nodeAnim->mNumPositionKeys; t++)
 			{
-				printf("key frame set is null @ %d for bone %s\n", nodeIndex, nodeName.c_str());
+				aiVectorKey& vectorKey = *(nodeAnim->mPositionKeys + t);
+
+				TranslationKeyFrame keyFrame;
+				keyFrame.NormalizedTime = (float)vectorKey.mTime / durationTicks;
+				keyFrame.RealTime = (float)vectorKey.mTime / ticksPerSecond;
+				keyFrame.RealTimeTicks = (float)vectorKey.mTime;
+				keyFrame.Translation.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
+
+				keyFrameSet->TranslationKeyFrames.push_back(keyFrame);
 			}
 
-			keyFrameSet->RotationKeyFrames.push_back(keyFrame);
+			for(unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++)
+			{
+				aiVectorKey& vectorKey = *(nodeAnim->mScalingKeys + s);
+
+				ScaleKeyFrame keyFrame;
+				keyFrame.NormalizedTime = (float)vectorKey.mTime / durationTicks;
+				keyFrame.RealTime = (float)vectorKey.mTime / ticksPerSecond;
+				keyFrame.RealTimeTicks = (float)vectorKey.mTime;
+				keyFrame.Scale.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
+
+				keyFrameSet->ScaleKeyFrames.push_back(keyFrame);
+			}
+
+			for(unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++)
+			{
+				aiQuatKey& quatKey = *(nodeAnim->mRotationKeys + r);
+
+				RotationKeyFrame keyFrame;
+				keyFrame.NormalizedTime = (float)quatKey.mTime / durationTicks;
+				keyFrame.RealTime = (float)quatKey.mTime / ticksPerSecond;
+				keyFrame.RealTimeTicks = (float)quatKey.mTime;
+				//keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w * Constants::RadsToDegrees);
+				keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w );
+
+				keyFrameSet->RotationKeyFrames.push_back(keyFrame);
+			}
 		}
 	}
 
 	return animationRef;
 }
 
+/*
+ * Currently this loads only the first animation found in the model file.
+ */
 AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
 {
 	bool initSuccess = InitImporter();

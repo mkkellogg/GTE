@@ -13,6 +13,7 @@
 #include "graphics/animation/skeleton.h"
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationmanager.h"
+#include "graphics/animation/animationinstance.h"
 #include "graphics/animation/bone.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
@@ -302,7 +303,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
-		koopaRoot = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
+		koopaRoot = importer->LoadModelDirect("../../models/koopa/model/koopa@walk.fbx", 1 );
 		if(koopaRoot.IsValid())
 		{
 			koopaRoot->SetActive(true);
@@ -314,16 +315,28 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		}
 		koopaRoot->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 		//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
-		koopaRoot->GetLocalTransform().Translate(0,0,-3,false);
+		koopaRoot->GetLocalTransform().Translate(0,-2,-2,false);
 		koopaRoot->GetLocalTransform().Scale(.35, .35, .35, true);
 
-		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/anim/koopa@walk.fbx");
+
+
+
+		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
 
 		koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
-		AnimationManager * animManager = new AnimationManager();
+		AnimationManager * animManager = AnimationManager::Instance();
 		bool compatible = animManager->IsCompatible(koopaRenderer, koopaWalk);
 		if(compatible)printf("animation is compatible!! :)\n");
 		else printf("animation is not compatible! boooo!\n");
+
+		if(compatible)
+		{
+			AnimationInstanceRef walkInstance = animManager->CreateAnimationInstance(koopaRenderer, koopaWalk);
+			walkInstance->Play();
+		}
+
+
+
 
 		SceneObjectRef lightObject;
 		LightRef light;
@@ -360,7 +373,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,45 * Time::GetDeltaTime());
+		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,22 * Time::GetDeltaTime());
 		 //printf("total time: %f\n", Time::GetRealTimeSinceStartup());
 
 		 float realTime = Time::GetRealTimeSinceStartup();
