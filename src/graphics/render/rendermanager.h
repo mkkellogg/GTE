@@ -70,9 +70,9 @@ class RenderManager
     void ProcessScene(SceneObject * parent, Transform * aggregateTransform);
     void RenderSceneFromCamera(unsigned int cameraIndex);
 
-    bool ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh);
-    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh);
-    bool ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh);
+    bool ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer);
+    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer);
+    bool ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer);
 
     public:
 

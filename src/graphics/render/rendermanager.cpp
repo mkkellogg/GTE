@@ -378,6 +378,8 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 							SendTransformUniformsToShader(&modelTransform, &modelView, camera->GetProjectionTransform());
 							SendCustomUniformsToShader();
 
+							subRenderer->PreRender();
+
 							// loop through each active light and render sub mesh for that light, if in range
 							for(unsigned int l = 0; l < lightCount; l++)
 							{
@@ -417,7 +419,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 								child->GetFullTransform(&full);
 
 								// check if this mesh should be culled from this light.
-								if(!ShouldCullFromLight(*light, lightPosition, full, *subMesh))
+								if(!ShouldCullFromLight(*light, lightPosition, full, *subMesh, *subRenderer))
 								{
 									// send light data to the active shader
 									currentMaterial->SendLightToShader(light, &lightPosition);
@@ -450,7 +452,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
  * Check if [mesh] should be rendered with [light], based
  * on its distance from [lightPosition].
  */
-bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh)
+bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer)
 {
 	switch(mesh.GetLightCullType())
 	{
@@ -458,10 +460,10 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Tra
 			return false;
 		break;
 		case LightCullType::SphereOfInfluence:
-			return ShouldCullBySphereOfInfluence(light, lightPosition, fullTransform, mesh);
+			return ShouldCullBySphereOfInfluence(light, lightPosition, fullTransform, mesh, renderer);
 		break;
 		case LightCullType::Tiled:
-			return ShouldCullByTile(light, lightPosition, fullTransform, mesh);
+			return ShouldCullByTile(light, lightPosition, fullTransform, mesh, renderer);
 		break;
 		default:
 			return false;
@@ -477,7 +479,7 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Tra
  * sphere does not intersect with the sphere that is formed by the light's range, then the light should
  * be culled from the meshes.
  */
-bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh)
+bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer)
 {
 	// get the maximum distances from mesh center along each axis
 	Vector3 soiX = *(mesh.GetSphereOfInfluenceX());
@@ -502,7 +504,8 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 	if(zMag > meshMag)meshMag = zMag;
 
 	Vector3 toLight;
-	Point3 meshCenter = *(mesh.GetCenter());
+	//Point3 meshCenter = *(mesh.GetCenter());
+	Point3 meshCenter = *(renderer.GetFinalCenter());
 	fullTransform.GetMatrix()->Transform(&meshCenter);
 
 	// get the distance from the light to the mesh's center
@@ -519,7 +522,7 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 /*
  * Tile-based culling - needs to be implemented!
  */
-bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh)
+bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer)
 {
 	return false;
 }

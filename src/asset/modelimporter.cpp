@@ -841,7 +841,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
 	float durationTicks = (float)animation.mDuration;
-	float duration = durationTicks / ticksPerSecond;
+	//float duration = durationTicks / ticksPerSecond;
 
 	AnimationRef animationRef = objectManager->CreateAnimation(nodeCount, durationTicks, ticksPerSecond, skeleton);
 	if(!animationRef.IsValid())
@@ -906,7 +906,6 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 				keyFrame.NormalizedTime = (float)quatKey.mTime / durationTicks;
 				keyFrame.RealTime = (float)quatKey.mTime / ticksPerSecond;
 				keyFrame.RealTimeTicks = (float)quatKey.mTime;
-				//keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w * Constants::RadsToDegrees);
 				keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w );
 
 				keyFrameSet->RotationKeyFrames.push_back(keyFrame);

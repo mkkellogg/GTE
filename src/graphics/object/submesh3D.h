@@ -18,6 +18,7 @@ class SubMesh3DRenderer;
 #include "graphics/stdattributes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
+#include "geometry/matrix4x4.h"
 #include "graphics/light/light.h"
 
 class SubMesh3D : public EngineObject

@@ -96,7 +96,6 @@ void AnimationManager::Drive()
 {
 	for(std::unordered_map<unsigned int, std::vector<AnimationInstanceRef>>::iterator iter = activeAnimations.begin(); iter != activeAnimations.end(); ++iter)
 	{
-		unsigned int objectID = iter->first;
 		std::vector<AnimationInstanceRef>& animations = iter->second;
 
 		if(animations.size() > 0)
@@ -155,17 +154,17 @@ void AnimationManager::UpdateAnimationInstance(AnimationInstanceRef instance)
 
 	if(instance->IsPlaying())
 	{
+		Matrix4x4 rotMatrix;
+		Matrix4x4 matrix;
+
 		for(unsigned int state = 0; state < instance->StateCount; state++)
 		{
-			AnimationInstance::FrameState * frameState = instance->GetFrameState(state);
+			//AnimationInstance::FrameState * frameState = instance->GetFrameState(state);
 
 			unsigned int frameSetIndex = state;
 			KeyFrameSet * frameSet = instance->Animation->GetKeyFrameSet(frameSetIndex);
 			if(frameSet != NULL && frameSet->Used)
 			{
-				Matrix4x4 rotMatrix;
-				Matrix4x4 matrix;
-
 				Vector3 translation;
 				CalculateInterpolatedTranslation(instance->Progress,instance->Duration, *frameSet, translation);
 
@@ -174,54 +173,9 @@ void AnimationManager::UpdateAnimationInstance(AnimationInstanceRef instance)
 
 				Quaternion rotation;
 				CalculateInterpolatedRotation(instance->Progress,instance->Duration, *frameSet, rotation);
+				rotMatrix = rotation.rotationMatrix();
 
-				Matrix4x4::SetRotate(&rotMatrix, rotation.x(), rotation.y(), rotation.z(), rotation.w()/Constants::TwoPI * 360);
-
-				aiQuaternion rotQuat;
-				rotQuat.x = rotation.x();
-				rotQuat.y = rotation.y();
-				rotQuat.z = rotation.z();
-				rotQuat.w = rotation.w();
-				aiMatrix3x3t<float> mat = rotQuat.GetMatrix();
-				float matData[16];
-				matData[0] = mat.a1;
-				matData[1] = mat.b1;
-				matData[2] = mat.c1;
-				matData[3] = 0;
-				matData[4] = mat.a2;
-				matData[5] = mat.b2;
-				matData[6] = mat.c2;
-				matData[7] = 0;
-				matData[8] = mat.a3;
-				matData[9] = mat.b3;
-				matData[10] = mat.c3;
-				matData[11] = 0;
-				matData[12] = 0;
-				matData[13] = 0;
-				matData[14] = 0;
-				matData[15] = 1;
-
-				/*if(frameSetIndex == 21)
-				{
-					printf("\n");
-					printf("\n");
-					printf("-- assimp quat -- \n");
-					for(unsigned int i =0; i < 16; i++)
-					{
-						printf("%f,", matData[i]);
-					}
-					printf("\n");
-					printf("\n");
-					printf("-- Matrix4x4::SetRotate -- \n");
-					for(unsigned int i =0; i < 16; i++)
-					{
-						printf("%f,", rotMatrix.GetDataPtr()[i]);
-					}
-					printf("\n");
-				}*/
-
-				rotMatrix.SetTo(matData);
-
+				matrix.SetIdentity();
 				matrix.Scale(scale.x,scale.y,scale.z);
 				matrix.PreMultiply(&rotMatrix);
 				matrix.PreTranslate(translation.x, translation.y, translation.z);
@@ -235,12 +189,6 @@ void AnimationManager::UpdateAnimationInstance(AnimationInstanceRef instance)
 						localTransform->SetTo(&matrix);
 					}
 				}
-
-				if(frameSetIndex == 21)
-				{
-					//printf("%s, w: %f\n",targetNode->Name.c_str(), rotation.w());
-				}
-				//printf("index: %d\n", frameSetIndex);
 			}
 		}
 
@@ -279,9 +227,6 @@ void AnimationManager::CalculateInterpolatedTranslation(float progress, float du
 			vector.y = ((keyFrame.Translation.y - lastFrame.Translation.y) * interFrameProgress) + lastFrame.Translation.y;
 			vector.z = ((keyFrame.Translation.z - lastFrame.Translation.z) * interFrameProgress) + lastFrame.Translation.z;
 
-			//printf("x: %f\n",vector.x);
-
-
 			break;
 		}
 	}
@@ -308,7 +253,6 @@ void AnimationManager::CalculateInterpolatedScale(float progress, float duration
 			vector.y = ((keyFrame.Scale.y - lastFrame.Scale.y) * interFrameProgress) + lastFrame.Scale.y;
 			vector.z = ((keyFrame.Scale.z - lastFrame.Scale.z) * interFrameProgress) + lastFrame.Scale.z;
 
-
 			break;
 		}
 	}
@@ -332,12 +276,13 @@ void AnimationManager::CalculateInterpolatedRotation(float progress, float durat
 			if(interFrameTimeDelta >0)interFrameProgress = interFrameElapsed/interFrameTimeDelta;
 
 
-			//float x = ((keyFrame.Rotation.x() - lastFrame.Rotation.x()) * interFrameProgress) + lastFrame.Rotation.x();
-			//float y = ((keyFrame.Rotation.y() - lastFrame.Rotation.y()) * interFrameProgress) + lastFrame.Rotation.y();
-			//float z = ((keyFrame.Rotation.z() - lastFrame.Rotation.z()) * interFrameProgress) + lastFrame.Rotation.z();
-			//float w = ((keyFrame.Rotation.w() - lastFrame.Rotation.w()) * interFrameProgress) + lastFrame.Rotation.w();
+			/*float x = ((keyFrame.Rotation.x() - lastFrame.Rotation.x()) * interFrameProgress) + lastFrame.Rotation.x();
+			float y = ((keyFrame.Rotation.y() - lastFrame.Rotation.y()) * interFrameProgress) + lastFrame.Rotation.y();
+			float z = ((keyFrame.Rotation.z() - lastFrame.Rotation.z()) * interFrameProgress) + lastFrame.Rotation.z();
+			float w = ((keyFrame.Rotation.w() - lastFrame.Rotation.w()) * interFrameProgress) + lastFrame.Rotation.w();
+			rotation.Set(x,y,z,-w);*/
 
-			aiQuaternion start;
+			/*aiQuaternion start;
 			aiQuaternion end;
 			aiQuaternion out;
 
@@ -352,12 +297,12 @@ void AnimationManager::CalculateInterpolatedRotation(float progress, float durat
 			end.w = keyFrame.Rotation.w();
 
 			aiQuaternion::Interpolate(out, start, end, interFrameProgress);
+			rotation.Set(out.x,out.y,out.z,-out.w);*/
 
-			//rotation.Set(x,y,z,w);
-			rotation.Set(out.x,out.y,out.z,out.w);
-
-			//printf("w: %f\n",rotation.w());
-			//printf("index: %d\n", lastIndex);
+			Quaternion a(lastFrame.Rotation.x(),lastFrame.Rotation.y(),lastFrame.Rotation.z(),lastFrame.Rotation.w());
+			Quaternion b(keyFrame.Rotation.x(),keyFrame.Rotation.y(),keyFrame.Rotation.z(),keyFrame.Rotation.w());
+			Quaternion quatOut= Quaternion::slerp(a,b, interFrameProgress);
+			rotation.Set(quatOut.x(),quatOut.y(),quatOut.z(), -quatOut.w());
 
 			break;
 		}

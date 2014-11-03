@@ -55,8 +55,8 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
     void SetSkeleton(SkeletonRef skeleton);
     void SetVertexBoneMapIndex(int index);
 
-    void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut, const Vector3Array& normalsIn, Vector3Array& normalsOut);
-    void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut);
+    void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut, const Vector3Array& normalsIn, Vector3Array& normalsOut, const Point3& centerIn, Point3& centerOut);
+    void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut, const Point3& centerIn, Point3& centerOut);
     void TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut);
 };
 

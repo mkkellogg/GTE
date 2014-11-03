@@ -44,10 +44,12 @@ class Point3 : public BaseVector4
     void Add(const Vector3 * v);
     static void Add(const Point3 * point, const Vector3 * v, Point3 * result);
     static void Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result);
+    static void Lerp(const Point3 *p1, const Point3 * p2, Point3 * result, float t);
 
     Point3 & operator= (const Point3 & source);
 
     void Set(float x, float y, float z);
+    void SetTo(Point3 * p);
 
     void AttachTo(float * data);
     void Detach();

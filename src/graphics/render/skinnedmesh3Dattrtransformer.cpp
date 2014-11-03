@@ -162,14 +162,23 @@ void SkinnedMesh3DAttributeTransformer::SetVertexBoneMapIndex(int index)
 }
 
 void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut,
-																	 const Vector3Array& normalsIn, Vector3Array& normalsOut)
+																	 const Vector3Array& normalsIn, Vector3Array& normalsOut,
+																	 const Point3& centerIn, Point3& centerOut)
 {
 	positionsIn.CopyTo(&positionsOut);
 	normalsIn.CopyTo(&normalsOut);
+	centerOut.Set(centerIn.x,centerIn.y,centerIn.z);
+
+	unsigned int uniqueBonesEncountered = 0;
+	Matrix4x4 averageBoneOffset;
 
 	if(skeleton.IsValid() && vertexBoneMapIndex >= 0)
 	{
 		ClearTransformedBoneFlagsArray();
+
+		Point3 finalPoint;
+		Point3 currentPoint;
+		Point3 fullyTransformedPoint;
 
 		Matrix4x4 temp;
 		Matrix4x4 full;
@@ -230,7 +239,10 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 							bone->TempFullMatrix.PreMultiply(targetFull->GetMatrix());
 						}
 
+						averageBoneOffset.Add(&bone->OffsetMatrix);
+
 						boneTransformed[desc->BoneIndex[b]] = 1;
+						uniqueBonesEncountered++;
 					}
 
 					temp.SetTo(&bone->TempFullMatrix);
@@ -239,23 +251,38 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 					else full.Add(&temp);
 				}
 
-				Point3 * p = positionsOut.GetPoint(i);
-				full.Transform(p);
+				/*currentPoint.SetTo(positionsOut.GetPoint(i));
+				fullyTransformedPoint = currentPoint;
+				full.Transform(&fullyTransformedPoint);
+				Point3::Lerp(&currentPoint, &fullyTransformedPoint, &finalPoint, .35);
+				positionsOut.GetPoint(i)->SetTo(&finalPoint)*/
+
+				finalPoint.SetTo(positionsOut.GetPoint(i));
+				full.Transform(&finalPoint);
+				positionsOut.GetPoint(i)->SetTo(&finalPoint);
 
 				Vector3 * v = normalsOut.GetVector(i);
 				full.Transform(v);
 
-				transformedPositions.GetPoint(desc->UVertexIndex)->Set(p->x,p->y,p->z);
+				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(&finalPoint);
 				transformedNormals.GetVector(desc->UVertexIndex)->Set(v->x,v->y,v->z);
 				positionTransformed[desc->UVertexIndex] = 1;
 			}
 		}
+
+		if(uniqueBonesEncountered==0)uniqueBonesEncountered=1;
+		averageBoneOffset.MultiplyByScalar(1/(float)uniqueBonesEncountered);
+		averageBoneOffset.Transform(&centerOut);
 	}
 }
 
-void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut)
+void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut, const Point3& centerIn, Point3& centerOut)
 {
 	positionsIn.CopyTo(&positionsOut);
+	centerOut.Set(centerIn.x,centerIn.y,centerIn.z);
+
+	unsigned int uniqueBonesEncountered = 0;
+	Matrix4x4 averageBoneOffset;
 
 	if(skeleton.IsValid() && vertexBoneMapIndex >= 0)
 	{
@@ -307,6 +334,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 							bone->TempFullMatrix.PreMultiply(targetFull->GetMatrix());
 						}
 
+						averageBoneOffset.Add(&bone->OffsetMatrix);
 						boneTransformed[desc->BoneIndex[b]] = 1;
 					}
 
@@ -323,6 +351,10 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 				positionTransformed[desc->UVertexIndex] = 1;
 			}
 		}
+
+		if(uniqueBonesEncountered==0)uniqueBonesEncountered=1;
+		averageBoneOffset.MultiplyByScalar(1/(float)uniqueBonesEncountered);
+		averageBoneOffset.Transform(&centerOut);
 	}
 }
 

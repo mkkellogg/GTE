@@ -58,19 +58,11 @@ void SceneObjectTransform::AttachTo(SceneObject * sceneObject)
 	this->sceneObject = sceneObject;
 }
 
+
 /*
- * Get the full transform represented by this transform and all
- * its ancestors, and store in [transform]. Additionally, assign the sceneObject
- * attached to this transform to [transform]
+ * Store the full transformation made up by the ancestors of the this transform's scene
+ * object concatenated with this transform. This method should only be called once.
  */
-void SceneObjectTransform::GetFullTransform(SceneObjectTransform * transform)
-{
-	NULL_CHECK_RTRN(transform, "SceneObjectTransform::GetFullTransform -> NULL transform passed.");
-
-	transform->AttachTo(sceneObject);
-	transform->StoreFullTransform();
-}
-
 void SceneObjectTransform::StoreFullTransform()
 {
 	Transform full;

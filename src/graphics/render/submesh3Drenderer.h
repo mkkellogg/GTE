@@ -18,6 +18,7 @@ class Material;
 #include "attributetransformer.h"
 #include "geometry/vector/vector3array.h"
 #include "geometry/point/point3array.h"
+#include "geometry/point/point3.h"
 
 class SubMesh3DRenderer : public EngineObject
 {
@@ -40,10 +41,12 @@ class SubMesh3DRenderer : public EngineObject
 	unsigned int storedVertexCount;
 	StandardAttributeSet storedAttributes;
     bool buffersOnGPU;
+
     AttributeTransformer * attributeTransformer;
     bool doAttributeTransform;
     Point3Array positionsCopy, transformedPositions;
     Vector3Array normalsCopy, transformedNormals;
+    Point3 centerCopy,transformedCenter;
 
     bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount,  int stride);
     void DestroyBuffers();
@@ -64,16 +67,20 @@ class SubMesh3DRenderer : public EngineObject
     SubMesh3DRenderer(Graphics * graphics, AttributeTransformer * attributeTransformer);
     SubMesh3DRenderer(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer);
 
+    void CopyMeshData();
+
     public:
 
-    void CopyMeshData();
+    virtual ~SubMesh3DRenderer();
+
     void UpdateFromMesh();
 
     void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
     AttributeTransformer * GetAttributeTransformer();
 
+    const Point3 * GetFinalCenter();
 
-    virtual ~SubMesh3DRenderer();
+    void PreRender();
 
     virtual void Render() = 0;
 };

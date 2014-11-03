@@ -52,6 +52,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 	SceneObjectRef koopaRoot;
 	SkinnedMesh3DRendererRef koopaRenderer;
 	int boneIndex ;
+
+	int rotationDir = 1;
+
 	CustomGraphicsCallbacks()
 	{
 		offset = 0;
@@ -303,7 +306,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
-		koopaRoot = importer->LoadModelDirect("../../models/koopa/model/koopa@walk.fbx", 1 );
+		koopaRoot = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
 		if(koopaRoot.IsValid())
 		{
 			koopaRoot->SetActive(true);
@@ -373,8 +376,27 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 	void OnUpdate(Graphics * graphics)
 	{
-		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,22 * Time::GetDeltaTime());
-		 //printf("total time: %f\n", Time::GetRealTimeSinceStartup());
+		Point3 cameraPos;
+		SceneObjectTransform sot;
+		cameraObject->GetFullTransform(&sot);
+		sot.GetMatrix()->Transform(&cameraPos);
+
+		if(rotationDir > 0)
+		{
+			if(cameraPos.x > 20)
+			{
+				rotationDir = -1;
+			}
+		}
+		else
+		{
+			if(cameraPos.x < - 20)
+			{
+				rotationDir = 1;
+			}
+		}
+
+		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,22 * Time::GetDeltaTime() * rotationDir);
 
 		 float realTime = Time::GetRealTimeSinceStartup();
 		 unsigned int intTime = (unsigned int)Time::GetRealTimeSinceStartup();

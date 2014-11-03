@@ -38,7 +38,6 @@ class SceneObjectTransform : public Transform
     ~SceneObjectTransform();
 
     void AttachTo(SceneObject * sceneObject);
-    void GetFullTransform(SceneObjectTransform * transform);
 
     void Translate(float x, float y, float z, bool local);
     void RotateAround(Point3 * point, Vector3 * axis, float angle);

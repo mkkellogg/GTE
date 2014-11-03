@@ -56,38 +56,6 @@ void SubMesh3DRendererGL::Render()
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
-	if(doAttributeTransform)
-	{
-		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
-
-
-		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
-				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position) &&
-				   StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
-				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
-		{
-			attributeTransformer->TransformPositionsAndNormals(positionsCopy, transformedPositions,normalsCopy, transformedNormals);
-			SetPositionData(&transformedPositions);
-			SetNormalData(&transformedNormals);
-		}
-		else
-		{
-			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
-			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
-			{
-				attributeTransformer->TransformPositions(positionsCopy, transformedPositions);
-				SetPositionData(&transformedPositions);
-			}
-
-			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
-			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
-			{
-				attributeTransformer->TransformNormals(normalsCopy, transformedNormals);
-				SetNormalData(&transformedNormals);
-			}
-		}
-	}
-
 	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
 		StandardAttribute attr = (StandardAttribute)i;

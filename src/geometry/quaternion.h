@@ -41,8 +41,9 @@ class Quaternion
     Matrix4x4 matrix() const;
     Matrix4x4 rightMatrix() const;
     // Vector3 vector() const;
+    void normalize();
     float norm() const;
-    // Matrix rotationMatrix() const;
+     Matrix4x4 rotationMatrix() const;
     // Vector3 scaledAxis(void) const;
     // void scaledAxis(const Vector3& w);
     // Vector3 rotatedVector(const Vector3& v) const;

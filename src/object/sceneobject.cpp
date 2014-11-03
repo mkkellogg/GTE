@@ -63,10 +63,16 @@ Transform& SceneObject::GetLocalTransform()
 	return transform;
 }
 
+/*
+ * Get the full transform represented by this object's transform and all
+ * its ancestors, and store in [transform]. Additionally, assign this scene
+ * object to [transform]
+ */
 void SceneObject::GetFullTransform(SceneObjectTransform * transform)
 {
 	NULL_CHECK_RTRN(transform,"SceneObject::GetFullTransform -> transform is NULL.");
 	transform->AttachTo(this);
+	transform->SetTo(&this->transform);
 	transform->StoreFullTransform();
 }
 

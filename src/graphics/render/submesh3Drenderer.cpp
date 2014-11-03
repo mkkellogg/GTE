@@ -209,6 +209,9 @@ bool SubMesh3DRenderer::UpdateMeshData()
 					return false;
 				}
 			}
+
+			const Point3* center = mesh->GetCenter();
+			centerCopy.Set(center->x,center->y,center->z);
 		}
 
 		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
@@ -358,4 +361,70 @@ void SubMesh3DRenderer::SetAttributeTransformer(AttributeTransformer * attribute
 AttributeTransformer * SubMesh3DRenderer::GetAttributeTransformer()
 {
 	return attributeTransformer;
+}
+
+void SubMesh3DRenderer::PreRender()
+{
+	MaterialRef currentMaterial = graphics->GetActiveMaterial();
+	UseMaterial(currentMaterial);
+
+	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
+
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SHARED_REF_CHECK_RTRN(mesh,"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
+
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	if(doAttributeTransform)
+	{
+		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
+
+
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
+				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position) &&
+				   StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
+				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+		{
+			attributeTransformer->TransformPositionsAndNormals(positionsCopy, transformedPositions,normalsCopy, transformedNormals, centerCopy, transformedCenter);
+			SetPositionData(&transformedPositions);
+			SetNormalData(&transformedNormals);
+		}
+		else
+		{
+			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
+			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+			{
+				attributeTransformer->TransformPositions(positionsCopy, transformedPositions,  centerCopy, transformedCenter);
+				SetPositionData(&transformedPositions);
+			}
+
+			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
+			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+			{
+				attributeTransformer->TransformNormals(normalsCopy, transformedNormals);
+				SetNormalData(&transformedNormals);
+			}
+		}
+	}
+}
+
+const Point3 * SubMesh3DRenderer::GetFinalCenter()
+{
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SHARED_REF_CHECK(mesh,"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.", NULL);
+
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	if(doAttributeTransform)
+	{
+		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
+
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
+		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+		{
+			return &transformedCenter;
+		}
+	}
+
+	return mesh->GetCenter();
 }

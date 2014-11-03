@@ -6,6 +6,7 @@
 #include "vector/vector3.h"
 #include "base/basevector4.h"
 #include "ui/debug.h"
+#include <cmath>
 
 Quaternion::Quaternion()
 {
@@ -228,6 +229,7 @@ Quaternion Quaternion::operator/(float s) const
 Matrix4x4 Quaternion::matrix() const
 {
     float m[16] = { w(), -z(), y(), x(), z(), w(), -x(), y(), -y(), x(), w(), z(), -x(), -y(), -z(), w() };
+
     return Matrix4x4(m);
 }
 
@@ -256,6 +258,15 @@ Matrix4x4 Quaternion::rightMatrix() const
  */
 //TVector4 vector() const { return TVector4(mData); }
 
+void Quaternion::normalize()
+{
+	float normFactor = norm();
+	mData[0] /= normFactor;
+	mData[1] /= normFactor;
+	mData[2] /= normFactor;
+	mData[3] /= normFactor;
+}
+
 /**
  * @brief Returns the norm ("magnitude") of the quaternion.
  * @return The 2-norm of [ w(), x(), y(), z() ]<sup>T</sup>.
@@ -273,16 +284,17 @@ float Quaternion::norm() const
  * It formulaically returns the matrix, which will not be a
  * rotation if the quaternion is non-unit.
  */
-/*TMatrix3 rotationMatrix() const 
+Matrix4x4 Quaternion::rotationMatrix() const
  {
-     float m[9] =
+     float m[16] =
      {
-        1-2*y()*y()-2*z()*z(), 2*x()*y() - 2*z()*w(), 2*x()*z() + 2*y()*w(),
-         2*x()*y() + 2*z()*w(), 1-2*x()*x()-2*z()*z(), 2*y()*z() - 2*x()*w(),
-         2*x()*z() - 2*y()*w(), 2*y()*z() + 2*x()*w(), 1-2*x()*x()-2*y()*y()
+        1-2*y()*y()-2*z()*z(), 2*x()*y() - 2*z()*w(), 2*x()*z() + 2*y()*w(),0,
+         2*x()*y() + 2*z()*w(), 1-2*x()*x()-2*z()*z(), 2*y()*z() - 2*x()*w(),0,
+         2*x()*z() - 2*y()*w(), 2*y()*z() + 2*x()*w(), 1-2*x()*x()-2*y()*y(),0,
+         0,0,0,1
      };
-     return TMatrix3(m);
- }*/
+     return Matrix4x4(m);
+ }
 
 /** 
  * @brief Returns the scaled-axis representation of this
@@ -420,7 +432,7 @@ Quaternion Quaternion::slerp(const Quaternion& q1, float t)
 
 Quaternion Quaternion::slerp(const Quaternion &qa, const Quaternion &qb, float t)
 {
-    // quaternion to return
+  /*  // quaternion to return
     Quaternion qm;
     // Calculate angle between them.
     float cosHalfTheta = qa.w() * qb.w() + qa.x() * qb.x() + qa.y() * qb.y() + qa.z() * qb.z();
@@ -453,7 +465,47 @@ Quaternion Quaternion::slerp(const Quaternion &qa, const Quaternion &qb, float t
     qm.mData[0] = (qa.x() * ratioA + qb.x() * ratioB);
     qm.mData[1] = (qa.y() * ratioA + qb.y() * ratioB);
     qm.mData[2] = (qa.z() * ratioA + qb.z() * ratioB);
-    return qm;
+    return qm;*/
+
+	// calc cosine theta
+	float cosom = qa.x() * qb.x() + qa.y() * qb.y() + qa.z() * qb.z() + qa.w() * qb.w();
+	// adjust signs (if necessary)
+	Quaternion end = qb;
+	if( cosom < static_cast<float>(0.0))
+	{
+		cosom = -cosom;
+		end.mData[0] = -end.x(); // Reverse all signs
+		end.mData[1] = -end.y();
+		end.mData[2] = -end.z();
+		end.mData[3] = -end.w();
+	}
+	// Calculate coefficients
+	float sclp, sclq;
+	if( (static_cast<float>(1.0) - cosom) > static_cast<float>(0.0001)) // 0.0001 -> some epsillon
+	{
+		// Standard case (slerp)
+		float omega, sinom;
+		omega = std::acos( cosom); // extract theta from dot product's cos theta
+		sinom = std::sin( omega);
+		sclp = std::sin( (static_cast<float>(1.0) - t) * omega) / sinom;
+		sclq = std::sin( t * omega) / sinom;
+	}
+	else
+	{
+		// Very close, do linear interp (because it's faster)
+		sclp = static_cast<float>(1.0) - t;
+		sclq = t;
+	}
+
+	Quaternion qOut;
+
+	float x = sclp * qa.x() + sclq * end.x();
+	float y = sclp * qa.y() + sclq * end.y();
+	float z= sclp * qa.z() + sclq * end.z();
+	float w = sclp * qa.w() + sclq * end.w();
+
+	qOut.Set(x,y,z,w);
+	return qOut;
 }
 
 /// Returns quaternion that is slerped by fraction 't' between q0 and q1.
