@@ -4,25 +4,34 @@
 
 #include "object/enginetypes.h"
 #include "animation.h"
+#include "skeleton.h"
 #include "global/global.h"
 #include "ui/debug.h"
 #include <string>
 
-Animation::Animation(unsigned int nodeCount, float durationTicks, float ticksPerSecond, SkeletonRef skeleton)
+/*
+ * Single constructor, which initializes all member variables of this animation.
+ */
+Animation::Animation(float durationTicks, float ticksPerSecond, SkeletonRef target)
 {
 	keyFrames = NULL;
-
-	this->nodeCount = nodeCount;
 	this->durationTicks = durationTicks;
 	this->ticksPerSecond = ticksPerSecond;
-	this->skeleton = skeleton;
+	this->target = target;
+	keyFrameSetCount = 0;
 }
 
+/*
+ * Cleanup the animation
+ */
 Animation::~Animation()
 {
 	Destroy();
 }
 
+/*
+ * This method destroys the member array of KeyFrameSet objects and invalidates the array pointer.
+ */
 void Animation::Destroy()
 {
 	if(keyFrames != NULL)
@@ -30,42 +39,70 @@ void Animation::Destroy()
 		delete[] keyFrames;
 		keyFrames = NULL;
 	}
+	keyFrameSetCount = 0;
 }
 
+/*
+ * Initialize this animation. This method will validate the target skeleton [target] and allocate
+ * a KeyFrameSet object for each node in [target] in [keyframes].
+ */
 bool Animation::Init()
 {
 	Destroy();
 
-	if(nodeCount == 0)return true;
+	SHARED_REF_CHECK(target,"Animation::Init -> Animation target is not valid.",false);
+	if(target->GetNodeCount() == 0)return true;
 
-	keyFrames = new KeyFrameSet[nodeCount];
-	NULL_CHECK(keyFrames,"Animation::Init -> Could not allocate key frames parent array", false);
+	keyFrames = new KeyFrameSet[target->GetNodeCount()];
+	NULL_CHECK(keyFrames,"Animation::Init -> Could not allocate key frame set array", false);
+
+	keyFrameSetCount = target->GetNodeCount();
 
 	return true;
 }
 
-KeyFrameSet * Animation::GetKeyFrameSet(unsigned int node)
+/*
+ * Return the number of KeyFrameSet objects in [keyFrames].
+ */
+unsigned int Animation::GetKeyFrameSetCount()
 {
-	if(node >= nodeCount)
+	return keyFrameSetCount;
+}
+
+/*
+ * Retrieve the KeyFrameSet corresponding to a particular node in [target].
+ */
+KeyFrameSet * Animation::GetKeyFrameSet(unsigned int nodeIndex)
+{
+	if(nodeIndex >= keyFrameSetCount)
 	{
 		Debug::PrintError("Animation::GetKeyFrameSet -> Node index is out of range.");
 		return NULL;
 	}
 
-	return keyFrames + node;
+	return keyFrames + nodeIndex;
 }
 
-float Animation::GetDurationTicks()
+/*
+ * Get the duration of this animaion in ticks.
+ */
+float Animation::GetDurationTicks() const
 {
 	return durationTicks;
 }
 
-float Animation::GetTicksPerSecond()
+/*
+ * Get the mapping of duration ticks to seconds.
+ */
+float Animation::GetTicksPerSecond() const
 {
 	return ticksPerSecond;
 }
 
-SkeletonRef Animation::GetSkeleton()
+/*
+ * Get a reference to the target of this animation.
+ */
+SkeletonRef Animation::GetTarget()
 {
-	return skeleton;
+	return target;
 }

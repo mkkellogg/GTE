@@ -61,13 +61,13 @@ void SceneObjectTransform::AttachTo(SceneObject * sceneObject)
 
 /*
  * Store the full transformation made up by the ancestors of the this transform's scene
- * object concatenated with this transform. This method should only be called once.
+ * object concatenated with [localTransform]
  */
-void SceneObjectTransform::StoreFullTransform()
+void SceneObjectTransform::StoreFullTransform(Transform& localTransform)
 {
 	Transform full;
 	GetInheritedTransform(&full, false);
-	full.TransformBy(this);
+	full.TransformBy(localTransform);
 	SetTo(&full);
 }
 

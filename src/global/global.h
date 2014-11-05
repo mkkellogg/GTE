@@ -43,7 +43,7 @@
 
 #define SHARED_REF_CHECK_RTRN(ref, msg)    		\
 {										   		\
-	if(!(ref).IsValid())					   		\
+	if(!(ref).IsValid())					    \
 	{									   		\
 		Debug::PrintError((msg));  		   		\
 		return;			       					\
@@ -52,10 +52,28 @@
 
 #define SHARED_REF_CHECK(ref, msg, returnExp)    \
 {										   		 \
-	if(!(ref).IsValid())					   		 \
+	if(!(ref).IsValid())					     \
 	{									   		 \
 		Debug::PrintError((msg));  		   		 \
 		return (returnExp);			       		 \
+	}									   		 \
+}
+
+#define ASSERT(exp, msg, returnExp)          \
+{										   		 \
+	if(!(exp))					     			 \
+	{									   		 \
+		Debug::PrintError((msg));  		   		 \
+		return (returnExp);			       		 \
+	}									   		 \
+}
+
+#define ASSERT_RTRN(exp, msg)        	     \
+{										   		 \
+	if(!(exp))					     			 \
+	{									   		 \
+		Debug::PrintError((msg));  		   		 \
+		return;			       		 			 \
 	}									   		 \
 }
 

@@ -14,6 +14,7 @@
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationmanager.h"
 #include "graphics/animation/animationinstance.h"
+#include "graphics/animation/animationplayer.h"
 #include "graphics/animation/bone.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
@@ -334,8 +335,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 		if(compatible)
 		{
-			AnimationInstanceRef walkInstance = animManager->CreateAnimationInstance(koopaRenderer, koopaWalk);
-			walkInstance->Play();
+			AnimationPlayerRef player = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
+			player->AddAnimation(koopaWalk);
+			player->Play(koopaWalk);
 		}
 
 
@@ -396,53 +398,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 			}
 		}
 
-		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,22 * Time::GetDeltaTime() * rotationDir);
+		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,12 * Time::GetDeltaTime() * rotationDir);
 
-		 float realTime = Time::GetRealTimeSinceStartup();
-		 unsigned int intTime = (unsigned int)Time::GetRealTimeSinceStartup();
-		 unsigned int mod = intTime % 2;
-		 float fraction = realTime - (float)intTime;
-		 float mag = .001;
-		 float translateFactor = 0;
-
-		 float scaleFactor = 1;
-
-		 if(mod == 1)
-		 {
-			offset += Time::GetDeltaTime();
-			scaleFactor = offset;
-			translateFactor = -.2;
-		 }
-		 else
-		 {
-			offset -= Time::GetDeltaTime();
-			scaleFactor = offset;
-			translateFactor = .2;
-		 }
-
-		 if(!koopaRenderer.IsValid())
-			 koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
-
-		 SkeletonRef skeleton = koopaRenderer->GetSkeleton();
-		 if(boneIndex < 0)
-		 {
-			 for(unsigned int i=0; i < skeleton->GetBoneCount(); i++)
-			 {
-				 Bone * bone = skeleton->GetBone(i);
-				// printf("%s\n", bone->Name.c_str());
-				 if(bone->Name == "LegR2")
-				 {
-					 boneIndex = i;
-					 break;
-				 }
-			 }
-		 }
-
-		 if(boneIndex >= 0)
-		 {
-			 Bone * bone = skeleton->GetBone(boneIndex);
-			 bone->Node->GetLocalTransform()->Translate(0,translateFactor,0,true);
-		 }
+		 //float realTime = Time::GetRealTimeSinceStartup();
 	}
 
 	SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref)

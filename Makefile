@@ -38,7 +38,7 @@ UIOBJ= obj/debug.o
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
-ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o obj/sceneobjectskeletonnode.o obj/keyframeset.o obj/keyframe.o obj/translationkeyframe.o obj/scalekeyframe.o obj/rotationkeyframe.o obj/animation.o obj/animationmanager.o obj/animationinstance.o
+ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o obj/sceneobjectskeletonnode.o obj/keyframeset.o obj/keyframe.o obj/translationkeyframe.o obj/scalekeyframe.o obj/rotationkeyframe.o obj/animation.o obj/animationmanager.o obj/animationinstance.o obj/animationplayer.o
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
@@ -246,6 +246,9 @@ obj/sceneobjectskeletonnode.o: $(ANIMATIONSRC)/sceneobjectskeletonnode.cpp $(ANI
 
  obj/animationmanager.o: $(ANIMATIONSRC)/animationmanager.cpp $(ANIMATIONSRC)/animationmanager.h
 	$(CC) $(CFLAGS) -o obj/animationmanager.o -c $(ANIMATIONSRC)/animationmanager.cpp	
+
+obj/animationplayer.o: $(ANIMATIONSRC)/animationplayer.cpp $(ANIMATIONSRC)/animationplayer.h
+	$(CC) $(CFLAGS) -o obj/animationplayer.o -c $(ANIMATIONSRC)/animationplayer.cpp	
 	
 obj/animationinstance.o: $(ANIMATIONSRC)/animationinstance.cpp $(ANIMATIONSRC)/animationinstance.h
 	$(CC) $(CFLAGS) -o obj/animationinstance.o -c $(ANIMATIONSRC)/animationinstance.cpp	

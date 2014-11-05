@@ -1,40 +1,41 @@
+/*********************************************
+*
+* class: AnimationManager
+*
+* author: Mark Kellogg
+*
+* This class manages and drives all instances of AnimationPlayer, and
+* therefore, all playing animations.
+*
+***********************************************/
+
 #ifndef _ANIMATION_MANAGER_H_
 #define _ANIMATION_MANAGER_H_
 
-//forward declarations
-
 #include "object/enginetypes.h"
-#include "geometry/vector/vector3.h"
-#include "geometry/quaternion.h"
-#include "keyframeset.h"
-#include <vector>
 #include <unordered_map>
-#include <string>
 
 class AnimationManager
 {
 	AnimationManager();
     ~AnimationManager();
 
+    // singleton instance
     static AnimationManager * instance;
-    std::unordered_map<unsigned int, std::vector<AnimationInstanceRef>> activeAnimations;
-
-    void UpdateAnimationInstance(AnimationInstanceRef instance);
-
-    void CalculateInterpolatedTranslation(float progress, float duration, KeyFrameSet& keyFrameSet, Vector3& vector);
-    void CalculateInterpolatedScale(float progress, float duration, KeyFrameSet& keyFrameSet, Vector3& vector);
-    void CalculateInterpolatedRotation(float progress, float duration, KeyFrameSet& keyFrameSet, Quaternion& rotation);
+    // map object IDs of Skeleton objects to their assign animation player
+    std::unordered_map<unsigned int, AnimationPlayerRef> activePlayers;
 
 	public :
 
     static AnimationManager * Instance();
 
-    bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation);
-    bool IsCompatible(SkeletonRef skeleton, AnimationRef animation);
+    bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const;
+    bool IsCompatible(SkeletonRef skeleton, AnimationRef animation) const;
 
     void Drive();
-    AnimationInstanceRef CreateAnimationInstance(SkeletonRef skeleton, AnimationRef animation);
-    AnimationInstanceRef CreateAnimationInstance(SkinnedMesh3DRendererRef renderer, AnimationRef animation);
+
+    AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkeletonRef target);
+    AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRef renderer);
 };
 
 #endif

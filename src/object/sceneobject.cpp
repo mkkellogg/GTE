@@ -72,8 +72,7 @@ void SceneObject::GetFullTransform(SceneObjectTransform * transform)
 {
 	NULL_CHECK_RTRN(transform,"SceneObject::GetFullTransform -> transform is NULL.");
 	transform->AttachTo(this);
-	transform->SetTo(&this->transform);
-	transform->StoreFullTransform();
+	transform->StoreFullTransform(this->transform);
 }
 
 void SceneObject::SetProcessingTransform(Transform * transform)

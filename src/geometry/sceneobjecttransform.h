@@ -27,7 +27,7 @@ class SceneObjectTransform : public Transform
 	SceneObject * sceneObject;
 
 	void GetInheritedTransform(Transform * transform, bool invert);
-	void StoreFullTransform();
+	void StoreFullTransform(Transform& localTransform);
 
     public:
 

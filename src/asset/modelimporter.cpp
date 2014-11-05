@@ -135,7 +135,7 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float
 	}
 }
 
-SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale)
+SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale) const
 {
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 
@@ -181,7 +181,13 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	return root;
 }
 
-void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNode& node, float scale, SceneObjectRef current,   std::vector<MaterialImportDescriptor>& materialImportDescriptors,  SkeletonRef skeleton, std::vector<SceneObjectRef>& createdSceneObjects)
+void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
+											   const aiNode& node,
+											   float scale,
+											   SceneObjectRef current,
+											   std::vector<MaterialImportDescriptor>& materialImportDescriptors,
+											   SkeletonRef skeleton,
+											   std::vector<SceneObjectRef>& createdSceneObjects) const
 {
 	Matrix4x4 mat;
 
@@ -315,16 +321,12 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene, const aiNod
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{
-		//SceneObjectRef child = engineObjectManager->CreateSceneObject();
-		//SHARED_REF_CHECK_RTRN(child,"AssetImporter::RecursiveProcessModelScene -> Could not create child object.");
-
-		//current->AddChild(child);
 		const aiNode *childNode = node.mChildren[i];
 		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, sceneObject, materialImportDescriptors, skeleton, createdSceneObjects);
 	}
 }
 
-SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor)
+SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor) const
 {
 	unsigned int vertexCount = 0;
 
@@ -391,14 +393,13 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	{
 		const aiFace* face = mesh.mFaces + faceIndex;
 
-		// ** IMPORTANT ** Iterate through face vertices in reverse order
+		// ** IMPORTANT ** Iterate through face vertices in reverse order. This is necessary because
+		// vertices are stored in counter-clockwise order for each face.
 		for( int i = face->mNumIndices-1; i >=0; i--)
 		{
 			int vIndex = 0;
 
 			vIndex = face->mIndices[i];
-
-			//vIndex = face->mIndices[2-i];
 
 			aiVector3D srcPosition = mesh.mVertices[vIndex];
 
@@ -438,7 +439,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	return mesh3D;
 }
 
-bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors)
+bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const
 {
 	// TODO: Implement support for embedded textures
 	if (scene.HasTextures())
@@ -612,7 +613,7 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	}
 }
 
-SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene)
+SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 {
 	unsigned int boneCount = CountBones(scene);
 	if(boneCount <=0 )
@@ -676,7 +677,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene)
 	return target;
 }
 
-VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh)
+VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh) const
 {
 	VertexBoneMap * fullBoneMap = new VertexBoneMap(mesh.mNumFaces * 3, mesh.mNumVertices);
 	if(fullBoneMap == NULL)
@@ -697,7 +698,8 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	{
 		aiFace& face = mesh.mFaces[f];
 
-		// ** IMPORTANT ** Iterate through face vertices in reverse order
+		// ** IMPORTANT ** Iterate through face vertices in reverse order. This is necessary because
+		// vertices are stored in counter-clockwise order for each face.
 		for(int i = face.mNumIndices-1; i >=0; i--)
 		{
 			unsigned int vertexIndex = face.mIndices[i];
@@ -709,7 +711,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	return fullBoneMap;
 }
 
-void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap)
+void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap) const
 {
 	SHARED_REF_CHECK_RTRN(skeleton, "ModelImporter::AddBoneMappings -> skeleton is invalid.");
 
@@ -756,7 +758,7 @@ void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, un
 	}
 }
 
-unsigned ModelImporter::CountBones(const aiScene& scene)
+unsigned ModelImporter::CountBones(const aiScene& scene) const
 {
 	unsigned int boneCount = 0;
 	std::unordered_map<std::string, unsigned int> boneCountMap;
@@ -780,7 +782,7 @@ unsigned ModelImporter::CountBones(const aiScene& scene)
 	return boneCount;
 }
 
-bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene)
+bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const
 {
 	SceneObjectSkeletonNode * skeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), -1, "");
 	if(skeletonNode == NULL)
@@ -834,21 +836,17 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	return success;
 }
 
-AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef skeleton)
+AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef skeleton) const
 {
-	EngineObjectManager *objectManager = EngineObjectManager::Instance();
-	unsigned int nodeCount = skeleton->GetNodeCount();
+	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	NULL_CHECK(objectManager,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
 
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
 	float durationTicks = (float)animation.mDuration;
 	//float duration = durationTicks / ticksPerSecond;
 
-	AnimationRef animationRef = objectManager->CreateAnimation(nodeCount, durationTicks, ticksPerSecond, skeleton);
-	if(!animationRef.IsValid())
-	{
-		Debug::PrintError("ModelImporter::LoadAnimation -> Unable to create Animation.");
-		return AnimationRef::Null();
-	}
+	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond, skeleton);
+	SHARED_REF_CHECK(animationRef,"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null());
 
 	bool initSuccess = animationRef->Init();
 	if(!initSuccess)
@@ -867,9 +865,15 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 
 		if(nodeIndex >= 0)
 		{
-			//printf("animation has node: %s\n", nodeName.c_str());
-
 			KeyFrameSet * keyFrameSet = animationRef->GetKeyFrameSet(nodeIndex);
+			if(keyFrameSet == NULL)
+			{
+				objectManager->DestroyAnimation(animationRef);
+				std::string msg = std::string("ModelImporter::LoadAnimation -> NULL KeyFrameSet encountered for: ") + nodeName;
+				Debug::PrintError(msg);
+				return AnimationRef::Null();
+			}
+
 			keyFrameSet->Used = true;
 
 			for(unsigned int t = 0; t < nodeAnim->mNumPositionKeys; t++)
@@ -881,7 +885,6 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 				keyFrame.RealTime = (float)vectorKey.mTime / ticksPerSecond;
 				keyFrame.RealTimeTicks = (float)vectorKey.mTime;
 				keyFrame.Translation.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
-
 				keyFrameSet->TranslationKeyFrames.push_back(keyFrame);
 			}
 
@@ -894,7 +897,6 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 				keyFrame.RealTime = (float)vectorKey.mTime / ticksPerSecond;
 				keyFrame.RealTimeTicks = (float)vectorKey.mTime;
 				keyFrame.Scale.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
-
 				keyFrameSet->ScaleKeyFrames.push_back(keyFrame);
 			}
 
@@ -907,7 +909,6 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 				keyFrame.RealTime = (float)quatKey.mTime / ticksPerSecond;
 				keyFrame.RealTimeTicks = (float)quatKey.mTime;
 				keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w );
-
 				keyFrameSet->RotationKeyFrames.push_back(keyFrame);
 			}
 		}
@@ -950,11 +951,12 @@ AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
 	}
 
 	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), skeleton);
+	SHARED_REF_CHECK(animation,"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null());
 
 	return animation;
 }
 
-void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback)
+void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback) const
 {
 	if(scene.mRootNode != NULL)
 	{
@@ -964,7 +966,7 @@ void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder trave
 	}
 }
 
-void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback)
+void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback) const
 {
 	bool doContinue = callback(node);
 	if(!doContinue)return;

@@ -11,10 +11,13 @@
 #include "ui/debug.h"
 #include <string>
 
+/*
+ * Single constructor that initializes member variables.
+ */
 AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
 {
 	this->Target = target;
-	this->Animation = animation;
+	this->SourceAnimation = animation;
 
 	StateCount = 0;
 	FrameStates = NULL;
@@ -22,18 +25,23 @@ AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
 	Duration = 0;
 	Progress = 0;
 
-	DurationTicks = 0L;
-	ProgressTicks = 0L;
+	DurationTicks = 0;
+	ProgressTicks = 0;
 
-	Weight = 1;
 	Playing = false;
 }
 
+/*
+ * Default destructor
+ */
 AnimationInstance::~AnimationInstance()
 {
 
 }
 
+/*
+ * Destroy this animation instance. Delete all FrameState instances in [FrameStates].
+ */
 void AnimationInstance::Destroy()
 {
 	if(FrameStates != NULL)
@@ -41,19 +49,30 @@ void AnimationInstance::Destroy()
 		delete[] FrameStates;
 		FrameStates = NULL;
 	}
+	StateCount = 0;
 }
 
+/*
+ * Initialize this instance. This method will allocate a FrameState object for each node in [Target].
+ * It will also verify the the number of nodes in [Target] matches the number of KeyFrameSet objects
+ * contained in [SourceAnimation].
+ */
 bool AnimationInstance::Init()
 {
 	SHARED_REF_CHECK(Target, "AnimationInstance::Init -> Animation target is invalid.", false);
-	SHARED_REF_CHECK(Animation, "AnimationInstance::Init -> Animation is invalid.", false);
+	SHARED_REF_CHECK(SourceAnimation, "AnimationInstance::Init -> Animation is invalid.", false);
 
 	Destroy();
 
 	unsigned int nodeCount = Target->GetNodeCount();
+
+	ASSERT(nodeCount == SourceAnimation->GetKeyFrameSetCount(),"AnimationInstance::Init -> Node count does not equal animation key frame set count.",false);
+
 	if(nodeCount <= 0)return true;
 
 	FrameStates = new FrameState[nodeCount];
+	NULL_CHECK(FrameStates, "AnimationInstance::Init -> Unable to allocate FrameState array.", false);
+
 	for(unsigned int n = 0; n < nodeCount; n++)
 	{
 		FrameState state;
@@ -61,8 +80,8 @@ bool AnimationInstance::Init()
 	}
 	StateCount = nodeCount;
 
-	DurationTicks = Animation->GetDurationTicks();
-	Duration = DurationTicks / Animation->GetTicksPerSecond();
+	DurationTicks = SourceAnimation->GetDurationTicks();
+	Duration = DurationTicks / SourceAnimation->GetTicksPerSecond();
 
 	Progress = 0;
 	ProgressTicks = 0L;
@@ -70,6 +89,10 @@ bool AnimationInstance::Init()
 	return true;
 }
 
+/*
+ * Reset this instance by resetting each FrameState object for each node in [Target] as
+ * well as setting [Progress] and [ProgressTicks] to 0.
+ */
 void AnimationInstance::Reset()
 {
 	for(unsigned int s = 0; s < StateCount; s++)
@@ -78,9 +101,12 @@ void AnimationInstance::Reset()
 	}
 
 	Progress = 0;
-	ProgressTicks = 0L;
+	ProgressTicks = 0;
 }
 
+/*
+ * Retrieve the FrameState for a single node in [Target] via its index.
+ */
 AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int stateIndex)
 {
 	if(stateIndex >= StateCount)

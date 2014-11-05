@@ -23,6 +23,7 @@
 #include "graphics/animation/skeleton.h"
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationinstance.h"
+#include "graphics/animation/animationplayer.h"
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
@@ -305,20 +306,20 @@ SkeletonRef EngineObjectManager::CloneSkeleton(SkeletonRef source)
 	});
 }
 
-void EngineObjectManager::DestroySkeleton(SkeletonRef skeleton)
+void EngineObjectManager::DestroySkeleton(SkeletonRef target)
 {
-	skeleton.ForceDelete();
+	target.ForceDelete();
 }
 
-void EngineObjectManager::DeleteSkeleton(Skeleton * skeleton)
+void EngineObjectManager::DeleteSkeleton(Skeleton * target)
 {
-	NULL_CHECK_RTRN(skeleton, "EngineObjectManager::DeleteSkeleton -> skeleton is NULL.");
-	delete skeleton;
+	NULL_CHECK_RTRN(target, "EngineObjectManager::DeleteSkeleton -> skeleton is NULL.");
+	delete target;
 }
 
-AnimationRef EngineObjectManager::CreateAnimation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton)
+AnimationRef EngineObjectManager::CreateAnimation(float duration, float ticksPerSecond, SkeletonRef skeleton)
 {
-	Animation * animation = new Animation(nodeCount, duration, ticksPerSecond, skeleton);
+	Animation * animation = new Animation(duration, ticksPerSecond, skeleton);
 	NULL_CHECK(animation, "EngineObjectManager::CreateAnimation -> Could not create new Animation object.", AnimationRef::Null());
 	animation->SetObjectID(GetNextObjectID());
 
@@ -339,12 +340,12 @@ void EngineObjectManager::DeleteAnimation(Animation * animation)
 	delete animation;
 }
 
-AnimationInstanceRef EngineObjectManager::CreateAnimationInstance(SkeletonRef skeleton, AnimationRef animation)
+AnimationInstanceRef EngineObjectManager::CreateAnimationInstance(SkeletonRef target, AnimationRef animation)
 {
-	SHARED_REF_CHECK(skeleton, "EngineObjectManager::CreateAnimationInstance -> skeleton is invalid.", AnimationInstanceRef::Null());
+	SHARED_REF_CHECK(target, "EngineObjectManager::CreateAnimationInstance -> target is invalid.", AnimationInstanceRef::Null());
 	SHARED_REF_CHECK(animation, "EngineObjectManager::CreateAnimationInstance -> animation is invalid.", AnimationInstanceRef::Null());
 
-	AnimationInstance * instance = new AnimationInstance(skeleton, animation);
+	AnimationInstance * instance = new AnimationInstance(target, animation);
 	NULL_CHECK(instance, "EngineObjectManager::CreateAnimationInstance -> Could not create new AnimationInstance object.", AnimationInstanceRef::Null());
 
 	return AnimationInstanceRef(instance, [=](AnimationInstance * instance)
@@ -364,6 +365,29 @@ void EngineObjectManager::DeleteAnimationInstance(AnimationInstance * instance)
 	delete instance;
 }
 
+AnimationPlayerRef EngineObjectManager::CreateAnimationPlayer(SkeletonRef target)
+{
+	SHARED_REF_CHECK(target, "EngineObjectManager::CreateAnimationPlayer -> target is invalid.", AnimationPlayerRef::Null());
+
+	AnimationPlayer * player = new AnimationPlayer(target);
+	NULL_CHECK(player, "EngineObjectManager::CreateAnimationPlayer -> Could not create new AnimationPlayer object.", AnimationPlayerRef::Null());
+
+	return AnimationPlayerRef(player, [=](AnimationPlayer * player)
+	{
+		  DeleteAnimationPlayer(player);
+	});
+}
+
+void EngineObjectManager::DestroyAnimationPlayer(AnimationPlayerRef player)
+{
+	player.ForceDelete();
+}
+
+void EngineObjectManager::DeleteAnimationPlayer(AnimationPlayer * player)
+{
+	NULL_CHECK_RTRN(player, "EngineObjectManager::DeleteAnimationPlayer -> player is NULL.");
+	delete player;
+}
 
 ShaderRef EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)
 {

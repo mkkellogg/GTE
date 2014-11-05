@@ -176,10 +176,6 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 	{
 		ClearTransformedBoneFlagsArray();
 
-		Point3 finalPoint;
-		Point3 currentPoint;
-		Point3 fullyTransformedPoint;
-
 		Matrix4x4 temp;
 		Matrix4x4 full;
 
@@ -251,20 +247,13 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 					else full.Add(&temp);
 				}
 
-				/*currentPoint.SetTo(positionsOut.GetPoint(i));
-				fullyTransformedPoint = currentPoint;
-				full.Transform(&fullyTransformedPoint);
-				Point3::Lerp(&currentPoint, &fullyTransformedPoint, &finalPoint, .35);
-				positionsOut.GetPoint(i)->SetTo(&finalPoint)*/
-
-				finalPoint.SetTo(positionsOut.GetPoint(i));
-				full.Transform(&finalPoint);
-				positionsOut.GetPoint(i)->SetTo(&finalPoint);
+				Point3 * p = positionsOut.GetPoint(i);
+				full.Transform(p);
 
 				Vector3 * v = normalsOut.GetVector(i);
 				full.Transform(v);
 
-				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(&finalPoint);
+				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(p);
 				transformedNormals.GetVector(desc->UVertexIndex)->Set(v->x,v->y,v->z);
 				positionTransformed[desc->UVertexIndex] = 1;
 			}

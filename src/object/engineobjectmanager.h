@@ -62,9 +62,10 @@ class EngineObjectManager
 	void DeleteMaterial(Material * material);
 	void DeleteTexture(Texture * texture);
 	void DeleteShader(Shader * shader);
-	void DeleteSkeleton(Skeleton * skeleton);
+	void DeleteSkeleton(Skeleton * target);
 	void DeleteAnimation(Animation * animation);
 	void DeleteAnimationInstance(AnimationInstance * animation);
+	void DeleteAnimationPlayer(AnimationPlayer * player);
 
     public :
 
@@ -93,10 +94,12 @@ class EngineObjectManager
     SkeletonRef CloneSkeleton(SkeletonRef source);
     void DestroySkeleton(SkeletonRef skeleton);
 
-    AnimationRef CreateAnimation(unsigned int nodeCount, float duration, float ticksPerSecond, SkeletonRef skeleton);
+    AnimationRef CreateAnimation(float duration, float ticksPerSecond, SkeletonRef target);
     void DestroyAnimation(AnimationRef animation);
-    AnimationInstanceRef CreateAnimationInstance(SkeletonRef skeleton, AnimationRef animation);
+    AnimationInstanceRef CreateAnimationInstance(SkeletonRef target, AnimationRef animation);
     void DestroyAnimationInstance(AnimationInstanceRef instance);
+    AnimationPlayerRef CreateAnimationPlayer(SkeletonRef target);
+    void DestroyAnimationPlayer(AnimationPlayerRef player);
 
     ShaderRef CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
     void DestroyShader(ShaderRef shader);

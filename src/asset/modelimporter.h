@@ -86,21 +86,21 @@ class ModelImporter
 	bool InitImporter();
 	const aiScene * LoadAIScene(const std::string& filePath);
 
-	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,   std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton, std::vector<SceneObjectRef>& createdSceneObjects);
-	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale);
-	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors);
+	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,   std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton, std::vector<SceneObjectRef>& createdSceneObjects) const;
+	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale) const;
+	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
-	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor);
+	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor) const;
 
-	SkeletonRef LoadSkeleton(const aiScene& scene);
-	VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh);
-	void AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap);
-	unsigned CountBones(const aiScene& scene);
-	bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene);
-	AnimationRef LoadAnimation (aiAnimation& animation, SkeletonRef skeleton);
+	SkeletonRef LoadSkeleton(const aiScene& scene) const;
+	VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh) const;
+	void AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap) const;
+	unsigned CountBones(const aiScene& scene) const;
+	bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
+	AnimationRef LoadAnimation (aiAnimation& animation, SkeletonRef skeleton) const;
 
-	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback);
-	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback);
+	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback) const;
+	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback) const;
 
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);
