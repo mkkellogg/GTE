@@ -60,12 +60,12 @@ Mesh3DRef SkinnedMesh3DRenderer::GetMesh()
 
 SubMesh3DRef SkinnedMesh3DRenderer::GetSubMesh(unsigned int index)
 {
-	SHARED_REF_CHECK(sceneObject,"SkinnedMesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
+	ASSERT(sceneObject.IsValid(),"SkinnedMesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
 
-	SHARED_REF_CHECK(mesh,"SkinnedMesh3DRenderer::GetSubMesh -> mesh is NULL.", SubMesh3DRef::Null());
+	ASSERT(mesh.IsValid(),"SkinnedMesh3DRenderer::GetSubMesh -> mesh is NULL.", SubMesh3DRef::Null());
 
 	SubMesh3DRef subMesh = mesh->GetSubMesh(index);
-	SHARED_REF_CHECK(subMesh,"SkinnedMesh3DRenderer::GetSubMesh -> subMesh is NULL.", SubMesh3DRef::Null());
+	ASSERT(subMesh.IsValid(),"SkinnedMesh3DRenderer::GetSubMesh -> subMesh is NULL.", SubMesh3DRef::Null());
 
 	return subMesh;
 }
@@ -98,7 +98,7 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Normal);
 
 					SkinnedMesh3DAttributeTransformer *attributeTransformer = new SkinnedMesh3DAttributeTransformer(attributes);
-					NULL_CHECK_RTRN(attributeTransformer,"SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
+					ASSERT_RTRN(attributeTransformer != NULL,"SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
 
 					attributeTransformer->SetSkeleton(skeleton);
 					attributeTransformer->SetVertexBoneMapIndex(vertexBoneMapIndex);

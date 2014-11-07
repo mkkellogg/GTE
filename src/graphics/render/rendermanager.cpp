@@ -167,7 +167,7 @@ void RenderManager::ProcessScene()
 	Transform cameraModelView;
 
 	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
-	SHARED_REF_CHECK_RTRN(sceneRoot,"RenderManager::RenderAll -> sceneRoot is NULL.");
+	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderAll -> sceneRoot is NULL.");
 
 	// gather information about the cameras & lights in the scene
 	ProcessScene(sceneRoot.GetPtr(), &cameraModelView);
@@ -262,12 +262,12 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 
 	Camera * camera = dynamic_cast<Camera *>(sceneCameras[cameraIndex].component);
 
-	NULL_CHECK_RTRN(camera,"RenderManager::RenderSceneFromCamera -> camera in NULL");
+	ASSERT_RTRN(camera != NULL,"RenderManager::RenderSceneFromCamera -> camera in NULL");
 
 	// clear the appropriate render buffers this camera
 	ClearBuffersForCamera(camera);
 	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
-	SHARED_REF_CHECK_RTRN(sceneRoot,"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
+	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
 	Transform identity;
 	identity.SetIdentity();
@@ -533,10 +533,10 @@ bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transf
  */
 void RenderManager::SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection)
 {
-	SHARED_REF_CHECK_RTRN(activeMaterial,"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
+	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
 
 	ShaderRef shader = activeMaterial->GetShader();
-	SHARED_REF_CHECK_RTRN(shader,"RenderManager::SendTransformUniformsToShader -> material contains NULL shader.");
+	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendTransformUniformsToShader -> material contains NULL shader.");
 
 	Transform mvpTransform;
 	mvpTransform.TransformBy(modelView);

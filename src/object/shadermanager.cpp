@@ -31,7 +31,7 @@ ShaderManager::~ShaderManager()
 
 void ShaderManager::AddShader(LongMask properties, ShaderRef shader)
 {
-	SHARED_REF_CHECK_RTRN(shader,"ShaderManager::AddShader -> shader is NULL.");
+	ASSERT_RTRN(shader.IsValid(),"ShaderManager::AddShader -> shader is NULL.");
 
 	if(!shader->IsLoaded())
 	{

@@ -67,7 +67,7 @@ MaterialRef Mesh3DRenderer::GetMaterial(unsigned int index)
 
 void Mesh3DRenderer::SetMaterial(unsigned int index, MaterialRef material)
 {
-	SHARED_REF_CHECK_RTRN(material, "Mesh3DRenderer::SetMaterial -> material is NULL.");
+	ASSERT_RTRN(material.IsValid(), "Mesh3DRenderer::SetMaterial -> material is NULL.");
 
 	if(index > GetMaterialCount())
 	{
@@ -80,16 +80,16 @@ void Mesh3DRenderer::SetMaterial(unsigned int index, MaterialRef material)
 
 void Mesh3DRenderer::AddMaterial(MaterialRef material)
 {
-	SHARED_REF_CHECK_RTRN(material, "Mesh3DRenderer::AddMaterial -> material is NULL.");
+	ASSERT_RTRN(material.IsValid(), "Mesh3DRenderer::AddMaterial -> material is NULL.");
 	materials.push_back(material);
 }
 
 void Mesh3DRenderer::UpdateFromMesh()
 {
-	SHARED_REF_CHECK_RTRN(sceneObject,"Mesh3DRenderer::UpdateFromMeshes -> sceneObject is NULL.");
+	ASSERT_RTRN(sceneObject.IsValid(),"Mesh3DRenderer::UpdateFromMeshes -> sceneObject is NULL.");
 
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
-	SHARED_REF_CHECK_RTRN(mesh,"Mesh3DRenderer::UpdateFromMeshes -> mesh is NULL.");
+	ASSERT_RTRN(mesh.IsValid(),"Mesh3DRenderer::UpdateFromMeshes -> mesh is NULL.");
 
 	UpdateFromMesh(mesh);
 }
@@ -111,7 +111,7 @@ void Mesh3DRenderer::UpdateFromMesh(Mesh3DRef mesh)
 		for(unsigned int i = subRenderers.size(); i < subMeshCount; i++)
 		{
 			SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
-			SHARED_REF_CHECK_RTRN(renderer,"Mesh3DRenderer::UpdateFromMeshes(Mesh3DRef) -> could not create new SubMesh3DRenderer.");
+			ASSERT_RTRN(renderer.IsValid(),"Mesh3DRenderer::UpdateFromMeshes(Mesh3DRef) -> could not create new SubMesh3DRenderer.");
 
 			renderer->SetSubIndex(i);
 			renderer->SetContainerRenderer(this);
@@ -139,28 +139,28 @@ void Mesh3DRenderer::UpdateFromSubMesh(unsigned int index)
 
 Mesh3DRef Mesh3DRenderer::GetMesh()
 {
-	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetMesh -> sceneObject is NULL.", Mesh3DRef::Null());
+	ASSERT(sceneObject.IsValid(),"Mesh3DRenderer::GetMesh -> sceneObject is NULL.", Mesh3DRef::Null());
 
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
-	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetMesh -> mesh is NULL.", Mesh3DRef::Null());
+	ASSERT(mesh.IsValid(),"Mesh3DRenderer::GetMesh -> mesh is NULL.", Mesh3DRef::Null());
 
 	return mesh;
 }
 
 SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer)
 {
-	SHARED_REF_CHECK(subRenderer,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subRenderer is NULL.", SubMesh3DRef::Null());
-	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", SubMesh3DRef::Null());
+	ASSERT(subRenderer.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> subRenderer is NULL.", SubMesh3DRef::Null());
+	ASSERT(sceneObject.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", SubMesh3DRef::Null());
 
 	for(unsigned int i=0; i < subRenderers.size(); i++)
 	{
 		if(subRenderers[i] == subRenderer)
 		{
 			Mesh3DRef mesh = sceneObject->GetMesh3D();
-			SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", SubMesh3DRef::Null());
+			ASSERT(mesh.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", SubMesh3DRef::Null());
 
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-			SHARED_REF_CHECK(subMesh,"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", SubMesh3DRef::Null());
+			ASSERT(subMesh.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", SubMesh3DRef::Null());
 
 			return subMesh;
 		}
@@ -171,13 +171,13 @@ SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRef subRe
 
 SubMesh3DRef Mesh3DRenderer::GetSubMesh(unsigned int index)
 {
-	SHARED_REF_CHECK(sceneObject,"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
+	ASSERT(sceneObject.IsValid(),"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
 
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
-	SHARED_REF_CHECK(mesh,"Mesh3DRenderer::GetSubMesh -> mesh is NULL.", SubMesh3DRef::Null());
+	ASSERT(mesh.IsValid(),"Mesh3DRenderer::GetSubMesh -> mesh is NULL.", SubMesh3DRef::Null());
 
 	SubMesh3DRef subMesh = mesh->GetSubMesh(index);
-	SHARED_REF_CHECK(subMesh,"Mesh3DRenderer::GetSubMesh -> subMesh is NULL.", SubMesh3DRef::Null());
+	ASSERT(subMesh.IsValid(),"Mesh3DRenderer::GetSubMesh -> subMesh is NULL.", SubMesh3DRef::Null());
 
 	return subMesh;
 }

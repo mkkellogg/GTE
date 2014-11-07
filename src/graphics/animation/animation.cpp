@@ -50,11 +50,11 @@ bool Animation::Init()
 {
 	Destroy();
 
-	SHARED_REF_CHECK(target,"Animation::Init -> Animation target is not valid.",false);
+	ASSERT(target.IsValid(),"Animation::Init -> Animation target is not valid.",false);
 	if(target->GetNodeCount() == 0)return true;
 
 	keyFrames = new KeyFrameSet[target->GetNodeCount()];
-	NULL_CHECK(keyFrames,"Animation::Init -> Could not allocate key frame set array", false);
+	ASSERT(keyFrames != NULL,"Animation::Init -> Could not allocate key frame set array", false);
 
 	keyFrameSetCount = target->GetNodeCount();
 

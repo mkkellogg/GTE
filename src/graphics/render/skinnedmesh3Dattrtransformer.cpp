@@ -67,9 +67,8 @@ void SkinnedMesh3DAttributeTransformer::DestroySavedTransformsArray()
 
 bool SkinnedMesh3DAttributeTransformer::CreateSavedTransformsArray(unsigned int saveCount)
 {
-
 	savedTransforms = new Matrix4x4[saveCount];
-	NULL_CHECK(savedTransforms,"SkinnedMesh3DAttributeTransformer::CreateSavedTransformsArray -> Unable to allocate saved transforms array.",false);
+	ASSERT(savedTransforms != NULL,"SkinnedMesh3DAttributeTransformer::CreateSavedTransformsArray -> Unable to allocate saved transforms array.",false);
 	return true;
 }
 
@@ -83,7 +82,7 @@ bool SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray()
 	if(skeleton.IsValid())
 	{
 		boneTransformed = new unsigned char[skeleton->GetBoneCount()];
-		NULL_CHECK(boneTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneCache -> Unable to allocate flags array.", false);
+		ASSERT(boneTransformed != NULL, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneCache -> Unable to allocate flags array.", false);
 		return true;
 	}
 
@@ -104,7 +103,7 @@ bool SkinnedMesh3DAttributeTransformer::CreateTransformedPositionFlagsArray(unsi
 {
 	this->positionTransformedCount = positionTransformedCount;
 	positionTransformed = new unsigned char[positionTransformedCount];
-	NULL_CHECK(positionTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedPositionFlagsArray -> Unable to allocate flags array.", false);
+	ASSERT(positionTransformed != NULL, "SkinnedMesh3DAttributeTransformer::CreateTransformedPositionFlagsArray -> Unable to allocate flags array.", false);
 
 	bool initSuccess = transformedPositions.Init(positionTransformedCount);
 	if(!initSuccess)
@@ -130,14 +129,10 @@ bool SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray(unsign
 {
 	this->normalTransformedCount = normalTransformedCount;
 	normalTransformed = new unsigned char[normalTransformedCount];
-	NULL_CHECK(normalTransformed, "SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray -> Unable to allocate flags array.", false);
+	ASSERT(normalTransformed != NULL, "SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray -> Unable to allocate flags array.", false);
 
 	bool initSuccess = transformedNormals.Init(normalTransformedCount);
-	if(!initSuccess)
-	{
-		Debug::PrintError("SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray -> Could not init transformed vertex array.");
-		return false;
-	}
+	ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateTransformedNormalFlagsArray -> Could not init transformed vertex array.", false);
 
 	return true;
 }
@@ -180,7 +175,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		Matrix4x4 full;
 
 		VertexBoneMap * vertexBoneMap = skeleton->GetVertexBoneMap(vertexBoneMapIndex);
-		NULL_CHECK_RTRN(vertexBoneMap,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> No valid vertex bone map found for sub mesh.");
+		ASSERT_RTRN(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> No valid vertex bone map found for sub mesh.");
 
 		unsigned int uniqueVertexCount = vertexBoneMap->GetUVertexCount();
 		if(positionTransformedCount < 0 || uniqueVertexCount != (unsigned int)positionTransformedCount)
@@ -281,7 +276,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 		Matrix4x4 full;
 
 		VertexBoneMap * vertexBoneMap = skeleton->GetVertexBoneMap(vertexBoneMapIndex);
-		NULL_CHECK_RTRN(vertexBoneMap,"SkinnedMesh3DAttributeTransformer::TransformPositions -> No valid vertex bone map found for sub mesh.");
+		ASSERT_RTRN(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::TransformPositions -> No valid vertex bone map found for sub mesh.");
 
 		unsigned int uniqueVertexCount = vertexBoneMap->GetUVertexCount();
 		if(positionTransformedCount < 0 || uniqueVertexCount != (unsigned int)positionTransformedCount)

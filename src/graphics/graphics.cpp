@@ -53,7 +53,7 @@ bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callb
 {
 	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
 	renderManager = new RenderManager(this, engineObjectManager);
-	NULL_CHECK(renderManager, "Graphics::Init -> Unable to allocate render manager", false);
+	ASSERT(renderManager != NULL, "Graphics::Init -> Unable to allocate render manager", false);
 
 	bool renderInitSuccess = renderManager->Init();
 	if(!renderInitSuccess)return false;

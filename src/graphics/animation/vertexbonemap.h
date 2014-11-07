@@ -43,7 +43,7 @@ class VertexBoneMap
 		// make this VertexMappingDexcriptor object identical to [desc].
 		void SetTo(VertexMappingDescriptor* desc)
 		{
-			NULL_CHECK_RTRN(desc,"VertexMappingDescriptor::SetTo -> desc is NULL.");
+			ASSERT_RTRN(desc != NULL,"VertexMappingDescriptor::SetTo -> desc is NULL.");
 
 			this->BoneCount = desc->BoneCount;
 			this->UVertexIndex = desc->UVertexIndex;

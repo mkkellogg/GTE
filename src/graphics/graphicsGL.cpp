@@ -147,7 +147,7 @@ Shader * GraphicsGL::CreateShader(const std::string& vertexShaderPath, const std
 
 void GraphicsGL::DestroyShader(Shader * shader)
 {
-	NULL_CHECK_RTRN(shader, "GraphicsGL::DestroyShader -> shader is NULL");
+	ASSERT_RTRN(shader != NULL, "GraphicsGL::DestroyShader -> shader is NULL");
     delete shader;
 }
 
@@ -169,8 +169,7 @@ SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer(AttributeTransformer * attrTr
 
 void GraphicsGL::DestroyMeshRenderer(SubMesh3DRenderer * renderer)
 {
-	printf("deleteing\n");
-	NULL_CHECK_RTRN(renderer, "GraphicsGL::DestroyMeshRenderer -> renderer is NULL");
+	ASSERT_RTRN(renderer != NULL, "GraphicsGL::DestroyMeshRenderer -> renderer is NULL");
 	delete renderer;
 }
 
@@ -181,13 +180,13 @@ VertexAttrBuffer * GraphicsGL::CreateVertexAttributeBuffer()
 
 void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 {
-	NULL_CHECK_RTRN(buffer, "GraphicsGL::DestroyVertexAttributeBuffer -> buffer is NULL");
+	ASSERT_RTRN(buffer != NULL, "GraphicsGL::DestroyVertexAttributeBuffer -> buffer is NULL");
 	delete buffer;
 }
 
 Texture * GraphicsGL::CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes)
 {
-	NULL_CHECK(imageData, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
+	ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
 
 	glEnable(GL_TEXTURE_2D);
 	GLuint tex;
@@ -263,7 +262,7 @@ Texture * GraphicsGL::CreateTexture(const RawImage * imageData, const std::strin
 Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, TextureAttributes attributes)
 {
 	RawImage * raw = ImageLoader::LoadImage(sourcePath);
-	NULL_CHECK(raw, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
+	ASSERT(raw != NULL, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
 
 	TextureGL * tex = (TextureGL*)CreateTexture(raw, sourcePath, attributes);
 	if(tex == NULL)
@@ -322,7 +321,7 @@ GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property)
 
 void GraphicsGL::ActivateMaterial(MaterialRef material)
 {
-	SHARED_REF_CHECK_RTRN(material,"GraphicsGL::ActivateMaterial -> material is NULL");
+	ASSERT_RTRN(material.IsValid(),"GraphicsGL::ActivateMaterial -> material is NULL");
 
 	// TODO: Change this to a proper comparison, and not just
 	// a comparison of memory addresses
@@ -345,10 +344,10 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 		Graphics::ActivateMaterial(material);
 
 		ShaderRef shader = material->GetShader();
-		SHARED_REF_CHECK_RTRN(shader,"GraphicsGL::ActivateMaterial -> shader is NULL");
+		ASSERT_RTRN(shader.IsValid(),"GraphicsGL::ActivateMaterial -> shader is NULL");
 
 		ShaderGL * shaderGL = dynamic_cast<ShaderGL *>(shader.GetPtr());
-		NULL_CHECK_RTRN(shaderGL,"GraphicsGL::ActivateMaterial -> material's shader is not ShaderGL !!");
+		ASSERT_RTRN(shaderGL != NULL,"GraphicsGL::ActivateMaterial -> material's shader is not ShaderGL !!");
 
 		// only active the new shader if it is different from the currently active one
 		if(oldActiveProgramID != shaderGL->GetProgramID())

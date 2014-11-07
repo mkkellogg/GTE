@@ -76,7 +76,7 @@ int Matrix4x4::GetDataSize() const
  */
 void Matrix4x4::SetTo(const Matrix4x4 * src)
 {
-	NULL_CHECK_RTRN(src,"Matrix4x4::SetTo -> NULL pointer passed");
+	ASSERT_RTRN(src != NULL,"Matrix4x4::SetTo -> NULL pointer passed");
 	if(this == src)return;
 	SetTo(src->data);
 }
@@ -86,7 +86,7 @@ void Matrix4x4::SetTo(const Matrix4x4 * src)
  */
 void Matrix4x4::SetTo(const float * srcData)
 {
-	NULL_CHECK_RTRN(srcData,"Matrix4x4::SetTo -> srcData is NULL");
+	ASSERT_RTRN(srcData != NULL,"Matrix4x4::SetTo -> srcData is NULL");
 	memcpy(data, srcData, sizeof(float) * DATA_SIZE);
 }
 
@@ -140,7 +140,7 @@ void Matrix4x4::Transform(const Point3 * point, Point3 * out) const
  */
 void Matrix4x4::Transform(Vector3 * vector) const
 {
-	NULL_CHECK_RTRN(vector,"Matrix4x4::Transform(Vector3 *) -> vector is NULL");
+	ASSERT_RTRN(vector != NULL,"Matrix4x4::Transform(Vector3 *) -> vector is NULL");
 
 	float temp[DIM_SIZE];
 	MultiplyMV(this->data, vector->GetDataPtr(), temp);
@@ -162,7 +162,7 @@ void Matrix4x4::Transform(Point3 * point) const
  */
 void Matrix4x4::Transform(float * vector4f) const
 {
-	NULL_CHECK_RTRN(vector4f, "Matrix4x4::Transform(float *) -> vector4f is NULL");
+	ASSERT_RTRN(vector4f != NULL, "Matrix4x4::Transform(float *) -> vector4f is NULL");
 
 	float temp[DIM_SIZE];
 	MultiplyMV(this->data, vector4f, temp);
@@ -174,7 +174,7 @@ void Matrix4x4::Transform(float * vector4f) const
  */
 void Matrix4x4::Add(const Matrix4x4 * matrix)
 {
-	NULL_CHECK_RTRN(matrix, "Matrix4x4::add -> matrix is NULL");
+	ASSERT_RTRN(matrix != NULL, "Matrix4x4::add -> matrix is NULL");
 	for(unsigned int i=0; i < 16; i++)
 	{
 		data[i] += matrix->data[i];
@@ -186,7 +186,7 @@ void Matrix4x4::Add(const Matrix4x4 * matrix)
  */
 void Matrix4x4::Multiply(const Matrix4x4 * matrix)
 {
-	NULL_CHECK_RTRN(matrix, "Matrix4x4::Multiply(Matrix4x4 *) -> matrix is NULL");
+	ASSERT_RTRN(matrix != NULL, "Matrix4x4::Multiply(Matrix4x4 *) -> matrix is NULL");
 
     float temp[DATA_SIZE];
     MultiplyMM(this->data, matrix->data, temp);
@@ -198,7 +198,7 @@ void Matrix4x4::Multiply(const Matrix4x4 * matrix)
  */
 void Matrix4x4::PreMultiply(const Matrix4x4 * matrix)
 {
-	NULL_CHECK_RTRN(matrix, "Matrix4x4::PreMultiply(Matrix4x4 *) -> matrix is NULL");
+	ASSERT_RTRN(matrix != NULL, "Matrix4x4::PreMultiply(Matrix4x4 *) -> matrix is NULL");
 
     float temp[DATA_SIZE];
     MultiplyMM(matrix->data, this->data, temp);
@@ -210,8 +210,8 @@ void Matrix4x4::PreMultiply(const Matrix4x4 * matrix)
  */
 void Matrix4x4::Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const
 {
-	NULL_CHECK_RTRN(matrix, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *) -> matrix is NULL");
-	NULL_CHECK_RTRN(out, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *) -> out is NULL");
+	ASSERT_RTRN(matrix != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *) -> matrix is NULL");
+	ASSERT_RTRN(out != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *) -> out is NULL");
 
     MultiplyMM(this->data, matrix->data, out->data);
 }
@@ -221,9 +221,9 @@ void Matrix4x4::Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const
  */
 void Matrix4x4::Multiply(const Matrix4x4 * lhs, const Matrix4x4 *rhs, Matrix4x4 * out)
 {
-	NULL_CHECK_RTRN(lhs, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> lhs is NULL");
-	NULL_CHECK_RTRN(rhs, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> rhs is NULL");
-	NULL_CHECK_RTRN(out, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> out is NULL");
+	ASSERT_RTRN(lhs != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> lhs is NULL");
+	ASSERT_RTRN(rhs != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> rhs is NULL");
+	ASSERT_RTRN(out != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> out is NULL");
 
     MultiplyMM(lhs->data, rhs->data, out->data);
 }
@@ -234,9 +234,9 @@ void Matrix4x4::Multiply(const Matrix4x4 * lhs, const Matrix4x4 *rhs, Matrix4x4 
  */
 void Matrix4x4::MultiplyMV(const float * lhsMat, const float * rhsVec, float * out)
 {
-	NULL_CHECK_RTRN(lhsMat, "Matrix4x4::MultiplyMV -> lhsMat is NULL");
-	NULL_CHECK_RTRN(rhsVec, "Matrix4x4::MultiplyMV -> rhsVec is NULL");
-	NULL_CHECK_RTRN(out, "Matrix4x4::MultiplyMV -> out is NULL");
+	ASSERT_RTRN(lhsMat != NULL, "Matrix4x4::MultiplyMV -> lhsMat is NULL");
+	ASSERT_RTRN(rhsVec != NULL, "Matrix4x4::MultiplyMV -> rhsVec is NULL");
+	ASSERT_RTRN(out != NULL, "Matrix4x4::MultiplyMV -> out is NULL");
 
     Mx4transform(rhsVec[0], rhsVec[1], rhsVec[2], rhsVec[3], lhsMat, out);
 }
@@ -247,8 +247,8 @@ void Matrix4x4::MultiplyMV(const float * lhsMat, const float * rhsVec, float * o
  */
 void Matrix4x4::Mx4transform(float x, float y, float z, float w, const float* matrix, float* pDest) 
 {
-	NULL_CHECK_RTRN(matrix, "Matrix4x4::Mx4transform -> lhsMat is NULL");
-	NULL_CHECK_RTRN(pDest, "Matrix4x4::Mx4transform -> pDest is NULL");
+	ASSERT_RTRN(matrix != NULL, "Matrix4x4::Mx4transform -> lhsMat is NULL");
+	ASSERT_RTRN(pDest != NULL, "Matrix4x4::Mx4transform -> pDest is NULL");
 
     pDest[0] = matrix[0 + 4 * 0] * x + matrix[0 + 4 * 1] * y + matrix[0 + 4 * 2] * z + matrix[0 + 4 * 3] * w;
     pDest[1] = matrix[1 + 4 * 0] * x + matrix[1 + 4 * 1] * y + matrix[1 + 4 * 2] * z + matrix[1 + 4 * 3] * w;
@@ -309,8 +309,8 @@ void Matrix4x4::Transpose()
  */
 void Matrix4x4::Transpose(const float* source, float *dest)
 {
-	NULL_CHECK_RTRN(source, "Matrix4x4::Transpose -> source is NULL");
-	NULL_CHECK_RTRN(dest, "Matrix4x4::Transpose -> dest is NULL");
+	ASSERT_RTRN(source != NULL, "Matrix4x4::Transpose -> source is NULL");
+	ASSERT_RTRN(dest != NULL, "Matrix4x4::Transpose -> dest is NULL");
 
     for (int i = 0; i < DIM_SIZE; i++) 
     {
@@ -345,7 +345,7 @@ bool Matrix4x4::Invert()
  */
 bool Matrix4x4::Invert(Matrix4x4 * out)
 {
-	NULL_CHECK(out, "Matrix4x4::Invert -> out is NULL", false);
+	ASSERT(out != NULL, "Matrix4x4::Invert -> out is NULL", false);
 	return Invert(data, out->data);
 }
 
@@ -356,8 +356,8 @@ bool Matrix4x4::Invert(Matrix4x4 * out)
  */
 bool Matrix4x4::Invert(const float * source, float * dest)
 {
-	NULL_CHECK(source, "Matrix4x4::Invert -> source is NULL", false);
-	NULL_CHECK(dest, "Matrix4x4::Invert -> dest is NULL", false);
+	ASSERT(source != NULL, "Matrix4x4::Invert -> source is NULL", false);
+	ASSERT(dest != NULL, "Matrix4x4::Invert -> dest is NULL", false);
 
     // array of transpose source matrix
     float src[DATA_SIZE];
@@ -465,7 +465,7 @@ void Matrix4x4::SetIdentity()
  */
 void Matrix4x4::SetIdentity(float * target)
 {
-	NULL_CHECK_RTRN(target, "Matrix4x4::SetIdentity -> target is NULL");
+	ASSERT_RTRN(target != NULL, "Matrix4x4::SetIdentity -> target is NULL");
 
     for (int i=0 ; i< DATA_SIZE; i++) 
     {
@@ -537,8 +537,8 @@ void Matrix4x4::Scale(Matrix4x4 * out, float x, float y, float z) const
  */
 void Matrix4x4::Scale(const float * source, float * dest,  float x, float y, float z)
 {
-	NULL_CHECK_RTRN(source, "Matrix4x4::Scale -> source is NULL");
-	NULL_CHECK_RTRN(dest, "Matrix4x4::Scale -> dest is NULL");
+	ASSERT_RTRN(source != NULL, "Matrix4x4::Scale -> source is NULL");
+	ASSERT_RTRN(dest != NULL, "Matrix4x4::Scale -> dest is NULL");
 
     for (int i=0 ; i<4 ; i++) 
     {
@@ -559,7 +559,7 @@ void Matrix4x4::Scale(const float * source, float * dest,  float x, float y, flo
  */
 void Matrix4x4::Translate(const Vector3 * vector)
 {
-	NULL_CHECK_RTRN(vector, "Matrix4x4::Translate -> vector is NULL");
+	ASSERT_RTRN(vector != NULL, "Matrix4x4::Translate -> vector is NULL");
 
     float x = vector->x;
     float y = vector->y;
@@ -621,7 +621,7 @@ void Matrix4x4::Translate(const Matrix4x4 * source, Matrix4x4 * out,float x, flo
  */
 void Matrix4x4::Translate(const float * source, float * dest, float x, float y, float z)
 {
-	NULL_CHECK_RTRN(source, "Matrix4x4::Translate -> source is NULL");
+	ASSERT_RTRN(source != NULL, "Matrix4x4::Translate -> source is NULL");
 
     if(source != dest)
     {
@@ -666,7 +666,7 @@ void Matrix4x4::PreTranslate(const float * source, float * dest, float x, float 
  */
 void Matrix4x4::Rotate(const Vector3 * vector, float a)
 {
-	NULL_CHECK_RTRN(vector, "Matrix4x4::Rotate -> vector is NULL");
+	ASSERT_RTRN(vector != NULL, "Matrix4x4::Rotate -> vector is NULL");
 
     float temp[DATA_SIZE];  
     float r[DATA_SIZE];  
@@ -698,7 +698,7 @@ void Matrix4x4::Rotate(float x, float y, float z, float a)
  */
 void Matrix4x4::PreRotate(const Vector3 * vector, float a)
 {
-	NULL_CHECK_RTRN(vector, "Matrix4x4::PreRotate -> vector is NULL");
+	ASSERT_RTRN(vector != NULL, "Matrix4x4::PreRotate -> vector is NULL");
 
     float temp[DATA_SIZE];
     float r[DATA_SIZE];
@@ -736,7 +736,7 @@ void Matrix4x4::SetRotateEuler(float x, float y, float z)
  */
 void Matrix4x4::SetRotate(Matrix4x4 * m, float x, float y, float z, float a)
 {
-	NULL_CHECK_RTRN(m, "Matrix4x4::SetRotate -> m is NULL");
+	ASSERT_RTRN(m != NULL, "Matrix4x4::SetRotate -> m is NULL");
 	SetRotate(m->data,x,y,z,a);
 }
 
@@ -745,7 +745,7 @@ void Matrix4x4::SetRotate(Matrix4x4 * m, float x, float y, float z, float a)
  */
 void Matrix4x4::SetRotate(float * rm, float x, float y, float z, float a)
 {
-	NULL_CHECK_RTRN(rm, "Matrix4x4::SetRotate -> rm is NULL");
+	ASSERT_RTRN(rm != NULL, "Matrix4x4::SetRotate -> rm is NULL");
 
     rm[3] = 0;
     rm[7] = 0;
@@ -815,7 +815,7 @@ void Matrix4x4::SetRotate(float * rm, float x, float y, float z, float a)
  */
 void Matrix4x4::SetRotateEuler(float * rm, float x, float y, float z)
 {
-	NULL_CHECK_RTRN(rm, "Matrix4x4::SetRotateEuler -> rm is NULL");
+	ASSERT_RTRN(rm != NULL, "Matrix4x4::SetRotateEuler -> rm is NULL");
 
     float piOver180 = PI / 180.0f;
     x *= piOver180;

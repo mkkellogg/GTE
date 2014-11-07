@@ -298,7 +298,7 @@ SkeletonRef EngineObjectManager::CloneSkeleton(SkeletonRef source)
 	ASSERT(source.IsValid(),"EngineObjectManager::CloneSkeleton -> source is invalid.", SkeletonRef::Null());
 
 	Skeleton * skeleton = source->FullClone();
-	NULL_CHECK(skeleton,"EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonRef::Null());
+	ASSERT(skeleton != NULL,"EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonRef::Null());
 
 	return SkeletonRef(skeleton, [=](Skeleton * skeleton)
 	{

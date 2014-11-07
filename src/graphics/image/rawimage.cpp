@@ -39,7 +39,7 @@ bool RawImage::Init()
 
 void RawImage::SetDataTo(BYTE * data)
 {
-	NULL_CHECK_RTRN(data, "RawImage::SetDataTo -> data is NULL");
+	ASSERT_RTRN(data != NULL, "RawImage::SetDataTo -> data is NULL");
 
 	if(imageBytes != NULL)
 	{

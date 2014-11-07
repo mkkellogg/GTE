@@ -64,7 +64,7 @@ void SubMesh3DRenderer::SetSubIndex(unsigned int index)
 
 void SubMesh3DRenderer::SetContainerRenderer(Mesh3DRenderer * renderer)
 {
-	NULL_CHECK_RTRN(renderer, "SubMesh3DRenderer::SetContainerRenderer -> renderer is NULL");
+	ASSERT_RTRN(renderer != NULL, "SubMesh3DRenderer::SetContainerRenderer -> renderer is NULL");
 	this->containerRenderer = renderer;
 }
 
@@ -156,10 +156,10 @@ void SubMesh3DRenderer::SetUV2Data(UV2Array * uvs)
 bool SubMesh3DRenderer::UpdateMeshData()
 {
 	DestroyBuffers();
-	NULL_CHECK(containerRenderer,"SubMesh3DRendererGL::UpdateMeshData -> containerRenderer is NULL.",false);
+	ASSERT(containerRenderer != NULL,"SubMesh3DRendererGL::UpdateMeshData -> containerRenderer is NULL.",false);
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	SHARED_REF_CHECK(mesh,"SubMesh3DRendererGL::UpdateMeshData -> Could not find matching sub mesh for sub renderer.",false);
+	ASSERT(mesh.IsValid(),"SubMesh3DRendererGL::UpdateMeshData -> Could not find matching sub mesh for sub renderer.",false);
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
@@ -240,10 +240,10 @@ bool SubMesh3DRenderer::UpdateMeshData()
 
 void SubMesh3DRenderer::CopyMeshData()
 {
-	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::CopyMeshData -> containerRenderer is NULL.");
+	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::CopyMeshData -> containerRenderer is NULL.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	SHARED_REF_CHECK_RTRN(mesh,"SubMesh3DRendererGL::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
+	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
@@ -293,10 +293,10 @@ void SubMesh3DRenderer::CopyMeshData()
 
 void SubMesh3DRenderer::UpdateFromMesh()
 {
-	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::UpdateFromMesh -> containerRenderer is NULL.");
+	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::UpdateFromMesh -> containerRenderer is NULL.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	SHARED_REF_CHECK_RTRN(mesh,"SubMesh3DRendererGL::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
+	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
 	if(mesh->GetVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
 	{
@@ -312,13 +312,13 @@ bool SubMesh3DRenderer::UseMaterial(MaterialRef material)
 {
 	if(material == activeMaterial)return true;
 
-	SHARED_REF_CHECK(material, "SubMesh3DRenderer::UseMaterial -> material is NULL", false);
+	ASSERT(material.IsValid(), "SubMesh3DRenderer::UseMaterial -> material is NULL", false);
 	this->activeMaterial = material;
 
-	NULL_CHECK(containerRenderer,"SubMesh3DRendererGL::UseMaterial -> containerRenderer is NULL.", false);
+	ASSERT(containerRenderer != NULL,"SubMesh3DRendererGL::UseMaterial -> containerRenderer is NULL.", false);
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	SHARED_REF_CHECK(mesh,"SubMesh3DRendererGL::UseMaterial -> Could not find matching sub mesh for sub renderer.", false);
+	ASSERT(mesh.IsValid(),"SubMesh3DRendererGL::UseMaterial -> Could not find matching sub mesh for sub renderer.", false);
 
 	StandardAttributeSet materialAttributes = material->GetStandardAttributes();
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
@@ -368,10 +368,10 @@ void SubMesh3DRenderer::PreRender()
 	MaterialRef currentMaterial = graphics->GetActiveMaterial();
 	UseMaterial(currentMaterial);
 
-	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
+	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	SHARED_REF_CHECK_RTRN(mesh,"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
+	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
@@ -411,7 +411,7 @@ void SubMesh3DRenderer::PreRender()
 const Point3 * SubMesh3DRenderer::GetFinalCenter()
 {
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	SHARED_REF_CHECK(mesh,"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.", NULL);
+	ASSERT(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.", NULL);
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 

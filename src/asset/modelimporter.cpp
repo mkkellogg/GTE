@@ -496,7 +496,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 				{
 					// create a new Material engine object
 					MaterialRef newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
-					SHARED_REF_CHECK(newMaterial, "AssetImporter::ProcessMaterials -> Could not create new Material object.", false);
+					ASSERT(newMaterial.IsValid(), "AssetImporter::ProcessMaterials -> Could not create new Material object.", false);
 
 					// if there is a diffuse texture, set it and get the appropriate mapping
 					// to UV coordinates

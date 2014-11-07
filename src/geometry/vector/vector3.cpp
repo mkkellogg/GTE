@@ -82,7 +82,7 @@ Vector3::~Vector3()
  */
 void Vector3::Add(const Vector3 * vector)
 {
-	NULL_CHECK_RTRN(vector, "Vector3::Add -> NULL vector passed.");
+	ASSERT_RTRN(vector != NULL, "Vector3::Add -> NULL vector passed.");
 
     x += vector->x;
     y += vector->y;
@@ -94,9 +94,9 @@ void Vector3::Add(const Vector3 * vector)
  */
 void Vector3::Add(const Vector3 * v1,const Vector3 * v2, Vector3 * result)
 {
-	NULL_CHECK_RTRN(v1, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL v1 passed.");
-	NULL_CHECK_RTRN(v2, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL v2 passed.");
-	NULL_CHECK_RTRN(result, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
+	ASSERT_RTRN(v1 != NULL, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL v1 passed.");
+	ASSERT_RTRN(v2 != NULL, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL v2 passed.");
+	ASSERT_RTRN(result != NULL, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
 
     result->x = v1->x + v2->x;
     result->y = v1->y + v2->y;
@@ -108,9 +108,9 @@ void Vector3::Add(const Vector3 * v1,const Vector3 * v2, Vector3 * result)
  */
 void Vector3::Subtract(const Vector3 * v1,const Vector3 * v2, Vector3 * result)
 {
-	NULL_CHECK_RTRN(v1, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL v1 passed.");
-	NULL_CHECK_RTRN(v2, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL v2 passed.");
-	NULL_CHECK_RTRN(result, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
+	ASSERT_RTRN(v1 != NULL, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL v1 passed.");
+	ASSERT_RTRN(v2 != NULL, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL v2 passed.");
+	ASSERT_RTRN(result != NULL, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
 
     result->x = v1->x - v2->x;
     result->y = v1->y - v2->y;
@@ -193,9 +193,9 @@ void Vector3::Invert()
  */
 void Vector3::Cross(const Vector3 * a,const Vector3 * b, Vector3 * result)
 {
-	NULL_CHECK_RTRN(a, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.");
-	NULL_CHECK_RTRN(b, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.");
-	NULL_CHECK_RTRN(result, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
+	ASSERT_RTRN(a != NULL, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.");
+	ASSERT_RTRN(b != NULL, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.");
+	ASSERT_RTRN(result != NULL, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
 
     float x,y,z;
     x = (a->y*b->z) - (b->y*a->z);
@@ -210,9 +210,9 @@ void Vector3::Cross(const Vector3 * a,const Vector3 * b, Vector3 * result)
  */
 void Vector3::CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result)
 {
-	NULL_CHECK_RTRN(a, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.");
-	NULL_CHECK_RTRN(b, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.");
-	NULL_CHECK_RTRN(result, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
+	ASSERT_RTRN(a != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.");
+	ASSERT_RTRN(b != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.");
+	ASSERT_RTRN(result != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
 
     Cross(a,b,result);
     result->Normalize();
@@ -238,8 +238,8 @@ void Vector3::UpdateComponentPointers()
  */
 float Vector3::Dot(const Vector3 * a,const Vector3 * b)
 {
-	NULL_CHECK(a, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.", 0);
-	NULL_CHECK(b, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.", 0);
+	ASSERT(a != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.", 0);
+	ASSERT(b != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.", 0);
 
     float x = a->x * b->x;
     float y = a->y * b->y;
@@ -252,7 +252,7 @@ float Vector3::Dot(const Vector3 * a,const Vector3 * b)
  */
 void Vector3::AttachTo(float * data)
 {
-	NULL_CHECK_RTRN(data, "Vector3::AttachTo -> NULL data passed.");
+	ASSERT_RTRN(data != NULL, "Vector3::AttachTo -> NULL data passed.");
 
 	BaseVector4::AttachTo(data);
 	UpdateComponentPointers();

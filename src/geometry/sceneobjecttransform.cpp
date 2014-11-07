@@ -81,7 +81,7 @@ void SceneObjectTransform::StoreFullTransform(Transform& localTransform)
  */
 void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool invert)
 {
-	NULL_CHECK_RTRN(transform, "SceneObjectTransform::GetInheritedTransform -> NULL transform passed.");
+	ASSERT_RTRN(transform != NULL, "SceneObjectTransform::GetInheritedTransform -> NULL transform passed.");
 
 	Transform full;
 	SceneObjectRef parent = sceneObject->GetParent();
@@ -170,7 +170,7 @@ void SceneObjectTransform::RotateAround(float px, float py, float pz, float ax, 
  */
 void SceneObjectTransform::Scale(Vector3 * mag,  bool local)
 {
-	NULL_CHECK_RTRN(mag, "Transform::Scale -> mag is null.");
+	ASSERT_RTRN(mag != NULL, "Transform::Scale -> mag is null.");
 
 	Scale(mag->x, mag->y, mag->z, local);
 }

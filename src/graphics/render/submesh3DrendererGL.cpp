@@ -49,10 +49,10 @@ void SubMesh3DRendererGL::Render()
 	MaterialRef currentMaterial = graphics->GetActiveMaterial();
 	UseMaterial(currentMaterial);
 
-	NULL_CHECK_RTRN(containerRenderer,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
+	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	SHARED_REF_CHECK_RTRN(mesh,"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
+	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 

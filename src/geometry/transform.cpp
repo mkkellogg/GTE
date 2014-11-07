@@ -39,7 +39,7 @@ Transform::Transform(Matrix4x4 * m) : Transform()
  */
 Transform::Transform(Transform * transform) : Transform()
 {
-	NULL_CHECK_RTRN(transform, "Transform::copy constructor -> NULL transform passed.");
+	ASSERT_RTRN(transform != NULL, "Transform::copy constructor -> NULL transform passed.");
 
 	matrix.SetTo(transform->GetMatrix());
 }
@@ -65,7 +65,7 @@ const Matrix4x4 * Transform::GetMatrix() const
  */
 void Transform::SetTo(const Matrix4x4 * matrix)
 {
-	NULL_CHECK_RTRN(matrix, "Transform::SetTo -> NULL matrix passed.");
+	ASSERT_RTRN(matrix != NULL, "Transform::SetTo -> NULL matrix passed.");
 
 	this->matrix.SetTo(matrix);
 }
@@ -75,7 +75,7 @@ void Transform::SetTo(const Matrix4x4 * matrix)
  */
 void Transform::SetTo(const Transform * transform)
 {
-	NULL_CHECK_RTRN(transform, "Transform::SetTo -> NULL transform passed.");
+	ASSERT_RTRN(transform != NULL, "Transform::SetTo -> NULL transform passed.");
 
 	SetTo(transform->GetMatrix());
 }
@@ -98,7 +98,7 @@ void Transform::SetIdentity()
  */
 void Transform::TransformBy(const Matrix4x4 * matrix)
 {
-	NULL_CHECK_RTRN(matrix, "Transform::TransformBy(Matrix*) -> NULL matrix passed.");
+	ASSERT_RTRN(matrix != NULL, "Transform::TransformBy(Matrix*) -> NULL matrix passed.");
 	this->matrix.Multiply(matrix);
 }
 
@@ -107,7 +107,7 @@ void Transform::TransformBy(const Matrix4x4 * matrix)
  */
 void Transform::PreTransformBy(const Matrix4x4 * matrix)
 {
-	NULL_CHECK_RTRN(matrix, "Transform::PreTransformBy(Matrix*) -> NULL matrix passed.");
+	ASSERT_RTRN(matrix != NULL, "Transform::PreTransformBy(Matrix*) -> NULL matrix passed.");
 	this->matrix.PreMultiply(matrix);
 }
 
@@ -132,7 +132,7 @@ void Transform::PreTransformBy(const Transform& transform)
  */
 void Transform::TransformBy(const Transform * transform)
 {
-	NULL_CHECK_RTRN(transform, "Transform::TransformBy(Transform *) -> NULL transform passed.");
+	ASSERT_RTRN(transform != NULL, "Transform::TransformBy(Transform *) -> NULL transform passed.");
 
 	matrix.Multiply(transform->GetMatrix());
 }
@@ -142,7 +142,7 @@ void Transform::TransformBy(const Transform * transform)
  */
 void Transform::PreTransformBy(const Transform * transform)
 {
-	NULL_CHECK_RTRN(transform, "Transform::PreTransformBy(Transform *) -> NULL transform passed.");
+	ASSERT_RTRN(transform != NULL, "Transform::PreTransformBy(Transform *) -> NULL transform passed.");
 	matrix.PreMultiply(transform->GetMatrix());
 }
 
@@ -222,7 +222,7 @@ void Transform::RotateAround(float px, float py, float pz, float ax, float ay, f
  */
 void Transform::Scale(Vector3 * mag,  bool local)
 {
-	NULL_CHECK_RTRN(mag, "Transform::Scale -> mag is null.");
+	ASSERT_RTRN(mag != NULL, "Transform::Scale -> mag is null.");
 
 	Scale(mag->x, mag->y, mag->z, local);
 }
@@ -251,7 +251,7 @@ void Transform::Scale(float x, float y, float z,  bool local)
  */
 void Transform::BuildProjectionMatrix(Matrix4x4 * matrix, float fov, float ratio, float nearP, float farP)
 {
-	NULL_CHECK_RTRN(matrix, "Transform::BuildProjectionMatrix -> [matrix] is null.");
+	ASSERT_RTRN(matrix != NULL, "Transform::BuildProjectionMatrix -> [matrix] is null.");
 
 	// convert fov to radians
     float f = 1.0f / tan (fov * Constants::TwoPIOver360 *.5);
@@ -289,7 +289,7 @@ void Transform::BuildProjectionMatrix(Matrix4x4 * matrix, float fov, float ratio
 void Transform::BuildLookAtMatrix(Matrix4x4 * matrix, float posX, float posY, float posZ,
 								  float lookAtX, float lookAtY, float lookAtZ)
 {
-	NULL_CHECK_RTRN(matrix, "Transform::BuildLookAtMatrix -> [matrix] is null.");
+	ASSERT_RTRN(matrix != NULL, "Transform::BuildLookAtMatrix -> [matrix] is null.");
 
 	Vector3 vDir(lookAtX - posX, lookAtY - posY, lookAtZ - posZ);
 	Vector3 vUp(0,1,0);

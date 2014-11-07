@@ -82,9 +82,9 @@ void Point3::Add(const Point3 * point,const Vector3 * v, Point3 * result)
  */
 void Point3::Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result)
 {
-	NULL_CHECK_RTRN(p1, "Point3::Subtract -> NULL p1 passed.");
-	NULL_CHECK_RTRN(p2, "Point3::Subtract -> NULL p2 passed.");
-	NULL_CHECK_RTRN(result, "Point3::Subtract -> NULL result passed.");
+	ASSERT_RTRN(p1 != NULL, "Point3::Subtract -> NULL p1 passed.");
+	ASSERT_RTRN(p2 != NULL, "Point3::Subtract -> NULL p2 passed.");
+	ASSERT_RTRN(result != NULL, "Point3::Subtract -> NULL result passed.");
 
     result->x = p1->x - p2->x;
     result->y = p1->y - p2->y;        
@@ -96,9 +96,9 @@ void Point3::Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result)
  */
 void Point3::Lerp(const Point3 *p1, const Point3 * p2, Point3 * result, float t)
 {
-	NULL_CHECK_RTRN(p1, "Point3::Lerp -> NULL p1 passed.");
-	NULL_CHECK_RTRN(p2, "Point3::Lerp -> NULL p2 passed.");
-	NULL_CHECK_RTRN(result, "Point3::Lerp -> NULL result passed.");
+	ASSERT_RTRN(p1 != NULL, "Point3::Lerp -> NULL p1 passed.");
+	ASSERT_RTRN(p2 != NULL, "Point3::Lerp -> NULL p2 passed.");
+	ASSERT_RTRN(result != NULL, "Point3::Lerp -> NULL result passed.");
 
 	result->x = ((p2->x - p1->x) * t) + p1->x;
 	result->y = ((p2->y - p1->y) * t) + p1->y;
@@ -110,7 +110,7 @@ void Point3::Lerp(const Point3 *p1, const Point3 * p2, Point3 * result, float t)
  */
 void Point3::AttachTo(float * data)
 {
-	NULL_CHECK_RTRN(data, "Point3::AttachTo -> NULL data passed.");
+	ASSERT_RTRN(data != NULL, "Point3::AttachTo -> NULL data passed.");
 
 	BaseVector4::AttachTo(data);
 	UpdateComponentPointers();
@@ -162,7 +162,7 @@ void Point3::Set(float x, float y, float z)
 
 void Point3::SetTo(Point3 * p)
 {
-	NULL_CHECK_RTRN(p, "Point3::SetTo -> NULL point passed.");
+	ASSERT_RTRN(p != NULL, "Point3::SetTo -> NULL point passed.");
 
 	BaseVector4::Set(p->x,p->y,p->z,1);
 }

@@ -59,8 +59,8 @@ void AnimationInstance::Destroy()
  */
 bool AnimationInstance::Init()
 {
-	SHARED_REF_CHECK(Target, "AnimationInstance::Init -> Animation target is invalid.", false);
-	SHARED_REF_CHECK(SourceAnimation, "AnimationInstance::Init -> Animation is invalid.", false);
+	ASSERT(Target.IsValid(), "AnimationInstance::Init -> Animation target is invalid.", false);
+	ASSERT(SourceAnimation.IsValid(), "AnimationInstance::Init -> Animation is invalid.", false);
 
 	Destroy();
 
@@ -71,7 +71,7 @@ bool AnimationInstance::Init()
 	if(nodeCount <= 0)return true;
 
 	FrameStates = new FrameState[nodeCount];
-	NULL_CHECK(FrameStates, "AnimationInstance::Init -> Unable to allocate FrameState array.", false);
+	ASSERT(FrameStates != NULL, "AnimationInstance::Init -> Unable to allocate FrameState array.", false);
 
 	for(unsigned int n = 0; n < nodeCount; n++)
 	{

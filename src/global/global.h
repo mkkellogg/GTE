@@ -23,42 +23,6 @@
   }										   \
 }
 
-#define NULL_CHECK_RTRN(ptr, msg)    			\
-{										   		\
-	if((ptr) == NULL)					   		\
-	{									   		\
-		Debug::PrintError((msg));  		   		\
-		return;			       					\
-	}									   		\
-}
-
-#define NULL_CHECK(ptr, msg, returnExp)    \
-{										   \
-	if((ptr) == NULL)					   \
-	{									   \
-		Debug::PrintError((msg));  		   \
-		return (returnExp);			       \
-	}									   \
-}
-
-#define SHARED_REF_CHECK_RTRN(ref, msg)    		\
-{										   		\
-	if(!(ref).IsValid())					    \
-	{									   		\
-		Debug::PrintError((msg));  		   		\
-		return;			       					\
-	}									   		\
-}
-
-#define SHARED_REF_CHECK(ref, msg, returnExp)    \
-{										   		 \
-	if(!(ref).IsValid())					     \
-	{									   		 \
-		Debug::PrintError((msg));  		   		 \
-		return (returnExp);			       		 \
-	}									   		 \
-}
-
 #define ASSERT(exp, msg, returnExp)          \
 {										   		 \
 	if(!(exp))					     			 \
