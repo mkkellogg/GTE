@@ -74,7 +74,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	vertexSource = std::string(builtinPath) + std::string("diffuse.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse.fragment.shader");
 	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
-	SHARED_REF_CHECK(shader,"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored", false);
+	ASSERT(shader.IsValid(),"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseColored);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
@@ -83,7 +83,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	vertexSource = std::string(builtinPath) + std::string("diffuse_texture.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture.fragment.shader");
 	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
-	SHARED_REF_CHECK(shader,"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured", false);
+	ASSERT(shader.IsValid(),"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
@@ -92,7 +92,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	vertexSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.vertex.shader");
 	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.fragment.shader");
 	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
-	SHARED_REF_CHECK(shader,"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors", false);
+	ASSERT(shader.IsValid(),"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexColors);
@@ -115,7 +115,7 @@ SceneObjectRef EngineObjectManager::FindSceneObjectInDirectory(unsigned long obj
 
 void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref)
 {
-	SHARED_REF_CHECK_RTRN(ref, "EngineObjectManager::AddSceneObjectToDirectory -> Tried to add NULL scene object reference.");
+	ASSERT_RTRN(ref.IsValid(), "EngineObjectManager::AddSceneObjectToDirectory -> Tried to add NULL scene object reference.");
 
 	sceneObjectDirectory[objectID] = ref;
 }
@@ -128,7 +128,7 @@ ShaderRef EngineObjectManager::GetLoadedShader(LongMask properties)
 SceneObjectRef EngineObjectManager::CreateSceneObject()
 {
 	SceneObject *sceneObject = new SceneObject();
-	NULL_CHECK(sceneObject,"EngineObjectManager::CreateSceneObject -> could not allocate new scene object.", SceneObjectRef::Null());
+	ASSERT(sceneObject != NULL,"EngineObjectManager::CreateSceneObject -> could not allocate new scene object.", SceneObjectRef::Null());
 	sceneObject->SetObjectID(GetNextObjectID());
 
 	SceneObjectRef ref(sceneObject, [=](SceneObject * sceneObject)
@@ -149,7 +149,7 @@ void EngineObjectManager::DestroySceneObject(SceneObjectRef sceneObject)
 
 void EngineObjectManager::DeleteSceneObject(SceneObject * sceneObject)
 {
-	NULL_CHECK_RTRN(sceneObject, "EngineObjectManager::DeleteSceneObject -> sceneObject is NULL.");
+	ASSERT_RTRN(sceneObject!=NULL, "EngineObjectManager::DeleteSceneObject -> sceneObject is NULL.");
 	delete sceneObject;
 }
 
@@ -161,7 +161,7 @@ const SceneObjectRef EngineObjectManager::GetSceneRoot() const
 Mesh3DRef EngineObjectManager::CreateMesh3D(unsigned int subMeshCount)
 {
 	Mesh3D * mesh =  new Mesh3D(subMeshCount);
-	NULL_CHECK(mesh,"EngineObjectManager::CreateMesh3D -> could not create new Mesh3D object.", Mesh3DRef::Null());
+	ASSERT(mesh != NULL,"EngineObjectManager::CreateMesh3D -> could not create new Mesh3D object.", Mesh3DRef::Null());
 	mesh->SetObjectID(GetNextObjectID());
 
 	return Mesh3DRef(mesh, [=](Mesh3D * mesh)
@@ -177,14 +177,14 @@ void EngineObjectManager::DestroyMesh3D(Mesh3DRef mesh)
 
 void EngineObjectManager::DeleteMesh3D(Mesh3D * mesh)
 {
-	NULL_CHECK_RTRN(mesh, "EngineObjectManager::DeleteMesh -> mesh is NULL.");
+	ASSERT_RTRN(mesh != NULL, "EngineObjectManager::DeleteMesh -> mesh is NULL.");
 	delete mesh;
 }
 
 Mesh3DRendererRef EngineObjectManager::CreateMesh3DRenderer()
 {
 	Mesh3DRenderer * renderer =  new Mesh3DRenderer();
-	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer -> could not create new Mesh3DRenderer object.", Mesh3DRendererRef::Null());
+	ASSERT(renderer != NULL,"EngineObjectManager::CreateMesh3DRenderer -> could not create new Mesh3DRenderer object.", Mesh3DRendererRef::Null());
 	renderer->SetObjectID(GetNextObjectID());
 
 	return Mesh3DRendererRef(renderer, [=](Mesh3DRenderer * renderer)
@@ -198,16 +198,16 @@ void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRendererRef renderer)
 	renderer.ForceDelete();
 }
 
-void EngineObjectManager::DeleteMesh3DRenderer(Mesh3DRenderer* renderer)
+void EngineObjectManager::DeleteMesh3DRenderer(Mesh3DRenderer * renderer)
 {
-	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteMesh3DRenderer -> renderer is NULL.");
+	ASSERT_RTRN(renderer!= NULL,"EngineObjectManager::DeleteMesh3DRenderer -> renderer is NULL.");
 	delete renderer;
 }
 
 SkinnedMesh3DRendererRef EngineObjectManager::CreateSkinnedMesh3DRenderer()
 {
 	SkinnedMesh3DRenderer * renderer =  new SkinnedMesh3DRenderer();
-	NULL_CHECK(renderer,"EngineObjectManager::CreateSkinnedMesh3DRenderer -> could not create new SkinnedMesh3DRenderer object.", SkinnedMesh3DRendererRef::Null());
+	ASSERT(renderer != NULL,"EngineObjectManager::CreateSkinnedMesh3DRenderer -> could not create new SkinnedMesh3DRenderer object.", SkinnedMesh3DRendererRef::Null());
 	renderer->SetObjectID(GetNextObjectID());
 
 	return SkinnedMesh3DRendererRef(renderer, [=](SkinnedMesh3DRenderer * renderer)
@@ -221,16 +221,16 @@ void EngineObjectManager::DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererRef 
 	renderer.ForceDelete();
 }
 
-void EngineObjectManager::DeleteSkinnedMesh3DRenderer(SkinnedMesh3DRenderer* renderer)
+void EngineObjectManager::DeleteSkinnedMesh3DRenderer(SkinnedMesh3DRenderer * renderer)
 {
-	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteSkinnedMesh3DRenderer -> renderer is NULL.");
+	ASSERT_RTRN(renderer != NULL,"EngineObjectManager::DeleteSkinnedMesh3DRenderer -> renderer is NULL.");
 	delete renderer;
 }
 
 SubMesh3DRef EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
 {
 	SubMesh3D * mesh = new SubMesh3D(attributes);
-	NULL_CHECK(mesh,"EngineObjectManager::CreateSubMesh3D -> could not create new SubMesh3D object.", SubMesh3DRef::Null());
+	ASSERT(mesh != NULL,"EngineObjectManager::CreateSubMesh3D -> could not create new SubMesh3D object.", SubMesh3DRef::Null());
 	mesh->SetObjectID(GetNextObjectID());
 
 	return SubMesh3DRef(mesh, [=](SubMesh3D * mesh)
@@ -246,7 +246,7 @@ void EngineObjectManager::DestroySubMesh3D(SubMesh3DRef mesh)
 
 void EngineObjectManager::DeleteSubMesh3D(SubMesh3D * mesh)
 {
-	NULL_CHECK_RTRN(mesh,"EngineObjectManager::DeleteSubMesh3D -> mesh is NULL.");
+	ASSERT_RTRN(mesh != NULL,"EngineObjectManager::DeleteSubMesh3D -> mesh is NULL.");
 	delete mesh;
 }
 
@@ -261,7 +261,7 @@ SubMesh3DRendererRef EngineObjectManager::CreateSubMesh3DRenderer(AttributeTrans
 
 	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer(attrTransformer);
 
-	NULL_CHECK(renderer,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.", SubMesh3DRendererRef::Null());
+	ASSERT(renderer != NULL,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.", SubMesh3DRendererRef::Null());
 	renderer->SetObjectID(GetNextObjectID());
 
 	return SubMesh3DRendererRef(renderer, [=](SubMesh3DRenderer * renderer)
@@ -278,14 +278,14 @@ void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer
 void EngineObjectManager::DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer)
 {
 	Graphics * graphics = Graphics::Instance();
-	NULL_CHECK_RTRN(renderer,"EngineObjectManager::DeleteSubMesh3DRenderer -> renderer is NULL.");
+	ASSERT_RTRN(renderer != NULL,"EngineObjectManager::DeleteSubMesh3DRenderer -> renderer is NULL.");
 	graphics->DestroyMeshRenderer(renderer);
 }
 
 SkeletonRef EngineObjectManager::CreateSkeleton(unsigned int boneCount)
 {
 	Skeleton * skeleton = new Skeleton(boneCount);
-	NULL_CHECK(skeleton,"EngineObjectManager::CreateSkeleton -> Could not allocate new skeleton.", SkeletonRef::Null());
+	ASSERT(skeleton != NULL,"EngineObjectManager::CreateSkeleton -> Could not allocate new skeleton.", SkeletonRef::Null());
 
 	return SkeletonRef(skeleton, [=](Skeleton * skeleton)
 	{
@@ -295,7 +295,7 @@ SkeletonRef EngineObjectManager::CreateSkeleton(unsigned int boneCount)
 
 SkeletonRef EngineObjectManager::CloneSkeleton(SkeletonRef source)
 {
-	SHARED_REF_CHECK(source,"EngineObjectManager::CloneSkeleton -> source is invalid.", SkeletonRef::Null());
+	ASSERT(source.IsValid(),"EngineObjectManager::CloneSkeleton -> source is invalid.", SkeletonRef::Null());
 
 	Skeleton * skeleton = source->FullClone();
 	NULL_CHECK(skeleton,"EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonRef::Null());
@@ -313,14 +313,14 @@ void EngineObjectManager::DestroySkeleton(SkeletonRef target)
 
 void EngineObjectManager::DeleteSkeleton(Skeleton * target)
 {
-	NULL_CHECK_RTRN(target, "EngineObjectManager::DeleteSkeleton -> skeleton is NULL.");
+	ASSERT_RTRN(target != NULL, "EngineObjectManager::DeleteSkeleton -> skeleton is NULL.");
 	delete target;
 }
 
 AnimationRef EngineObjectManager::CreateAnimation(float duration, float ticksPerSecond, SkeletonRef skeleton)
 {
 	Animation * animation = new Animation(duration, ticksPerSecond, skeleton);
-	NULL_CHECK(animation, "EngineObjectManager::CreateAnimation -> Could not create new Animation object.", AnimationRef::Null());
+	ASSERT(animation != NULL, "EngineObjectManager::CreateAnimation -> Could not create new Animation object.", AnimationRef::Null());
 	animation->SetObjectID(GetNextObjectID());
 
 	return AnimationRef(animation, [=](Animation * animation)
@@ -336,17 +336,17 @@ void EngineObjectManager::DestroyAnimation(AnimationRef animation)
 
 void EngineObjectManager::DeleteAnimation(Animation * animation)
 {
-	NULL_CHECK_RTRN(animation, "EngineObjectManager::CreateAnimation -> animation is NULL.");
+	ASSERT_RTRN(animation != NULL, "EngineObjectManager::CreateAnimation -> animation is NULL.");
 	delete animation;
 }
 
 AnimationInstanceRef EngineObjectManager::CreateAnimationInstance(SkeletonRef target, AnimationRef animation)
 {
-	SHARED_REF_CHECK(target, "EngineObjectManager::CreateAnimationInstance -> target is invalid.", AnimationInstanceRef::Null());
-	SHARED_REF_CHECK(animation, "EngineObjectManager::CreateAnimationInstance -> animation is invalid.", AnimationInstanceRef::Null());
+	ASSERT(target.IsValid(), "EngineObjectManager::CreateAnimationInstance -> target is invalid.", AnimationInstanceRef::Null());
+	ASSERT(animation.IsValid(), "EngineObjectManager::CreateAnimationInstance -> animation is invalid.", AnimationInstanceRef::Null());
 
 	AnimationInstance * instance = new AnimationInstance(target, animation);
-	NULL_CHECK(instance, "EngineObjectManager::CreateAnimationInstance -> Could not create new AnimationInstance object.", AnimationInstanceRef::Null());
+	ASSERT(instance != NULL, "EngineObjectManager::CreateAnimationInstance -> Could not create new AnimationInstance object.", AnimationInstanceRef::Null());
 
 	return AnimationInstanceRef(instance, [=](AnimationInstance * instance)
 	{
@@ -361,16 +361,16 @@ void EngineObjectManager::DestroyAnimationInstance(AnimationInstanceRef instance
 
 void EngineObjectManager::DeleteAnimationInstance(AnimationInstance * instance)
 {
-	NULL_CHECK_RTRN(instance, "EngineObjectManager::DeleteAnimationInstance -> instance is NULL.");
+	ASSERT_RTRN(instance != NULL, "EngineObjectManager::DeleteAnimationInstance -> instance is NULL.");
 	delete instance;
 }
 
 AnimationPlayerRef EngineObjectManager::CreateAnimationPlayer(SkeletonRef target)
 {
-	SHARED_REF_CHECK(target, "EngineObjectManager::CreateAnimationPlayer -> target is invalid.", AnimationPlayerRef::Null());
+	ASSERT(target.IsValid(), "EngineObjectManager::CreateAnimationPlayer -> target is invalid.", AnimationPlayerRef::Null());
 
 	AnimationPlayer * player = new AnimationPlayer(target);
-	NULL_CHECK(player, "EngineObjectManager::CreateAnimationPlayer -> Could not create new AnimationPlayer object.", AnimationPlayerRef::Null());
+	ASSERT(player != NULL, "EngineObjectManager::CreateAnimationPlayer -> Could not create new AnimationPlayer object.", AnimationPlayerRef::Null());
 
 	return AnimationPlayerRef(player, [=](AnimationPlayer * player)
 	{
@@ -385,7 +385,7 @@ void EngineObjectManager::DestroyAnimationPlayer(AnimationPlayerRef player)
 
 void EngineObjectManager::DeleteAnimationPlayer(AnimationPlayer * player)
 {
-	NULL_CHECK_RTRN(player, "EngineObjectManager::DeleteAnimationPlayer -> player is NULL.");
+	ASSERT_RTRN(player != NULL, "EngineObjectManager::DeleteAnimationPlayer -> player is NULL.");
 	delete player;
 }
 
@@ -393,7 +393,7 @@ ShaderRef EngineObjectManager::CreateShader(const char * vertexSourcePath, const
 {
 	Graphics * graphics = Graphics::Instance();
 	Shader * shader = graphics->CreateShader(vertexSourcePath,fragmentSourcePath);
-	NULL_CHECK(shader,"EngineObjectManager::CreateShader -> could not create new Shader object.", ShaderRef::Null());
+	ASSERT(shader != NULL,"EngineObjectManager::CreateShader -> could not create new Shader object.", ShaderRef::Null());
 	shader->SetObjectID(GetNextObjectID());
 
 	return ShaderRef(shader, [=](Shader * shader)
@@ -410,7 +410,7 @@ void EngineObjectManager::DestroyShader(ShaderRef shader)
 void EngineObjectManager::DeleteShader(Shader * shader)
 {
 	Graphics * graphics = Graphics::Instance();
-	NULL_CHECK_RTRN(shader,"EngineObjectManager::DeleteShader -> shader is NULL.");
+	ASSERT_RTRN(shader != NULL,"EngineObjectManager::DeleteShader -> shader is NULL.");
 	graphics->DestroyShader(shader);
 }
 
@@ -418,7 +418,7 @@ TextureRef EngineObjectManager::CreateTexture(const char * sourcePath, TextureAt
 {
 	Graphics * graphics = Graphics::Instance();
 	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
-	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
+	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
 
 	return TextureRef(texture, [=](Texture * texture)
@@ -431,7 +431,7 @@ TextureRef EngineObjectManager::CreateTexture(const RawImage * imageData, const 
 {
 	Graphics * graphics = Graphics::Instance();
 	Texture * texture = graphics->CreateTexture(imageData, sourcePath, attributes);
-	NULL_CHECK(texture,"EngineObjectManager::CreateTexture(const RawImage*, const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
+	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture(const RawImage*, const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
 
 	return TextureRef(texture, [=](Texture * texture)
@@ -447,7 +447,7 @@ void EngineObjectManager::DestroyTexture(TextureRef texture)
 
 void EngineObjectManager::DeleteTexture(Texture * texture)
 {
-	NULL_CHECK_RTRN(texture,"EngineObjectManager::DeleteTexture -> texture is NULL.");
+	ASSERT_RTRN(texture != NULL,"EngineObjectManager::DeleteTexture -> texture is NULL.");
 
 	Graphics * graphics = Graphics::Instance();
 	graphics->DestroyTexture(texture);
@@ -500,10 +500,10 @@ void EngineObjectManager::DestroyMaterial(MaterialRef material)
 
 void EngineObjectManager::DeleteMaterial(Material * material)
 {
-	NULL_CHECK_RTRN(material,"EngineObjectManager::DeleteMaterial -> material is NULL.");
+	ASSERT_RTRN(material != NULL,"EngineObjectManager::DeleteMaterial -> material is NULL.");
 	ShaderRef shader = material->GetShader();
 
-	SHARED_REF_CHECK_RTRN(shader,"EngineObjectManager::DeleteMaterial -> shader is NULL.");
+	ASSERT_RTRN(shader.IsValid(),"EngineObjectManager::DeleteMaterial -> shader is NULL.");
 	DestroyShader(shader);
 
 	delete material;
@@ -514,7 +514,7 @@ CameraRef EngineObjectManager::CreateCamera()
 {
 	Graphics * graphics = Graphics::Instance();
 	Camera * camera = new Camera(graphics);
-	NULL_CHECK(camera, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef::Null());
+	ASSERT(camera != NULL, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef::Null());
 	camera->SetObjectID(GetNextObjectID());
 
 	return CameraRef(camera, [=](Camera * camera)
@@ -530,14 +530,14 @@ void EngineObjectManager::DestroyCamera(CameraRef camera)
 
 void EngineObjectManager::DeleteCamera(Camera * camera)
 {
-	NULL_CHECK_RTRN(camera, "EngineObjectManager::DeleteCamera -> camera is NULL.");
+	ASSERT_RTRN(camera != NULL, "EngineObjectManager::DeleteCamera -> camera is NULL.");
 	delete camera;
 }
 
 LightRef EngineObjectManager::CreateLight()
 {
 	Light * light = new Light();
-	NULL_CHECK(light, "EngineObjectManager::CreateLight -> Could not create new Light object.", LightRef::Null());
+	ASSERT(light != NULL, "EngineObjectManager::CreateLight -> Could not create new Light object.", LightRef::Null());
 	light->SetObjectID(GetNextObjectID());
 
 	return LightRef(light, [=](Light * light)
@@ -553,7 +553,7 @@ void EngineObjectManager::DestroyLight(LightRef light)
 
 void EngineObjectManager::DeleteLight(Light * light)
 {
-	NULL_CHECK_RTRN(light, "EngineObjectManager::DeleteLight -> light is NULL.");
+	ASSERT_RTRN(light != NULL, "EngineObjectManager::DeleteLight -> light is NULL.");
 	delete light;
 }
 

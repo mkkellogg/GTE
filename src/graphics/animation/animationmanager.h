@@ -13,6 +13,7 @@
 #define _ANIMATION_MANAGER_H_
 
 #include "object/enginetypes.h"
+#include "object/engineobject.h"
 #include <unordered_map>
 
 class AnimationManager
@@ -23,7 +24,7 @@ class AnimationManager
     // singleton instance
     static AnimationManager * instance;
     // map object IDs of Skeleton objects to their assign animation player
-    std::unordered_map<unsigned int, AnimationPlayerRef> activePlayers;
+    std::unordered_map<ObjectID, AnimationPlayerRef> activePlayers;
 
 	public :
 

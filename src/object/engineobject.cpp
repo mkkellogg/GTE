@@ -6,7 +6,7 @@
 
 #include "engineobject.h"
 
-EngineObject::EngineObject() : objectID((unsigned long)-1L)
+EngineObject::EngineObject() : objectID((ObjectID)-1)
 {
 
 }
@@ -16,12 +16,12 @@ EngineObject::~EngineObject()
 
 }
 
-unsigned long EngineObject::GetObjectID() const
+ObjectID EngineObject::GetObjectID() const
 {
 	return objectID;
 }
 
-void EngineObject::SetObjectID(unsigned long id)
+void EngineObject::SetObjectID(ObjectID id)
 {
 	objectID = id;
 }

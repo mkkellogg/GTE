@@ -110,7 +110,7 @@ unsigned int BaseVector4Array::GetCount()
 
 bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
 {
-	NULL_CHECK(dest," BaseVector4Array::CopyTo -> Destination is NULL.",false);
+	ASSERT(dest != NULL," BaseVector4Array::CopyTo -> Destination is NULL.",false);
 
 	if(dest->GetCount() != count)
 	{

@@ -6,16 +6,25 @@
 #include "geometry/vector/vector3.h"
 #include <string>
 
+/*
+ * Default constructor.
+ */
 ScaleKeyFrame::ScaleKeyFrame() : KeyFrame()
 {
 
 }
 
+/*
+ * Parameterized constructor.
+ */
 ScaleKeyFrame::ScaleKeyFrame(float normalizedTime, float realTime,  float realTimeTicks, const Vector3& scale) : KeyFrame(normalizedTime, realTime, realTimeTicks)
 {
 	this->Scale = scale;
 }
 
+/*
+ * Destructor.
+ */
 ScaleKeyFrame::~ScaleKeyFrame()
 {
 

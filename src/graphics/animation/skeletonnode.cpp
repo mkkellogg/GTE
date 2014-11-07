@@ -11,12 +11,18 @@
 #include "global/global.h"
 #include "ui/debug.h"
 
+/*
+ * Only constructor.
+ */
 SkeletonNode::SkeletonNode(int boneIndex, const std::string& name)
 {
 	this->BoneIndex = boneIndex;
 	this->Name = name;
 }
 
+/*
+ * Destructor.
+ */
 SkeletonNode::~SkeletonNode()
 {
 

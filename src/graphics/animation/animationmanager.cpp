@@ -4,6 +4,7 @@
 
 #include "animationmanager.h"
 #include "object/enginetypes.h"
+#include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
@@ -62,12 +63,12 @@ AnimationManager * AnimationManager::Instance()
  */
 bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation) const
 {
-	SHARED_REF_CHECK(skeleton, "AnimationManager::IsCompatible -> Skeleton is not valid.", false);
-	SHARED_REF_CHECK(animation, "AnimationManager::IsCompatible -> Animation is not valid.", false);
+	ASSERT(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false);
+	ASSERT(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false);
 
 	SkeletonRef animationSkeleton = animation->GetTarget();
 
-	SHARED_REF_CHECK(animationSkeleton, "AnimationManager::IsCompatible -> Animation does not have a valid skeleton.", false);
+	ASSERT(animationSkeleton.IsValid(), "AnimationManager::IsCompatible -> Animation does not have a valid skeleton.", false);
 
 	unsigned int skeletonNodeCount = skeleton->GetNodeCount();
 
@@ -102,8 +103,8 @@ bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation
  */
 bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const
 {
-	SHARED_REF_CHECK(meshRenderer, "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false);
-	SHARED_REF_CHECK(meshRenderer->GetSkeleton(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false);
+	ASSERT(meshRenderer.IsValid(), "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false);
+	ASSERT(meshRenderer->GetSkeleton().IsValid(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false);
 
 	return IsCompatible(meshRenderer->GetSkeleton(), animation);
 }
@@ -130,15 +131,15 @@ void AnimationManager::Drive()
  */
 AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkeletonRef target)
 {
-	SHARED_REF_CHECK(target, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerRef::Null());
+	ASSERT(target.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerRef::Null());
 
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
-	NULL_CHECK(objectManager, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is NULL.", AnimationPlayerRef::Null());
+	ASSERT(objectManager != NULL, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is NULL.", AnimationPlayerRef::Null());
 
 	if(activePlayers.find(target->GetObjectID()) == activePlayers.end())
 	{
 		AnimationPlayerRef player = objectManager->CreateAnimationPlayer(target);
-		SHARED_REF_CHECK(player, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Unable to create player.", AnimationPlayerRef::Null());
+		ASSERT(player.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Unable to create player.", AnimationPlayerRef::Null());
 
 		// put the newly created AnimationPlayer in the list of active players.s
 		activePlayers[target->GetObjectID()] = player;
@@ -154,7 +155,7 @@ AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkeletonRef
  */
 AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRef renderer)
 {
-	SHARED_REF_CHECK(renderer, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Mesh renderer is not valid.", AnimationPlayerRef::Null());
+	ASSERT(renderer.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Mesh renderer is not valid.", AnimationPlayerRef::Null());
 	return RetrieveOrCreateAnimationPlayer(renderer->GetSkeleton());
 }
 

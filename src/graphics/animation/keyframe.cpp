@@ -5,6 +5,9 @@
 #include "keyframe.h"
 #include <string>
 
+/*
+ * Default constructor.
+ */
 KeyFrame::KeyFrame()
 {
 	NormalizedTime = 0;
@@ -12,6 +15,9 @@ KeyFrame::KeyFrame()
 	RealTimeTicks = 1;
 }
 
+/*
+ * Parameterized constructor.
+ */
 KeyFrame::KeyFrame(float normalizedTime, float realTime, float realTimeTicks)
 {
 	this->NormalizedTime = normalizedTime;
@@ -19,6 +25,9 @@ KeyFrame::KeyFrame(float normalizedTime, float realTime, float realTimeTicks)
 	this->RealTimeTicks = realTimeTicks;
 }
 
+/*
+ * Destructor.
+ */
 KeyFrame::~KeyFrame()
 {
 

@@ -45,14 +45,10 @@ void ImportUtil::ConvertAssimpMatrix(const aiMatrix4x4& source, Matrix4x4& dest)
 RawImage * ImportUtil::GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height)
 {
 	RawImage * rawImage = new RawImage(width, height);
-	NULL_CHECK(rawImage,"ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.",NULL);
+	ASSERT(rawImage != NULL,"ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.",NULL);
 
 	bool initSuccess = rawImage->Init();
-	if(!initSuccess)
-	{
-		Debug::PrintError("ImportUtil::GetRawImageFromILData -> Could not init RawImage.");
-		return NULL;
-	}
+	ASSERT(initSuccess,"ImportUtil::GetRawImageFromILData -> Could not init RawImage.", NULL);
 
 	for(unsigned int i=0; i < width * height * 4; i++)
 	{

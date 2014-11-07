@@ -109,7 +109,7 @@ void BaseVector4::Set(float x, float y, float z, float w)
  */
 void BaseVector4::Get(BaseVector4 * baseVector) const
 {
-	NULL_CHECK_RTRN(baseVector, "BaseVector4::Get -> NULL baseVector passed.");
+	ASSERT_RTRN(baseVector != NULL, "BaseVector4::Get -> NULL baseVector passed.");
 	memcpy(baseVector->data, data, sizeof(float) * 4);
 }
 

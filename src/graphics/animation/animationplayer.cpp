@@ -4,6 +4,7 @@
 
 #include "animationplayer.h"
 #include "object/enginetypes.h"
+#include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
@@ -26,8 +27,9 @@
  */
 AnimationPlayer::AnimationPlayer(SkeletonRef target)
 {
-	SHARED_REF_CHECK_RTRN(target,"AnimationPlayer::AnimationPlayer -> Invalid target.");
+	ASSERT_RTRN(target.IsValid(),"AnimationPlayer::AnimationPlayer -> Invalid target.");
 	this->target = target;
+	indexCount = 0;
 }
 
 /*
@@ -43,9 +45,9 @@ AnimationPlayer::~AnimationPlayer()
  */
 void AnimationPlayer::Drive()
 {
-	for(std::unordered_map<unsigned int, AnimationInstanceRef>::iterator iter = activeAnimations.begin(); iter != activeAnimations.end(); ++iter)
+	for(unsigned int i = 0; i < activeAnimations.size(); i++)
 	{
-		AnimationInstanceRef instance = iter->second;
+		AnimationInstanceRef instance = activeAnimations[i];
 
 		if(instance.IsValid())
 		{
@@ -61,7 +63,7 @@ void AnimationPlayer::Drive()
  */
 void AnimationPlayer::UpdateAnimationInstance(AnimationInstanceRef instance) const
 {
-	SHARED_REF_CHECK_RTRN(instance, " AnimationPlayer::UpdateAnimationInstance -> Animation instance is invalid.");
+	ASSERT_RTRN(instance.IsValid(), " AnimationPlayer::UpdateAnimationInstance -> Animation instance is invalid.");
 
 	// only update if playing
 	if(instance->IsPlaying())
@@ -244,9 +246,9 @@ void AnimationPlayer::CalculateInterpolatedRotation(float progress, const KeyFra
 void AnimationPlayer::AddAnimation(AnimationRef animation)
 {
 	AnimationManager * animationManager = AnimationManager::Instance();
-	NULL_CHECK_RTRN(animationManager,"AnimationPlayer::CreateAnimationInstance -> Animation manager is NULL.");
+	ASSERT_RTRN(animationManager != NULL,"AnimationPlayer::CreateAnimationInstance -> Animation manager is NULL.");
 
-	SHARED_REF_CHECK_RTRN(animation, "AnimationPlayer::CreateAnimationInstance -> Animation is invalid.");
+	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::CreateAnimationInstance -> Animation is invalid.");
 
 	// verify compatibility with [target]
 	ASSERT_RTRN(animationManager->IsCompatible(target,animation), "AnimationPlayer::CreateAnimationInstance -> Skeleton is not compatible with animation.");
@@ -254,17 +256,20 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
 	AnimationInstanceRef instance;
 
 	// make sure an instance of [animation] does not already exist for this player
-	if(activeAnimations.find(animation->GetObjectID()) == activeAnimations.end())
+	if(activeAnimationIndices.find(animation->GetObjectID()) == activeAnimationIndices.end())
 	{
 		EngineObjectManager * objectManager = EngineObjectManager::Instance();
 		AnimationInstanceRef instance = objectManager->CreateAnimationInstance(target, animation);
 
-		SHARED_REF_CHECK_RTRN(instance, " AnimationPlayer::CreateAnimationInstance -> Unable to create animation instance.");
+		ASSERT_RTRN(instance.IsValid(), " AnimationPlayer::CreateAnimationInstance -> Unable to create animation instance.");
 
 		bool initSuccess = instance->Init();
 		ASSERT_RTRN(initSuccess,"AnimationPlayer::CreateAnimationInstance -> Unable to initialize animation instance.");
 
-		activeAnimations[animation->GetObjectID()] = instance;
+		activeAnimations.push_back(instance);
+
+		activeAnimationIndices[animation->GetObjectID()] = indexCount;
+		indexCount++;
 	}
 }
 
@@ -273,10 +278,11 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
  */
 void AnimationPlayer::Play(AnimationRef animation)
 {
-	SHARED_REF_CHECK_RTRN(animation, "AnimationPlayer::Play -> Animation is invalid.");
-	if(activeAnimations.find(animation->GetObjectID()) != activeAnimations.end())
+	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Play -> Animation is invalid.");
+	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
 	{
-		AnimationInstanceRef instance = activeAnimations[animation->GetObjectID()];
+		unsigned int index = activeAnimationIndices[animation->GetObjectID()];
+		AnimationInstanceRef instance = activeAnimations[index];
 		instance->Play();
 	}
 }
@@ -286,10 +292,11 @@ void AnimationPlayer::Play(AnimationRef animation)
  */
 void AnimationPlayer::Stop(AnimationRef animation)
 {
-	SHARED_REF_CHECK_RTRN(animation, "AnimationPlayer::Stop -> Animation is invalid.");
-	if(activeAnimations.find(animation->GetObjectID()) != activeAnimations.end())
+	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Stop -> Animation is invalid.");
+	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
 	{
-		AnimationInstanceRef instance = activeAnimations[animation->GetObjectID()];
+		unsigned int index = activeAnimationIndices[animation->GetObjectID()];
+		AnimationInstanceRef instance = activeAnimations[index];
 		instance->Stop();
 	}
 }
@@ -299,10 +306,11 @@ void AnimationPlayer::Stop(AnimationRef animation)
  */
 void AnimationPlayer::Pause(AnimationRef animation)
 {
-	SHARED_REF_CHECK_RTRN(animation, "AnimationPlayer::Pause -> Animation is invalid.");
-	if(activeAnimations.find(animation->GetObjectID()) != activeAnimations.end())
+	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Pause -> Animation is invalid.");
+	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
 	{
-		AnimationInstanceRef instance = activeAnimations[animation->GetObjectID()];
+		unsigned int index = activeAnimationIndices[animation->GetObjectID()];
+		AnimationInstanceRef instance = activeAnimations[index];
 		instance->Pause();
 	}
 }

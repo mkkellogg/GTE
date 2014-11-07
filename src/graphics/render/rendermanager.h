@@ -24,6 +24,7 @@ class Transform;
 #include <vector>
 #include <map>
 #include <memory>
+#include "object/engineobject.h"
 #include "util/datastack.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
@@ -55,7 +56,7 @@ class RenderManager
 	unsigned int cameraCount;
 	RenderSceneObjectComponent sceneCameras[MAX_CAMERAS];
 
-	std::map<unsigned long, bool> renderedObjects;
+	std::map<ObjectID, bool> renderedObjects;
 
 	void ForwardRenderScene(SceneObject * parent, Transform * viewTransformInverse, Camera * camera);
     void ClearBuffersForCamera(const Camera * camera) const;

@@ -325,7 +325,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 
 
 
-		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
+		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
 
 		koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
 		AnimationManager * animManager = AnimationManager::Instance();

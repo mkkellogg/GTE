@@ -1,7 +1,15 @@
+/*********************************************
+*
+* class: ScaleKeyFrame
+*
+* author: Mark Kellogg
+*
+* This class encapsulates a single scale key frame.
+*
+***********************************************/
+
 #ifndef _SCALE_KEYFRAME_H_
 #define _SCALE_KEYFRAME_H_
-
-//forward declarations
 
 #include "keyframe.h"
 #include "geometry/vector/vector3.h"
@@ -11,6 +19,7 @@ class ScaleKeyFrame : public KeyFrame
 {
 	public:
 
+	// scale transformation
 	Vector3 Scale;
 
 	ScaleKeyFrame();

@@ -145,37 +145,32 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 		return SceneObjectRef::Null();
 	}
 
+	ASSERT(scene.mRootNode != NULL,"AssetImporter::ProcessModelScene -> Assimp scene root is NULL.", SceneObjectRef::Null());
+
 	SceneObjectRef root = objectManager->CreateSceneObject();
-	SHARED_REF_CHECK(root,"AssetImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
+	ASSERT(root.IsValid(),"AssetImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
 
 	root->SetActive(false);
 	Matrix4x4 baseTransform;
 
-	if(scene.mRootNode != NULL)
+	SkeletonRef skeleton = LoadSkeleton(scene);
+
+	std::vector<SceneObjectRef> createdSceneObjects;
+	RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root,  materialImportDescriptors, skeleton, createdSceneObjects);
+
+	for(unsigned int s = 0; s < createdSceneObjects.size(); s++)
 	{
-		SkeletonRef skeleton = LoadSkeleton(scene);
-
-		std::vector<SceneObjectRef> createdSceneObjects;
-		RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root,  materialImportDescriptors, skeleton, createdSceneObjects);
-
-		for(unsigned int s = 0; s < createdSceneObjects.size(); s++)
+		SkinnedMesh3DRendererRef renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
+		if(renderer.IsValid())
 		{
-			SkinnedMesh3DRendererRef renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
-			if(renderer.IsValid())
+			SkeletonRef skeletonClone = objectManager->CloneSkeleton(skeleton);
+			if(!skeletonClone.IsValid())
 			{
-				SkeletonRef skeletonClone = objectManager->CloneSkeleton(skeleton);
-				if(!skeletonClone.IsValid())
-				{
-					Debug::PrintWarning("ModelImporter::ProcessModelScene -> Could not clone scene skeleton.");
-					continue;
-				}
-				renderer->SetSkeleton(skeletonClone);
+				Debug::PrintWarning("ModelImporter::ProcessModelScene -> Could not clone scene skeleton.");
+				continue;
 			}
+			renderer->SetSkeleton(skeletonClone);
 		}
-	}
-	else
-	{
-		Debug::PrintError("AssetImporter::ProcessModelScene -> Assimp scene root is NULL.");
 	}
 
 	return root;
@@ -204,7 +199,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 	// create new scene object to hold the Mesh3D object and its renderer
 	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
-	SHARED_REF_CHECK_RTRN(sceneObject,"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
+	ASSERT_RTRN(sceneObject.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
 	bool hasSkeleton = skeleton.IsValid() && skeleton->GetBoneCount() ? true : false;
 	Mesh3DRenderer * rendererPtr = NULL;
@@ -216,7 +211,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	if(node.mNumMeshes > 0)
 	{
 		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
-		SHARED_REF_CHECK_RTRN(mesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
+		ASSERT_RTRN(mesh3D.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
 
 		bool meshInitSuccess = mesh3D->Init();
 		if(!meshInitSuccess)
@@ -228,13 +223,13 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		if(hasSkeleton)
 		{
 			skinnedMeshRenderer = engineObjectManager->CreateSkinnedMesh3DRenderer();
-			SHARED_REF_CHECK_RTRN(skinnedMeshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.");
+			ASSERT_RTRN(skinnedMeshRenderer.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.");
 			rendererPtr = (Mesh3DRenderer*)skinnedMeshRenderer.GetPtr();
 		}
 		else
 		{
 			meshRenderer = engineObjectManager->CreateMesh3DRenderer();
-			SHARED_REF_CHECK_RTRN(meshRenderer,"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
+			ASSERT_RTRN(meshRenderer.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
 			rendererPtr = meshRenderer.GetPtr();
 		}
 
@@ -255,14 +250,14 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			int materialIndex = mesh->mMaterialIndex;
 			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
 			MaterialRef material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
-			SHARED_REF_CHECK_RTRN(material,"AssetImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
+			ASSERT_RTRN(material.IsValid(),"AssetImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
 
 			// add the material to the mesh renderer
 			rendererPtr->AddMaterial(material);
 
 			// convert Assimp mesh to a Mesh3D object
 			SubMesh3DRef subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
-			SHARED_REF_CHECK_RTRN(subMesh3D,"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
+			ASSERT_RTRN(subMesh3D.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 			// add the mesh to the newly created scene object
 			mesh3D->SetSubMesh(subMesh3D, n);
@@ -372,7 +367,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 
 	// create Mesh3D object with the constructed StandardAttributeSet
 	SubMesh3DRef mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
-	SHARED_REF_CHECK(mesh3D,"AssetImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null());
+	ASSERT(mesh3D.IsValid(),"AssetImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null());
 
 	bool initSuccess = mesh3D->Init(vertexCount);
 
@@ -461,7 +456,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		aiString aiTexturePath;
 
 		aiMaterial * material = scene.mMaterials[m];
-		NULL_CHECK(material, "AssetImporter::ProcessMaterials -> scene contains a NULL material.", false);
+		ASSERT(material != NULL, "AssetImporter::ProcessMaterials -> scene contains a NULL material.", false);
 
 		aiString mtName;
 		material->Get(AI_MATKEY_NAME,mtName);
@@ -623,7 +618,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
 	SkeletonRef target = objectManager->CreateSkeleton(boneCount);
-	SHARED_REF_CHECK(target,"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",SkeletonRef::Null());
+	ASSERT(target.IsValid(),"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",SkeletonRef::Null());
 
 	bool skeletonInitSuccess = target->Init();
 	if(!skeletonInitSuccess)
@@ -713,7 +708,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 
 void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap) const
 {
-	SHARED_REF_CHECK_RTRN(skeleton, "ModelImporter::AddBoneMappings -> skeleton is invalid.");
+	ASSERT_RTRN(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.");
 
 	for(unsigned int b = 0; b < mesh.mNumBones; b++)
 	{
@@ -839,14 +834,16 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef skeleton) const
 {
 	EngineObjectManager * objectManager = EngineObjectManager::Instance();
-	NULL_CHECK(objectManager,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
+	ASSERT(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
 
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
 	float durationTicks = (float)animation.mDuration;
+
+	ASSERT(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> tickers per second is 0.", AnimationRef::Null());
 	//float duration = durationTicks / ticksPerSecond;
 
 	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond, skeleton);
-	SHARED_REF_CHECK(animationRef,"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null());
+	ASSERT(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null());
 
 	bool initSuccess = animationRef->Init();
 	if(!initSuccess)
@@ -923,35 +920,18 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
 {
 	bool initSuccess = InitImporter();
-	if(!initSuccess)
-	{
-		Debug::PrintError("ModelImporter::LoadAnimation -> Unable to initialize importer.");
-		return AnimationRef::Null();
-	}
+	ASSERT(initSuccess, "ModelImporter::LoadAnimation -> Unable to initialize importer.", AnimationRef::Null());
 
 	const aiScene * scene = LoadAIScene(filePath);
-	if(scene == NULL)
-	{
-		Debug::PrintError("ModelImporter::LoadAnimation -> Unable to load scene.");
-		return AnimationRef::Null();
-	}
+	ASSERT(scene != NULL, "ModelImporter::LoadAnimation -> Unable to load scene.", AnimationRef::Null());
 
 	SkeletonRef skeleton = LoadSkeleton(*scene);
+	ASSERT(skeleton.IsValid(), "ModelImporter::LoadAnimation -> Model file does not contain skeleton.", AnimationRef::Null());
+	ASSERT(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationRef::Null());
 
-	if(!skeleton.IsValid())
-	{
-		Debug::PrintError("ModelImporter::LoadAnimation -> Model file does not contain skeleton.");
-		return AnimationRef::Null();
-	}
-
-	if(scene->mNumAnimations == 0)
-	{
-		Debug::PrintError("ModelImporter::LoadAnimation -> Model does not contain any animations.");
-		return AnimationRef::Null();
-	}
-
+	// only load the first animation
 	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), skeleton);
-	SHARED_REF_CHECK(animation,"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null());
+	ASSERT(animation.IsValid(),"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null());
 
 	return animation;
 }

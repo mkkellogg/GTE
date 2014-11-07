@@ -4,12 +4,14 @@
 //forward declarations
 class EngineObjectManager;
 
+typedef unsigned int ObjectID;
+
 class EngineObject
 {
 	friend class EngineObjectManager;
 
-	unsigned long objectID;
-	void SetObjectID(unsigned long id);
+	ObjectID objectID;
+	void SetObjectID(ObjectID id);
 
     protected:
 
@@ -18,7 +20,7 @@ class EngineObject
 
     public:
 
-	unsigned long GetObjectID() const;
+	ObjectID GetObjectID() const;
 };
 
 #endif

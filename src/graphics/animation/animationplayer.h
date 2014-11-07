@@ -1,4 +1,3 @@
-
 /*********************************************
 *
 * class: AnimationPlayer
@@ -17,6 +16,7 @@ class Transform;
 class SkeletonNode;
 
 #include "object/enginetypes.h"
+#include "object/engineobject.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
 #include "keyframeset.h"
@@ -29,10 +29,14 @@ class AnimationPlayer
 	friend class EngineObjectManager;
 	friend class AnimationManager;
 
+	// number of aniamtions being handled by this player
+	unsigned int indexCount;
+	// mapping from object ID's of Animation objects to respective indices in member arrays/vectors
+	std::unordered_map<ObjectID, unsigned int> activeAnimationIndices;
 	// target of all animations managed by this player
 	SkeletonRef target;
 	// mapping from the object ID's of Animation objects to corresponding AnimationInstance objects
-	std::unordered_map<unsigned int, AnimationInstanceRef> activeAnimations;
+	std::vector<AnimationInstanceRef> activeAnimations;
 	// weights used for animation blending
 	std::vector<float> weights;
 
