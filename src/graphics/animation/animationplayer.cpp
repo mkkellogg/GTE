@@ -136,8 +136,11 @@ void AnimationPlayer::UpdateAnimationInstance(AnimationInstanceRef instance) con
  */
 void AnimationPlayer::CalculateInterpolatedTranslation(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const
 {
+	bool foundFrame =false;
+	unsigned int frameCount = keyFrameSet.TranslationKeyFrames.size();
+
 	// loop through each key frame
-	for(unsigned int f = 0; f < keyFrameSet.TranslationKeyFrames.size(); f++)
+	for(unsigned int f = 0; f < frameCount; f++)
 	{
 		const TranslationKeyFrame& keyFrame = keyFrameSet.TranslationKeyFrames[f];
 
@@ -161,8 +164,15 @@ void AnimationPlayer::CalculateInterpolatedTranslation(float progress, const Key
 			vector.y = ((keyFrame.Translation.y - lastFrame.Translation.y) * interFrameProgress) + lastFrame.Translation.y;
 			vector.z = ((keyFrame.Translation.z - lastFrame.Translation.z) * interFrameProgress) + lastFrame.Translation.z;
 
+			foundFrame = true;
 			break;
 		}
+	}
+
+	if(!foundFrame && frameCount > 0)
+	{
+		const TranslationKeyFrame& lastFrame = keyFrameSet.TranslationKeyFrames[frameCount-1];
+		vector.Set(lastFrame.Translation.x,lastFrame.Translation.y,lastFrame.Translation.y);
 	}
 }
 
@@ -172,8 +182,11 @@ void AnimationPlayer::CalculateInterpolatedTranslation(float progress, const Key
  */
 void AnimationPlayer::CalculateInterpolatedScale(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const
 {
+	bool foundFrame =false;
+	unsigned int frameCount = keyFrameSet.ScaleKeyFrames.size();
+
 	// loop through each key frame
-	for(unsigned int f = 0; f < keyFrameSet.ScaleKeyFrames.size(); f++)
+	for(unsigned int f = 0; f < frameCount; f++)
 	{
 		const ScaleKeyFrame& keyFrame = keyFrameSet.ScaleKeyFrames[f];
 
@@ -197,8 +210,15 @@ void AnimationPlayer::CalculateInterpolatedScale(float progress, const KeyFrameS
 			vector.y = ((keyFrame.Scale.y - lastFrame.Scale.y) * interFrameProgress) + lastFrame.Scale.y;
 			vector.z = ((keyFrame.Scale.z - lastFrame.Scale.z) * interFrameProgress) + lastFrame.Scale.z;
 
+			foundFrame = true;
 			break;
 		}
+	}
+
+	if(!foundFrame && frameCount > 0)
+	{
+		const ScaleKeyFrame& lastFrame = keyFrameSet.ScaleKeyFrames[frameCount-1];
+		vector.Set(lastFrame.Scale.x,lastFrame.Scale.y,lastFrame.Scale.y);
 	}
 }
 
@@ -208,8 +228,11 @@ void AnimationPlayer::CalculateInterpolatedScale(float progress, const KeyFrameS
  */
 void AnimationPlayer::CalculateInterpolatedRotation(float progress, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const
 {
+	bool foundFrame =false;
+	unsigned int frameCount = keyFrameSet.RotationKeyFrames.size();
+
 	// loop through each key frame
-	for(unsigned int f = 0; f < keyFrameSet.RotationKeyFrames.size(); f++)
+	for(unsigned int f = 0; f < frameCount; f++)
 	{
 		const RotationKeyFrame& keyFrame = keyFrameSet.RotationKeyFrames[f];
 
@@ -234,8 +257,15 @@ void AnimationPlayer::CalculateInterpolatedRotation(float progress, const KeyFra
 			Quaternion quatOut= Quaternion::slerp(a,b, interFrameProgress);
 			rotation.Set(quatOut.x(),quatOut.y(),quatOut.z(), -quatOut.w());
 
+			foundFrame = true;
 			break;
 		}
+	}
+
+	if(!foundFrame && frameCount > 0)
+	{
+		const RotationKeyFrame& lastFrame = keyFrameSet.RotationKeyFrames[frameCount-1];
+		rotation.Set(lastFrame.Rotation.x(),lastFrame.Rotation.y(),lastFrame.Rotation.z(), -lastFrame.Rotation.w());
 	}
 }
 

@@ -1,8 +1,6 @@
 #ifndef _ASSET_IMPORTER_H_
 #define _ASSET_IMPORTER_H_
 
-//forward declarations
-
 #include "object/engineobjectmanager.h"
 #include "object/enginetypes.h"
 #include <string>
@@ -10,8 +8,6 @@
 class AssetImporter
 {
 	friend EngineObjectManager;
-
-	protected :
 
 	public:
 

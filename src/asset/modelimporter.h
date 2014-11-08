@@ -10,11 +10,7 @@ class Material;
 class UV2Array;
 class Skeleton;
 class VertexBoneMap;
-
-namespace Assimp
-{
-	class Importer;
-}
+namespace Assimp { class Importer; }
 
 #include "object/sceneobjectcomponent.h"
 #include "object/shadermanager.h"
