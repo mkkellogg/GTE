@@ -33,7 +33,7 @@ class AnimationManager
     bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const;
     bool IsCompatible(SkeletonRef skeleton, AnimationRef animation) const;
 
-    void Drive();
+    void Update();
 
     AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkeletonRef target);
     AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRef renderer);

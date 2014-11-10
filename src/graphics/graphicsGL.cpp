@@ -382,7 +382,7 @@ void GraphicsGL::_glutDisplayFunc()
 	_thisInstance->PreProcessScene();
 
 	_instanceCallbacks->OnUpdate(_thisInstance);
-	AnimationManager::Instance()->Drive();
+	AnimationManager::Instance()->Update();
 
 	// update timer before rendering scene so that calls to Time::GetDeltaTime() within
 	// _instanceCallbacks->OnUpdate reflect rendering time

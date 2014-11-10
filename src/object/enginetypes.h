@@ -27,25 +27,38 @@ template <typename T> class EngineObjectRef
 	friend class EngineObjectManager;
 
 	std::shared_ptr<T> sharedPtr;
-	std::function<void(T*)> deleter;
 
-	void InvokeDeleter(T* p)
+	/*void InvokeDeleter(T* p)
 	{
-		if(deleter)deleter(p);
-	}
+		printf("deleting...\n");
+		if(deleter)
+		{
+			printf("Invoking deleter...\n");
+			deleter(p);
+		}
+		printf("delete complete!\n");
+	}*/
 
 	public:
 
 	EngineObjectRef() : sharedPtr(NULL) {}
-	EngineObjectRef(const EngineObjectRef<T>& ref) : sharedPtr(ref.sharedPtr) {}
-	EngineObjectRef(const std::shared_ptr<T>& ref) : sharedPtr(ref) {}
-	EngineObjectRef( std::shared_ptr<T>& ref) : sharedPtr(ref) {}
-	EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : sharedPtr(ptr, [=](T*p){InvokeDeleter(p);})
+	EngineObjectRef(const EngineObjectRef<T>& ref) : sharedPtr(ref.sharedPtr){}
+	EngineObjectRef(EngineObjectRef<T>& ref) : sharedPtr(ref.sharedPtr){}
+	//EngineObjectRef(const std::shared_ptr<T>& ref) : sharedPtr(ref) {}
+	//EngineObjectRef( std::shared_ptr<T>& ref) : sharedPtr(ref) {}
+	EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : sharedPtr(ptr,/*[this](T*p){InvokeDeleter(p);}*/ deleter)
 	{
-		this->deleter = deleter;
+		//this->deleter = deleter;
 	}
 
 	EngineObjectRef<T>& operator=(const EngineObjectRef<T>& other)
+	{
+		if(&other == this)return *this;
+		sharedPtr = other.sharedPtr;
+		return *this;
+	}
+
+	EngineObjectRef<T>& operator=(EngineObjectRef<T>& other)
 	{
 		if(&other == this)return *this;
 		sharedPtr = other.sharedPtr;
@@ -103,8 +116,6 @@ template <typename T> class EngineObjectRef
 		return EngineObjectRef<T>();
 	}
 };
-
-//typedef std::shared_ptr<Light> LightRef;
 
 typedef EngineObjectRef<Shader> ShaderRef;
 typedef EngineObjectRef<SubMesh3DRenderer> SubMesh3DRendererRef;

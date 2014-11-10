@@ -22,8 +22,6 @@ class SkeletonNode;
 
 class Bone
 {
-	protected:
-
 	public :
 
 	Bone();

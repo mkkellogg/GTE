@@ -172,7 +172,6 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 			renderer->SetSkeleton(skeletonClone);
 		}
 	}
-
 	return root;
 }
 

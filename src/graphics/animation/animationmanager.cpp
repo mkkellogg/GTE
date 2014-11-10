@@ -112,7 +112,7 @@ bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, Anima
 /*
  * Loop through each active AnimationPlayer and drive its playback.
  */
-void AnimationManager::Drive()
+void AnimationManager::Update()
 {
 	for(std::unordered_map<unsigned int, AnimationPlayerRef>::iterator iter = activePlayers.begin(); iter != activePlayers.end(); ++iter)
 	{
@@ -120,7 +120,7 @@ void AnimationManager::Drive()
 
 		if(player.IsValid())
 		{
-			player->Drive();
+			player->Update();
 		}
 	}
 }

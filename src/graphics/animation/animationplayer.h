@@ -14,6 +14,7 @@
 //forward declarations
 class Transform;
 class SkeletonNode;
+class BlendOp;
 
 #include "object/enginetypes.h"
 #include "object/engineobject.h"
@@ -21,6 +22,7 @@ class SkeletonNode;
 #include "geometry/quaternion.h"
 #include "keyframeset.h"
 #include <vector>
+#include <queue>
 #include <unordered_map>
 #include <string>
 
@@ -29,8 +31,8 @@ class AnimationPlayer
 	friend class EngineObjectManager;
 	friend class AnimationManager;
 
-	// number of aniamtions being handled by this player
-	unsigned int indexCount;
+	// number of animations being handled by this player
+	unsigned int animationCount;
 	// mapping from object ID's of Animation objects to respective indices in member arrays/vectors
 	std::unordered_map<ObjectID, unsigned int> activeAnimationIndices;
 	// target of all animations managed by this player
@@ -39,12 +41,19 @@ class AnimationPlayer
 	std::vector<AnimationInstanceRef> activeAnimations;
 	// weights used for animation blending
 	std::vector<float> weights;
+	// if the sum of [weights] is less than 1, the difference is stored in [leftOverWeight]
+	float leftOverWeight;
+	// active animation blending operations
+	std::queue<BlendOp*> activeBlendOperations;
 
 	AnimationPlayer(SkeletonRef target);
 	~AnimationPlayer();
 
-	void Drive();
-
+	void QueueBlendOperation(BlendOp * op);
+	void Update();
+	void UpdateBlending();
+	void CheckWeights();
+	void UpdateAnimations();
 	void UpdateAnimationInstance(AnimationInstanceRef instance) const;
 	void CalculateInterpolatedTranslation(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
 	void CalculateInterpolatedScale(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
@@ -56,6 +65,8 @@ class AnimationPlayer
 	void Play(AnimationRef animation);
 	void Stop(AnimationRef animation);
 	void Pause(AnimationRef animation);
+	void Resume(AnimationRef animation);
+	void CrossFade(AnimationRef target, float duration);
 };
 
 #endif

@@ -52,6 +52,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 	SceneObjectRef cameraObject;
 	SceneObjectRef koopaRoot;
 	SkinnedMesh3DRendererRef koopaRenderer;
+	AnimationRef koopaAnim;
 	int boneIndex ;
 
 	int rotationDir = 1;
@@ -292,6 +293,7 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		modelSceneObject->GetLocalTransform().Scale(.10,.10,.10, true);
 
 
+
 		modelSceneObject = importer->LoadModelDirect("../../models/Rck-Wtrfll_dae/Rck-Wtrfll_dae.dae", 1 );
 		if(modelSceneObject.IsValid())
 		{
@@ -304,8 +306,6 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		}
 		modelSceneObject->GetLocalTransform().Translate(0,0,-12,false);
 		modelSceneObject->GetLocalTransform().Scale(13,13,13, true);
-
-
 
 		koopaRoot = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
 		if(koopaRoot.IsValid())
@@ -323,13 +323,14 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		koopaRoot->GetLocalTransform().Scale(.35, .35, .35, true);
 
 
-
-
-		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
+		AnimationRef koopaRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
+		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
 
 		koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
 		AnimationManager * animManager = AnimationManager::Instance();
 		bool compatible = animManager->IsCompatible(koopaRenderer, koopaWalk);
+		compatible &= animManager->IsCompatible(koopaRenderer, koopaRoar);
+
 		if(compatible)printf("animation is compatible!! :)\n");
 		else printf("animation is not compatible! boooo!\n");
 
@@ -337,7 +338,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		{
 			AnimationPlayerRef player = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
 			player->AddAnimation(koopaWalk);
+			player->AddAnimation(koopaRoar);
 			player->Play(koopaWalk);
+			player->CrossFade(koopaRoar, 5);
 		}
 
 

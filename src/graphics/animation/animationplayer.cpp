@@ -15,6 +15,8 @@
 #include "graphics/animation/animationinstance.h"
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationmanager.h"
+#include "graphics/animation/crossfadeblendop.h"
+#include "graphics/animation/blendop.h"
 #include "global/global.h"
 #include "global/constants.h"
 #include "ui/debug.h"
@@ -29,7 +31,8 @@ AnimationPlayer::AnimationPlayer(SkeletonRef target)
 {
 	ASSERT_RTRN(target.IsValid(),"AnimationPlayer::AnimationPlayer -> Invalid target.");
 	this->target = target;
-	indexCount = 0;
+	animationCount = 0;
+	leftOverWeight = 1;
 }
 
 /*
@@ -40,10 +43,7 @@ AnimationPlayer::~AnimationPlayer()
 
 }
 
-/*
- * Update all animation instances to reflect the time that has past since the last call to Drive().
- */
-void AnimationPlayer::Drive()
+void AnimationPlayer::UpdateAnimations()
 {
 	for(unsigned int i = 0; i < activeAnimations.size(); i++)
 	{
@@ -56,6 +56,51 @@ void AnimationPlayer::Drive()
 			UpdateAnimationInstance(instance);
 		}
 	}
+}
+
+void AnimationPlayer::QueueBlendOperation(BlendOp * op)
+{
+	ASSERT_RTRN(op,"AnimationPlayer::QueueBlendOperation -> op is NULL.");
+	activeBlendOperations.push(op);
+}
+
+void AnimationPlayer::UpdateBlending()
+{
+	if(activeBlendOperations.size() > 0)
+	{
+		BlendOp * op = activeBlendOperations.front();
+
+		if(op == NULL)
+		{
+			Debug::PrintWarning("AnimationPlayer::UpdateBlending -> NULL operation found in queue.");
+			activeBlendOperations.pop();
+			return;
+		}
+
+		printf("cross-fading: %f% \n",op->GetNormalizedProgress() * 100);
+		op->Update(weights);
+
+		if(op->IsComplete())
+		{
+			activeBlendOperations.pop();
+			delete op;
+		}
+	}
+}
+
+void AnimationPlayer::CheckWeights()
+{
+
+}
+
+/*
+ * Update all animation instances to reflect the time that has past since the last call to Drive().
+ */
+void AnimationPlayer::Update()
+{
+	UpdateBlending();
+	CheckWeights();
+	UpdateAnimations();
 }
 
 /*
@@ -297,9 +342,10 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
 		ASSERT_RTRN(initSuccess,"AnimationPlayer::CreateAnimationInstance -> Unable to initialize animation instance.");
 
 		activeAnimations.push_back(instance);
+		weights.push_back(0);
 
-		activeAnimationIndices[animation->GetObjectID()] = indexCount;
-		indexCount++;
+		activeAnimationIndices[animation->GetObjectID()] = animationCount;
+		animationCount++;
 	}
 }
 
@@ -311,9 +357,28 @@ void AnimationPlayer::Play(AnimationRef animation)
 	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Play -> Animation is invalid.");
 	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
 	{
-		unsigned int index = activeAnimationIndices[animation->GetObjectID()];
-		AnimationInstanceRef instance = activeAnimations[index];
-		instance->Play();
+		unsigned int targetIndex = activeAnimationIndices[animation->GetObjectID()];
+
+		float tempLeftOver = 1;
+		for(unsigned int i = 0; i < activeAnimations.size(); i++)
+		{
+			AnimationInstanceRef instance = activeAnimations[i];
+
+			if(i != targetIndex)
+			{
+				instance->Stop();
+				weights[i] = 0;
+			}
+			else
+			{
+				weights[i] = 1;
+				instance->Play();
+			}
+
+			tempLeftOver -= weights[1];
+		}
+		if(tempLeftOver < 0)tempLeftOver = 0;
+		leftOverWeight = tempLeftOver;
 	}
 }
 
@@ -325,9 +390,13 @@ void AnimationPlayer::Stop(AnimationRef animation)
 	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Stop -> Animation is invalid.");
 	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
 	{
-		unsigned int index = activeAnimationIndices[animation->GetObjectID()];
-		AnimationInstanceRef instance = activeAnimations[index];
-		instance->Stop();
+		unsigned int targetIndex = activeAnimationIndices[animation->GetObjectID()];
+		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index found in index map.");
+
+		AnimationInstanceRef instance = activeAnimations[targetIndex];
+		if(instance.IsValid())instance->Stop();
+		leftOverWeight += weights[targetIndex];
+		weights[targetIndex] = 0;
 	}
 }
 
@@ -339,8 +408,50 @@ void AnimationPlayer::Pause(AnimationRef animation)
 	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Pause -> Animation is invalid.");
 	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
 	{
-		unsigned int index = activeAnimationIndices[animation->GetObjectID()];
-		AnimationInstanceRef instance = activeAnimations[index];
+		unsigned int targetIndex = activeAnimationIndices[animation->GetObjectID()];
+		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index found in index map.");
+
+		AnimationInstanceRef instance = activeAnimations[targetIndex];
 		instance->Pause();
+	}
+}
+
+/*
+ * Resume playback of [animation] on this player.
+ */
+void AnimationPlayer::Resume(AnimationRef animation)
+{
+	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Resume -> Animation is invalid.");
+	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
+	{
+		unsigned int targetIndex = activeAnimationIndices[animation->GetObjectID()];
+		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Resume -> invalid animation index found in index map.");
+
+		AnimationInstanceRef instance = activeAnimations[targetIndex];
+		instance->Play();
+	}
+}
+
+void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
+{
+	if(activeAnimationIndices.find(animation->GetObjectID()) != activeAnimationIndices.end())
+	{
+		unsigned int targetIndex = activeAnimationIndices[animation->GetObjectID()];
+		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::CrossFade -> invalid animation index found in index map.");
+
+		AnimationInstanceRef instance = activeAnimations[targetIndex];
+
+		CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
+		ASSERT_RTRN(blendOp, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
+
+		bool initSuccess = blendOp->Init(weights);
+		if(!initSuccess)
+		{
+			Debug::PrintError("AnimationPlayer::CrossFade -> Unable to Init new CrossFadeBlendOp object.");
+			delete blendOp;
+			return;
+		}
+
+		QueueBlendOperation(blendOp);
 	}
 }
