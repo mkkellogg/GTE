@@ -45,6 +45,8 @@ class AnimationPlayer
 	float leftOverWeight;
 	// active animation blending operations
 	std::queue<BlendOp*> activeBlendOperations;
+	// number of animations currently playing
+	int playingAnimationsCount;
 
 	AnimationPlayer(SkeletonRef target);
 	~AnimationPlayer();
@@ -54,10 +56,12 @@ class AnimationPlayer
 	void UpdateBlending();
 	void CheckWeights();
 	void UpdateAnimations();
-	void UpdateAnimationInstance(AnimationInstanceRef instance) const;
-	void CalculateInterpolatedTranslation(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
-	void CalculateInterpolatedScale(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
-	void CalculateInterpolatedRotation(float progress, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
+	void UpdateAnimationInstancePositions(AnimationInstanceRef instance, unsigned int state, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+	void UpdateTargetWithWeightedIdentity(float weight);
+	void UpdateAnimationInstanceProgress(AnimationInstanceRef instance) const;
+	void CalculateInterpolatedTranslation(AnimationInstanceRef instance,float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
+	void CalculateInterpolatedScale(AnimationInstanceRef instance,float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
+	void CalculateInterpolatedRotation(AnimationInstanceRef instance,float progress, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
 
 	public :
 

@@ -33,6 +33,7 @@ AnimationPlayer::AnimationPlayer(SkeletonRef target)
 	this->target = target;
 	animationCount = 0;
 	leftOverWeight = 1;
+	playingAnimationsCount = 0;
 }
 
 /*
@@ -41,21 +42,6 @@ AnimationPlayer::AnimationPlayer(SkeletonRef target)
 AnimationPlayer::~AnimationPlayer()
 {
 
-}
-
-void AnimationPlayer::UpdateAnimations()
-{
-	for(unsigned int i = 0; i < activeAnimations.size(); i++)
-	{
-		AnimationInstanceRef instance = activeAnimations[i];
-
-		if(instance.IsValid())
-		{
-			// TODO: Implement animation blending.
-			// For now simply update instance with weight of 1.
-			UpdateAnimationInstance(instance);
-		}
-	}
 }
 
 void AnimationPlayer::QueueBlendOperation(BlendOp * op)
@@ -77,12 +63,19 @@ void AnimationPlayer::UpdateBlending()
 			return;
 		}
 
-		printf("cross-fading: %f% \n",op->GetNormalizedProgress() * 100);
+		if(!op->IsStarted())
+		{
+			op->OnStart();
+			op->SignalStarted();
+		}
+
+		//printf("cross-fading: %f% \n",op->GetNormalizedProgress() * 100);
 		op->Update(weights);
 
 		if(op->IsComplete())
 		{
 			activeBlendOperations.pop();
+			op->OnComplete();
 			delete op;
 		}
 	}
@@ -90,7 +83,17 @@ void AnimationPlayer::UpdateBlending()
 
 void AnimationPlayer::CheckWeights()
 {
+	leftOverWeight = 1;
+	for(unsigned int i = 0; i < activeAnimations.size(); i++)
+	{
+		AnimationInstanceRef instance = activeAnimations[i];
 
+		if(instance.IsValid() && instance->Playing)
+		{
+			leftOverWeight -= weights[i];
+		}
+	}
+	if(leftOverWeight <0)leftOverWeight = 0;
 }
 
 /*
@@ -103,69 +106,163 @@ void AnimationPlayer::Update()
 	UpdateAnimations();
 }
 
-/*
- * Advance [instance] according to the amount of time that has elapsed since the last call to UpdateAnimationInstance()
- */
-void AnimationPlayer::UpdateAnimationInstance(AnimationInstanceRef instance) const
+void AnimationPlayer::UpdateAnimations()
 {
-	ASSERT_RTRN(instance.IsValid(), " AnimationPlayer::UpdateAnimationInstance -> Animation instance is invalid.");
+	Vector3 translation;
+	Vector3 scale;
+	Quaternion rotation;
+	aiQuaternion aiRotation;
 
-	// only update if playing
-	if(instance->IsPlaying())
+	Vector3 agTranslation;
+	Vector3 agScale;
+	Quaternion agRotation;
+	Quaternion temp;
+
+	// temp use Matrices
+	Matrix4x4 rotMatrix;
+	Matrix4x4 matrix;
+
+	unsigned int playingAnimationsSeen = 0;
+
+	// loop through each node in the target Skeleton object calculated the position based on weighted average
+	// of values returned from each active animation
+	for(unsigned int node = 0; node < target->GetNodeCount(); node++)
 	{
-		// temp use Matrices
-		Matrix4x4 rotMatrix;
-		Matrix4x4 matrix;
-
-		// loop through each KeyFrameSet in animation and advance according to the instance's progress
-		for(unsigned int state = 0; state < instance->StateCount; state++)
+		playingAnimationsSeen = 0;
+		float agWeight = 0;
+		for(int i = activeAnimations.size()-1; i >= 0; i--)
 		{
-			unsigned int frameSetIndex = state;
-			KeyFrameSet * frameSet = instance->SourceAnimation->GetKeyFrameSet(frameSetIndex);
-
-			// make sure it's an active KeyFrameSet
-			if(frameSet != NULL && frameSet->Used)
+			AnimationInstanceRef instance = activeAnimations[i];
+			if(instance.IsValid() && instance->Playing)
 			{
-				Vector3 translation;
-				Vector3 scale;
-				Quaternion rotation;
+				float weight = weights[i];
+				if(weight <=0)continue;
 
-				// for each of translation, scale, and rotation, find the two respective key frames between which
-				// instance->Progress lies, and interpolate between them based on instance->Progress.
-				CalculateInterpolatedTranslation(instance->Progress, *frameSet, translation);
-				CalculateInterpolatedScale(instance->Progress, *frameSet, scale);
-				CalculateInterpolatedRotation(instance->Progress, *frameSet, rotation);
-				rotMatrix = rotation.rotationMatrix();
-
-				matrix.SetIdentity();
-				// apply interpolated scale
-				matrix.Scale(scale.x,scale.y,scale.z);
-				// apply interpolated rotation
-				matrix.PreMultiply(&rotMatrix);
-				// apply interpolated translation
-				matrix.PreTranslate(translation.x, translation.y, translation.z);
-
-				// get the Skeleton node corresponding to this KeyFrameSet
-				SkeletonNode * targetNode = instance->Target->GetNodeFromList(frameSetIndex);
-				if(targetNode->HasTarget())
+				if(playingAnimationsCount == 1)
 				{
-					// get the local transform of the target of this node and apply
-					// [matrix], which contains the interpolated scale, rotation, and translation
-					Transform * localTransform = targetNode->GetLocalTransform();
-					if(localTransform != NULL)
+					UpdateAnimationInstancePositions(instance, node, translation, rotation, scale);
+					agTranslation = translation;
+					agScale = scale;
+					agRotation = rotation;
+				}
+				else
+				{
+					agWeight += weight;
+					UpdateAnimationInstancePositions(instance, node, translation, rotation, scale);
+
+					translation.Scale(weight);
+					scale.Scale(weight);
+					rotation.Set(rotation.x() * weight,rotation.y() * weight,rotation.z() * weight, rotation.w() * weight);
+					rotation.normalize();
+
+					if(playingAnimationsSeen == 0)
 					{
-						localTransform->SetTo(&matrix);
+						agTranslation = translation;
+						agScale = scale;
+						agRotation = rotation;
+					}
+					else
+					{
+						Vector3::Add(&translation, &agTranslation, &agTranslation);
+						Vector3::Add(&scale, &agScale, &agScale);
+						//agRotation =  agRotation * rotation;
+						if(agWeight != 0)
+							temp = Quaternion::slerp(agRotation, rotation, weight/agWeight);
+						else
+							temp = rotation;
+						agRotation =temp;
 					}
 				}
+
+				playingAnimationsSeen++;
 			}
 		}
 
-		// update animation instance progress
-		float deltaTime = Time::GetDeltaTime();
+		rotMatrix = agRotation.rotationMatrix();
+
+		matrix.SetIdentity();
+		// apply interpolated scale
+		matrix.Scale(agScale.x,agScale.y,agScale.z);
+		// apply interpolated rotation
+		matrix.PreMultiply(&rotMatrix);
+		// apply interpolated translation
+		matrix.PreTranslate(agTranslation.x, agTranslation.y, agTranslation.z);
+
+		// get the Skeleton node corresponding to the current node index
+		SkeletonNode * targetNode = target->GetNodeFromList(node);
+		if(targetNode->HasTarget())
+		{
+			// get the local transform of the target of this node and apply
+			// [matrix], which contains the interpolated scale, rotation, and translation
+			Transform * localTransform = targetNode->GetLocalTransform();
+			if(localTransform != NULL)localTransform->SetTo(&matrix);
+		}
+	}
+
+	for(unsigned int i = 0; i < activeAnimations.size(); i++)
+	{
+		AnimationInstanceRef instance = activeAnimations[i];
+		if(instance.IsValid() && instance->Playing)
+		{
+			UpdateAnimationInstanceProgress(instance);
+		}
+	}
+
+
+	if(leftOverWeight > 0)
+	{
+		//UpdateTargetWithWeightedIdentity(1);
+	}
+}
+
+void AnimationPlayer::UpdateTargetWithWeightedIdentity(float weight)
+{
+	ASSERT_RTRN(target.IsValid(), " AnimationPlayer::UpdateTargetWithWeightedIdentity -> Target skeleton is invalid.");
+
+	for(unsigned int i = 0; i < target->GetNodeCount(); i++)
+	{
+		SkeletonNode * node = target->GetNodeFromList(i);
+
+		if(node != NULL && node->HasTarget())
+		{
+			Matrix4x4 matrix;
+			matrix.MultiplyByScalar(weight);
+
+			Matrix4x4 * mat = const_cast<Matrix4x4*>(node->GetLocalTransform()->GetMatrix());
+			mat->Add(&matrix);
+		}
+	}
+}
+AnimationInstanceRef _tempInstance;
+void AnimationPlayer::UpdateAnimationInstancePositions(AnimationInstanceRef instance, unsigned int state, Vector3& translation, Quaternion& rotation, Vector3& scale) const
+{
+	unsigned int frameSetIndex = state;
+	KeyFrameSet * frameSet = instance->SourceAnimation->GetKeyFrameSet(frameSetIndex);
+
+	// make sure it's an active KeyFrameSet
+	if(frameSet != NULL && frameSet->Used)
+	{
+		_tempInstance = instance;
+		// for each of translation, scale, and rotation, find the two respective key frames between which
+		// instance->Progress lies, and interpolate between them based on instance->Progress.
+		CalculateInterpolatedTranslation(instance, instance->Progress, *frameSet, translation);
+		CalculateInterpolatedScale(instance, instance->Progress, *frameSet, scale);
+		CalculateInterpolatedRotation(instance, instance->Progress, *frameSet, rotation);
+	}
+
+}
+
+void AnimationPlayer::UpdateAnimationInstanceProgress(AnimationInstanceRef instance) const
+{
+	// update animation instance progress
+	float deltaTime = Time::GetDeltaTime();
+
+	if(instance->Playing && !instance->Paused)
+	{
 		instance->Progress += deltaTime;
 
 		//TODO: update to either stop or loop based on settings. for now auto-loop.
-		if(instance->Progress >= instance->Duration)
+		if(instance->Progress > instance->Duration)
 		{
 			instance->Progress = instance->Progress - instance->Duration;
 			if(instance->Progress < 0) instance->Progress = 0;
@@ -179,35 +276,47 @@ void AnimationPlayer::UpdateAnimationInstance(AnimationInstanceRef instance) con
  * Use the value of [progress] to find the two closest translation key frames in [keyFrameSet]. Then interpolate between the translation
  * values in those two key frames based on where [progress] lies between them, and store the result in [vector].
  */
-void AnimationPlayer::CalculateInterpolatedTranslation(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const
+void AnimationPlayer::CalculateInterpolatedTranslation(AnimationInstanceRef instance,float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const
 {
 	bool foundFrame =false;
 	unsigned int frameCount = keyFrameSet.TranslationKeyFrames.size();
 
 	// loop through each key frame
-	for(unsigned int f = 0; f < frameCount; f++)
+	for(unsigned int f = 1; f < frameCount; f++)
 	{
-		const TranslationKeyFrame& keyFrame = keyFrameSet.TranslationKeyFrames[f];
+		const TranslationKeyFrame& checkFrame = keyFrameSet.TranslationKeyFrames[f];
 
 		// if the RealTime value for this key frame is greater than [progress], then the last key frame and the current key frame
 		// are the frames we want
-		if(keyFrame.RealTime > progress)
+		if(checkFrame.RealTime > progress || f == frameCount-1)
 		{
 			unsigned int lastIndex = 0;
 			if(f > 0)lastIndex = f-1;
+			unsigned int nextIndex = f;
+			bool overShoot = false;
 
+			if(f == frameCount-1 && checkFrame.RealTime <= progress)
+			{
+				lastIndex = f;
+				nextIndex = 0;
+				overShoot = true;
+			}
+
+			const TranslationKeyFrame& nextFrame = keyFrameSet.TranslationKeyFrames[nextIndex];
 			const TranslationKeyFrame& lastFrame = keyFrameSet.TranslationKeyFrames[lastIndex];
 
 			// calculate local progress between [lastFrame] and [keyFrame]
-			float interFrameTimeDelta = keyFrame.RealTime - lastFrame.RealTime;
+			float interFrameTimeDelta = nextFrame.RealTime - lastFrame.RealTime;
+			if(overShoot)  interFrameTimeDelta = instance->Duration -lastFrame.RealTime;
+
 			float interFrameElapsed = progress - lastFrame.RealTime;
 			float interFrameProgress = 1;
 			if(interFrameTimeDelta >0)interFrameProgress = interFrameElapsed/interFrameTimeDelta;
 
 			// perform interpolation
-			vector.x = ((keyFrame.Translation.x - lastFrame.Translation.x) * interFrameProgress) + lastFrame.Translation.x;
-			vector.y = ((keyFrame.Translation.y - lastFrame.Translation.y) * interFrameProgress) + lastFrame.Translation.y;
-			vector.z = ((keyFrame.Translation.z - lastFrame.Translation.z) * interFrameProgress) + lastFrame.Translation.z;
+			vector.x = ((nextFrame.Translation.x - lastFrame.Translation.x) * interFrameProgress) + lastFrame.Translation.x;
+			vector.y = ((nextFrame.Translation.y - lastFrame.Translation.y) * interFrameProgress) + lastFrame.Translation.y;
+			vector.z = ((nextFrame.Translation.z - lastFrame.Translation.z) * interFrameProgress) + lastFrame.Translation.z;
 
 			foundFrame = true;
 			break;
@@ -225,7 +334,7 @@ void AnimationPlayer::CalculateInterpolatedTranslation(float progress, const Key
  * Use the value of [progress] to find the two closest scale key frames in [keyFrameSet]. Then interpolate between the scale
  * values in those two key frames based on where [progress] lies between them, and store the result in [vector].
  */
-void AnimationPlayer::CalculateInterpolatedScale(float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const
+void AnimationPlayer::CalculateInterpolatedScale(AnimationInstanceRef instance,float progress, const KeyFrameSet& keyFrameSet, Vector3& vector) const
 {
 	bool foundFrame =false;
 	unsigned int frameCount = keyFrameSet.ScaleKeyFrames.size();
@@ -233,27 +342,39 @@ void AnimationPlayer::CalculateInterpolatedScale(float progress, const KeyFrameS
 	// loop through each key frame
 	for(unsigned int f = 0; f < frameCount; f++)
 	{
-		const ScaleKeyFrame& keyFrame = keyFrameSet.ScaleKeyFrames[f];
+		const ScaleKeyFrame& checkFrame = keyFrameSet.ScaleKeyFrames[f];
 
 		// if the RealTime value for this key frame is greater than [progress], then the last key frame and the current key frame
 		// are the frames we want
-		if(keyFrame.RealTime > progress)
+		if(checkFrame.RealTime > progress)
 		{
 			unsigned int lastIndex = 0;
 			if(f > 0)lastIndex = f-1;
+			unsigned int nextIndex = f;
+			bool overShoot = false;
 
+			if(f == frameCount-1 && checkFrame.RealTime <= progress)
+			{
+				lastIndex = f;
+				nextIndex = 0;
+				overShoot = true;
+			}
+
+			const ScaleKeyFrame& nextFrame = keyFrameSet.ScaleKeyFrames[nextIndex];
 			const ScaleKeyFrame& lastFrame = keyFrameSet.ScaleKeyFrames[lastIndex];
 
 			// calculate local progress between [lastFrame] and [keyFrame]
-			float interFrameTimeDelta = keyFrame.RealTime - lastFrame.RealTime;
+			float interFrameTimeDelta = nextFrame.RealTime - lastFrame.RealTime;
+			if(overShoot)  interFrameTimeDelta = instance->Duration -lastFrame.RealTime;
+
 			float interFrameElapsed = progress - lastFrame.RealTime;
 			float interFrameProgress = 1;
 			if(interFrameTimeDelta >0)interFrameProgress = interFrameElapsed/interFrameTimeDelta;
 
 			// perform interpolation
-			vector.x = ((keyFrame.Scale.x - lastFrame.Scale.x) * interFrameProgress) + lastFrame.Scale.x;
-			vector.y = ((keyFrame.Scale.y - lastFrame.Scale.y) * interFrameProgress) + lastFrame.Scale.y;
-			vector.z = ((keyFrame.Scale.z - lastFrame.Scale.z) * interFrameProgress) + lastFrame.Scale.z;
+			vector.x = ((nextFrame.Scale.x - lastFrame.Scale.x) * interFrameProgress) + lastFrame.Scale.x;
+			vector.y = ((nextFrame.Scale.y - lastFrame.Scale.y) * interFrameProgress) + lastFrame.Scale.y;
+			vector.z = ((nextFrame.Scale.z - lastFrame.Scale.z) * interFrameProgress) + lastFrame.Scale.z;
 
 			foundFrame = true;
 			break;
@@ -271,7 +392,7 @@ void AnimationPlayer::CalculateInterpolatedScale(float progress, const KeyFrameS
  * Use the value of [progress] to find the two closest rotation key frames in [keyFrameSet]. Then interpolate between the rotation
  * values in those two key frames based on where [progress] lies between them, and store the result in [rotation].
  */
-void AnimationPlayer::CalculateInterpolatedRotation(float progress, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const
+void AnimationPlayer::CalculateInterpolatedRotation(AnimationInstanceRef instance,float progress, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const
 {
 	bool foundFrame =false;
 	unsigned int frameCount = keyFrameSet.RotationKeyFrames.size();
@@ -279,26 +400,38 @@ void AnimationPlayer::CalculateInterpolatedRotation(float progress, const KeyFra
 	// loop through each key frame
 	for(unsigned int f = 0; f < frameCount; f++)
 	{
-		const RotationKeyFrame& keyFrame = keyFrameSet.RotationKeyFrames[f];
+		const RotationKeyFrame& checkFrame = keyFrameSet.RotationKeyFrames[f];
 
 		// if the RealTime value for this key frame is greater than [progress], then the last key frame and the current key frame
 		// are the frames we want
-		if(keyFrame.RealTime > progress)
+		if(checkFrame.RealTime > progress  || f == frameCount-1)
 		{
 			unsigned int lastIndex = 0;
 			if(f > 0)lastIndex = f-1;
+			unsigned int nextIndex = f;
+			bool overShoot = false;
 
+			if(f == frameCount-1 && checkFrame.RealTime <= progress)
+			{
+				lastIndex = f;
+				nextIndex = 0;
+				overShoot = true;
+			}
+
+			const RotationKeyFrame& nextFrame = keyFrameSet.RotationKeyFrames[nextIndex];
 			const RotationKeyFrame& lastFrame = keyFrameSet.RotationKeyFrames[lastIndex];
 
 			// calculate local progress between [lastFrame] and [keyFrame]
-			float interFrameTimeDelta = keyFrame.RealTime - lastFrame.RealTime;
+			float interFrameTimeDelta = nextFrame.RealTime - lastFrame.RealTime;
+			if(overShoot)  interFrameTimeDelta = instance->Duration -lastFrame.RealTime;
+
 			float interFrameElapsed = progress - lastFrame.RealTime;
 			float interFrameProgress = 1;
 			if(interFrameTimeDelta >0)interFrameProgress = interFrameElapsed/interFrameTimeDelta;
 
 			// perform spherical interpolation between the two Quaternions
 			Quaternion a(lastFrame.Rotation.x(),lastFrame.Rotation.y(),lastFrame.Rotation.z(),lastFrame.Rotation.w());
-			Quaternion b(keyFrame.Rotation.x(),keyFrame.Rotation.y(),keyFrame.Rotation.z(),keyFrame.Rotation.w());
+			Quaternion b(nextFrame.Rotation.x(),nextFrame.Rotation.y(),nextFrame.Rotation.z(),nextFrame.Rotation.w());
 			Quaternion quatOut= Quaternion::slerp(a,b, interFrameProgress);
 			rotation.Set(quatOut.x(),quatOut.y(),quatOut.z(), -quatOut.w());
 
@@ -379,6 +512,7 @@ void AnimationPlayer::Play(AnimationRef animation)
 		}
 		if(tempLeftOver < 0)tempLeftOver = 0;
 		leftOverWeight = tempLeftOver;
+		playingAnimationsCount = 1;
 	}
 }
 
@@ -394,7 +528,11 @@ void AnimationPlayer::Stop(AnimationRef animation)
 		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index found in index map.");
 
 		AnimationInstanceRef instance = activeAnimations[targetIndex];
-		if(instance.IsValid())instance->Stop();
+		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Stop -> Target animation is invalid.");
+
+		if(instance->Playing)playingAnimationsCount--;
+		instance->Stop();
+
 		leftOverWeight += weights[targetIndex];
 		weights[targetIndex] = 0;
 	}
@@ -412,6 +550,8 @@ void AnimationPlayer::Pause(AnimationRef animation)
 		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index found in index map.");
 
 		AnimationInstanceRef instance = activeAnimations[targetIndex];
+		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Pause -> Target animation is invalid.");
+
 		instance->Pause();
 	}
 }
@@ -428,6 +568,8 @@ void AnimationPlayer::Resume(AnimationRef animation)
 		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Resume -> invalid animation index found in index map.");
 
 		AnimationInstanceRef instance = activeAnimations[targetIndex];
+		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Resume -> Target animation is invalid.");
+
 		instance->Play();
 	}
 }
@@ -440,6 +582,11 @@ void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::CrossFade -> invalid animation index found in index map.");
 
 		AnimationInstanceRef instance = activeAnimations[targetIndex];
+		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CrossFade -> Target animation is invalid.");
+
+		if(!(instance->Playing))playingAnimationsCount++;
+		instance->Reset();
+		instance->Play();
 
 		CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
 		ASSERT_RTRN(blendOp, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
@@ -451,6 +598,26 @@ void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 			delete blendOp;
 			return;
 		}
+
+		blendOp->SetOnCompleteCallback([targetIndex, this](CrossFadeBlendOp * op)
+		{
+			playingAnimationsCount = 1;
+
+			for(unsigned int i = 0; i < activeAnimations.size(); i++)
+			{
+				if(i != targetIndex)
+				{
+					AnimationInstanceRef instance = activeAnimations[i];
+					if(!instance.IsValid())
+					{
+						Debug::PrintWarning("AnimationPlayer::CrossFade::OnCompleteCallback -> Invalid animation found.");
+						continue;
+					}
+
+					if(instance->Playing)instance->Stop();
+				}
+			}
+		});
 
 		QueueBlendOperation(blendOp);
 	}

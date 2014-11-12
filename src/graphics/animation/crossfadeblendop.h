@@ -19,12 +19,15 @@ class SkeletonNode;
 #include "object/enginetypes.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 class CrossFadeBlendOp : public BlendOp
 {
 	friend class AnimationPlayer;
 
 	unsigned int targetIndex;
+	std::function<void(CrossFadeBlendOp*)> startCallback;
+	std::function<void(CrossFadeBlendOp*)> completeCallback;
 
 	CrossFadeBlendOp(float duration, unsigned int targetIndex);
 
@@ -35,6 +38,10 @@ class CrossFadeBlendOp : public BlendOp
 	public :
 
 	void Update(std::vector<float>& weights);
+	void OnStart();
+	void OnComplete();
+	void SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback);
+	void SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback);
 };
 
 #endif

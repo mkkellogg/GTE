@@ -160,10 +160,3 @@ void Point3::Set(float x, float y, float z)
 	BaseVector4::Set(x,y,z,1);
 }
 
-void Point3::SetTo(Point3 * p)
-{
-	ASSERT_RTRN(p != NULL, "Point3::SetTo -> NULL point passed.");
-
-	BaseVector4::Set(p->x,p->y,p->z,1);
-}
-

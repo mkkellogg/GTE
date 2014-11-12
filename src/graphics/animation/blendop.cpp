@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "blendop.h"
+#include "util/time.h"
 #include <string>
 
 /*
@@ -13,6 +14,7 @@ BlendOp::BlendOp(float duration)
 	this->duration = duration;
 	this->progress = 0;
 	complete = false;
+	started = false;
 }
 
 /*
@@ -36,7 +38,22 @@ void BlendOp::Reset()
 	complete = false;
 }
 
-void BlendOp::SetComplete(bool complete)
+void BlendOp::Update(std::vector<float>& weights)
+{
+	progress += Time::GetDeltaTime();
+}
+
+bool BlendOp::IsStarted()
+{
+	return started;
+}
+
+void BlendOp::SignalStarted()
+{
+	started = true;
+}
+
+void BlendOp::NotifyComplete(bool complete)
 {
 	this->complete = complete;
 }

@@ -29,6 +29,7 @@ AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
 	ProgressTicks = 0;
 
 	Playing = false;
+	Paused = false;
 }
 
 /*
@@ -118,14 +119,10 @@ AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int st
 	return FrameStates + stateIndex;
 }
 
-bool AnimationInstance::IsPlaying()
-{
-	return Playing;
-}
-
 void AnimationInstance::Play()
 {
 	Playing = true;
+	Paused = false;
 }
 
 void AnimationInstance::Stop()
@@ -136,5 +133,5 @@ void AnimationInstance::Stop()
 
 void AnimationInstance::Pause()
 {
-	Playing = false;
+	Paused = true;
 }

@@ -94,7 +94,7 @@ BaseVector4::~BaseVector4()
 
 
 /*
- * Set this bas vector's data
+ * Set this base vector's data
  */
 void BaseVector4::Set(float x, float y, float z, float w)
 {
@@ -102,6 +102,19 @@ void BaseVector4::Set(float x, float y, float z, float w)
     data[1] = y;
     data[2] = z;
     data[3] = w;
+}
+
+/*
+ * Set this base vector's data to be equal to [baseVector]
+ */
+void BaseVector4::SetTo(BaseVector4 * baseVector)
+{
+	ASSERT_RTRN(baseVector != NULL, "BaseVector4::SetTo -> NULL baseVector passed.");
+
+	data[0] = baseVector->data[0];
+	data[1] = baseVector->data[1];
+	data[2] = baseVector->data[2];
+	data[3] = baseVector->data[3];
 }
 
 /*

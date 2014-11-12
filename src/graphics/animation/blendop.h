@@ -28,19 +28,24 @@ class BlendOp
 	float duration;
 	float progress;
 	bool complete;
+	bool started;
 
 	std::vector<float> initialWeights;
 
 	BlendOp(float duration);
 	virtual ~BlendOp();
-	void SetComplete(bool complete);
+	void NotifyComplete(bool complete);
+	void SignalStarted();
 
 	public :
 
 	void Reset();
 	bool Init(std::vector<float>& initialWeights);
-	virtual void Update(std::vector<float>& weights) = 0;
+	virtual void Update(std::vector<float>& weights);
+	virtual void OnStart() = 0;
+	virtual void OnComplete() = 0;
 	bool IsComplete();
+	bool IsStarted();
 	float GetNormalizedProgress();
 	float GetProgress();
 

@@ -7,6 +7,7 @@
 #include "global/global.h"
 #include "ui/debug.h"
 #include "util/time.h"
+#include <memory>
 
 /*
  * Default constructor.
@@ -14,8 +15,8 @@
 CrossFadeBlendOp::CrossFadeBlendOp(float duration, unsigned int targetIndex) : BlendOp(duration)
 {
 	this->targetIndex = targetIndex;
-	SetComplete(false);
-	if(duration <=0)SetComplete(true);
+	NotifyComplete(false);
+	if(duration <=0)NotifyComplete(true);
 }
 
 /*
@@ -34,7 +35,9 @@ void CrossFadeBlendOp::Update(std::vector<float>& weights)
 	if(complete)return;
 	ASSERT_RTRN(weights.size() >= initialWeights.size(), "CrossFadeBlendOp::Update -> Weight count is less than initial weight count.");
 
+	BlendOp::Update(weights);
 	float normalizedProgress = progress / duration;
+
 	for(unsigned int i = 0; i < initialWeights.size(); i++)
 	{
 		float initialWeight = initialWeights[i];
@@ -44,7 +47,6 @@ void CrossFadeBlendOp::Update(std::vector<float>& weights)
 		weights[i] = normalizedProgress * deltaWeight + initialWeight;
 	}
 
-	progress += Time::GetDeltaTime();
 	if(progress > duration)
 	{
 		for(unsigned int i = 0; i < initialWeights.size(); i++)
@@ -52,7 +54,27 @@ void CrossFadeBlendOp::Update(std::vector<float>& weights)
 			if(i == targetIndex)weights[i] = 1;
 			else weights[i] = 0;
 		}
-		SetComplete(true);
+		NotifyComplete(true);
 	}
+}
+
+void CrossFadeBlendOp::OnStart()
+{
+	if(startCallback)startCallback(this);
+}
+
+void CrossFadeBlendOp::OnComplete()
+{
+	if(completeCallback)completeCallback(this);
+}
+
+void CrossFadeBlendOp::SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback)
+{
+	this->startCallback = callback;
+}
+
+void CrossFadeBlendOp::SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback)
+{
+	this->completeCallback = callback;
 }
 

@@ -53,7 +53,9 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 	SceneObjectRef koopaRoot;
 	SkinnedMesh3DRendererRef koopaRenderer;
 	AnimationRef koopaAnim;
+	AnimationRef koopaWait, koopaWalk, koopaJump;
 	int boneIndex ;
+	bool isWalking = false;
 
 	int rotationDir = 1;
 
@@ -323,13 +325,15 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		koopaRoot->GetLocalTransform().Scale(.35, .35, .35, true);
 
 
-		AnimationRef koopaRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
-		AnimationRef koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
+		koopaWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
+		koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
+		koopaJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
 
 		koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
 		AnimationManager * animManager = AnimationManager::Instance();
 		bool compatible = animManager->IsCompatible(koopaRenderer, koopaWalk);
-		compatible &= animManager->IsCompatible(koopaRenderer, koopaRoar);
+		compatible &= animManager->IsCompatible(koopaRenderer, koopaWait);
+		compatible &= animManager->IsCompatible(koopaRenderer, koopaJump);
 
 		if(compatible)printf("animation is compatible!! :)\n");
 		else printf("animation is not compatible! boooo!\n");
@@ -337,10 +341,12 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		if(compatible)
 		{
 			AnimationPlayerRef player = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
+			player->AddAnimation(koopaWait);
 			player->AddAnimation(koopaWalk);
-			player->AddAnimation(koopaRoar);
-			player->Play(koopaWalk);
-			player->CrossFade(koopaRoar, 5);
+			player->AddAnimation(koopaJump);
+			player->Play(koopaWait);
+			player->CrossFade(koopaWalk, 2);
+			isWalking = true;
 		}
 
 
@@ -402,6 +408,14 @@ class CustomGraphicsCallbacks: public GraphicsCallbacks
 		}
 
 		 cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,12 * Time::GetDeltaTime() * rotationDir);
+
+		 if(isWalking && Time::GetRealTimeSinceStartup() > 8)
+		 {
+			 isWalking = false;
+			 AnimationManager * animManager = AnimationManager::Instance();
+			 AnimationPlayerRef player = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
+			 player->CrossFade(koopaJump, 2);
+		 }
 
 		 //float realTime = Time::GetRealTimeSinceStartup();
 	}

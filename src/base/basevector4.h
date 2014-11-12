@@ -33,6 +33,7 @@ class BaseVector4
 
     float * GetDataPtr();
     virtual void Set(float x, float y, float z, float w);
+    void SetTo(BaseVector4 * baseVector);
     void Get(BaseVector4 * baseVector) const;
 
     virtual void AttachTo(float * data);

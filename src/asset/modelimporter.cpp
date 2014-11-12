@@ -836,7 +836,11 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 	ASSERT(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
 
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
-	float durationTicks = (float)animation.mDuration;
+	// adding little extra time to the animation allows for the interpolation between the last
+	// and the first frame, which smoothes out looping animations
+	// TODO: figure out a better way to do this, possibly a setting for smoothing looped animations
+	float loopPadding = ticksPerSecond * .05;
+	float durationTicks = (float)animation.mDuration + loopPadding;
 
 	ASSERT(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> tickers per second is 0.", AnimationRef::Null());
 	//float duration = durationTicks / ticksPerSecond;

@@ -49,7 +49,6 @@ class Point3 : public BaseVector4
     Point3 & operator= (const Point3 & source);
 
     void Set(float x, float y, float z);
-    void SetTo(Point3 * p);
 
     void AttachTo(float * data);
     void Detach();

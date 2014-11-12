@@ -82,6 +82,9 @@ class AnimationInstance
 	// is the animation playing?
 	bool Playing;
 
+	// is the animation paused?
+	bool Paused;
+
 	AnimationInstance(SkeletonRef target, AnimationRef animation);
 	 ~AnimationInstance();
 
@@ -97,8 +100,6 @@ class AnimationInstance
     void Reset();
 
     FrameState * GetFrameState(unsigned int stateIndex);
-
-    bool IsPlaying();
 };
 
 #endif

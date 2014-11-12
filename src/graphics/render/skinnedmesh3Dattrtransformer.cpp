@@ -285,10 +285,10 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 			if(positionTransformed[desc->UVertexIndex] == 1)
 			{
 				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);
-				positionsOut.GetPoint(i)->Set(p->x,p->y,p->z);
+				positionsOut.GetPoint(i)->SetTo(p);
 
 				Vector3 * v = transformedNormals.GetVector(desc->UVertexIndex);
-				normalsOut.GetVector(i)->Set(v->x,v->y,v->z);
+				normalsOut.GetVector(i)->SetTo(v);
 			}
 			else
 			{
@@ -330,6 +330,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 					temp.SetTo(&bone->TempFullMatrix);
 					// apply weight for this vertex & bone
 					temp.MultiplyByScalar(desc->Weight[b]);
+
 					if(b==0)full.SetTo(&temp);
 					else full.Add(&temp);
 				}
@@ -345,7 +346,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 				// update saved positions
 				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(p);
 				// update saved normals
-				transformedNormals.GetVector(desc->UVertexIndex)->Set(v->x,v->y,v->z);
+				transformedNormals.GetVector(desc->UVertexIndex)->SetTo(v);
 				// set position transformation flag to 1 so we don't repeat the work for this vertex if we
 				// encounter it again
 				positionTransformed[desc->UVertexIndex] = 1;
