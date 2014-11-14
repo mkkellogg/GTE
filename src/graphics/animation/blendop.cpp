@@ -43,22 +43,22 @@ void BlendOp::Update(std::vector<float>& weights)
 	progress += Time::GetDeltaTime();
 }
 
-bool BlendOp::IsStarted()
+bool BlendOp::HasStarted()
 {
 	return started;
 }
 
-void BlendOp::SignalStarted()
+void BlendOp::SetStarted(bool started)
 {
-	started = true;
+	this->started = started;
 }
 
-void BlendOp::NotifyComplete(bool complete)
+void BlendOp::SetComplete(bool complete)
 {
 	this->complete = complete;
 }
 
-bool BlendOp::IsComplete()
+bool BlendOp::HasCompleted()
 {
 	return complete;
 }

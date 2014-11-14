@@ -34,8 +34,8 @@ class BlendOp
 
 	BlendOp(float duration);
 	virtual ~BlendOp();
-	void NotifyComplete(bool complete);
-	void SignalStarted();
+	void SetComplete(bool complete);
+	void SetStarted(bool started);
 
 	public :
 
@@ -44,8 +44,8 @@ class BlendOp
 	virtual void Update(std::vector<float>& weights);
 	virtual void OnStart() = 0;
 	virtual void OnComplete() = 0;
-	bool IsComplete();
-	bool IsStarted();
+	bool HasCompleted();
+	bool HasStarted();
 	float GetNormalizedProgress();
 	float GetProgress();
 

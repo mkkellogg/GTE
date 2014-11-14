@@ -15,8 +15,8 @@
 CrossFadeBlendOp::CrossFadeBlendOp(float duration, unsigned int targetIndex) : BlendOp(duration)
 {
 	this->targetIndex = targetIndex;
-	NotifyComplete(false);
-	if(duration <=0)NotifyComplete(true);
+	SetComplete(false);
+	if(duration <=0)SetComplete(true);
 }
 
 /*
@@ -54,7 +54,7 @@ void CrossFadeBlendOp::Update(std::vector<float>& weights)
 			if(i == targetIndex)weights[i] = 1;
 			else weights[i] = 0;
 		}
-		NotifyComplete(true);
+		SetComplete(true);
 	}
 }
 

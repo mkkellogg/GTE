@@ -53,6 +53,7 @@
 #include "geometry/vector/vector3array.h"
 #include "geometry/matrix4x4.h"
 #include "base/longmask.h"
+#include "util/time.h"
 #include "global/global.h"
 #include "ui/debug.h"
 

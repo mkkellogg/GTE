@@ -8,9 +8,10 @@ LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -L$(DEVIL_LIB) -lassimp -lm -lGL -lglut -l
 CFLAGS=-Isrc -I$(ASSIMP_INC) -I$(DEVIL_INC)  -std=c++11 -Wall 
 CC=g++
 
-GLOBALSRC = src/global
-BASESRC = src/base
-GTEMATHSRC = src/gtemath
+GLOBALSRC= src/global
+BASESRC= src/base
+GTEMAINSRC= src/game
+GTEMATHSRC= src/gtemath
 GEOMETRYSRC= src/geometry
 UTILSRC= src/util
 GRAPHICSSRC= src/graphics
@@ -30,7 +31,7 @@ FILESYSTEMSRC= src/filesys
 
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o obj/longmask.o
-GTEMAINOBJ= obj/gte.o
+GTEMAINOBJ= obj/gte.o obj/game.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o 
@@ -68,6 +69,9 @@ gtemain: $(GTEMAINOBJ)
  
 obj/gte.o: src/gte.cpp src/gte.h 
 	$(CC) $(CFLAGS) -o obj/gte.o -c src/gte.cpp
+	
+obj/game.o: $(GTEMAINSRC)/game.cpp $(GTEMAINSRC)/game.h 
+	$(CC) $(CFLAGS) -o obj/game.o -c $(GTEMAINSRC)/game.cpp
 
 
 # ==================================
