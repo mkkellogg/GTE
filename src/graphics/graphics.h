@@ -42,7 +42,7 @@ enum class BlendingProperty
 
 class Graphics
 {
-	static Graphics * theInstance;
+	friend class Engine;
 
     protected:
 
@@ -53,14 +53,16 @@ class Graphics
     Graphics();
     virtual ~Graphics();
 
-    public :
+    virtual bool Run();
+    virtual void Update();
+    virtual void PreProcessScene();
+    virtual void RenderScene();
 
-    static Graphics * Instance();
+    public :
 
     RenderManager * GetRenderManager();
 
     virtual bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle);
-    virtual bool Run();
 
     virtual Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) = 0;
     virtual void DestroyShader(Shader * shader) = 0;

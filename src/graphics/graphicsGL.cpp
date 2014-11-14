@@ -7,6 +7,7 @@
 #include <GL/glut.h>
 #include <string>
  
+#include "engine.h"
 #include "graphicsGL.h"
 #include "graphics/screendesc.h"
 #include "graphics/animation/animationmanager.h"
@@ -81,10 +82,8 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     	 Debug::PrintError("Requires OpenGL 2.0 or greater.");
     	 return false;
     }
-
 	// call base method
 	Graphics::Init(windowWidth, windowHeight, callbacks, windowTitle);
-
     screenDescriptor = new ScreenDescriptor(windowWidth, windowHeight);
 
     glutDisplayFunc(&_glutDisplayFunc);
@@ -98,10 +97,7 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     glDepthFunc(GL_LEQUAL);
     glCullFace(GL_BACK);
 
-    if(callbacks != NULL)
-    {
-        callbacks->OnInit(this);
-    }
+    if(callbacks != NULL) callbacks->OnInit(this);
 
     return true;
 }
@@ -112,10 +108,7 @@ bool GraphicsGL::Run()
 
 	glutMainLoop();
 
-	if(callbacks != NULL)
-	{
-		callbacks->OnQuit(this);
-	}
+	if(callbacks != NULL)callbacks->OnQuit(this);
 
 	return true;
 }
@@ -368,7 +361,6 @@ void GraphicsGL::PreProcessScene()
 void GraphicsGL::RenderScene()
 {
 	renderManager->RenderAll();
-
 	glutSwapBuffers();
 }
 
@@ -377,18 +369,14 @@ unsigned int GraphicsGL::GetOpenGLVersion()
 	return openGLVersion;
 }
 
+void GraphicsGL::Update()
+{
+	_instanceCallbacks->OnUpdate(_thisInstance);
+}
+
 void GraphicsGL::_glutDisplayFunc()
 {
-	_thisInstance->PreProcessScene();
-
-	_instanceCallbacks->OnUpdate(_thisInstance);
-	AnimationManager::Instance()->Update();
-
-	// update timer before rendering scene so that calls to Time::GetDeltaTime() within
-	// _instanceCallbacks->OnUpdate reflect rendering time
-	Time::Update();
-
-	_thisInstance->RenderScene();
+	Engine::Instance()->Update();
 }
 
 void GraphicsGL::_glutIdleFunc()

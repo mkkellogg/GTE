@@ -16,6 +16,8 @@ class Game
 	bool isJumping;
 	int rotationDir;
 
+	void ControlPlayer();
+
     public:
 
     Game();

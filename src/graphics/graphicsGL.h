@@ -20,6 +20,7 @@ class AttributeTransformer;
 class GraphicsGL : public Graphics
 {
     friend class Graphics;
+    friend class Engine;
     friend class SubMesh3DRendererGL;
 
     static void _glutDisplayFunc();
@@ -52,11 +53,12 @@ class GraphicsGL : public Graphics
 
     void PreProcessScene();
     void RenderScene();
+    bool Run();
+    void Update();
 
     public :
 
     bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle);
-    bool Run();
     unsigned int GetOpenGLVersion();
 };
 

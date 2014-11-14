@@ -6,6 +6,7 @@
 #include <GL/glut.h>
 
 #include <memory>
+#include "engine.h"
 #include "asset/assetimporter.h"
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
@@ -45,91 +46,50 @@
 #include "gte.h"
 #include "game/game.h"
 
-class CustomGraphicsCallbacks: public GraphicsCallbacks
+Game * game = NULL;
+class CustomEngineCallbacks: public EngineCallbacks
 {
 	public:
 
-	Game * game;
-
-	CustomGraphicsCallbacks()
-	{
-		game = NULL;
-	}
-
-	void PrintMatrix(Matrix4x4 *m)
-	{
-		const float * data = m->GetDataPtr();
-		for (int r = 0; r < 4; r++)
-		{
-			printf("[");
-			for (int c = 0; c < 4; c++)
-			{
-				if (c > 0)
-					printf(",");
-				printf("%f", data[c * 4 + r]);
-			}
-			printf("]\n");
-		}
-	}
-
-	void PrintVector(BaseVector4 * vector)
-	{
-		float * data = vector->GetDataPtr();
-		printf("[");
-		for (int c = 0; c < 4; c++)
-		{
-			if (c > 0)
-				printf(",");
-			printf("%f", data[c]);
-		}
-		printf("]\n");
-	}
-
-	void OnInit(Graphics * graphics)
-	{
-		game = new Game();
-		game->Init();
-	}
-
-	void OnUpdate(Graphics * graphics)
+	CustomEngineCallbacks(){}
+	void OnInit(){}
+	void OnUpdate()
 	{
 		game->Update();
 	}
 
-	SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
-	{
-		if(!ref.IsValid())return SkinnedMesh3DRendererRef::Null();
+	void OnQuit(){}
+	virtual ~CustomEngineCallbacks(){}
+};
 
-		if(ref->GetSkinnedMesh3DRenderer().IsValid())return ref->GetSkinnedMesh3DRenderer();
+class CustomGraphicsCallbacks: public GraphicsCallbacks
+{
+	public:
 
-		for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
-		{
-			SceneObjectRef childRef = ref->GetChildAt(i);
-			SkinnedMesh3DRendererRef subRef = FindFirstSkinnedMeshRenderer(childRef);
-			if(subRef.IsValid())return subRef;
-		}
-
-		return SkinnedMesh3DRendererRef::Null();
-	}
-
-	void OnQuit(Graphics * graphics)
-	{
-
-	}
-
-	virtual ~CustomGraphicsCallbacks()
-	{
-
-	}
+	CustomGraphicsCallbacks(){}
+	void OnInit(Graphics * graphics){}
+	void OnUpdate(Graphics * graphics){}
+	void OnQuit(Graphics * graphics){}
+	virtual ~CustomGraphicsCallbacks(){}
 };
 
 int main(int argc, char** argv)
 {
+	CustomEngineCallbacks engineCallbacks;
 	CustomGraphicsCallbacks graphicsCallbacks;
-	bool initSuccess = Graphics::Instance()->Init(1280, 800,(CustomGraphicsCallbacks*) (&graphicsCallbacks), "GTE Test");
+
+	game = new Game();
+
+	Engine * engine = Engine::Instance();
+	engine->Init(&engineCallbacks);
+	Graphics * graphicsEngine = engine->GetGraphicsEngine();
+
+	bool initSuccess = graphicsEngine->Init(1280, 800, &graphicsCallbacks, "GTE Test");
+	game->Init();
+
 	if(initSuccess)
 	{
-		Graphics::Instance()->Run();
+		engine->Start();
 	}
 	else
 	{

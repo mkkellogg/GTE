@@ -18,8 +18,6 @@
 #include "ui/debug.h"
 
 
-Graphics * Graphics::theInstance = NULL;
-
 Graphics::~Graphics()
 {
 
@@ -29,19 +27,6 @@ Graphics::Graphics()
 {
 	renderManager = NULL;
 	screenDescriptor = NULL;
-}
-
-Graphics * Graphics::Instance()
-{
-	//TODO: make thread-safe & add double checked locking
-    if(theInstance == NULL)
-    {
-        // TODO: add switch to detect correct type for platform
-        // for now, only support OpenGL
-        theInstance = new GraphicsGL();
-    }
-
-    return theInstance;
 }
 
 GraphicsCallbacks::~GraphicsCallbacks()
@@ -66,6 +51,21 @@ bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callb
 	}
 
 	return true;
+}
+
+void Graphics::PreProcessScene()
+{
+
+}
+
+void Graphics::Update()
+{
+
+}
+
+void Graphics::RenderScene()
+{
+
 }
 
 bool Graphics::Run()

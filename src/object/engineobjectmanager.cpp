@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <math.h>
 
+#include "engine.h"
 #include "engineobjectmanager.h"
 #include "sceneobject.h"
 #include "enginetypes.h"
@@ -257,8 +258,7 @@ SubMesh3DRendererRef  EngineObjectManager::CreateSubMesh3DRenderer()
 
 SubMesh3DRendererRef EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
 {
-	Graphics * graphics = Graphics::Instance();
-
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer(attrTransformer);
 
 	ASSERT(renderer != NULL,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.", SubMesh3DRendererRef::Null());
@@ -277,7 +277,7 @@ void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer
 
 void EngineObjectManager::DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer)
 {
-	Graphics * graphics = Graphics::Instance();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	ASSERT_RTRN(renderer != NULL,"EngineObjectManager::DeleteSubMesh3DRenderer -> renderer is NULL.");
 	graphics->DestroyMeshRenderer(renderer);
 }
@@ -391,7 +391,7 @@ void EngineObjectManager::DeleteAnimationPlayer(AnimationPlayer * player)
 
 ShaderRef EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)
 {
-	Graphics * graphics = Graphics::Instance();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Shader * shader = graphics->CreateShader(vertexSourcePath,fragmentSourcePath);
 	ASSERT(shader != NULL,"EngineObjectManager::CreateShader -> could not create new Shader object.", ShaderRef::Null());
 	shader->SetObjectID(GetNextObjectID());
@@ -409,14 +409,14 @@ void EngineObjectManager::DestroyShader(ShaderRef shader)
 
 void EngineObjectManager::DeleteShader(Shader * shader)
 {
-	Graphics * graphics = Graphics::Instance();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	ASSERT_RTRN(shader != NULL,"EngineObjectManager::DeleteShader -> shader is NULL.");
 	graphics->DestroyShader(shader);
 }
 
 TextureRef EngineObjectManager::CreateTexture(const char * sourcePath, TextureAttributes attributes)
 {
-	Graphics * graphics = Graphics::Instance();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
 	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
@@ -429,7 +429,7 @@ TextureRef EngineObjectManager::CreateTexture(const char * sourcePath, TextureAt
 
 TextureRef EngineObjectManager::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
 {
-	Graphics * graphics = Graphics::Instance();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateTexture(imageData, sourcePath, attributes);
 	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture(const RawImage*, const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
@@ -449,7 +449,7 @@ void EngineObjectManager::DeleteTexture(Texture * texture)
 {
 	ASSERT_RTRN(texture != NULL,"EngineObjectManager::DeleteTexture -> texture is NULL.");
 
-	Graphics * graphics = Graphics::Instance();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	graphics->DestroyTexture(texture);
 }
 
@@ -512,7 +512,7 @@ void EngineObjectManager::DeleteMaterial(Material * material)
 
 CameraRef EngineObjectManager::CreateCamera()
 {
-	Graphics * graphics = Graphics::Instance();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Camera * camera = new Camera(graphics);
 	ASSERT(camera != NULL, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef::Null());
 	camera->SetObjectID(GetNextObjectID());

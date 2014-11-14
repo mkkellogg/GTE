@@ -8,9 +8,10 @@ LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -L$(DEVIL_LIB) -lassimp -lm -lGL -lglut -l
 CFLAGS=-Isrc -I$(ASSIMP_INC) -I$(DEVIL_INC)  -std=c++11 -Wall 
 CC=g++
 
+ENGINESRC= src
 GLOBALSRC= src/global
 BASESRC= src/base
-GTEMAINSRC= src/game
+GTESRC= src/game
 GTEMATHSRC= src/gtemath
 GEOMETRYSRC= src/geometry
 UTILSRC= src/util
@@ -28,10 +29,10 @@ ASSETSRC= src/asset
 UTILSRC= src/util
 FILESYSTEMSRC= src/filesys
 
-
+ENGINEOBJ = obj/engine.o
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o obj/longmask.o
-GTEMAINOBJ= obj/gte.o obj/game.o
+GTEOBJ= obj/gte.o obj/game.o obj/gameutil.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o 
@@ -52,9 +53,9 @@ FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(BASEOBJ) $(UTILOBJ) $(GTEMAINOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ)
+OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ)
 
-all: gtemain graphics animation ui geometry gtemath base global engineobjects asset util image filesystem
+all: gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -65,14 +66,17 @@ all: gtemain graphics animation ui geometry gtemath base global engineobjects as
 # GTE
 # ==================================
 
-gtemain: $(GTEMAINOBJ)
+gtemain: $(GTEOBJ)
  
 obj/gte.o: src/gte.cpp src/gte.h 
 	$(CC) $(CFLAGS) -o obj/gte.o -c src/gte.cpp
 	
-obj/game.o: $(GTEMAINSRC)/game.cpp $(GTEMAINSRC)/game.h 
-	$(CC) $(CFLAGS) -o obj/game.o -c $(GTEMAINSRC)/game.cpp
+obj/game.o: $(GTESRC)/game.cpp $(GTESRC)/game.h 
+	$(CC) $(CFLAGS) -o obj/game.o -c $(GTESRC)/game.cpp
 
+obj/gameutil.o: $(GTESRC)/gameutil.cpp $(GTESRC)/gameutil.h 
+	$(CC) $(CFLAGS) -o obj/gameutil.o -c $(GTESRC)/gameutil.cpp
+	
 
 # ==================================
 # Global
@@ -95,6 +99,16 @@ obj/filesystem.o: $(FILESYSTEMSRC)/filesystem.cpp $(FILESYSTEMSRC)/filesystem.h
 	
 obj/filesystemIX.o: $(FILESYSTEMSRC)/filesystemIX.cpp $(FILESYSTEMSRC)/filesystemIX.h
 	$(CC) $(CFLAGS) -o obj/filesystemIX.o -c $(FILESYSTEMSRC)/filesystemIX.cpp 
+	
+	
+# ==================================
+# Engine
+# ==================================	
+
+engine: $(ENGINEOBJ)
+
+obj/engine.o: $(ENGINESRC)/engine.cpp $(ENGINESRC)/engine.h
+	$(CC) $(CFLAGS) -o obj/engine.o -c $(ENGINESRC)/engine.cpp 
 	
 	
 # ==================================
