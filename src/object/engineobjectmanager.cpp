@@ -30,18 +30,6 @@
 #include "base/longmask.h"
 #include <string>
 
-EngineObjectManager * EngineObjectManager::theInstance = NULL;
-
-EngineObjectManager * EngineObjectManager::Instance()
-{
-	//TODO: make thread-safe & add double checked locking
-    if(theInstance == NULL)
-    {
-        theInstance = new EngineObjectManager();
-    }
-
-    return theInstance;
-}
 
 EngineObjectManager::EngineObjectManager()
 {

@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <math.h>
 
+#include "engine.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
@@ -37,7 +38,7 @@ void Mesh3DRenderer::DestroyRenderers()
 
 void Mesh3DRenderer::DestroyRenderer(unsigned int index)
 {
-	EngineObjectManager *objectManager = EngineObjectManager::Instance();
+	EngineObjectManager *objectManager = Engine::Instance()->GetEngineObjectManager();
 	if(index < subRenderers.size())
 	{
 		SubMesh3DRendererRef renderer = subRenderers[index];
@@ -96,7 +97,7 @@ void Mesh3DRenderer::UpdateFromMesh()
 
 void Mesh3DRenderer::UpdateFromMesh(Mesh3DRef mesh)
 {
-	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
+	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 	unsigned int subMeshCount =  mesh->GetSubMeshCount();
 
 	if(subMeshCount < subRenderers.size())

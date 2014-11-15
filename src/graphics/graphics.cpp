@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <math.h>
  
+#include "engine.h"
 #include "graphics.h"
 #include "global/global.h"
 #include "graphicsGL.h"
@@ -26,17 +27,11 @@ Graphics::~Graphics()
 Graphics::Graphics()
 {
 	renderManager = NULL;
-	screenDescriptor = NULL;
 }
 
-GraphicsCallbacks::~GraphicsCallbacks()
+bool Graphics::Init(const GraphicsAttributes& attributes)
 {
-
-}
-
-bool Graphics::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle)
-{
-	EngineObjectManager * engineObjectManager = EngineObjectManager::Instance();
+	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 	renderManager = new RenderManager(this, engineObjectManager);
 	ASSERT(renderManager != NULL, "Graphics::Init -> Unable to allocate render manager", false);
 
@@ -70,7 +65,6 @@ void Graphics::RenderScene()
 
 bool Graphics::Run()
 {
-
 	return true;
 }
 
@@ -90,9 +84,9 @@ RenderManager * Graphics::GetRenderManager()
 	return renderManager;
 }
 
-ScreenDescriptor * Graphics::GetScreenDescriptor() const
+const GraphicsAttributes& Graphics::GetAttributes() const
 {
-	return screenDescriptor;
+	return attributes;
 }
 
 

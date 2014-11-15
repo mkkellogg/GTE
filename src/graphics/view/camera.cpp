@@ -18,9 +18,9 @@ Camera::Camera(Graphics * graphics)
 	projectionTransform = Transform::CreateIdentityTransform();
 
 	Matrix4x4 proj;
-	ScreenDescriptor *screenDesc = graphics->GetScreenDescriptor();
+	const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
 
-	float ratio = (float)screenDesc->GetScreenWidth() / (float)screenDesc->getScreenHeight();
+	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
 
 	Transform::BuildProjectionMatrix(&proj, 65, ratio, 10, 100);
 

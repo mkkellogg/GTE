@@ -33,7 +33,7 @@ class AnimationInstance;
 
 class EngineObjectManager
 {
-	static EngineObjectManager * theInstance;
+	friend class Engine;
 
 	const char* builtinPath ="resources/builtin/";
 
@@ -69,7 +69,6 @@ class EngineObjectManager
 
     public :
 
-    static EngineObjectManager * Instance();
     bool InitBuiltinShaders();
     ShaderRef GetLoadedShader(LongMask properties);
 

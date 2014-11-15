@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
-
+#include "engine.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
@@ -31,7 +31,7 @@
 
 Mesh3DRef GameUtil::CreateCubeMesh(StandardAttributeSet meshAttributes)
 {
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 	subMesh->Init(36);
 

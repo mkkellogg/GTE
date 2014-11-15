@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "animationplayer.h"
+#include "engine.h"
 #include "object/enginetypes.h"
 #include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
@@ -501,7 +502,7 @@ bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, cons
  */
 void AnimationPlayer::AddAnimation(AnimationRef animation)
 {
-	AnimationManager * animationManager = AnimationManager::Instance();
+	AnimationManager * animationManager = Engine::Instance()->GetAnimationManager();
 	ASSERT_RTRN(animationManager != NULL,"AnimationPlayer::CreateAnimationInstance -> Animation manager is NULL.");
 
 	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::CreateAnimationInstance -> Animation is invalid.");
@@ -514,7 +515,7 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
 	// make sure an instance of [animation] does not already exist for this player
 	if(animationIndexMap.find(animation->GetObjectID()) == animationIndexMap.end())
 	{
-		EngineObjectManager * objectManager = EngineObjectManager::Instance();
+		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 		AnimationInstanceRef instance = objectManager->CreateAnimationInstance(target, animation);
 
 		ASSERT_RTRN(instance.IsValid(), " AnimationPlayer::CreateAnimationInstance -> Unable to create animation instance.");

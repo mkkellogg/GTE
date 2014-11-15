@@ -3,9 +3,12 @@
 
 //forward declarations
 class Graphics;
+class EngineObjectManager;
+class AnimationManager;
 
 #include <string>
 #include "object/enginetypes.h"
+#include "graphics/graphics.h"
 
 class EngineCallbacks
 {
@@ -24,7 +27,9 @@ class Engine
 
 	static Engine * theInstance;
 
+	EngineObjectManager * engineObjectManager;
 	Graphics * graphicsEngine;
+	AnimationManager * animationManager;
 	EngineCallbacks * callbacks;
 
 	Engine();
@@ -32,15 +37,19 @@ class Engine
 
     void Update();
     void Quit();
+    bool _Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
+    void _Start();
 
     public :
 
     static Engine * Instance();
+    static void ShutDown();
+    static bool Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
+    static void Start();
 
-    bool Init(EngineCallbacks * callbacks);
-    void Start();
-
+    EngineObjectManager * GetEngineObjectManager();
     Graphics * GetGraphicsEngine();
+    AnimationManager * GetAnimationManager();
 };
 
 #endif

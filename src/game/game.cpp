@@ -7,6 +7,7 @@
 
 #include <memory>
 #include "game.h"
+#include "engine.h"
 #include "gameutil.h"
 #include "asset/assetimporter.h"
 #include "graphics/graphics.h"
@@ -78,7 +79,7 @@ SkinnedMesh3DRendererRef Game::FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
 
 void Game::Init()
 {
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	cameraObject = objectManager->CreateSceneObject();
 	CameraRef camera = objectManager->CreateCamera();
@@ -182,7 +183,7 @@ void Game::Init()
 	koopaRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
 
 	koopaRenderer = FindFirstSkinnedMeshRenderer(koopaRoot);
-	AnimationManager * animManager = AnimationManager::Instance();
+	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
 	bool compatible = animManager->IsCompatible(koopaRenderer, koopaWalk);
 	compatible &= animManager->IsCompatible(koopaRenderer, koopaWait);
 	compatible &= animManager->IsCompatible(koopaRenderer, koopaJump);

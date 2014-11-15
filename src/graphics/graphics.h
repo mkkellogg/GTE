@@ -21,15 +21,6 @@ class AttributeTransformer;
 #include <string>
 #include "object/enginetypes.h"
 
-class GraphicsCallbacks
-{
-    public:
-
-    virtual void OnInit(Graphics * graphics) = 0;
-    virtual void OnQuit(Graphics * graphics) = 0;
-    virtual void OnUpdate(Graphics * graphics) = 0;
-    virtual ~GraphicsCallbacks();
-};
 
 enum class BlendingProperty
 {
@@ -40,6 +31,15 @@ enum class BlendingProperty
 	OneMinusDstAlpha
 };
 
+class GraphicsAttributes
+{
+	public:
+
+	unsigned int WindowWidth;
+	unsigned int WindowHeight;
+	std::string WindowTitle;
+};
+
 class Graphics
 {
 	friend class Engine;
@@ -48,7 +48,7 @@ class Graphics
 
 	MaterialRef activeMaterial;
     RenderManager * renderManager;
-    ScreenDescriptor * screenDescriptor;
+    GraphicsAttributes attributes;
 
     Graphics();
     virtual ~Graphics();
@@ -62,7 +62,7 @@ class Graphics
 
     RenderManager * GetRenderManager();
 
-    virtual bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle);
+    virtual bool Init(const GraphicsAttributes& attributes);
 
     virtual Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) = 0;
     virtual void DestroyShader(Shader * shader) = 0;
@@ -80,7 +80,7 @@ class Graphics
     virtual void ActivateMaterial(MaterialRef material);
     MaterialRef GetActiveMaterial() const;
 
-    virtual ScreenDescriptor * GetScreenDescriptor() const;
+    virtual const GraphicsAttributes& GetAttributes() const;
 };
 
 #endif

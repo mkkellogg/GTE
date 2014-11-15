@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "animationmanager.h"
+#include "engine.h"
 #include "object/enginetypes.h"
 #include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
@@ -21,9 +22,6 @@
 #include <string>
 #include <unordered_map>
 
-// singleton instance
-AnimationManager * AnimationManager::instance = NULL;
-
 /*
  * Default constructor
  */
@@ -38,20 +36,6 @@ AnimationManager::AnimationManager()
 AnimationManager::~AnimationManager()
 {
 
-}
-
-/*
- * Accessor for the singleton instance
- */
-AnimationManager * AnimationManager::Instance()
-{
-	// TODO: implement double checked locking
-	if(instance == NULL)
-	{
-		instance = new AnimationManager();
-	}
-
-	return instance;
 }
 
 /*
@@ -133,7 +117,7 @@ AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkeletonRef
 {
 	ASSERT(target.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerRef::Null());
 
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	ASSERT(objectManager != NULL, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is NULL.", AnimationPlayerRef::Null());
 
 	if(activePlayers.find(target->GetObjectID()) == activePlayers.end())

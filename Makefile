@@ -28,6 +28,7 @@ ENGINEOBJECTSRC= src/object
 ASSETSRC= src/asset
 UTILSRC= src/util
 FILESYSTEMSRC= src/filesys
+INPUTSRC= src/input
 
 ENGINEOBJ = obj/engine.o
 GLOBALOBJ = obj/constants.o
@@ -50,12 +51,13 @@ ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engine
 ASSETOBJ= obj/assetimporter.o obj/importutil.o obj/modelimporter.o
 UTILOBJ= obj/datastack.o obj/util.o obj/time.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
+INPUTOBJ= obj/input.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
 
 OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ)
 
-all: gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem
+all: gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem input
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -99,6 +101,16 @@ obj/filesystem.o: $(FILESYSTEMSRC)/filesystem.cpp $(FILESYSTEMSRC)/filesystem.h
 	
 obj/filesystemIX.o: $(FILESYSTEMSRC)/filesystemIX.cpp $(FILESYSTEMSRC)/filesystemIX.h
 	$(CC) $(CFLAGS) -o obj/filesystemIX.o -c $(FILESYSTEMSRC)/filesystemIX.cpp 
+
+	
+# ==================================
+# Input
+# ==================================	
+
+input: $(INPUTOBJ)
+
+obj/input.o: $(INPUTSRC)/input.cpp $(INPUTSRC)/input.h
+	$(CC) $(CFLAGS) -o obj/input.o -c $(INPUTSRC)/input.cpp 
 	
 	
 # ==================================

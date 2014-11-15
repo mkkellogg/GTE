@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "sceneobject.h"
+#include "engine.h"
 #include "engineobject.h"
 #include "enginetypes.h"
 #include "engineobjectmanager.h"
@@ -92,7 +93,7 @@ bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 	if(this->renderer3D == renderer)return true;
 	ASSERT(renderer.IsValid(),"SceneObject::SetMeshRenderer3D -> attempted to add NULL renderer.", false);
 
-	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	ASSERT(thisRef.IsValid(),"SceneObject::SetMeshRenderer3D -> Could not find matching reference for scene object", false);
 
 	renderer->sceneObject = thisRef;
@@ -110,7 +111,7 @@ bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
 	if(this->skinnedRenderer3D == renderer)return true;
 	ASSERT(renderer.IsValid(),"SceneObject::SkinnedMesh3DRendererRef -> attempted to add NULL renderer.", false);
 
-	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	ASSERT(thisRef.IsValid(),"SceneObject::SkinnedMesh3DRendererRef -> Could not find matching reference for scene object", false);
 
 	renderer->sceneObject = thisRef;
@@ -126,7 +127,7 @@ bool SceneObject::SetMesh3D(Mesh3DRef mesh)
 	if(this->mesh3D == mesh)return true;
 	ASSERT(mesh.IsValid(),"SceneObject::SetMesh3D -> attempted to add NULL mesh.", false);
 
-	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	ASSERT(thisRef.IsValid(),"SceneObject::SetMesh3D -> Could not find matching reference for scene object", false);
 
 	mesh->sceneObject = thisRef;
@@ -144,10 +145,10 @@ bool SceneObject::SetCamera(CameraRef camera)
 {
 	ASSERT(camera.IsValid(),"SceneObject::SetCamera -> attempted to add NULL camera.", false);
 
-	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	ASSERT(thisRef.IsValid(),"SceneObject::SetCamera -> Could not find matching reference for scene object", false);
 
-	camera->sceneObject = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	camera->sceneObject = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	this->camera = camera;
 
 	return true;
@@ -157,7 +158,7 @@ bool SceneObject::SetLight(LightRef light)
 {
 	ASSERT(light.IsValid(),"SceneObject::SetLight -> attempted to add NULL light.", false);
 
-	SceneObjectRef thisRef = EngineObjectManager::Instance()->FindSceneObjectInDirectory(GetObjectID());
+	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	ASSERT(thisRef.IsValid(),"SceneObject::SetLight -> Could not find matching reference for scene object", false);
 
 	light->sceneObject = thisRef;
@@ -202,7 +203,7 @@ void SceneObject::AddChild(SceneObjectRef child)
 		return;
 	}
 
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	SceneObjectRef sceneObjectRef = objectManager->FindSceneObjectInDirectory(this->GetObjectID());
 	ASSERT_RTRN(sceneObjectRef.IsValid(),"SceneObject::AddChild -> sceneObjectRef is NULL.");

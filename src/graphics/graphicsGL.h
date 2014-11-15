@@ -28,7 +28,6 @@ class GraphicsGL : public Graphics
 
     protected:
 
-    GraphicsCallbacks * callbacks;
     GraphicsGL();
     ~GraphicsGL();
 
@@ -58,7 +57,7 @@ class GraphicsGL : public Graphics
 
     public :
 
-    bool Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle);
+    bool Init(const GraphicsAttributes& attributes);
     unsigned int GetOpenGLVersion();
 };
 

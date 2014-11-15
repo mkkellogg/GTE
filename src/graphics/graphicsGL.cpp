@@ -34,23 +34,20 @@
 #include "global/global.h"
 #include "util/time.h"
 
-GraphicsGL * _thisInstance;
-GraphicsCallbacks * _instanceCallbacks;
 
 //TODO: Right now, GLUT callbacks drive the engine loop. This is not ideal,
 // so eventually we need to move the loop driver somewhere else
 
-bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * callbacks, const std::string& windowTitle)
+bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 {
-	_instanceCallbacks = this->callbacks = callbacks;
-	_thisInstance = this;
+	this->attributes = attributes;
 
     int argc = 0;
     char * argv = (char*)"";
     glutInit(&argc, &argv);
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(windowWidth, windowHeight);
+    glutInitWindowSize(this->attributes.WindowWidth, this->attributes.WindowHeight);
 
     if(!glutGet(GLUT_DISPLAY_MODE_POSSIBLE))
     {
@@ -58,7 +55,7 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
        exit(1);
     }
 
-    (void)glutCreateWindow(windowTitle.c_str());
+    (void)glutCreateWindow(this->attributes.WindowTitle.c_str());
 
     glewExperimental = GL_TRUE; 
     glewInit();
@@ -83,8 +80,7 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     	 return false;
     }
 	// call base method
-	Graphics::Init(windowWidth, windowHeight, callbacks, windowTitle);
-    screenDescriptor = new ScreenDescriptor(windowWidth, windowHeight);
+	Graphics::Init(this->attributes);
 
     glutDisplayFunc(&_glutDisplayFunc);
     glutIdleFunc(&_glutIdleFunc);
@@ -97,28 +93,15 @@ bool GraphicsGL::Init(int windowWidth, int windowHeight, GraphicsCallbacks * cal
     glDepthFunc(GL_LEQUAL);
     glCullFace(GL_BACK);
 
-    if(callbacks != NULL) callbacks->OnInit(this);
-
     return true;
-}
-
-bool GraphicsGL::Run()
-{
-	Graphics::Run();
-
-	glutMainLoop();
-
-	if(callbacks != NULL)callbacks->OnQuit(this);
-
-	return true;
 }
 
 GraphicsGL::~GraphicsGL() 
 {
-    SAFE_DELETE(screenDescriptor);
+
 }
 
-GraphicsGL::GraphicsGL() : Graphics(), callbacks(NULL)
+GraphicsGL::GraphicsGL() : Graphics()
 {
 	openGLVersion = 0;
 }
@@ -350,6 +333,13 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 	}
 }
 
+bool GraphicsGL::Run()
+{
+	Graphics::Run();
+	glutMainLoop();
+	return true;
+}
+
 /*
  * For now, this method does nothing.
  */
@@ -371,7 +361,7 @@ unsigned int GraphicsGL::GetOpenGLVersion()
 
 void GraphicsGL::Update()
 {
-	_instanceCallbacks->OnUpdate(_thisInstance);
+
 }
 
 void GraphicsGL::_glutDisplayFunc()

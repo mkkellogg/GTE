@@ -22,6 +22,7 @@
 #include "assimp/LogStream.hpp"
 #include "modelimporter.h"
 #include "importutil.h"
+#include "engine.h"
 #include "object/engineobjectmanager.h"
 #include "object/shadermanager.h"
 #include "object/sceneobjectcomponent.h"
@@ -138,7 +139,7 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float
 
 SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale) const
 {
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	std::vector<MaterialImportDescriptor> materialImportDescriptors;
 	if(!ProcessMaterials(modelPath, scene, materialImportDescriptors))
@@ -195,7 +196,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 	scale = 1;
 
-	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
 
 	// create new scene object to hold the Mesh3D object and its renderer
 	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
@@ -363,7 +364,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 	}
 
-	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
 
 	// create Mesh3D object with the constructed StandardAttributeSet
 	SubMesh3DRef mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
@@ -443,7 +444,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		return false;
 	}
 
-	EngineObjectManager * engineObjectManager =  EngineObjectManager::Instance();
+	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
 	FileSystem * fileSystem = FileSystem::Instance();
 	std::string basepath = fileSystem->GetBasePath(modelPath);
 
@@ -616,7 +617,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 		return SkeletonRef::Null();
 	}
 
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	SkeletonRef target = objectManager->CreateSkeleton(boneCount);
 	ASSERT(target.IsValid(),"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",SkeletonRef::Null());
 
@@ -833,7 +834,7 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 
 AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef skeleton) const
 {
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	ASSERT(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
 
 	float ticksPerSecond = (float)animation.mTicksPerSecond;

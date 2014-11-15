@@ -7,6 +7,7 @@
 #include <functional>
 #include <vector>
 
+#include "engine.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
 #include "object/engineobject.h"
@@ -27,7 +28,7 @@ Mesh3D::Mesh3D(unsigned int subMeshCount)
 
 Mesh3D::~Mesh3D()
 {
-	EngineObjectManager * objectManager = EngineObjectManager::Instance();
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	if(subMeshes != NULL)
 	{
 		for(unsigned int i =0; i < subMeshCount; i++)

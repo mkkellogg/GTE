@@ -18,17 +18,15 @@
 
 class AnimationManager
 {
+	friend class Engine;
+
 	AnimationManager();
     ~AnimationManager();
 
-    // singleton instance
-    static AnimationManager * instance;
     // map object IDs of Skeleton objects to their assign animation player
     std::unordered_map<ObjectID, AnimationPlayerRef> activePlayers;
 
 	public :
-
-    static AnimationManager * Instance();
 
     bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const;
     bool IsCompatible(SkeletonRef skeleton, AnimationRef animation) const;

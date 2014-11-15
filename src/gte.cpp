@@ -62,40 +62,30 @@ class CustomEngineCallbacks: public EngineCallbacks
 	virtual ~CustomEngineCallbacks(){}
 };
 
-class CustomGraphicsCallbacks: public GraphicsCallbacks
-{
-	public:
-
-	CustomGraphicsCallbacks(){}
-	void OnInit(Graphics * graphics){}
-	void OnUpdate(Graphics * graphics){}
-	void OnQuit(Graphics * graphics){}
-	virtual ~CustomGraphicsCallbacks(){}
-};
-
 int main(int argc, char** argv)
 {
 	CustomEngineCallbacks engineCallbacks;
-	CustomGraphicsCallbacks graphicsCallbacks;
 
 	game = new Game();
 
-	Engine * engine = Engine::Instance();
-	engine->Init(&engineCallbacks);
-	Graphics * graphicsEngine = engine->GetGraphicsEngine();
+	GraphicsAttributes graphicsAttributes;
+	graphicsAttributes.WindowWidth = 1280;
+	graphicsAttributes.WindowHeight = 800;
+	graphicsAttributes.WindowTitle = "GTE Test";
 
-	bool initSuccess = graphicsEngine->Init(1280, 800, &graphicsCallbacks, "GTE Test");
-	game->Init();
+	bool initSuccess = Engine::Init(&engineCallbacks, graphicsAttributes);
 
 	if(initSuccess)
 	{
-		engine->Start();
+		game->Init();
+		Engine::Start();
 	}
 	else
 	{
 		Debug::PrintError("Error occurred while initializing engine.");
 	}
 
+	Engine::ShutDown();
 	return EXIT_SUCCESS;
 }
 
