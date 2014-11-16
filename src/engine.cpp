@@ -9,6 +9,8 @@
 #include "graphics/graphics.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/animation/animationmanager.h"
+#include "input/inputmanager.h"
+#include "input/inputmanagerGL.h"
 #include "global/global.h"
 #include "util/time.h"
 #include "ui/debug.h"
@@ -20,11 +22,13 @@ Engine::Engine()
 	engineObjectManager = NULL;
 	graphicsEngine = NULL;
 	animationManager = NULL;
+	inputManager = NULL;
 	callbacks = NULL;
 }
 
 Engine::~Engine()
 {
+	SAFE_DELETE(inputManager);
 	SAFE_DELETE(animationManager);
 	SAFE_DELETE(graphicsEngine);
 	SAFE_DELETE(engineObjectManager);
@@ -62,6 +66,12 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 	animationManager = new AnimationManager();
 	ASSERT(animationManager != NULL, "Engine::Init -> Unable to create animation manager.", false);
 
+	inputManager = new InputManagerGL();
+	ASSERT(inputManager != NULL, "Engine::Init -> Unable to create input manager.", false);
+
+	bool inputInitSuccess = inputManager->Init();
+	ASSERT(inputInitSuccess, "Engine::Init -> Unable to initialize input manager.", false);
+
 	this->callbacks = callbacks;
 
 	if(callbacks!=NULL)callbacks->OnInit();
@@ -80,16 +90,11 @@ bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphic
 void Engine::Update()
 {
 	graphicsEngine->PreProcessScene();
-
 	if(callbacks!=NULL)callbacks->OnUpdate();
 	graphicsEngine->Update();
 	animationManager->Update();
-
-	// update timer before rendering scene so that calls to Time::GetDeltaTime() within
-	// _instanceCallbacks->OnUpdate reflect rendering time
-	Time::Update();
-
 	graphicsEngine->RenderScene();
+	Time::Update();
 }
 
 void Engine::Quit()
@@ -133,5 +138,10 @@ Graphics * Engine::GetGraphicsEngine()
 AnimationManager * Engine::GetAnimationManager()
 {
 	return animationManager;
+}
+
+InputManager * Engine::GetInputManager()
+{
+	return inputManager;
 }
 

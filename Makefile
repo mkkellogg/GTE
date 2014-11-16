@@ -51,13 +51,13 @@ ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engine
 ASSETOBJ= obj/assetimporter.o obj/importutil.o obj/modelimporter.o
 UTILOBJ= obj/datastack.o obj/util.o obj/time.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
-INPUTOBJ= obj/input.o
+INPUTOBJ= obj/inputmanager.o obj/inputmanagerGL.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ)
+OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ)
 
-all: gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem input
+all: gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem inputmanager
 	$(CC) -o bin/gte $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -107,10 +107,13 @@ obj/filesystemIX.o: $(FILESYSTEMSRC)/filesystemIX.cpp $(FILESYSTEMSRC)/filesyste
 # Input
 # ==================================	
 
-input: $(INPUTOBJ)
+inputmanager: $(INPUTOBJ)
 
-obj/input.o: $(INPUTSRC)/input.cpp $(INPUTSRC)/input.h
-	$(CC) $(CFLAGS) -o obj/input.o -c $(INPUTSRC)/input.cpp 
+obj/inputmanager.o: $(INPUTSRC)/inputmanager.cpp $(INPUTSRC)/inputmanager.h
+	$(CC) $(CFLAGS) -o obj/inputmanager.o -c $(INPUTSRC)/inputmanager.cpp 
+	
+obj/inputmanagerGL.o: $(INPUTSRC)/inputmanagerGL.cpp $(INPUTSRC)/inputmanagerGL.h
+	$(CC) $(CFLAGS) -o obj/inputmanagerGL.o -c $(INPUTSRC)/inputmanagerGL.cpp 
 	
 	
 # ==================================

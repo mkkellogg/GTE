@@ -19,6 +19,7 @@ class Time
 	static bool initialized;
 	static unsigned long long startupTime;
 	static float lastRecordedTime;
+	static float deltaTime;
 
 	static void Initialize();
 

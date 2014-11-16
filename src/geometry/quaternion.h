@@ -1,13 +1,14 @@
 #ifndef QUATERNION_H
 #define QUATERNION_H
 
-#include <iostream>
-#include <math.h>
-
 // forward declarations
 class Matrix4x4;
 class Vector3;
 class BaseVector4;
+
+#include <iostream>
+#include <math.h>
+#include "geometry/vector/vector3.h"
 
 class Quaternion 
 {
@@ -15,6 +16,8 @@ class Quaternion
   
     public:
   
+    static const Quaternion Identity;
+
     Quaternion();
     Quaternion(const Vector3& v, float w) ;
     Quaternion(const BaseVector4& v);
@@ -54,6 +57,7 @@ class Quaternion
     static Quaternion slerp(const Quaternion& Qa, const Quaternion& Qb, const float t);
     float* row(uint32_t i);
     const float* row(uint32_t i) const;
+    static Quaternion getRotation(const Vector3& source, const Vector3& dest);
 };
 
 /**

@@ -15,6 +15,7 @@ class Vector3;
 class Point3;
 
 #include "base/basevector4.h"
+#include "gtemath/gtemath.h"
 #include <functional>
 #include <unordered_map>
 #include <iostream>
@@ -47,7 +48,7 @@ class Point3 : public BaseVector4
     static void Lerp(const Point3 *p1, const Point3 * p2, Point3 * result, float t);
 
     Point3 & operator= (const Point3 & source);
-
+    bool operator==(const Point3 & source);
     void Set(float x, float y, float z);
 
     void AttachTo(float * data);
@@ -70,7 +71,7 @@ class Point3 : public BaseVector4
     bool operator==(const Point3& p) const
     {
     	float epsilon =.005;
-		return abs(p.x - this->x) < epsilon && abs(p.y - this->y) < epsilon && abs(p.z - this->z) < epsilon;
+		return GTEMath::Abs(p.x - this->x) < epsilon && GTEMath::Abs(p.y - this->y) < epsilon && GTEMath::Abs(p.z - this->z) < epsilon;
     }
 };
 

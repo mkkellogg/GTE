@@ -11,6 +11,7 @@
 bool Time::initialized = false;
 unsigned long long Time::startupTime = 0;
 float Time::lastRecordedTime = 0;
+float Time::deltaTime = 0;
 
 Time::Time()
 {
@@ -43,11 +44,12 @@ float Time::GetRealTimeSinceStartup()
 void Time::Update()
 {
 	Initialize();
+	deltaTime = GetRealTimeSinceStartup() - lastRecordedTime;
 	lastRecordedTime = GetRealTimeSinceStartup();
 }
 
 float Time::GetDeltaTime()
 {
 	Initialize();
-	return GetRealTimeSinceStartup() - lastRecordedTime;
+	return deltaTime;
 }

@@ -221,25 +221,30 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 				playingAnimationsSeen++;
 			}
 		}
-		agRotation.normalize();
-		rotMatrix = agRotation.rotationMatrix();
 
-		matrix.SetIdentity();
-		// apply interpolated scale
-		matrix.Scale(agScale.x,agScale.y,agScale.z);
-		// apply interpolated rotation
-		matrix.PreMultiply(&rotMatrix);
-		// apply interpolated translation
-		matrix.PreTranslate(agTranslation.x, agTranslation.y, agTranslation.z);
-
-		// get the Skeleton node corresponding to the current node index
-		SkeletonNode * targetNode = target->GetNodeFromList(node);
-		if(targetNode->HasTarget())
+		// only apply transformations if they were actually calculated
+		if(playingAnimationsCount > 0)
 		{
-			// get the local transform of the target of this node and apply
-			// [matrix], which contains the interpolated scale, rotation, and translation
-			Transform * localTransform = targetNode->GetLocalTransform();
-			if(localTransform != NULL)localTransform->SetTo(&matrix);
+			agRotation.normalize();
+			rotMatrix = agRotation.rotationMatrix();
+
+			matrix.SetIdentity();
+			// apply interpolated scale
+			matrix.Scale(agScale.x,agScale.y,agScale.z);
+			// apply interpolated rotation
+			matrix.PreMultiply(&rotMatrix);
+			// apply interpolated translation
+			matrix.PreTranslate(agTranslation.x, agTranslation.y, agTranslation.z);
+
+			// get the Skeleton node corresponding to the current node index
+			SkeletonNode * targetNode = target->GetNodeFromList(node);
+			if(targetNode->HasTarget())
+			{
+				// get the local transform of the target of this node and apply
+				// [matrix], which contains the interpolated scale, rotation, and translation
+				Transform * localTransform = targetNode->GetLocalTransform();
+				if(localTransform != NULL)localTransform->SetTo(&matrix);
+			}
 		}
 	}
 }
@@ -394,12 +399,12 @@ void AnimationPlayer::CalculateInterpolatedRotation(AnimationInstanceRef instanc
 		Quaternion a(previousFrame.Rotation.x(),previousFrame.Rotation.y(),previousFrame.Rotation.z(),previousFrame.Rotation.w());
 		Quaternion b(nextFrame.Rotation.x(),nextFrame.Rotation.y(),nextFrame.Rotation.z(),nextFrame.Rotation.w());
 		Quaternion quatOut= Quaternion::slerp(a,b, interFrameProgress);
-		rotation.Set(quatOut.x(),quatOut.y(),quatOut.z(), -quatOut.w());
+		rotation.Set(quatOut.x(),quatOut.y(),quatOut.z(), quatOut.w());
 	}
 	else //we did not find 2 frames, so set rotation equal to the first frame
 	{
 		const RotationKeyFrame& firstFrame = keyFrameSet.RotationKeyFrames[0];
-		rotation.Set(firstFrame.Rotation.x(),firstFrame.Rotation.y(),firstFrame.Rotation.z(), -firstFrame.Rotation.w());
+		rotation.Set(firstFrame.Rotation.x(),firstFrame.Rotation.y(),firstFrame.Rotation.z(), firstFrame.Rotation.w());
 	}
 }
 

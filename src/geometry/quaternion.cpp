@@ -3,10 +3,14 @@
 
 #include "quaternion.h"
 #include "matrix4x4.h"
+#include "gtemath/gtemath.h"
 #include "vector/vector3.h"
 #include "base/basevector4.h"
 #include "ui/debug.h"
+#include "global/constants.h"
 #include <cmath>
+
+const Quaternion Quaternion::Identity(0,0,0,1);
 
 Quaternion::Quaternion()
 {
@@ -273,7 +277,7 @@ void Quaternion::normalize()
  */
 float Quaternion::norm() const
 {
-    return sqrt(mData[0] * mData[0] + mData[1] * mData[1] + mData[2] * mData[2] + mData[3] * mData[3]);
+    return GTEMath::SquareRoot(mData[0] * mData[0] + mData[1] * mData[1] + mData[2] * mData[2] + mData[3] * mData[3]);
 }
 
 /**
@@ -286,14 +290,23 @@ float Quaternion::norm() const
  */
 Matrix4x4 Quaternion::rotationMatrix() const
  {
-     float m[16] =
+     /*float m[16] =
      {
         1-2*y()*y()-2*z()*z(), 2*x()*y() - 2*z()*w(), 2*x()*z() + 2*y()*w(),0,
          2*x()*y() + 2*z()*w(), 1-2*x()*x()-2*z()*z(), 2*y()*z() - 2*x()*w(),0,
          2*x()*z() - 2*y()*w(), 2*y()*z() + 2*x()*w(), 1-2*x()*x()-2*y()*y(),0,
          0,0,0,1
-     };
-     return Matrix4x4(m);
+     };*/
+
+	 float m[16] =
+	 {
+		 1-2*y()*y()-2*z()*z(),  2*x()*y() + 2*z()*w(), 2*x()*z() - 2*y()*w(), 0,
+		 2*x()*y() - 2*z()*w(), 1-2*x()*x()-2*z()*z(), 2*y()*z() + 2*x()*w(), 0,
+		 2*x()*z() + 2*y()*w(), 2*y()*z() - 2*x()*w(), 1-2*x()*x()-2*y()*y(), 0,
+		 0,0,0,1
+	 };
+	 Matrix4x4 p(m);
+     return p;
  }
 
 /** 
@@ -349,12 +362,12 @@ Matrix4x4 Quaternion::rotationMatrix() const
  */
 void Quaternion::euler(const Vector3& euler)
 {
-    float c1 = cos(euler.z * 0.5);
-    float c2 = cos(euler.y * 0.5);
-    float c3 = cos(euler.x * 0.5);
-    float s1 = sin(euler.z * 0.5);
-    float s2 = sin(euler.y * 0.5);
-    float s3 = sin(euler.x * 0.5);
+    float c1 = GTEMath::Cos(euler.z * 0.5 * Constants::DegreesToRads);
+    float c2 = GTEMath::Cos(euler.y * 0.5 * Constants::DegreesToRads);
+    float c3 = GTEMath::Cos(euler.x * 0.5 * Constants::DegreesToRads);
+    float s1 = GTEMath::Sin(euler.z * 0.5 * Constants::DegreesToRads);
+    float s2 = GTEMath::Sin(euler.y * 0.5 * Constants::DegreesToRads);
+    float s3 = GTEMath::Sin(euler.x * 0.5 * Constants::DegreesToRads);
 
     mData[0] = c1 * c2 * s3 - s1 * s2 * c3;
     mData[1] = c1 * s2 * c3 + s1 * c2 * s3;
@@ -542,6 +555,57 @@ const float* Quaternion::row(uint32_t i) const
 {
     return mData + i;
 }
+
+Quaternion Quaternion::getRotation(const Vector3& source, const Vector3& dest)
+{
+	// Based on Stan Melax's article in Game Programming Gems
+	Quaternion q;
+
+	// Copy, since cannot modify local
+	Vector3 v0 = source;
+	Vector3 v1 = dest;
+	v0.Normalize();
+	v1.Normalize();
+
+	float d = Vector3::Dot(&v0, &v1);
+
+	// If dot == 1, vectors are the same
+	if (d >= 1.0f)
+	{
+		 return Quaternion::Identity;
+	}
+
+	Vector3 axis;
+	if (d < (1e-6f - 1.0f))
+	{
+		// Generate an axis
+
+		Vector3::Cross(&Vector3::UnitX, &source, &axis);
+
+		if (axis.IsZeroLength()) // pick another if colinear
+		{
+			Vector3::Cross(&Vector3::UnitY, &source, &axis);
+		}
+
+		axis.Normalize();
+		q = Quaternion(axis, Constants::PI);
+		q.normalize();
+
+	}
+	else
+	{
+		float s = GTEMath::SquareRoot( (1+d)*2 );
+		float invs = 1 / s;
+
+		Vector3 c;
+		Vector3::Cross(&v0, &v1, &c);
+
+		q.Set(c.x * invs, c.y * invs, c.z * invs, s * 0.5f);
+		q.normalize();
+	}
+
+	return q;
+ }
 
 /**
  * @brief Global operator allowing left-multiply by scalar.

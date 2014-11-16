@@ -8,6 +8,13 @@
 #include "gtemath/gtemath.h"
 #include "ui/debug.h"
 #include "global/global.h"
+#include "global/constants.h"
+#include "gtemath/gtemath.h"
+
+const Vector3 Vector3::Zero(0,0,0);
+const Vector3 Vector3::UnitX(1,0,0);
+const Vector3 Vector3::UnitY(0,1,0);
+const Vector3 Vector3::UnitZ(0,0,1);
 
 /*
  * Default constructor
@@ -59,6 +66,14 @@ Vector3& Vector3::operator=(const Vector3& source)
     memcpy((void*)data, (void*)source.data, sizeof(float) * 4);
     memcpy((void*)baseData, (void*)source.baseData, sizeof(float) * 4);
     return *this;
+}
+
+/*
+ * Comparison operator
+ */
+bool Vector3::operator==(const Vector3 & source)
+{
+	return source.x == x && source.y == y && source.z == z;
 }
 
 /*
@@ -161,12 +176,30 @@ float Vector3::Magnitude() const
 }
 
 /*
+ * Get the squared length of this vector
+ */
+float Vector3::SquareMagnitude() const
+{
+    return SquareMagnitude(x,y,z);
+}
+
+
+/*
  * Get the length of the vector specified by [x], [y], [z]
  */
 float Vector3::Magnitude(float x, float y, float z)
 {
-    return (float)sqrt(x*x + y*y + z*z);
+    return (float)GTEMath::SquareRoot(x*x + y*y + z*z);
 }
+
+/*
+ * Get the squared length of the vector specified by [x], [y], [z]
+ */
+float Vector3::SquareMagnitude(float x, float y, float z)
+{
+    return x*x + y*y + z*z;
+}
+
 
 /*
  * A cheat to get this vector's magnitude that is much faster than the traditional way.
@@ -267,11 +300,95 @@ void Vector3::Detach()
 	UpdateComponentPointers();
 }
 
+/*
+ * Rotate [a] towards [b] by [theta] degrees.
+ */
+void Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result)
+{
+	ASSERT_RTRN(from != NULL, "Vector3::RotateTowards -> NULL from passed.");
+	ASSERT_RTRN(to != NULL, "Vector3::RotateTowards -> NULL to passed.");
+	ASSERT_RTRN(result != NULL, "Vector3::RotateTowards -> NULL result passed.");
+
+	theta *= Constants::DegreesToRads;
+
+	Vector3 newVector;
+	Vector3 rotationAxis;
+	Vector3 fromCopy = *from;
+	Vector3 toCopy = *to;
+	fromCopy.Normalize();
+	toCopy.Normalize();
+
+	Vector3::Cross(&fromCopy, &toCopy, &rotationAxis);
+	Vector3::Cross(&rotationAxis, &fromCopy, &newVector);
+
+	Vector3 fromScaled;
+	Vector3 newScaled;
+
+	// vectors are parallel
+	if(newVector.Magnitude() < .001)
+	{
+		float xdiff = GTEMath::Abs(fromCopy.x - toCopy.x);
+		float ydiff = GTEMath::Abs(fromCopy.y - toCopy.y);
+		float zdiff = GTEMath::Abs(fromCopy.z - toCopy.z);
+
+		// vectors [a] and [b] are close enough to not bother with rotation
+		if(GTEMath::Abs(xdiff) < .001 && GTEMath::Abs(ydiff) < .001  && GTEMath::Abs(zdiff) < .001)
+		{
+			*result = fromCopy;
+			return;
+		}
+		else // vectors [a] and [b] are opposite
+		{
+			float realTheta = theta/Constants::PI;
+			float intRealTheta = (int)realTheta;
+
+			realTheta -= (float)intRealTheta;
+			float diffAngle = Constants::PI - realTheta;
+
+			Vector3 toOrthoLeft;
+			toOrthoLeft.Set(-toCopy.z, 0, toCopy.x);
+			toOrthoLeft.Scale(GTEMath::Sin(diffAngle));
+
+			Vector3 toScaled = toCopy;
+			toScaled.Scale(GTEMath::Cos(diffAngle));
+
+			Vector3::Add(&toOrthoLeft, &toScaled, result);
+			result->Normalize();
+			return;
+		}
+	}
+	else
+	{
+		fromScaled = fromCopy;
+		fromScaled.Scale(GTEMath::Cos(theta));
+
+		newVector.Normalize();
+		newScaled = newVector;
+		newScaled.Scale(GTEMath::Sin(theta));
+
+		Vector3::Add(&fromScaled, &newScaled, result);
+		result->Normalize();
+		return;
+	}
+}
+
 // TODO: Implement!!!
 float Vector3::AngleBetween(const Vector3 * a,const Vector3 * b,const Vector3 * refRightNormal)
 {
+
     return 0 ;
 }
+
+/*
+ *  Returns true if this vector is zero length.
+ */
+
+bool Vector3::IsZeroLength() const
+{
+	float sqlen = (x * x) + (y * y) + (z * z);
+	return (sqlen < (1e-06 * 1e-06));
+}
+
 
 /*
 public static void avgVectors(Vector3 a, Vector3 b, Vector3 avg)

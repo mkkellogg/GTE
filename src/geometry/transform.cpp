@@ -223,7 +223,6 @@ void Transform::RotateAround(float px, float py, float pz, float ax, float ay, f
 void Transform::Scale(Vector3 * mag,  bool local)
 {
 	ASSERT_RTRN(mag != NULL, "Transform::Scale -> mag is null.");
-
 	Scale(mag->x, mag->y, mag->z, local);
 }
 
@@ -334,4 +333,23 @@ void Transform::BuildLookAtMatrix(Matrix4x4 * matrix, float posX, float posY, fl
 	aux.Translate(-posX, -posY, -posZ);
 
 	Matrix4x4::Multiply(&viewMatrix, &aux, matrix);
+}
+
+/*
+ * Shortcut to transform [vector] by [matrix].
+ */
+void Transform::TransformVector(Vector3 * vector) const
+{
+	ASSERT_RTRN(vector != NULL, "Transform::TransformVector -> NULL vector passed.");
+	matrix.Transform(vector);
+}
+
+
+/*
+ * Shortcut to transform [point] by [matrix]
+ */
+void Transform::TransformPoint(Point3 * point) const
+{
+	ASSERT_RTRN(point != NULL, "Transform::TransformPoint -> NULL point passed.");
+	matrix.Transform(point);
 }

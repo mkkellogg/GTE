@@ -11,6 +11,11 @@ union IntFloatUnion
     float f;
 };
 
+float GTEMath::SquareRoot(float n)
+{
+	return sqrt(n);
+}
+
 float GTEMath::QuickSquareRoot(float n)
 {
 	IntFloatUnion ifu;
@@ -23,4 +28,36 @@ float GTEMath::QuickSquareRoot(float n)
 	ifu.f = ifu.f * (threeHalfs - (x2 * ifu.f * ifu.f));
 
 	return ifu.f * n;
+}
+
+float GTEMath::Cos(float n)
+{
+	return cos(n);
+}
+
+float GTEMath::Sin(float n)
+{
+	return sin(n);
+}
+
+float GTEMath::Abs(float n)
+{
+	return abs(n);
+}
+
+float GTEMath::Min(float a, float b)
+{
+	if(a < b)return a;
+	else return b;
+}
+
+float GTEMath::Max(float a, float b)
+{
+	if(a > b)return a;
+	else return b;
+}
+
+float GTEMath::Lerp(float a, float b, float t)
+{
+	return (b - a) * t + a;
 }

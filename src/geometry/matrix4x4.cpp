@@ -28,6 +28,8 @@
 #include "point/point3.h"
 #include "vector/vector3.h"
 #include "global/global.h"
+#include "global/constants.h"
+#include "gtemath/gtemath.h"
 
 #define I(_i, _j) ((_j)+ DIM_SIZE*(_i))
 #define PI 3.14159265
@@ -754,9 +756,9 @@ void Matrix4x4::SetRotate(float * rm, float x, float y, float z, float a)
     rm[13]= 0;
     rm[14]= 0;
     rm[15]= 1;
-    a *= (float) (PI/ 180.0f);
-    float s = (float) sin(a);
-    float c = (float) cos(a);
+    a *= Constants::DegreesToRads;
+    float s = (float) GTEMath::Sin(a);
+    float c = (float) GTEMath::Cos(a);
     if (1.0f == x && 0.0f == y && 0.0f == z) 
     {
         rm[5] = c;   rm[10]= c;
@@ -817,16 +819,15 @@ void Matrix4x4::SetRotateEuler(float * rm, float x, float y, float z)
 {
 	ASSERT_RTRN(rm != NULL, "Matrix4x4::SetRotateEuler -> rm is NULL");
 
-    float piOver180 = PI / 180.0f;
-    x *= piOver180;
-    y *= piOver180;
-    z *= piOver180;
-    float cx = (float) cos(x);
-    float sx = (float) sin(x);
-    float cy = (float) cos(y);
-    float sy = (float) sin(y);
-    float cz = (float) cos(z);
-    float sz = (float) sin(z);
+    x *= Constants::DegreesToRads;
+    y *= Constants::DegreesToRads;
+    z *= Constants::DegreesToRads;
+    float cx = (float) GTEMath::Cos(x);
+    float sx = (float) GTEMath::Sin(x);
+    float cy = (float) GTEMath::Cos(y);
+    float sy = (float) GTEMath::Sin(y);
+    float cz = (float) GTEMath::Cos(z);
+    float sz = (float) GTEMath::Sin(z);
     float cxsy = cx * sy;
     float sxsy = sx * sy;
 

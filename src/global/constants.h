@@ -10,6 +10,7 @@ class Constants
     static const float PIOver360;
     static const float TwoPIOver360;
     static const float RadsToDegrees;
+    static const float DegreesToRads;
     static const unsigned int MaxObjectRecursionDepth = 512;
     static const unsigned int MaxBonesPerVertex = 4;
 };

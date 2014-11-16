@@ -151,6 +151,13 @@ Point3 & Point3::operator= (const Point3 & source)
     return *this;
 }
 
+/*
+ * Comparison operator
+ */
+bool Point3::operator==(const Point3 & source)
+{
+	return source.x == x && source.y == y && source.z == z;
+}
 
 /*
  * Set the values of this point

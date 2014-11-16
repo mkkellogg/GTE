@@ -5,6 +5,7 @@
 class Graphics;
 class EngineObjectManager;
 class AnimationManager;
+class InputManager;
 
 #include <string>
 #include "object/enginetypes.h"
@@ -30,6 +31,7 @@ class Engine
 	EngineObjectManager * engineObjectManager;
 	Graphics * graphicsEngine;
 	AnimationManager * animationManager;
+	InputManager * inputManager;
 	EngineCallbacks * callbacks;
 
 	Engine();
@@ -50,6 +52,7 @@ class Engine
     EngineObjectManager * GetEngineObjectManager();
     Graphics * GetGraphicsEngine();
     AnimationManager * GetAnimationManager();
+    InputManager * GetInputManager();
 };
 
 #endif
