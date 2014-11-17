@@ -18,13 +18,13 @@
  */
 SceneObjectTransform::SceneObjectTransform() : Transform()
 {
-	this->sceneObject = NULL;
+
 }
 
 /*
  * Base constructor
  */
-SceneObjectTransform::SceneObjectTransform(SceneObject * sceneObject) : Transform()
+SceneObjectTransform::SceneObjectTransform(SceneObjectRef sceneObject) : Transform()
 {
 	this->sceneObject = sceneObject;
 }
@@ -32,7 +32,7 @@ SceneObjectTransform::SceneObjectTransform(SceneObject * sceneObject) : Transfor
 /*
  * Constructor to build SceneObjectTransform from Matrix4x4
  */
-SceneObjectTransform::SceneObjectTransform(SceneObject * sceneObject, Matrix4x4 * m) : Transform(m)
+SceneObjectTransform::SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4 * m) : Transform(m)
 {
 	this->sceneObject = sceneObject;
 }
@@ -40,9 +40,9 @@ SceneObjectTransform::SceneObjectTransform(SceneObject * sceneObject, Matrix4x4 
 /*
  * Copy constructor
  */
-SceneObjectTransform::SceneObjectTransform(SceneObject * sceneObject, SceneObjectTransform * sceneObjectTransform) :  Transform(sceneObjectTransform)
+SceneObjectTransform::SceneObjectTransform(SceneObjectTransform * sceneObjectTransform) :  Transform(sceneObjectTransform)
 {
-	this->sceneObject = sceneObject;
+	this->sceneObject = sceneObjectTransform->sceneObject;
 }
 
 /*
@@ -53,22 +53,54 @@ SceneObjectTransform::~SceneObjectTransform()
 
 }
 
-void SceneObjectTransform::AttachTo(SceneObject * sceneObject)
+/*
+ * Set the target SceneObject.
+ */
+void SceneObjectTransform::AttachTo(SceneObjectRef sceneObject)
 {
 	this->sceneObject = sceneObject;
 }
 
 
 /*
- * Store the full transformation made up by the ancestors of the this transform's scene
- * object concatenated with [localTransform]
+ * Set the local matrix [localMatrix] to match [localTransform].
  */
-void SceneObjectTransform::StoreFullTransform(Transform& localTransform)
+void SceneObjectTransform::SetLocalTransform(const Transform* localTransform)
 {
-	Transform full;
-	GetInheritedTransform(&full, false);
-	full.TransformBy(localTransform);
-	SetTo(&full);
+	localTransform->CopyMatrix(&this->localMatrix);
+
+	UpdateFullTransform();
+	UpdateTarget();
+}
+
+/*
+ * Set the local matrix.
+ */
+void SceneObjectTransform::SetLocalMatrix(const Matrix4x4 *  localMatrix)
+{
+	this->localMatrix.SetTo(localMatrix);
+
+	UpdateFullTransform();
+	UpdateTarget();
+}
+
+/*
+ * Decompose this transform's matrix into [translation], [rotation], and [scaling].
+ */
+void SceneObjectTransform::GetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale)
+{
+	localMatrix.Decompose(translation, rotation, scale);
+}
+
+/*
+ * Build matrix from base components: [translation], [rotation], and [scaling].
+ */
+void SceneObjectTransform::SetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale)
+{
+	localMatrix.BuildFromComponents(translation, rotation, scale);
+
+	UpdateFullTransform();
+	UpdateTarget();
 }
 
 /*
@@ -99,6 +131,25 @@ void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool inv
 }
 
 /*
+ * Update the local transform of the target SceneObject to reflect any relevant changes.
+ */
+void SceneObjectTransform::UpdateTarget()
+{
+	sceneObject->GetLocalTransform().SetTo(&localMatrix);
+}
+
+/*
+ * Update the the value of this SceneObjectTransform object's full matrix [matrix]. This
+ * should be called after any operation that affects [localMatrix].
+ */
+void SceneObjectTransform::UpdateFullTransform()
+{
+	Transform full;
+	GetInheritedTransform(&full, false);
+	full.TransformBy(&this->localMatrix);
+	SetTo(&full);
+}
+/*
  * Apply translation transformation to this transform's matrix. The parameter [local]
  * determines if the transformation is relative to world coordinates or the transform's
  * local space, which includes the aggregated transform of the scene object's ancestors.
@@ -114,7 +165,7 @@ void SceneObjectTransform::Translate(float x, float y, float z, bool local)
 		GetInheritedTransform(&full, false);
 		full.TransformBy(this);
 		full.Invert();
-		full.GetMatrix()->Transform(trans);
+		full.TransformVector4f(trans);
 
 		matrix.Translate(trans[0], trans[1], trans[2]);
 	}
@@ -153,8 +204,8 @@ void SceneObjectTransform::RotateAround(float px, float py, float pz, float ax, 
 	mod.TransformBy(this);
 
 	mod.Invert();
-	mod.GetMatrix()->Transform(pointTrans);
-	mod.GetMatrix()->Transform(rotVector);
+	mod.TransformVector4f(pointTrans);
+	mod.TransformVector4f(rotVector);
 
 	float diffX = pointTrans[0];
 	float diffY = pointTrans[1];
@@ -177,7 +228,7 @@ void SceneObjectTransform::Scale(Vector3 * mag,  bool local)
 
 /*
  * Scale this transform by [x], [y], [z]. If [local] is true then the operation is
- * performed in local space, otherwise it is performed in local space.
+ * performed in local space, otherwise it is performed in global space.
  */
 void SceneObjectTransform::Scale(float x, float y, float z,  bool local)
 {
@@ -188,7 +239,7 @@ void SceneObjectTransform::Scale(float x, float y, float z,  bool local)
 		GetInheritedTransform(&full, false);
 		full.TransformBy(this);
 		full.Invert();
-		full.GetMatrix()->Transform(trans);
+		full.TransformVector4f(trans);
 
 		matrix.Scale(trans[0], trans[1], trans[2]);
 	}

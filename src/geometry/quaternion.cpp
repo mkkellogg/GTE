@@ -63,6 +63,12 @@ void Quaternion::Set(float x, float y, float z, float w)
 	mData[3] = w;
 }
 
+Quaternion::Quaternion(const Matrix4x4& matrix)
+{
+   FromMatrix(matrix);
+}
+
+
 float Quaternion::x() const
 {
     return mData[0];
@@ -309,6 +315,65 @@ Matrix4x4 Quaternion::rotationMatrix() const
      return p;
  }
 
+/*
+ * Based off the function Quaternion::fromRotationMatrix in the Ogre open source engine.
+ */
+void Quaternion::FromMatrix(const Matrix4x4& matrix)
+{
+	float trace = matrix.A0+matrix.B1+matrix.C2;
+	float root;
+
+	const float * data = matrix.GetDataPtr();
+
+	if ( trace > 0.0 )
+	{
+		root = GTEMath::SquareRoot(trace + 1.0f);
+		mData[3] = 0.5f*root;
+		root = 0.5f/root;
+		mData[0] = (matrix.C1-matrix.B2)*root;
+		mData[1] = (matrix.A2-matrix.C0)*root;
+		mData[2] = (matrix.B0-matrix.A1)*root;
+	}
+	else
+	{
+		static unsigned int iNext[3] = { 1, 2, 0 };
+		unsigned int i = 0;
+		if ( matrix.B1 > matrix.A0 )
+			i = 1;
+		if ( matrix.C2 > data[i * 4 + i])
+			i = 2;
+		unsigned int j = iNext[i];
+		unsigned int k = iNext[j];
+
+		root = GTEMath::SquareRoot(data[i * 4 + i]-data[j * 4 + j]-data[k * 4 + k] + 1.0f);
+		float * apkQuat[3] = { mData, mData + 1, mData + 2 };
+		*apkQuat[i] = 0.5f*root;
+		root = 0.5f/root;
+
+		mData[3] = (data[j * 4 + k]-data[k * 4 + j])*root;
+		*apkQuat[j] = (data[i * 4 + j]+data[j * 4 + i])*root;
+		*apkQuat[k] = (data[i * 4 + k]+data[k * 4 + i])*root;
+
+		//w = (kRot[k][j]-kRot[j][k])*root;
+		//*apkQuat[j] = (kRot[j][i]+kRot[i][j])*root;
+		//*apkQuat[k] = (kRot[k][i]+kRot[i][k])*root;
+	}
+}
+
+void Quaternion::FromAngleAxis (const float rfAngle, const Vector3& rkAxis)
+{
+	// assert:  axis[] is unit length
+	//
+	// The quaternion representing the rotation is
+	//   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
+
+	float fHalfAngle ( 0.5*rfAngle );
+	float fSin = GTEMath::Sin(fHalfAngle);
+	mData[3] =  GTEMath::Cos(fHalfAngle);
+	mData[0] = fSin*rkAxis.x;
+	mData[1] = fSin*rkAxis.y;
+	mData[2] = fSin*rkAxis.z;
+}
 /** 
  * @brief Returns the scaled-axis representation of this
  * quaternion rotation.
@@ -556,7 +621,14 @@ const float* Quaternion::row(uint32_t i) const
     return mData + i;
 }
 
+
+
 Quaternion Quaternion::getRotation(const Vector3& source, const Vector3& dest)
+{
+	return getRotation(source, dest, Vector3::Zero);
+}
+
+Quaternion Quaternion::getRotation(const Vector3& source, const Vector3& dest, const Vector3& fallbackAxis)
 {
 	// Based on Stan Melax's article in Game Programming Gems
 	Quaternion q;
@@ -578,19 +650,24 @@ Quaternion Quaternion::getRotation(const Vector3& source, const Vector3& dest)
 	Vector3 axis;
 	if (d < (1e-6f - 1.0f))
 	{
-		// Generate an axis
-
-		Vector3::Cross(&Vector3::UnitX, &source, &axis);
-
-		if (axis.IsZeroLength()) // pick another if colinear
+		if (!(fallbackAxis == Vector3::Zero))
 		{
-			Vector3::Cross(&Vector3::UnitY, &source, &axis);
+			// rotate 180 degrees about the fallback axis
+			q.FromAngleAxis(Constants::PI, fallbackAxis);
 		}
+		else
+		{
+			// Generate an axis
+			Vector3::Cross(&Vector3::UnitX, &source, &axis);
 
-		axis.Normalize();
-		q = Quaternion(axis, Constants::PI);
-		q.normalize();
+			if (axis.IsZeroLength()) // pick another if colinear
+			{
+				Vector3::Cross(&Vector3::UnitY, &source, &axis);
+			}
 
+			axis.Normalize();
+			q.FromAngleAxis(Constants::PI, axis);
+		}
 	}
 	else
 	{

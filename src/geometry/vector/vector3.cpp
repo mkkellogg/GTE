@@ -71,7 +71,7 @@ Vector3& Vector3::operator=(const Vector3& source)
 /*
  * Comparison operator
  */
-bool Vector3::operator==(const Vector3 & source)
+bool Vector3::operator==(const Vector3 & source) const
 {
 	return source.x == x && source.y == y && source.z == z;
 }

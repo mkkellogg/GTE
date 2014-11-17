@@ -19,6 +19,7 @@ class Quaternion
     static const Quaternion Identity;
 
     Quaternion();
+    Quaternion(const Matrix4x4& matrix);
     Quaternion(const Vector3& v, float w) ;
     Quaternion(const BaseVector4& v);
     Quaternion(const float* array);
@@ -46,7 +47,9 @@ class Quaternion
     // Vector3 vector() const;
     void normalize();
     float norm() const;
-     Matrix4x4 rotationMatrix() const;
+    Matrix4x4 rotationMatrix() const;
+    void FromMatrix(const Matrix4x4& matrix);
+    void FromAngleAxis (const float rfAngle, const Vector3& rkAxis);
     // Vector3 scaledAxis(void) const;
     // void scaledAxis(const Vector3& w);
     // Vector3 rotatedVector(const Vector3& v) const;
@@ -58,6 +61,7 @@ class Quaternion
     float* row(uint32_t i);
     const float* row(uint32_t i) const;
     static Quaternion getRotation(const Vector3& source, const Vector3& dest);
+    static Quaternion getRotation(const Vector3& source, const Vector3& dest, const Vector3& fallbackAxis);
 };
 
 /**

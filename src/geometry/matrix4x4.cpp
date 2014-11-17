@@ -25,6 +25,7 @@
  
 #include "ui/debug.h"
 #include "matrix4x4.h"
+#include "quaternion.h"
 #include "point/point3.h"
 #include "vector/vector3.h"
 #include "global/global.h"
@@ -37,7 +38,10 @@
 /*
  * Default constructor
  */
-Matrix4x4::Matrix4x4()
+Matrix4x4::Matrix4x4() : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
+						 B0(data[1]), B1(data[5]), B2(data[9]), B3(data[13]),
+						 C0(data[2]), C1(data[6]), C2(data[10]), C3(data[14]),
+						 D0(data[3]), D1(data[7]), D2(data[11]), D3(data[15])
 {
     Init();
     SetIdentity();
@@ -46,7 +50,10 @@ Matrix4x4::Matrix4x4()
 /*
  * Construct matrix with existing float data
  */
-Matrix4x4::Matrix4x4(float * data)
+Matrix4x4::Matrix4x4(float * data) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
+									 B0(data[1]), B1(data[5]), B2(data[9]), B3(data[13]),
+									 C0(data[2]), C1(data[6]), C2(data[10]), C3(data[14]),
+									 D0(data[3]), D1(data[7]), D2(data[11]), D3(data[15])
 {
     Init();
     if(data != NULL)
@@ -58,6 +65,17 @@ Matrix4x4::Matrix4x4(float * data)
     	SetIdentity();
     	Debug::PrintError("Matrix4x4::Matrix4x4(float *) -> NULL data passed.");
     }
+}
+
+/*
+ * Copy constructor.
+ */
+Matrix4x4::Matrix4x4(const Matrix4x4 & source) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
+												 B0(data[1]), B1(data[5]), B2(data[9]), B3(data[13]),
+												 C0(data[2]), C1(data[6]), C2(data[10]), C3(data[14]),
+												 D0(data[3]), D1(data[7]), D2(data[11]), D3(data[15])
+{
+	SetTo(&source);
 }
 
 /*
@@ -90,6 +108,110 @@ void Matrix4x4::SetTo(const float * srcData)
 {
 	ASSERT_RTRN(srcData != NULL,"Matrix4x4::SetTo -> srcData is NULL");
 	memcpy(data, srcData, sizeof(float) * DATA_SIZE);
+}
+
+/*
+ * Build matrix from components [translation], [scale], and [rotation]
+ */
+void Matrix4x4::BuildFromComponents(const Vector3 * translation, const Quaternion * rotation,  const Vector3 * scale)
+{
+	ASSERT_RTRN(translation != NULL,"Matrix4x4::BuildFromComponents -> translation is NULL");
+	ASSERT_RTRN(scale != NULL,"Matrix4x4::BuildFromComponents -> scale is NULL");
+	ASSERT_RTRN(rotation != NULL,"Matrix4x4::BuildFromComponents -> rotation is NULL");
+
+	Matrix4x4 rotMatrix = rotation->rotationMatrix();
+
+	// Build the final matrix, with translation, scale, and rotation
+  	A0 = scale->x * rotMatrix.A0; A1 = scale->y *  rotMatrix.A1; A2 = scale->z * rotMatrix.A2; A3 = translation->x;
+  	B0 = scale->x * rotMatrix.B0; B1 = scale->y *  rotMatrix.B1; B2 = scale->z * rotMatrix.B2; B3 = translation->y;
+  	C0 = scale->x * rotMatrix.C0; C1 = scale->y *  rotMatrix.C1; C2 = scale->z * rotMatrix.C2; C3 = translation->z;
+
+  	D0 = 0; D1 = 0; D2 = 0;D3 = 1;
+}
+
+void Matrix4x4::Decompose(Vector3 * translation, Quaternion * rotation, Vector3 * scale)
+{
+	ASSERT_RTRN(translation != NULL,"Matrix4x4::Decompose -> translation is NULL");
+	ASSERT_RTRN(scale != NULL,"Matrix4x4::Decompose -> scale is NULL");
+	ASSERT_RTRN(rotation != NULL,"Matrix4x4::Decompose -> rotation is NULL");
+	ASSERT_RTRN(IsAffine(), "Matrix4x4::Decompose -> matrix is not affine");
+
+	Matrix4x4 rotMatrix;
+
+	// build orthogonal matrix Q
+	float fInvLength = GTEMath::InverseSquareRoot(A0*A0 + B0*B0 + C0*C0);
+
+	rotMatrix.A0 = A0*fInvLength;
+	rotMatrix.B0 = B0*fInvLength;
+	rotMatrix.C0 = C0*fInvLength;
+
+	float fDot = rotMatrix.A0*A1 + rotMatrix.B0*B1 + rotMatrix.C0*C1;
+	rotMatrix.A1 = A1-fDot*rotMatrix.A0;
+	rotMatrix.B1 = B1-fDot*rotMatrix.B0;
+	rotMatrix.C1 = C1-fDot*rotMatrix.C0;
+	fInvLength = GTEMath::InverseSquareRoot(rotMatrix.A1*rotMatrix.A1 + rotMatrix.B1*rotMatrix.B1 + rotMatrix.C1*rotMatrix.C1);
+
+	rotMatrix.A1 *= fInvLength;
+	rotMatrix.B1 *= fInvLength;
+	rotMatrix.C1 *= fInvLength;
+
+	fDot = rotMatrix.A0*A2 + rotMatrix.B0*B2 + rotMatrix.C0*C2;
+	rotMatrix.A2 = A2-fDot*rotMatrix.A0;
+	rotMatrix.B2 = B2-fDot*rotMatrix.B0;
+	rotMatrix.C2 = C2-fDot*rotMatrix.C0;
+
+	fDot = rotMatrix.A1*A2 + rotMatrix.B1*B2 +rotMatrix.C1*C2;
+	rotMatrix.A2 -= fDot*rotMatrix.A1;
+	rotMatrix.B2 -= fDot*rotMatrix.B1;
+	rotMatrix.C2 -= fDot*rotMatrix.C1;
+
+	fInvLength =  GTEMath::InverseSquareRoot(rotMatrix.A2*rotMatrix.A2 + rotMatrix.B2*rotMatrix.B2 + rotMatrix.C2*rotMatrix.C2);
+
+	rotMatrix.A2 *= fInvLength;
+	rotMatrix.B2 *= fInvLength;
+	rotMatrix.C2 *= fInvLength;
+
+	// guarantee that orthogonal matrix has determinant 1 (no reflections)
+	float fDet = rotMatrix.A0*rotMatrix.B1*rotMatrix.C2 + rotMatrix.A1*rotMatrix.B2*rotMatrix.C0 +
+			 	  rotMatrix.A2*rotMatrix.B0*rotMatrix.C1 - rotMatrix.A2*rotMatrix.B1*rotMatrix.C0 -
+			 	  rotMatrix.A1*rotMatrix.B0*rotMatrix.C2 - rotMatrix.A0*rotMatrix.B2*rotMatrix.C1;
+
+	if ( fDet < 0.0 )
+	{
+		 for (size_t iRow = 0; iRow < 3; iRow++)
+			 for (size_t iCol = 0; iCol < 3; iCol++)
+				 rotMatrix.data[iCol * 4 + iRow] = -rotMatrix.data[iCol * 4 + iRow];
+	}
+
+	// build "right" matrix R
+	Matrix4x4 rightMatrix;
+	rightMatrix.A0 = rotMatrix.A0*A0 + rotMatrix.B0*B0 + rotMatrix.C0*C0;
+	rightMatrix.A1 = rotMatrix.A0*A1 + rotMatrix.B0*B1 + rotMatrix.C0*C1;
+	rightMatrix.B1 = rotMatrix.A1*A1 + rotMatrix.B1*B1 + rotMatrix.C1*C1;
+	rightMatrix.A2 = rotMatrix.A0*A2 + rotMatrix.B0*B2 + rotMatrix.C0*C2;
+	rightMatrix.B2 = rotMatrix.A1*A2 + rotMatrix.B1*B2 + rotMatrix.C1*C2;
+	rightMatrix.C2 = rotMatrix.A2*A2 + rotMatrix.B2*B2 + rotMatrix.C2*C2;
+
+	// the scaling component
+	scale->x = rightMatrix.A0;
+	scale->y = rightMatrix.B1;
+	scale->z = rightMatrix.C2;
+
+	Vector3 shear;
+	// the shear component
+	float fInvD0 = 1.0f/scale->x;
+	shear.x = rightMatrix.A1*fInvD0;
+	shear.y = rightMatrix.A2*fInvD0;
+	shear.z = rightMatrix.B2/scale->y;
+
+	rotation->FromMatrix(rotMatrix);
+
+	translation->Set(A3, B3, C3);
+}
+
+bool Matrix4x4::IsAffine(void) const
+{
+   return D0 == 0 && D1 == 0 && D2 == 0 && D3 == 1;
 }
 
 /*
@@ -580,6 +702,16 @@ void Matrix4x4::Translate(float x, float y, float z)
     Translate(data, data, x, y, z);
 }
 
+/*
+ * Translate this matrix by  [vector].
+ *
+ * This performs a pre-transformation, in that it is equivalent to pre-multiplying
+ * this matrix by a translation matrix
+ */
+void Matrix4x4::PreTranslate(const Vector3 * vector)
+{
+	PreTranslate(vector->x, vector->y, vector->z);
+}
 /*
  * Translate this matrix by [x], [y], [z]
  *

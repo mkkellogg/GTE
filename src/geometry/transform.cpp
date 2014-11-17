@@ -40,8 +40,7 @@ Transform::Transform(Matrix4x4 * m) : Transform()
 Transform::Transform(Transform * transform) : Transform()
 {
 	ASSERT_RTRN(transform != NULL, "Transform::copy constructor -> NULL transform passed.");
-
-	matrix.SetTo(transform->GetMatrix());
+	transform->CopyMatrix(&matrix);
 }
 
 /*
@@ -53,11 +52,12 @@ Transform::~Transform()
 }
 
 /*
- * Get the underlying Matrix4x4 that is encapsulated by this transform.
+ * Copy this Transform object's matrix into [dest].
  */
-const Matrix4x4 * Transform::GetMatrix() const
+void Transform::CopyMatrix(Matrix4x4 * dest) const
 {
-	return &matrix;
+	ASSERT_RTRN(dest != NULL, "Transform::CopyTo -> NULL destination passed.");
+	dest->SetTo(&matrix);
 }
 
 /*
@@ -76,8 +76,7 @@ void Transform::SetTo(const Matrix4x4 * matrix)
 void Transform::SetTo(const Transform * transform)
 {
 	ASSERT_RTRN(transform != NULL, "Transform::SetTo -> NULL transform passed.");
-
-	SetTo(transform->GetMatrix());
+	transform->CopyMatrix(&matrix);
 }
 
 /*
@@ -85,7 +84,16 @@ void Transform::SetTo(const Transform * transform)
  */
 void Transform::SetTo(const Transform& transform)
 {
-	SetTo(transform.GetMatrix());
+	transform.CopyMatrix(&matrix);
+}
+
+/*
+ * Set this transform's matrix data to [matrixData].
+ */
+void Transform::SetTo(const float * matrixData)
+{
+	ASSERT_RTRN(matrixData != NULL, "Transform::SetTo -> NULL matrix data passed.");
+	matrix.SetTo(matrixData);
 }
 
 void Transform::SetIdentity()
@@ -133,8 +141,7 @@ void Transform::PreTransformBy(const Transform& transform)
 void Transform::TransformBy(const Transform * transform)
 {
 	ASSERT_RTRN(transform != NULL, "Transform::TransformBy(Transform *) -> NULL transform passed.");
-
-	matrix.Multiply(transform->GetMatrix());
+	matrix.Multiply(&transform->matrix);
 }
 
 /*
@@ -143,7 +150,7 @@ void Transform::TransformBy(const Transform * transform)
 void Transform::PreTransformBy(const Transform * transform)
 {
 	ASSERT_RTRN(transform != NULL, "Transform::PreTransformBy(Transform *) -> NULL transform passed.");
-	matrix.PreMultiply(transform->GetMatrix());
+	matrix.PreMultiply(&transform->matrix);
 }
 
 /*
@@ -173,6 +180,27 @@ void Transform::Translate(float x, float y, float z, bool local)
 		matrix.PreTranslate(x,y,z);
 	}
 	else matrix.Translate(x,y,z);
+}
+
+/*
+ * Apply translation transformation to this transform's matrix. The parameter [local]
+ * determines if the transformation is relative to world space or the transform's
+ * local space.
+ */
+void Transform::Translate(Vector3 * vector, bool local)
+{
+	if(!local)
+	{
+		/*float trans[] = {x,y,z,0};
+		Transform full;
+		full.SetTo(this);
+		full.Invert();
+		full.GetMatrix()->Transform(trans);
+		matrix.Translate(trans[0], trans[1], trans[2]);*/
+
+		matrix.PreTranslate(vector);
+	}
+	else matrix.Translate(vector);
 }
 
 /*
@@ -344,7 +372,6 @@ void Transform::TransformVector(Vector3 * vector) const
 	matrix.Transform(vector);
 }
 
-
 /*
  * Shortcut to transform [point] by [matrix]
  */
@@ -352,4 +379,13 @@ void Transform::TransformPoint(Point3 * point) const
 {
 	ASSERT_RTRN(point != NULL, "Transform::TransformPoint -> NULL point passed.");
 	matrix.Transform(point);
+}
+
+/*
+ * Shortcut to transform [vector] by [matrix]
+ */
+void Transform::TransformVector4f(float * vector) const
+{
+	ASSERT_RTRN(vector != NULL, "Transform::TransformVector4f -> NULL vector passed.");
+	matrix.Transform(vector);
 }

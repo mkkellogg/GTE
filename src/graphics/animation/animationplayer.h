@@ -52,6 +52,8 @@ class AnimationPlayer
 	float leftOverWeight;
 	// active animation blending operations
 	std::queue<BlendOp*> activeBlendOperations;
+	// flags that indicate if the animation at a specified index is the target of a cross fade operation in activeBlendOperations
+	std::vector<bool> crossFadeTargets;
 	// number of animations currently playing
 	int playingAnimationsCount;
 
@@ -59,6 +61,7 @@ class AnimationPlayer
 	~AnimationPlayer();
 
 	void QueueBlendOperation(BlendOp * op);
+	BlendOp * GetCurrentBlendOp();
 	void Update();
 	void UpdateBlending();
 	void CheckWeights();
@@ -78,6 +81,10 @@ class AnimationPlayer
 	void Stop(AnimationRef animation);
 	void Pause(AnimationRef animation);
 	void Resume(AnimationRef animation);
+	void Play(unsigned int animationIndex);
+	void Stop(unsigned int  animationIndex);
+	void Pause(unsigned int  animationIndex);
+	void Resume(unsigned int  animationIndex);
 	void CrossFade(AnimationRef target, float duration);
 };
 

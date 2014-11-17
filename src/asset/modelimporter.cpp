@@ -57,6 +57,7 @@
 #include "util/time.h"
 #include "global/global.h"
 #include "ui/debug.h"
+#include "util/util.h"
 
 ModelImporter::ModelImporter()
 {
@@ -188,10 +189,10 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	Matrix4x4 mat;
 
 	aiMatrix4x4 matBaseTransformation = node.mTransformation;
-	aiMatrix4x4 matScaling;
-	aiMatrix4x4::Scaling(aiVector3D(scale, scale, scale), matScaling);
+	//aiMatrix4x4 matScaling;
+	//aiMatrix4x4::Scaling(aiVector3D(scale, scale, scale), matScaling);
 
-	matBaseTransformation = matBaseTransformation * matScaling;
+//	matBaseTransformation = matBaseTransformation;
 	ImportUtil::ConvertAssimpMatrix(matBaseTransformation,mat);
 
 	scale = 1;

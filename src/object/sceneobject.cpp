@@ -52,28 +52,28 @@ void SceneObject::SetName(const std::string& name)
 	this->name = name;
 }
 
-const char * SceneObject::GetName()
+const std::string& SceneObject::GetName()
 {
-	return (const char *)name.c_str();
+	return name;
 }
 
 Transform& SceneObject::GetLocalTransform()
 {
-	//const Transform * ptr = &transform;
-	//return const_cast<Transform*>(ptr);
 	return transform;
 }
 
 /*
- * Get the full transform represented by this object's transform and all
- * its ancestors, and store in [transform]. Additionally, assign this scene
- * object to [transform]
+ * Attach the SceneObjectTransform [transform] to this scene object.
  */
-void SceneObject::GetFullTransform(SceneObjectTransform * transform)
+void SceneObject::InitSceneObjectTransform(SceneObjectTransform * transform)
 {
 	ASSERT_RTRN(transform != NULL,"SceneObject::GetFullTransform -> transform is NULL.");
-	transform->AttachTo(this);
-	transform->StoreFullTransform(this->transform);
+
+	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+	ASSERT_RTRN(thisRef.IsValid(),"SceneObject::InitSceneObjectTransform -> Could not find matching reference for scene object");
+
+	transform->AttachTo(thisRef);
+	transform->SetLocalTransform(&this->transform);
 }
 
 void SceneObject::SetProcessingTransform(Transform * transform)
@@ -84,7 +84,6 @@ void SceneObject::SetProcessingTransform(Transform * transform)
 
 const Transform& SceneObject::GetProcessingTransform() const
 {
-	//const Transform * ptr = &processingTransform;
 	return processingTransform;
 }
 

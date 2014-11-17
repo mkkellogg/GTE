@@ -38,7 +38,7 @@ class Vector3 : public BaseVector4
     ~Vector3();
 
     Vector3& operator=(const Vector3 & source);
-    bool operator==(const Vector3 & source);
+    bool operator==(const Vector3 & source) const;
     void Set(float x, float y, float z);
 
     void Add(const Vector3 * v);

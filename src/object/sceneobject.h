@@ -48,10 +48,10 @@ class SceneObject : public EngineObject
     bool IsActive();
     void SetActive(bool active);
     void SetName(const std::string& name);
-    const char * GetName();
+    const std::string& GetName();
 
     Transform& GetLocalTransform() ;
-    void GetFullTransform(SceneObjectTransform * transform);
+    void InitSceneObjectTransform(SceneObjectTransform * transform);
     const Transform& GetProcessingTransform() const;
 
     bool SetMesh3DRenderer(Mesh3DRendererRef renderer);

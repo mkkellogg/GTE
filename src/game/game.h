@@ -12,6 +12,7 @@ class Game
 	SkinnedMesh3DRendererRef koopaRenderer;
 	AnimationRef koopaAnim;
 	AnimationRef koopaWait, koopaWalk, koopaJump, koopaRoar;
+	AnimationPlayerRef animationPlayer;
 
 	float walkSpeed;
 	float runSpeed;
@@ -23,13 +24,16 @@ class Game
 
 	Vector3 moveDirection;
 	Vector3 lookDirection;
-	Vector3 baseForward;
+	Vector3 basePlayerForward;
+	Vector3 baseCameraForward;
 
 	bool isGrounded;
 
 	void InitializePlayerPosition();
 	void UpdatePlayerMovementDirection();
-	void UpdateLookDirection();
+	void UpdatePlayerAnimation();
+	void UpdatePlayerPosition();
+	void UpdatePlayerLookDirection();
 
     public:
 

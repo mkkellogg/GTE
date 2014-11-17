@@ -5,6 +5,8 @@ class GTEMath
 {
     public:
     
+	static float InverseSquareRoot(float n);
+	static float QuickInverseSquareRoot(float n);
 	static float SquareRoot(float n);
     static float QuickSquareRoot(float n);
     static float Cos(float n);

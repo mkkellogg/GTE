@@ -28,8 +28,8 @@
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
+#include "util/util.h"
 #include <string>
-
 
 EngineObjectManager::EngineObjectManager()
 {

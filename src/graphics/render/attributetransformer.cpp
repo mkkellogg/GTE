@@ -29,3 +29,9 @@ StandardAttributeSet AttributeTransformer::GetActiveAttributes()
 {
 	return activeAttributes;
 }
+
+void AttributeTransformer::SetModelMatrix(const Matrix4x4& model, const Matrix4x4& modelInverse)
+{
+	this->model = model;
+	this->modelInverse = modelInverse;
+}

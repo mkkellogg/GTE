@@ -49,8 +49,6 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 	uvsTexture0 = new UV2Array();
 	uvsTexture1 = new UV2Array();
 
-	lightCullType = LightCullType::SphereOfInfluence;
-
 	containerMesh = NULL;
 	subIndex = -1;
 }
@@ -267,22 +265,21 @@ const Vector3 * SubMesh3D::GetSphereOfInfluenceZ() const
 	return (const Vector3 *)(&sphereOfInfluenceZ);
 }
 
-LightCullType SubMesh3D::GetLightCullType() const
-{
-	return lightCullType;
-}
-
 void SubMesh3D::Update()
 {
 	CalcSphereOfInfluence();
 	CalculateNormals(normalsSmoothingThreshold);
 
-	if(containerMesh != NULL &&
-	   containerMesh->IsAttachedToSceneObject() &&
-	   containerMesh->SceneObjectHasRenderer())
+	if(containerMesh != NULL)
 	{
-		if(subIndex >=0)
-			containerMesh->SendDataToRenderer((unsigned int)subIndex);
+		containerMesh->CalculateSphereOfInfluence();
+
+		 if(containerMesh->IsAttachedToSceneObject() &&
+			containerMesh->SceneObjectHasRenderer())
+		{
+			if(subIndex >=0)
+				containerMesh->SendDataToRenderer((unsigned int)subIndex);
+		}
 	}
 }
 

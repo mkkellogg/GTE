@@ -60,10 +60,11 @@ Game::Game()
 
 	walkSpeed = 3.0;
 	runSpeed = 6.0;
-	rotateSpeed = 50;
+	rotateSpeed = 100;
 	speedSmoothing = 10;
 
-	baseForward = Vector3(0,0,1);
+	basePlayerForward = Vector3(0,0,1);
+	baseCameraForward = Vector3(0,0,-1);
 }
 
 Game::~Game()
@@ -93,7 +94,7 @@ void Game::Init()
 
 	cameraObject = objectManager->CreateSceneObject();
 	CameraRef camera = objectManager->CreateCamera();
-	cameraObject->GetLocalTransform().Translate(0, 5, 15, true);
+	cameraObject->GetLocalTransform().Translate(0, 5, 25, true);
 	// cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
 	camera->AddClearBuffer(RenderBufferType::Color);
 	camera->AddClearBuffer(RenderBufferType::Depth);
@@ -171,7 +172,9 @@ void Game::Init()
 	modelSceneObject->GetLocalTransform().Translate(0,0,-12,false);
 	modelSceneObject->GetLocalTransform().Scale(13,13,13, true);
 
-	playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa@wait.fbx", 1 );
+
+
+	playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
 	if(playerObject.IsValid())
 	{
 		playerObject->SetActive(true);
@@ -181,10 +184,10 @@ void Game::Init()
 		Debug::PrintError(" >> could not load model!\n");
 		return;
 	}
-	playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
+	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-2,-2,false);
-	playerObject->GetLocalTransform().Scale(.35, .35, .35, true);
+	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
 
 
 	koopaWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
@@ -204,12 +207,12 @@ void Game::Init()
 
 	if(compatible)
 	{
-		AnimationPlayerRef player = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
-		player->AddAnimation(koopaWait);
-		player->AddAnimation(koopaWalk);
-		player->AddAnimation(koopaJump);
-		player->AddAnimation(koopaRoar);
-		player->Play(koopaWalk);
+		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
+		animationPlayer->AddAnimation(koopaWait);
+		animationPlayer->AddAnimation(koopaWalk);
+		animationPlayer->AddAnimation(koopaJump);
+		animationPlayer->AddAnimation(koopaRoar);
+		animationPlayer->Play(koopaWait);
 	}
 
 
@@ -253,9 +256,9 @@ void Game::Init()
 void Game::InitializePlayerPosition()
 {
 	SceneObjectTransform playerTransform;
-	playerObject->GetFullTransform(&playerTransform);
+	playerObject->InitSceneObjectTransform(&playerTransform);
 
-	Vector3 playerForward = baseForward;
+	Vector3 playerForward = basePlayerForward;
 	playerTransform.TransformVector(&playerForward);
 	playerForward.y = 0;
 	playerForward.Normalize();
@@ -269,8 +272,8 @@ void Game::Update()
 	Point3 playerPos;
 
 	SceneObjectTransform cameraTransform;
-	cameraObject->GetFullTransform(&cameraTransform);
-	cameraTransform.GetMatrix()->Transform(&cameraPos);
+	cameraObject->InitSceneObjectTransform(&cameraTransform);
+	cameraTransform.TransformPoint(&cameraPos);
 
 	 //cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,12 * Time::GetDeltaTime() * rotationDir);
 
@@ -282,7 +285,9 @@ void Game::Update()
 	 //float realTime = Time::GetRealTimeSinceStartup();
 
 	UpdatePlayerMovementDirection();
-	UpdateLookDirection();
+	UpdatePlayerAnimation();
+	UpdatePlayerPosition();
+	UpdatePlayerLookDirection();
 }
 
 void Game::UpdatePlayerMovementDirection()
@@ -291,19 +296,19 @@ void Game::UpdatePlayerMovementDirection()
 	Point3 playerPos;
 
 	SceneObjectTransform cameraTransform;
-	cameraObject->GetFullTransform(&cameraTransform);
-	cameraTransform.GetMatrix()->Transform(&cameraPos);
+	cameraObject->InitSceneObjectTransform(&cameraTransform);
+	cameraTransform.TransformPoint(&cameraPos);
 
 	SceneObjectTransform playerTransform;
-	playerObject->GetFullTransform(&playerTransform);
+	playerObject->InitSceneObjectTransform(&playerTransform);
 	playerTransform.TransformPoint(&playerPos);
 
-	Vector3 playerForward = baseForward;
+	Vector3 playerForward = basePlayerForward;
 	playerTransform.TransformVector(&playerForward);
 	playerForward.y = 0;
 	playerForward.Normalize();
 
-	Vector3 cameraForward = baseForward;
+	Vector3 cameraForward = baseCameraForward;
 	cameraTransform.TransformVector(&cameraForward);
 	cameraForward.y = 0;
 	cameraForward.Normalize();
@@ -320,7 +325,6 @@ void Game::UpdatePlayerMovementDirection()
 	if(inputManager->GetDigitalInputState(DigitalInput::Up))v += 1;
 	if(inputManager->GetDigitalInputState(DigitalInput::Down))v -= 1;
 
-	bool wasMoving = isMoving;
 	isMoving = GTEMath::Abs(h) > .1 || GTEMath::Abs(v) > .1;
 
 	Vector3 cameraRightScaled = cameraRight;
@@ -331,23 +335,26 @@ void Game::UpdatePlayerMovementDirection()
 
 	Vector3 targetDirection;
 	Vector3::Add(&cameraRightScaled, &cameraForwardScaled, &targetDirection);
+	targetDirection.Normalize();
 
-	if(Vector3::Dot(&targetDirection, &playerForward) >= .999)
-	{
-		lookDirection = targetDirection;
-	}
-	else if(targetDirection.x != 0 || targetDirection.y != 0 || targetDirection.z != 0)
+	Vector3 forward(0,0,1);
+
+	if(targetDirection.x != 0 || targetDirection.y != 0 || targetDirection.z != 0)
 	{
 		Vector3::RotateTowards(&lookDirection, &targetDirection, rotateSpeed * Time::GetDeltaTime(), &moveDirection);
 		lookDirection = moveDirection;
 	}
 
+	if(Vector3::Dot(&lookDirection, &targetDirection) > .9999)lookDirection = targetDirection;
+
 	if(isGrounded)
 	{
+		float targetSpeed = 0;
 		float curSmooth = speedSmoothing * Time::GetDeltaTime();
-
-		float targetSpeed = walkSpeed;
-
+		if(isMoving)
+		{
+			targetSpeed = walkSpeed;
+		}
 		moveSpeed = GTEMath::Lerp(moveSpeed, targetSpeed, curSmooth);
 	}
 	else
@@ -356,23 +363,36 @@ void Game::UpdatePlayerMovementDirection()
 	}
 }
 
-void Game::UpdateLookDirection()
+void Game::UpdatePlayerPosition()
+{
+	if(moveSpeed > .1)
+	{
+		Vector3 move = lookDirection;
+		move.Scale(moveSpeed * Time::GetDeltaTime() );
+		playerObject->GetLocalTransform().Translate(&move, false);
+	}
+}
+
+void Game::UpdatePlayerLookDirection()
 {
 	if(lookDirection.SquareMagnitude() > .001)
 	{
 		SceneObjectTransform playerTransform;
-		playerObject->GetFullTransform(&playerTransform);
+		playerObject->InitSceneObjectTransform(&playerTransform);
 
-		Vector3 playerForward = baseForward;
+		Vector3 playerForward = basePlayerForward;
 		playerTransform.TransformVector(&playerForward);
 		playerForward.y = 0;
 		playerForward.Normalize();
 
 		Vector3 localLookDirection = lookDirection;
 		Matrix4x4 inversePlayerTransform;
-		inversePlayerTransform.SetTo(playerTransform.GetMatrix());
+		playerTransform.CopyMatrix(&inversePlayerTransform);
 		inversePlayerTransform.Invert();
 		inversePlayerTransform.Transform(&localLookDirection);
+
+		Vector3 localAxis(0,1,0);
+		inversePlayerTransform.Transform(&localAxis);
 
 		lookDirection.y = 0;
 		lookDirection.Normalize();
@@ -380,10 +400,28 @@ void Game::UpdateLookDirection()
 		float diff = Vector3::Dot(&playerForward, &lookDirection);
 		if(diff >= .9999)return;
 
-		Quaternion rotation = Quaternion::getRotation(baseForward, localLookDirection);
-		rotation.normalize();
-		Matrix4x4 rotMatrix = rotation.rotationMatrix();
+		Quaternion modRotation = Quaternion::getRotation(basePlayerForward, lookDirection, localAxis);
+		modRotation.normalize();
 
-		playerObject->GetLocalTransform().TransformBy(&rotMatrix);
+		Quaternion currentRotation;
+		Vector3 currentTranslation;
+		Vector3 currentScale;
+
+		playerTransform.GetLocalComponents(&currentTranslation, &currentRotation, &currentScale);
+
+		currentRotation = modRotation;
+		playerTransform.SetLocalComponents(&currentTranslation, &currentRotation, &currentScale);
+	}
+}
+
+void Game::UpdatePlayerAnimation()
+{
+	if(moveSpeed > .1)
+	{
+		animationPlayer->CrossFade(koopaWalk, .2);
+	}
+	else
+	{
+		animationPlayer->CrossFade(koopaWait, .3);
 	}
 }

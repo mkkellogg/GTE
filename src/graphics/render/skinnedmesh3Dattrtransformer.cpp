@@ -315,9 +315,12 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 						if(bone->Node->HasTarget())
 						{
 							const Transform * targetFull = bone->Node->GetFullTransform();
+							Matrix4x4 fullMatrix;
+							targetFull->CopyMatrix(&fullMatrix);
 
 							// store final transformation for this bone in bone->TempFullMatrix
-							bone->TempFullMatrix.PreMultiply(targetFull->GetMatrix());
+							bone->TempFullMatrix.PreMultiply(&fullMatrix);
+							bone->TempFullMatrix.PreMultiply(&modelInverse);
 						}
 
 						// factor into average bone offset
@@ -416,7 +419,10 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 						if(bone->Node->HasTarget())
 						{
 							const Transform * targetFull = bone->Node->GetFullTransform();
-							bone->TempFullMatrix.PreMultiply(targetFull->GetMatrix());
+							Matrix4x4 fullMatrix;
+							targetFull->CopyMatrix(&fullMatrix);
+
+							bone->TempFullMatrix.PreMultiply(&fullMatrix);
 						}
 
 						averageBoneOffset.Add(&bone->OffsetMatrix);

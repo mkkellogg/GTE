@@ -19,7 +19,6 @@ class SubMesh3DRenderer;
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
-#include "graphics/light/light.h"
 
 class SubMesh3D : public EngineObject
 {
@@ -42,8 +41,6 @@ class SubMesh3D : public EngineObject
     Vector3 sphereOfInfluenceZ;
     Point3 center;
 
-    LightCullType lightCullType;
-
     Mesh3D * containerMesh;
 
     void Destroy();
@@ -64,7 +61,6 @@ class SubMesh3D : public EngineObject
     const Vector3 * GetSphereOfInfluenceX() const;
     const Vector3 * GetSphereOfInfluenceY() const;
     const Vector3 * GetSphereOfInfluenceZ() const;
-    LightCullType GetLightCullType() const;
     void SetNormalsSmoothingThreshold(unsigned int threshhold);
     void Update();
 

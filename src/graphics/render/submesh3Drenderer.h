@@ -10,6 +10,7 @@ class Color4Array;
 class UV2Array;
 class SubMesh3D;
 class Material;
+class Matrix4x4;
 
 #include "object/sceneobjectcomponent.h"
 #include "object/enginetypes.h"
@@ -42,8 +43,8 @@ class SubMesh3DRenderer : public EngineObject
 	StandardAttributeSet storedAttributes;
     bool buffersOnGPU;
 
-    AttributeTransformer * attributeTransformer;
     bool doAttributeTransform;
+    AttributeTransformer * attributeTransformer;
     Point3Array positionsCopy, transformedPositions;
     Vector3Array normalsCopy, transformedNormals;
     Point3 centerCopy,transformedCenter;
@@ -77,10 +78,11 @@ class SubMesh3DRenderer : public EngineObject
 
     void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
     AttributeTransformer * GetAttributeTransformer();
+    bool DoesAttributeTransform();
 
     const Point3 * GetFinalCenter();
 
-    void PreRender();
+    void PreRender(const Matrix4x4& modelView, const Matrix4x4& modelViewInverse);
 
     virtual void Render() = 0;
 };

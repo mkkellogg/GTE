@@ -15,7 +15,10 @@
 class Transform;
 class SceneObject;
 class SceneObjectTransform;
+class Quaternion;
+class Vector3;
 
+#include "object/enginetypes.h"
 #include "transform.h"
 #include "matrix4x4.h"
 #include "util/datastack.h"
@@ -24,20 +27,27 @@ class SceneObjectTransform : public Transform
 {
 	friend class SceneObject;
 
-	SceneObject * sceneObject;
+	SceneObjectRef sceneObject;
+	Matrix4x4 localMatrix;
 
 	void GetInheritedTransform(Transform * transform, bool invert);
-	void StoreFullTransform(Transform& localTransform);
+	void UpdateTarget();
+	void UpdateFullTransform();
 
     public:
 
 	SceneObjectTransform();
-	SceneObjectTransform(SceneObject * sceneObject);
-	SceneObjectTransform(SceneObject * sceneObject, Matrix4x4 * m);
-	SceneObjectTransform(SceneObject * sceneObject, SceneObjectTransform * sceneObjectTransform);
+	SceneObjectTransform(SceneObjectRef sceneObject);
+	SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4 * m);
+	SceneObjectTransform(SceneObjectTransform * sceneObjectTransform);
     ~SceneObjectTransform();
 
-    void AttachTo(SceneObject * sceneObject);
+    void AttachTo(SceneObjectRef sceneObject);
+    void SetLocalTransform(const Transform* localTransform);
+    void SetLocalMatrix(const Matrix4x4 * localMatrix);
+
+    void GetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale);
+    void SetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale);
 
     void Translate(float x, float y, float z, bool local);
     void RotateAround(Point3 * point, Vector3 * axis, float angle);

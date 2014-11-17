@@ -28,6 +28,7 @@
 // forward declarations
 class Point3;
 class Vector3;
+class Quaternion;
 
 class Matrix4x4 
 {
@@ -40,8 +41,14 @@ class Matrix4x4
     public:
     
     Matrix4x4();
+    Matrix4x4(const Matrix4x4 & source);
     Matrix4x4(float * data);
     ~Matrix4x4();
+
+    float& A0; float& A1; float& A2; float& A3;
+    float& B0; float& B1; float& B2; float& B3;
+    float& C0; float& C1; float& C2; float& C3;
+    float& D0; float& D1; float& D2; float& D3;
 
     int GetDataSize() const;
 
@@ -49,6 +56,11 @@ class Matrix4x4
 
     void SetTo(const Matrix4x4 * src);
     void SetTo(const float * data);
+
+    void BuildFromComponents(const Vector3 * translation,const Quaternion * rotation,  const Vector3 * scale);
+    void Decompose(Vector3 * translation, Quaternion * rotation, Vector3 * scale);
+
+    bool IsAffine(void) const;
 
     void MultiplyByScalar(float scalar);
 
@@ -77,6 +89,7 @@ class Matrix4x4
 
     void Translate(const Vector3 * vector);
     void Translate(float x, float y, float z);
+    void PreTranslate(const Vector3 * vector);
     void PreTranslate(float x, float y, float z);
     static void Translate(const Matrix4x4 * src, Matrix4x4 * out, const Vector3 * vector);
     static void Translate(const Matrix4x4 * src, Matrix4x4 * out,float x, float y, float z);

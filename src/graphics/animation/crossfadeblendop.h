@@ -42,6 +42,7 @@ class CrossFadeBlendOp : public BlendOp
 	void OnComplete();
 	void SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback);
 	void SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback);
+	unsigned int GetTargetIndex();
 };
 
 #endif

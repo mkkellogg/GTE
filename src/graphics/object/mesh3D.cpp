@@ -24,6 +24,7 @@ Mesh3D::Mesh3D(unsigned int subMeshCount)
 	if(subMeshCount<=0)subMeshCount=1;
 	this->subMeshCount = subMeshCount;
 	subMeshes = NULL;
+	lightCullType = LightCullType::SphereOfInfluence;
 }
 
 Mesh3D::~Mesh3D()
@@ -71,6 +72,62 @@ void Mesh3D::SendDataToRenderer(unsigned int index)
 	ASSERT_RTRN(renderer.IsValid()," Mesh3D::SendDataToRenderer -> renderer is NULL.");
 
 	renderer->UpdateFromSubMesh(index);
+}
+
+void Mesh3D::CalculateSphereOfInfluence()
+{
+	Point3 average;
+	unsigned int validSubMeshes = 0;
+	for(unsigned int i = 0; i < subMeshCount; i++)
+	{
+
+		SubMesh3DRef subMesh = subMeshes[i];
+		if(subMesh.IsValid())
+		{
+			const Point3 *temp = subMesh->GetCenter();
+			average.x += temp->x;
+			average.y += temp->y;
+			average.z += temp->z;
+			validSubMeshes++;
+		}
+	}
+
+	if(validSubMeshes > 0)
+	{
+		average.x /= (float)validSubMeshes;
+		average.y /= (float)validSubMeshes;
+		average.z /= (float)validSubMeshes;
+	}
+
+	center = average;
+
+	float maxSoiX = 0;
+	float maxSoiY = 0;
+	float maxSoiZ = 0;
+	for(unsigned int i = 0; i < subMeshCount; i++)
+	{
+		SubMesh3DRef subMesh = subMeshes[i];
+		if(subMesh.IsValid())
+		{
+			const Point3 *temp = subMesh->GetCenter();
+
+			float offsetX = GTEMath::Abs(center.x - temp->x);
+			float offsetY = GTEMath::Abs(center.y - temp->y);
+			float offsetZ = GTEMath::Abs(center.z - temp->z);
+
+			float soiX = offsetX + GTEMath::Abs(subMesh->GetSphereOfInfluenceX()->x);
+			float soiY = offsetY + GTEMath::Abs(subMesh->GetSphereOfInfluenceX()->y);
+			float soiZ = offsetZ + GTEMath::Abs(subMesh->GetSphereOfInfluenceX()->z);
+
+			if(soiX > maxSoiX)maxSoiX = soiX;
+			if(soiY > maxSoiY)maxSoiY = soiY;
+			if(soiZ > maxSoiZ)maxSoiZ = soiZ;
+		}
+	}
+
+	sphereOfInfluenceX.Set(maxSoiX,0,0);
+	sphereOfInfluenceY.Set(0,maxSoiY,0);
+	sphereOfInfluenceZ.Set(0,0,maxSoiZ);
 }
 
 void Mesh3D::Update()
@@ -130,4 +187,29 @@ bool Mesh3D::SceneObjectHasRenderer()
 	if(!IsAttachedToSceneObject())return false;
 	if(!sceneObject->GetMesh3DRenderer().IsValid())return false;
 	return true;
+}
+
+const Point3 * Mesh3D::GetCenter() const
+{
+	return &center;
+}
+
+const Vector3 * Mesh3D::GetSphereOfInfluenceX() const
+{
+	return &sphereOfInfluenceX;
+}
+
+const Vector3 * Mesh3D::GetSphereOfInfluenceY() const
+{
+	return &sphereOfInfluenceY;
+}
+
+const Vector3 * Mesh3D::GetSphereOfInfluenceZ() const
+{
+	return &sphereOfInfluenceZ;
+}
+
+LightCullType Mesh3D::GetLightCullType() const
+{
+	return lightCullType;
 }

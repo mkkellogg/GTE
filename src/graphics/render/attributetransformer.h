@@ -8,10 +8,15 @@ class VertexAttrBuffer;
 class Point3;
 
 #include "graphics/stdattributes.h"
+#include "geometry/matrix4x4.h"
 
 class AttributeTransformer
 {
+	protected:
+
 	StandardAttributeSet activeAttributes;
+	Matrix4x4 model;
+	Matrix4x4 modelInverse;
 
 	public :
 
@@ -25,6 +30,8 @@ class AttributeTransformer
 
     void SetActiveAttributes (StandardAttributeSet attributes);
     StandardAttributeSet GetActiveAttributes();
+
+    void SetModelMatrix(const Matrix4x4& model, const Matrix4x4& modelInverse);
 };
 
 #endif

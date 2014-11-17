@@ -363,7 +363,12 @@ AttributeTransformer * SubMesh3DRenderer::GetAttributeTransformer()
 	return attributeTransformer;
 }
 
-void SubMesh3DRenderer::PreRender()
+bool SubMesh3DRenderer::DoesAttributeTransform()
+{
+	return doAttributeTransform;
+}
+
+void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& modelInverse)
 {
 	MaterialRef currentMaterial = graphics->GetActiveMaterial();
 	UseMaterial(currentMaterial);
@@ -378,7 +383,7 @@ void SubMesh3DRenderer::PreRender()
 	if(doAttributeTransform)
 	{
 		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
-
+		attributeTransformer->SetModelMatrix(model, modelInverse);
 
 		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
 				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position) &&

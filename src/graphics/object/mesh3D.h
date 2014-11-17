@@ -10,6 +10,9 @@ class SceneObjectComponent;
 #include "object/engineobject.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/enginetypes.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
+#include "graphics/light/light.h"
 
 class Mesh3D : public SceneObjectComponent
 {
@@ -18,12 +21,20 @@ class Mesh3D : public SceneObjectComponent
 
 	protected :
 
+	LightCullType lightCullType;
+
+	Point3 center;
+	Vector3 sphereOfInfluenceX;
+	Vector3 sphereOfInfluenceY;
+	Vector3 sphereOfInfluenceZ;
+
 	unsigned int subMeshCount;
 	SubMesh3DRef * subMeshes;
 
     Mesh3D(unsigned int subMeshCount);
     ~Mesh3D();
     void SendDataToRenderer(unsigned int subIndex);
+    void CalculateSphereOfInfluence();
 
 	public:
 
@@ -35,6 +46,12 @@ class Mesh3D : public SceneObjectComponent
 
     bool IsAttachedToSceneObject();
     bool SceneObjectHasRenderer();
+
+    const Point3 * GetCenter() const;
+    const Vector3 * GetSphereOfInfluenceX() const;
+    const Vector3 * GetSphereOfInfluenceY() const;
+    const Vector3 * GetSphereOfInfluenceZ() const;
+    LightCullType GetLightCullType() const;
 };
 
 #endif

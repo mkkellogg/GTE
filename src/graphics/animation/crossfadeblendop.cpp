@@ -78,3 +78,11 @@ void CrossFadeBlendOp::SetOnCompleteCallback(std::function<void(CrossFadeBlendOp
 	this->completeCallback = callback;
 }
 
+/*
+ * Get the target animation index for this cross fade operation.
+ */
+unsigned int CrossFadeBlendOp::GetTargetIndex()
+{
+	return targetIndex;
+}
+

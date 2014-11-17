@@ -59,14 +59,14 @@ RenderManager::~RenderManager()
  */
 bool RenderManager::Init()
 {
-	viewTransformStack = new DataStack<float>(Constants::MaxObjectRecursionDepth, 16);
+	viewTransformStack = new DataStack<Matrix4x4>(Constants::MaxObjectRecursionDepth, 1);
 	if(!viewTransformStack->Init())
 	{
 		Debug::PrintError("RenderManager::Init -> unable to allocate view transform stack.");
 		return false;
 	}
 
-	modelTransformStack = new DataStack<float>(Constants::MaxObjectRecursionDepth, 16);
+	modelTransformStack = new DataStack<Matrix4x4>(Constants::MaxObjectRecursionDepth, 1);
 	if(!modelTransformStack->Init())
 	{
 		Debug::PrintError("RenderManager::Init -> unable to allocate model transform stack.");
@@ -96,7 +96,7 @@ void RenderManager::ClearBuffersForCamera(const Camera * camera) const
  * Save a transform to the transform stack. This method is used to to save transformations
  * as the render manager progresses through the object tree that makes up the scene.
  */
-void RenderManager::PushTransformData(const Transform * transform, DataStack<float> * transformStack)
+void RenderManager::PushTransformData(const Transform * transform, DataStack<Matrix4x4> * transformStack)
 {
 	if(transform == NULL)
 	{
@@ -108,13 +108,13 @@ void RenderManager::PushTransformData(const Transform * transform, DataStack<flo
 		Debug::PrintError("RenderManager::PushTransformData -> transformStack is NULL.");
 		return;
 	}
-	transformStack->Push(transform->GetMatrix()->GetDataPtr());
+	transformStack->Push(&transform->matrix);
 }
 
 /*
  * Remove the top transform from the transform stack.
  */
-void RenderManager::PopTransformData(const Transform * transform, DataStack<float> * transformStack)
+void RenderManager::PopTransformData(Transform * transform, DataStack<Matrix4x4> * transformStack)
 {
 	if(transform == NULL)
 	{
@@ -126,15 +126,14 @@ void RenderManager::PopTransformData(const Transform * transform, DataStack<floa
 		Debug::PrintError("RenderManager::PopTransformData -> transformStack is NULL.");
 		return;
 	}
-	float * data = transformStack->Pop();
-	Matrix4x4 * mat = const_cast<Matrix4x4 *>(transform->GetMatrix());
-	if(data != NULL)mat->SetTo(data);
+	Matrix4x4 * mat = transformStack->Pop();
+	transform->SetTo(mat);
 }
 
 /*
  * Get the number of entries stored on the transform stack.
  */
-unsigned int RenderManager::RenderDepth(const DataStack<float> * transformStack) const
+unsigned int RenderManager::RenderDepth(const DataStack<Matrix4x4> * transformStack) const
 {
 	if(transformStack == NULL)return Constants::MaxObjectRecursionDepth;
 	return transformStack->GetEntryCount();
@@ -292,6 +291,10 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTransformInverse, Camera * camera)
 {
 	Transform modelView;
+	Transform modelViewInverse;
+	Transform model;
+	Transform modelInverse;
+
 
 	renderedObjects.clear();
 
@@ -366,9 +369,15 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 
 						if(doRender)
 						{
-							modelView.SetTo(child->GetProcessingTransform());
+							model.SetTo(child->GetProcessingTransform());
+							modelInverse.SetTo(&model);
+							modelInverse.Invert();
+
+							modelView.SetTo(&model);
 							// concatenate modelTransform with inverted viewTransform
 							modelView.PreTransformBy(viewTransformInverse);
+							modelViewInverse.SetTo(&modelView);
+							modelViewInverse.Invert();
 
 							// activate the material, which will switch the GPU's active shader to
 							// the one associated with the material
@@ -378,7 +387,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 							SendTransformUniformsToShader(&modelTransform, &modelView, camera->GetProjectionTransform());
 							SendCustomUniformsToShader();
 
-							subRenderer->PreRender();
+							subRenderer->PreRender(model.matrix, modelInverse.matrix);
 
 							// loop through each active light and render sub mesh for that light, if in range
 							for(unsigned int l = 0; l < lightCount; l++)
@@ -411,15 +420,15 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 								}
 
 								Point3 lightPosition;
-								sceneLights[l].transform.GetMatrix()->Transform(&lightPosition);
+								sceneLights[l].transform.TransformPoint(&lightPosition);
 
 								SceneObjectTransform full;
 
 								// get the full transform of the scene object, including those of all ancestors
-								child->GetFullTransform(&full);
+								child->InitSceneObjectTransform(&full);
 
 								// check if this mesh should be culled from this light.
-								if(!ShouldCullFromLight(*light, lightPosition, full, *subMesh, *subRenderer))
+								if(!ShouldCullFromLight(*light, lightPosition, full, *mesh))
 								{
 									// send light data to the active shader
 									currentMaterial->SendLightToShader(light, &lightPosition);
@@ -449,10 +458,9 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 }
 
 /*
- * Check if [mesh] should be rendered with [light], based
- * on its distance from [lightPosition].
+ * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].
  */
-bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer)
+bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh)
 {
 	switch(mesh.GetLightCullType())
 	{
@@ -460,10 +468,10 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Tra
 			return false;
 		break;
 		case LightCullType::SphereOfInfluence:
-			return ShouldCullBySphereOfInfluence(light, lightPosition, fullTransform, mesh, renderer);
+			return ShouldCullBySphereOfInfluence(light, lightPosition, fullTransform, mesh);
 		break;
 		case LightCullType::Tiled:
-			return ShouldCullByTile(light, lightPosition, fullTransform, mesh, renderer);
+			return ShouldCullByTile(light, lightPosition, fullTransform, mesh);
 		break;
 		default:
 			return false;
@@ -474,12 +482,12 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Tra
 }
 
 /*
- * Cull light based on distance of [mesh] from [light]. Each mesh has
+ * Cull light based on distance of center of [mesh] from [light]. Each mesh has
  * a sphere of influence based on maximum distance of the mesh's vertices from the mesh's center. If that
  * sphere does not intersect with the sphere that is formed by the light's range, then the light should
  * be culled from the meshes.
  */
-bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer)
+bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh)
 {
 	// get the maximum distances from mesh center along each axis
 	Vector3 soiX = *(mesh.GetSphereOfInfluenceX());
@@ -488,9 +496,9 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 
 	// transform each distance vector by the full transform of the scene
 	// object that contains [mesh]
-	fullTransform.GetMatrix()->Transform(&soiX);
-	fullTransform.GetMatrix()->Transform(&soiY);
-	fullTransform.GetMatrix()->Transform(&soiZ);
+	fullTransform.TransformVector(&soiX);
+	fullTransform.TransformVector(&soiY);
+	fullTransform.TransformVector(&soiZ);
 
 	// get length of each transformed vector
 	float xMag = soiX.QuickMagnitude();
@@ -504,9 +512,8 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 	if(zMag > meshMag)meshMag = zMag;
 
 	Vector3 toLight;
-	//Point3 meshCenter = *(mesh.GetCenter());
-	Point3 meshCenter = *(renderer.GetFinalCenter());
-	fullTransform.GetMatrix()->Transform(&meshCenter);
+	Point3 meshCenter = *(mesh.GetCenter());
+	fullTransform.TransformPoint(&meshCenter);
 
 	// get the distance from the light to the mesh's center
 	Point3::Subtract(&lightPosition, &meshCenter, &toLight);
@@ -522,7 +529,7 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 /*
  * Tile-based culling - needs to be implemented!
  */
-bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform, SubMesh3D& mesh,  SubMesh3DRenderer& renderer)
+bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh)
 {
 	return false;
 }
@@ -542,10 +549,10 @@ void RenderManager::SendTransformUniformsToShader(const Transform * model, const
 	mvpTransform.TransformBy(modelView);
 	mvpTransform.TransformBy(projection);
 
-	activeMaterial->SendModelMatrixToShader(model->GetMatrix());
-	activeMaterial->SendModelViewMatrixToShader(modelView->GetMatrix());
-	activeMaterial->SendProjectionMatrixToShader(projection->GetMatrix());
-	activeMaterial->SendMVPMatrixToShader(mvpTransform.GetMatrix());
+	activeMaterial->SendModelMatrixToShader(&model->matrix);
+	activeMaterial->SendModelViewMatrixToShader(&modelView->matrix);
+	activeMaterial->SendProjectionMatrixToShader(&projection->matrix);
+	activeMaterial->SendMVPMatrixToShader(&mvpTransform.matrix);
 }
 
 /*

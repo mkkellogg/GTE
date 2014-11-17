@@ -55,6 +55,15 @@ void AnimationPlayer::QueueBlendOperation(BlendOp * op)
 }
 
 /*
+ * Get the currently active blend operation, if there is one. If there isn't one,
+ * return NULL;
+ */
+BlendOp * AnimationPlayer::GetCurrentBlendOp()
+{
+	if(activeBlendOperations.size() > 0)return activeBlendOperations.front();
+	return NULL;
+}
+/*
  * Update & drive the blending operation that is at the head of the queue of
  * active blending operations.
  */
@@ -85,9 +94,10 @@ void AnimationPlayer::UpdateBlending()
 		// trigger OnComplete callback and deallocate blending operation, if appropriate
 		if(op->HasCompleted())
 		{
-			activeBlendOperations.pop();
 			op->OnComplete();
+			activeBlendOperations.pop();
 			delete op;
+
 		}
 	}
 }
@@ -530,6 +540,7 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
 
 		registeredAnimations.push_back(instance);
 		animationWeights.push_back(0);
+		crossFadeTargets.push_back(false);
 
 		animationIndexMap[animation->GetObjectID()] = animationCount;
 		animationCount++;
@@ -545,29 +556,37 @@ void AnimationPlayer::Play(AnimationRef animation)
 	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
-
-		float tempLeftOver = 1;
-		for(unsigned int i = 0; i < registeredAnimations.size(); i++)
-		{
-			AnimationInstanceRef instance = registeredAnimations[i];
-
-			if(i != targetIndex)
-			{
-				instance->Stop();
-				animationWeights[i] = 0;
-			}
-			else
-			{
-				animationWeights[i] = 1;
-				instance->Play();
-			}
-
-			tempLeftOver -= animationWeights[1];
-		}
-		if(tempLeftOver < 0)tempLeftOver = 0;
-		leftOverWeight = tempLeftOver;
-		playingAnimationsCount = 1;
+		Play(targetIndex);
 	}
+}
+
+/*
+ * Start or resume playback of registered animation at [animationIndex].
+ */
+void AnimationPlayer::Play(unsigned int animationIndex)
+{
+	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Play -> invalid animation index.");
+
+	float tempLeftOver = 1;
+	for(unsigned int i = 0; i < registeredAnimations.size(); i++)
+	{
+		AnimationInstanceRef instance = registeredAnimations[i];
+
+		if(i != animationIndex)
+		{
+			instance->Stop();
+			animationWeights[i] = 0;
+		}
+		else
+		{
+			animationWeights[i] = 1;
+			instance->Play();
+		}
+
+		tempLeftOver -= animationWeights[1];
+	}
+	if(tempLeftOver < 0)tempLeftOver = 0;
+	playingAnimationsCount = 1;
 }
 
 /*
@@ -581,15 +600,24 @@ void AnimationPlayer::Stop(AnimationRef animation)
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
 		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index found in index map.");
 
-		AnimationInstanceRef instance = registeredAnimations[targetIndex];
-		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Stop -> Target animation is invalid.");
-
-		if(instance->Playing)playingAnimationsCount--;
-		instance->Stop();
-
-		leftOverWeight += animationWeights[targetIndex];
-		animationWeights[targetIndex] = 0;
+		Stop(targetIndex);
 	}
+}
+
+/*
+ * Stop playback of registered animation at [animationIndex].
+ */
+void AnimationPlayer::Stop(unsigned int  animationIndex)
+{
+	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index.");
+
+	AnimationInstanceRef instance = registeredAnimations[animationIndex];
+	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Stop -> Target animation is invalid.");
+
+	if(instance->Playing)playingAnimationsCount--;
+	instance->Stop();
+
+	animationWeights[animationIndex] = 0;
 }
 
 /*
@@ -603,11 +631,21 @@ void AnimationPlayer::Pause(AnimationRef animation)
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
 		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index found in index map.");
 
-		AnimationInstanceRef instance = registeredAnimations[targetIndex];
-		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Pause -> Target animation is invalid.");
-
-		instance->Pause();
+		Pause(targetIndex);
 	}
+}
+
+/*
+ * Pause playback of registered animation at [animationIndex].
+ */
+void AnimationPlayer::Pause(unsigned int  animationIndex)
+{
+	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index.");
+
+	AnimationInstanceRef instance = registeredAnimations[animationIndex];
+	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Pause -> Target animation is invalid.");
+
+	instance->Pause();
 }
 
 /*
@@ -628,6 +666,19 @@ void AnimationPlayer::Resume(AnimationRef animation)
 	}
 }
 
+/*
+ * Resume playback of registered animation at [animationIndex].
+ */
+void AnimationPlayer::Resume(unsigned int  animationIndex)
+{
+	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Resume -> invalid animation index.");
+
+	AnimationInstanceRef instance = registeredAnimations[animationIndex];
+	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Resume -> Target animation is invalid.");
+
+	instance->Play();
+}
+
 void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 {
 	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
@@ -638,9 +689,7 @@ void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 		AnimationInstanceRef instance = registeredAnimations[targetIndex];
 		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CrossFade -> Target animation is invalid.");
 
-		if(!(instance->Playing))playingAnimationsCount++;
-		instance->Reset();
-		instance->Play();
+		if(crossFadeTargets[targetIndex] == 1)return;
 
 		CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
 		ASSERT_RTRN(blendOp, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
@@ -648,15 +697,38 @@ void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 		bool initSuccess = blendOp->Init(animationWeights);
 		if(!initSuccess)
 		{
-			Debug::PrintError("AnimationPlayer::CrossFade -> Unable to Init new CrossFadeBlendOp object.");
+			Debug::PrintError("AnimationPlayer::CrossFade -> Unable to init new CrossFadeBlendOp object.");
 			delete blendOp;
 			return;
 		}
 
+		crossFadeTargets[targetIndex] = 1;
+		blendOp->SetOnStartCallback([targetIndex, this](CrossFadeBlendOp * op)
+		{
+			AnimationInstanceRef instance = registeredAnimations[targetIndex];
+			if(!instance.IsValid())
+			{
+				Debug::PrintError("AnimationPlayer::CrossFade::SetOnStartCallback -> Invalid target animation.");
+				return;
+			}
+
+			bool initSuccess = op->Init(animationWeights);
+			if(!initSuccess)
+			{
+				Debug::PrintError("AnimationPlayer::CrossFade::SetOnStartCallback -> Unable to init CrossFadeBlendOp object.");
+				return;
+			}
+
+			if(!instance->Playing)
+			{
+				playingAnimationsCount++;
+				instance->Reset();
+				instance->Play();
+			}
+		});
+
 		blendOp->SetOnCompleteCallback([targetIndex, this](CrossFadeBlendOp * op)
 		{
-			playingAnimationsCount = 1;
-
 			for(unsigned int i = 0; i < registeredAnimations.size(); i++)
 			{
 				if(i != targetIndex)
@@ -668,10 +740,19 @@ void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 						continue;
 					}
 
-					if(instance->Playing)instance->Stop();
+					Stop(i);
+					animationWeights[i] = 0;
+				}
+				else
+				{
+					animationWeights[i] = 1;
 				}
 			}
+
+			crossFadeTargets[targetIndex] = 0;
+			playingAnimationsCount = 1;
 		});
+
 
 		QueueBlendOperation(blendOp);
 	}

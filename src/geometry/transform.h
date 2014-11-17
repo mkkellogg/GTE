@@ -18,6 +18,9 @@ class Transform;
 
 class Transform
 {
+	// give access to the transform's matrix
+	friend class RenderManager;
+
 	protected:
 
 	Matrix4x4 matrix;
@@ -29,10 +32,11 @@ class Transform
     Transform(Transform *);
     virtual ~Transform();
 
-    const  Matrix4x4 * GetMatrix() const ;
+    void CopyMatrix(Matrix4x4 * dest) const;
     void SetTo(const Matrix4x4 * matrix);
     void SetTo(const Transform * transform);
     void SetTo(const Transform& transform);
+    void SetTo(const float * matrixData);
 
     void SetIdentity();
     void Invert();
@@ -46,6 +50,7 @@ class Transform
     void PreTransformBy(const Transform& transform);
 
     virtual void Translate(float x, float y, float z, bool local);
+    virtual void Translate(Vector3 * vector, bool local);
     virtual void RotateAround(Point3 * point, Vector3 * axis, float angle);
     virtual void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
     virtual void Scale(Vector3 * mag,  bool local);
@@ -59,6 +64,7 @@ class Transform
 
     void TransformVector(Vector3 * vector) const;
     void TransformPoint(Point3 * point3) const;
+    void TransformVector4f(float * vector) const;
 };
 
 #endif
