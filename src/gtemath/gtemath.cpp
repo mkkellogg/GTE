@@ -49,6 +49,11 @@ float GTEMath::Cos(float n)
 	return cos(n);
 }
 
+float GTEMath::ACos(float n)
+{
+	return acos(n);
+}
+
 float GTEMath::Sin(float n)
 {
 	return sin(n);

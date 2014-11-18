@@ -23,21 +23,17 @@ Mesh3D::Mesh3D(unsigned int subMeshCount)
 {
 	if(subMeshCount<=0)subMeshCount=1;
 	this->subMeshCount = subMeshCount;
-	subMeshes = NULL;
 	lightCullType = LightCullType::SphereOfInfluence;
 }
 
 Mesh3D::~Mesh3D()
 {
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	if(subMeshes != NULL)
-	{
-		for(unsigned int i =0; i < subMeshCount; i++)
-		{
-			objectManager->DestroySubMesh3D(subMeshes[i]);
-		}
-		SAFE_DELETE(subMeshes);
-	}
+	Destroy();
+}
+
+void Mesh3D::Destroy()
+{
+	subMeshes.clear();
 }
 
 unsigned int Mesh3D::GetSubMeshCount()
@@ -47,11 +43,12 @@ unsigned int Mesh3D::GetSubMeshCount()
 
 bool Mesh3D::Init()
 {
-	subMeshes = new SubMesh3DRef[subMeshCount];
-	ASSERT(subMeshes != NULL," Mesh3D::Init -> Could not allocate sub meshes.",false);
-
-	memset(subMeshes, 0, sizeof(SubMesh3D*) * subMeshCount);
-
+	Destroy();
+	//subMeshes.reserve(subMeshCount);
+	for(unsigned int i = 0; i < subMeshCount; i++)
+	{
+		subMeshes.push_back(SubMesh3DRef::Null());
+	}
 	return true;
 }
 
@@ -67,6 +64,8 @@ void Mesh3D::SendDataToRenderer(unsigned int index)
 
 	SubMesh3DRef subMesh = subMeshes[index];
 	ASSERT_RTRN(subMesh.IsValid()," Mesh3D::SendDataToRenderer -> subMesh is NULL.");
+
+	ASSERT_RTRN(IsAttachedToSceneObject()," Mesh3D::SendDataToRenderer -> Mesh is not attached to a scene object.");
 
 	Mesh3DRendererRef renderer = sceneObject->GetMesh3DRenderer();
 	ASSERT_RTRN(renderer.IsValid()," Mesh3D::SendDataToRenderer -> renderer is NULL.");
@@ -132,8 +131,6 @@ void Mesh3D::CalculateSphereOfInfluence()
 
 void Mesh3D::Update()
 {
-	ASSERT_RTRN(subMeshes != NULL," Mesh3D::Update -> subMeshes is NULL.");
-
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
 		if(subMeshes[i].IsValid())
@@ -146,7 +143,6 @@ void Mesh3D::Update()
 void Mesh3D::SetSubMesh(SubMesh3DRef mesh, unsigned int index)
 {
 	ASSERT_RTRN(mesh.IsValid(),"Mesh3D::SetSubMesh -> mesh is NULL.");
-	ASSERT_RTRN(subMeshes != NULL,"Mesh3D::SetSubMesh -> subMeshes is NULL.");
 
 	if(index < subMeshCount)
 	{
@@ -164,8 +160,6 @@ void Mesh3D::SetSubMesh(SubMesh3DRef mesh, unsigned int index)
 
 SubMesh3DRef Mesh3D::GetSubMesh(unsigned int index)
 {
-	ASSERT(subMeshes != NULL,"Mesh3D::GetSubMesh -> subMeshes is NULL.", SubMesh3DRef::Null());
-
 	if(index < subMeshCount)
 	{
 		return subMeshes[index];

@@ -13,6 +13,7 @@ class SceneObjectComponent;
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/light/light.h"
+#include <vector>
 
 class Mesh3D : public SceneObjectComponent
 {
@@ -29,10 +30,12 @@ class Mesh3D : public SceneObjectComponent
 	Vector3 sphereOfInfluenceZ;
 
 	unsigned int subMeshCount;
-	SubMesh3DRef * subMeshes;
+	std::vector<SubMesh3DRef> subMeshes;
 
     Mesh3D(unsigned int subMeshCount);
     ~Mesh3D();
+    void Destroy();
+
     void SendDataToRenderer(unsigned int subIndex);
     void CalculateSphereOfInfluence();
 

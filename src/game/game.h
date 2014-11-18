@@ -34,6 +34,7 @@ class Game
 	void UpdatePlayerAnimation();
 	void UpdatePlayerPosition();
 	void UpdatePlayerLookDirection();
+	void UpdatePlayerFollowCamera();
 
     public:
 

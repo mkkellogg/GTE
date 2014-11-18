@@ -234,7 +234,6 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		ClearTransformedBoneFlagsArray();
 
 		Matrix4x4 temp;
-
 		// used to store full transformation for a vertex
 		Matrix4x4 full;
 
@@ -315,11 +314,10 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 						if(bone->Node->HasTarget())
 						{
 							const Transform * targetFull = bone->Node->GetFullTransform();
-							Matrix4x4 fullMatrix;
-							targetFull->CopyMatrix(&fullMatrix);
+							targetFull->CopyMatrix(&temp);
 
 							// store final transformation for this bone in bone->TempFullMatrix
-							bone->TempFullMatrix.PreMultiply(&fullMatrix);
+							bone->TempFullMatrix.PreMultiply(&temp);
 							bone->TempFullMatrix.PreMultiply(&modelInverse);
 						}
 
@@ -419,10 +417,9 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 						if(bone->Node->HasTarget())
 						{
 							const Transform * targetFull = bone->Node->GetFullTransform();
-							Matrix4x4 fullMatrix;
-							targetFull->CopyMatrix(&fullMatrix);
+							targetFull->CopyMatrix(&temp);
 
-							bone->TempFullMatrix.PreMultiply(&fullMatrix);
+							bone->TempFullMatrix.PreMultiply(&temp);
 						}
 
 						averageBoneOffset.Add(&bone->OffsetMatrix);

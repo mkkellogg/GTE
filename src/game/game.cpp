@@ -60,7 +60,7 @@ Game::Game()
 
 	walkSpeed = 3.0;
 	runSpeed = 6.0;
-	rotateSpeed = 100;
+	rotateSpeed = 200;
 	speedSmoothing = 10;
 
 	basePlayerForward = Vector3(0,0,1);
@@ -92,6 +92,14 @@ void Game::Init()
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
+	Mesh3DRendererRef renderer;
+	SceneObjectRef sceneObject;
+	TextureAttributes texAttributes;
+	TextureRef texture;
+	Mesh3DRef mesh;
+	StandardAttributeSet meshAttributes;
+	SceneObjectRef childSceneObject;
+
 	cameraObject = objectManager->CreateSceneObject();
 	CameraRef camera = objectManager->CreateCamera();
 	cameraObject->GetLocalTransform().Translate(0, 5, 25, true);
@@ -101,33 +109,32 @@ void Game::Init()
 	cameraObject->SetCamera(camera);
 
 
-	SceneObjectRef sceneObject = objectManager->CreateSceneObject();
+	sceneObject = objectManager->CreateSceneObject();
 	sceneObject->GetLocalTransform().Scale(3,3,3, true);
 	sceneObject->GetLocalTransform().RotateAround(0, 0, 0, 0, 1, 0, 45);
 	sceneObject->GetLocalTransform().Translate(-15, 0, -12, false);
 
-	TextureAttributes texAttributes;
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	TextureRef texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
+	texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
 
 	MaterialRef material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 	material->SetTexture(texture, "TEXTURE0");
 
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+    renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
 	sceneObject->SetMesh3DRenderer(renderer);
 
-	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
+	meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
-	Mesh3DRef mesh = GameUtil::CreateCubeMesh(meshAttributes);
+	mesh = GameUtil::CreateCubeMesh(meshAttributes);
 	sceneObject->SetMesh3D(mesh);
 
-	SceneObjectRef childSceneObject = objectManager->CreateSceneObject();
+	childSceneObject = objectManager->CreateSceneObject();
 	sceneObject->AddChild(childSceneObject);
 
 	childSceneObject->SetMesh3D(mesh);
@@ -139,11 +146,14 @@ void Game::Init()
 
 
 
+
 	AssetImporter * importer = new AssetImporter();
 	SceneObjectRef modelSceneObject;
 
-	modelSceneObject = importer->LoadModelDirect("../../models/houseA/houseA_obj.obj", 1 );
 
+
+
+	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/island/island.fbx", 1 );
 	if(modelSceneObject.IsValid())
 	{
 		modelSceneObject->SetActive(true);
@@ -153,13 +163,12 @@ void Game::Init()
 		Debug::PrintError(" >> could not load model!\n");
 		return;
 	}
-	modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0, 90);
-	modelSceneObject->GetLocalTransform().Translate(10,0,-12,false);
-	modelSceneObject->GetLocalTransform().Scale(.10,.10,.10, true);
+	modelSceneObject->GetLocalTransform().Translate(0,-10,0,false);
+	modelSceneObject->GetLocalTransform().Scale(.05,.05,.05, true);
 
 
 
-	modelSceneObject = importer->LoadModelDirect("../../models/Rck-Wtrfll_dae/Rck-Wtrfll_dae.dae", 1 );
+	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/castle/Tower_01.fbx", 1 );
 	if(modelSceneObject.IsValid())
 	{
 		modelSceneObject->SetActive(true);
@@ -169,8 +178,8 @@ void Game::Init()
 		Debug::PrintError(" >> could not load model!\n");
 		return;
 	}
-	modelSceneObject->GetLocalTransform().Translate(0,0,-12,false);
-	modelSceneObject->GetLocalTransform().Scale(13,13,13, true);
+	modelSceneObject->GetLocalTransform().Translate(10,-10,-10,false);
+	modelSceneObject->GetLocalTransform().Scale(.05,.05,.05, true);
 
 
 
@@ -186,7 +195,7 @@ void Game::Init()
 	}
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
-	playerObject->GetLocalTransform().Translate(0,-2,-2,false);
+	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
 	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
 
 
@@ -221,34 +230,84 @@ void Game::Init()
 	SceneObjectRef lightObject;
 	LightRef light;
 
-	lightObject = objectManager->CreateSceneObject();
-	lightObject->GetLocalTransform().Translate(0, 25, 15, false);
+	meshAttributes = StandardAttributes::CreateAttributeSet();
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
+	mesh = GameUtil::CreateCubeMesh(meshAttributes);
+
+	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", "resources/builtin/selflit.vertex.shader","resources/builtin/selflit.fragment.shader");
+
+
+
+	sceneObject = objectManager->CreateSceneObject();
+	renderer = objectManager->CreateMesh3DRenderer();
+	renderer->AddMaterial(selflitMaterial);
+	sceneObject->SetMesh3DRenderer(renderer);
+
 	light = objectManager->CreateLight();
 	light->SetDirection(1,-1,-1);
 	light->SetIntensity(2);
 	light->SetRange(30);
-	lightObject->SetLight(light);
+	sceneObject->SetLight(light);
 
-	lightObject = objectManager->CreateSceneObject();
-	lightObject->GetLocalTransform().Translate(0, 15, -10, false);
+	sceneObject->SetMesh3D(mesh);
+	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
+	sceneObject->GetLocalTransform().Translate(0, 10, 30, false);
+
+
+
+	sceneObject = objectManager->CreateSceneObject();
+	renderer = objectManager->CreateMesh3DRenderer();
+	renderer->AddMaterial(selflitMaterial);
+	sceneObject->SetMesh3DRenderer(renderer);
+
 	light = objectManager->CreateLight();
 	light->SetDirection(1,-1,-1);
 	light->SetIntensity(2);
-	lightObject->SetLight(light);
+	light->SetRange(45);
+	sceneObject->SetLight(light);
 
-	lightObject = objectManager->CreateSceneObject();
-	lightObject->GetLocalTransform().Translate(-15, -3, 5, false);
+	sceneObject->SetMesh3D(mesh);
+	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
+	sceneObject->GetLocalTransform().Translate(-2, 10, -10, false);
+
+
+
+
+	sceneObject = objectManager->CreateSceneObject();
+	renderer = objectManager->CreateMesh3DRenderer();
+	renderer->AddMaterial(selflitMaterial);
+	sceneObject->SetMesh3DRenderer(renderer);
+
 	light = objectManager->CreateLight();
 	light->SetDirection(1,-1,-1);
 	light->SetIntensity(2);
-	lightObject->SetLight(light);
+	light->SetRange(45);
+	sceneObject->SetLight(light);
 
-	lightObject = objectManager->CreateSceneObject();
-	lightObject->GetLocalTransform().Translate(15, -3, 5, false);
+	sceneObject->SetMesh3D(mesh);
+	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
+	sceneObject->GetLocalTransform().Translate(-30, -3, 5, false);
+
+
+
+
+	sceneObject = objectManager->CreateSceneObject();
+	renderer = objectManager->CreateMesh3DRenderer();
+	renderer->AddMaterial(selflitMaterial);
+	sceneObject->SetMesh3DRenderer(renderer);
+
 	light = objectManager->CreateLight();
 	light->SetDirection(1,-1,-1);
 	light->SetIntensity(2);
-	lightObject->SetLight(light);
+	light->SetRange(45);
+	sceneObject->SetLight(light);
+
+	sceneObject->SetMesh3D(mesh);
+	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
+	sceneObject->GetLocalTransform().Translate(30, -3, 5, false);
+
+
 
 	InitializePlayerPosition();
 }
@@ -288,6 +347,7 @@ void Game::Update()
 	UpdatePlayerAnimation();
 	UpdatePlayerPosition();
 	UpdatePlayerLookDirection();
+	UpdatePlayerFollowCamera();
 }
 
 void Game::UpdatePlayerMovementDirection()
@@ -314,7 +374,7 @@ void Game::UpdatePlayerMovementDirection()
 	cameraForward.Normalize();
 
 	Vector3 cameraRight;
-	cameraRight.Set(-cameraForward.z, 0, cameraForward.x);
+	Vector3::Cross(&cameraForward, &Vector3::Up, &cameraRight);
 
 	float h = 0;
 	float v = 0;
@@ -337,15 +397,22 @@ void Game::UpdatePlayerMovementDirection()
 	Vector3::Add(&cameraRightScaled, &cameraForwardScaled, &targetDirection);
 	targetDirection.Normalize();
 
-	Vector3 forward(0,0,1);
 
 	if(targetDirection.x != 0 || targetDirection.y != 0 || targetDirection.z != 0)
 	{
-		Vector3::RotateTowards(&lookDirection, &targetDirection, rotateSpeed * Time::GetDeltaTime(), &moveDirection);
+		//float dot = Vector3::Dot(&lookDirection, &targetDirection);
+
+		bool success = Vector3::RotateTowards(&lookDirection, &targetDirection,  rotateSpeed * Time::GetDeltaTime(), &moveDirection);
+
+		if(!success)
+		{
+			Vector3::Cross(&Vector3::Up, &lookDirection, &targetDirection);
+			Vector3::RotateTowards(&lookDirection, &targetDirection,  rotateSpeed * Time::GetDeltaTime(), &moveDirection);
+		}
+
+
 		lookDirection = moveDirection;
 	}
-
-	if(Vector3::Dot(&lookDirection, &targetDirection) > .9999)lookDirection = targetDirection;
 
 	if(isGrounded)
 	{
@@ -375,8 +442,8 @@ void Game::UpdatePlayerPosition()
 
 void Game::UpdatePlayerLookDirection()
 {
-	if(lookDirection.SquareMagnitude() > .001)
-	{
+//	if(lookDirection.SquareMagnitude() > .00001)
+	//{
 		SceneObjectTransform playerTransform;
 		playerObject->InitSceneObjectTransform(&playerTransform);
 
@@ -397,8 +464,8 @@ void Game::UpdatePlayerLookDirection()
 		lookDirection.y = 0;
 		lookDirection.Normalize();
 
-		float diff = Vector3::Dot(&playerForward, &lookDirection);
-		if(diff >= .9999)return;
+		//float diff = Vector3::Dot(&playerForward, &lookDirection);
+		//if(diff >= .9999)return;
 
 		Quaternion modRotation = Quaternion::getRotation(basePlayerForward, lookDirection, localAxis);
 		modRotation.normalize();
@@ -408,10 +475,8 @@ void Game::UpdatePlayerLookDirection()
 		Vector3 currentScale;
 
 		playerTransform.GetLocalComponents(&currentTranslation, &currentRotation, &currentScale);
-
-		currentRotation = modRotation;
-		playerTransform.SetLocalComponents(&currentTranslation, &currentRotation, &currentScale);
-	}
+		playerTransform.SetLocalComponents(&currentTranslation, &modRotation, &currentScale);
+	//}
 }
 
 void Game::UpdatePlayerAnimation()
@@ -424,4 +489,74 @@ void Game::UpdatePlayerAnimation()
 	{
 		animationPlayer->CrossFade(koopaWait, .3);
 	}
+}
+
+void Game::UpdatePlayerFollowCamera()
+{
+	Point3 cameraPos;
+	Point3 playerPos;
+	Point3 playerPosCameraLookTarget;
+	Point3 playerPosCameraMoveTarget;
+	Vector3 cameraForward;
+
+	SceneObjectTransform cameraTransform;
+	cameraObject->InitSceneObjectTransform(&cameraTransform);
+	cameraTransform.TransformPoint(&cameraPos);
+	cameraForward = baseCameraForward;
+	cameraTransform.TransformVector(&cameraForward);
+	cameraForward.Normalize();
+
+	SceneObjectTransform playerTransform;
+	playerObject->InitSceneObjectTransform(&playerTransform);
+	playerTransform.TransformPoint(&playerPos);
+
+	playerPosCameraLookTarget = playerPos;
+	playerPosCameraMoveTarget = playerPos;
+
+	playerPosCameraLookTarget.y = cameraPos.y;
+	playerPosCameraMoveTarget.y = playerPos.y + 10;
+
+	Vector3 cameraToPlayerLook;
+	Point3::Subtract(&playerPosCameraLookTarget, &cameraPos, &cameraToPlayerLook);
+
+	Vector3 cameraToPlayerMove;
+	Point3::Subtract(&playerPosCameraMoveTarget, &cameraPos, &cameraToPlayerMove);
+	cameraToPlayerMove.y=0;
+
+	float desiredFollowDistance = 30;
+	float currentDistance = cameraToPlayerMove.Magnitude();
+
+	float scaleFactor = desiredFollowDistance;
+	if(currentDistance != 0)scaleFactor = desiredFollowDistance/currentDistance;
+
+	Vector3 newCameraToPlayer = cameraToPlayerMove;
+	newCameraToPlayer.Scale(scaleFactor);
+	newCameraToPlayer.Invert();
+
+	Point3 cameraTarget;
+	Point3::Add(&playerPosCameraMoveTarget, &newCameraToPlayer, &cameraTarget);
+
+	Point3 newCameraPos;
+	Point3::Lerp(&cameraPos, &cameraTarget, &newCameraPos, .4 * Time::GetDeltaTime());
+
+	Vector3 cameraMove;
+	Point3::Subtract(&newCameraPos, &cameraPos, &cameraMove);
+
+
+	cameraToPlayerMove.Normalize();
+
+	Quaternion cameraRotationA;
+	cameraRotationA = Quaternion::getRotation(baseCameraForward,cameraToPlayerLook);
+	cameraRotationA.normalize();
+
+	Quaternion currentRotation;
+	Vector3 currentTranslation;
+	Vector3 currentScale;
+
+	cameraTransform.GetLocalComponents(&currentTranslation, &currentRotation, &currentScale);
+	cameraTransform.SetLocalComponents(&currentTranslation, &cameraRotationA, &currentScale);
+
+	cameraObject->GetLocalTransform().Translate(&cameraMove, false);
+
+
 }

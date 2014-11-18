@@ -198,6 +198,7 @@ void Matrix4x4::Decompose(Vector3 * translation, Quaternion * rotation, Vector3 
 	scale->z = rightMatrix.C2;
 
 	Vector3 shear;
+
 	// the shear component
 	float fInvD0 = 1.0f/scale->x;
 	shear.x = rightMatrix.A1*fInvD0;
@@ -205,7 +206,6 @@ void Matrix4x4::Decompose(Vector3 * translation, Quaternion * rotation, Vector3 
 	shear.z = rightMatrix.B2/scale->y;
 
 	rotation->FromMatrix(rotMatrix);
-
 	translation->Set(A3, B3, C3);
 }
 

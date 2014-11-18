@@ -105,6 +105,8 @@ void SubMesh3D::CalcSphereOfInfluence()
 
 void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 {
+	if(!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))return;
+
 	// loop through each triangle in this mesh's vertices
 	// and calculate normals for each
 	for(unsigned int v =0; v < vertexCount-2; v+=3)

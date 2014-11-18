@@ -15,6 +15,7 @@ const Vector3 Vector3::Zero(0,0,0);
 const Vector3 Vector3::UnitX(1,0,0);
 const Vector3 Vector3::UnitY(0,1,0);
 const Vector3 Vector3::UnitZ(0,0,1);
+const Vector3 Vector3::Up(0,1,0);
 
 /*
  * Default constructor
@@ -303,11 +304,19 @@ void Vector3::Detach()
 /*
  * Rotate [a] towards [b] by [theta] degrees.
  */
-void Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result)
+bool Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result)
 {
-	ASSERT_RTRN(from != NULL, "Vector3::RotateTowards -> NULL from passed.");
-	ASSERT_RTRN(to != NULL, "Vector3::RotateTowards -> NULL to passed.");
-	ASSERT_RTRN(result != NULL, "Vector3::RotateTowards -> NULL result passed.");
+	return RotateTowards(from, to, theta, result, &Vector3::UnitX);
+}
+
+/*
+ * Rotate [a] towards [b] by [theta] degrees.
+ */
+bool Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result, const Vector3 * fallbackAxis)
+{
+	ASSERT(from != NULL, "Vector3::RotateTowards -> NULL from passed.", false);
+	ASSERT(to != NULL, "Vector3::RotateTowards -> NULL to passed.", false);
+	ASSERT(result != NULL, "Vector3::RotateTowards -> NULL result passed.", false);
 
 	theta *= Constants::DegreesToRads;
 
@@ -315,8 +324,19 @@ void Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float the
 	Vector3 rotationAxis;
 	Vector3 fromCopy = *from;
 	Vector3 toCopy = *to;
+
 	fromCopy.Normalize();
 	toCopy.Normalize();
+
+	float dot = Vector3::Dot(&fromCopy, &toCopy);
+	float thetaDiff = GTEMath::ACos(dot);
+
+	if((theta > thetaDiff && thetaDiff > 0) || (theta < thetaDiff && thetaDiff < 0))
+	{
+		theta = thetaDiff;
+		*result =toCopy;
+		return true;
+	}
 
 	Vector3::Cross(&fromCopy, &toCopy, &rotationAxis);
 	Vector3::Cross(&rotationAxis, &fromCopy, &newVector);
@@ -324,38 +344,15 @@ void Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float the
 	Vector3 fromScaled;
 	Vector3 newScaled;
 
-	// vectors are parallel
-	if(newVector.Magnitude() < .001)
+	if(newVector.Magnitude() < .001) // vectors [a] and [b] are opposite
 	{
-		float xdiff = GTEMath::Abs(fromCopy.x - toCopy.x);
-		float ydiff = GTEMath::Abs(fromCopy.y - toCopy.y);
-		float zdiff = GTEMath::Abs(fromCopy.z - toCopy.z);
-
-		// vectors [a] and [b] are close enough to not bother with rotation
-		if(GTEMath::Abs(xdiff) < .001 && GTEMath::Abs(ydiff) < .001  && GTEMath::Abs(zdiff) < .001)
+		if(dot > .99999)
 		{
-			*result = fromCopy;
-			return;
+			*result = toCopy;
+			return true;
 		}
-		else // vectors [a] and [b] are opposite
-		{
-			float realTheta = theta/Constants::PI;
-			float intRealTheta = (int)realTheta;
-
-			realTheta -= (float)intRealTheta;
-			float diffAngle = Constants::PI - realTheta;
-
-			Vector3 toOrthoLeft;
-			toOrthoLeft.Set(-toCopy.z, 0, toCopy.x);
-			toOrthoLeft.Scale(GTEMath::Sin(diffAngle));
-
-			Vector3 toScaled = toCopy;
-			toScaled.Scale(GTEMath::Cos(diffAngle));
-
-			Vector3::Add(&toOrthoLeft, &toScaled, result);
-			result->Normalize();
-			return;
-		}
+		//*result = fromCopy;
+		return false;
 	}
 	else
 	{
@@ -368,7 +365,7 @@ void Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float the
 
 		Vector3::Add(&fromScaled, &newScaled, result);
 		result->Normalize();
-		return;
+		return true;
 	}
 }
 

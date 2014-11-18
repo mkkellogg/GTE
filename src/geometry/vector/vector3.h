@@ -25,6 +25,8 @@ class Vector3 : public BaseVector4
 	static const Vector3 UnitY;
 	static const Vector3 UnitZ;
 
+	static const Vector3 Up;
+
     float &x;
     float &y;
     float &z;
@@ -57,7 +59,8 @@ class Vector3 : public BaseVector4
     static void Cross(const Vector3 * a, const Vector3 * b, Vector3 * results);
     static void CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result);
     static float Dot(const Vector3 * a,const Vector3 * b);
-    static void RotateTowards(const Vector3 * from,const Vector3 * to,  float theta, Vector3 * result);
+    static bool RotateTowards(const Vector3 * from,const Vector3 * to,  float theta, Vector3 * result);
+    static bool RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result, const Vector3 * fallbackAxis);
     static float AngleBetween(const Vector3 * a,const Vector3 * b,const Vector3 * refRightNormal);
 
     bool IsZeroLength() const;
