@@ -68,6 +68,11 @@ void CrossFadeBlendOp::OnComplete()
 	if(completeCallback)completeCallback(this);
 }
 
+void CrossFadeBlendOp::OnStoppedEarly()
+{
+	if(stoppedEarlyCallback)stoppedEarlyCallback(this);
+}
+
 void CrossFadeBlendOp::SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback)
 {
 	this->startCallback = callback;
@@ -78,6 +83,10 @@ void CrossFadeBlendOp::SetOnCompleteCallback(std::function<void(CrossFadeBlendOp
 	this->completeCallback = callback;
 }
 
+void CrossFadeBlendOp::SetOnStoppedEarlyCallback(std::function<void(CrossFadeBlendOp*)> callback)
+{
+	this->stoppedEarlyCallback = callback;
+}
 /*
  * Get the target animation index for this cross fade operation.
  */

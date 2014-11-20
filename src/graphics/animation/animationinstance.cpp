@@ -24,6 +24,7 @@ AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
 
 	Duration = 0;
 	Progress = 0;
+	SpeedFactor = 1;
 
 	DurationTicks = 0;
 	ProgressTicks = 0;
@@ -117,6 +118,11 @@ AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int st
 	}
 
 	return FrameStates + stateIndex;
+}
+
+void AnimationInstance::SetSpeed(float speedFactor)
+{
+	this->SpeedFactor = speedFactor;
 }
 
 void AnimationInstance::Play()

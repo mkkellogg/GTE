@@ -34,7 +34,7 @@ void Vector3Factory::CreateArray(int count, BaseVector4 *** ppptr)
 	}
 }
 
-Vector3Factory * Vector3Factory::GetInstance()
+Vector3Factory * Vector3Factory::Instance()
 {
 	if(instance == NULL)
 	{

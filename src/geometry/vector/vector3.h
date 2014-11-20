@@ -24,7 +24,6 @@ class Vector3 : public BaseVector4
 	static const Vector3 UnitX;
 	static const Vector3 UnitY;
 	static const Vector3 UnitZ;
-
 	static const Vector3 Up;
 
     float &x;
@@ -34,7 +33,6 @@ class Vector3 : public BaseVector4
     Vector3();
     Vector3(bool permAttached, float * target);
     Vector3(float x, float y, float z);
-    Vector3(const Vector3 * vector);
     Vector3(const Vector3& vector);
     Vector3(const float * data);
     ~Vector3();
@@ -43,9 +41,9 @@ class Vector3 : public BaseVector4
     bool operator==(const Vector3 & source) const;
     void Set(float x, float y, float z);
 
-    void Add(const Vector3 * v);
-    static void Add(const Vector3 * v1, const Vector3 * v2, Vector3 * result);
-    static void Subtract(const Vector3 * v1, const Vector3 * p2, Vector3 * result);
+    void Add(const Vector3& v);
+    static void Add(const Vector3& v1, const Vector3& v2, Vector3& result);
+    static void Subtract(const Vector3& v1, const Vector3& p2, Vector3& result);
 
     void Scale(float magnitude);
     void Normalize();
@@ -56,11 +54,11 @@ class Vector3 : public BaseVector4
     static float SquareMagnitude(float x, float y, float z);
     float QuickMagnitude() const;
     void Invert();
-    static void Cross(const Vector3 * a, const Vector3 * b, Vector3 * results);
-    static void CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result);
-    static float Dot(const Vector3 * a,const Vector3 * b);
-    static bool RotateTowards(const Vector3 * from,const Vector3 * to,  float theta, Vector3 * result);
-    static bool RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result, const Vector3 * fallbackAxis);
+    static void Cross(const Vector3& a, const Vector3& b, Vector3& results);
+    static void CalcNormal(const Vector3& a,const Vector3& b, Vector3& result);
+    static float Dot(const Vector3& a,const Vector3& b);
+    static bool RotateTowards(const Vector3& from,const Vector3& to,  float theta, Vector3& result);
+    static bool RotateTowards(const Vector3& from, const Vector3& to,  float theta, Vector3& result, const Vector3& fallbackAxis);
     static float AngleBetween(const Vector3 * a,const Vector3 * b,const Vector3 * refRightNormal);
 
     bool IsZeroLength() const;

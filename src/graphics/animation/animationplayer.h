@@ -62,6 +62,8 @@ class AnimationPlayer
 
 	void QueueBlendOperation(BlendOp * op);
 	BlendOp * GetCurrentBlendOp();
+	void ClearBlendOpQueue();
+
 	void Update();
 	void UpdateBlending();
 	void CheckWeights();
@@ -74,18 +76,22 @@ class AnimationPlayer
 	void CalculateInterpolatedRotation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
 	bool CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, unsigned int& lastIndex, unsigned int& nextIndex, float& interFrameProgress, TransformationCompnent component) const;
 
-	public :
-
-    void AddAnimation(AnimationRef animation);
-	void Play(AnimationRef animation);
-	void Stop(AnimationRef animation);
-	void Pause(AnimationRef animation);
-	void Resume(AnimationRef animation);
+	void SetSpeed(unsigned int animationIndex, float speedFactor);
 	void Play(unsigned int animationIndex);
 	void Stop(unsigned int  animationIndex);
 	void Pause(unsigned int  animationIndex);
 	void Resume(unsigned int  animationIndex);
+
+	public :
+
+    void AddAnimation(AnimationRef animation);
+    void SetSpeed(AnimationRef animation, float speedFactor);
+	void Play(AnimationRef animation);
+	void Stop(AnimationRef animation);
+	void Pause(AnimationRef animation);
+	void Resume(AnimationRef animation);
 	void CrossFade(AnimationRef target, float duration);
+	void CrossFade(AnimationRef target, float duration, bool queued);
 };
 
 #endif

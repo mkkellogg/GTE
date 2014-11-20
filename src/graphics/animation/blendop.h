@@ -44,6 +44,7 @@ class BlendOp
 	virtual void Update(std::vector<float>& weights);
 	virtual void OnStart() = 0;
 	virtual void OnComplete() = 0;
+	virtual void OnStoppedEarly() = 0;
 	bool HasCompleted();
 	bool HasStarted();
 	float GetNormalizedProgress();

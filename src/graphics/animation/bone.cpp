@@ -48,7 +48,7 @@ void Bone::SetTo(Bone * bone)
 {
 	Name = bone->Name;
 	ID = bone->ID;
-	OffsetMatrix.SetTo(&bone->OffsetMatrix);
+	OffsetMatrix.SetTo(bone->OffsetMatrix);
 	Node = bone->Node;
 }
 

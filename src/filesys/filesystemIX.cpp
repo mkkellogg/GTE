@@ -4,6 +4,8 @@
 #include <memory.h>
 #include <math.h>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #include "filesystem.h"
 #include "filesystemIX.h"
@@ -62,4 +64,25 @@ std::string FileSystemIX::FixupPath(const std::string& path) const
 	//newPath.replace(newPath.begin(),newPath.end(), "\\", "/");
 	return newPath;
 }
+
+std::string FileSystemIX::GetFileName(const std::string& fullPath) const
+{
+	size_t pos = fullPath.find_last_of("/");
+	return (std::string::npos == pos) ? "" : fullPath.substr(pos+1);
+}
+
+bool FileSystemIX::FileExists(const std::string& fullPath) const
+{
+   std::ifstream f(fullPath.c_str());
+   if (f.good())
+   {
+       f.close();
+       return true;
+   } else
+   {
+       f.close();
+       return false;
+   }
+}
+
 

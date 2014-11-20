@@ -116,18 +116,12 @@ void RenderManager::PushTransformData(const Transform * transform, DataStack<Mat
  */
 void RenderManager::PopTransformData(Transform * transform, DataStack<Matrix4x4> * transformStack)
 {
-	if(transform == NULL)
-	{
-		Debug::PrintError("RenderManager::PopTransformData -> transform is NULL.");
-		return;
-	}
-	if(transformStack == NULL)
-	{
-		Debug::PrintError("RenderManager::PopTransformData -> transformStack is NULL.");
-		return;
-	}
+	ASSERT_RTRN(transform != NULL,"RenderManager::PopTransformData -> transform is NULL.");
+	ASSERT_RTRN(transformStack != NULL,"RenderManager::PopTransformData -> transformStack is NULL.");
+	ASSERT_RTRN(transformStack->GetEntryCount() > 0,"RenderManager::PopTransformData -> transformStack is empty!");
+
 	Matrix4x4 * mat = transformStack->Pop();
-	transform->SetTo(mat);
+	transform->SetTo(*mat);
 }
 
 /*
@@ -295,7 +289,6 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 	Transform model;
 	Transform modelInverse;
 
-
 	renderedObjects.clear();
 
 	// enforce max recursion depth
@@ -384,7 +377,8 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 							ActivateMaterial(currentMaterial);
 							// pass concatenated modelViewTransform and projection transforms to shader
 							const Transform& modelTransform = child->GetProcessingTransform();
-							SendTransformUniformsToShader(&modelTransform, &modelView, camera->GetProjectionTransform());
+
+							SendTransformUniformsToShader(modelTransform, modelView, camera->GetProjectionTransform());
 							SendCustomUniformsToShader();
 
 							subRenderer->PreRender(model.matrix, modelInverse.matrix);
@@ -420,7 +414,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 								}
 
 								Point3 lightPosition;
-								sceneLights[l].transform.TransformPoint(&lightPosition);
+								sceneLights[l].transform.TransformPoint(lightPosition);
 
 								SceneObjectTransform full;
 
@@ -496,9 +490,9 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 
 	// transform each distance vector by the full transform of the scene
 	// object that contains [mesh]
-	fullTransform.TransformVector(&soiX);
-	fullTransform.TransformVector(&soiY);
-	fullTransform.TransformVector(&soiZ);
+	fullTransform.TransformVector(soiX);
+	fullTransform.TransformVector(soiY);
+	fullTransform.TransformVector(soiZ);
 
 	// get length of each transformed vector
 	float xMag = soiX.QuickMagnitude();
@@ -513,10 +507,10 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 
 	Vector3 toLight;
 	Point3 meshCenter = *(mesh.GetCenter());
-	fullTransform.TransformPoint(&meshCenter);
+	fullTransform.TransformPoint(meshCenter);
 
 	// get the distance from the light to the mesh's center
-	Point3::Subtract(&lightPosition, &meshCenter, &toLight);
+	Point3::Subtract(lightPosition, meshCenter, toLight);
 
 	// if the distance from the mesh's center to the light is bigger
 	// than the radius of the sphere of influence + the light's range,
@@ -538,7 +532,7 @@ bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transf
  * Send the ModelView matrix in [modelView] and Projection matrix in [projection] to the active shader.
  * The binding information stored in the active material holds the shader variable locations for these matrices.
  */
-void RenderManager::SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection)
+void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection)
 {
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
 
@@ -549,9 +543,9 @@ void RenderManager::SendTransformUniformsToShader(const Transform * model, const
 	mvpTransform.TransformBy(modelView);
 	mvpTransform.TransformBy(projection);
 
-	activeMaterial->SendModelMatrixToShader(&model->matrix);
-	activeMaterial->SendModelViewMatrixToShader(&modelView->matrix);
-	activeMaterial->SendProjectionMatrixToShader(&projection->matrix);
+	activeMaterial->SendModelMatrixToShader(&model.matrix);
+	activeMaterial->SendModelViewMatrixToShader(&modelView.matrix);
+	activeMaterial->SendProjectionMatrixToShader(&projection.matrix);
 	activeMaterial->SendMVPMatrixToShader(&mvpTransform.matrix);
 }
 

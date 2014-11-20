@@ -12,7 +12,7 @@ class Point3Factory : public BaseVector4Factory
 
     public:
 
-	static Point3Factory * GetInstance();
+	static Point3Factory * Instance();
 
 	Point3Factory();
     virtual ~Point3Factory();

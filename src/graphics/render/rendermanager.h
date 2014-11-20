@@ -66,7 +66,7 @@ class RenderManager
     void PopTransformData(Transform * transform, DataStack<Matrix4x4> * transformStack);
     unsigned int RenderDepth(const DataStack<Matrix4x4> * transformStack) const;
     void ActivateMaterial(MaterialRef material);
-    void SendTransformUniformsToShader(const Transform * model, const Transform * modelView, const Transform * projection);
+    void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection);
     void SendCustomUniformsToShader();
 
     void ProcessScene();

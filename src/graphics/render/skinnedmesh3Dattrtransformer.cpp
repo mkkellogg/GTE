@@ -284,10 +284,12 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 			if(positionTransformed[desc->UVertexIndex] == 1)
 			{
 				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);
-				positionsOut.GetPoint(i)->SetTo(p);
+				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedPositions contains NULL point.");
+				positionsOut.GetPoint(i)->SetTo(*p);
 
 				Vector3 * v = transformedNormals.GetVector(desc->UVertexIndex);
-				normalsOut.GetVector(i)->SetTo(v);
+				ASSERT_RTRN(v!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedNormals contains NULL vector.");
+				normalsOut.GetVector(i)->SetTo(*v);
 			}
 			else
 			{
@@ -309,45 +311,47 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 					// then we skip this step. A value of zero means it is not yet calculated.
 					if(boneTransformed[desc->BoneIndex[b]] == 0)
 					{
-						bone->TempFullMatrix.SetTo(&bone->OffsetMatrix);
+						bone->TempFullMatrix.SetTo(bone->OffsetMatrix);
 
 						if(bone->Node->HasTarget())
 						{
 							const Transform * targetFull = bone->Node->GetFullTransform();
-							targetFull->CopyMatrix(&temp);
+							targetFull->CopyMatrix(temp);
 
 							// store final transformation for this bone in bone->TempFullMatrix
-							bone->TempFullMatrix.PreMultiply(&temp);
-							bone->TempFullMatrix.PreMultiply(&modelInverse);
+							bone->TempFullMatrix.PreMultiply(temp);
+							bone->TempFullMatrix.PreMultiply(modelInverse);
 						}
 
 						// factor into average bone offset
-						averageBoneOffset.Add(&bone->OffsetMatrix);
+						averageBoneOffset.Add(bone->OffsetMatrix);
 
 						boneTransformed[desc->BoneIndex[b]] = 1;
 						uniqueBonesEncountered++;
 					}
 
-					temp.SetTo(&bone->TempFullMatrix);
+					temp.SetTo(bone->TempFullMatrix);
 					// apply weight for this vertex & bone
 					temp.MultiplyByScalar(desc->Weight[b]);
 
-					if(b==0)full.SetTo(&temp);
-					else full.Add(&temp);
+					if(b==0)full.SetTo(temp);
+					else full.Add(temp);
 				}
 
 				// transform position
 				Point3 * p = positionsOut.GetPoint(i);
-				full.Transform(p);
+				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> positionsOut contains NULL point.");
+				full.Transform(*p);
 
 				// transform nomral
 				Vector3 * v = normalsOut.GetVector(i);
-				full.Transform(v);
+				ASSERT_RTRN(v!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> normalsOut contains NULL vector.");
+				full.Transform(*v);
 
 				// update saved positions
-				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(p);
+				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(*p);
 				// update saved normals
-				transformedNormals.GetVector(desc->UVertexIndex)->SetTo(v);
+				transformedNormals.GetVector(desc->UVertexIndex)->SetTo(*v);
 				// set position transformation flag to 1 so we don't repeat the work for this vertex if we
 				// encounter it again
 				positionTransformed[desc->UVertexIndex] = 1;
@@ -358,7 +362,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		if(uniqueBonesEncountered==0)uniqueBonesEncountered=1;
 		averageBoneOffset.MultiplyByScalar(1/(float)uniqueBonesEncountered);
 		// apply average bone offset to center point
-		averageBoneOffset.Transform(&centerOut);
+		averageBoneOffset.Transform(centerOut);
 	}
 }
 
@@ -401,7 +405,8 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 			if(positionTransformed[desc->UVertexIndex] == 1)
 			{
 				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);
-				positionsOut.GetPoint(i)->Set(p->x,p->y,p->z);
+				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedPositions contains NULL point.");
+				positionsOut.GetPoint(i)->SetTo(*p);
 			}
 			else
 			{
@@ -412,37 +417,38 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 
 					if(boneTransformed[desc->BoneIndex[b]] == 0)
 					{
-						bone->TempFullMatrix.SetTo(&bone->OffsetMatrix);
+						bone->TempFullMatrix.SetTo(bone->OffsetMatrix);
 
 						if(bone->Node->HasTarget())
 						{
 							const Transform * targetFull = bone->Node->GetFullTransform();
-							targetFull->CopyMatrix(&temp);
+							targetFull->CopyMatrix(temp);
 
-							bone->TempFullMatrix.PreMultiply(&temp);
+							bone->TempFullMatrix.PreMultiply(temp);
 						}
 
-						averageBoneOffset.Add(&bone->OffsetMatrix);
+						averageBoneOffset.Add(bone->OffsetMatrix);
 						boneTransformed[desc->BoneIndex[b]] = 1;
 					}
 
-					temp.SetTo(&bone->TempFullMatrix);
+					temp.SetTo(bone->TempFullMatrix);
 					temp.MultiplyByScalar(desc->Weight[b]);
-					if(b==0)full.SetTo(&temp);
-					else full.Add(&temp);
+					if(b==0)full.SetTo(temp);
+					else full.Add(temp);
 				}
 
 				Point3 * p = positionsOut.GetPoint(i);
-				full.Transform(p);
+				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositions -> positionsOut contains NULL point.");
+				full.Transform(*p);
 
-				transformedPositions.GetPoint(desc->UVertexIndex)->Set(p->x,p->y,p->z);
+				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(*p);
 				positionTransformed[desc->UVertexIndex] = 1;
 			}
 		}
 
 		if(uniqueBonesEncountered==0)uniqueBonesEncountered=1;
 		averageBoneOffset.MultiplyByScalar(1/(float)uniqueBonesEncountered);
-		averageBoneOffset.Transform(&centerOut);
+		averageBoneOffset.Transform(centerOut);
 	}
 }
 

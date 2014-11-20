@@ -19,12 +19,12 @@
  */
 void BaseVector4::Init(float x, float y, float z, float w, float *target, bool permAttach)
 {
-	//data = baseData = NULL;
 	data = baseData;
 
 	if(target == NULL && permAttach == true)
 	{
-		Debug::PrintError("BaseVector4::Init -> permAttach is true, but target is NULL!");
+		Debug::PrintWarning("BaseVector4::Init -> permAttach is true, but target is NULL!");
+		permAttach = false;
 	}
 
 	if(permAttach)
@@ -33,7 +33,6 @@ void BaseVector4::Init(float x, float y, float z, float w, float *target, bool p
 	}
 	else
 	{
-		//data = baseData = new float[4];
 		data = baseData;
 		canDetach = true;
 	}
@@ -47,6 +46,7 @@ void BaseVector4::Init(float x, float y, float z, float w, float *target, bool p
 	{
 		attached = false;
 	}
+
     Set(x,y,z,w);
 }
 
@@ -77,9 +77,9 @@ BaseVector4::BaseVector4(float x, float y, float z, float w)
 /*
  * Copy constructor
  */
-BaseVector4::BaseVector4(const BaseVector4 * baseVector)
+BaseVector4::BaseVector4(const BaseVector4& baseVector)
 {
-    Init(baseVector->data[0], baseVector->data[1], baseVector->data[2], baseVector->data[3], NULL, false);
+    Init(baseVector.data[0], baseVector.data[1], baseVector.data[2], baseVector.data[3], NULL, false);
 }
 
 /*
@@ -107,23 +107,20 @@ void BaseVector4::Set(float x, float y, float z, float w)
 /*
  * Set this base vector's data to be equal to [baseVector]
  */
-void BaseVector4::SetTo(BaseVector4 * baseVector)
+void BaseVector4::SetTo(const BaseVector4& baseVector)
 {
-	ASSERT_RTRN(baseVector != NULL, "BaseVector4::SetTo -> NULL baseVector passed.");
-
-	data[0] = baseVector->data[0];
-	data[1] = baseVector->data[1];
-	data[2] = baseVector->data[2];
-	data[3] = baseVector->data[3];
+	data[0] = baseVector.data[0];
+	data[1] = baseVector.data[1];
+	data[2] = baseVector.data[2];
+	data[3] = baseVector.data[3];
 }
 
 /*
  * Copy this base vector's data into [baseVector]
  */
-void BaseVector4::Get(BaseVector4 * baseVector) const
+void BaseVector4::Get(BaseVector4& baseVector) const
 {
-	ASSERT_RTRN(baseVector != NULL, "BaseVector4::Get -> NULL baseVector passed.");
-	memcpy(baseVector->data, data, sizeof(float) * 4);
+	memcpy(baseVector.data, data, sizeof(float) * 4);
 }
 
 /*

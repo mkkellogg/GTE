@@ -28,6 +28,7 @@ class CrossFadeBlendOp : public BlendOp
 	unsigned int targetIndex;
 	std::function<void(CrossFadeBlendOp*)> startCallback;
 	std::function<void(CrossFadeBlendOp*)> completeCallback;
+	std::function<void(CrossFadeBlendOp*)> stoppedEarlyCallback;
 
 	CrossFadeBlendOp(float duration, unsigned int targetIndex);
 
@@ -40,8 +41,10 @@ class CrossFadeBlendOp : public BlendOp
 	void Update(std::vector<float>& weights);
 	void OnStart();
 	void OnComplete();
+	void OnStoppedEarly();
 	void SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback);
 	void SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback);
+	void SetOnStoppedEarlyCallback(std::function<void(CrossFadeBlendOp*)> callback);
 	unsigned int GetTargetIndex();
 };
 

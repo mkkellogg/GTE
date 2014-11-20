@@ -29,7 +29,7 @@ Transform::Transform()
 /*
  * Constructor to build Transform from Matrix4x4
  */
-Transform::Transform(Matrix4x4 * m) : Transform()
+Transform::Transform(const Matrix4x4& m) : Transform()
 {
 	matrix.SetTo(m);
 }
@@ -40,7 +40,7 @@ Transform::Transform(Matrix4x4 * m) : Transform()
 Transform::Transform(Transform * transform) : Transform()
 {
 	ASSERT_RTRN(transform != NULL, "Transform::copy constructor -> NULL transform passed.");
-	transform->CopyMatrix(&matrix);
+	transform->CopyMatrix(matrix);
 }
 
 /*
@@ -54,29 +54,17 @@ Transform::~Transform()
 /*
  * Copy this Transform object's matrix into [dest].
  */
-void Transform::CopyMatrix(Matrix4x4 * dest) const
+void Transform::CopyMatrix(Matrix4x4& dest) const
 {
-	ASSERT_RTRN(dest != NULL, "Transform::CopyTo -> NULL destination passed.");
-	dest->SetTo(&matrix);
+	dest.SetTo(matrix);
 }
 
 /*
  * Copy [matrix] into the underlying Matrix4x4 that is encapsulated by this transform.
  */
-void Transform::SetTo(const Matrix4x4 * matrix)
+void Transform::SetTo(const Matrix4x4& matrix)
 {
-	ASSERT_RTRN(matrix != NULL, "Transform::SetTo -> NULL matrix passed.");
-
 	this->matrix.SetTo(matrix);
-}
-
-/*
- * Make this transform equal to [transform]
- */
-void Transform::SetTo(const Transform * transform)
-{
-	ASSERT_RTRN(transform != NULL, "Transform::SetTo -> NULL transform passed.");
-	transform->CopyMatrix(&matrix);
 }
 
 /*
@@ -84,7 +72,7 @@ void Transform::SetTo(const Transform * transform)
  */
 void Transform::SetTo(const Transform& transform)
 {
-	transform.CopyMatrix(&matrix);
+	transform.CopyMatrix(matrix);
 }
 
 /*
@@ -104,18 +92,16 @@ void Transform::SetIdentity()
 /*
  * Post-multiply this transform's matrix by [matrix]
  */
-void Transform::TransformBy(const Matrix4x4 * matrix)
+void Transform::TransformBy(const Matrix4x4& matrix)
 {
-	ASSERT_RTRN(matrix != NULL, "Transform::TransformBy(Matrix*) -> NULL matrix passed.");
 	this->matrix.Multiply(matrix);
 }
 
 /*
  * Pre-multiply this transform's matrix by [matrix]
  */
-void Transform::PreTransformBy(const Matrix4x4 * matrix)
+void Transform::PreTransformBy(const Matrix4x4& matrix)
 {
-	ASSERT_RTRN(matrix != NULL, "Transform::PreTransformBy(Matrix*) -> NULL matrix passed.");
 	this->matrix.PreMultiply(matrix);
 }
 
@@ -124,7 +110,7 @@ void Transform::PreTransformBy(const Matrix4x4 * matrix)
  */
 void Transform::TransformBy(const Transform& transform)
 {
-	TransformBy(&transform);
+	matrix.Multiply(transform.matrix);
 }
 
 /*
@@ -132,25 +118,7 @@ void Transform::TransformBy(const Transform& transform)
  */
 void Transform::PreTransformBy(const Transform& transform)
 {
-	PreTransformBy(&transform);
-}
-
-/*
- * Post-multiply this transform's matrix by the matrix contained in [transform]
- */
-void Transform::TransformBy(const Transform * transform)
-{
-	ASSERT_RTRN(transform != NULL, "Transform::TransformBy(Transform *) -> NULL transform passed.");
-	matrix.Multiply(&transform->matrix);
-}
-
-/*
- * Pre-multiply this transform's matrix by the matrix contained in [transform]
- */
-void Transform::PreTransformBy(const Transform * transform)
-{
-	ASSERT_RTRN(transform != NULL, "Transform::PreTransformBy(Transform *) -> NULL transform passed.");
-	matrix.PreMultiply(&transform->matrix);
+	matrix.PreMultiply(transform.matrix);
 }
 
 /*
@@ -187,7 +155,7 @@ void Transform::Translate(float x, float y, float z, bool local)
  * determines if the transformation is relative to world space or the transform's
  * local space.
  */
-void Transform::Translate(Vector3 * vector, bool local)
+void Transform::Translate(Vector3& vector, bool local)
 {
 	if(!local)
 	{
@@ -276,14 +244,12 @@ void Transform::Scale(float x, float y, float z,  bool local)
  * [nearP]  -   Distance from the eye to the near clip plane
  * [farP]   -   Distance from the eye to the far clip plane
  */
-void Transform::BuildProjectionMatrix(Matrix4x4 * matrix, float fov, float ratio, float nearP, float farP)
+void Transform::BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP)
 {
-	ASSERT_RTRN(matrix != NULL, "Transform::BuildProjectionMatrix -> [matrix] is null.");
-
 	// convert fov to radians
     float f = 1.0f / tan (fov * Constants::TwoPIOver360 *.5);
 
-    matrix->SetIdentity();
+    matrix.SetIdentity();
 
     float data[16];
     memset(data,0,16 * sizeof(float));
@@ -295,7 +261,7 @@ void Transform::BuildProjectionMatrix(Matrix4x4 * matrix, float fov, float ratio
     data[2 * 4 + 3] = -1.0f;
     data[3 * 4 + 3] = 0.0f;
 
-    matrix->SetTo(data);
+    matrix.SetTo(data);
 }
 
 /*
@@ -313,21 +279,19 @@ void Transform::BuildProjectionMatrix(Matrix4x4 * matrix, float fov, float ratio
  * [lookAtY]    -  The Y value of the look at direction
  * [lookAtZ]    -  The Z value of the look at direction
  */
-void Transform::BuildLookAtMatrix(Matrix4x4 * matrix, float posX, float posY, float posZ,
+void Transform::BuildLookAtMatrix(Matrix4x4& matrix, float posX, float posY, float posZ,
 								  float lookAtX, float lookAtY, float lookAtZ)
 {
-	ASSERT_RTRN(matrix != NULL, "Transform::BuildLookAtMatrix -> [matrix] is null.");
-
 	Vector3 vDir(lookAtX - posX, lookAtY - posY, lookAtZ - posZ);
 	Vector3 vUp(0,1,0);
 	Vector3 vRight;
 
 	vDir.Normalize();
 
-	Vector3::Cross((const Vector3 *)&vDir, (const Vector3 *)&vUp, &vRight);
+	Vector3::Cross(vDir, vUp, vRight);
 	vRight.Normalize();
 
-	Vector3::Cross((const Vector3 *)&vRight, (const Vector3 *)&vDir, &vUp);
+	Vector3::Cross(vRight, vDir, vUp);
 	vUp.Normalize();
 
 	float view[16];
@@ -360,24 +324,22 @@ void Transform::BuildLookAtMatrix(Matrix4x4 * matrix, float posX, float posY, fl
 	aux.SetIdentity();
 	aux.Translate(-posX, -posY, -posZ);
 
-	Matrix4x4::Multiply(&viewMatrix, &aux, matrix);
+	Matrix4x4::Multiply(viewMatrix, aux, matrix);
 }
 
 /*
  * Shortcut to transform [vector] by [matrix].
  */
-void Transform::TransformVector(Vector3 * vector) const
+void Transform::TransformVector(Vector3& vector) const
 {
-	ASSERT_RTRN(vector != NULL, "Transform::TransformVector -> NULL vector passed.");
 	matrix.Transform(vector);
 }
 
 /*
  * Shortcut to transform [point] by [matrix]
  */
-void Transform::TransformPoint(Point3 * point) const
+void Transform::TransformPoint(Point3& point) const
 {
-	ASSERT_RTRN(point != NULL, "Transform::TransformPoint -> NULL point passed.");
 	matrix.Transform(point);
 }
 

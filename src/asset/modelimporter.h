@@ -77,6 +77,7 @@ class ModelImporter
 		}
 	};
 
+	static const std::string AssimpPathDelimiter;
 	Assimp::Importer * importer;
 
 	bool InitImporter();

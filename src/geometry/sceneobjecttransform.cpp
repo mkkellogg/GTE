@@ -32,7 +32,7 @@ SceneObjectTransform::SceneObjectTransform(SceneObjectRef sceneObject) : Transfo
 /*
  * Constructor to build SceneObjectTransform from Matrix4x4
  */
-SceneObjectTransform::SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4 * m) : Transform(m)
+SceneObjectTransform::SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4& m) : Transform(m)
 {
 	this->sceneObject = sceneObject;
 }
@@ -40,9 +40,9 @@ SceneObjectTransform::SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4
 /*
  * Copy constructor
  */
-SceneObjectTransform::SceneObjectTransform(SceneObjectTransform * sceneObjectTransform) :  Transform(sceneObjectTransform)
+SceneObjectTransform::SceneObjectTransform(SceneObjectTransform & sceneObjectTransform) :  Transform(sceneObjectTransform)
 {
-	this->sceneObject = sceneObjectTransform->sceneObject;
+	this->sceneObject = sceneObjectTransform.sceneObject;
 }
 
 /*
@@ -65,9 +65,9 @@ void SceneObjectTransform::AttachTo(SceneObjectRef sceneObject)
 /*
  * Set the local matrix [localMatrix] to match [localTransform].
  */
-void SceneObjectTransform::SetLocalTransform(const Transform* localTransform)
+void SceneObjectTransform::SetLocalTransform(const Transform& localTransform)
 {
-	localTransform->CopyMatrix(&this->localMatrix);
+	localTransform.CopyMatrix(this->localMatrix);
 
 	UpdateFullTransform();
 	UpdateTarget();
@@ -76,7 +76,7 @@ void SceneObjectTransform::SetLocalTransform(const Transform* localTransform)
 /*
  * Set the local matrix.
  */
-void SceneObjectTransform::SetLocalMatrix(const Matrix4x4 *  localMatrix)
+void SceneObjectTransform::SetLocalMatrix(const Matrix4x4&  localMatrix)
 {
 	this->localMatrix.SetTo(localMatrix);
 
@@ -87,7 +87,7 @@ void SceneObjectTransform::SetLocalMatrix(const Matrix4x4 *  localMatrix)
 /*
  * Decompose this transform's matrix into [translation], [rotation], and [scaling].
  */
-void SceneObjectTransform::GetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale)
+void SceneObjectTransform::GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale)
 {
 	localMatrix.Decompose(translation, rotation, scale);
 }
@@ -95,7 +95,7 @@ void SceneObjectTransform::GetLocalComponents(Vector3 * translation, Quaternion 
 /*
  * Build matrix from base components: [translation], [rotation], and [scaling].
  */
-void SceneObjectTransform::SetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale)
+void SceneObjectTransform::SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale)
 {
 	localMatrix.BuildFromComponents(translation, rotation, scale);
 
@@ -111,10 +111,8 @@ void SceneObjectTransform::SetLocalComponents(Vector3 * translation, Quaternion 
  * scene object, and concatenate each ancestor's transform to form the transform
  * that is inherited by connected scene object.
  */
-void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool invert)
+void SceneObjectTransform::GetInheritedTransform(Transform& transform, bool invert)
 {
-	ASSERT_RTRN(transform != NULL, "SceneObjectTransform::GetInheritedTransform -> NULL transform passed.");
-
 	Transform full;
 	SceneObjectRef parent = sceneObject->GetParent();
 	while(parent.IsValid())
@@ -127,7 +125,7 @@ void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool inv
 	}
 	// optionally invert
 	if(invert == true)full.Invert();
-	transform->SetTo(&full);
+	transform.SetTo(full);
 }
 
 /*
@@ -135,7 +133,7 @@ void SceneObjectTransform::GetInheritedTransform(Transform * transform, bool inv
  */
 void SceneObjectTransform::UpdateTarget()
 {
-	sceneObject->GetLocalTransform().SetTo(&localMatrix);
+	sceneObject->GetLocalTransform().SetTo(localMatrix);
 }
 
 /*
@@ -145,8 +143,8 @@ void SceneObjectTransform::UpdateTarget()
 void SceneObjectTransform::UpdateFullTransform()
 {
 	Transform full;
-	GetInheritedTransform(&full, false);
-	full.TransformBy(&this->localMatrix);
+	GetInheritedTransform(full, false);
+	full.TransformBy(this->localMatrix);
 	SetTo(&full);
 }
 /*
@@ -162,7 +160,7 @@ void SceneObjectTransform::Translate(float x, float y, float z, bool local)
 
 		float trans[] = {x,y,z,0};
 		Transform full;
-		GetInheritedTransform(&full, false);
+		GetInheritedTransform(full, false);
 		full.TransformBy(this);
 		full.Invert();
 		full.TransformVector4f(trans);
@@ -175,9 +173,9 @@ void SceneObjectTransform::Translate(float x, float y, float z, bool local)
 /*
  * Rotate around a specific world point and orientation vector.
  */
-void SceneObjectTransform::RotateAround(Point3 * point, Vector3 * axis, float angle)
+void SceneObjectTransform::RotateAround(Point3& point, Vector3& axis, float angle)
 {
-	RotateAround(point->x, point->y, point->z, axis->x, axis->y, axis->z, angle);
+	RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle);
 }
 
 /*
@@ -200,7 +198,7 @@ void SceneObjectTransform::RotateAround(float px, float py, float pz, float ax, 
 	float rotVector[] = {ax,ay,az,0};
 
 	Transform mod;
-	GetInheritedTransform(&mod, false);
+	GetInheritedTransform(mod, false);
 	mod.TransformBy(this);
 
 	mod.Invert();
@@ -219,11 +217,9 @@ void SceneObjectTransform::RotateAround(float px, float py, float pz, float ax, 
 /*
  * Scale this transform by the x,y, and z components of [mag]
  */
-void SceneObjectTransform::Scale(Vector3 * mag,  bool local)
+void SceneObjectTransform::Scale(Vector3& mag,  bool local)
 {
-	ASSERT_RTRN(mag != NULL, "Transform::Scale -> mag is null.");
-
-	Scale(mag->x, mag->y, mag->z, local);
+	Scale(mag.x, mag.y, mag.z, local);
 }
 
 /*
@@ -236,7 +232,7 @@ void SceneObjectTransform::Scale(float x, float y, float z,  bool local)
 	{
 		float trans[] = {x,y,z,0};
 		Transform full;
-		GetInheritedTransform(&full, false);
+		GetInheritedTransform(full, false);
 		full.TransformBy(this);
 		full.Invert();
 		full.TransformVector4f(trans);

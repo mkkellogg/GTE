@@ -15,24 +15,19 @@ Camera::Camera(Graphics * graphics)
 	clearBufferMask = 0;
 	this->graphics = graphics;
 
-	projectionTransform = Transform::CreateIdentityTransform();
-
 	Matrix4x4 proj;
 	const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
 
 	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
 
-	Transform::BuildProjectionMatrix(&proj, 65, ratio, 10, 100);
+	Transform::BuildProjectionMatrix(proj, 65, ratio, 10, 100);
 
-	projectionTransform->SetTo(&proj);
-
-	//Matrix4x4 * projectionMatrix = projectionTransform->GetMatrix();
-	//Transform::BuildProjectionMatrix(projectioNmatrix);
+	projectionTransform.SetTo(proj);
 }
 
 Camera::~Camera()
 {
-	SAFE_DELETE(projectionTransform);
+
 }
 
 void Camera::AddClearBuffer(RenderBufferType buffer)
@@ -50,7 +45,7 @@ unsigned int Camera::GetClearBufferMask() const
 	return clearBufferMask;
 }
 
-const Transform * Camera::GetProjectionTransform() const
+const Transform& Camera::GetProjectionTransform() const
 {
 	return projectionTransform;
 }

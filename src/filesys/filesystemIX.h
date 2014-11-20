@@ -30,6 +30,8 @@ class FileSystemIX : public FileSystem
     std::string GetBasePath(const std::string& path) const;
 	std::string GetPathFromIXPath(const std::string& path) const;
 	std::string FixupPath(const std::string& path) const;
+	std::string GetFileName(const std::string& fullPath) const;
+	bool FileExists(const std::string& fullPath) const;
 };
 
 #endif

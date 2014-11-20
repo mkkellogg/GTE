@@ -111,19 +111,23 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	// and calculate normals for each
 	for(unsigned int v =0; v < vertexCount-2; v+=3)
 	{
-		// get Point3 objects for each vertex
-		Point3 pa = positions->GetPoint(v);
-		Point3 pb = positions->GetPoint(v+1);
-		Point3 pc = positions->GetPoint(v+2);
-
 		Vector3 a,b,c;
 
+		// get Point3 objects for each vertex
+		Point3 *pa = positions->GetPoint(v);
+		Point3 *pb = positions->GetPoint(v+1);
+		Point3 *pc = positions->GetPoint(v+2);
+
+		ASSERT_RTRN(pa, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
+		ASSERT_RTRN(pb, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
+		ASSERT_RTRN(pc, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
+
 		// form 2 vectors based on triangle's vertices
-		Point3::Subtract(&pb, &pa, &b);
-		Point3::Subtract(&pc, &pa, &a);
+		Point3::Subtract(*pb, *pa, b);
+		Point3::Subtract(*pc, *pa, a);
 
 		// calculate cross product
-		Vector3::Cross(&a, &b, &c);
+		Vector3::Cross(a, b, c);
 		c.Normalize();
 
 		normals->GetVector(v)->Set(c.x,c.y,c.z);
@@ -179,7 +183,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 
 			// calculate angle between the normal that exists for this vertex,
 			// and the current normal in the last.
-			float dot = Vector3::Dot(&current, &oNormal);
+			float dot = Vector3::Dot(current, oNormal);
 			float angle = acos(dot);
 			if(angle <0)angle = -angle;
 

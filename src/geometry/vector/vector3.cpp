@@ -45,17 +45,9 @@ Vector3::Vector3(float x, float y, float z) : BaseVector4(x,y,z,0), x(data[0]), 
 /*
  * Copy constructor
  */
-Vector3::Vector3(const Vector3& vector) : BaseVector4(&vector), x(data[0]), y(data[1]), z(data[2])
+Vector3::Vector3(const Vector3& vector) : BaseVector4(vector), x(data[0]), y(data[1]), z(data[2])
 {
 
-}
-
-/*
- * Copy constructor
- */
-Vector3::Vector3(const Vector3 * vector) : BaseVector4(vector),  x(data[0]), y(data[1]), z(data[2])
-{
-    
 }
 
 /*
@@ -96,41 +88,31 @@ Vector3::~Vector3()
 /*
  * Add vector [v] to this vector
  */
-void Vector3::Add(const Vector3 * vector)
+void Vector3::Add(const Vector3& vector)
 {
-	ASSERT_RTRN(vector != NULL, "Vector3::Add -> NULL vector passed.");
-
-    x += vector->x;
-    y += vector->y;
-    z += vector->z;
+    x += vector.x;
+    y += vector.y;
+    z += vector.z;
 }
 
 /*
  * Add [v1] to [v2] and store the result in [result]
  */
-void Vector3::Add(const Vector3 * v1,const Vector3 * v2, Vector3 * result)
+void Vector3::Add(const Vector3& v1,const Vector3& v2, Vector3& result)
 {
-	ASSERT_RTRN(v1 != NULL, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL v1 passed.");
-	ASSERT_RTRN(v2 != NULL, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL v2 passed.");
-	ASSERT_RTRN(result != NULL, "Vector3::Add(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
-
-    result->x = v1->x + v2->x;
-    result->y = v1->y + v2->y;
-    result->z = v1->z + v2->z;
+    result.x = v1.x + v2.x;
+    result.y = v1.y + v2.y;
+    result.z = v1.z + v2.z;
 }
 
 /*
  * Subtract [v2] from [v1] and store the result in [result]
  */
-void Vector3::Subtract(const Vector3 * v1,const Vector3 * v2, Vector3 * result)
+void Vector3::Subtract(const Vector3& v1,const Vector3& v2, Vector3& result)
 {
-	ASSERT_RTRN(v1 != NULL, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL v1 passed.");
-	ASSERT_RTRN(v2 != NULL, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL v2 passed.");
-	ASSERT_RTRN(result != NULL, "Vector3::Subtract(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
-
-    result->x = v1->x - v2->x;
-    result->y = v1->y - v2->y;
-    result->z = v1->z - v2->z;
+    result.x = v1.x - v2.x;
+    result.y = v1.y - v2.y;
+    result.z = v1.z - v2.z;
 }
 
 /*
@@ -225,31 +207,23 @@ void Vector3::Invert()
 /*
  * Calculate the cross product of [a] x [b], and store the result in [result].
  */
-void Vector3::Cross(const Vector3 * a,const Vector3 * b, Vector3 * result)
+void Vector3::Cross(const Vector3& a,const Vector3& b, Vector3& result)
 {
-	ASSERT_RTRN(a != NULL, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.");
-	ASSERT_RTRN(b != NULL, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.");
-	ASSERT_RTRN(result != NULL, "Vector3::Cross(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
-
     float x,y,z;
-    x = (a->y*b->z) - (b->y*a->z);
-    y = (b->x*a->z) - (a->x*b->z);
-    z = (a->x*b->y) - (b->x*a->y);	
-    result->Set(x,y,z);
+    x = (a.y*b.z) - (b.y*a.z);
+    y = (b.x*a.z) - (a.x*b.z);
+    z = (a.x*b.y) - (b.x*a.y);
+    result.Set(x,y,z);
 }
 
 /*
  * Calculate a unit-vector perpendicular to the plane formed by [a] & [b]. Store
  * the result in [result].
  */
-void Vector3::CalcNormal(const Vector3 * a,const Vector3 * b, Vector3 * result)
+void Vector3::CalcNormal(const Vector3& a,const Vector3& b, Vector3& result)
 {
-	ASSERT_RTRN(a != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.");
-	ASSERT_RTRN(b != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.");
-	ASSERT_RTRN(result != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL result passed.");
-
     Cross(a,b,result);
-    result->Normalize();
+    result.Normalize();
 }
 
 /*
@@ -270,14 +244,11 @@ void Vector3::UpdateComponentPointers()
 /*
  * Calculate the dot product: [a] dot [b]
  */
-float Vector3::Dot(const Vector3 * a,const Vector3 * b)
+float Vector3::Dot(const Vector3& a,const Vector3& b)
 {
-	ASSERT(a != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL a passed.", 0);
-	ASSERT(b != NULL, "Vector3::CalcNormal(Vector3 *, Vector3 *, Vector3 *) -> NULL b passed.", 0);
-
-    float x = a->x * b->x;
-    float y = a->y * b->y;
-    float z = a->z * b->z;
+    float x = a.x * b.x;
+    float y = a.y * b.y;
+    float z = a.z * b.z;
     return x+y+z;
 }
 
@@ -304,54 +275,58 @@ void Vector3::Detach()
 /*
  * Rotate [a] towards [b] by [theta] degrees.
  */
-bool Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result)
+bool Vector3::RotateTowards(const Vector3& from, const Vector3& to,  float theta, Vector3& result)
 {
-	return RotateTowards(from, to, theta, result, &Vector3::UnitX);
+	return RotateTowards(from, to, theta, result, Vector3::UnitY);
 }
 
 /*
  * Rotate [a] towards [b] by [theta] degrees.
  */
-bool Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float theta, Vector3 * result, const Vector3 * fallbackAxis)
+bool Vector3::RotateTowards(const Vector3& from, const Vector3& to,  float theta, Vector3& result, const Vector3& fallbackAxis)
 {
-	ASSERT(from != NULL, "Vector3::RotateTowards -> NULL from passed.", false);
-	ASSERT(to != NULL, "Vector3::RotateTowards -> NULL to passed.", false);
-	ASSERT(result != NULL, "Vector3::RotateTowards -> NULL result passed.", false);
-
+	// convert theta to radians
 	theta *= Constants::DegreesToRads;
 
 	Vector3 newVector;
 	Vector3 rotationAxis;
-	Vector3 fromCopy = *from;
-	Vector3 toCopy = *to;
+	Vector3 fromCopy = from;
+	Vector3 toCopy = to;
 
 	fromCopy.Normalize();
 	toCopy.Normalize();
 
-	float dot = Vector3::Dot(&fromCopy, &toCopy);
+	// calculate angle between [from] and [to]
+	float dot = Vector3::Dot(fromCopy, toCopy);
 	float thetaDiff = GTEMath::ACos(dot);
 
+	// cap theta so we don't rotate past [to]
 	if((theta > thetaDiff && thetaDiff > 0) || (theta < thetaDiff && thetaDiff < 0))
 	{
 		theta = thetaDiff;
-		*result =toCopy;
+		result =toCopy;
 		return true;
 	}
 
-	Vector3::Cross(&fromCopy, &toCopy, &rotationAxis);
-	Vector3::Cross(&rotationAxis, &fromCopy, &newVector);
+	// form rotation axis
+	Vector3::Cross(fromCopy, toCopy, rotationAxis);
+	Vector3::Cross(rotationAxis, fromCopy, newVector);
 
 	Vector3 fromScaled;
 	Vector3 newScaled;
 
-	if(newVector.Magnitude() < .001) // vectors [a] and [b] are opposite
+	// Magnitude() < .001 means vectors [from] and [too] are essentially parallel
+	if(newVector.Magnitude() < .001)
 	{
+		// are these vectors really close? if so, just set [result] to [to]
 		if(dot > .99999)
 		{
-			*result = toCopy;
+			result = toCopy;
 			return true;
 		}
-		//*result = fromCopy;
+
+		// at this point we have determined the vectors are essentially opposite, and since we can't form
+		// a plane in which to do the rotation, the operation fails.
 		return false;
 	}
 	else
@@ -363,8 +338,8 @@ bool Vector3::RotateTowards(const Vector3 * from, const Vector3 * to,  float the
 		newScaled = newVector;
 		newScaled.Scale(GTEMath::Sin(theta));
 
-		Vector3::Add(&fromScaled, &newScaled, result);
-		result->Normalize();
+		Vector3::Add(fromScaled, newScaled, result);
+		result.Normalize();
 		return true;
 	}
 }

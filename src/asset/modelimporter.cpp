@@ -59,6 +59,8 @@
 #include "ui/debug.h"
 #include "util/util.h"
 
+const std::string ModelImporter::AssimpPathDelimiter = std::string("/");
+
 ModelImporter::ModelImporter()
 {
 	importer = NULL;
@@ -312,7 +314,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	// update the scene object's local transform
 	std::string name(node.mName.C_Str());
 	sceneObject->SetName(name);
-	sceneObject->GetLocalTransform().SetTo(&mat);
+	sceneObject->GetLocalTransform().SetTo(mat);
 	current->AddChild(sceneObject);
 	createdSceneObjects.push_back(sceneObject);
 
@@ -477,12 +479,37 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		{
 			// load & create diffuse texture
 			std::string texPath = fileSystem->FixupPath(std::string(aiTexturePath.data));
-			filename = fileSystem->ConcatenatePaths(basepath, texPath);
+			std::string originalFilePath = fileSystem->ConcatenatePaths(basepath, texPath);
 
 			TextureAttributes texAttributes;
 			texAttributes.FilterMode = TextureFilter::TriLinear;
 			texAttributes.MipMapLevel = 4;
-			diffuseTexture = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
+
+
+			if(fileSystem->FileExists(originalFilePath)) // attempt to find texture using full path specified by model
+			{
+				diffuseTexture = engineObjectManager->CreateTexture(originalFilePath.c_str(),texAttributes);
+			}
+			else // try loading texture looking in the model's directory
+			{
+				unsigned int pos = texPath.find_last_of(AssimpPathDelimiter);
+				filename = (std::string::npos == pos) ? "" : texPath.substr(pos+1);
+
+				if(!(std::string::npos == pos))
+				{
+					filename = fileSystem->ConcatenatePaths(basepath, filename);
+					if(fileSystem->FileExists(filename))
+					{
+						diffuseTexture = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
+					}
+				}
+			}
+
+			if(!diffuseTexture.IsValid())
+			{
+				std::string msg = std::string("Could not load texture file: ") + originalFilePath;
+				Debug::PrintWarning(msg);
+			}
 		}
 
 		// loop through each mesh in the scene and check if it uses [material]. If so,
@@ -728,7 +755,7 @@ void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, un
 
 				skeleton->GetBone(currentBoneIndex)->Name = boneName;
 				skeleton->GetBone(currentBoneIndex)->ID = currentBoneIndex;
-				skeleton->GetBone(currentBoneIndex)->OffsetMatrix.SetTo(&offsetMatrix);
+				skeleton->GetBone(currentBoneIndex)->OffsetMatrix.SetTo(offsetMatrix);
 
 				currentBoneIndex++;
 			}

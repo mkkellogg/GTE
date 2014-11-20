@@ -639,7 +639,7 @@ Quaternion Quaternion::getRotation(const Vector3& source, const Vector3& dest, c
 	v0.Normalize();
 	v1.Normalize();
 
-	float d = Vector3::Dot(&v0, &v1);
+	float d = Vector3::Dot(v0, v1);
 
 	// If dot == 1, vectors are the same
 	if (d >= 1.0f)
@@ -658,11 +658,11 @@ Quaternion Quaternion::getRotation(const Vector3& source, const Vector3& dest, c
 		else
 		{
 			// Generate an axis
-			Vector3::Cross(&Vector3::UnitX, &source, &axis);
+			Vector3::Cross(Vector3::UnitX, source, axis);
 
 			if (axis.IsZeroLength()) // pick another if colinear
 			{
-				Vector3::Cross(&Vector3::UnitY, &source, &axis);
+				Vector3::Cross(Vector3::UnitY, source, axis);
 			}
 
 			axis.Normalize();
@@ -675,7 +675,7 @@ Quaternion Quaternion::getRotation(const Vector3& source, const Vector3& dest, c
 		float invs = 1 / s;
 
 		Vector3 c;
-		Vector3::Cross(&v0, &v1, &c);
+		Vector3::Cross(v0, v1, c);
 
 		q.Set(c.x * invs, c.y * invs, c.z * invs, s * 0.5f);
 		q.normalize();

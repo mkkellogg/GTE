@@ -13,10 +13,6 @@
 
 // forward declarations
 class Transform;
-class SceneObject;
-class SceneObjectTransform;
-class Quaternion;
-class Vector3;
 
 #include "object/enginetypes.h"
 #include "transform.h"
@@ -30,7 +26,7 @@ class SceneObjectTransform : public Transform
 	SceneObjectRef sceneObject;
 	Matrix4x4 localMatrix;
 
-	void GetInheritedTransform(Transform * transform, bool invert);
+	void GetInheritedTransform(Transform& transform, bool invert);
 	void UpdateTarget();
 	void UpdateFullTransform();
 
@@ -38,21 +34,21 @@ class SceneObjectTransform : public Transform
 
 	SceneObjectTransform();
 	SceneObjectTransform(SceneObjectRef sceneObject);
-	SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4 * m);
-	SceneObjectTransform(SceneObjectTransform * sceneObjectTransform);
+	SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4& m);
+	SceneObjectTransform(SceneObjectTransform& sceneObjectTransform);
     ~SceneObjectTransform();
 
     void AttachTo(SceneObjectRef sceneObject);
-    void SetLocalTransform(const Transform* localTransform);
-    void SetLocalMatrix(const Matrix4x4 * localMatrix);
+    void SetLocalTransform(const Transform& localTransform);
+    void SetLocalMatrix(const Matrix4x4& localMatrix);
 
-    void GetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale);
-    void SetLocalComponents(Vector3 * translation, Quaternion * rotation, Vector3 * scale);
+    void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
+    void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
 
     void Translate(float x, float y, float z, bool local);
-    void RotateAround(Point3 * point, Vector3 * axis, float angle);
+    void RotateAround(Point3& point, Vector3& axis, float angle);
     void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
-    void Scale(Vector3 * mag,  bool local);
+    void Scale(Vector3& mag,  bool local);
     void Scale(float x, float y, float z,  bool local);
 };
 

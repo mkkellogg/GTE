@@ -50,15 +50,16 @@ Matrix4x4::Matrix4x4() : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
 /*
  * Construct matrix with existing float data
  */
-Matrix4x4::Matrix4x4(float * data) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
-									 B0(data[1]), B1(data[5]), B2(data[9]), B3(data[13]),
-									 C0(data[2]), C1(data[6]), C2(data[10]), C3(data[14]),
-									 D0(data[3]), D1(data[7]), D2(data[11]), D3(data[15])
+Matrix4x4::Matrix4x4(const float * sourceData) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
+									 	 	 	 B0(data[1]), B1(data[5]), B2(data[9]), B3(data[13]),
+									 	 	 	 C0(data[2]), C1(data[6]), C2(data[10]), C3(data[14]),
+									 	 	 	 D0(data[3]), D1(data[7]), D2(data[11]), D3(data[15])
 {
     Init();
+
     if(data != NULL)
     {
-    	memcpy(this->data, data, sizeof(float) * DATA_SIZE);
+    	memcpy(data, sourceData, sizeof(float) * DATA_SIZE);
     }
     else
     {
@@ -70,12 +71,12 @@ Matrix4x4::Matrix4x4(float * data) : A0(data[0]), A1(data[4]), A2(data[8]), A3(d
 /*
  * Copy constructor.
  */
-Matrix4x4::Matrix4x4(const Matrix4x4 & source) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
+Matrix4x4::Matrix4x4(const Matrix4x4& source) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
 												 B0(data[1]), B1(data[5]), B2(data[9]), B3(data[13]),
 												 C0(data[2]), C1(data[6]), C2(data[10]), C3(data[14]),
 												 D0(data[3]), D1(data[7]), D2(data[11]), D3(data[15])
 {
-	SetTo(&source);
+	SetTo(source);
 }
 
 /*
@@ -94,51 +95,43 @@ int Matrix4x4::GetDataSize() const
 /*
  * Copy data from existing matrix to this one
  */
-void Matrix4x4::SetTo(const Matrix4x4 * src)
+void Matrix4x4::SetTo(const Matrix4x4& src)
 {
-	ASSERT_RTRN(src != NULL,"Matrix4x4::SetTo -> NULL pointer passed");
-	if(this == src)return;
-	SetTo(src->data);
+	if(this == &src)return;
+	SetTo(src.data);
 }
 
 /*
  * Copy existing matrix data (from a float array) to this one
  */
-void Matrix4x4::SetTo(const float * srcData)
+void Matrix4x4::SetTo(const float * sourceData)
 {
-	ASSERT_RTRN(srcData != NULL,"Matrix4x4::SetTo -> srcData is NULL");
-	memcpy(data, srcData, sizeof(float) * DATA_SIZE);
+	ASSERT_RTRN(sourceData != NULL,"Matrix4x4::SetTo -> srcData is NULL");
+	memcpy(data, sourceData, sizeof(float) * DATA_SIZE);
 }
 
 /*
  * Build matrix from components [translation], [scale], and [rotation]
  */
-void Matrix4x4::BuildFromComponents(const Vector3 * translation, const Quaternion * rotation,  const Vector3 * scale)
+void Matrix4x4::BuildFromComponents(const Vector3& translation, const Quaternion& rotation,  const Vector3& scale)
 {
-	ASSERT_RTRN(translation != NULL,"Matrix4x4::BuildFromComponents -> translation is NULL");
-	ASSERT_RTRN(scale != NULL,"Matrix4x4::BuildFromComponents -> scale is NULL");
-	ASSERT_RTRN(rotation != NULL,"Matrix4x4::BuildFromComponents -> rotation is NULL");
-
-	Matrix4x4 rotMatrix = rotation->rotationMatrix();
+	Matrix4x4 rotMatrix = rotation.rotationMatrix();
 
 	// Build the final matrix, with translation, scale, and rotation
-  	A0 = scale->x * rotMatrix.A0; A1 = scale->y *  rotMatrix.A1; A2 = scale->z * rotMatrix.A2; A3 = translation->x;
-  	B0 = scale->x * rotMatrix.B0; B1 = scale->y *  rotMatrix.B1; B2 = scale->z * rotMatrix.B2; B3 = translation->y;
-  	C0 = scale->x * rotMatrix.C0; C1 = scale->y *  rotMatrix.C1; C2 = scale->z * rotMatrix.C2; C3 = translation->z;
+  	A0 = scale.x * rotMatrix.A0; A1 = scale.y *  rotMatrix.A1; A2 = scale.z * rotMatrix.A2; A3 = translation.x;
+  	B0 = scale.x * rotMatrix.B0; B1 = scale.y *  rotMatrix.B1; B2 = scale.z * rotMatrix.B2; B3 = translation.y;
+  	C0 = scale.x * rotMatrix.C0; C1 = scale.y *  rotMatrix.C1; C2 = scale.z * rotMatrix.C2; C3 = translation.z;
 
   	D0 = 0; D1 = 0; D2 = 0;D3 = 1;
 }
 
-void Matrix4x4::Decompose(Vector3 * translation, Quaternion * rotation, Vector3 * scale)
+void Matrix4x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale)
 {
-	ASSERT_RTRN(translation != NULL,"Matrix4x4::Decompose -> translation is NULL");
-	ASSERT_RTRN(scale != NULL,"Matrix4x4::Decompose -> scale is NULL");
-	ASSERT_RTRN(rotation != NULL,"Matrix4x4::Decompose -> rotation is NULL");
 	ASSERT_RTRN(IsAffine(), "Matrix4x4::Decompose -> matrix is not affine");
 
 	Matrix4x4 rotMatrix;
 
-	// build orthogonal matrix Q
+	// build orthogonal matrix [rotMatrix]
 	float fInvLength = GTEMath::InverseSquareRoot(A0*A0 + B0*B0 + C0*C0);
 
 	rotMatrix.A0 = A0*fInvLength;
@@ -180,10 +173,10 @@ void Matrix4x4::Decompose(Vector3 * translation, Quaternion * rotation, Vector3 
 	{
 		 for (size_t iRow = 0; iRow < 3; iRow++)
 			 for (size_t iCol = 0; iCol < 3; iCol++)
-				 rotMatrix.data[iCol * 4 + iRow] = -rotMatrix.data[iCol * 4 + iRow];
+				 rotMatrix.data[iCol * DIM_SIZE + iRow] = -rotMatrix.data[iCol * DIM_SIZE + iRow];
 	}
 
-	// build "right" matrix R
+	// build "right" matrix [rightMatrix]
 	Matrix4x4 rightMatrix;
 	rightMatrix.A0 = rotMatrix.A0*A0 + rotMatrix.B0*B0 + rotMatrix.C0*C0;
 	rightMatrix.A1 = rotMatrix.A0*A1 + rotMatrix.B0*B1 + rotMatrix.C0*C1;
@@ -193,20 +186,20 @@ void Matrix4x4::Decompose(Vector3 * translation, Quaternion * rotation, Vector3 
 	rightMatrix.C2 = rotMatrix.A2*A2 + rotMatrix.B2*B2 + rotMatrix.C2*C2;
 
 	// the scaling component
-	scale->x = rightMatrix.A0;
-	scale->y = rightMatrix.B1;
-	scale->z = rightMatrix.C2;
+	scale.x = rightMatrix.A0;
+	scale.y = rightMatrix.B1;
+	scale.z = rightMatrix.C2;
 
 	Vector3 shear;
 
 	// the shear component
-	float fInvD0 = 1.0f/scale->x;
+	float fInvD0 = 1.0f/scale.x;
 	shear.x = rightMatrix.A1*fInvD0;
 	shear.y = rightMatrix.A2*fInvD0;
-	shear.z = rightMatrix.B2/scale->y;
+	shear.z = rightMatrix.B2/scale.y;
 
-	rotation->FromMatrix(rotMatrix);
-	translation->Set(A3, B3, C3);
+	rotation.FromMatrix(rotMatrix);
+	translation.Set(A3, B3, C3);
 }
 
 bool Matrix4x4::IsAffine(void) const
@@ -217,10 +210,10 @@ bool Matrix4x4::IsAffine(void) const
 /*
  * Overloaded assignment operator
  */
-Matrix4x4 & Matrix4x4::operator= (const Matrix4x4 & source)
+Matrix4x4 & Matrix4x4::operator= (const Matrix4x4& source)
 {
     if(this == &source)return *this;
-    SetTo(&source);
+    SetTo(source);
     return *this;
 }
 
@@ -237,7 +230,7 @@ void Matrix4x4::Init()
  */
 void Matrix4x4::MultiplyByScalar(float scalar)
 {
-	for(unsigned int i = 0; i < 16; i++)
+	for(unsigned int i = 0; i < DATA_SIZE; i++)
 	{
 		data[i] *= scalar;
 	}
@@ -246,39 +239,39 @@ void Matrix4x4::MultiplyByScalar(float scalar)
 /*
  * Transform [vector] by this matrix, and store the result in [out]
  */
-void Matrix4x4::Transform(const Vector3 * vector, Vector3 * out) const
+void Matrix4x4::Transform(const Vector3& vector, Vector3& out) const
 {
-    MultiplyMV(this->data, const_cast<Vector3 *>(vector)->GetDataPtr(), out->GetDataPtr());
+	float * vectorData = const_cast<Vector3&>(vector).GetDataPtr();
+    MultiplyMV(this->data, vectorData, out.GetDataPtr());
 }
 
 /*
  * Transform [point] by this matrix, and store the result in [out]
  */
-void Matrix4x4::Transform(const Point3 * point, Point3 * out) const
+void Matrix4x4::Transform(const Point3& point, Point3& out) const
 {
-    MultiplyMV(this->data,  const_cast<Point3 *>(point)->GetDataPtr(), out->GetDataPtr());
+	float * pointData = const_cast<Point3&>(point).GetDataPtr();
+    MultiplyMV(this->data,  pointData, out.GetDataPtr());
 }
 
 /*
  * Transform [vector] by this matrix
  */
-void Matrix4x4::Transform(Vector3 * vector) const
+void Matrix4x4::Transform(Vector3& vector) const
 {
-	ASSERT_RTRN(vector != NULL,"Matrix4x4::Transform(Vector3 *) -> vector is NULL");
-
 	float temp[DIM_SIZE];
-	MultiplyMV(this->data, vector->GetDataPtr(), temp);
-	memcpy(vector->GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
+	MultiplyMV(this->data, vector.GetDataPtr(), temp);
+	memcpy(vector.GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
 }
 
 /*
  * Transform [point] by this matrix
  */
-void Matrix4x4::Transform(Point3 * point) const
+void Matrix4x4::Transform(Point3& point) const
 {
 	float temp[DIM_SIZE];
-	MultiplyMV(this->data, point->GetDataPtr(), temp);
-	memcpy(point->GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
+	MultiplyMV(this->data, point.GetDataPtr(), temp);
+	memcpy(point.GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
 }
 
 /*
@@ -296,60 +289,48 @@ void Matrix4x4::Transform(float * vector4f) const
 /*
  * Add [matrix] to this matrix
  */
-void Matrix4x4::Add(const Matrix4x4 * matrix)
+void Matrix4x4::Add(const Matrix4x4& matrix)
 {
-	ASSERT_RTRN(matrix != NULL, "Matrix4x4::add -> matrix is NULL");
-	for(unsigned int i=0; i < 16; i++)
+	for(unsigned int i=0; i < DATA_SIZE; i++)
 	{
-		data[i] += matrix->data[i];
+		data[i] += matrix.data[i];
 	}
 }
 
 /*
  * Post-multiply this matrix by [matrix]
  */
-void Matrix4x4::Multiply(const Matrix4x4 * matrix)
+void Matrix4x4::Multiply(const Matrix4x4& matrix)
 {
-	ASSERT_RTRN(matrix != NULL, "Matrix4x4::Multiply(Matrix4x4 *) -> matrix is NULL");
-
     float temp[DATA_SIZE];
-    MultiplyMM(this->data, matrix->data, temp);
+    MultiplyMM(this->data, matrix.data, temp);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
 /*
  * Pre-multiply this matrix by [matrix]
  */
-void Matrix4x4::PreMultiply(const Matrix4x4 * matrix)
+void Matrix4x4::PreMultiply(const Matrix4x4& matrix)
 {
-	ASSERT_RTRN(matrix != NULL, "Matrix4x4::PreMultiply(Matrix4x4 *) -> matrix is NULL");
-
     float temp[DATA_SIZE];
-    MultiplyMM(matrix->data, this->data, temp);
+    MultiplyMM(matrix.data, this->data, temp);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
 
 /*
  * Post-multiply this matrix by [matrix], and store the result in [out]
  */
-void Matrix4x4::Multiply(const Matrix4x4 * matrix, Matrix4x4 * out) const
+void Matrix4x4::Multiply(const Matrix4x4& matrix, Matrix4x4& out) const
 {
-	ASSERT_RTRN(matrix != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *) -> matrix is NULL");
-	ASSERT_RTRN(out != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *) -> out is NULL");
-
-    MultiplyMM(this->data, matrix->data, out->data);
+    MultiplyMM(this->data, matrix.data, out.data);
 }
 
 /*
  * Post-multiply [lhs] by [rhs], and store the result in [out]
  */
-void Matrix4x4::Multiply(const Matrix4x4 * lhs, const Matrix4x4 *rhs, Matrix4x4 * out)
+void Matrix4x4::Multiply(const Matrix4x4& lhs, const Matrix4x4& rhs, Matrix4x4& out)
 {
-	ASSERT_RTRN(lhs != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> lhs is NULL");
-	ASSERT_RTRN(rhs != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> rhs is NULL");
-	ASSERT_RTRN(out != NULL, "Matrix4x4::Multiply(Matrix4x4 *, Matrix4x4 *,  Matrix4x4 *) -> out is NULL");
-
-    MultiplyMM(lhs->data, rhs->data, out->data);
+    MultiplyMM(lhs.data, rhs.data, out.data);
 }
 
 /*
@@ -374,10 +355,10 @@ void Matrix4x4::Mx4transform(float x, float y, float z, float w, const float* ma
 	ASSERT_RTRN(matrix != NULL, "Matrix4x4::Mx4transform -> lhsMat is NULL");
 	ASSERT_RTRN(pDest != NULL, "Matrix4x4::Mx4transform -> pDest is NULL");
 
-    pDest[0] = matrix[0 + 4 * 0] * x + matrix[0 + 4 * 1] * y + matrix[0 + 4 * 2] * z + matrix[0 + 4 * 3] * w;
-    pDest[1] = matrix[1 + 4 * 0] * x + matrix[1 + 4 * 1] * y + matrix[1 + 4 * 2] * z + matrix[1 + 4 * 3] * w;
-    pDest[2] = matrix[2 + 4 * 0] * x + matrix[2 + 4 * 1] * y + matrix[2 + 4 * 2] * z + matrix[2 + 4 * 3] * w;
-    pDest[3] = matrix[3 + 4 * 0] * x + matrix[3 + 4 * 1] * y + matrix[3 + 4 * 2] * z + matrix[3 + 4 * 3] * w;
+    pDest[0] = matrix[0 + DIM_SIZE * 0] * x + matrix[0 + DIM_SIZE * 1] * y + matrix[0 + DIM_SIZE * 2] * z + matrix[0 + DIM_SIZE * 3] * w;
+    pDest[1] = matrix[1 + DIM_SIZE * 0] * x + matrix[1 + DIM_SIZE * 1] * y + matrix[1 + DIM_SIZE * 2] * z + matrix[1 + DIM_SIZE * 3] * w;
+    pDest[2] = matrix[2 + DIM_SIZE * 0] * x + matrix[2 + DIM_SIZE * 1] * y + matrix[2 + DIM_SIZE * 2] * z + matrix[2 + DIM_SIZE * 3] * w;
+    pDest[3] = matrix[3 + DIM_SIZE * 0] * x + matrix[3 + DIM_SIZE * 1] * y + matrix[3 + DIM_SIZE * 2] * z + matrix[3 + DIM_SIZE * 3] * w;
 }
 
 /*********************************************************
@@ -467,10 +448,9 @@ bool Matrix4x4::Invert()
  *
  * Returns false if the matrix cannot be inverted
  */
-bool Matrix4x4::Invert(Matrix4x4 * out)
+bool Matrix4x4::Invert(Matrix4x4& out)
 {
-	ASSERT(out != NULL, "Matrix4x4::Invert -> out is NULL", false);
-	return Invert(data, out->data);
+	return Invert(data, out.data);
 }
 
 /*
@@ -611,6 +591,17 @@ const float * Matrix4x4::GetDataPtr() const
 }
 
 /*
+ * Scale this matrix by the x,y, and z components of [scale]
+ *
+ * This performs a post-transformation, in that it is equivalent to post-multiplying this
+ * matrix by a scale matrix
+ */
+void Matrix4x4::Scale(const Vector3& scale)
+{
+	Scale(scale.x, scale.y, scale.z);
+}
+
+/*
  * Scale this matrix by [x], [y], and [z].
  *
  * This performs a post-transformation, in that it is equivalent to post-multiplying this
@@ -647,9 +638,9 @@ void Matrix4x4::PreScale(float x, float y, float z)
  * This performs a post-transformation, in that it is equivalent to post-multiplying this
  * matrix by a scale matrix
  */
-void Matrix4x4::Scale(Matrix4x4 * out, float x, float y, float z) const
+void Matrix4x4::Scale(Matrix4x4& out, float x, float y, float z) const
 {
-    Scale(this->data, out->data, x, y, z);
+    Scale(this->data, out.data, x, y, z);
 }
 
 /*
@@ -664,7 +655,7 @@ void Matrix4x4::Scale(const float * source, float * dest,  float x, float y, flo
 	ASSERT_RTRN(source != NULL, "Matrix4x4::Scale -> source is NULL");
 	ASSERT_RTRN(dest != NULL, "Matrix4x4::Scale -> dest is NULL");
 
-    for (int i=0 ; i<4 ; i++) 
+    for (int i = 0; i < DIM_SIZE ; i++)
     {
         int smi = i;
         int mi = i;
@@ -681,13 +672,11 @@ void Matrix4x4::Scale(const float * source, float * dest,  float x, float y, flo
  * This performs a post-transformation, in that it is equivalent to post-multiplying
  * this matrix by a translation matrix
  */
-void Matrix4x4::Translate(const Vector3 * vector)
+void Matrix4x4::Translate(const Vector3& vector)
 {
-	ASSERT_RTRN(vector != NULL, "Matrix4x4::Translate -> vector is NULL");
-
-    float x = vector->x;
-    float y = vector->y;
-    float z = vector->z;
+    float x = vector.x;
+    float y = vector.y;
+    float z = vector.z;
     Translate(x,y,z);
 }
 
@@ -708,9 +697,9 @@ void Matrix4x4::Translate(float x, float y, float z)
  * This performs a pre-transformation, in that it is equivalent to pre-multiplying
  * this matrix by a translation matrix
  */
-void Matrix4x4::PreTranslate(const Vector3 * vector)
+void Matrix4x4::PreTranslate(const Vector3& vector)
 {
-	PreTranslate(vector->x, vector->y, vector->z);
+	PreTranslate(vector.x, vector.y, vector.z);
 }
 /*
  * Translate this matrix by [x], [y], [z]
@@ -731,9 +720,9 @@ void Matrix4x4::PreTranslate(float x, float y, float z)
  * This performs a post-transformation, in that it is equivalent to post-multiplying
  * [source] by a translation matrix
  */
-void Matrix4x4::Translate(const Matrix4x4 * source, Matrix4x4 * out, const Vector3 * vector)
+void Matrix4x4::Translate(const Matrix4x4& source, Matrix4x4& out, const Vector3& vector)
 {
-    Translate(source->data, out->data, vector->x, vector->y, vector->z);
+    Translate(source.data, out.data, vector.x, vector.y, vector.z);
 }
 
 /*
@@ -742,9 +731,9 @@ void Matrix4x4::Translate(const Matrix4x4 * source, Matrix4x4 * out, const Vecto
  * This performs a post-transformation, in that it is equivalent to post-multiplying
  * [source] by a translation matrix
  */
-void Matrix4x4::Translate(const Matrix4x4 * source, Matrix4x4 * out,float x, float y, float z)
+void Matrix4x4::Translate(const Matrix4x4& source, Matrix4x4& out,float x, float y, float z)
 {
-    Translate(source->data, out->data, x, y, z);
+    Translate(source.data, out.data, x, y, z);
 }
 
 /*
@@ -765,7 +754,7 @@ void Matrix4x4::Translate(const float * source, float * dest, float x, float y, 
         }
     }
     
-    for (int i=0 ; i<4 ; i++) 
+    for (int i=0 ; i < DIM_SIZE; i++)
     {
         int tmi = i;
         int mi = i;
@@ -798,13 +787,11 @@ void Matrix4x4::PreTranslate(const float * source, float * dest, float x, float 
  * This performs a post-transformation, in that it is equivalent to post-multiplying
  * this matrix by a rotation matrix
  */
-void Matrix4x4::Rotate(const Vector3 * vector, float a)
+void Matrix4x4::Rotate(const Vector3& vector, float a)
 {
-	ASSERT_RTRN(vector != NULL, "Matrix4x4::Rotate -> vector is NULL");
-
     float temp[DATA_SIZE];  
     float r[DATA_SIZE];  
-    SetRotate(r, vector->x, vector->y, vector->z, a);
+    SetRotate(r, vector.x, vector.y, vector.z, a);
     MultiplyMM(data, r, temp);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
@@ -830,13 +817,11 @@ void Matrix4x4::Rotate(float x, float y, float z, float a)
  * This performs a pre-transformation, in that it is equivalent to pre-multiplying
  * this matrix by a rotation matrix
  */
-void Matrix4x4::PreRotate(const Vector3 * vector, float a)
+void Matrix4x4::PreRotate(const Vector3& vector, float a)
 {
-	ASSERT_RTRN(vector != NULL, "Matrix4x4::PreRotate -> vector is NULL");
-
     float temp[DATA_SIZE];
     float r[DATA_SIZE];
-    SetRotate(r, vector->x, vector->y, vector->z, a);
+    SetRotate(r, vector.x, vector.y, vector.z, a);
     MultiplyMM(r, data,temp);
     memcpy(data, temp, sizeof(float) * DATA_SIZE);
 }
@@ -868,10 +853,9 @@ void Matrix4x4::SetRotateEuler(float x, float y, float z)
 /*
  * Set the 4x4 matrix [m] to be a rotation matrix, around axis [x], [y], [z] by [a] degrees
  */
-void Matrix4x4::SetRotate(Matrix4x4 * m, float x, float y, float z, float a)
+void Matrix4x4::SetRotate(Matrix4x4& m, float x, float y, float z, float a)
 {
-	ASSERT_RTRN(m != NULL, "Matrix4x4::SetRotate -> m is NULL");
-	SetRotate(m->data,x,y,z,a);
+	SetRotate(m.data,x,y,z,a);
 }
 
 /*

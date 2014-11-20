@@ -14,7 +14,9 @@ class Game
 	AnimationRef koopaWait, koopaWalk, koopaJump, koopaRoar;
 	AnimationPlayerRef animationPlayer;
 
+	float walkAnimationSpeed;
 	float walkSpeed;
+	float runAnimationSpeed;
 	float runSpeed;
 	float rotateSpeed;
 	float speedSmoothing;

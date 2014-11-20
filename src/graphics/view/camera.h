@@ -3,9 +3,9 @@
 
 //forward declarations
 class Camera;
-class Transform;
 class Graphics;
 
+#include "geometry/transform.h"
 #include "graphics/render/renderbuffer.h"
 #include "object/sceneobjectcomponent.h"
 
@@ -15,7 +15,7 @@ class Camera : public SceneObjectComponent
 
     unsigned int clearBufferMask;
 
-    Transform * projectionTransform;
+    Transform projectionTransform;
     Graphics * graphics;
 
     protected:
@@ -25,7 +25,7 @@ class Camera : public SceneObjectComponent
 
     public:
 
-    const Transform * GetProjectionTransform() const ;
+    const Transform& GetProjectionTransform() const ;
     void AddClearBuffer(RenderBufferType buffer);
     void RemoveClearBuffer(RenderBufferType buffer);
     unsigned int GetClearBufferMask() const;

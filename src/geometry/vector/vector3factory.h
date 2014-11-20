@@ -12,7 +12,7 @@ class Vector3Factory : public BaseVector4Factory
 
     public:
 
-	static Vector3Factory * GetInstance();
+	static Vector3Factory * Instance();
 
 	Vector3Factory();
     virtual ~Vector3Factory();

@@ -28,43 +28,32 @@ class Transform
     public:
 
     Transform();
-    Transform(Matrix4x4 * m);
+    Transform(const Matrix4x4& m);
     Transform(Transform *);
     virtual ~Transform();
 
-    void CopyMatrix(Matrix4x4 * dest) const;
-    void SetTo(const Matrix4x4 * matrix);
-    void SetTo(const Transform * transform);
+    void CopyMatrix(Matrix4x4& dest) const;
+    void SetTo(const Matrix4x4& matrix);
     void SetTo(const Transform& transform);
     void SetTo(const float * matrixData);
-
     void SetIdentity();
     void Invert();
-
-    void TransformBy(const Matrix4x4 * matrix);
-    void PreTransformBy(const Matrix4x4 * matrix);
-
-    void TransformBy(const Transform * transform);
-    void PreTransformBy(const Transform * transform);
+    void TransformBy(const Matrix4x4& matrix);
+    void PreTransformBy(const Matrix4x4& matrix);
     void TransformBy(const Transform& transform);
     void PreTransformBy(const Transform& transform);
-
     virtual void Translate(float x, float y, float z, bool local);
-    virtual void Translate(Vector3 * vector, bool local);
+    virtual void Translate(Vector3& vector, bool local);
     virtual void RotateAround(Point3 * point, Vector3 * axis, float angle);
     virtual void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
     virtual void Scale(Vector3 * mag,  bool local);
     virtual void Scale(float x, float y, float z,  bool local);
-
-    static Transform * CreateIdentityTransform();
-
-    static void BuildProjectionMatrix(Matrix4x4 * m,float fov, float ratio, float nearP, float farP);
-    static void BuildLookAtMatrix(Matrix4x4 * m, float posX, float posY, float posZ,
-            						float lookAtX, float lookAtY, float lookAtZ);
-
-    void TransformVector(Vector3 * vector) const;
-    void TransformPoint(Point3 * point3) const;
+    void TransformVector(Vector3& vector) const;
+    void TransformPoint(Point3& point3) const;
     void TransformVector4f(float * vector) const;
+    static Transform * CreateIdentityTransform();
+    static void BuildProjectionMatrix(Matrix4x4& m,float fov, float ratio, float nearP, float farP);
+    static void BuildLookAtMatrix(Matrix4x4& m, float posX, float posY, float posZ, float lookAtX, float lookAtY, float lookAtZ);
 };
 
 #endif

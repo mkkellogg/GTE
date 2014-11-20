@@ -36,15 +36,7 @@ Point3::Point3(float x, float y, float z) : BaseVector4(x,y,z,1), x(data[0]), y(
 /*
  * Copy constructor
  */
-Point3::Point3(const Point3& point) : BaseVector4(&point), x(data[0]), y(data[1]), z(data[2])
-{
-
-}
-
-/*
- * Copy constructor
- */
-Point3::Point3(const Point3 * point) : BaseVector4(point), x(data[0]), y(data[1]), z(data[2])
+Point3::Point3(const Point3& point) : BaseVector4(point), x(data[0]), y(data[1]), z(data[2])
 {
 
 }
@@ -60,49 +52,41 @@ Point3::~Point3()
 /*
  * Move this point by [v]
  */
-void Point3::Add(const Vector3 * v)
+void Point3::Add(const Vector3& v)
 {
-    x += v->x;
-    y += v->y;
-    z += v->z;
+    x += v.x;
+    y += v.y;
+    z += v.z;
 }
 
 /*
  * Add vector [v] to [point] and store the result in [result]
  */
-void Point3::Add(const Point3 * point,const Vector3 * v, Point3 * result)
+void Point3::Add(const Point3& point, const Vector3& v, Point3& result)
 {
-    result->x = point->x + v->x;
-    result->y = point->y + v->y;
-    result->z = point->z + v->z;
+    result.x = point.x + v.x;
+    result.y = point.y + v.y;
+    result.z = point.z + v.z;
 }
 
 /*
  * Subtract [p2] from [p1] and store the resulting vector in [result]
  */
-void Point3::Subtract(const Point3 * p1,const Point3 * p2, Vector3 * result)
+void Point3::Subtract(const Point3& p1,const Point3& p2, Vector3& result)
 {
-	ASSERT_RTRN(p1 != NULL, "Point3::Subtract -> NULL p1 passed.");
-	ASSERT_RTRN(p2 != NULL, "Point3::Subtract -> NULL p2 passed.");
-	ASSERT_RTRN(result != NULL, "Point3::Subtract -> NULL result passed.");
-
-    result->x = p1->x - p2->x;
-    result->y = p1->y - p2->y;        
-    result->z = p1->z - p2->z;
+    result.x = p1.x - p2.x;
+    result.y = p1.y - p2.y;
+    result.z = p1.z - p2.z;
 }
 
 /*
  * Linearly interpolate from [p1] to [2] and store the result in [result]
  */
-void Point3::Lerp(const Point3 *p1, const Point3 * p2, Point3 * result, float t)
+void Point3::Lerp(const Point3& p1, const Point3& p2, Point3& result, float t)
 {
-	ASSERT_RTRN(p1 != NULL, "Point3::Lerp -> NULL p1 passed.");
-	ASSERT_RTRN(p2 != NULL, "Point3::Lerp -> NULL p2 passed.");
-	ASSERT_RTRN(result != NULL, "Point3::Lerp -> NULL result passed.");
-
-	result->x = ((p2->x - p1->x) * t) + p1->x;
-	result->y = ((p2->y - p1->y) * t) + p1->y;
-	result->z = ((p2->z - p1->z) * t) + p1->z;
+	result.x = ((p2.x - p1.x) * t) + p1.x;
+	result.y = ((p2.y - p1.y) * t) + p1.y;
+	result.z = ((p2.z - p1.z) * t) + p1.z;
 }
 
 /*

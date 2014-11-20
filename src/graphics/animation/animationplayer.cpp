@@ -63,6 +63,28 @@ BlendOp * AnimationPlayer::GetCurrentBlendOp()
 	if(activeBlendOperations.size() > 0)return activeBlendOperations.front();
 	return NULL;
 }
+
+/*
+ * Remove all blending operations from the blending operations queue [activeBlendOperations]
+ */
+void AnimationPlayer::ClearBlendOpQueue()
+{
+	if(activeBlendOperations.size() > 0)
+	{
+		BlendOp * op = activeBlendOperations.front();
+		op->OnStoppedEarly();
+		activeBlendOperations.pop();
+		delete op;
+	}
+
+	while(activeBlendOperations.size() > 0)
+	{
+		BlendOp * op = activeBlendOperations.front();
+		activeBlendOperations.pop();
+		delete op;
+	}
+}
+
 /*
  * Update & drive the blending operation that is at the head of the queue of
  * active blending operations.
@@ -219,8 +241,8 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 					// rotation for this animation into the aggregate rotation.
 					else
 					{
-						Vector3::Add(&translation, &agTranslation, &agTranslation);
-						Vector3::Add(&scale, &agScale, &agScale);
+						Vector3::Add(translation, agTranslation, agTranslation);
+						Vector3::Add(scale, agScale, agScale);
 
 						if(agWeight != 0)temp = Quaternion::slerp(agRotation, rotation, weight/agWeight);
 						else temp = rotation;
@@ -242,7 +264,7 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 			// apply interpolated scale
 			matrix.Scale(agScale.x,agScale.y,agScale.z);
 			// apply interpolated rotation
-			matrix.PreMultiply(&rotMatrix);
+			matrix.PreMultiply(rotMatrix);
 			// apply interpolated translation
 			matrix.PreTranslate(agTranslation.x, agTranslation.y, agTranslation.z);
 
@@ -253,7 +275,7 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 				// get the local transform of the target of this node and apply
 				// [matrix], which contains the interpolated scale, rotation, and translation
 				Transform * localTransform = targetNode->GetLocalTransform();
-				if(localTransform != NULL)localTransform->SetTo(&matrix);
+				if(localTransform != NULL)localTransform->SetTo(matrix);
 			}
 		}
 	}
@@ -305,7 +327,7 @@ void AnimationPlayer::UpdateAnimationInstanceProgress(AnimationInstanceRef insta
 	if(instance->Playing && !instance->Paused)
 	{
 		// update animation instance progress
-		instance->Progress += Time::GetDeltaTime();
+		instance->Progress += Time::GetDeltaTime() * instance->SpeedFactor;
 
 		//TODO: update to either stop or loop based on settings. for now auto-loop.
 		if(instance->Progress > instance->Duration)
@@ -548,6 +570,29 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
 }
 
 /*
+ * Set the normalized speed of playback of [animation] to [speedFactor].
+ */
+void AnimationPlayer::SetSpeed(AnimationRef animation, float speedFactor)
+{
+	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::SetSpeed -> Animation is invalid.");
+	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
+	{
+		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
+		SetSpeed(targetIndex, speedFactor);
+	}
+}
+
+void AnimationPlayer::SetSpeed(unsigned int animationIndex, float speedFactor)
+{
+	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::SetSpeed -> invalid animation index.");
+
+	AnimationInstanceRef instance = registeredAnimations[animationIndex];
+	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::SetSpeed -> Target animation is invalid.");
+
+	instance->SpeedFactor = speedFactor;
+}
+
+/*
  * Start or resume playback of [animation] on the target of this player.
  */
 void AnimationPlayer::Play(AnimationRef animation)
@@ -679,16 +724,22 @@ void AnimationPlayer::Resume(unsigned int  animationIndex)
 	instance->Play();
 }
 
-void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
+void AnimationPlayer::CrossFade(AnimationRef target, float duration)
 {
-	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
+	CrossFade(target, duration, false);
+}
+
+void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued)
+{
+	if(animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
 	{
-		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
+		unsigned int targetIndex = animationIndexMap[target->GetObjectID()];
 		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::CrossFade -> invalid animation index found in index map.");
 
 		AnimationInstanceRef instance = registeredAnimations[targetIndex];
 		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CrossFade -> Target animation is invalid.");
 
+		// if the current blending operation is a crossfade with the same target, then do nothing
 		if(crossFadeTargets[targetIndex] == 1)return;
 
 		CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
@@ -727,6 +778,11 @@ void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 			}
 		});
 
+		blendOp->SetOnStoppedEarlyCallback([targetIndex, this](CrossFadeBlendOp * op)
+		{
+			crossFadeTargets[targetIndex] = 0;
+		});
+
 		blendOp->SetOnCompleteCallback([targetIndex, this](CrossFadeBlendOp * op)
 		{
 			for(unsigned int i = 0; i < registeredAnimations.size(); i++)
@@ -753,6 +809,8 @@ void AnimationPlayer::CrossFade(AnimationRef animation, float duration)
 			playingAnimationsCount = 1;
 		});
 
+		// clear the current queue if [queued] == false
+		if(!queued)ClearBlendOpQueue();
 
 		QueueBlendOperation(blendOp);
 	}

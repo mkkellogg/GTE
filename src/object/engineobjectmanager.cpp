@@ -406,7 +406,7 @@ TextureRef EngineObjectManager::CreateTexture(const char * sourcePath, TextureAt
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
-	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> could create new Texture object.", TextureRef::Null());
+	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture(const char *, TextureAttributes) -> couldn't create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
 
 	return TextureRef(texture, [=](Texture * texture)

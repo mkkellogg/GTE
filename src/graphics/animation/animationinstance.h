@@ -61,6 +61,8 @@ class AnimationInstance
 	SkeletonRef Target;
 	// the Animation for which this is an instance
 	AnimationRef SourceAnimation;
+	// used to make animation play faster or slow than default. default = 1.
+	float SpeedFactor;
 
 	// number of states in [FrameStates]. This number should equal the number of nodes in [target].
 	// it should also be equal to the number of KeyFrameSet objects in [SourceAnimation].
@@ -90,6 +92,7 @@ class AnimationInstance
 
 	void Destroy();
 
+	void SetSpeed(float speedFactor);
     void Play();
     void Stop();
     void Pause();
