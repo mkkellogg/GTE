@@ -156,7 +156,9 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		{
 			// we use a shared_ptr so that the vector will automatically be
 			// deallocated when the containing map goes out of scope
-			normalGroups[targetPoint] = std::shared_ptr<std::vector<Vector3*>>(new std::vector<Vector3*>());
+			std::vector<Vector3*> * newVector = new std::vector<Vector3*>();
+			ASSERT_RTRN(newVector != NULL, "SubMesh3D::CalculateNormals -> Could not allocate new normal std::vector.");
+			normalGroups[targetPoint] = std::shared_ptr<std::vector<Vector3*>>(newVector);
 		}
 
 		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[targetPoint];
