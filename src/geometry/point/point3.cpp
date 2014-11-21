@@ -95,7 +95,6 @@ void Point3::Lerp(const Point3& p1, const Point3& p2, Point3& result, float t)
 void Point3::AttachTo(float * data)
 {
 	ASSERT_RTRN(data != NULL, "Point3::AttachTo -> NULL data passed.");
-
 	BaseVector4::AttachTo(data);
 	UpdateComponentPointers();
 }
@@ -115,6 +114,14 @@ void Point3::Detach()
  */
 void Point3::UpdateComponentPointers()
 {
+	float **xp = (((float**)&x));
+	float **yp = (((float**)&y));
+	float **zp = (((float**)&z));
+
+	xp[0] = data;
+	yp[0] = data+1;
+	zp[0] = data+2;
+
     float ** rPtr;
     rPtr = (float **)&x;
     *rPtr = data;
@@ -122,6 +129,18 @@ void Point3::UpdateComponentPointers()
     *rPtr = data+1;
     rPtr = (float **)&z;
     *rPtr = data+2;
+
+    // memcpy(xp, data, sizeof(float *));
+    // memcpy(yp, data+1, sizeof(float *));
+    // memcpy(zp, data+2, sizeof(float *));
+
+   // memcpy(&x, data, sizeof(float *));
+   // memcpy(&y, data+1, sizeof(float *));
+    //memcpy(&z, data+2, sizeof(float *));
+
+    float *xp2 = (float*)(*((float**)&x));
+    float *yp2 = (float*)(*((float**)&y));
+    float *zp2 = (float*)(*((float**)&z));
 }
 
 /*

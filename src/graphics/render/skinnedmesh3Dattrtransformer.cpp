@@ -271,6 +271,14 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		// transformation flags arrays. in this case it will be the position transformation array
 		ClearTransformedPositionFlagsArray();
 
+		Point3 iteratorPoint;
+		Point3Array::Iterator iterator = positionsOut.GetIterator(iteratorPoint);
+		while(iterator.HasNext())
+		{
+			iterator.Next();
+			iteratorPoint.Set(iteratorPoint.x,iteratorPoint.y,iteratorPoint.z);
+		}
+
 		// loop through each vertex
 		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
 		{

@@ -140,8 +140,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	// be used to calculate average (smoothed) normals
 	std::unordered_map<Point3, std::shared_ptr<std::vector<Vector3*>>, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
 
-	// This map is used to store the calculated average normal for all equal vertices
-	//std::unordered_map<Point3, Vector3, Point3::Point3Hasher,Point3::Point3Eq> averageNormals;
+	// This vector is used to store the calculated average normal for all equal vertices
 	std::vector<Vector3> averageNormals;
 
 	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
@@ -154,15 +153,18 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		// create a normal list for a vertex if one does not exist
 		if(normalGroups.find(targetPoint) == normalGroups.end())
 		{
-			// we use a shared_ptr so that the vector will automatically be
-			// deallocated when the containing map goes out of scope
 			std::vector<Vector3*> * newVector = new std::vector<Vector3*>();
 			ASSERT_RTRN(newVector != NULL, "SubMesh3D::CalculateNormals -> Could not allocate new normal std::vector.");
+
+			// we use a shared_ptr so that the dynamically allocated vector that contains pointers to all normals in
+			// a normal group will automatically be deallocated when the containing map goes out of scope
 			normalGroups[targetPoint] = std::shared_ptr<std::vector<Vector3*>>(newVector);
 		}
 
 		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[targetPoint];
 		Vector3 * normal = normals->GetVector(v);
+
+		// add the normal at index [v] to the normal group linked to [targetPoint]
 		list->push_back(normal);
 	}
 
@@ -180,6 +182,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		Point3 * point = positions->GetPoint(v);
 		Point3 targetPoint = *point;
 
+		// retrieve the list of normals for [targetPoint]
 		std::shared_ptr<std::vector<Vector3*>> listPtr = normalGroups[targetPoint];
 
 		ASSERT_RTRN(listPtr != NULL, "SubMesh3D::CalculateNormals -> NULL pointer to normal group list");
@@ -197,12 +200,14 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 			// and the current normal in the list.
 			float dot = Vector3::Dot(current, oNormal);
 
+			// clamp to the range -1.0 ... 1.0 to prevent rounding errors in Acos()
 			if (dot < -1.0) dot = -1.0 ;
 			else if (dot > 1.0) dot = 1.0 ;
 
 			float angle = GTEMath::ACos(dot);
 			if(angle <0)angle = -angle;
 			angle *= Constants::RadsToDegrees;
+
 			if(angle < smoothingThreshhold)
 			{
 				avg.x += current.x;
@@ -359,9 +364,8 @@ bool SubMesh3D::Init(unsigned int vertexCount)
 	}
 	if(!initSuccess)
 	{
-		char errStr[64];
-		sprintf(errStr, "Error initializing attribute array(s) for SubMesh3D: %d\n",errorMask);
-		Debug::PrintError(errStr);
+		std::string msg = std::string("Error initializing attribute array(s) for SubMesh3D: ") + std::to_string(errorMask);
+		Debug::PrintError(msg);
 		Destroy();
 		return false;
 	}

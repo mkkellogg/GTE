@@ -122,3 +122,8 @@ bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
 
 	return true;
 }
+
+BaseVector4Array::Iterator BaseVector4Array::GetIterator(BaseVector4& targetVector)
+{
+	return Iterator(*this, targetVector);
+}

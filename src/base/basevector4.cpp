@@ -17,7 +17,7 @@
  * backing storage array. If [permAttach] is false, then this base vector can attach and
  * re-attach to various different backing storage arrays.
  */
-void BaseVector4::Init(float x, float y, float z, float w, float *target, bool permAttach)
+void BaseVector4::Init(float *target, bool permAttach)
 {
 	data = baseData;
 
@@ -46,8 +46,6 @@ void BaseVector4::Init(float x, float y, float z, float w, float *target, bool p
 	{
 		attached = false;
 	}
-
-    Set(x,y,z,w);
 }
 
 /*
@@ -55,7 +53,8 @@ void BaseVector4::Init(float x, float y, float z, float w, float *target, bool p
  */
 BaseVector4::BaseVector4()
 {
-    Init(0,0,0,0, NULL, false);
+    Init(NULL, false);
+    Set(0,0,0,0);
 }
 
 /*
@@ -63,7 +62,7 @@ BaseVector4::BaseVector4()
  */
 BaseVector4::BaseVector4(bool permAttached, float * target)
 {
-	Init(0,0,0,0,target, true);
+	Init(target, true);
 }
 
 /*
@@ -71,7 +70,8 @@ BaseVector4::BaseVector4(bool permAttached, float * target)
  */
 BaseVector4::BaseVector4(float x, float y, float z, float w)
 {
-    Init(x,y,z,w, NULL, false);
+    Init(NULL, false);
+    Set(x,y,z,w);
 }
 
 /*
@@ -79,7 +79,8 @@ BaseVector4::BaseVector4(float x, float y, float z, float w)
  */
 BaseVector4::BaseVector4(const BaseVector4& baseVector)
 {
-    Init(baseVector.data[0], baseVector.data[1], baseVector.data[2], baseVector.data[3], NULL, false);
+    Init(NULL, false);
+    Set(baseVector.data[0], baseVector.data[1], baseVector.data[2], baseVector.data[3]);
 }
 
 /*

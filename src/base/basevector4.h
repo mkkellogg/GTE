@@ -12,9 +12,11 @@
 
 class BaseVector4
 {
+	friend class BaseVector4Array;
+
     protected:
 
-    void Init(float x, float y, float z, float w, float *target, bool permAttach);
+    void Init(float *target, bool permAttach);
 
     float * data;
     float baseData[4];

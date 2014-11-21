@@ -2,11 +2,44 @@
 #define _BASEVECTOR4ARRAY_H_
 
 // forward declarations
-class BaseVector4;
 class BaseVector4Factory;
+
+#include "basevector4.h"
 
 class BaseVector4Array
 {
+	public:
+
+	class Iterator
+	{
+		friend class BaseVector4Array;
+
+		protected:
+
+		BaseVector4Array& targetArray;
+		BaseVector4& targetVector;
+		int currentIndex;
+
+		Iterator(BaseVector4Array& targetArray, BaseVector4& targetVector) : targetArray(targetArray), targetVector(targetVector)
+		{
+			currentIndex = -1;
+		}
+
+		public:
+
+		bool HasNext()
+		{
+			return currentIndex < (int)targetArray.count - 1;
+		}
+
+		void Next()
+		{
+			if(currentIndex >= (int)targetArray.count-1)return;
+			currentIndex++;
+			targetVector.AttachTo(targetArray.data + (currentIndex * 4));
+		}
+	};
+
 	protected:
 
 	unsigned int count;
@@ -25,6 +58,7 @@ class BaseVector4Array
     bool Init(unsigned int count);
     unsigned int GetCount();
     bool CopyTo(BaseVector4Array * dest) const;
+    Iterator GetIterator(BaseVector4& targetVector);
 };
 
 #endif
