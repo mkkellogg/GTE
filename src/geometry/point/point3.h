@@ -46,7 +46,9 @@ class Point3 : public BaseVector4
     static void Lerp(const Point3& p1, const Point3& p2, Point3& result, float t);
 
     Point3 & operator= (const Point3 & source);
+    BaseVector4 & operator= (const BaseVector4 & source);
     bool operator==(const Point3 & source);
+    bool operator==(const Point3& p) const;
     void Set(float x, float y, float z);
 
     void AttachTo(float * data);
@@ -57,20 +59,19 @@ class Point3 : public BaseVector4
     {
     	 int operator()(const Point3& p) const
     	 {
-			  return (int)p.x + (((int)p.y) << 1) + (((int)p.z) << 2);
+			 return (int)GTEMath::Round(p.x) + (((int)GTEMath::Round(p.y)) << 1) + (((int)GTEMath::Round(p.z)) << 2);
     	 }
+
+    	 int operator()(const Point3& p)
+		 {
+    		 return (int)GTEMath::Round(p.x) + (((int)GTEMath::Round(p.y)) << 1) + (((int)GTEMath::Round(p.z)) << 2);
+		 }
     }Point3Hasher;
 
     typedef struct
     {
       bool operator() (const Point3& a, const Point3& b) const { return a==b; }
     } Point3Eq;
-
-    bool operator==(const Point3& p) const
-    {
-    	float epsilon =.005;
-		return GTEMath::Abs(p.x - this->x) < epsilon && GTEMath::Abs(p.y - this->y) < epsilon && GTEMath::Abs(p.z - this->z) < epsilon;
-    }
 };
 
 #endif

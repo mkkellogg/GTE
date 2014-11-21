@@ -55,10 +55,19 @@ Vector3::Vector3(const Vector3& vector) : BaseVector4(vector), x(data[0]), y(dat
  */
 Vector3& Vector3::operator=(const Vector3& source)
 {
-    if(this == &source)return *this;
-    memcpy((void*)data, (void*)source.data, sizeof(float) * 4);
-    memcpy((void*)baseData, (void*)source.baseData, sizeof(float) * 4);
-    return *this;
+	if(this == &source)return *this;
+	BaseVector4::operator=(source);
+	return *this;
+}
+
+/*
+ * Over-ridden assignment operator from BaseVector4
+ */
+BaseVector4& Vector3::operator= (const BaseVector4& source)
+{
+	if(this == &source)return *this;
+	BaseVector4::operator=(source);
+	return *this;
 }
 
 /*

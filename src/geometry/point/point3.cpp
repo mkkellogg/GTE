@@ -127,12 +127,21 @@ void Point3::UpdateComponentPointers()
 /*
  * Assignment operator
  */
-Point3 & Point3::operator= (const Point3 & source)
+Point3& Point3::operator= (const Point3& source)
 {
     if(this == &source)return *this;
-    memcpy((void*)data, (void*)source.data, sizeof(float) * 4);
-    memcpy((void*)baseData, (void*)source.baseData, sizeof(float) * 4);
+    BaseVector4::operator=(source);
     return *this;
+}
+
+/*
+ * Over-ridden assignment operator from BaseVector4
+ */
+BaseVector4& Point3::operator= (const BaseVector4& source)
+{
+	if(this == &source)return *this;
+	BaseVector4::operator=(source);
+	return *this;
 }
 
 /*
@@ -140,7 +149,17 @@ Point3 & Point3::operator= (const Point3 & source)
  */
 bool Point3::operator==(const Point3 & source)
 {
-	return source.x == x && source.y == y && source.z == z;
+	float epsilon = .005;
+	return GTEMath::Abs(source.x - x) < epsilon && GTEMath::Abs(source.y - y) < epsilon && GTEMath::Abs(source.z - z) < epsilon;
+}
+
+/*
+ * Comparison operator
+ */
+bool Point3::operator==(const Point3& p) const
+{
+	float epsilon = .005;
+	return GTEMath::Abs(p.x - this->x) < epsilon && GTEMath::Abs(p.y - this->y) < epsilon && GTEMath::Abs(p.z - this->z) < epsilon;
 }
 
 /*

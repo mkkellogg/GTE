@@ -43,9 +43,18 @@ UV2::~UV2()
 UV2 & UV2::operator= (const UV2 & source)
 {
     if(this == &source)return *this;
-    memcpy((void*)source.data, (void*)data, sizeof(float) * 2);
-    memcpy((void*)source.baseData, (void*)baseData, sizeof(float) * 2);
+    BaseVector2::operator=(source);
     return *this;
+}
+
+/*
+ * Over-ridden assignment operator from BaseVector2
+ */
+BaseVector2& UV2::operator= (const BaseVector2& source)
+{
+	if(this == &source)return *this;
+	BaseVector2::operator=(source);
+	return *this;
 }
 
 void UV2::AttachTo(float * data)

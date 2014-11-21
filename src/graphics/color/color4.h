@@ -24,6 +24,7 @@ class Color4 : public BaseVector4
     ~Color4();
 
     Color4 & operator= (const Color4 & source);
+    BaseVector4 & operator= (const BaseVector4 & source);
 
     void Set(float r, float g, float b, float a);
 

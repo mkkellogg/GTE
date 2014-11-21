@@ -140,56 +140,67 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	// be used to calculate average (smoothed) normals
 	std::unordered_map<Point3, std::shared_ptr<std::vector<Vector3*>>, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
 
+	// This map is used to store the calculated average normal for all equal vertices
+	//std::unordered_map<Point3, Vector3, Point3::Point3Hasher,Point3::Point3Eq> averageNormals;
+	std::vector<Vector3> averageNormals;
+
 	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
 	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
-	for(unsigned int v =0; v < vertexCount; v++)
+	for(unsigned int v = 0; v < vertexCount; v++)
 	{
 		Point3 * point = positions->GetPoint(v);
+		Point3 targetPoint = *point;
 
 		// create a normal list for a vertex if one does not exist
-		if(normalGroups.find(*point) == normalGroups.end())
+		if(normalGroups.find(targetPoint) == normalGroups.end())
 		{
 			// we use a shared_ptr so that the vector will automatically be
 			// deallocated when the containing map goes out of scope
-			normalGroups[*point] = std::shared_ptr<std::vector<Vector3*>>(new std::vector<Vector3*>());
+			normalGroups[targetPoint] = std::shared_ptr<std::vector<Vector3*>>(new std::vector<Vector3*>());
 		}
 
-		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[*point];
+		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[targetPoint];
 		Vector3 * normal = normals->GetVector(v);
 		list->push_back(normal);
 	}
 
 	// loop through each vertex and lookup the associated list of
 	// normals associated with that vertex, and then calculate the
-	// average normal from that list and assign it to the vertex
+	// average normal from that list.
 	for(unsigned int v =0; v < vertexCount; v++)
 	{
 		// get existing normal for this vertex
-		Vector3 oNormal = *normals->GetVector(v);
+		Vector3 oNormal;
+		oNormal = *(normals->GetVector(v));
 		oNormal.Normalize();
 
 		// get vertex position
 		Point3 * point = positions->GetPoint(v);
+		Point3 targetPoint = *point;
 
-		// lookup normal list associated with vertex
-		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[*point];
+		std::shared_ptr<std::vector<Vector3*>> listPtr = normalGroups[targetPoint];
+
+		ASSERT_RTRN(listPtr != NULL, "SubMesh3D::CalculateNormals -> NULL pointer to normal group list");
+		std::vector<Vector3*> list = *listPtr;
 
 		Vector3 avg(0,0,0);
 		float divisor = 0;
-		for(unsigned int i=0; i < list->size(); i++)
+		for(unsigned int i=0; i < list.size(); i++)
 		{
-			Vector3 current = (*((*list)[i]));
+			Vector3 * currentPtr = list[i];
+			Vector3 current = *currentPtr;
 			current.Normalize();
 
 			// calculate angle between the normal that exists for this vertex,
-			// and the current normal in the last.
+			// and the current normal in the list.
 			float dot = Vector3::Dot(current, oNormal);
-			float angle = acos(dot);
+
+			if (dot < -1.0) dot = -1.0 ;
+			else if (dot > 1.0) dot = 1.0 ;
+
+			float angle = GTEMath::ACos(dot);
 			if(angle <0)angle = -angle;
-
-			angle /= Constants::TwoPIOver360;
-
-			// if the angle is less than [smoothingThreshhold], factor into the average
+			angle *= Constants::RadsToDegrees;
 			if(angle < smoothingThreshhold)
 			{
 				avg.x += current.x;
@@ -201,18 +212,27 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 
 		// if divisor < 1, then no valid normals were found to include in the average,
 		// so just use the existing one
-		if(divisor < 1)
-	    {
+		if(divisor <= 1)
+		{
 			avg.x = oNormal.x;
 			avg.y = oNormal.y;
 			avg.z = oNormal.z;
-	    }
+		}
 		else
 		{
 			float scaleFactor = (float)1.0/divisor;
 			avg.Scale(scaleFactor);
+			//avg.Normalize();
 		}
 
+		averageNormals.push_back(avg);
+	}
+
+	// loop through each vertex and assign the average normal
+	// calculated for that vertex
+	for(unsigned int v =0; v < vertexCount; v++)
+	{
+		Vector3 avg = averageNormals[v];
 		// set the normal for this vertex to the averaged normal
 		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
 	}

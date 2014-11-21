@@ -92,6 +92,23 @@ BaseVector4::~BaseVector4()
     if(!attached)data = NULL;
 }
 
+/*
+ * Assignment operator.
+ */
+BaseVector4& BaseVector4::operator=(const BaseVector4& source)
+{
+	if(this == &source)return * this;
+
+	attached = source.attached;
+	canDetach = source.canDetach;
+
+	data[0] = source.data[0];
+	data[1] = source.data[1];
+	data[2] = source.data[2];
+	data[3] = source.data[3];
+
+	return *this;
+}
 
 /*
  * Set this base vector's data

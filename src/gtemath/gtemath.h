@@ -9,6 +9,7 @@ class GTEMath
 	static float QuickInverseSquareRoot(float n);
 	static float SquareRoot(float n);
     static float QuickSquareRoot(float n);
+    static float Round(float n);
     static float Cos(float n);
     static float ACos(float n);
     static float Sin(float n);

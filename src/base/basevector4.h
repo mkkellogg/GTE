@@ -30,6 +30,8 @@ class BaseVector4
     BaseVector4(const float * copyData);
     virtual ~BaseVector4();
 
+    virtual BaseVector4& operator=(const BaseVector4& source);
+
     float * GetDataPtr();
     virtual void Set(float x, float y, float z, float w);
     void SetTo(const BaseVector4& baseVector);

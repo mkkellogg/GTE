@@ -38,9 +38,18 @@ Color4::~Color4()
 Color4 & Color4::operator= (const Color4 & source)
 {
     if(this == &source)return *this;
-    memcpy((void*)source.data, (void*)data, sizeof(float) * 4);
-    memcpy((void*)source.baseData, (void*)baseData, sizeof(float) * 4);
+    BaseVector4::operator=(source);
     return *this;
+}
+
+/*
+ * Over-ridden assignment operator from BaseVector4
+ */
+BaseVector4& Color4::operator= (const BaseVector4& source)
+{
+	if(this == &source)return *this;
+	BaseVector4::operator=(source);
+	return *this;
 }
 
 void Color4::Set(float r, float g, float b, float a)

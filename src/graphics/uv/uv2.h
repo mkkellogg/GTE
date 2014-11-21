@@ -27,6 +27,7 @@ class UV2 : public BaseVector2
     void Detach();
 
     UV2 & operator= (const UV2 & source);
+    BaseVector2& operator= (const BaseVector2& source);
 };
 
 #endif

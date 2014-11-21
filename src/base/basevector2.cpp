@@ -65,9 +65,15 @@ BaseVector2::~BaseVector2()
 
 BaseVector2 & BaseVector2::operator= (const BaseVector2 & source)
 {
-    if(this == &source)return *this;
-    memcpy((void*)source.data, (void*)data, sizeof(float) * 2);
-    return *this;
+	if(this == &source)return * this;
+
+	attached = source.attached;
+	canDetach = source.canDetach;
+
+	data[0] = source.data[0];
+	data[1] = source.data[1];
+
+	return *this;
 }
 
 void BaseVector2::Set(float x, float y)

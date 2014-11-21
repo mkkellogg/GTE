@@ -30,6 +30,11 @@ float GTEMath::QuickSquareRoot(float n)
 	return ifu.f * n;
 }
 
+float GTEMath::Round(float n)
+{
+	return floor(n + 0.5);
+}
+
 float GTEMath::InverseSquareRoot(float n)
 {
 	float root = SquareRoot(n);
