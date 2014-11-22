@@ -45,8 +45,8 @@ class RenderManager
 	Graphics * graphics;
 	EngineObjectManager * objectManager;
 
-	DataStack<Matrix4x4> * viewTransformStack;
-	DataStack<Matrix4x4> * modelTransformStack;
+	DataStack<Matrix4x4> viewTransformStack;
+	DataStack<Matrix4x4> modelTransformStack;
 
 	MaterialRef activeMaterial;
 
@@ -60,22 +60,22 @@ class RenderManager
 
 	std::map<ObjectID, bool> renderedObjects;
 
-	void ForwardRenderScene(SceneObject * parent, Transform * viewTransformInverse, Camera * camera);
-    void ClearBuffersForCamera(const Camera * camera) const;
-    void PushTransformData(const Transform * transform, DataStack<Matrix4x4> * transformStack);
-    void PopTransformData(Transform * transform, DataStack<Matrix4x4> * transformStack);
-    unsigned int RenderDepth(const DataStack<Matrix4x4> * transformStack) const;
+	void ForwardRenderScene(SceneObject& parent, Transform& viewTransformInverse, Camera& camera);
+    void ClearBuffersForCamera(const Camera& camera) const;
+    void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
+    void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
+    unsigned int RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
     void ActivateMaterial(MaterialRef material);
     void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection);
     void SendCustomUniformsToShader();
 
     void ProcessScene();
-    void ProcessScene(SceneObject * parent, Transform * aggregateTransform);
+    void ProcessScene(SceneObject * parent, Transform& aggregateTransform);
     void RenderSceneFromCamera(unsigned int cameraIndex);
 
-    bool ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, Mesh3D& mesh);
-    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh);
-    bool ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh);
+    bool ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, Mesh3D& mesh) const;
+    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const;
+    bool ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const;
 
     public:
 

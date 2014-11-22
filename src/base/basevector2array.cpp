@@ -56,7 +56,7 @@ bool BaseVector2Array::Init(int count)
 		return false;
 	}
 
-	baseFactory->CreateArray(count, &objects);
+	objects = baseFactory->CreateArray(count);
 
 	if(objects == NULL)
 	{

@@ -210,8 +210,8 @@ bool SubMesh3DRenderer::UpdateMeshData()
 				}
 			}
 
-			const Point3* center = mesh->GetCenter();
-			centerCopy.Set(center->x,center->y,center->z);
+			const Point3& center = mesh->GetCenter();
+			centerCopy.Set(center.x,center.y,center.z);
 		}
 
 		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
@@ -413,7 +413,7 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 	}
 }
 
-const Point3 * SubMesh3DRenderer::GetFinalCenter()
+const Point3* SubMesh3DRenderer::GetFinalCenter()
 {
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.", NULL);
@@ -431,5 +431,5 @@ const Point3 * SubMesh3DRenderer::GetFinalCenter()
 		}
 	}
 
-	return mesh->GetCenter();
+	return &(mesh->GetCenter());
 }

@@ -22,14 +22,9 @@ UV2::UV2(float u, float v) : BaseVector2(u,v), u(data[0]), v(data[1])
    
 }
 
-UV2::UV2(const UV2& uv) : BaseVector2(&uv), u(data[0]), v(data[1])
+UV2::UV2(const UV2& uv) : BaseVector2(uv), u(data[0]), v(data[1])
 {
 
-}
-
-UV2::UV2(const UV2 * uv) : BaseVector2(uv), u(data[0]), v(data[1])
-{
-   
 }
 
 UV2::~UV2()
@@ -69,6 +64,9 @@ void UV2::Detach()
 	UpdateComponentPointers();
 }
 
+/*
+ * TODO: This does NOT currently work...fix!
+ */
 void UV2::UpdateComponentPointers()
 {
     float ** rPtr;

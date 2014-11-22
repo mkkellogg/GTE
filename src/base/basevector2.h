@@ -17,14 +17,14 @@ class BaseVector2
     BaseVector2();
     BaseVector2(bool permAttached, float * target);
     BaseVector2(float x, float y);
-    BaseVector2(const BaseVector2 * baseVector);
+    BaseVector2(const BaseVector2& baseVector);
     BaseVector2(const float * copyData);
     virtual ~BaseVector2();
 
     BaseVector2 & operator= (const BaseVector2 & source);
     float * GetDataPtr() const;
     void Set(float x, float y);
-    void Get(BaseVector2 * baseVector);
+    void Get(BaseVector2& baseVector);
 
     virtual void AttachTo(float * data);
     virtual void Detach();

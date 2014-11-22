@@ -12,7 +12,7 @@ class BaseVector2Factory
     virtual ~BaseVector2Factory();
 
     virtual BaseVector2 * CreatePermAttached(float * target);
-    virtual void CreateArray(int count, BaseVector2*** ppptr);
+    virtual BaseVector2** CreateArray(int count);
 };
 
 #endif

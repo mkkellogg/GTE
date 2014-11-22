@@ -57,7 +57,7 @@ bool BaseVector4Array::Init(unsigned int count)
 		return false;
 	}
 
-	baseFactory->CreateArray(count, &objects);
+	objects = baseFactory->CreateArray(count);
 
 	if(objects == NULL)
 	{

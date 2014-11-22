@@ -16,7 +16,7 @@ class UV2Factory : public BaseVector2Factory
     virtual ~UV2Factory();
 
     virtual UV2 * CreatePermAttached(float * target);
-    virtual void CreateArray(int count, BaseVector2 *** ppptr);
+    virtual BaseVector2** CreateArray(int count);
 };
 
 #endif

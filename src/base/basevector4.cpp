@@ -88,8 +88,6 @@ BaseVector4::BaseVector4(const BaseVector4& baseVector)
  */
 BaseVector4::~BaseVector4()
 {   
-	//SAFE_DELETE(baseData);
-
     if(!attached)data = NULL;
 }
 

@@ -19,7 +19,7 @@ class Color4Factory : public BaseVector4Factory
     virtual ~Color4Factory();
 
     virtual BaseVector4 * CreatePermAttached(float * target);
-    virtual void CreateArray(int count, BaseVector4 *** ppptr);
+    virtual BaseVector4 ** CreateArray(int count);
 };
 
 #endif

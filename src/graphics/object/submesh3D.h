@@ -57,10 +57,10 @@ class SubMesh3D : public EngineObject
 
 	public:
 
-    const Point3 * GetCenter() const;
-    const Vector3 * GetSphereOfInfluenceX() const;
-    const Vector3 * GetSphereOfInfluenceY() const;
-    const Vector3 * GetSphereOfInfluenceZ() const;
+    const Point3& GetCenter() const;
+    const Vector3& GetSphereOfInfluenceX() const;
+    const Vector3& GetSphereOfInfluenceY() const;
+    const Vector3& GetSphereOfInfluenceZ() const;
     void SetNormalsSmoothingThreshold(unsigned int threshhold);
     void Update();
 

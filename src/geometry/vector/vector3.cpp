@@ -75,7 +75,17 @@ BaseVector4& Vector3::operator= (const BaseVector4& source)
  */
 bool Vector3::operator==(const Vector3 & source) const
 {
-	return source.x == x && source.y == y && source.z == z;
+	float epsilon = .005;
+	return GTEMath::Abs(source.x - this->x) < epsilon && GTEMath::Abs(source.y - this->y) < epsilon && GTEMath::Abs(source.z - this->z) < epsilon;
+}
+
+/*
+ * Comparison operator
+ */
+bool Vector3::operator==(const Vector3 & source)
+{
+	float epsilon = .005;
+	return GTEMath::Abs(source.x - this->x) < epsilon && GTEMath::Abs(source.y - this->y) < epsilon && GTEMath::Abs(source.z - this->z) < epsilon;
 }
 
 /*
@@ -236,11 +246,15 @@ void Vector3::CalcNormal(const Vector3& a,const Vector3& b, Vector3& result)
 }
 
 /*
+ * TODO: This does NOT currently work...fix!
+ *
  * Update the element accessor variables to point to the current backing storage. This is
  * usually called when the vector is attached to new backing storage.
  */
 void Vector3::UpdateComponentPointers()
 {
+	return;
+
     float ** rPtr;
     rPtr = (float **)&x;
     *rPtr = data;
@@ -267,7 +281,6 @@ float Vector3::Dot(const Vector3& a,const Vector3& b)
 void Vector3::AttachTo(float * data)
 {
 	ASSERT_RTRN(data != NULL, "Vector3::AttachTo -> NULL data passed.");
-
 	BaseVector4::AttachTo(data);
 	UpdateComponentPointers();
 }
@@ -356,7 +369,6 @@ bool Vector3::RotateTowards(const Vector3& from, const Vector3& to,  float theta
 // TODO: Implement!!!
 float Vector3::AngleBetween(const Vector3 * a,const Vector3 * b,const Vector3 * refRightNormal)
 {
-
     return 0 ;
 }
 

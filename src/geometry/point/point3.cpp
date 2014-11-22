@@ -109,38 +109,26 @@ void Point3::Detach()
 }
 
 /*
+ * TODO: This does NOT currently work...fix!
+ *
  * Update the element accessor variables to point to the current backing storage. This is
  * usually called when the point is attached to new backing storage.
  */
 void Point3::UpdateComponentPointers()
 {
-	float **xp = (((float**)&x));
-	float **yp = (((float**)&y));
-	float **zp = (((float**)&z));
+	return;
 
-	xp[0] = data;
-	yp[0] = data+1;
-	zp[0] = data+2;
+	float *xp = (((float*)&x));
+	float *yp = (((float*)&y));
+	float *zp = (((float*)&z));
 
-    float ** rPtr;
-    rPtr = (float **)&x;
-    *rPtr = data;
-    rPtr = (float **)&y;
-    *rPtr = data+1;
-    rPtr = (float **)&z;
-    *rPtr = data+2;
+    //xp[0] = data;
+    //yp[0] = data+1;
+    //zp[0] = data+2;
 
-    // memcpy(xp, data, sizeof(float *));
-    // memcpy(yp, data+1, sizeof(float *));
-    // memcpy(zp, data+2, sizeof(float *));
-
-   // memcpy(&x, data, sizeof(float *));
-   // memcpy(&y, data+1, sizeof(float *));
-    //memcpy(&z, data+2, sizeof(float *));
-
-    float *xp2 = (float*)(*((float**)&x));
-    float *yp2 = (float*)(*((float**)&y));
-    float *zp2 = (float*)(*((float**)&z));
+    memcpy(xp, &data, sizeof(float *));
+    memcpy(yp, &data+1, sizeof(float *));
+    memcpy(zp, &data+2, sizeof(float *));
 }
 
 /*

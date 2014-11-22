@@ -65,7 +65,7 @@ class Matrix4x4
     static void SetIdentity(float * target);
 
     void BuildFromComponents(const Vector3& translation,const Quaternion& rotation,  const Vector3& scale);
-    void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale);
+    void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
     bool IsAffine(void) const;
 
     void MultiplyByScalar(float scalar);

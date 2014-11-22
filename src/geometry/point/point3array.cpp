@@ -32,8 +32,3 @@ Point3 ** Point3Array::GetPoints()
 {
 	return (Point3**)objects;
 }
-
-Point3Array::Iterator Point3Array::GetIterator(Point3& targetPoint)
-{
-	return Point3Array::Iterator(*this,targetPoint);
-}

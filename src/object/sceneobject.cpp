@@ -76,9 +76,8 @@ void SceneObject::InitSceneObjectTransform(SceneObjectTransform * transform)
 	transform->SetLocalTransform(&this->transform);
 }
 
-void SceneObject::SetProcessingTransform(Transform * transform)
+void SceneObject::SetProcessingTransform(Transform& transform)
 {
-	ASSERT_RTRN(transform != NULL,"SceneObject::SetAggregateTransform -> transform is NULL.");
 	processingTransform.SetTo(transform);
 }
 

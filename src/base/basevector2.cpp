@@ -47,9 +47,9 @@ BaseVector2::BaseVector2(float x, float y)
     Init(x,y, NULL, false);
 }
 
-BaseVector2::BaseVector2(const BaseVector2 * baseVector)
+BaseVector2::BaseVector2(const BaseVector2& baseVector)
 {
-    Init(baseVector->data[0], baseVector->data[1], NULL, false);
+    Init(baseVector.data[0], baseVector.data[1], NULL, false);
 }
 
 BaseVector2::~BaseVector2()
@@ -82,9 +82,9 @@ void BaseVector2::Set(float x, float y)
     data[1] = y;
 }
 
-void BaseVector2::Get(BaseVector2 * baseVector)
+void BaseVector2::Get(BaseVector2& baseVector)
 {
-   memcpy(baseVector->data, data, sizeof(float) * 2);
+   memcpy(baseVector.data, data, sizeof(float) * 2);
 }
 
 float * BaseVector2::GetDataPtr() const

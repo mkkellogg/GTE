@@ -41,7 +41,7 @@ class SceneObject : public EngineObject
 	SceneObject();
     virtual ~SceneObject();
 
-    void SetProcessingTransform(Transform * transform);
+    void SetProcessingTransform(Transform& transform);
 
 	public:
 

@@ -25,7 +25,7 @@ void AttributeTransformer::SetActiveAttributes (StandardAttributeSet attributes)
 	activeAttributes = attributes;
 }
 
-StandardAttributeSet AttributeTransformer::GetActiveAttributes()
+StandardAttributeSet AttributeTransformer::GetActiveAttributes() const
 {
 	return activeAttributes;
 }

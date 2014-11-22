@@ -70,6 +70,9 @@ void Color4::Detach()
 	UpdateComponentPointers();
 }
 
+/*
+ * TODO: This does NOT currently work...fix!
+ */
 void Color4::UpdateComponentPointers()
 {
     float ** rPtr;

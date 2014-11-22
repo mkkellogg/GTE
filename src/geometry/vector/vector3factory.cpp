@@ -25,13 +25,14 @@ BaseVector4 * Vector3Factory::CreatePermAttached(float * target)
 	return new Vector3(true, target);
 }
 
-void Vector3Factory::CreateArray(int count, BaseVector4 *** ppptr)
+BaseVector4 ** Vector3Factory::CreateArray(int count)
 {
-	*ppptr = (BaseVector4**)new Vector3*[count];
-	if(*ppptr != NULL)
+	BaseVector4** pptr = (BaseVector4**)new Vector3*[count];
+	if(pptr != NULL)
 	{
-		memset(*ppptr, (int)NULL, sizeof(Vector3*) * count);
+		memset(pptr, (int)NULL, sizeof(Vector3*) * count);
 	}
+	return pptr;
 }
 
 Vector3Factory * Vector3Factory::Instance()

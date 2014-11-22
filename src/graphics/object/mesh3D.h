@@ -50,10 +50,10 @@ class Mesh3D : public SceneObjectComponent
     bool IsAttachedToSceneObject();
     bool SceneObjectHasRenderer();
 
-    const Point3 * GetCenter() const;
-    const Vector3 * GetSphereOfInfluenceX() const;
-    const Vector3 * GetSphereOfInfluenceY() const;
-    const Vector3 * GetSphereOfInfluenceZ() const;
+    const Point3& GetCenter() const;
+    const Vector3& GetSphereOfInfluenceX() const;
+    const Vector3& GetSphereOfInfluenceY() const;
+    const Vector3& GetSphereOfInfluenceZ() const;
     LightCullType GetLightCullType() const;
 };
 

@@ -80,7 +80,7 @@ class SubMesh3DRenderer : public EngineObject
     AttributeTransformer * GetAttributeTransformer();
     bool DoesAttributeTransform();
 
-    const Point3 * GetFinalCenter();
+    const Point3* GetFinalCenter();
 
     void PreRender(const Matrix4x4& modelView, const Matrix4x4& modelViewInverse);
 

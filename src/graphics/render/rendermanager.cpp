@@ -31,16 +31,14 @@
  * Single constructor, which requires pointers the Graphics and EngineObjectManager
  * singleton instances.
  */
-RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectManager)
+RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectManager) : viewTransformStack(Constants::MaxObjectRecursionDepth, 1),
+																						 modelTransformStack(Constants::MaxObjectRecursionDepth, 1)
 {
 	this->graphics = graphics;
 	this->objectManager = objectManager;
 
 	lightCount = 0;
 	cameraCount = 0;
-
-	viewTransformStack = NULL;
-	modelTransformStack = NULL;
 
 	cycleCount = 0;
 }
@@ -50,8 +48,7 @@ RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectMa
  */
 RenderManager::~RenderManager()
 {
-	SAFE_DELETE(viewTransformStack);
-	SAFE_DELETE(modelTransformStack);
+
 }
 
 /*
@@ -59,18 +56,15 @@ RenderManager::~RenderManager()
  */
 bool RenderManager::Init()
 {
-	viewTransformStack = new DataStack<Matrix4x4>(Constants::MaxObjectRecursionDepth, 1);
-	if(!viewTransformStack->Init())
+	if(!viewTransformStack.Init())
 	{
-		Debug::PrintError("RenderManager::Init -> unable to allocate view transform stack.");
+		Debug::PrintError("RenderManager::Init -> unable to initialize view transform stack.");
 		return false;
 	}
 
-	modelTransformStack = new DataStack<Matrix4x4>(Constants::MaxObjectRecursionDepth, 1);
-	if(!modelTransformStack->Init())
+	if(!modelTransformStack.Init())
 	{
-		Debug::PrintError("RenderManager::Init -> unable to allocate model transform stack.");
-		SAFE_DELETE(viewTransformStack);
+		Debug::PrintError("RenderManager::Init -> unable to initialize model transform stack.");
 		return false;
 	}
 
@@ -81,14 +75,9 @@ bool RenderManager::Init()
  * Look at the clear flags for a given camera and tell the graphics
  * system to clear the corresponding buffers.
  */
-void RenderManager::ClearBuffersForCamera(const Camera * camera) const
+void RenderManager::ClearBuffersForCamera(const Camera& camera) const
 {
-	if(camera == NULL)
-	{
-		Debug::PrintError("RenderManager::ClearBuffersForCamera -> camera is NULL.");
-		return;
-	}
-	unsigned int clearBufferMask = camera->GetClearBufferMask();
+	unsigned int clearBufferMask = camera.GetClearBufferMask();
 	graphics->ClearBuffers(clearBufferMask);
 }
 
@@ -96,41 +85,28 @@ void RenderManager::ClearBuffersForCamera(const Camera * camera) const
  * Save a transform to the transform stack. This method is used to to save transformations
  * as the render manager progresses through the object tree that makes up the scene.
  */
-void RenderManager::PushTransformData(const Transform * transform, DataStack<Matrix4x4> * transformStack)
+void RenderManager::PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack)
 {
-	if(transform == NULL)
-	{
-		Debug::PrintError("RenderManager::PushTransformData -> transform is NULL.");
-		return;
-	}
-	if(transformStack == NULL)
-	{
-		Debug::PrintError("RenderManager::PushTransformData -> transformStack is NULL.");
-		return;
-	}
-	transformStack->Push(&transform->matrix);
+	transformStack.Push(&transform.matrix);
 }
 
 /*
  * Remove the top transform from the transform stack.
  */
-void RenderManager::PopTransformData(Transform * transform, DataStack<Matrix4x4> * transformStack)
+void RenderManager::PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack)
 {
-	ASSERT_RTRN(transform != NULL,"RenderManager::PopTransformData -> transform is NULL.");
-	ASSERT_RTRN(transformStack != NULL,"RenderManager::PopTransformData -> transformStack is NULL.");
-	ASSERT_RTRN(transformStack->GetEntryCount() > 0,"RenderManager::PopTransformData -> transformStack is empty!");
+	ASSERT_RTRN(transformStack.GetEntryCount() > 0,"RenderManager::PopTransformData -> transformStack is empty!");
 
-	Matrix4x4 * mat = transformStack->Pop();
-	transform->SetTo(*mat);
+	Matrix4x4 * mat = transformStack.Pop();
+	transform.SetTo(*mat);
 }
 
 /*
  * Get the number of entries stored on the transform stack.
  */
-unsigned int RenderManager::RenderDepth(const DataStack<Matrix4x4> * transformStack) const
+unsigned int RenderManager::RenderDepth(const DataStack<Matrix4x4>& transformStack) const
 {
-	if(transformStack == NULL)return Constants::MaxObjectRecursionDepth;
-	return transformStack->GetEntryCount();
+	return transformStack.GetEntryCount();
 
 }
 
@@ -163,7 +139,7 @@ void RenderManager::ProcessScene()
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderAll -> sceneRoot is NULL.");
 
 	// gather information about the cameras & lights in the scene
-	ProcessScene(sceneRoot.GetPtr(), &cameraModelView);
+	ProcessScene(sceneRoot.GetPtr(), cameraModelView);
 
 	cycleCount++;
 }
@@ -177,7 +153,7 @@ void RenderManager::ProcessScene()
  * and passed to the current invocation via 'viewTransform', since they will ultimately form position
  * from which the scene is rendered. The transform stored in 'viewTransform' is passed to RenderScene();
  */
-void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTransform)
+void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTransform)
 {
 	Transform viewInverse;
 	Transform identity;
@@ -198,7 +174,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTran
 
 			// concatenate the current view transform with that of the current scene object
 			Transform& localTransform = child->GetLocalTransform();
-			aggregateTransform->TransformBy(&localTransform);
+			aggregateTransform.TransformBy(localTransform);
 
 			CameraRef camera = child->GetCamera();
 			if(camera.IsValid() && cameraCount < MAX_CAMERAS)
@@ -209,7 +185,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTran
 				viewInverse.Invert();
 
 				// add a scene camera from which to render the scene
-				sceneCameras[cameraCount].transform.SetTo(&viewInverse);
+				sceneCameras[cameraCount].transform.SetTo(viewInverse);
 				sceneCameras[cameraCount].component = camera.GetPtr();
 
 				cameraCount++;
@@ -242,32 +218,24 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform * aggregateTran
 
 /*
  * Render the entire scene from the perspective of a single camera. Uses [cameraIndex]
- * as an index into the array of cameras that has been found by processing the scene
- * [sceneCameras].
+ * as an index into the array of cameras [sceneCameras] that has been found by processing the scene.
  */
 void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 {
-	if(cameraIndex >= cameraCount)
-	{
-		Debug::PrintError("RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds");
-		return;
-	}
+	ASSERT_RTRN(cameraIndex < cameraCount,"RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds");
 
-	Camera * camera = dynamic_cast<Camera *>(sceneCameras[cameraIndex].component);
-
-	ASSERT_RTRN(camera != NULL,"RenderManager::RenderSceneFromCamera -> camera in NULL");
+	Camera * cameraPtr = dynamic_cast<Camera *>(sceneCameras[cameraIndex].component);
+	ASSERT_RTRN(cameraPtr != NULL,"RenderManager::RenderSceneFromCamera -> camera in NULL");
+	Camera& camera = *cameraPtr;
 
 	// clear the appropriate render buffers this camera
 	ClearBuffersForCamera(camera);
 	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
-	Transform identity;
-	identity.SetIdentity();
-
 	// render the scene using the view transform of the current camera
 	Transform& cameraTransform = sceneCameras[cameraIndex].transform;
-	ForwardRenderScene(sceneRoot.GetPtr(), &cameraTransform, camera);
+	ForwardRenderScene(sceneRoot.GetRef(), cameraTransform, camera);
 }
 
 /*
@@ -282,7 +250,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
  * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
  * each pass is combined with the others using additive blending.
  */
-void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTransformInverse, Camera * camera)
+void RenderManager::ForwardRenderScene(SceneObject& parent, Transform& viewTransformInverse, Camera& camera)
 {
 	Transform modelView;
 	Transform modelViewInverse;
@@ -295,9 +263,9 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 	if(RenderDepth(modelTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
 	// loop through each child scene object
-	for(unsigned int i = 0; i < parent->GetChildrenCount(); i++)
+	for(unsigned int i = 0; i < parent.GetChildrenCount(); i++)
 	{
-		SceneObjectRef child = parent->GetChildAt(i);
+		SceneObjectRef child = parent.GetChildAt(i);
 
 		if(!child.IsValid())
 		{
@@ -363,13 +331,13 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 						if(doRender)
 						{
 							model.SetTo(child->GetProcessingTransform());
-							modelInverse.SetTo(&model);
+							modelInverse.SetTo(model);
 							modelInverse.Invert();
 
-							modelView.SetTo(&model);
+							modelView.SetTo(model);
 							// concatenate modelTransform with inverted viewTransform
 							modelView.PreTransformBy(viewTransformInverse);
-							modelViewInverse.SetTo(&modelView);
+							modelViewInverse.SetTo(modelView);
 							modelViewInverse.Invert();
 
 							// activate the material, which will switch the GPU's active shader to
@@ -378,7 +346,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 							// pass concatenated modelViewTransform and projection transforms to shader
 							const Transform& modelTransform = child->GetProcessingTransform();
 
-							SendTransformUniformsToShader(modelTransform, modelView, camera->GetProjectionTransform());
+							SendTransformUniformsToShader(modelTransform, modelView, camera.GetProjectionTransform());
 							SendCustomUniformsToShader();
 
 							subRenderer->PreRender(model.matrix, modelInverse.matrix);
@@ -446,7 +414,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 			}
 
 			// continue recursion through child
-			ForwardRenderScene(child.GetPtr(), viewTransformInverse,camera);
+			ForwardRenderScene(child.GetRef(), viewTransformInverse,camera);
 		}
 	}
 }
@@ -454,7 +422,7 @@ void RenderManager::ForwardRenderScene(SceneObject * parent, Transform * viewTra
 /*
  * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].
  */
-bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh)
+bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const
 {
 	switch(mesh.GetLightCullType())
 	{
@@ -481,12 +449,12 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Tra
  * sphere does not intersect with the sphere that is formed by the light's range, then the light should
  * be culled from the meshes.
  */
-bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh)
+bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const
 {
 	// get the maximum distances from mesh center along each axis
-	Vector3 soiX = *(mesh.GetSphereOfInfluenceX());
-	Vector3 soiY = *(mesh.GetSphereOfInfluenceY());
-	Vector3 soiZ = *(mesh.GetSphereOfInfluenceZ());
+	Vector3 soiX = mesh.GetSphereOfInfluenceX();
+	Vector3 soiY = mesh.GetSphereOfInfluenceY();
+	Vector3 soiZ = mesh.GetSphereOfInfluenceZ();
 
 	// transform each distance vector by the full transform of the scene
 	// object that contains [mesh]
@@ -506,7 +474,7 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 	if(zMag > meshMag)meshMag = zMag;
 
 	Vector3 toLight;
-	Point3 meshCenter = *(mesh.GetCenter());
+	Point3 meshCenter = mesh.GetCenter();
 	fullTransform.TransformPoint(meshCenter);
 
 	// get the distance from the light to the mesh's center
@@ -521,9 +489,9 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 }
 
 /*
- * Tile-based culling - needs to be implemented!
+ * TODO: (Eventually) - Implement tile-base culling.
  */
-bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh)
+bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const
 {
 	return false;
 }
@@ -554,14 +522,8 @@ void RenderManager::SendTransformUniformsToShader(const Transform& model, const 
  */
 void RenderManager::SendCustomUniformsToShader()
 {
-	if(activeMaterial.IsValid())
-	{
-		activeMaterial->SendAllSetUniformsToShader();
-	}
-	else
-	{
-		Debug::PrintError("RenderManager::SendCustomUniformsToShader -> activeMaterial is NULL.");
-	}
+	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendCustomUniformsToShader -> activeMaterial is not valid.");
+	activeMaterial->SendAllSetUniformsToShader();
 }
 
 /*

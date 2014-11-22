@@ -25,13 +25,14 @@ UV2  * UV2Factory::CreatePermAttached(float * target)
 	return new UV2(true, target);
 }
 
-void UV2Factory::CreateArray(int count, BaseVector2 *** ppptr)
+BaseVector2** UV2Factory::CreateArray(int count)
 {
-	*ppptr = (BaseVector2**)new UV2*[count];
-	if(*ppptr != NULL)
+	BaseVector2** pptr = (BaseVector2**)new UV2*[count];
+	if(*pptr != NULL)
 	{
-		memset(*ppptr, (int)NULL, sizeof(UV2*) * count);
+		memset(pptr, (int)NULL, sizeof(UV2*) * count);
 	}
+	return pptr;
 }
 
 UV2Factory * UV2Factory::GetInstance()

@@ -29,7 +29,7 @@ class AttributeTransformer
     virtual void TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut) = 0;
 
     void SetActiveAttributes (StandardAttributeSet attributes);
-    StandardAttributeSet GetActiveAttributes();
+    StandardAttributeSet GetActiveAttributes() const;
 
     void SetModelMatrix(const Matrix4x4& model, const Matrix4x4& modelInverse);
 };

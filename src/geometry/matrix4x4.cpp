@@ -64,7 +64,7 @@ Matrix4x4::Matrix4x4(const float * sourceData) : A0(data[0]), A1(data[4]), A2(da
     else
     {
     	SetIdentity();
-    	Debug::PrintError("Matrix4x4::Matrix4x4(float *) -> NULL data passed.");
+    	Debug::PrintWarning("Matrix4x4::Matrix4x4(float *) -> NULL data passed.");
     }
 }
 
@@ -125,7 +125,7 @@ void Matrix4x4::BuildFromComponents(const Vector3& translation, const Quaternion
   	D0 = 0; D1 = 0; D2 = 0;D3 = 1;
 }
 
-void Matrix4x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale)
+void Matrix4x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
 	ASSERT_RTRN(IsAffine(), "Matrix4x4::Decompose -> matrix is not affine");
 

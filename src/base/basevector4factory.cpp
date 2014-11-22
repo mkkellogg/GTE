@@ -22,7 +22,8 @@ BaseVector4 * BaseVector4Factory::CreatePermAttached(float * target)
 	return new BaseVector4(true, target);
 }
 
-void BaseVector4Factory::CreateArray(int count, BaseVector4*** ppptr)
+BaseVector4** BaseVector4Factory::CreateArray(int count)
 {
-	*ppptr = new BaseVector4*[count];
+	BaseVector4** pptr = new BaseVector4*[count];
+	return pptr;
 }

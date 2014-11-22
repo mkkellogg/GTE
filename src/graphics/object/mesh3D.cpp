@@ -83,10 +83,10 @@ void Mesh3D::CalculateSphereOfInfluence()
 		SubMesh3DRef subMesh = subMeshes[i];
 		if(subMesh.IsValid())
 		{
-			const Point3 *temp = subMesh->GetCenter();
-			average.x += temp->x;
-			average.y += temp->y;
-			average.z += temp->z;
+			const Point3 temp = subMesh->GetCenter();
+			average.x += temp.x;
+			average.y += temp.y;
+			average.z += temp.z;
 			validSubMeshes++;
 		}
 	}
@@ -108,15 +108,15 @@ void Mesh3D::CalculateSphereOfInfluence()
 		SubMesh3DRef subMesh = subMeshes[i];
 		if(subMesh.IsValid())
 		{
-			const Point3 *temp = subMesh->GetCenter();
+			const Point3 temp = subMesh->GetCenter();
 
-			float offsetX = GTEMath::Abs(center.x - temp->x);
-			float offsetY = GTEMath::Abs(center.y - temp->y);
-			float offsetZ = GTEMath::Abs(center.z - temp->z);
+			float offsetX = GTEMath::Abs(center.x - temp.x);
+			float offsetY = GTEMath::Abs(center.y - temp.y);
+			float offsetZ = GTEMath::Abs(center.z - temp.z);
 
-			float soiX = offsetX + GTEMath::Abs(subMesh->GetSphereOfInfluenceX()->x);
-			float soiY = offsetY + GTEMath::Abs(subMesh->GetSphereOfInfluenceX()->y);
-			float soiZ = offsetZ + GTEMath::Abs(subMesh->GetSphereOfInfluenceX()->z);
+			float soiX = offsetX + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().x);
+			float soiY = offsetY + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().y);
+			float soiZ = offsetZ + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().z);
 
 			if(soiX > maxSoiX)maxSoiX = soiX;
 			if(soiY > maxSoiY)maxSoiY = soiY;
@@ -183,24 +183,24 @@ bool Mesh3D::SceneObjectHasRenderer()
 	return true;
 }
 
-const Point3 * Mesh3D::GetCenter() const
+const Point3& Mesh3D::GetCenter() const
 {
-	return &center;
+	return center;
 }
 
-const Vector3 * Mesh3D::GetSphereOfInfluenceX() const
+const Vector3& Mesh3D::GetSphereOfInfluenceX() const
 {
-	return &sphereOfInfluenceX;
+	return sphereOfInfluenceX;
 }
 
-const Vector3 * Mesh3D::GetSphereOfInfluenceY() const
+const Vector3& Mesh3D::GetSphereOfInfluenceY() const
 {
-	return &sphereOfInfluenceY;
+	return sphereOfInfluenceY;
 }
 
-const Vector3 * Mesh3D::GetSphereOfInfluenceZ() const
+const Vector3& Mesh3D::GetSphereOfInfluenceZ() const
 {
-	return &sphereOfInfluenceZ;
+	return sphereOfInfluenceZ;
 }
 
 LightCullType Mesh3D::GetLightCullType() const

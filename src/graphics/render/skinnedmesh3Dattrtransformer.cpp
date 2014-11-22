@@ -271,17 +271,17 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		// transformation flags arrays. in this case it will be the position transformation array
 		ClearTransformedPositionFlagsArray();
 
-		Point3 iteratorPoint;
-		Point3Array::Iterator iterator = positionsOut.GetIterator(iteratorPoint);
-		while(iterator.HasNext())
-		{
-			iterator.Next();
-			iteratorPoint.Set(iteratorPoint.x,iteratorPoint.y,iteratorPoint.z);
-		}
+		BaseVector4 iteratorPosition;
+		BaseVector4 iteratorNormal;
+		BaseVector4Array::Iterator positionsOutIterator = positionsOut.GetIterator(iteratorPosition);
+		BaseVector4Array::Iterator normalsOutIterator = normalsOut.GetIterator(iteratorNormal);
 
 		// loop through each vertex
 		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
 		{
+			positionsOutIterator.Next();
+			normalsOutIterator.Next();
+
 			// get the mapping information for the current vertex
 			VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
 
@@ -293,11 +293,13 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 			{
 				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);
 				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedPositions contains NULL point.");
-				positionsOut.GetPoint(i)->SetTo(*p);
+				// positionsOut.GetPoint(i)->SetTo(*p);
+				iteratorPosition.SetTo(*p);
 
 				Vector3 * v = transformedNormals.GetVector(desc->UVertexIndex);
 				ASSERT_RTRN(v!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedNormals contains NULL vector.");
-				normalsOut.GetVector(i)->SetTo(*v);
+				//normalsOut.GetVector(i)->SetTo(*v);
+				iteratorNormal.SetTo(*v);
 			}
 			else
 			{
@@ -347,19 +349,35 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 				}
 
 				// transform position
-				Point3 * p = positionsOut.GetPoint(i);
-				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> positionsOut contains NULL point.");
-				full.Transform(*p);
+				//Point3 * p = positionsOut.GetPoint(i);
+				//ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> positionsOut contains NULL point.");
+				//full.Transform(*p);
+				float * positionPtr = iteratorPosition.GetDataPtr();
+				full.Transform(positionPtr);
 
 				// transform nomral
-				Vector3 * v = normalsOut.GetVector(i);
-				ASSERT_RTRN(v!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> normalsOut contains NULL vector.");
-				full.Transform(*v);
+				//Vector3 * v = normalsOut.GetVector(i);
+				//ASSERT_RTRN(v!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> normalsOut contains NULL vector.");
+				//full.Transform(*v);
+				float * normalPtr = iteratorNormal.GetDataPtr();
+				full.Transform(normalPtr);
 
 				// update saved positions
-				transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(*p);
+				//transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(*p);
+				float* transformPositionsPtr = const_cast<float*>(transformedPositions.GetDataPtr())+(desc->UVertexIndex*4);
+				transformPositionsPtr[0] = positionPtr[0];
+				transformPositionsPtr[1] = positionPtr[1];
+				transformPositionsPtr[2] = positionPtr[2];
+				transformPositionsPtr[3] = positionPtr[3];
+
 				// update saved normals
-				transformedNormals.GetVector(desc->UVertexIndex)->SetTo(*v);
+				//transformedNormals.GetVector(desc->UVertexIndex)->SetTo(*v);
+				float* transformNormalsPtr = const_cast<float*>(transformedNormals.GetDataPtr())+(desc->UVertexIndex*4);
+				transformNormalsPtr[0] = normalPtr[0];
+				transformNormalsPtr[1] = normalPtr[1];
+				transformNormalsPtr[2] = normalPtr[2];
+				transformNormalsPtr[3] = normalPtr[3];
+
 				// set position transformation flag to 1 so we don't repeat the work for this vertex if we
 				// encounter it again
 				positionTransformed[desc->UVertexIndex] = 1;

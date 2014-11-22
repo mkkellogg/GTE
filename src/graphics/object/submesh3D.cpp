@@ -278,24 +278,24 @@ void SubMesh3D::Destroy()
 	}
 }
 
-const Point3 * SubMesh3D::GetCenter() const
+const Point3& SubMesh3D::GetCenter() const
 {
-	return (const Point3 *)(&center);
+	return center;
 }
 
-const Vector3 * SubMesh3D::GetSphereOfInfluenceX() const
+const Vector3& SubMesh3D::GetSphereOfInfluenceX() const
 {
-	return (const Vector3 *)(&sphereOfInfluenceX);
+	return sphereOfInfluenceX;
 }
 
-const Vector3 * SubMesh3D::GetSphereOfInfluenceY() const
+const Vector3& SubMesh3D::GetSphereOfInfluenceY() const
 {
-	return (const Vector3 *)(&sphereOfInfluenceY);
+	return sphereOfInfluenceY;
 }
 
-const Vector3 * SubMesh3D::GetSphereOfInfluenceZ() const
+const Vector3& SubMesh3D::GetSphereOfInfluenceZ() const
 {
-	return (const Vector3 *)(&sphereOfInfluenceZ);
+	return sphereOfInfluenceZ;
 }
 
 void SubMesh3D::Update()

@@ -18,7 +18,7 @@ class Vector3Factory : public BaseVector4Factory
     virtual ~Vector3Factory();
 
     BaseVector4 * CreatePermAttached(float * target);
-    void CreateArray(int count, BaseVector4 *** ppptr);
+    BaseVector4 ** CreateArray(int count);
 };
 
 #endif
