@@ -6,10 +6,6 @@ class Point3;
 class Vector3;
 class color4;
 class UV2;
-class Point3Array;
-class Vector3Array;
-class Color4Array;
-class UV2Array;
 class EngineObjectManager;
 class SubMesh3DRenderer;
 
@@ -20,6 +16,11 @@ class SubMesh3DRenderer;
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
 
+#include "geometry/point/point3array.h"
+#include "geometry/vector/vector3array.h"
+#include "graphics/color/color4array.h"
+#include "graphics/uv/uv2array.h"
+
 class SubMesh3D : public EngineObject
 {
 	friend EngineObjectManager;
@@ -29,11 +30,11 @@ class SubMesh3D : public EngineObject
 	unsigned int vertexCount;
 	int subIndex;
 
-    Point3Array * positions;
-    Vector3Array * normals;
-    Color4Array * colors;
-    UV2Array * uvsTexture0;
-    UV2Array * uvsTexture1;
+    Point3Array positions;
+    Vector3Array normals;
+    Color4Array colors;
+    UV2Array uvsTexture0;
+    UV2Array uvsTexture1;
 
     int normalsSmoothingThreshold;
     Vector3 sphereOfInfluenceX;

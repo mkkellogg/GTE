@@ -1,6 +1,8 @@
 #ifndef _DATASTACK_
 #define _DATASTACK_
 
+#include "global/global.h"
+
 template <typename T> class DataStack
 {
 	unsigned int maxEntryCount;
@@ -9,6 +11,11 @@ template <typename T> class DataStack
 	T * data;
 
 	T * stackPointer;
+
+	void Destroy()
+	{
+		SAFE_DELETE(data);
+	}
 
 	public:
 
@@ -23,11 +30,13 @@ template <typename T> class DataStack
 
 	~DataStack()
 	{
-
+		Destroy();
 	}
 
 	bool Init()
 	{
+		Destroy();
+
 		data = new T[maxEntryCount * elementsPerEntry];
 		if(data == NULL)
 		{
@@ -50,7 +59,7 @@ template <typename T> class DataStack
 	}
 
 	/*
-	 * !!! Important: The pointer returned from this method points to the data array for this stack. This
+	 * !!! IMPORTANT: The pointer returned from this method points to the data array for this stack. This
 	 * means the data this pointer points to can be overwritten by Push() operations. Therefore the return
 	 * value from this method is only guaranteed to be valid up until any subsequent Push() calls.
 	 */

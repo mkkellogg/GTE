@@ -24,6 +24,7 @@ class Matrix4x4;
 class SubMesh3DRenderer : public EngineObject
 {
 	friend class Mesh3DRenderer;
+	friend class Graphics;
 
 	protected:
 
@@ -50,6 +51,7 @@ class SubMesh3DRenderer : public EngineObject
     Point3 centerCopy,transformedCenter;
 
     bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount,  int stride);
+    void Destroy();
     void DestroyBuffers();
     void DestroyBuffer(VertexAttrBuffer ** buffer);
     void SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride);
@@ -70,9 +72,11 @@ class SubMesh3DRenderer : public EngineObject
 
     void CopyMeshData();
 
-    public:
+	protected:
 
     virtual ~SubMesh3DRenderer();
+
+    public:
 
     void UpdateFromMesh();
 

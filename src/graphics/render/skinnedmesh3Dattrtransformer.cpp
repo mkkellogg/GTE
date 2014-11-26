@@ -61,6 +61,7 @@ SkinnedMesh3DAttributeTransformer::~SkinnedMesh3DAttributeTransformer()
 {
 	DestroyTransformedBoneFlagsArray();
 	DestroyTransformedPositionFlagsArray();
+	DestroyTransformedNormalFlagsArray();
 }
 
 /*
@@ -276,6 +277,11 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		BaseVector4Array::Iterator positionsOutIterator = positionsOut.GetIterator(iteratorPosition);
 		BaseVector4Array::Iterator normalsOutIterator = normalsOut.GetIterator(iteratorNormal);
 
+		float* transformPositionsPtrBase =  const_cast<float*>(transformedPositions.GetDataPtr());
+		float* transformNormalsPtrBase = const_cast<float*>(transformedNormals.GetDataPtr());
+		float* transformPositionsPtr = NULL;
+		float* transformNormalsPtr = NULL;
+
 		// loop through each vertex
 		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
 		{
@@ -291,15 +297,11 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 			// duplicated for each triangle)
 			if(positionTransformed[desc->UVertexIndex] == 1)
 			{
-				Point3 * p = transformedPositions.GetPoint(desc->UVertexIndex);
-				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedPositions contains NULL point.");
-				// positionsOut.GetPoint(i)->SetTo(*p);
-				iteratorPosition.SetTo(*p);
+				transformPositionsPtr = transformPositionsPtrBase+(desc->UVertexIndex*4);
+				iteratorPosition.Set(transformPositionsPtr[0],transformPositionsPtr[1],transformPositionsPtr[2],transformPositionsPtr[3]);
 
-				Vector3 * v = transformedNormals.GetVector(desc->UVertexIndex);
-				ASSERT_RTRN(v!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedNormals contains NULL vector.");
-				//normalsOut.GetVector(i)->SetTo(*v);
-				iteratorNormal.SetTo(*v);
+				transformNormalsPtr = transformNormalsPtrBase+(desc->UVertexIndex*4);
+				iteratorNormal.Set(transformNormalsPtr[0],transformNormalsPtr[1],transformNormalsPtr[2],transformNormalsPtr[3]);
 			}
 			else
 			{
@@ -348,35 +350,25 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 					else full.Add(temp);
 				}
 
-				// transform position
-				//Point3 * p = positionsOut.GetPoint(i);
-				//ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> positionsOut contains NULL point.");
-				//full.Transform(*p);
 				float * positionPtr = iteratorPosition.GetDataPtr();
 				full.Transform(positionPtr);
 
-				// transform nomral
-				//Vector3 * v = normalsOut.GetVector(i);
-				//ASSERT_RTRN(v!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> normalsOut contains NULL vector.");
-				//full.Transform(*v);
 				float * normalPtr = iteratorNormal.GetDataPtr();
 				full.Transform(normalPtr);
 
-				// update saved positions
-				//transformedPositions.GetPoint(desc->UVertexIndex)->SetTo(*p);
-				float* transformPositionsPtr = const_cast<float*>(transformedPositions.GetDataPtr())+(desc->UVertexIndex*4);
-				transformPositionsPtr[0] = positionPtr[0];
-				transformPositionsPtr[1] = positionPtr[1];
-				transformPositionsPtr[2] = positionPtr[2];
-				transformPositionsPtr[3] = positionPtr[3];
+				// update saved positions & normals
+				transformPositionsPtr = transformPositionsPtrBase+(desc->UVertexIndex*4);
+				transformNormalsPtr = transformNormalsPtrBase+(desc->UVertexIndex*4);
+				for(unsigned int i =0; i<4; i++)
+				{
+					*transformNormalsPtr = *normalPtr;
+					transformNormalsPtr++;
+					normalPtr++;
 
-				// update saved normals
-				//transformedNormals.GetVector(desc->UVertexIndex)->SetTo(*v);
-				float* transformNormalsPtr = const_cast<float*>(transformedNormals.GetDataPtr())+(desc->UVertexIndex*4);
-				transformNormalsPtr[0] = normalPtr[0];
-				transformNormalsPtr[1] = normalPtr[1];
-				transformNormalsPtr[2] = normalPtr[2];
-				transformNormalsPtr[3] = normalPtr[3];
+					*transformPositionsPtr = *positionPtr;
+					transformPositionsPtr++;
+					positionPtr++;
+				}
 
 				// set position transformation flag to 1 so we don't repeat the work for this vertex if we
 				// encounter it again

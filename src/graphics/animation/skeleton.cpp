@@ -39,6 +39,7 @@ void Skeleton::Destroy()
 	{
 		VertexBoneMap * map = vertexBoneMaps[i];
 		SAFE_DELETE(map);
+		vertexBoneMaps[i] = NULL;
 	}
 	vertexBoneMaps.clear();
 
@@ -57,6 +58,7 @@ void Skeleton::Destroy()
 		if(node != NULL && node->Data != NULL)
 		{
 			delete node->Data;
+			node->Data = NULL;
 		}
 		return true;
 	});

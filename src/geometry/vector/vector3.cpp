@@ -320,13 +320,18 @@ bool Vector3::RotateTowards(const Vector3& from, const Vector3& to,  float theta
 
 	// calculate angle between [from] and [to]
 	float dot = Vector3::Dot(fromCopy, toCopy);
+
+	// clamp to the range -1.0 ... 1.0 to prevent rounding errors in Acos()
+	if (dot < -1.0) dot = -1.0 ;
+	else if (dot > 1.0) dot = 1.0 ;
+
 	float thetaDiff = GTEMath::ACos(dot);
 
 	// cap theta so we don't rotate past [to]
 	if((theta > thetaDiff && thetaDiff > 0) || (theta < thetaDiff && thetaDiff < 0))
 	{
 		theta = thetaDiff;
-		result =toCopy;
+		result = toCopy;
 		return true;
 	}
 
@@ -337,7 +342,7 @@ bool Vector3::RotateTowards(const Vector3& from, const Vector3& to,  float theta
 	Vector3 fromScaled;
 	Vector3 newScaled;
 
-	// Magnitude() < .001 means vectors [from] and [too] are essentially parallel
+	// Magnitude() < .001 means vectors [from] and [to] are essentially parallel
 	if(newVector.Magnitude() < .001)
 	{
 		// are these vectors really close? if so, just set [result] to [to]

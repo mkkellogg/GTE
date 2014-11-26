@@ -23,6 +23,7 @@ class RawImage
 	BYTE * imageBytes;
 
 	unsigned int ImageSizeBytes();
+	void Destroy();
 
 	public:
 

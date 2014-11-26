@@ -18,6 +18,11 @@ RawImage::RawImage(unsigned int width, unsigned int height)
 
 RawImage::~RawImage()
 {
+	Destroy();
+}
+
+void RawImage::Destroy()
+{
 	SAFE_DELETE(imageBytes);
 }
 
@@ -29,10 +34,7 @@ unsigned int RawImage::ImageSizeBytes()
 bool RawImage::Init()
 {
 	imageBytes = new BYTE[ImageSizeBytes()];
-	if(imageBytes == NULL)
-	{
-		return false;
-	}
+	ASSERT(imageBytes != NULL, "RawImage::Init -> Unable to allocate image bytes.", false);
 
 	return true;
 }

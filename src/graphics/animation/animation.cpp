@@ -74,17 +74,12 @@ unsigned int Animation::GetKeyFrameSetCount()
  */
 KeyFrameSet * Animation::GetKeyFrameSet(unsigned int nodeIndex)
 {
-	if(nodeIndex >= keyFrameSetCount)
-	{
-		Debug::PrintError("Animation::GetKeyFrameSet -> Node index is out of range.");
-		return NULL;
-	}
-
+	ASSERT(nodeIndex < keyFrameSetCount,"Animation::GetKeyFrameSet -> Node index is out of range.", NULL);
 	return keyFrames + nodeIndex;
 }
 
 /*
- * Get the duration of this animaion in ticks.
+ * Get the duration of this animation in ticks.
  */
 float Animation::GetDurationTicks() const
 {

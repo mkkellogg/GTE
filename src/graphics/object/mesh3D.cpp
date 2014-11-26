@@ -44,11 +44,12 @@ unsigned int Mesh3D::GetSubMeshCount()
 bool Mesh3D::Init()
 {
 	Destroy();
-	//subMeshes.reserve(subMeshCount);
+
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
 		subMeshes.push_back(SubMesh3DRef::Null());
 	}
+
 	return true;
 }
 

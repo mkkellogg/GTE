@@ -13,6 +13,7 @@ class BaseVector4Factory
 
     virtual BaseVector4 * CreatePermAttached(float * target);
     virtual BaseVector4** CreateArray(int count);
+    virtual void DestroyArray(BaseVector4 ** array, unsigned int size);
 };
 
 #endif

@@ -12,7 +12,8 @@ class BaseVector2Factory
     virtual ~BaseVector2Factory();
 
     virtual BaseVector2 * CreatePermAttached(float * target);
-    virtual BaseVector2** CreateArray(int count);
+    virtual BaseVector2 ** CreateArray(int count);
+    virtual void DestroyArray(BaseVector2 ** array, unsigned int size);
 };
 
 #endif

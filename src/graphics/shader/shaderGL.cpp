@@ -35,7 +35,6 @@
 ShaderGL::ShaderGL(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
 {
     ready = false;
-    name = NULL;
 
     programID = 0;
     vertexShaderID = 0;
@@ -56,19 +55,10 @@ ShaderGL::ShaderGL(const std::string& vertexShaderPath, const std::string& fragm
  */
 ShaderGL::~ShaderGL() 
 {
-    if(vertexShaderSource != NULL)
-    {
-        delete vertexShaderSource;
-        vertexShaderSource = NULL;
-    }
+   SAFE_DELETE(vertexShaderSource);
+   SAFE_DELETE(fragmentShaderSource);
 
-    if(fragmentShaderSource != NULL)
-    {
-        delete fragmentShaderSource;
-        fragmentShaderSource = NULL;
-    }
-
-    DestroyComponents();
+   DestroyComponents();
 }
 
 /*
@@ -124,10 +114,12 @@ void ShaderGL::DestroyUniformAndAttributeInfo()
 			if(attributes[i] != NULL)
 			{
 				delete attributes[i];
+				attributes[i] = NULL;
 			}
 		}
 		delete attributes;
 	}
+	attributes = NULL;
 
 	if(uniforms != NULL)
 	{
@@ -136,10 +128,12 @@ void ShaderGL::DestroyUniformAndAttributeInfo()
 			if(uniforms[i] != NULL)
 			{
 				delete uniforms[i];
+				uniforms[i] = NULL;
 			}
 		}
 		delete uniforms;
 	}
+	uniforms = NULL;
 }
 
 /*

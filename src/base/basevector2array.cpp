@@ -7,6 +7,7 @@
 #include "basevector2array.h"
 #include "basevector2.h"
 #include "basevector2factory.h"
+#include "global/global.h"
 #include "ui/debug.h"
 
 BaseVector2Array::BaseVector2Array(BaseVector2Factory * factory) : count(0), data(NULL), objects(NULL), baseFactory(factory)
@@ -21,26 +22,10 @@ BaseVector2Array::~BaseVector2Array()
 
 void BaseVector2Array::Destroy()
 {
-	if(objects != NULL)
-	{
-		for(int i=0; i < count; i++)
-		{
-			BaseVector2 * baseObj = objects[i];
-			if(baseObj != NULL)
-			{
-				delete baseObj;
-				objects[i] = NULL;
-			}
-		}
-		delete objects;
-		objects = NULL;
-	}
+	if(objects!=NULL)baseFactory->DestroyArray(objects, count);
+	objects = NULL;
 
-	if(data != NULL)
-	{
-		delete data;
-		data = NULL;
-	}
+	SAFE_DELETE(data);
 }
 
 bool BaseVector2Array::Init(int count)
@@ -61,8 +46,7 @@ bool BaseVector2Array::Init(int count)
 	if(objects == NULL)
 	{
 		Debug::PrintError("Could not allocate objects memory for BaseVector2Array");
-		delete data;
-		data = NULL;
+		Destroy();
 		return false;
 	}
 
@@ -76,14 +60,7 @@ bool BaseVector2Array::Init(int count)
 		if(currentObject == NULL)
 		{
 			Debug::PrintError("Could not allocate BaseVector2 for BaseVector2Array");
-
-			for(int i=0; i< index; i++)delete objects[i];
-			delete objects;
-			objects = NULL;
-
-			delete data;
-			data = NULL;
-
+			Destroy();
 			return false;
 		}
 

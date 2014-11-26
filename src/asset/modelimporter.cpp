@@ -296,6 +296,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 				if(bone != NULL)
 				{
 					SkeletonNode * skNode = bone->Node;
+					if(skNode != NULL)
 					{
 						// if this skeleton node has a SceneObject target, then set it to [sceneObject]
 						SceneObjectSkeletonNode *soskNode = dynamic_cast<SceneObjectSkeletonNode*>(skNode);

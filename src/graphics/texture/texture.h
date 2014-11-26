@@ -27,11 +27,11 @@ class Texture : public EngineObject
 	std::string sourcePath;
 	TextureAttributes attributes;
 
-	public:
-
 	Texture(TextureAttributes attributes);
 	Texture(TextureAttributes attributes, const std::string& sourcePath);
 	virtual ~Texture();
+
+	public:
 };
 
 #endif

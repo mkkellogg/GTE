@@ -80,7 +80,8 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     	 return false;
     }
 	// call base method
-	Graphics::Init(this->attributes);
+	bool parentInit = Graphics::Init(this->attributes);
+	if(!parentInit)return false;
 
     glutDisplayFunc(&_glutDisplayFunc);
     glutIdleFunc(&_glutIdleFunc);
@@ -146,7 +147,12 @@ SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer(AttributeTransformer * attrTr
 void GraphicsGL::DestroyMeshRenderer(SubMesh3DRenderer * renderer)
 {
 	ASSERT_RTRN(renderer != NULL, "GraphicsGL::DestroyMeshRenderer -> renderer is NULL");
-	delete renderer;
+
+	SubMesh3DRendererGL * rendererGL = dynamic_cast<SubMesh3DRendererGL*>(renderer);
+	if(rendererGL != NULL)
+	{
+		delete rendererGL;
+	}
 }
 
 VertexAttrBuffer * GraphicsGL::CreateVertexAttributeBuffer()
@@ -254,7 +260,13 @@ Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, TextureAttrib
 
 void GraphicsGL::DestroyTexture(Texture * texture)
 {
-	delete texture;
+	ASSERT_RTRN(texture != NULL, "GraphicsGL::DestroyTexture -> texture is NULL");
+
+	TextureGL * texGL = dynamic_cast<TextureGL*>(texture);
+	if(texGL != NULL)
+	{
+		delete texGL;
+	}
 }
 
 void GraphicsGL::EnableBlending(bool enabled)

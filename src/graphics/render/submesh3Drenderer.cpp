@@ -53,8 +53,7 @@ SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, Graphics * graphics, Att
 
 SubMesh3DRenderer::~SubMesh3DRenderer()
 {
-	DestroyBuffers();
-	SAFE_DELETE(attributeTransformer);
+	Destroy();
 }
 
 void SubMesh3DRenderer::SetSubIndex(unsigned int index)
@@ -66,6 +65,12 @@ void SubMesh3DRenderer::SetContainerRenderer(Mesh3DRenderer * renderer)
 {
 	ASSERT_RTRN(renderer != NULL, "SubMesh3DRenderer::SetContainerRenderer -> renderer is NULL");
 	this->containerRenderer = renderer;
+}
+
+void SubMesh3DRenderer::Destroy()
+{
+	DestroyBuffers();
+	SAFE_DELETE(attributeTransformer);
 }
 
 void SubMesh3DRenderer::DestroyBuffers()
@@ -94,19 +99,12 @@ void SubMesh3DRenderer::SetVertexData(VertexAttrBuffer * buffer, const float * d
 
 bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount, int stride)
 {
-	if(buffer == NULL)
-	{
-		Debug::PrintError("Attempted to initialize vertex attribute buffer from null pointer.");
-		return false;
-	}
+	ASSERT(buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false);
+
+	DestroyBuffer(buffer);
 
 	*buffer = graphics->CreateVertexAttributeBuffer();
-
-	if(*buffer == NULL)
-	{
-		Debug::PrintError("Graphics::CreateVertexAttrBuffer() returned NULL.");
-		return false;
-	}
+	ASSERT(*buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Graphics::CreateVertexAttrBuffer() returned NULL.", false);
 
 	(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, NULL);
 

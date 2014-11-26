@@ -22,26 +22,10 @@ BaseVector4Array::~BaseVector4Array()
 
 void BaseVector4Array::Destroy()
 {
-	if(objects != NULL)
-	{
-		for(unsigned int i=0; i < count; i++)
-		{
-			BaseVector4 * baseObj = objects[i];
-			if(baseObj != NULL)
-			{
-				delete baseObj;
-				objects[i] = NULL;
-			}
-		}
-		delete objects;
-		objects = NULL;
-	}
+	if(objects != NULL)baseFactory->DestroyArray(objects, count);
+	objects = NULL;
 
-	if(data != NULL)
-	{
-		delete data;
-		data = NULL;
-	}
+	SAFE_DELETE(data);
 }
 
 bool BaseVector4Array::Init(unsigned int count)
@@ -62,8 +46,7 @@ bool BaseVector4Array::Init(unsigned int count)
 	if(objects == NULL)
 	{
 		Debug::PrintError("Could not allocate objects memory for BaseVector4Array");
-		delete data;
-		data = NULL;
+		Destroy();
 		return false;
 	}
 
@@ -77,14 +60,7 @@ bool BaseVector4Array::Init(unsigned int count)
 		if(currentObject == NULL)
 		{
 			Debug::PrintError("Could not allocate BaseVector4 for BaseVector4Array");
-
-			for(unsigned int i=0; i< index; i++)delete objects[i];
-			delete objects;
-			objects = NULL;
-
-			delete data;
-			data = NULL;
-
+			Destroy();
 			return false;
 		}
 

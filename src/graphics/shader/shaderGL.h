@@ -42,7 +42,7 @@ class ShaderGL : public Shader
     // is this shader loaded, compiled and linked?
     bool ready;
 
-    char * name;
+    std::string name;
 
     // pointers to the source code for each type of shader
     ShaderSource * vertexShaderSource;

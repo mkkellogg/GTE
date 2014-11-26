@@ -5,10 +5,18 @@
 #include <math.h>
  
 #include "basevector2.h"
+#include "global/global.h"
+#include "ui/debug.h"
 
-void BaseVector2::Init(float x, float y, float *target, bool permAttach)
+void BaseVector2::Init(float *target, bool permAttach)
 {
-	data = baseData = NULL;
+	data = baseData;
+
+	if(target == NULL && permAttach == true)
+	{
+		Debug::PrintWarning("BaseVector4::Init -> permAttach is true, but target is NULL!");
+		permAttach = false;
+	}
 
 	if(permAttach)
 	{
@@ -16,7 +24,7 @@ void BaseVector2::Init(float x, float y, float *target, bool permAttach)
 	}
 	else
 	{
-		data = baseData = new float[4];
+		data = baseData;
 		canDetach = true;
 	}
 
@@ -29,37 +37,34 @@ void BaseVector2::Init(float x, float y, float *target, bool permAttach)
 	{
 		attached = false;
 	}
-    Set(x,y);
 }
 
 BaseVector2::BaseVector2()
 {
-    Init(0,0, NULL, false);
+    Init(NULL, false);
+    Set(0,0);
 }
 
 BaseVector2::BaseVector2(bool permAttached, float * target)
 {
-	Init(0,0,target, true);
+	Init(target, true);
+	Set(0,0);
 }
 
 BaseVector2::BaseVector2(float x, float y)
 {
-    Init(x,y, NULL, false);
+    Init(NULL, false);
+    Set(x,y);
 }
 
 BaseVector2::BaseVector2(const BaseVector2& baseVector)
 {
-    Init(baseVector.data[0], baseVector.data[1], NULL, false);
+    Init(NULL, false);
+    Set(baseVector.data[0], baseVector.data[1]);
 }
 
 BaseVector2::~BaseVector2()
 {   
-	if(baseData != NULL)
-	{
-		delete baseData;
-		baseData = NULL;
-	}
-
     if(!attached)data = NULL;
 }
 

@@ -9,6 +9,7 @@
  
 #include "shadersource.h"
 #include "gte.h"
+#include "global/global.h"
 
 ShaderSource::ShaderSource(const std::string& filePath)
 {
@@ -19,11 +20,7 @@ ShaderSource::ShaderSource(const std::string& filePath)
 
 ShaderSource::~ShaderSource()
 {
-    if(sourceString != NULL)
-    {
-        delete sourceString;
-        sourceString = NULL;
-    }
+	SAFE_DELETE(sourceString);
 }
 
 bool ShaderSource::Load()

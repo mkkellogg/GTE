@@ -5,10 +5,10 @@ class BaseVector2
 {
     protected:
 
-    void Init(float x, float y, float *target, bool permAttach);
+    void Init(float *target, bool permAttach);
 
     float * data;
-    float * baseData;
+    float baseData[2];
     bool attached;
     bool canDetach;
 

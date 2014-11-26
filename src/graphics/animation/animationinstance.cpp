@@ -38,7 +38,7 @@ AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
  */
 AnimationInstance::~AnimationInstance()
 {
-
+	Destroy();
 }
 
 /*
@@ -61,10 +61,10 @@ void AnimationInstance::Destroy()
  */
 bool AnimationInstance::Init()
 {
+	Destroy();
+
 	ASSERT(Target.IsValid(), "AnimationInstance::Init -> Animation target is invalid.", false);
 	ASSERT(SourceAnimation.IsValid(), "AnimationInstance::Init -> Animation is invalid.", false);
-
-	Destroy();
 
 	unsigned int nodeCount = Target->GetNodeCount();
 

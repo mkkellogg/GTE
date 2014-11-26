@@ -88,7 +88,7 @@ class AnimationInstance
 	bool Paused;
 
 	AnimationInstance(SkeletonRef target, AnimationRef animation);
-	 ~AnimationInstance();
+	~AnimationInstance();
 
 	void Destroy();
 

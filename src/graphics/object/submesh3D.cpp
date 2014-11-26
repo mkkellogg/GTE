@@ -43,12 +43,6 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 	vertexCount = 0;
 	normalsSmoothingThreshold = 90;
 
-	positions = new Point3Array();
-	normals = new Vector3Array();
-	colors = new Color4Array();
-	uvsTexture0 = new UV2Array();
-	uvsTexture1 = new UV2Array();
-
 	containerMesh = NULL;
 	subIndex = -1;
 }
@@ -77,7 +71,7 @@ void SubMesh3D::CalcSphereOfInfluence()
 	// along each axis.
 	for(unsigned int v=0; v < vertexCount; v++)
 	{
-		Point3 * point = positions->GetPoint(v);
+		Point3 * point = positions.GetPoint(v);
 		if(point->x > maxX || v == 0)maxX = point->x;
 		if(point->x < minX || v == 0)minX = point->x;
 		if(point->y > maxY || v == 0)maxY = point->y;
@@ -114,9 +108,9 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		Vector3 a,b,c;
 
 		// get Point3 objects for each vertex
-		Point3 *pa = positions->GetPoint(v);
-		Point3 *pb = positions->GetPoint(v+1);
-		Point3 *pc = positions->GetPoint(v+2);
+		Point3 *pa = positions.GetPoint(v);
+		Point3 *pb = positions.GetPoint(v+1);
+		Point3 *pc = positions.GetPoint(v+2);
 
 		ASSERT_RTRN(pa, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
 		ASSERT_RTRN(pb, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
@@ -130,9 +124,9 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		Vector3::Cross(a, b, c);
 		c.Normalize();
 
-		normals->GetVector(v)->Set(c.x,c.y,c.z);
-		normals->GetVector(v+1)->Set(c.x,c.y,c.z);
-		normals->GetVector(v+2)->Set(c.x,c.y,c.z);
+		normals.GetVector(v)->Set(c.x,c.y,c.z);
+		normals.GetVector(v+1)->Set(c.x,c.y,c.z);
+		normals.GetVector(v+2)->Set(c.x,c.y,c.z);
 	}
 
 	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
@@ -147,7 +141,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
 	for(unsigned int v = 0; v < vertexCount; v++)
 	{
-		Point3 * point = positions->GetPoint(v);
+		Point3 * point = positions.GetPoint(v);
 		Point3 targetPoint = *point;
 
 		// create a normal list for a vertex if one does not exist
@@ -162,7 +156,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		}
 
 		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[targetPoint];
-		Vector3 * normal = normals->GetVector(v);
+		Vector3 * normal = normals.GetVector(v);
 
 		// add the normal at index [v] to the normal group linked to [targetPoint]
 		list->push_back(normal);
@@ -175,11 +169,11 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	{
 		// get existing normal for this vertex
 		Vector3 oNormal;
-		oNormal = *(normals->GetVector(v));
+		oNormal = *(normals.GetVector(v));
 		oNormal.Normalize();
 
 		// get vertex position
-		Point3 * point = positions->GetPoint(v);
+		Point3 * point = positions.GetPoint(v);
 		Point3 targetPoint = *point;
 
 		// retrieve the list of normals for [targetPoint]
@@ -241,41 +235,13 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	{
 		Vector3 avg = averageNormals[v];
 		// set the normal for this vertex to the averaged normal
-		normals->GetVector(v)->Set(avg.x,avg.y,avg.z);
+		normals.GetVector(v)->Set(avg.x,avg.y,avg.z);
 	}
 }
 
 void SubMesh3D::Destroy()
 {
-	if(positions != NULL)
-	{
-		delete positions;
-		positions = NULL;
-	}
 
-	if(normals != NULL)
-	{
-		delete normals;
-		normals = NULL;
-	}
-
-	if(colors != NULL)
-	{
-		delete colors;
-		colors = NULL;
-	}
-
-	if(uvsTexture0 != NULL)
-	{
-		delete uvsTexture0;
-		uvsTexture0 = NULL;
-	}
-
-	if(uvsTexture1 != NULL)
-	{
-		delete uvsTexture1;
-		uvsTexture1 = NULL;
-	}
 }
 
 const Point3& SubMesh3D::GetCenter() const
@@ -335,33 +301,34 @@ bool SubMesh3D::Init(unsigned int vertexCount)
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Position))
 	{
-		initSuccess = positions->Init(vertexCount) && initSuccess;
+		initSuccess = positions.Init(vertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Position;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Normal))
 	{
-		initSuccess = normals->Init(vertexCount) && initSuccess;
+		initSuccess = normals.Init(vertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::VertexColor))
 	{
-		initSuccess = colors->Init(vertexCount) && initSuccess;
+		initSuccess = colors.Init(vertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::VertexColor;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture0))
 	{
-		initSuccess = uvsTexture0->Init(vertexCount) && initSuccess;
+		initSuccess = uvsTexture0.Init(vertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture0;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture1))
 	{
-		initSuccess = uvsTexture1->Init(vertexCount) && initSuccess;
+		initSuccess = uvsTexture1.Init(vertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture1;
 	}
+
 	if(!initSuccess)
 	{
 		std::string msg = std::string("Error initializing attribute array(s) for SubMesh3D: ") + std::to_string(errorMask);
@@ -381,27 +348,27 @@ void SubMesh3D::SetNormalsSmoothingThreshold(unsigned int threshhold)
 
 Point3Array * SubMesh3D::GetPostions()
 {
-	return positions;
+	return &positions;
 }
 
 Vector3Array * SubMesh3D::GetNormals()
 {
-	return normals;
+	return &normals;
 }
 
 Color4Array * SubMesh3D::GetColors()
 {
-	return colors;
+	return &colors;
 }
 
 UV2Array * SubMesh3D::GetUVsTexture0()
 {
-	return uvsTexture0;
+	return &uvsTexture0;
 }
 
 UV2Array * SubMesh3D::GetUVsTexture1()
 {
-	return uvsTexture1;
+	return &uvsTexture1;
 }
 
 

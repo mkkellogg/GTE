@@ -8,6 +8,7 @@
 #include <GL/glut.h>
 
 #include "vertexattrbufferGL.h"
+#include "global/global.h"
 #include "ui/debug.h"
 
 int VertexAttrBufferGL::CalcFloatCount() const
@@ -41,11 +42,7 @@ bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, b
 	int fullDataSize =  CalcFullSize();
 
 	data = new float[CalcFloatCount()];
-	if(data == NULL)
-	{
-		Debug::PrintMessage("Could not allocate VertexAttrBufferGL data.");
-		return false;
-	}
+	ASSERT(data != NULL, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.", false);
 
 	if(srcData == NULL)
 	{
