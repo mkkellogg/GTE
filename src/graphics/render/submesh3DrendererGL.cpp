@@ -65,8 +65,8 @@ void SubMesh3DRendererGL::Render()
 		}
 	}
 
-	if(!currentMaterial->VerifySetVars(mesh->GetVertexCount()))return;
+	if(!currentMaterial->VerifySetVars(mesh->GetTotalVertexCount()))return;
 
-	glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
+	glDrawArrays(GL_TRIANGLES, 0, mesh->GetTotalVertexCount());
 }
 

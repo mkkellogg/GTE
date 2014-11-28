@@ -49,6 +49,9 @@ class Point3 : public BaseVector4
     BaseVector4 & operator= (const BaseVector4 & source);
     bool operator==(const Point3 & source);
     bool operator==(const Point3& p) const;
+    static bool AreEqual(const Point3& a, const Point3& b);
+    static bool AreEqual(const Point3* a, const Point3* b);
+    static bool AreStrictlyEqual(const Point3* a, const Point3* b);
     void Set(float x, float y, float z);
 
     void AttachTo(float * data);

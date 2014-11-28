@@ -169,6 +169,26 @@ bool Point3::operator==(const Point3& p) const
 	return GTEMath::Abs(p.x - this->x) < epsilon && GTEMath::Abs(p.y - this->y) < epsilon && GTEMath::Abs(p.z - this->z) < epsilon;
 }
 
+bool Point3::AreEqual(const Point3& a, const Point3& b)
+{
+	return AreEqual(&a, &b);
+}
+
+bool Point3::AreEqual(const Point3* a, const Point3* b)
+{
+	ASSERT(a != NULL && b != NULL, "Point3::AreEqual -> NULL point passed.", false);
+
+	float epsilon = .005;
+	return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
+}
+
+bool Point3::AreStrictlyEqual(const Point3* a, const Point3* b)
+{
+	ASSERT(a != NULL && b != NULL, "Point3::AreStrictlyEqual -> NULL point passed.", false);
+
+	return a->x == b->x && a->y == b->y && a->z == b->z;
+}
+
 /*
  * Set the values of this point
  */

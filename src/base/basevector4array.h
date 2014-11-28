@@ -29,12 +29,12 @@ class BaseVector4Array
 
 		bool HasNext()
 		{
-			return currentIndex < (int)targetArray.count - 1;
+			return currentIndex < (int)targetArray.usedCount - 1;
 		}
 
 		void Next()
 		{
-			if(currentIndex >= (int)targetArray.count-1)return;
+			if(currentIndex >= (int)targetArray.usedCount-1)return;
 			currentIndex++;
 			targetVector.AttachTo(targetArray.data + (currentIndex * 4));
 		}
@@ -42,7 +42,8 @@ class BaseVector4Array
 
 	protected:
 
-	unsigned int count;
+	unsigned int maxCount;
+	unsigned int usedCount;
 	float * data;
 	BaseVector4 ** objects;
 	BaseVector4Factory * baseFactory;
@@ -55,8 +56,10 @@ class BaseVector4Array
     virtual ~BaseVector4Array();
 
     const float * GetDataPtr() const;
-    bool Init(unsigned int count);
-    unsigned int GetCount();
+    bool Init(unsigned int maxCount);
+    unsigned int GetMaxCount();
+    void SetUsedCount(unsigned int usedCount);
+    unsigned int GetUsedCount();
     bool CopyTo(BaseVector4Array * dest) const;
     Iterator GetIterator(BaseVector4& targetVector);
 };

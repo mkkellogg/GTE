@@ -434,7 +434,6 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	}
 
 	mesh3D->SetNormalsSmoothingThreshold(80);
-	mesh3D->Update();
 
 	return mesh3D;
 }

@@ -10,7 +10,7 @@
 #include "global/global.h"
 #include "ui/debug.h"
 
-BaseVector4Array::BaseVector4Array(BaseVector4Factory * factory) : count(0), data(NULL), objects(NULL), baseFactory(factory)
+BaseVector4Array::BaseVector4Array(BaseVector4Factory * factory) : maxCount(0), usedCount(0), data(NULL), objects(NULL), baseFactory(factory)
 {
 
 }
@@ -22,26 +22,27 @@ BaseVector4Array::~BaseVector4Array()
 
 void BaseVector4Array::Destroy()
 {
-	if(objects != NULL)baseFactory->DestroyArray(objects, count);
+	if(objects != NULL)baseFactory->DestroyArray(objects, maxCount);
 	objects = NULL;
 
 	SAFE_DELETE(data);
 }
 
-bool BaseVector4Array::Init(unsigned int count)
+bool BaseVector4Array::Init(unsigned int maxCount)
 {
 	Destroy();
 
-	this->count = count;
+	this->maxCount = maxCount;
+	this->usedCount = maxCount;
 
-	data = new float[count * 4];
+	data = new float[maxCount * 4];
 	if(data == NULL)
 	{
 		Debug::PrintError("Could not allocate data memory for BaseVector4Array");
 		return false;
 	}
 
-	objects = baseFactory->CreateArray(count);
+	objects = baseFactory->CreateArray(maxCount);
 
 	if(objects == NULL)
 	{
@@ -53,7 +54,7 @@ bool BaseVector4Array::Init(unsigned int count)
 	float *dataPtr = data;
 
 	unsigned int index = 0;
-	while(index < count)
+	while(index < maxCount)
 	{
 		BaseVector4 * currentObject = (BaseVector4*)baseFactory->CreatePermAttached(dataPtr);
 
@@ -79,22 +80,32 @@ const float * BaseVector4Array::GetDataPtr() const
 	return (const float *)data;
 }
 
-unsigned int BaseVector4Array::GetCount()
+unsigned int BaseVector4Array::GetMaxCount()
 {
-	return count;
+	return maxCount;
+}
+
+void BaseVector4Array::SetUsedCount(unsigned int usedCount)
+{
+	this->usedCount = usedCount;
+}
+
+unsigned int BaseVector4Array::GetUsedCount()
+{
+	return usedCount;
 }
 
 bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
 {
 	ASSERT(dest != NULL," BaseVector4Array::CopyTo -> Destination is NULL.",false);
 
-	if(dest->GetCount() != count)
+	if(dest->GetMaxCount() != maxCount)
 	{
 		Debug::PrintError("BaseVector4Array::CopyTo -> Source count does not match destination count.");
 		return false;
 	}
 
-	memcpy(dest->data, data, count * sizeof(float) * 4);
+	memcpy(dest->data, data, maxCount * sizeof(float) * 4);
 
 	return true;
 }

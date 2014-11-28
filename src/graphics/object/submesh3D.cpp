@@ -12,22 +12,21 @@
 #include "object/sceneobject.h"
 #include "submesh3D.h"
 #include "mesh3D.h"
+#include "submesh3Dface.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/graphics.h"
 #include "graphics/render/submesh3Drenderer.h"
-
-#include "geometry/point/point3.h"
-#include "geometry/vector/vector3.h"
-#include "graphics/color/color4.h"
-#include "graphics/uv/uv2.h"
-
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
-#include "gtemath/gtemath.h"
+#include "graphics/color/color4.h"
+#include "graphics/uv/uv2.h"
 #include "graphics/light/light.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
+#include "geometry/point/point3array.h"
+#include "geometry/vector/vector3array.h"
+#include "gtemath/gtemath.h"
 #include "global/global.h"
 #include "ui/debug.h"
 #include "global/constants.h"
@@ -40,7 +39,7 @@ SubMesh3D::SubMesh3D() : SubMesh3D (StandardAttributes::CreateAttributeSet())
 SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 {
 	attributeSet = attributes;
-	vertexCount = 0;
+	totalVertexCount = 0;
 	normalsSmoothingThreshold = 90;
 
 	containerMesh = NULL;
@@ -62,6 +61,95 @@ void SubMesh3D::SetSubIndex(int index)
 	subIndex = index;
 }
 
+void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result)
+{
+	ASSERT_RTRN(faceIndex < totalVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> faceIndex is out range.");
+
+	Vector3 a,b,c;
+
+	// get Point3 objects for each vertex
+	Point3 *pa = positions.GetPoint(faceIndex);
+	Point3 *pb = positions.GetPoint(faceIndex+1);
+	Point3 *pc = positions.GetPoint(faceIndex+2);
+
+	ASSERT_RTRN(pa != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
+	ASSERT_RTRN(pb != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
+	ASSERT_RTRN(pc != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
+
+	// form 2 vectors based on triangle's vertices
+	Point3::Subtract(*pb, *pa, b);
+	Point3::Subtract(*pc, *pa, a);
+
+	// calculate cross product
+	Vector3::Cross(a, b, c);
+	c.Normalize();
+
+	result.Set(c.x,c.y,c.z);
+}
+
+void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC)
+{
+	ASSERT_RTRN(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> faceIndex is out range.");
+
+	SubMesh3DFace * face = faces.GetFace(faceIndex);
+
+	int faceVertexIndex = face->FirstVertexIndex;
+	Point3 * faceVertexA = positions.GetPoint(faceVertexIndex);
+	Point3 * faceVertexB = positions.GetPoint(faceVertexIndex + 1);
+	Point3 * faceVertexC = positions.GetPoint(faceVertexIndex + 2);
+
+	int edgesSet = 0;
+	for(unsigned int f = 0; f < faces.GetFaceCount(); f++)
+	{
+		if(faceIndex != f)
+		{
+			SubMesh3DFace * compareFace = faces.GetFace(f);
+			int compareVertexIndex = compareFace->FirstVertexIndex;
+
+			if(compareVertexIndex < 0)continue;
+
+			Point3 * compareVertexA = positions.GetPoint(compareVertexIndex);
+			Point3 * compareVertexB = positions.GetPoint(compareVertexIndex+1);
+			Point3 * compareVertexC = positions.GetPoint(compareVertexIndex+2);
+
+			if(Point3::AreStrictlyEqual(compareVertexB,faceVertexA) && Point3::AreStrictlyEqual(compareVertexA,faceVertexB)){edgeA = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexA) && Point3::AreStrictlyEqual(compareVertexB,faceVertexB)){edgeA = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexA) && Point3::AreStrictlyEqual(compareVertexC, faceVertexB)){edgeA = f;edgesSet++;}
+
+			if(Point3::AreStrictlyEqual(compareVertexB, faceVertexB) && Point3::AreStrictlyEqual(compareVertexA, faceVertexC)){edgeB = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexB) && Point3::AreStrictlyEqual(compareVertexB, faceVertexC)){edgeB = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexB) && Point3::AreStrictlyEqual(compareVertexC, faceVertexC)){edgeB = f;edgesSet++;}
+
+			if(Point3::AreStrictlyEqual(compareVertexB, faceVertexC) && Point3::AreStrictlyEqual(compareVertexA, faceVertexA)){edgeC = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexC) && Point3::AreStrictlyEqual(compareVertexB, faceVertexA)){edgeC = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexC) && Point3::AreStrictlyEqual(compareVertexC, faceVertexA)){edgeC = f;edgesSet++;}
+
+			if(edgesSet >=3)return;
+		}
+	}
+}
+
+void SubMesh3D::BuildFaces()
+{
+	unsigned int faceCount = totalVertexCount / 3;
+
+	unsigned int vertexIndex = 0;
+	for(unsigned int f = 0; f < faceCount; f++)
+	{
+		SubMesh3DFace * face = faces.GetFace(f);
+		face->FirstVertexIndex = vertexIndex;
+		CalculateFaceNormal(vertexIndex, face->FaceNormal);
+		vertexIndex += 3;
+	}
+
+	for(unsigned int f = 0; f < faceCount; f++)
+	{
+		SubMesh3DFace * face = faces.GetFace(f);
+		FindAdjacentFaceIndex(f, face->AdjacentFaceIndex1, face->AdjacentFaceIndex2, face->AdjacentFaceIndex3);
+		//printf("adj: %d, %d, %d\n",face->AdjacentFaceIndex1, face->AdjacentFaceIndex2, face->AdjacentFaceIndex3);
+	}
+}
+
 void SubMesh3D::CalcSphereOfInfluence()
 {
 	float maxX,maxY,maxZ,minX,minY,minZ;
@@ -69,7 +157,7 @@ void SubMesh3D::CalcSphereOfInfluence()
 
 	// get the maximum and minimum extents of the mesh
 	// along each axis.
-	for(unsigned int v=0; v < vertexCount; v++)
+	for(unsigned int v=0; v < totalVertexCount; v++)
 	{
 		Point3 * point = positions.GetPoint(v);
 		if(point->x > maxX || v == 0)maxX = point->x;
@@ -103,30 +191,13 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 
 	// loop through each triangle in this mesh's vertices
 	// and calculate normals for each
-	for(unsigned int v =0; v < vertexCount-2; v+=3)
+	for(unsigned int v =0; v < totalVertexCount-2; v+=3)
 	{
-		Vector3 a,b,c;
-
-		// get Point3 objects for each vertex
-		Point3 *pa = positions.GetPoint(v);
-		Point3 *pb = positions.GetPoint(v+1);
-		Point3 *pc = positions.GetPoint(v+2);
-
-		ASSERT_RTRN(pa, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
-		ASSERT_RTRN(pb, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
-		ASSERT_RTRN(pc, "SubMesh3D::CalculateNormals -> Mesh vertex array contains null points.");
-
-		// form 2 vectors based on triangle's vertices
-		Point3::Subtract(*pb, *pa, b);
-		Point3::Subtract(*pc, *pa, a);
-
-		// calculate cross product
-		Vector3::Cross(a, b, c);
-		c.Normalize();
-
-		normals.GetVector(v)->Set(c.x,c.y,c.z);
-		normals.GetVector(v+1)->Set(c.x,c.y,c.z);
-		normals.GetVector(v+2)->Set(c.x,c.y,c.z);
+		Vector3 normal;
+		CalculateFaceNormal(v, normal);
+		normals.GetVector(v)->Set(normal.x,normal.y,normal.z);
+		normals.GetVector(v+1)->Set(normal.x,normal.y,normal.z);
+		normals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
 	}
 
 	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
@@ -139,7 +210,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 
 	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
 	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
-	for(unsigned int v = 0; v < vertexCount; v++)
+	for(unsigned int v = 0; v < totalVertexCount; v++)
 	{
 		Point3 * point = positions.GetPoint(v);
 		Point3 targetPoint = *point;
@@ -165,7 +236,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	// loop through each vertex and lookup the associated list of
 	// normals associated with that vertex, and then calculate the
 	// average normal from that list.
-	for(unsigned int v =0; v < vertexCount; v++)
+	for(unsigned int v =0; v < totalVertexCount; v++)
 	{
 		// get existing normal for this vertex
 		Vector3 oNormal;
@@ -231,7 +302,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 
 	// loop through each vertex and assign the average normal
 	// calculated for that vertex
-	for(unsigned int v =0; v < vertexCount; v++)
+	for(unsigned int v =0; v < totalVertexCount; v++)
 	{
 		Vector3 avg = averageNormals[v];
 		// set the normal for this vertex to the averaged normal
@@ -268,6 +339,7 @@ void SubMesh3D::Update()
 {
 	CalcSphereOfInfluence();
 	CalculateNormals(normalsSmoothingThreshold);
+	BuildFaces();
 
 	if(containerMesh != NULL)
 	{
@@ -282,9 +354,9 @@ void SubMesh3D::Update()
 	}
 }
 
-unsigned int SubMesh3D::GetVertexCount() const
+unsigned int SubMesh3D::GetTotalVertexCount() const
 {
-	return vertexCount;
+	return totalVertexCount;
 }
 
 StandardAttributeSet SubMesh3D::GetAttributeSet() const
@@ -292,47 +364,70 @@ StandardAttributeSet SubMesh3D::GetAttributeSet() const
 	return attributeSet;
 }
 
-bool SubMesh3D::Init(unsigned int vertexCount)
+bool SubMesh3D::Init(unsigned int totalVertexCount)
 {
-	this->vertexCount = vertexCount;
+	this->totalVertexCount = totalVertexCount;
 
 	bool initSuccess = true;
 	int errorMask = 0;
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Position))
 	{
-		initSuccess = positions.Init(vertexCount) && initSuccess;
+		initSuccess = positions.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Position;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Normal))
 	{
-		initSuccess = normals.Init(vertexCount) && initSuccess;
+		initSuccess = normals.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::VertexColor))
 	{
-		initSuccess = colors.Init(vertexCount) && initSuccess;
+		initSuccess = colors.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::VertexColor;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture0))
 	{
-		initSuccess = uvsTexture0.Init(vertexCount) && initSuccess;
+		initSuccess = uvsTexture0.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture0;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture1))
 	{
-		initSuccess = uvsTexture1.Init(vertexCount) && initSuccess;
+		initSuccess = uvsTexture1.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture1;
 	}
 
 	if(!initSuccess)
 	{
-		std::string msg = std::string("Error initializing attribute array(s) for SubMesh3D: ") + std::to_string(errorMask);
+		std::string msg = std::string("SubMesh3D::Init -> Error initializing attribute array(s) for SubMesh3D: ") + std::to_string(errorMask);
 		Debug::PrintError(msg);
+		Destroy();
+		return false;
+	}
+
+	unsigned int faceCount = totalVertexCount / 3;
+	bool facesInitSuccess = faces.Init(faceCount);
+
+	if(!facesInitSuccess)
+	{
+		Debug::PrintError("SubMesh3D::Init -> Error occurred while initializing face array.");
+		Destroy();
+		return false;
+	}
+
+	bool shadowVolumeInitSuccess = true;
+
+	shadowVolumeInitSuccess = shadowVolumeFront.Init(totalVertexCount);
+	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(totalVertexCount);
+	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(totalVertexCount * 2);
+
+	if(!shadowVolumeInitSuccess)
+	{
+		Debug::PrintError("SubMesh3D::Init -> Error occurred while initializing shadow volume.");
 		Destroy();
 		return false;
 	}
@@ -344,6 +439,14 @@ void SubMesh3D::SetNormalsSmoothingThreshold(unsigned int threshhold)
 {
 	if(threshhold > 180)threshhold = 180;
 	this->normalsSmoothingThreshold = threshhold;
+}
+
+inline bool ArePointsEqual(const Point3* a, const Point3* b)
+{
+	ASSERT(a != NULL && b != NULL, "ArePointsEqual -> NULL point passed.", false);
+
+	float epsilon = .005;
+	return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
 }
 
 Point3Array * SubMesh3D::GetPostions()
@@ -370,6 +473,4 @@ UV2Array * SubMesh3D::GetUVsTexture1()
 {
 	return &uvsTexture1;
 }
-
-
 

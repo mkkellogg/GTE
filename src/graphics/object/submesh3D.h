@@ -15,7 +15,7 @@ class SubMesh3DRenderer;
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
-
+#include "submesh3Dfaces.h"
 #include "geometry/point/point3array.h"
 #include "geometry/vector/vector3array.h"
 #include "graphics/color/color4array.h"
@@ -27,8 +27,13 @@ class SubMesh3D : public EngineObject
 	friend Mesh3D;
 
 	StandardAttributeSet attributeSet;
-	unsigned int vertexCount;
+	unsigned int totalVertexCount;
 	int subIndex;
+
+	SubMesh3DFaces faces;
+	Point3Array shadowVolumeFront;
+	Point3Array shadowVolumeBack;
+	Point3Array shadowVolumeSides;
 
     Point3Array positions;
     Vector3Array normals;
@@ -51,6 +56,11 @@ class SubMesh3D : public EngineObject
     SubMesh3D();
     SubMesh3D(StandardAttributeSet attributes);
     virtual ~SubMesh3D();
+
+    void CalculateFaceNormal(unsigned int faceIndex, Vector3& result);
+    void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC);
+    void BuildFaces();
+
     void CalcSphereOfInfluence();
     void CalculateNormals(float smoothingThreshhold);
     void SetContainerMesh(Mesh3D * mesh);
@@ -65,8 +75,8 @@ class SubMesh3D : public EngineObject
     void SetNormalsSmoothingThreshold(unsigned int threshhold);
     void Update();
 
-    bool Init(unsigned int vertexCount);
-    unsigned int GetVertexCount() const;
+    bool Init(unsigned int totalVertexCount);
+    unsigned int GetTotalVertexCount() const;
     StandardAttributeSet GetAttributeSet() const ;
 
     Point3Array * GetPostions();

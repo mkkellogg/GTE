@@ -283,7 +283,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		float* transformNormalsPtr = NULL;
 
 		// loop through each vertex
-		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
+		for(unsigned int i = 0; i < positionsOut.GetUsedCount(); i++)
 		{
 			positionsOutIterator.Next();
 			normalsOutIterator.Next();
@@ -417,7 +417,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 
 		ClearTransformedPositionFlagsArray();
 
-		for(unsigned int i = 0; i < positionsOut.GetCount(); i++)
+		for(unsigned int i = 0; i < positionsOut.GetUsedCount(); i++)
 		{
 			VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
 			if(positionTransformed[desc->UVertexIndex] == 1)

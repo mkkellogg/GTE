@@ -117,7 +117,7 @@ bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int componentC
 	if(mesh.IsValid())
 	{
 		DestroyBuffer(&attributeBuffers[(int)attr]);
-		bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], mesh->GetVertexCount(), componentCount, stride);
+		bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], mesh->GetTotalVertexCount(), componentCount, stride);
 		if(!initSuccess)return false;
 	}
 	return true;
@@ -196,9 +196,9 @@ bool SubMesh3DRenderer::UpdateMeshData()
 		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
 		{
 			Point3Array * positions = mesh->GetPostions();
-			if(positions->GetCount() != positionsCopy.GetCount())
+			if(positions->GetMaxCount() != positionsCopy.GetMaxCount())
 			{
-				unsigned int positionCount = positions->GetCount();
+				unsigned int positionCount = positions->GetMaxCount();
 				if(!positionsCopy.Init(positionCount) || !transformedPositions.Init(positionCount))
 				{
 					doAttributeTransform = false;
@@ -216,9 +216,9 @@ bool SubMesh3DRenderer::UpdateMeshData()
 		StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
 		{
 			Vector3Array * normals = mesh->GetNormals();
-			if(normals->GetCount() != normalsCopy.GetCount())
+			if(normals->GetMaxCount() != normalsCopy.GetMaxCount())
 			{
-				unsigned int normalCount = normals->GetCount();
+				unsigned int normalCount = normals->GetMaxCount();
 				if(!normalsCopy.Init(normalCount) || !transformedNormals.Init(normalCount))
 				{
 					doAttributeTransform = false;
@@ -230,7 +230,7 @@ bool SubMesh3DRenderer::UpdateMeshData()
 		}
 	}
 
-	storedVertexCount = mesh->GetVertexCount();
+	storedVertexCount = mesh->GetTotalVertexCount();
 	CopyMeshData();
 
 	return true;
@@ -254,7 +254,7 @@ void SubMesh3DRenderer::CopyMeshData()
 			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position))
 			{
 				Point3Array * positions = mesh->GetPostions();
-				if(positions->GetCount() == positionsCopy.GetCount())
+				if(positions->GetMaxCount() == positionsCopy.GetMaxCount())
 				{
 					positions->CopyTo(&positionsCopy);
 				}
@@ -267,7 +267,7 @@ void SubMesh3DRenderer::CopyMeshData()
 			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal))
 			{
 				Vector3Array * normals = mesh->GetNormals();
-				if(normals->GetCount() == normalsCopy.GetCount())
+				if(normals->GetMaxCount() == normalsCopy.GetMaxCount())
 				{
 					normals->CopyTo(&normalsCopy);
 				}
@@ -296,7 +296,7 @@ void SubMesh3DRenderer::UpdateFromMesh()
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
-	if(mesh->GetVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
+	if(mesh->GetTotalVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
 	{
 		UpdateMeshData();
 	}

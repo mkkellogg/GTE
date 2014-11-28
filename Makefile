@@ -36,7 +36,7 @@ BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/baseve
 GTEOBJ= obj/gte.o obj/game.o obj/gameutil.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
-GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o 
+GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
@@ -367,8 +367,12 @@ obj/mesh3D.o: $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/mesh3D.h
 	
 obj/submesh3D.o: $(GRAPHICSOBJECTSRC)/submesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3D.h 
 	$(CC) $(CFLAGS) -o obj/submesh3D.o -c $(GRAPHICSOBJECTSRC)/submesh3D.cpp
-	
 
+obj/submesh3Dfaces.o: $(GRAPHICSOBJECTSRC)/submesh3Dfaces.cpp $(GRAPHICSOBJECTSRC)/submesh3Dfaces.h 
+	$(CC) $(CFLAGS) -o obj/submesh3Dfaces.o -c $(GRAPHICSOBJECTSRC)/submesh3Dfaces.cpp	
+
+obj/submesh3Dface.o: $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp $(GRAPHICSOBJECTSRC)/submesh3Dface.h 
+	$(CC) $(CFLAGS) -o obj/submesh3Dface.o -c $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp	
 	
 # ==================================
 # UI
