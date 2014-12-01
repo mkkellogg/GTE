@@ -1,9 +1,6 @@
 #ifndef _GRAPHICS_GL_H_
 #define _GRAPHICS_GL_H_
 
-#include <GL/glew.h>
-#include <GL/glut.h>
-
 //forward declarations
 class Shader;
 class SubMesh3DRenderer;
@@ -13,8 +10,12 @@ class Camera;
 class VertexAttrBuffer;
 class TextureAttributes;
 class AttributeTransformer;
+class RenderTarget;
 
+#include <GL/glew.h>
+#include <GL/glut.h>
 #include "graphics.h"
+#include "base/intmask.h"
 #include <string>
 
 class GraphicsGL : public Graphics
@@ -27,6 +28,8 @@ class GraphicsGL : public Graphics
     static void _glutIdleFunc();
 
     protected:
+
+    bool blendingEnabled;
 
     GraphicsGL();
     ~GraphicsGL();
@@ -42,6 +45,9 @@ class GraphicsGL : public Graphics
     Texture * CreateTexture(const std::string& sourcePath,  TextureAttributes attributes);
     Texture * CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes);
     void DestroyTexture(Texture * texture);
+    RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height);
+    void DestroyRenderTarget(RenderTarget * target);
+
     void ClearBuffers(unsigned int bufferMask) const;
 
     void EnableBlending(bool enabled);

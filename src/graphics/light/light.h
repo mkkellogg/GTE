@@ -45,12 +45,12 @@ class Light : public SceneObjectComponent
 	public:
 
 	Color4 GetColor() const;
-	const Color4 * GetColorPtr();
+	const Color4 * GetColorPtr() const;
 	void SetColor(Color4 color);
 	void SetColor(float r, float g, float b, float a);
 
 	Vector3 GetDirection() const;
-	const Vector3 * GetDirectionPtr();
+	const Vector3 * GetDirectionPtr() const;
 	void SetDirection(Vector3  direction);
 	void SetDirection(float x, float y, float z);
 

@@ -20,7 +20,7 @@
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
-#include "graphics/render/renderbuffer.h"
+#include "graphics/render/rendertarget.h"
 #include "graphics/render/material.h"
 #include "graphics/shader/shader.h"
 #include "graphics/view/camera.h"

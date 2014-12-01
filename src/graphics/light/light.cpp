@@ -36,7 +36,7 @@ void Light::CalcAttentuationForCurrentRange()
 	attenuation = 1.0/range;
 }
 
-const Color4 * Light::GetColorPtr()
+const Color4 * Light::GetColorPtr() const
 {
 	return &color;
 }
@@ -56,7 +56,7 @@ Vector3 Light::GetDirection() const
 	return direction;
 }
 
-const Vector3 * Light::GetDirectionPtr()
+const Vector3 * Light::GetDirectionPtr() const
 {
 	return &direction;
 }

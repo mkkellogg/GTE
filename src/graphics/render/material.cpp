@@ -556,7 +556,7 @@ void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
  * Send the light data in [light] to this material's shader using
  * several standard uniforms: LIGHT_POSITION, LIGHT_DIRECTION, and LIGHT_COLOR
  */
-void Material::SendLightToShader(Light * light, Point3 * position)
+void Material::SendLightToShader(const Light * light, const Point3 * position)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SendLightToShader -> shader is NULL");
 

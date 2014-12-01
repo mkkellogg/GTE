@@ -368,9 +368,6 @@ bool SubMesh3DRenderer::DoesAttributeTransform()
 
 void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& modelInverse)
 {
-	MaterialRef currentMaterial = graphics->GetActiveMaterial();
-	UseMaterial(currentMaterial);
-
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);

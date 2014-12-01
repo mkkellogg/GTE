@@ -2,7 +2,7 @@
 #include <math.h>
 
 #include "camera.h"
-#include "graphics/render/renderbuffer.h"
+#include "graphics/render/rendertarget.h"
 #include "graphics/graphics.h"
 #include "graphics/screendesc.h"
 #include "base/intmask.h"

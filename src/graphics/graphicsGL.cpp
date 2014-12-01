@@ -23,7 +23,8 @@
 #include "render/vertexattrbufferGL.h"
 #include "render/submesh3Drenderer.h"
 #include "render/submesh3DrendererGL.h"
-#include "render/renderbuffer.h"
+#include "render/rendertarget.h"
+#include "render/rendertargetGL.h"
 #include "render/attributetransformer.h"
 #include "image/imageloader.h"
 #include "image/rawimage.h"
@@ -46,7 +47,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     char * argv = (char*)"";
     glutInit(&argc, &argv);
 
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
     glutInitWindowSize(this->attributes.WindowWidth, this->attributes.WindowHeight);
 
     if(!glutGet(GLUT_DISPLAY_MODE_POSSIBLE))
@@ -93,6 +94,8 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LEQUAL);
     glCullFace(GL_BACK);
+    glDisable(GL_BLEND);
+    blendingEnabled = false;
 
     return true;
 }
@@ -269,10 +272,31 @@ void GraphicsGL::DestroyTexture(Texture * texture)
 	}
 }
 
+RenderTarget * GraphicsGL::CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height)
+{
+	RenderTargetGL * buffer;
+	buffer = new RenderTargetGL(buffers, width, height);
+	ASSERT(buffer != NULL, "GraphicsGL::CreateRenderTarget -> unable to create render target", NULL);
+	return buffer;
+}
+
+void GraphicsGL::DestroyRenderTarget(RenderTarget * target)
+{
+	ASSERT_RTRN(target != NULL, "GraphicsGL::DestroyRenderTarget -> target is NULL");
+
+	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL*>(target);
+	if(targetGL != NULL)
+	{
+		delete targetGL;
+	}
+}
+
 void GraphicsGL::EnableBlending(bool enabled)
 {
+	if(blendingEnabled == enabled)return;
 	if(enabled)glEnable(GL_BLEND);
 	else glDisable(GL_BLEND);
+	blendingEnabled = enabled;
 }
 
 void GraphicsGL::SetBlendingFunction(BlendingProperty source, BlendingProperty dest)

@@ -19,6 +19,7 @@ class Skeleton;
 class Animation;
 class AnimationInstance;
 class AnimationPlayer;
+class RenderTarget;
 
 #include <memory>
 
@@ -133,6 +134,7 @@ typedef EngineObjectRef<Skeleton> SkeletonRef;
 typedef EngineObjectRef<Animation> AnimationRef;
 typedef EngineObjectRef<AnimationInstance> AnimationInstanceRef;
 typedef EngineObjectRef<AnimationPlayer> AnimationPlayerRef;
+typedef EngineObjectRef<RenderTarget> RenderTargetRef;
 
 typedef std::shared_ptr<Transform> TransformRef;
 

@@ -17,6 +17,7 @@
 #include "graphics/graphics.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/view/camera.h"
@@ -39,7 +40,7 @@ RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectMa
 
 	lightCount = 0;
 	cameraCount = 0;
-
+	sceneMeshCount = 0;
 	cycleCount = 0;
 }
 
@@ -132,6 +133,7 @@ void RenderManager::ProcessScene()
 {
 	lightCount = 0;
 	cameraCount = 0;
+	sceneMeshCount = 0;
 
 	Transform cameraModelView;
 
@@ -157,6 +159,8 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTrans
 {
 	Transform viewInverse;
 	Transform identity;
+	Transform model;
+	Transform modelInverse;
 
 	// enforce max recursion depth
 	if(RenderDepth(viewTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
@@ -185,8 +189,8 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTrans
 				viewInverse.Invert();
 
 				// add a scene camera from which to render the scene
-				sceneCameras[cameraCount].transform.SetTo(viewInverse);
-				sceneCameras[cameraCount].component = camera.GetPtr();
+				sceneCameras[cameraCount].AffectorTransform.SetTo(viewInverse);
+				sceneCameras[cameraCount].AffectorCamera = camera.GetPtr();
 
 				cameraCount++;
 			}
@@ -195,10 +199,54 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTrans
 			if(light.IsValid() && lightCount < MAX_LIGHTS)
 			{
 				// add a scene light
-				sceneLights[lightCount].transform.SetTo(aggregateTransform);
-				sceneLights[lightCount].component = light.GetPtr();
+				sceneLights[lightCount].AffectorTransform.SetTo(aggregateTransform);
+				sceneLights[lightCount].AffectorLight = light.GetPtr();
 
 				lightCount++;
+			}
+
+			Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
+			SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
+
+			if(meshRenderer.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
+			{
+				meshObjects[sceneMeshCount] = child.GetPtr();
+
+				model.SetTo(child->GetProcessingTransform());
+				modelInverse.SetTo(model);
+				modelInverse.Invert();
+
+				for(unsigned int r = 0; r< meshRenderer->GetSubRendererCount(); r++)
+				{
+					SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
+					if(subRenderer.IsValid())
+					{
+						subRenderer->PreRender(model.matrix, modelInverse.matrix);
+					}
+				}
+
+				sceneMeshCount++;
+			}
+
+
+			if(skinnedMeshRenderer.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
+			{
+				meshObjects[sceneMeshCount] = child.GetPtr();
+
+				model.SetTo(child->GetProcessingTransform());
+				modelInverse.SetTo(model);
+				modelInverse.Invert();
+
+				for(unsigned int r = 0; r< skinnedMeshRenderer->GetSubRendererCount(); r++)
+				{
+					SubMesh3DRendererRef subRenderer = skinnedMeshRenderer->GetSubRenderer(r);
+					if(subRenderer.IsValid())
+					{
+						subRenderer->PreRender(model.matrix, modelInverse.matrix);
+					}
+				}
+
+				sceneMeshCount++;
 			}
 
 			child->SetProcessingTransform(aggregateTransform);
@@ -224,7 +272,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 {
 	ASSERT_RTRN(cameraIndex < cameraCount,"RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds");
 
-	Camera * cameraPtr = dynamic_cast<Camera *>(sceneCameras[cameraIndex].component);
+	Camera * cameraPtr = sceneCameras[cameraIndex].AffectorCamera;
 	ASSERT_RTRN(cameraPtr != NULL,"RenderManager::RenderSceneFromCamera -> camera in NULL");
 	Camera& camera = *cameraPtr;
 
@@ -234,40 +282,56 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
 	// render the scene using the view transform of the current camera
-	Transform& cameraTransform = sceneCameras[cameraIndex].transform;
-	ForwardRenderScene(sceneRoot.GetRef(), cameraTransform, camera);
+	Transform& cameraTransform = sceneCameras[cameraIndex].AffectorTransform;
+	ForwardRenderScene(cameraTransform, camera);
 }
 
 /*
- * This method recursively visits all objects in the scene that are reachable from [parent] and renders
+ * This method looks at each mesh that was found in the ProcessScene() method and renders each of
  * them from the perspective of [viewTransformInverse], which the inverse of the view transform.
  * The reason the inverse is used is because on the GPU side of things the view transform is used to move
  * the world relative to the camera, rather than move the camera in the world.
  *
- * The transforms of each scene are concatenated as progress moves down the scene object tree and passed
- * to the current invocation via [modelTransform].
- *
  * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
  * each pass is combined with the others using additive blending.
  */
-void RenderManager::ForwardRenderScene(SceneObject& parent, Transform& viewTransformInverse, Camera& camera)
+void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, const Camera& camera)
+{
+	renderedObjects.clear();
+
+	graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+	// loop through each active light and render sub mesh for that light, if in range
+	for(unsigned int l = 0; l < lightCount; l++)
+	{
+		Light * light = sceneLights[l].AffectorLight;
+		if(light == NULL)
+		{
+			Debug::PrintError("RenderManager::ForwardRenderScene -> light is NULL");
+			continue;
+		}
+
+		Point3 lightPosition;
+		sceneLights[l].AffectorTransform.TransformPoint(lightPosition);
+
+		RenderSceneForLight(*light, lightPosition, viewTransformInverse, camera);
+	}
+}
+
+/*
+ * Render all the meshes found in ProcessScene() for a single light [light] from the perspective of
+ * [viewTransformInverse], which the inverse of the view transform.
+ */
+void RenderManager::RenderSceneForLight(const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera)
 {
 	Transform modelView;
-	Transform modelViewInverse;
 	Transform model;
 	Transform modelInverse;
 
-	renderedObjects.clear();
-
-	// enforce max recursion depth
-	if(RenderDepth(modelTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
-
-	// loop through each child scene object
-	for(unsigned int i = 0; i < parent.GetChildrenCount(); i++)
+	for(unsigned int s = 0; s < sceneMeshCount; s++)
 	{
-		SceneObjectRef child = parent.GetChildAt(i);
+		SceneObject * child = meshObjects[s];
 
-		if(!child.IsValid())
+		if(child == NULL)
 		{
 			Debug::PrintError("RenderManager::ForwardRenderScene -> NULL scene object encountered.");
 		}
@@ -331,74 +395,43 @@ void RenderManager::ForwardRenderScene(SceneObject& parent, Transform& viewTrans
 						if(doRender)
 						{
 							model.SetTo(child->GetProcessingTransform());
-							modelInverse.SetTo(model);
-							modelInverse.Invert();
-
 							modelView.SetTo(model);
 							// concatenate modelTransform with inverted viewTransform
 							modelView.PreTransformBy(viewTransformInverse);
-							modelViewInverse.SetTo(modelView);
-							modelViewInverse.Invert();
 
 							// activate the material, which will switch the GPU's active shader to
 							// the one associated with the material
 							ActivateMaterial(currentMaterial);
 							// pass concatenated modelViewTransform and projection transforms to shader
-							const Transform& modelTransform = child->GetProcessingTransform();
-
-							SendTransformUniformsToShader(modelTransform, modelView, camera.GetProjectionTransform());
+							SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform());
 							SendCustomUniformsToShader();
 
-							subRenderer->PreRender(model.matrix, modelInverse.matrix);
-
-							// loop through each active light and render sub mesh for that light, if in range
-							for(unsigned int l = 0; l < lightCount; l++)
+							// if this sub mesh has already been rendered by this camera, then we want to use
+							// additive blending to combine it with the output from other lights. Otherwise
+							// turn off blending and render.
+							bool rendered = renderedObjects[subMesh->GetObjectID()];
+							if(rendered)
 							{
-								if(sceneLights[l].component == NULL)
-								{
-									Debug::PrintError("RenderManager::ForwardRenderScene -> sceneLights[l].component is NULL");
-									continue;
-								}
+								graphics->EnableBlending(true);
+							}
+							else
+							{
+								graphics->EnableBlending(false);
+							}
 
-								Light * light = dynamic_cast<Light *>(sceneLights[l].component);
-								if(light == NULL)
-								{
-									Debug::PrintError("RenderManager::ForwardRenderScene -> light is NULL");
-									continue;
-								}
+							// get the full transform of the scene object, including those of all ancestors
+							SceneObjectTransform full;
+							child->InitSceneObjectTransform(&full);
 
-								// if this sub mesh has already been rendered by this camera, then we want to use
-								// additive blending to combine it with the output from other lights. Otherwise
-								// turn off blending and render.
-								bool rendered = renderedObjects[subMesh->GetObjectID()];
-								if(rendered)
-								{
-									graphics->EnableBlending(true);
-									graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
-								}
-								else
-								{
-									graphics->EnableBlending(false);
-								}
-
-								Point3 lightPosition;
-								sceneLights[l].transform.TransformPoint(lightPosition);
-
-								SceneObjectTransform full;
-
-								// get the full transform of the scene object, including those of all ancestors
-								child->InitSceneObjectTransform(&full);
-
-								// check if this mesh should be culled from this light.
-								if(!ShouldCullFromLight(*light, lightPosition, full, *mesh))
-								{
-									// send light data to the active shader
-									currentMaterial->SendLightToShader(light, &lightPosition);
-									// render the current mesh
-									subRenderer->Render();
-									// flag the current mesh as being rendered (at least once)
-									renderedObjects[subMesh->GetObjectID()] = true;
-								}
+							// check if this mesh should be culled from this light.
+							if(!ShouldCullFromLight(light, lightPosition, full, *mesh))
+							{
+								// send light data to the active shader
+								currentMaterial->SendLightToShader(&light, &lightPosition);
+								// render the current mesh
+								subRenderer->Render();
+								// flag the current mesh as being rendered (at least once)
+								renderedObjects[subMesh->GetObjectID()] = true;
 							}
 						}
 
@@ -412,9 +445,6 @@ void RenderManager::ForwardRenderScene(SceneObject& parent, Transform& viewTrans
 					}
 				}
 			}
-
-			// continue recursion through child
-			ForwardRenderScene(child.GetRef(), viewTransformInverse,camera);
 		}
 	}
 }
@@ -422,7 +452,7 @@ void RenderManager::ForwardRenderScene(SceneObject& parent, Transform& viewTrans
 /*
  * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].
  */
-bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const
+bool RenderManager::ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform,  const Mesh3D& mesh) const
 {
 	switch(mesh.GetLightCullType())
 	{
@@ -449,7 +479,7 @@ bool RenderManager::ShouldCullFromLight(Light& light, Point3& lightPosition, Tra
  * sphere does not intersect with the sphere that is formed by the light's range, then the light should
  * be culled from the meshes.
  */
-bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const
+bool RenderManager::ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform,  const Mesh3D& mesh) const
 {
 	// get the maximum distances from mesh center along each axis
 	Vector3 soiX = mesh.GetSphereOfInfluenceX();
@@ -491,7 +521,7 @@ bool RenderManager::ShouldCullBySphereOfInfluence(Light& light, Point3& lightPos
 /*
  * TODO: (Eventually) - Implement tile-base culling.
  */
-bool RenderManager::ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const
+bool RenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const
 {
 	return false;
 }

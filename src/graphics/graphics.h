@@ -17,10 +17,11 @@ class VertexAttrBuffer;
 class TextureAttributes;
 class RawImage;
 class AttributeTransformer;
+class RenderTarget;
 
 #include <string>
 #include "object/enginetypes.h"
-
+#include "base/intmask.h"
 
 enum class BlendingProperty
 {
@@ -73,6 +74,9 @@ class Graphics
     virtual Texture * CreateTexture(const std::string& sourcePath, TextureAttributes attributes) = 0;
     virtual Texture * CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes) = 0;
     virtual void DestroyTexture(Texture * texture) = 0;
+    virtual RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height) = 0;
+    virtual void DestroyRenderTarget(RenderTarget * target) = 0;
+
     virtual void ClearBuffers(unsigned int bufferMask) const = 0;
 
     virtual void EnableBlending(bool enabled) = 0;

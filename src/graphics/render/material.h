@@ -131,7 +131,7 @@ class Material : public EngineObject
     void SendModelViewMatrixToShader(const Matrix4x4 * mat);
     void SendProjectionMatrixToShader(const Matrix4x4 * mat);
     void SendMVPMatrixToShader(const Matrix4x4 * mat);
-    void SendLightToShader(Light * light, Point3 * position);
+    void SendLightToShader(const Light * light, const Point3 * position);
 
     bool VerifySetVars(int vertexCount);
 };

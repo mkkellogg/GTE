@@ -39,7 +39,7 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o
 UIOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/renderbuffer.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/rendertarget.o obj/rendertargetGL.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
 ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o obj/sceneobjectskeletonnode.o obj/keyframeset.o obj/keyframe.o obj/translationkeyframe.o obj/scalekeyframe.o \
               obj/rotationkeyframe.o obj/animation.o obj/animationmanager.o obj/animationinstance.o obj/animationplayer.o obj/blendop.o obj/crossfadeblendop.o
@@ -343,9 +343,12 @@ obj/material.o: $(RENDERSRC)/material.cpp $(RENDERSRC)/material.h
 obj/vertexattrbufferGL.o:  $(RENDERSRC)/vertexattrbufferGL.cpp  $(RENDERSRC)/vertexattrbufferGL.h
 	$(CC) $(CFLAGS) -o obj/vertexattrbufferGL.o -c $(RENDERSRC)/vertexattrbufferGL.cpp
 	
-obj/renderbuffer.o: $(RENDERSRC)/renderbuffer.cpp  $(RENDERSRC)/renderbuffer.h 
-	$(CC) $(CFLAGS) -o obj/renderbuffer.o -c $(RENDERSRC)/renderbuffer.cpp
-	
+obj/rendertarget.o: $(RENDERSRC)/rendertarget.cpp  $(RENDERSRC)/rendertarget.h 
+	$(CC) $(CFLAGS) -o obj/rendertarget.o -c $(RENDERSRC)/rendertarget.cpp
+
+obj/rendertargetGL.o: $(RENDERSRC)/rendertargetGL.cpp  $(RENDERSRC)/rendertargetGL.h 
+	$(CC) $(CFLAGS) -o obj/rendertargetGL.o -c $(RENDERSRC)/rendertargetGL.cpp
+		
 obj/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexattrbuffer.h
 	$(CC) $(CFLAGS) -o obj/vertexattrbuffer.o -c $(RENDERSRC)/vertexattrbuffer.cpp
 	

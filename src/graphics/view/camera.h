@@ -6,8 +6,8 @@ class Camera;
 class Graphics;
 
 #include "geometry/transform.h"
-#include "graphics/render/renderbuffer.h"
 #include "object/sceneobjectcomponent.h"
+#include "graphics/render/rendertarget.h"
 
 class Camera : public SceneObjectComponent
 {

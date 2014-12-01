@@ -32,13 +32,21 @@ class Transform;
 
 class RenderManager
 {
-	class RenderSceneObjectComponent
+	static const int MAX_LIGHTS = 16;
+	static const int MAX_CAMERAS = 8;
+	static const int MAX_SCENE_MESHES = 128;
+
+	class RenderAffector
 	{
 		public:
 
-		Transform transform;
-		SceneObjectComponent * component = NULL;
+		Transform AffectorTransform;
+		Camera * AffectorCamera = NULL;
+		Light * AffectorLight = NULL;
 	};
+
+	unsigned int sceneMeshCount;
+	SceneObject * meshObjects[MAX_SCENE_MESHES];
 
 	int cycleCount;
 
@@ -50,17 +58,19 @@ class RenderManager
 
 	MaterialRef activeMaterial;
 
-	static const int MAX_LIGHTS = 16;
 	unsigned int lightCount;
-	RenderSceneObjectComponent sceneLights[MAX_LIGHTS];
+	RenderAffector sceneLights[MAX_LIGHTS];
 
-	static const int MAX_CAMERAS = 8;
 	unsigned int cameraCount;
-	RenderSceneObjectComponent sceneCameras[MAX_CAMERAS];
+	RenderAffector sceneCameras[MAX_CAMERAS];
 
 	std::map<ObjectID, bool> renderedObjects;
 
-	void ForwardRenderScene(SceneObject& parent, Transform& viewTransformInverse, Camera& camera);
+	void ProcessScene();
+	void ProcessScene(SceneObject * parent, Transform& aggregateTransform);
+	void RenderSceneFromCamera(unsigned int cameraIndex);
+	void ForwardRenderScene(const Transform& viewTransformInverse, const Camera& camera);
+	void RenderSceneForLight(const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera);
     void ClearBuffersForCamera(const Camera& camera) const;
     void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
     void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
@@ -69,13 +79,10 @@ class RenderManager
     void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection);
     void SendCustomUniformsToShader();
 
-    void ProcessScene();
-    void ProcessScene(SceneObject * parent, Transform& aggregateTransform);
-    void RenderSceneFromCamera(unsigned int cameraIndex);
 
-    bool ShouldCullFromLight(Light& light, Point3& lightPosition, Transform& fullTransform, Mesh3D& mesh) const;
-    bool ShouldCullBySphereOfInfluence(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const;
-    bool ShouldCullByTile(Light& light, Point3& lightPosition, Transform& fullTransform,  Mesh3D& mesh) const;
+    bool ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
+    bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
+    bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 
     public:
 

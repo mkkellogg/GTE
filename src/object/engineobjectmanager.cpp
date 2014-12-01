@@ -28,6 +28,7 @@
 #include "ui/debug.h"
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
+#include "base/intmask.h"
 #include "util/util.h"
 #include <string>
 
@@ -497,6 +498,31 @@ void EngineObjectManager::DeleteMaterial(Material * material)
 	delete material;
 }
 
+RenderTargetRef EngineObjectManager::CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height)
+{
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+
+	RenderTarget*  target = graphics->CreateRenderTarget(buffers, width, height);
+	ASSERT(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null());
+
+	return RenderTargetRef(target, [=](RenderTarget * target)
+	{
+		  DeleteRenderTarget(target);
+	});
+}
+
+void EngineObjectManager::DestroyRenderTarget(RenderTargetRef buffer)
+{
+	buffer.ForceDelete();
+}
+
+void EngineObjectManager::DeleteRenderTarget(RenderTarget * target)
+{
+	ASSERT_RTRN(target != NULL,"EngineObjectManager::DeleteRenderBuffer -> target is NULL.");
+
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	graphics->DestroyRenderTarget(target);
+}
 
 CameraRef EngineObjectManager::CreateCamera()
 {

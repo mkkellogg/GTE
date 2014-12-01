@@ -20,6 +20,7 @@ class AttributeTransformer;
 class Skeleton;
 class Animation;
 class AnimationInstance;
+class RenderTarget;
 
 #include <vector>
 #include <memory>
@@ -30,6 +31,7 @@ class AnimationInstance;
 #include "graphics/texture/textureattr.h"
 #include "shadermanager.h"
 #include "base/longmask.h"
+#include "base/intmask.h"
 
 class EngineObjectManager
 {
@@ -66,6 +68,7 @@ class EngineObjectManager
 	void DeleteAnimation(Animation * animation);
 	void DeleteAnimationInstance(AnimationInstance * animation);
 	void DeleteAnimationPlayer(AnimationPlayer * player);
+	void DeleteRenderTarget(RenderTarget * target);
 
     public :
 
@@ -108,6 +111,9 @@ class EngineObjectManager
     MaterialRef CreateMaterial(const char *name, ShaderRef shader);
     MaterialRef CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
     void DestroyMaterial(MaterialRef material);
+    RenderTargetRef CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height);
+    void DestroyRenderTarget(RenderTargetRef buffer);
+
     CameraRef CreateCamera();
     void DestroyCamera(CameraRef camera);
     LightRef CreateLight();
