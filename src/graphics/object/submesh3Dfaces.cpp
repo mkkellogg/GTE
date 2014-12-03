@@ -28,7 +28,7 @@ void SubMesh3DFaces::Destroy()
 	}
 }
 
-unsigned int SubMesh3DFaces::GetFaceCount()
+unsigned int SubMesh3DFaces::GetFaceCount() const
 {
 	return faceCount;
 }
@@ -48,6 +48,5 @@ bool SubMesh3DFaces::Init(unsigned int faceCount)
 SubMesh3DFace * SubMesh3DFaces::GetFace(unsigned int index)
 {
 	ASSERT(index < faceCount, "SubMesh3DFaces::Face * SubMesh3DFaces::GetFace -> Index is out of range.", NULL);
-
 	return faces + index;
 }

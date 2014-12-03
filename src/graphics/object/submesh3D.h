@@ -31,9 +31,6 @@ class SubMesh3D : public EngineObject
 	int subIndex;
 
 	SubMesh3DFaces faces;
-	Point3Array shadowVolumeFront;
-	Point3Array shadowVolumeBack;
-	Point3Array shadowVolumeSides;
 
     Point3Array positions;
     Vector3Array normals;
@@ -61,12 +58,15 @@ class SubMesh3D : public EngineObject
     void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC);
     void BuildFaces();
 
+
     void CalcSphereOfInfluence();
     void CalculateNormals(float smoothingThreshhold);
     void SetContainerMesh(Mesh3D * mesh);
     void SetSubIndex(int index);
 
 	public:
+
+    SubMesh3DFaces& GetFaces();
 
     const Point3& GetCenter() const;
     const Vector3& GetSphereOfInfluenceX() const;

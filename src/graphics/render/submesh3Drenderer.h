@@ -37,7 +37,6 @@ class SubMesh3DRenderer : public EngineObject
 	void SetSubIndex(unsigned int index);
 
 	const static int MAX_ATTRIBUTE_BUFFERS = 64;
-
     VertexAttrBuffer * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
 
 	unsigned int storedVertexCount;
@@ -50,6 +49,10 @@ class SubMesh3DRenderer : public EngineObject
     Vector3Array normalsCopy, transformedNormals;
     Point3 centerCopy,transformedCenter;
 
+    Point3Array shadowVolumeFront;
+    Point3Array shadowVolumeBack;
+    Point3Array shadowVolumeSides;
+
     bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount,  int stride);
     void Destroy();
     void DestroyBuffers();
@@ -57,6 +60,7 @@ class SubMesh3DRenderer : public EngineObject
     void SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride);
 
     bool InitAttributeData(StandardAttribute attr, int componentCount,  int stride);
+    void BuildShadowVolume(Vector3& lightPosDir, bool directional);
 
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);

@@ -91,7 +91,7 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 {
 	ASSERT_RTRN(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> faceIndex is out range.");
 
-	SubMesh3DFace * face = faces.GetFace(faceIndex);
+	const SubMesh3DFace * face = faces.GetFace(faceIndex);
 
 	int faceVertexIndex = face->FirstVertexIndex;
 	Point3 * faceVertexA = positions.GetPoint(faceVertexIndex);
@@ -103,7 +103,7 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 	{
 		if(faceIndex != f)
 		{
-			SubMesh3DFace * compareFace = faces.GetFace(f);
+			const SubMesh3DFace * compareFace = faces.GetFace(f);
 			int compareVertexIndex = compareFace->FirstVertexIndex;
 
 			if(compareVertexIndex < 0)continue;
@@ -131,12 +131,12 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 
 void SubMesh3D::BuildFaces()
 {
-	unsigned int faceCount = totalVertexCount / 3;
+	unsigned int faceCount = faces.GetFaceCount();
 
 	unsigned int vertexIndex = 0;
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
-		SubMesh3DFace * face = faces.GetFace(f);
+	    SubMesh3DFace * face = faces.GetFace(f);
 		face->FirstVertexIndex = vertexIndex;
 		CalculateFaceNormal(vertexIndex, face->FaceNormal);
 		vertexIndex += 3;
@@ -315,6 +315,11 @@ void SubMesh3D::Destroy()
 
 }
 
+SubMesh3DFaces& SubMesh3D::GetFaces()
+{
+	return faces;
+}
+
 const Point3& SubMesh3D::GetCenter() const
 {
 	return center;
@@ -415,19 +420,6 @@ bool SubMesh3D::Init(unsigned int totalVertexCount)
 	if(!facesInitSuccess)
 	{
 		Debug::PrintError("SubMesh3D::Init -> Error occurred while initializing face array.");
-		Destroy();
-		return false;
-	}
-
-	bool shadowVolumeInitSuccess = true;
-
-	shadowVolumeInitSuccess = shadowVolumeFront.Init(totalVertexCount);
-	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(totalVertexCount);
-	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(totalVertexCount * 2);
-
-	if(!shadowVolumeInitSuccess)
-	{
-		Debug::PrintError("SubMesh3D::Init -> Error occurred while initializing shadow volume.");
 		Destroy();
 		return false;
 	}

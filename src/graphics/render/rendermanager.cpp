@@ -141,7 +141,7 @@ void RenderManager::ProcessScene()
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderAll -> sceneRoot is NULL.");
 
 	// gather information about the cameras & lights in the scene
-	ProcessScene(sceneRoot.GetPtr(), cameraModelView);
+	ProcessScene(sceneRoot.GetRef(), cameraModelView);
 
 	cycleCount++;
 }
@@ -155,7 +155,7 @@ void RenderManager::ProcessScene()
  * and passed to the current invocation via 'viewTransform', since they will ultimately form position
  * from which the scene is rendered. The transform stored in 'viewTransform' is passed to RenderScene();
  */
-void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTransform)
+void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransform)
 {
 	Transform viewInverse;
 	Transform identity;
@@ -165,9 +165,9 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTrans
 	// enforce max recursion depth
 	if(RenderDepth(viewTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
-	for(unsigned int i = 0; i < parent->GetChildrenCount(); i++)
+	for(unsigned int i = 0; i < parent.GetChildrenCount(); i++)
 	{
-		SceneObjectRef child = parent->GetChildAt(i);
+		SceneObjectRef child = parent.GetChildAt(i);
 
 		if(child.IsValid() && child->IsActive())
 		{
@@ -212,7 +212,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTrans
 			{
 				meshObjects[sceneMeshCount] = child.GetPtr();
 
-				model.SetTo(child->GetProcessingTransform());
+				model.SetTo(aggregateTransform);
 				modelInverse.SetTo(model);
 				modelInverse.Invert();
 
@@ -233,7 +233,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTrans
 			{
 				meshObjects[sceneMeshCount] = child.GetPtr();
 
-				model.SetTo(child->GetProcessingTransform());
+				model.SetTo(aggregateTransform);
 				modelInverse.SetTo(model);
 				modelInverse.Invert();
 
@@ -252,7 +252,7 @@ void RenderManager::ProcessScene(SceneObject * parent, Transform& aggregateTrans
 			child->SetProcessingTransform(aggregateTransform);
 
 			// continue recursion through child object
-			ProcessScene(child.GetPtr(), aggregateTransform);
+			ProcessScene(child.GetRef(), aggregateTransform);
 
 			// restore previous view transform
 			PopTransformData(aggregateTransform, viewTransformStack);
@@ -337,112 +337,121 @@ void RenderManager::RenderSceneForLight(const Light& light, const Point3& lightP
 		}
 		else if(child->IsActive())
 		{
-			Mesh3DRenderer * renderer = NULL;
+			RenderSceneObjectMeshes(*child, light, lightPosition, viewTransformInverse, camera);
+		}
+	}
+}
 
-			// check if current scene object has a mesh & renderer
-			if(child->GetMesh3DRenderer().IsValid())
-			{
-				renderer = child->GetMesh3DRenderer().GetPtr();
-			}
-			else if(child->GetSkinnedMesh3DRenderer().IsValid())
-			{
-				renderer = (Mesh3DRenderer *)child->GetSkinnedMesh3DRenderer().GetPtr();
-			}
+void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera)
+{
+	Mesh3DRenderer * renderer = NULL;
+	Transform modelView;
+	Transform model;
+	Transform modelInverse;
 
-			if(renderer != NULL)
-			{
-				Mesh3DRef mesh = renderer->GetMesh();
+	// check if current scene object has a mesh & renderer
+	if(sceneObject.GetMesh3DRenderer().IsValid())
+	{
+		renderer = sceneObject.GetMesh3DRenderer().GetPtr();
+	}
+	else if(sceneObject.GetSkinnedMesh3DRenderer().IsValid())
+	{
+		renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
+	}
 
-				if(!mesh.IsValid())
+	if(renderer != NULL)
+	{
+		Mesh3DRef mesh = renderer->GetMesh();
+
+		if(!mesh.IsValid())
+		{
+			Debug::PrintError("RenderManager::ForwardRenderScene -> renderer returned NULL mesh.");
+		}
+		else if(mesh->GetSubMeshCount() != renderer->GetSubRendererCount())
+		{
+			Debug::PrintError("RenderManager::ForwardRenderScene -> Sub mesh count does not match sub renderer count!.");
+		}
+		else if(renderer->GetMaterialCount() <= 0)
+		{
+			Debug::PrintError("RenderManager::ForwardRenderScene -> renderer has no materials.");
+		}
+		else
+		{
+			unsigned int materialIndex = 0;
+			for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
+			{
+				bool doRender = true;
+				MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
+				if(!currentMaterial.IsValid())
 				{
-					Debug::PrintError("RenderManager::ForwardRenderScene -> renderer returned NULL mesh.");
+					Debug::PrintError("RenderManager::ForwardRenderScene -> NULL material encountered.");
+					doRender = false;
 				}
-				else if(mesh->GetSubMeshCount() != renderer->GetSubRendererCount())
+
+				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
+				if(!subRenderer.IsValid())
 				{
-					Debug::PrintError("RenderManager::ForwardRenderScene -> Sub mesh count does not match sub renderer count!.");
+					Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
+					doRender = false;
 				}
-				else if(renderer->GetMaterialCount() <= 0)
+
+				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
+				if(!subMesh.IsValid())
 				{
-					Debug::PrintError("RenderManager::ForwardRenderScene -> renderer has no materials.");
+					Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
+					doRender = false;
 				}
-				else
+
+				if(doRender)
 				{
-					unsigned int materialIndex = 0;
-					for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
+					// get the full transform of the scene object, including those of all ancestors
+					SceneObjectTransform full;
+					sceneObject.InitSceneObjectTransform(&full);
+
+					// check if this mesh should be culled from this light.
+					if(!ShouldCullFromLight(light, lightPosition, full, *mesh))
 					{
-						bool doRender = true;
-						MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
-						if(!currentMaterial.IsValid())
+						model.SetTo(sceneObject.GetProcessingTransform());
+						modelView.SetTo(model);
+						// concatenate modelTransform with inverted viewTransform
+						modelView.PreTransformBy(viewTransformInverse);
+
+						// activate the material, which will switch the GPU's active shader to
+						// the one associated with the material
+						ActivateMaterial(currentMaterial);
+						SendActiveMaterialUniformsToShader();
+						// send light data to the active shader
+						currentMaterial->SendLightToShader(&light, &lightPosition);
+
+						// pass concatenated modelViewTransform and projection transforms to shader
+						SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform());
+
+						// if this sub mesh has already been rendered by this camera, then we want to use
+						// additive blending to combine it with the output from other lights. Otherwise
+						// turn off blending and render.
+						bool rendered = renderedObjects[subMesh->GetObjectID()];
+						if(rendered)
 						{
-							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL material encountered.");
-							doRender = false;
+							graphics->EnableBlending(true);
+						}
+						else
+						{
+							graphics->EnableBlending(false);
 						}
 
-						SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
-						if(!subRenderer.IsValid())
-						{
-							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
-							doRender = false;
-						}
-
-						SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-						if(!subMesh.IsValid())
-						{
-							Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
-							doRender = false;
-						}
-
-						if(doRender)
-						{
-							model.SetTo(child->GetProcessingTransform());
-							modelView.SetTo(model);
-							// concatenate modelTransform with inverted viewTransform
-							modelView.PreTransformBy(viewTransformInverse);
-
-							// activate the material, which will switch the GPU's active shader to
-							// the one associated with the material
-							ActivateMaterial(currentMaterial);
-							// pass concatenated modelViewTransform and projection transforms to shader
-							SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform());
-							SendCustomUniformsToShader();
-
-							// if this sub mesh has already been rendered by this camera, then we want to use
-							// additive blending to combine it with the output from other lights. Otherwise
-							// turn off blending and render.
-							bool rendered = renderedObjects[subMesh->GetObjectID()];
-							if(rendered)
-							{
-								graphics->EnableBlending(true);
-							}
-							else
-							{
-								graphics->EnableBlending(false);
-							}
-
-							// get the full transform of the scene object, including those of all ancestors
-							SceneObjectTransform full;
-							child->InitSceneObjectTransform(&full);
-
-							// check if this mesh should be culled from this light.
-							if(!ShouldCullFromLight(light, lightPosition, full, *mesh))
-							{
-								// send light data to the active shader
-								currentMaterial->SendLightToShader(&light, &lightPosition);
-								// render the current mesh
-								subRenderer->Render();
-								// flag the current mesh as being rendered (at least once)
-								renderedObjects[subMesh->GetObjectID()] = true;
-							}
-						}
-
-						// Advance material index. Renderer can have any number of materials > 0; it does not have to match
-						// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
-						materialIndex++;
-						if(materialIndex >= renderer->GetMaterialCount())
-						{
-							materialIndex = 0;
-						}
+						// render the current mesh
+						subRenderer->Render();
+						// flag the current mesh as being rendered (at least once)
+						renderedObjects[subMesh->GetObjectID()] = true;
 					}
+				}
+
+				// Advance material index. Renderer can have any number of materials > 0; it does not have to match
+				// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
+				materialIndex++;
+				if(materialIndex >= renderer->GetMaterialCount())
+				{
+					materialIndex = 0;
 				}
 			}
 		}
@@ -532,6 +541,7 @@ bool RenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosi
  */
 void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection)
 {
+	MaterialRef activeMaterial = graphics->GetActiveMaterial();
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
 
 	ShaderRef shader = activeMaterial->GetShader();
@@ -550,8 +560,9 @@ void RenderManager::SendTransformUniformsToShader(const Transform& model, const 
 /*
  * Send any custom uniforms specified by the active material to the active shader
  */
-void RenderManager::SendCustomUniformsToShader()
+void RenderManager::SendActiveMaterialUniformsToShader()
 {
+	MaterialRef activeMaterial = graphics->GetActiveMaterial();
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendCustomUniformsToShader -> activeMaterial is not valid.");
 	activeMaterial->SendAllSetUniformsToShader();
 }
@@ -565,6 +576,5 @@ void RenderManager::ActivateMaterial(MaterialRef material)
 	// We MUST notify the graphics system about the change in active material because other
 	// components (like Mesh3DRenderer) need to know about the active material
 	graphics->ActivateMaterial(material);
-	this->activeMaterial = material;
 }
 

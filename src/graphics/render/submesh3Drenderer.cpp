@@ -7,6 +7,8 @@
 #include "object/sceneobjectcomponent.h"
 #include "submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
+#include "graphics/object/submesh3Dface.h"
+#include "graphics/object/submesh3Dfaces.h"
 #include "material.h"
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
@@ -123,6 +125,74 @@ bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int componentC
 	return true;
 }
 
+void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional)
+{
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	ASSERT_RTRN(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> mesh is invalid.");
+
+    SubMesh3DFaces& faces = mesh->GetFaces();
+
+	unsigned int faceCount = faces.GetFaceCount();
+
+	unsigned int faceVertexIndex = 0;
+	int adjacentFaceIndex = -1;
+	unsigned int v1Index = 0;
+	unsigned int v2Index = 0;
+
+	unsigned int currentFrontFaceVertexIndex = 0;
+	unsigned int currentBackFaceVertexIndex = 0;
+	unsigned int currentSideVertexIndex = 0;
+	Vector3 lightDirection = lightPosDir;
+
+	Point3 vertex1;
+	Point3 vertex2;
+	Point3 vertex3;
+
+	Vector3 tempA;
+	Vector3 tempB;
+	Vector3 tempC;
+
+	for(unsigned int f = 0; f < faceCount; f++)
+	{
+		SubMesh3DFace * face = faces.GetFace(f);
+		faceVertexIndex = face->FirstVertexIndex;
+		adjacentFaceIndex = -1;
+
+		for(unsigned int ai = 0; ai < 3; ai++)
+		{
+			if(ai == 0 && face->AdjacentFaceIndex1 >= 0)
+			{
+				adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex1;
+				v1Index = 0;
+				v2Index = 1;
+			}
+			else if(ai == 1 && face->AdjacentFaceIndex2 >= 0)
+			{
+				adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex2;
+				v1Index = 1;
+				v2Index = 2;
+			}
+			else if(ai == 2 && face->AdjacentFaceIndex3 >= 0)
+			{
+				adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex3;
+				v1Index = 2;
+				v2Index = 0;
+			}
+
+			if(adjacentFaceIndex >=0)
+			{
+				const SubMesh3DFace * adjacentFace = faces.GetFace(adjacentFaceIndex);
+				if(adjacentFace == NULL)continue;
+
+				if(!directional)
+				{
+					//Vector3::Subtract()
+				}
+			}
+		}
+	}
+}
+
 
 void SubMesh3DRenderer::SetPositionData(Point3Array * points)
 {
@@ -231,8 +301,20 @@ bool SubMesh3DRenderer::UpdateMeshData()
 	}
 
 	storedVertexCount = mesh->GetTotalVertexCount();
-	CopyMeshData();
+	bool shadowVolumeInitSuccess = true;
 
+	shadowVolumeInitSuccess = shadowVolumeFront.Init(storedVertexCount);
+	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(storedVertexCount);
+	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 2);
+
+	if(!shadowVolumeInitSuccess)
+	{
+		Debug::PrintError("SubMesh3DRenderer::UpdateData -> Error occurred while initializing shadow volume array.");
+		DestroyBuffers();
+		return false;
+	}
+
+	CopyMeshData();
 	return true;
 }
 
