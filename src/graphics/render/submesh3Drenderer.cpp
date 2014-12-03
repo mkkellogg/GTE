@@ -50,7 +50,10 @@ SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, Graphics * graphics, Att
 
 	this->buffersOnGPU = buffersOnGPU;
 	this->attributeTransformer = attributeTransformer;
+
 	doAttributeTransform = attributeTransformer == NULL ? false : true;
+	doPositionTransform = false;
+	doNormalTransform = false;
 }
 
 SubMesh3DRenderer::~SubMesh3DRenderer()
@@ -152,11 +155,17 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	Vector3 tempB;
 	Vector3 tempC;
 
+	Point3Array * positions = mesh->GetPostions();
+	ASSERT_RTRN(positions, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL positions array.");
+	Point3Array& positionsSource = doPositionTransform == true ? positionsCopy : *positions;
+
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
 		SubMesh3DFace * face = faces.GetFace(f);
 		faceVertexIndex = face->FirstVertexIndex;
 		adjacentFaceIndex = -1;
+
+		positionsSource.GetPoint(face->FirstVertexIndex);
 
 		for(unsigned int ai = 0; ai < 3; ai++)
 		{
@@ -221,7 +230,7 @@ void SubMesh3DRenderer::SetUV2Data(UV2Array * uvs)
 	attributeBuffers[(int)StandardAttribute::UVTexture1]->SetData(uvs->GetDataPtr());
 }
 
-bool SubMesh3DRenderer::UpdateMeshData()
+bool SubMesh3DRenderer::UpdateMeshStorageBuffers()
 {
 	DestroyBuffers();
 	ASSERT(containerRenderer != NULL,"SubMesh3DRendererGL::UpdateMeshData -> containerRenderer is NULL.",false);
@@ -231,6 +240,15 @@ bool SubMesh3DRenderer::UpdateMeshData()
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
+
+	if(err != 0)
+	{
+		std::string msg("Error initializing attribute buffer(s) for SubMesh3DRendererGL: ");
+		msg += std::to_string(err);
+		Debug::PrintError(msg);
+		DestroyBuffers();
+		return false;
+	}
 
 	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
@@ -249,14 +267,32 @@ bool SubMesh3DRenderer::UpdateMeshData()
 		}
 	}
 
-	if(err != 0)
+	storedVertexCount = mesh->GetTotalVertexCount();
+
+	bool shadowVolumeInitSuccess = true;
+	shadowVolumeInitSuccess = shadowVolumeFront.Init(storedVertexCount);
+	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(storedVertexCount);
+	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 2);
+
+	if(!shadowVolumeInitSuccess)
 	{
-		std::string msg("Error initializing attribute buffer(s) for SubMesh3DRendererGL: ");
-		msg += std::to_string(err);
-		Debug::PrintError(msg);
+		Debug::PrintError("SubMesh3DRenderer::UpdateData -> Error occurred while initializing shadow volume array.");
 		DestroyBuffers();
 		return false;
 	}
+
+	return true;
+}
+
+bool SubMesh3DRenderer::UpdateAttributeTransformerData()
+{
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	ASSERT(mesh.IsValid(),"SubMesh3DRendererGL::UpdateAttributeTransformerData -> Could not find matching sub mesh for sub renderer.",false);
+
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+
+	doPositionTransform = false;
+	doNormalTransform = false;
 
 	if(doAttributeTransform)
 	{
@@ -272,12 +308,14 @@ bool SubMesh3DRenderer::UpdateMeshData()
 				if(!positionsCopy.Init(positionCount) || !transformedPositions.Init(positionCount))
 				{
 					doAttributeTransform = false;
+					doPositionTransform = false;
+					doNormalTransform = false;
 					Debug::PrintError("SubMesh3DRendererGL::UpdateMeshData -> Unable to init local positions copy.");
-					DestroyBuffers();
 					return false;
 				}
 			}
 
+			doPositionTransform = true;
 			const Point3& center = mesh->GetCenter();
 			centerCopy.Set(center.x,center.y,center.z);
 		}
@@ -292,29 +330,17 @@ bool SubMesh3DRenderer::UpdateMeshData()
 				if(!normalsCopy.Init(normalCount) || !transformedNormals.Init(normalCount))
 				{
 					doAttributeTransform = false;
+					doPositionTransform = false;
+					doNormalTransform = false;
 					Debug::PrintError("SubMesh3DRendererGL::UpdateMeshData -> Unable to init local normals copy.");
-					DestroyBuffers();
 					return false;
 				}
 			}
+
+			doNormalTransform = true;
 		}
 	}
 
-	storedVertexCount = mesh->GetTotalVertexCount();
-	bool shadowVolumeInitSuccess = true;
-
-	shadowVolumeInitSuccess = shadowVolumeFront.Init(storedVertexCount);
-	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(storedVertexCount);
-	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 2);
-
-	if(!shadowVolumeInitSuccess)
-	{
-		Debug::PrintError("SubMesh3DRenderer::UpdateData -> Error occurred while initializing shadow volume array.");
-		DestroyBuffers();
-		return false;
-	}
-
-	CopyMeshData();
 	return true;
 }
 
@@ -329,33 +355,27 @@ void SubMesh3DRenderer::CopyMeshData()
 
 	if(doAttributeTransform)
 	{
-		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
-
-		if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+		if(doPositionTransform)
 		{
-			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position))
+			Point3Array * positions = mesh->GetPostions();
+			if(positions->GetMaxCount() == positionsCopy.GetMaxCount())
 			{
-				Point3Array * positions = mesh->GetPostions();
-				if(positions->GetMaxCount() == positionsCopy.GetMaxCount())
-				{
-					positions->CopyTo(&positionsCopy);
-				}
+				positions->CopyTo(&positionsCopy);
 			}
-			else SetPositionData(mesh->GetPostions());
+			else Debug::PrintWarning("SubMesh3DRenderer::CopyMeshData -> Cannot copy positions because vertex count differs.");
 		}
+		else SetPositionData(mesh->GetPostions());
 
-		if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+		if(doNormalTransform)
 		{
-			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal))
+			Vector3Array * normals = mesh->GetNormals();
+			if(normals->GetMaxCount() == normalsCopy.GetMaxCount())
 			{
-				Vector3Array * normals = mesh->GetNormals();
-				if(normals->GetMaxCount() == normalsCopy.GetMaxCount())
-				{
-					normals->CopyTo(&normalsCopy);
-				}
+				normals->CopyTo(&normalsCopy);
 			}
-			else SetNormalData(mesh->GetNormals());
+			else Debug::PrintWarning("SubMesh3DRenderer::CopyMeshData -> Cannot copy normals because vertex count differs.");
 		}
+		else SetNormalData(mesh->GetNormals());
 	}
 	else
 	{
@@ -378,14 +398,21 @@ void SubMesh3DRenderer::UpdateFromMesh()
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
-	if(mesh->GetTotalVertexCount() != storedVertexCount || storedAttributes != mesh->GetAttributeSet())
+	bool updateSuccess = true;
+	if(mesh->GetTotalVertexCount() != storedVertexCount || mesh->GetAttributeSet() != storedAttributes)
 	{
-		UpdateMeshData();
+		updateSuccess = updateSuccess && UpdateMeshStorageBuffers();
 	}
-	else
+
+	updateSuccess = updateSuccess && UpdateAttributeTransformerData();
+
+	if(!updateSuccess)
 	{
-		CopyMeshData();
+		Debug::PrintError("SubMesh3DRenderer::UpdateFromMesh -> Error occurred while updating mesh structure and data.");
+		return;
 	}
+
+	CopyMeshData();
 }
 
 bool SubMesh3DRenderer::UseMaterial(MaterialRef material)
@@ -430,11 +457,9 @@ void SubMesh3DRenderer::SetAttributeTransformer(AttributeTransformer * attribute
 	}
 	else
 	{
-		if(doAttributeTransform == false)
-		{
-			this->doAttributeTransform = true;
-			UpdateFromMesh();
-		}
+		this->doAttributeTransform = true;
+		UpdateAttributeTransformerData();
+		CopyMeshData();
 	}
 }
 
@@ -455,17 +480,11 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
-	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
-
 	if(doAttributeTransform)
 	{
-		StandardAttributeSet attributesToTransform = attributeTransformer->GetActiveAttributes();
 		attributeTransformer->SetModelMatrix(model, modelInverse);
 
-		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
-				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position) &&
-				   StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
-				   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+		if(doPositionTransform && doNormalTransform)
 		{
 			attributeTransformer->TransformPositionsAndNormals(positionsCopy, transformedPositions,normalsCopy, transformedNormals, centerCopy, transformedCenter);
 			SetPositionData(&transformedPositions);
@@ -473,15 +492,13 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 		}
 		else
 		{
-			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Position) &&
-			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
+			if(doPositionTransform)
 			{
 				attributeTransformer->TransformPositions(positionsCopy, transformedPositions,  centerCopy, transformedCenter);
 				SetPositionData(&transformedPositions);
 			}
 
-			if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
-			   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
+			if(doNormalTransform)
 			{
 				attributeTransformer->TransformNormals(normalsCopy, transformedNormals);
 				SetNormalData(&transformedNormals);

@@ -44,6 +44,9 @@ class SubMesh3DRenderer : public EngineObject
     bool buffersOnGPU;
 
     bool doAttributeTransform;
+    bool doPositionTransform;
+    bool doNormalTransform;
+
     AttributeTransformer * attributeTransformer;
     Point3Array positionsCopy, transformedPositions;
     Vector3Array normalsCopy, transformedNormals;
@@ -69,7 +72,8 @@ class SubMesh3DRenderer : public EngineObject
     void SetUV2Data(UV2Array * uvs);
 
     bool UseMaterial(MaterialRef material);
-    bool UpdateMeshData();
+    bool UpdateMeshStorageBuffers();
+    bool UpdateAttributeTransformerData();
 
     SubMesh3DRenderer(Graphics * graphics, AttributeTransformer * attributeTransformer);
     SubMesh3DRenderer(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer);
