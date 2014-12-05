@@ -17,6 +17,7 @@
 #include "object/sceneobject.h"
 #include "global/global.h"
 #include "ui/debug.h"
+#include "util/time.h"
 
 
 Graphics::~Graphics()
@@ -27,6 +28,8 @@ Graphics::~Graphics()
 Graphics::Graphics()
 {
 	renderManager = NULL;
+    fpsTime =0;
+	frames =0;
 }
 
 bool Graphics::Init(const GraphicsAttributes& attributes)
@@ -55,12 +58,25 @@ void Graphics::PreProcessScene()
 
 void Graphics::Update()
 {
-
+	UpdateFPS();
 }
 
 void Graphics::RenderScene()
 {
 
+}
+
+void Graphics::UpdateFPS()
+{
+	fpsTime += Time::GetDeltaTime();
+	frames++;
+	if(fpsTime >= 1)
+	{
+		float fps = (float)frames/fpsTime;
+		//printf("fps: %f\n", fps);
+		fpsTime = 0;
+		frames = 0;
+	}
 }
 
 bool Graphics::Run()

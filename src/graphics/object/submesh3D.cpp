@@ -138,7 +138,6 @@ void SubMesh3D::BuildFaces()
 	{
 	    SubMesh3DFace * face = faces.GetFace(f);
 		face->FirstVertexIndex = vertexIndex;
-		CalculateFaceNormal(vertexIndex, face->FaceNormal);
 		vertexIndex += 3;
 	}
 
@@ -195,9 +194,14 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	{
 		Vector3 normal;
 		CalculateFaceNormal(v, normal);
+
 		normals.GetVector(v)->Set(normal.x,normal.y,normal.z);
 		normals.GetVector(v+1)->Set(normal.x,normal.y,normal.z);
 		normals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
+
+		straightNormals.GetVector(v)->Set(normal.x,normal.y,normal.z);
+		straightNormals.GetVector(v+1)->Set(normal.x,normal.y,normal.z);
+		straightNormals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
 	}
 
 	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
@@ -265,7 +269,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 			// and the current normal in the list.
 			float dot = Vector3::Dot(current, oNormal);
 
-			// clamp to the range -1.0 ... 1.0 to prevent rounding errors in Acos()
+			// clamp to the range -1.0 ... 1.0 to prevent rounding errors in ACos()
 			if (dot < -1.0) dot = -1.0 ;
 			else if (dot > 1.0) dot = 1.0 ;
 
@@ -385,6 +389,7 @@ bool SubMesh3D::Init(unsigned int totalVertexCount)
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Normal))
 	{
 		initSuccess = normals.Init(totalVertexCount) && initSuccess;
+		initSuccess = straightNormals.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
 	}
 
@@ -449,6 +454,11 @@ Point3Array * SubMesh3D::GetPostions()
 Vector3Array * SubMesh3D::GetNormals()
 {
 	return &normals;
+}
+
+Vector3Array * SubMesh3D::GetStraightNormals()
+{
+	return &straightNormals;
 }
 
 Color4Array * SubMesh3D::GetColors()

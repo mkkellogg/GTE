@@ -16,7 +16,7 @@
 VertexBoneMap::VertexBoneMap(unsigned int vertexCount, unsigned int uVertexCount)
 {
 	this->vertexCount = vertexCount;
-	this->uVertexCount = uVertexCount;
+	this->uniqueVertexCount = uVertexCount;
 	mappingDescriptors = NULL;
 }
 
@@ -80,9 +80,9 @@ unsigned int VertexBoneMap::GetVertexCount()
 /*
  * Get number of unique vertices that are mapped.
  */
-unsigned int VertexBoneMap::GetUVertexCount()
+unsigned int VertexBoneMap::GetUniqueVertexCount()
 {
-	return uVertexCount;
+	return uniqueVertexCount;
 }
 
 /*
@@ -91,7 +91,7 @@ unsigned int VertexBoneMap::GetUVertexCount()
 VertexBoneMap * VertexBoneMap::FullClone()
 {
 	// allocate new VertexBoneMap objects
-	VertexBoneMap * clone = new VertexBoneMap(vertexCount, uVertexCount);
+	VertexBoneMap * clone = new VertexBoneMap(vertexCount, uniqueVertexCount);
 	ASSERT(clone != NULL, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.", NULL);
 
 	// initialize the new map

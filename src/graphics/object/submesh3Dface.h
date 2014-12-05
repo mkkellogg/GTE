@@ -25,7 +25,6 @@ class SubMesh3DFace
 	SubMesh3DFace();
 	~SubMesh3DFace();
 
-	Vector3 FaceNormal;
 	int FirstVertexIndex;
 	int AdjacentFaceIndex1;
 	int AdjacentFaceIndex2;

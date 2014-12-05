@@ -169,11 +169,17 @@ bool Point3::operator==(const Point3& p) const
 	return GTEMath::Abs(p.x - this->x) < epsilon && GTEMath::Abs(p.y - this->y) < epsilon && GTEMath::Abs(p.z - this->z) < epsilon;
 }
 
+/*
+ * Comparison function for references
+ */
 bool Point3::AreEqual(const Point3& a, const Point3& b)
 {
 	return AreEqual(&a, &b);
 }
 
+/*
+ * Comparison function for pointers
+ */
 bool Point3::AreEqual(const Point3* a, const Point3* b)
 {
 	ASSERT(a != NULL && b != NULL, "Point3::AreEqual -> NULL point passed.", false);
@@ -182,6 +188,9 @@ bool Point3::AreEqual(const Point3* a, const Point3* b)
 	return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
 }
 
+/*
+ * Test for exact equality
+ */
 bool Point3::AreStrictlyEqual(const Point3* a, const Point3* b)
 {
 	ASSERT(a != NULL && b != NULL, "Point3::AreStrictlyEqual -> NULL point passed.", false);

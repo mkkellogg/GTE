@@ -34,6 +34,7 @@ class SubMesh3D : public EngineObject
 
     Point3Array positions;
     Vector3Array normals;
+    Vector3Array straightNormals;
     Color4Array colors;
     UV2Array uvsTexture0;
     UV2Array uvsTexture1;
@@ -81,6 +82,7 @@ class SubMesh3D : public EngineObject
 
     Point3Array * GetPostions();
     Vector3Array * GetNormals();
+    Vector3Array * GetStraightNormals();
     Color4Array * GetColors();
     UV2Array * GetUVsTexture0();
     UV2Array * GetUVsTexture1();

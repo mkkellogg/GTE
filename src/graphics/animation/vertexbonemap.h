@@ -33,7 +33,7 @@ class VertexBoneMap
 
 		// the unique vertex index, all vertices that have the same x,y,z values will have
 		// the same UVertexIndex value
-		unsigned int UVertexIndex=0;
+		unsigned int UniqueVertexIndex=0;
 		// number of bones to which this vertex is attached
 		unsigned int BoneCount=0;
 		// bones to which this vertex is attached
@@ -47,7 +47,7 @@ class VertexBoneMap
 			ASSERT_RTRN(desc != NULL,"VertexMappingDescriptor::SetTo -> desc is NULL.");
 
 			this->BoneCount = desc->BoneCount;
-			this->UVertexIndex = desc->UVertexIndex;
+			this->UniqueVertexIndex = desc->UniqueVertexIndex;
 			memcpy(this->BoneIndex, desc->BoneIndex, sizeof(unsigned int) * Constants::MaxBonesPerVertex);
 			memcpy(this->Weight, desc->Weight, sizeof(float) * Constants::MaxBonesPerVertex);
 		}
@@ -56,7 +56,7 @@ class VertexBoneMap
 	private:
 
 	// number of unique vertices
-	unsigned int uVertexCount;
+	unsigned int uniqueVertexCount;
 	// total number of vertices
 	unsigned int vertexCount;
 	// mapping descriptor for each vertex
@@ -71,7 +71,7 @@ class VertexBoneMap
 	bool Init();
 	VertexMappingDescriptor* GetDescriptor(unsigned int index);
 	unsigned int GetVertexCount();
-	unsigned int GetUVertexCount();
+	unsigned int GetUniqueVertexCount();
 	VertexBoneMap * FullClone();
 };
 

@@ -171,4 +171,3 @@ void BaseVector4::Detach()
 
 
 
-

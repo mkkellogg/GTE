@@ -772,7 +772,7 @@ void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, un
 				VertexBoneMap::VertexMappingDescriptor * desc = vertexIndexBoneMap.GetDescriptor(vertexID);
 				if(desc != NULL && desc->BoneCount < Constants::MaxBonesPerVertex)
 				{
-					desc->UVertexIndex = vertexID;
+					desc->UniqueVertexIndex = vertexID;
 					desc->BoneIndex[desc->BoneCount] = boneIndex;
 					desc->Weight[desc->BoneCount] = weight;
 					desc->BoneCount++;

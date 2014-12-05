@@ -88,6 +88,17 @@ bool Vector3::operator==(const Vector3 & source)
 	return GTEMath::Abs(source.x - this->x) < epsilon && GTEMath::Abs(source.y - this->y) < epsilon && GTEMath::Abs(source.z - this->z) < epsilon;
 }
 
+
+/*
+ * Test for exact equality
+ */
+bool Vector3::AreStrictlyEqual(const Vector3* a, const Vector3* b)
+{
+	ASSERT(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> NULL point passed.", false);
+
+	return a->x == b->x && a->y == b->y && a->z == b->z;
+}
+
 /*
  * Set the values of this vector
  */

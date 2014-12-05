@@ -41,6 +41,7 @@ class Vector3 : public BaseVector4
     BaseVector4 & operator= (const BaseVector4 & source);
     bool operator==(const Vector3 & source) const;
     bool operator==(const Vector3 & source);
+    static bool AreStrictlyEqual(const Vector3* a, const Vector3* b);
     void Set(float x, float y, float z);
 
     void Add(const Vector3& v);

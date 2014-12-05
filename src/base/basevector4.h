@@ -10,6 +10,22 @@
 #ifndef _BASEVECTOR4_H_
 #define _BASEVECTOR4_H_
 
+#define BaseVector4_QuickCopy(source, dest)        \
+{                                          		   \
+  *(dest) = *(source);                      	   \
+  source++;					       		   		   \
+  dest++;						   		   		   \
+  *(dest) = *(source);                      	   \
+  source++;					       		   		   \
+  dest++;						   		   		   \
+  *(dest) = *(source);                      	   \
+  source++;					       		   		   \
+  dest++;						   		   		   \
+  *(dest) = *(source);                      	   \
+  source++;					       		   		   \
+  dest++;						   		   		   \
+}
+
 class BaseVector4
 {
 	friend class BaseVector4Array;

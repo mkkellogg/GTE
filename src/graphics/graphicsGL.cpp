@@ -108,6 +108,7 @@ GraphicsGL::~GraphicsGL()
 GraphicsGL::GraphicsGL() : Graphics()
 {
 	openGLVersion = 0;
+	blendingEnabled = false;
 }
 
 Shader * GraphicsGL::CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
@@ -397,7 +398,7 @@ unsigned int GraphicsGL::GetOpenGLVersion()
 
 void GraphicsGL::Update()
 {
-
+	Graphics::Update();
 }
 
 void GraphicsGL::_glutDisplayFunc()

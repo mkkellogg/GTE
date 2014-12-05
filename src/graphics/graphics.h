@@ -51,6 +51,9 @@ class Graphics
     RenderManager * renderManager;
     GraphicsAttributes attributes;
 
+    float fpsTime;
+    int frames;
+
     Graphics();
     virtual ~Graphics();
 
@@ -58,6 +61,8 @@ class Graphics
     virtual void Update();
     virtual void PreProcessScene();
     virtual void RenderScene();
+
+    void UpdateFPS();
 
     public :
 
