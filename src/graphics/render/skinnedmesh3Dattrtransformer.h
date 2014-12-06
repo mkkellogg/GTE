@@ -27,13 +27,12 @@ class Matrix4x4;
 
 class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 {
-	enum class Target
+	enum class CacheType
 	{
 		Position = 0,
 		Normal = 1,
 		StraightNormal = 2,
-		IdenticalNormal = 3,
-		Transform = 4
+		Transform = 3
 	};
 
 	// the Skeleton object that contains the bone structure that determines how
@@ -48,57 +47,44 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	// multiple times during a single vertex skinning operation).
 	unsigned char * boneTransformed;
 
-	// size of the [savedTransforms] array
-	int savedTransformCount;
-	// flag for each (unique) vertex that is transformed indicating that a transform
-	// has been calculated for it
-	unsigned char * transformCalculated;
+
+	// existing size of each cache
+	int currentCacheSize;
+	// flags that indicate that an entry in any cache at a specified index is valid
+	unsigned char * cacheFlags;
+
 	// once the full transformation has been calculated for a vertex, save it for later reuse
 	Matrix4x4 * savedTransforms;
 
-	// size of the [positionTransformed] array
-	int positionTransformedCount;
-	// flag for each (unique) vertex that is transformed indicating that it has been visited and transformed.
-	// used to avoid transforming a single vertex multiple times
-	unsigned char * positionTransformed;
 	// saved values of vertices that have been transformed
 	Point3Array transformedPositions;
 
-	// size of the [normalTransformed] array
-	int normalTransformedCount;
-	// flag for each (unique) normal that is transformed indicating that it has been visited and transformed.
-	// used to avoid transforming a single normal multiple times
-	unsigned char * normalTransformed;
 	// saved values of normals that have been transformed
 	Vector3Array transformedNormals;
 
-	// size of the [straightNormalTransformed] array
-	int straightNormalTransformedCount;
-	// flag for each (unique) straight normal that is transformed indicating that it has been visited and transformed.
-	// used to avoid transforming a single straight normal multiple times
-	unsigned char * straightNormalTransformed;
 	// saved values of straight normals that have been transformed
 	Vector3Array transformedStraightNormals;
 
-	// size of [identicalNormals] array
-	int identicalNormalCount;
 	// flag for each (unique) vertex that indicates whether the normals for all instances of that
 	// vertex are equal
-	unsigned char * identicalNormals;
-
-	void DestroySavedTransformsArray();
-	bool CreateSavedTransformsArray(unsigned int saveCount);
+	unsigned char * identicalNormalFlags;
 
 	void DestroyTransformedBoneFlagsArray();
 	bool CreateTransformedBoneFlagsArray();
 	void ClearTransformedBoneFlagsArray();
 
-	void DestroyTransformCache(Target target);
-	bool CreateTransformCache(Target target, unsigned int count);
-	void ClearTransformCache(Target target);
-	void SetAllTransformCache(Target target, unsigned char value);
+	void DestroyCache(CacheType target);
+	bool CreateCache(CacheType target);
+	void ClearCacheFlags();
+	void SetAllTransformCacheFlags(unsigned char value);
 
-	void FindIdenticalNormals(Vector3Array& fullNormalLists);
+	void DestroyIdenticalNormalsFlags();
+	bool CreateIdenticalNormalsFlags();
+	void ClearIdenticalNormalsFlags();
+	bool FindIdenticalNormals(Vector3Array& fullNormalLists);
+
+	bool CreateCaches();
+	void DestroyCaches();
 
 	public :
 

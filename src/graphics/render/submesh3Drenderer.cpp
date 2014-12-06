@@ -147,8 +147,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	unsigned int currentBackFaceVertexIndex = 0;
 	unsigned int currentSideVertexIndex = 0;
 
-	BaseVector4 svFrontFacesIteratorCurrent;
-	BaseVector4Array::Iterator svFrontFacesIterator = shadowVolumeFront.GetIterator(svFrontFacesIteratorCurrent);
+	float * svFrontBase = const_cast<float*>(shadowVolumeFront.GetDataPtr());
 
 	Vector3 lightDirection = lightPosDir;
 	Point3* vertex1;
@@ -159,10 +158,12 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	Point3Array * positions = mesh->GetPostions();
 	ASSERT_RTRN(positions, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL positions array.");
 	Point3Array& positionsSource = doPositionTransform == true ? transformedPositions : *positions;
+	float * positionsSrcPtr = const_cast<float*>(positionsSource.GetDataPtr());
 
 	Vector3Array * normals = mesh->GetStraightNormals();
 	ASSERT_RTRN(normals, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL straight normals array.");
 	Vector3Array& normalsSource = doNormalTransform == true ? transformedStraightNormals : *normals;
+	float * normalsSrcPtr = const_cast<float*>(normalsSource.GetDataPtr());
 
 	SubMesh3DFace * face = NULL;
 	SubMesh3DFace * adjacentFace = NULL;
@@ -198,23 +199,16 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 		if(faceToLightDot > 0 )
 		{
-			svFrontFacesIterator.Next();
-			float * svFrontFacesPtr = svFrontFacesIteratorCurrent.GetDataPtr();
-			*svFrontFacesPtr = vertex1->x;svFrontFacesPtr++;
-			*svFrontFacesPtr = vertex1->y;svFrontFacesPtr++;
-			*svFrontFacesPtr = vertex1->z;svFrontFacesPtr++;
+			float * vPtr = const_cast<float*>(vertex1->GetDataPtr());
+			BaseVector4_QuickCopy(vPtr, svFrontBase);
 
-			svFrontFacesIterator.Next();
-			svFrontFacesPtr = svFrontFacesIteratorCurrent.GetDataPtr();
-			*svFrontFacesPtr = vertex2->x;svFrontFacesPtr++;
-			*svFrontFacesPtr = vertex2->y;svFrontFacesPtr++;
-			*svFrontFacesPtr = vertex2->z;svFrontFacesPtr++;
+			vPtr = const_cast<float*>(vertex2->GetDataPtr());
+			BaseVector4_QuickCopy(vPtr, svFrontBase);
 
-			svFrontFacesIterator.Next();
-			svFrontFacesPtr = svFrontFacesIteratorCurrent.GetDataPtr();
-			*svFrontFacesPtr = vertex3->x;svFrontFacesPtr++;
-			*svFrontFacesPtr = vertex3->y;svFrontFacesPtr++;
-			*svFrontFacesPtr = vertex3->z;svFrontFacesPtr++;
+			vPtr = const_cast<float*>(vertex3->GetDataPtr());
+			BaseVector4_QuickCopy(vPtr, svFrontBase);
+
+			currentFrontFaceVertexIndex+=3;
 		}
 
 
@@ -360,8 +354,8 @@ bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 		   StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
 		{
 			Point3Array * positions = mesh->GetPostions();
-			unsigned int positionCount = positions->GetMaxCount();
-			if(positionCount != transformedPositions.GetMaxCount())
+			unsigned int positionCount = positions->GetCount();
+			if(positionCount != transformedPositions.GetCount())
 			{
 				if(!transformedPositions.Init(positionCount))
 				{
@@ -380,8 +374,8 @@ bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 		StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
 		{
 			Vector3Array * normals = mesh->GetNormals();
-			unsigned int normalCount = normals->GetMaxCount();
-			if(transformedNormals.GetMaxCount() != normalCount)
+			unsigned int normalCount = normals->GetCount();
+			if(transformedNormals.GetCount() != normalCount)
 			{
 				if(!transformedNormals.Init(normalCount) || !transformedStraightNormals.Init(normalCount))
 				{
