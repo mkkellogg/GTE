@@ -34,6 +34,7 @@ class Light : public SceneObjectComponent
 	float intensity;
 	float attenuation;
 	float range;
+	bool isDirectional;
 
 	protected:
 
@@ -65,6 +66,9 @@ class Light : public SceneObjectComponent
 
 	void SetAttenuation(float attenuation);
 	float GetAttenuation() const ;
+
+	void SetIsDirectional(bool isDirectional);
+	bool IsDirectional() const ;
 };
 
 #endif

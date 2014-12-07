@@ -85,6 +85,8 @@ unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
 		break;
 		case UniformType::Float:
 			return 1;
+		case UniformType::Int:
+			return 1;
 		default:
 			return -1;
 		break;
@@ -560,7 +562,14 @@ void Material::SendLightToShader(const Light * light, const Point3 * position)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SendLightToShader -> shader is NULL");
 
-	int varID = GetStandardUniformBinding(StandardUniform::LightPosition);
+	int varID = GetStandardUniformBinding(StandardUniform::LightIsDirectional);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, light->IsDirectional() ? 1 : 0);
+		SetUniformSetValue(varID, 1);
+	}
+
+	varID = GetStandardUniformBinding(StandardUniform::LightPosition);
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, position);

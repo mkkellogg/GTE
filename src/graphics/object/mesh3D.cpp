@@ -24,6 +24,8 @@ Mesh3D::Mesh3D(unsigned int subMeshCount)
 	if(subMeshCount<=0)subMeshCount=1;
 	this->subMeshCount = subMeshCount;
 	lightCullType = LightCullType::SphereOfInfluence;
+	castShadows = false;
+	receiveShadows = false;
 }
 
 Mesh3D::~Mesh3D()
@@ -207,4 +209,24 @@ const Vector3& Mesh3D::GetSphereOfInfluenceZ() const
 LightCullType Mesh3D::GetLightCullType() const
 {
 	return lightCullType;
+}
+
+void Mesh3D::SetCastShadows(bool castShadows)
+{
+	this->castShadows = castShadows;
+}
+
+bool Mesh3D::GetCastShadows()
+{
+	return castShadows;
+}
+
+void Mesh3D::SetReceiveShadows(bool receiveShadows)
+{
+	this->receiveShadows = receiveShadows;
+}
+
+bool Mesh3D::GetReceiveShadows()
+{
+	return receiveShadows;
 }

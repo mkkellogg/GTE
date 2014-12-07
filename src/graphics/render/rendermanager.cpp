@@ -4,16 +4,17 @@
 #include <memory.h>
 #include <math.h>
 
+#include <vector>
 #include "rendermanager.h"
 #include "material.h"
-#include "graphics/shader/shader.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
 #include "object/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "object/enginetypes.h"
-#include "ui/debug.h"
+#include "engine.h"
 #include "base/intmask.h"
+#include "graphics/shader/shader.h"
 #include "graphics/graphics.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
@@ -22,11 +23,10 @@
 #include "graphics/object/submesh3D.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
-
-#include <vector>
 #include "util/datastack.h"
 #include "global/global.h"
 #include "global/constants.h"
+#include "ui/debug.h"
 
 /*
  * Single constructor, which requires pointers the Graphics and EngineObjectManager
@@ -68,6 +68,10 @@ bool RenderManager::Init()
 		Debug::PrintError("RenderManager::Init -> unable to initialize model transform stack.");
 		return false;
 	}
+
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", "resources/builtin/shadowvolume.vertex.shader","resources/builtin/shadowvolume.fragment.shader");
+	ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.", false);
 
 	return true;
 }
@@ -228,7 +232,6 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 				sceneMeshCount++;
 			}
 
-
 			if(skinnedMeshRenderer.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
 			{
 				meshObjects[sceneMeshCount] = child.GetPtr();
@@ -363,96 +366,68 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 	{
 		Mesh3DRef mesh = renderer->GetMesh();
 
-		if(!mesh.IsValid())
+		ASSERT_RTRN(mesh.IsValid(),"RenderManager::ForwardRenderScene -> renderer returned NULL mesh.");
+		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::ForwardRenderScene -> Sub mesh count does not match sub renderer count!.");
+		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::ForwardRenderScene -> renderer has no materials.");
+
+		unsigned int materialIndex = 0;
+		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
-			Debug::PrintError("RenderManager::ForwardRenderScene -> renderer returned NULL mesh.");
-		}
-		else if(mesh->GetSubMeshCount() != renderer->GetSubRendererCount())
-		{
-			Debug::PrintError("RenderManager::ForwardRenderScene -> Sub mesh count does not match sub renderer count!.");
-		}
-		else if(renderer->GetMaterialCount() <= 0)
-		{
-			Debug::PrintError("RenderManager::ForwardRenderScene -> renderer has no materials.");
-		}
-		else
-		{
-			unsigned int materialIndex = 0;
-			for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
+			MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
+			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
+			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
+
+			ASSERT_RTRN(currentMaterial.IsValid(),"RenderManager::ForwardRenderScene -> NULL material encountered.")
+			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
+			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
+
+			// get the full transform of the scene object, including those of all ancestors
+			SceneObjectTransform full;
+			sceneObject.InitSceneObjectTransform(&full);
+
+			// check if this mesh should be culled from this light.
+			if(light.IsDirectional() || !ShouldCullFromLight(light, lightPosition, full, *mesh))
 			{
-				bool doRender = true;
-				MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
-				if(!currentMaterial.IsValid())
+				model.SetTo(sceneObject.GetProcessingTransform());
+				modelView.SetTo(model);
+				// concatenate modelTransform with inverted viewTransform
+				modelView.PreTransformBy(viewTransformInverse);
+
+				// activate the material, which will switch the GPU's active shader to
+				// the one associated with the material
+				ActivateMaterial(currentMaterial);
+				SendActiveMaterialUniformsToShader();
+				// send light data to the active shader
+				currentMaterial->SendLightToShader(&light, &lightPosition);
+
+				// pass concatenated modelViewTransform and projection transforms to shader
+				SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform());
+
+				// if this sub mesh has already been rendered by this camera, then we want to use
+				// additive blending to combine it with the output from other lights. Otherwise
+				// turn off blending and render.
+				bool rendered = renderedObjects[subMesh->GetObjectID()];
+				if(rendered)
 				{
-					Debug::PrintError("RenderManager::ForwardRenderScene -> NULL material encountered.");
-					doRender = false;
+					graphics->EnableBlending(true);
+				}
+				else
+				{
+					graphics->EnableBlending(false);
 				}
 
-				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
-				if(!subRenderer.IsValid())
-				{
-					Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
-					doRender = false;
-				}
+				// render the current mesh
+				subRenderer->Render();
+				// flag the current mesh as being rendered (at least once)
+				renderedObjects[subMesh->GetObjectID()] = true;
+			}
 
-				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-				if(!subMesh.IsValid())
-				{
-					Debug::PrintError("RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
-					doRender = false;
-				}
-
-				if(doRender)
-				{
-					// get the full transform of the scene object, including those of all ancestors
-					SceneObjectTransform full;
-					sceneObject.InitSceneObjectTransform(&full);
-
-					// check if this mesh should be culled from this light.
-					if(!ShouldCullFromLight(light, lightPosition, full, *mesh))
-					{
-						model.SetTo(sceneObject.GetProcessingTransform());
-						modelView.SetTo(model);
-						// concatenate modelTransform with inverted viewTransform
-						modelView.PreTransformBy(viewTransformInverse);
-
-						// activate the material, which will switch the GPU's active shader to
-						// the one associated with the material
-						ActivateMaterial(currentMaterial);
-						SendActiveMaterialUniformsToShader();
-						// send light data to the active shader
-						currentMaterial->SendLightToShader(&light, &lightPosition);
-
-						// pass concatenated modelViewTransform and projection transforms to shader
-						SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform());
-
-						// if this sub mesh has already been rendered by this camera, then we want to use
-						// additive blending to combine it with the output from other lights. Otherwise
-						// turn off blending and render.
-						bool rendered = renderedObjects[subMesh->GetObjectID()];
-						if(rendered)
-						{
-							graphics->EnableBlending(true);
-						}
-						else
-						{
-							graphics->EnableBlending(false);
-						}
-
-						// render the current mesh
-						subRenderer->Render();
-						// flag the current mesh as being rendered (at least once)
-						renderedObjects[subMesh->GetObjectID()] = true;
-					}
-				}
-
-				// Advance material index. Renderer can have any number of materials > 0; it does not have to match
-				// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
-				materialIndex++;
-				if(materialIndex >= renderer->GetMaterialCount())
-				{
-					materialIndex = 0;
-				}
+			// Advance material index. Renderer can have any number of materials > 0; it does not have to match
+			// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
+			materialIndex++;
+			if(materialIndex >= renderer->GetMaterialCount())
+			{
+				materialIndex = 0;
 			}
 		}
 	}

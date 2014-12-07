@@ -369,6 +369,9 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 				case GL_FLOAT:
 					desc->Type = UniformType::Float;
 				break;
+				case GL_INT:
+					desc->Type = UniformType::Int;
+				break;
 			}
 
 			strcpy(desc->Name, name);
@@ -573,6 +576,11 @@ void ShaderGL::SendUniformToShader2(int varID, float x, float y)
 void ShaderGL::SendUniformToShader(int varID, float  data)
 {
 	glUniform1f(varID,data);
+}
+
+void ShaderGL::SendUniformToShader(int varID, int  data)
+{
+	glUniform1i(varID, data);
 }
 
 /*

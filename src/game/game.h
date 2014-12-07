@@ -44,6 +44,7 @@ class Game
     ~Game();
 
     SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
+    Mesh3DRef FindFirstMesh(SceneObjectRef ref);
     void Init();
     void Update();
 };

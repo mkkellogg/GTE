@@ -133,27 +133,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT_RTRN(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> mesh is invalid.");
 
-    SubMesh3DFaces& faces = mesh->GetFaces();
-
-	unsigned int faceCount = faces.GetFaceCount();
-
-	unsigned int faceVertexIndex = 0;
-	unsigned int adjacentFaceVertexIndex = 0;
-	int adjacentFaceIndex = -1;
-	Point3 * edgeV1;
-	Point3 * edgeV2;
-
-	unsigned int currentFrontFaceVertexIndex = 0;
-	unsigned int currentBackFaceVertexIndex = 0;
-	unsigned int currentSideVertexIndex = 0;
-
-	float * svFrontBase = const_cast<float*>(shadowVolumeFront.GetDataPtr());
-
-	Vector3 lightDirection = lightPosDir;
-	Point3* vertex1;
-	Point3* vertex2;
-	Point3* vertex3;
-	Vector3 faceToLightDir;
 
 	Point3Array * positions = mesh->GetPostions();
 	ASSERT_RTRN(positions, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL positions array.");
@@ -165,12 +144,36 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	Vector3Array& normalsSource = doNormalTransform == true ? transformedStraightNormals : *normals;
 	float * normalsSrcPtr = const_cast<float*>(normalsSource.GetDataPtr());
 
+
+
+	float* vertex1 = NULL;
+	float* vertex2 = NULL;
+	float* vertex3 = NULL;
+	Vector3 faceToLightDir = lightPosDir;
+	SubMesh3DFaces& faces = mesh->GetFaces();
+	unsigned int faceCount = faces.GetFaceCount();
+	unsigned int faceVertexIndex = 0;
+	Vector3 * faceNormal = NULL;
 	SubMesh3DFace * face = NULL;
+	unsigned int currentFrontFaceVertexIndex = 0;
+	unsigned int currentBackFaceVertexIndex = 0;
+	unsigned int currentSideVertexIndex = 0;
+	float * svFrontBase = const_cast<float*>(shadowVolumeFront.GetDataPtr());
+	float * svBackBase = const_cast<float*>(shadowVolumeBack.GetDataPtr());
+	float * svSideBase = const_cast<float*>(shadowVolumeSides.GetDataPtr());
+
+
+
+	float * edgeV1 = NULL;
+	float * edgeV2 = NULL;
+	unsigned int adjacentFaceVertexIndex = 0;
+	int adjacentFaceIndex = -1;
 	SubMesh3DFace * adjacentFace = NULL;
+	Vector3 * adjacentFaceNormal = NULL;
 
-	Vector3 * faceNormal;
-	Vector3 * adjacentFaceNormal;
 
+
+	faceToLightDir.Invert();
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
 		face = faces.GetFace(f);
@@ -179,79 +182,91 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 		faceVertexIndex = face->FirstVertexIndex;
 
 		faceNormal = normalsSource.GetVector(faceVertexIndex);
-		vertex1 = positionsSource.GetPoint(faceVertexIndex);
-		vertex2 = positionsSource.GetPoint(faceVertexIndex+1);
-		vertex3 = positionsSource.GetPoint(faceVertexIndex+2);
+		vertex1 = positionsSrcPtr+faceVertexIndex;
+		vertex2 = positionsSrcPtr+faceVertexIndex+3;
+		vertex3 = positionsSrcPtr+faceVertexIndex+6;
 
 		if(!directional)
 		{
-			faceToLightDir.x = lightPosDir.x - vertex1->x;
-			faceToLightDir.y = lightPosDir.y - vertex1->y;
-			faceToLightDir.z = lightPosDir.z - vertex1->z;
-		}
-		else
-		{
-			faceToLightDir = lightPosDir;
-			faceToLightDir.Invert();
+			faceToLightDir.x = lightPosDir.x - vertex1[0];
+			faceToLightDir.y = lightPosDir.y - vertex1[1];
+			faceToLightDir.z = lightPosDir.z - vertex1[2];
 		}
 
 		float faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
 
 		if(faceToLightDot > 0 )
 		{
-			float * vPtr = const_cast<float*>(vertex1->GetDataPtr());
-			BaseVector4_QuickCopy(vPtr, svFrontBase);
-
-			vPtr = const_cast<float*>(vertex2->GetDataPtr());
-			BaseVector4_QuickCopy(vPtr, svFrontBase);
-
-			vPtr = const_cast<float*>(vertex3->GetDataPtr());
-			BaseVector4_QuickCopy(vPtr, svFrontBase);
-
-			currentFrontFaceVertexIndex+=3;
+			BaseVector4_QuickCopy(vertex1, svFrontBase);
+			BaseVector4_QuickCopy(vertex2, svFrontBase);
+			BaseVector4_QuickCopy(vertex3, svFrontBase);
+			currentFrontFaceVertexIndex += 3;
+		}
+		else
+		{
+			BaseVector4_QuickCopy_ZeroW(vertex1, svBackBase);
+			BaseVector4_QuickCopy_ZeroW(vertex2, svBackBase);
+			BaseVector4_QuickCopy_ZeroW(vertex3, svBackBase);
+			currentBackFaceVertexIndex += 3;
 		}
 
-
-		for(unsigned int ai = 0; ai < 3; ai++)
+		if(faceToLightDot > 0)
 		{
-			adjacentFaceIndex = -1;
-			edgeV1 = NULL;
-			edgeV2 = NULL;
-
-			if(ai == 0 && face->AdjacentFaceIndex1 >= 0)
+			for(unsigned int ai = 0; ai < 3; ai++)
 			{
-				adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex1;
-				edgeV1 = vertex1;
-				edgeV2 = vertex2;
-			}
-			else if(ai == 1 && face->AdjacentFaceIndex2 >= 0)
-			{
-				adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex2;
-				edgeV1 = vertex2;
-				edgeV2 = vertex3;
-			}
-			else if(ai == 2 && face->AdjacentFaceIndex3 >= 0)
-			{
-				adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex3;
-				edgeV1 = vertex3;
-				edgeV2 = vertex1;
-			}
+				adjacentFaceIndex = -1;
+				edgeV1 = edgeV2 = NULL;
 
-			if(adjacentFaceIndex >=0)
-			{
-				adjacentFace = faces.GetFace(adjacentFaceIndex);
-				if(adjacentFace == NULL)continue;
-
-				adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
-				adjacentFaceNormal = normalsSource.GetVector(adjacentFaceVertexIndex);
-
-				if(!directional)
+				if(ai == 0 && face->AdjacentFaceIndex1 >= 0)
 				{
-					float dot = Vector3::Dot(*faceNormal, *adjacentFaceNormal);
+					adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex1;
+					edgeV1 = vertex1;
+					edgeV2 = vertex2;
+				}
+				else if(ai == 1 && face->AdjacentFaceIndex2 >= 0)
+				{
+					adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex2;
+					edgeV1 = vertex2;
+					edgeV2 = vertex3;
+				}
+				else if(ai == 2 && face->AdjacentFaceIndex3 >= 0)
+				{
+					adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex3;
+					edgeV1 = vertex3;
+					edgeV2 = vertex1;
+				}
+
+				if(adjacentFaceIndex >= 0)
+				{
+					adjacentFace = faces.GetFace(adjacentFaceIndex);
+					if(adjacentFace == NULL)continue;
+
+					adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
+					adjacentFaceNormal = normalsSource.GetVector(adjacentFaceVertexIndex);
+
+					float dot = Vector3::Dot(faceToLightDir, *adjacentFaceNormal);
+
+					// angle between light vector and adjacent face normal is > 180, so
+					// the adjacent face points away from the light
+					if(dot < 0)
+					{
+						BaseVector4_QuickCopy(edgeV1, svSideBase);
+						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+						BaseVector4_QuickCopy(edgeV2, svSideBase);
+
+						BaseVector4_QuickCopy(edgeV1, svSideBase);
+						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+						BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
+
+						currentSideVertexIndex += 6;
+					}
 				}
 			}
 		}
 	}
+	shadowVolumeFront.SetCount(currentFrontFaceVertexIndex);
+	shadowVolumeBack.SetCount(currentBackFaceVertexIndex);
+	shadowVolumeSides.SetCount(currentSideVertexIndex);
 }
 
 

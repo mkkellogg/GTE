@@ -13,17 +13,32 @@
 #define BaseVector4_QuickCopy(source, dest)        \
 {                                          		   \
   *(dest) = *(source);                      	   \
-  source++;					       		   		   \
-  dest++;						   		   		   \
+  (source)++;					       		   	   \
+  (dest)++;						   		   		   \
   *(dest) = *(source);                      	   \
-  source++;					       		   		   \
-  dest++;						   		   		   \
+  (source)++;					       		   	   \
+  (dest)++;							   		   	   \
   *(dest) = *(source);                      	   \
-  source++;					       		   		   \
-  dest++;						   		   		   \
+  (source)++;					       		   	   \
+  (dest)++;							   		   	   \
   *(dest) = *(source);                      	   \
-  source++;					       		   		   \
-  dest++;						   		   		   \
+  (source)-=3;					       		   	   \
+  (dest)-=3;							   		   \
+}
+
+#define BaseVector4_QuickCopy_ZeroW(source, dest)  \
+{                                          		   \
+  *(dest) = *(source);                      	   \
+  (source)++;					       		   	   \
+  (dest)++;						   		   		   \
+  *(dest) = *(source);                      	   \
+  (source)++;					       		   	   \
+  (dest)++;							   		   	   \
+  *(dest) = *(source);                      	   \
+  (source)-=2;					       		   	   \
+  (dest)++;					   		   		       \
+  *(dest) = 0;                      	   		   \
+  (dest)-=3;						   		   	   \
 }
 
 class BaseVector4

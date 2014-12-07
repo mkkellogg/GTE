@@ -37,7 +37,7 @@ EngineObjectManager::EngineObjectManager()
 	currentEngineObjectID = 0L;
 
 	sceneRoot.SetObjectID(GetNextObjectID());
-	sceneRootRef = 	SceneObjectRef(&sceneRoot, [=](SceneObject * sceneObject)
+	sceneRootRef = SceneObjectRef(&sceneRoot, [=](SceneObject * sceneObject)
 	{
 
 	});

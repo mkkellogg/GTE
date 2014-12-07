@@ -109,6 +109,8 @@ class ShaderGL : public Shader
     void SendUniformToShader2(int varID, float x, float y);
     void SendUniformToShader(int varID, float  data);
 
+    void SendUniformToShader(int varID, int  data);
+
     unsigned int GetUniformCount() const;
     const UniformDescriptor * GetUniformDescriptor(unsigned int index) const;
 

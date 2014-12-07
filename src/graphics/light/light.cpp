@@ -18,6 +18,7 @@ Light::Light()
 	direction.Set(1,-1,0);
 	intensity = 1;
 	attenuation = 1;
+	isDirectional = false;
 	SetRange(30);
 }
 
@@ -110,5 +111,15 @@ void Light::SetAttenuation(float attenuation)
 float Light::GetAttenuation() const
 {
 	return attenuation;
+}
+
+void Light::SetIsDirectional(bool isDirectional)
+{
+	this->isDirectional = isDirectional;
+}
+
+bool Light::IsDirectional() const
+{
+	return isDirectional;
 }
 

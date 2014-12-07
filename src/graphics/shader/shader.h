@@ -63,6 +63,8 @@ class Shader : public EngineObject
     virtual void SendUniformToShader2(int varID, float x, float y) = 0;
     virtual void SendUniformToShader(int varID, float  data) = 0;
 
+    virtual void SendUniformToShader(int varID, int  data) = 0;
+
     virtual unsigned int GetUniformCount() const = 0;
     virtual const UniformDescriptor * GetUniformDescriptor(unsigned int index) const = 0;
 

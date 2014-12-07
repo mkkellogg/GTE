@@ -19,7 +19,6 @@
 #include "ui/debug.h"
 #include "util/time.h"
 
-
 Graphics::~Graphics()
 {
 

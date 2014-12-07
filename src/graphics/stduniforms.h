@@ -12,10 +12,11 @@ enum class StandardUniformMaskComponent
     LightColor=64,
     LightIntensity=128,
     LightAttenuation=256,
-    EmissiveColor=512,
-    Texture0=1024,
-    Texture1=2048,
-    NormalMap=4096
+    LightIsDirectional=512,
+    EmissiveColor=1024,
+    Texture0=2048,
+    Texture1=4096,
+    NormalMap=8192
 };
 
 enum class StandardUniform
@@ -29,11 +30,12 @@ enum class StandardUniform
 	LightColor=6,
 	LightIntensity=7,
 	LightAttenuation=8,
-	EmissiveColor=9,
-	Texture0=10,
-	Texture1=11,
-	NormalMap=12,
-    _Last=13, // always keep as last entry
+	LightIsDirectional=9,
+	EmissiveColor=10,
+	Texture0=11,
+	Texture1=12,
+	NormalMap=13,
+    _Last=14, // always keep as last entry (before _None)
     _None=14
 };
 

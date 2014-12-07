@@ -53,6 +53,8 @@ class RenderManager
 	Graphics * graphics;
 	EngineObjectManager * objectManager;
 
+	MaterialRef shadowVolumeMaterial;
+
 	DataStack<Matrix4x4> viewTransformStack;
 	DataStack<Matrix4x4> modelTransformStack;
 

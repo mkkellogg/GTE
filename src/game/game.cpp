@@ -90,6 +90,22 @@ SkinnedMesh3DRendererRef Game::FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
 	return SkinnedMesh3DRendererRef::Null();
 }
 
+Mesh3DRef Game::FindFirstMesh(SceneObjectRef ref)
+{
+	if(!ref.IsValid())return Mesh3DRef::Null();
+
+	if(ref->GetMesh3D().IsValid())return ref->GetMesh3D();
+
+	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
+	{
+		SceneObjectRef childRef = ref->GetChildAt(i);
+		Mesh3DRef subRef = FindFirstMesh(childRef);
+		if(subRef.IsValid())return subRef;
+	}
+
+	return Mesh3DRef::Null();
+}
+
 void Game::Init()
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -136,6 +152,10 @@ void Game::Init()
 	mesh = GameUtil::CreateCubeMesh(meshAttributes);
 	sceneObject->SetMesh3D(mesh);
 
+	Mesh3DRef firstMesh = FindFirstMesh(sceneObject);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
+
 	childSceneObject = objectManager->CreateSceneObject();
 	sceneObject->AddChild(childSceneObject);
 
@@ -165,6 +185,9 @@ void Game::Init()
 		Debug::PrintError(" >> could not load model!\n");
 		return;
 	}
+	firstMesh = FindFirstMesh(modelSceneObject);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(0,-10,0,false);
 	modelSceneObject->GetLocalTransform().Scale(.07,.05,.07, true);
 
@@ -180,6 +203,9 @@ void Game::Init()
 		Debug::PrintError(" >> could not load model!\n");
 		return;
 	}
+	firstMesh = FindFirstMesh(modelSceneObject);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(10,-10,-10,false);
 	modelSceneObject->GetLocalTransform().Scale(.05,.05,.05, true);
 
@@ -194,6 +220,9 @@ void Game::Init()
 		Debug::PrintError(" >> could not load model!\n");
 		return;
 	}
+	firstMesh = FindFirstMesh(modelSceneObject);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(-10,-10,20,false);
 	modelSceneObject->GetLocalTransform().Scale(.09,.09,.09, true);
 
@@ -209,10 +238,17 @@ void Game::Init()
 		Debug::PrintError(" >> could not load model!\n");
 		return;
 	}
+
+	SkinnedMesh3DRendererRef meshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
+	firstMesh = meshRenderer->GetMesh();
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
 	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
+
+
 
 
 	koopaWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
@@ -255,6 +291,8 @@ void Game::Init()
 
 	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", "resources/builtin/selflit.vertex.shader","resources/builtin/selflit.fragment.shader");
 
+
+	/*
 	sceneObject = objectManager->CreateSceneObject();
 	renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
@@ -269,6 +307,8 @@ void Game::Init()
 	sceneObject->SetMesh3D(mesh);
 	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
 	sceneObject->GetLocalTransform().Translate(0, 10, 30, false);
+
+
 
 
 
@@ -325,25 +365,6 @@ void Game::Init()
 
 
 
-
-	sceneObject = objectManager->CreateSceneObject();
-	renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(selflitMaterial);
-	sceneObject->SetMesh3DRenderer(renderer);
-
-	light = objectManager->CreateLight();
-	light->SetDirection(1,-1,-1);
-	light->SetIntensity(3);
-	light->SetRange(25);
-	sceneObject->SetLight(light);
-
-	sceneObject->SetMesh3D(mesh);
-	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	sceneObject->GetLocalTransform().Translate(45, -30, 5, false);
-
-
-
-
 	sceneObject = objectManager->CreateSceneObject();
 	renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
@@ -358,6 +379,38 @@ void Game::Init()
 	sceneObject->SetMesh3D(mesh);
 	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
 	sceneObject->GetLocalTransform().Translate(5, -30, 45, false);
+*/
+
+
+
+	sceneObject = objectManager->CreateSceneObject();
+	renderer = objectManager->CreateMesh3DRenderer();
+	renderer->AddMaterial(selflitMaterial);
+	sceneObject->SetMesh3DRenderer(renderer);
+
+	light = objectManager->CreateLight();
+	light->SetDirection(1,-1,-1);
+	light->SetIntensity(1.7);
+	light->SetRange(25);
+	sceneObject->SetLight(light);
+
+	sceneObject->SetMesh3D(mesh);
+	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
+	sceneObject->GetLocalTransform().Translate(0, 10, 30, false);
+
+
+	sceneObject = objectManager->CreateSceneObject();
+
+	light = objectManager->CreateLight();
+	light->SetDirection(-.8,-1.7,-.8);
+	light->SetIntensity(1.2);
+	light->SetIsDirectional(true);
+	sceneObject->SetLight(light);
+
+	//sceneObject->SetMesh3D(mesh);
+	//sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
+	//sceneObject->GetLocalTransform().Translate(45, -30, 5, false);
+
 
 
 
