@@ -64,15 +64,15 @@ class SubMesh3DRenderer : public EngineObject
     void SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride);
 
     bool InitAttributeData(StandardAttribute attr, int componentCount,  int stride);
-    void BuildShadowVolume(Vector3& lightPosDir, bool directional);
 
+    void SetShadowVolumePositionData(Point3Array * points);
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);
     void SetVertexColorData(Color4Array * colors);
     void SetUV1Data(UV2Array * uvs);
     void SetUV2Data(UV2Array * uvs);
 
-    bool UseMaterial(MaterialRef material);
+    bool UseMaterial(MaterialRef material, bool forShadowVoume);
     bool UpdateMeshAttributeBuffers();
     bool UpdateAttributeTransformerData();
 
@@ -87,6 +87,7 @@ class SubMesh3DRenderer : public EngineObject
 
     public:
 
+    void BuildShadowVolume(Vector3& lightPosDir, bool directional);
     void UpdateFromMesh();
 
     void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
@@ -98,6 +99,7 @@ class SubMesh3DRenderer : public EngineObject
     void PreRender(const Matrix4x4& modelView, const Matrix4x4& modelViewInverse);
 
     virtual void Render() = 0;
+    virtual void RenderShadowVolume() = 0;
 };
 
 #endif

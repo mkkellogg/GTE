@@ -36,7 +36,7 @@ enum class StandardUniform
 	Texture1=12,
 	NormalMap=13,
     _Last=14, // always keep as last entry (before _None)
-    _None=14
+    _None=15
 };
 
 #include "base/intmask.h"

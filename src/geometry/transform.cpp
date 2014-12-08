@@ -264,6 +264,26 @@ void Transform::BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio,
     matrix.SetTo(data);
 }
 
+void Transform::BuildProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP)
+{
+	// convert fov to radians
+    float f = 1.0f / tan (fov * Constants::TwoPIOver360 *.5);
+
+    matrix.SetIdentity();
+
+    float data[16];
+    memset(data,0,16 * sizeof(float));
+
+    data[0] = f / ratio;
+    data[1 * 4 + 1] = f;
+    data[2 * 4 + 2] = -1.0;
+    data[3 * 4 + 2] = -2.0 * nearP;
+    data[2 * 4 + 3] = -1.0f;
+    data[3 * 4 + 3] = 0.0f;
+
+    matrix.SetTo(data);
+}
+
 /*
  * Utility function to create a matrix that transforms the eye to be at a specific
  * location, looking in a specific direction. The direction vector does not have

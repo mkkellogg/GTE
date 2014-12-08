@@ -306,7 +306,6 @@ int Material::TestForStandardUniform(StandardUniform uniform) const
 {
 	const char * uniformName = StandardUniforms::GetUniformName(uniform);
 	int loc = shader->GetUniformVarID(uniformName);
-
 	return loc;
 }
 
@@ -531,7 +530,7 @@ void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
 	ASSERT_RTRN(shader.IsValid(),"Material::SendProjectionMatrixToShader -> shader is NULL");
 
 	int varID = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
-	if(varID)
+	if(varID >= 0)
 	{
 		shader->SendUniformToShader(varID, mat);
 		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);

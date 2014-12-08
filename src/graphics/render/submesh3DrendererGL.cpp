@@ -47,7 +47,7 @@ SubMesh3DRendererGL::~SubMesh3DRendererGL()
 void SubMesh3DRendererGL::Render()
 {
 	MaterialRef currentMaterial = graphics->GetActiveMaterial();
-	UseMaterial(currentMaterial);
+	UseMaterial(currentMaterial, false);
 
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
 
@@ -68,5 +68,32 @@ void SubMesh3DRendererGL::Render()
 	if(!currentMaterial->VerifySetVars(mesh->GetTotalVertexCount()))return;
 
 	glDrawArrays(GL_TRIANGLES, 0, mesh->GetTotalVertexCount());
+}
+
+void SubMesh3DRendererGL::RenderShadowVolume()
+{
+	MaterialRef currentMaterial = graphics->GetActiveMaterial();
+	UseMaterial(currentMaterial, true);
+
+	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> containerRenderer is NULL.");
+
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
+
+	if(shadowVolumeSides.GetCount() > 0)
+	{
+		/*SetShadowVolumePositionData(&shadowVolumeSides);
+		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
+		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeSides.GetCount());*/
+
+
+		SetShadowVolumePositionData(&shadowVolumeFront);
+		for(unsigned int i = 0; i < shadowVolumeFront.GetCount(); i++)
+		{
+			//printf("%f,%f,%f, %f\n", shadowVolumeFront.GetPoint(i)->x, shadowVolumeFront.GetPoint(i)->y, shadowVolumeFront.GetPoint(i)->z, shadowVolumeFront.GetPoint(i)->GetDataPtr()[3]);
+		}
+		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
+		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeFront.GetCount());
+	}
 }
 

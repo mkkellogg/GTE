@@ -52,8 +52,10 @@ class Transform
     void TransformPoint(Point3& point3) const;
     void TransformVector4f(float * vector) const;
     static Transform * CreateIdentityTransform();
-    static void BuildProjectionMatrix(Matrix4x4& m,float fov, float ratio, float nearP, float farP);
-    static void BuildLookAtMatrix(Matrix4x4& m, float posX, float posY, float posZ, float lookAtX, float lookAtY, float lookAtZ);
+
+    static void BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP);
+    static void BuildProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP);
+    static void BuildLookAtMatrix(Matrix4x4& matrix, float posX, float posY, float posZ, float lookAtX, float lookAtY, float lookAtZ);
 };
 
 #endif

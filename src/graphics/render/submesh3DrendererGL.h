@@ -29,6 +29,7 @@ class SubMesh3DRendererGL : public SubMesh3DRenderer
     public:
 
     void Render();
+    void RenderShadowVolume();
 };
 
 #endif

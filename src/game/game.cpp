@@ -381,9 +381,7 @@ void Game::Init()
 	sceneObject->GetLocalTransform().Translate(5, -30, 45, false);
 */
 
-
-
-	sceneObject = objectManager->CreateSceneObject();
+	/*sceneObject = objectManager->CreateSceneObject();
 	renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
 	sceneObject->SetMesh3DRenderer(renderer);
@@ -396,7 +394,7 @@ void Game::Init()
 
 	sceneObject->SetMesh3D(mesh);
 	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	sceneObject->GetLocalTransform().Translate(0, 10, 30, false);
+	sceneObject->GetLocalTransform().Translate(-10, 0, 40, false);*/
 
 
 	sceneObject = objectManager->CreateSceneObject();

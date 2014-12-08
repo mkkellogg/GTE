@@ -70,14 +70,17 @@ class RenderManager
 	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
 	void RenderSceneFromCamera(unsigned int cameraIndex);
 	void ForwardRenderScene(const Transform& viewTransformInverse, const Camera& camera);
-	void RenderSceneForLight(const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera);
+	void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera);
 	void RenderSceneObjectMeshes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera);
+	void RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& shadowVolumeViewProjection,
+											  const Transform& viewTransformInverse, const Camera& camera);
     void ClearBuffersForCamera(const Camera& camera) const;
     void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
     void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
     unsigned int RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
     void ActivateMaterial(MaterialRef material);
-    void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection);
+    void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection);
+    void SendModelViewProjectionToShader(const Transform& modelViewProjection);
     void SendActiveMaterialUniformsToShader();
 
 

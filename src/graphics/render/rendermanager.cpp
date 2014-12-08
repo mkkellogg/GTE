@@ -313,10 +313,7 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 			continue;
 		}
 
-		Point3 lightPosition;
-		sceneLights[l].AffectorTransform.TransformPoint(lightPosition);
-
-		RenderSceneForLight(*light, lightPosition, viewTransformInverse, camera);
+		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera);
 	}
 }
 
@@ -324,11 +321,27 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
  * Render all the meshes found in ProcessScene() for a single light [light] from the perspective of
  * [viewTransformInverse], which the inverse of the view transform.
  */
-void RenderManager::RenderSceneForLight(const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera)
 {
 	Transform modelView;
 	Transform model;
 	Transform modelInverse;
+
+	Point3 lightPosition;
+	lightFullTransform.TransformPoint(lightPosition);
+	Transform lightInverse;
+	lightInverse.SetTo(lightFullTransform);
+	lightInverse.Invert();
+
+	Matrix4x4 shadowVolumePerspectiveMatrix;
+	Transform::BuildProjectionMatrixInfiniteFar(shadowVolumePerspectiveMatrix, 70, 1, -1);
+
+	Transform shadowVolmeViewProjection;
+	shadowVolmeViewProjection.PreTransformBy(lightInverse);
+	shadowVolmeViewProjection.PreTransformBy(shadowVolumePerspectiveMatrix);
+	shadowVolmeViewProjection.PreTransformBy(lightFullTransform);
+	shadowVolmeViewProjection.PreTransformBy(viewTransformInverse);
+	shadowVolmeViewProjection.PreTransformBy(camera.GetProjectionTransform());
 
 	for(unsigned int s = 0; s < sceneMeshCount; s++)
 	{
@@ -336,11 +349,41 @@ void RenderManager::RenderSceneForLight(const Light& light, const Point3& lightP
 
 		if(child == NULL)
 		{
-			Debug::PrintError("RenderManager::ForwardRenderScene -> NULL scene object encountered.");
+			Debug::PrintError("RenderManager::RenderSceneForLight -> NULL scene object encountered.");
 		}
 		else if(child->IsActive())
 		{
-			RenderSceneObjectMeshes(*child, light, lightPosition, viewTransformInverse, camera);
+			Mesh3DRenderer * renderer = NULL;
+
+			// check if current scene object has a mesh & renderer
+			if(child->GetMesh3DRenderer().IsValid())
+			{
+				renderer =child->GetMesh3DRenderer().GetPtr();
+			}
+			else if(child->GetSkinnedMesh3DRenderer().IsValid())
+			{
+				renderer = (Mesh3DRenderer *)child->GetSkinnedMesh3DRenderer().GetPtr();
+			}
+
+			if(renderer != NULL)
+			{
+				Mesh3DRef mesh = renderer->GetMesh();
+
+				// get the full transform of the scene object, including those of all ancestors
+				SceneObjectTransform full;
+				child->InitSceneObjectTransform(&full);
+
+				// check if this mesh should be culled from this light.
+				if(light.IsDirectional() || !ShouldCullFromLight(light, lightPosition, full, *mesh))
+				{
+					if(mesh->GetCastShadows())
+					{
+						RenderSceneObjectMeshesShadowVolumes(*child, light, lightPosition, shadowVolmeViewProjection, viewTransformInverse, camera);
+					}
+
+					RenderSceneObjectMeshes(*child, light, lightPosition, viewTransformInverse, camera);
+				}
+			}
 		}
 	}
 }
@@ -348,6 +391,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Point3& lightP
 void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera)
 {
 	Mesh3DRenderer * renderer = NULL;
+	Transform modelViewProjection;
 	Transform modelView;
 	Transform model;
 	Transform modelInverse;
@@ -366,9 +410,9 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 	{
 		Mesh3DRef mesh = renderer->GetMesh();
 
-		ASSERT_RTRN(mesh.IsValid(),"RenderManager::ForwardRenderScene -> renderer returned NULL mesh.");
-		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::ForwardRenderScene -> Sub mesh count does not match sub renderer count!.");
-		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::ForwardRenderScene -> renderer has no materials.");
+		ASSERT_RTRN(mesh.IsValid(),"RenderManager::RenderSceneObjectMeshes -> renderer returned NULL mesh.");
+		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderSceneObjectMeshes -> Sub mesh count does not match sub renderer count!.");
+		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderSceneObjectMeshes -> renderer has no materials.");
 
 		unsigned int materialIndex = 0;
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
@@ -377,50 +421,44 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
-			ASSERT_RTRN(currentMaterial.IsValid(),"RenderManager::ForwardRenderScene -> NULL material encountered.")
-			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::ForwardRenderScene -> NULL sub renderer encountered.");
-			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::ForwardRenderScene -> NULL sub mesh encountered.");
+			ASSERT_RTRN(currentMaterial.IsValid(),"RenderManager::RenderSceneObjectMeshes -> NULL material encountered.")
+			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshes -> NULL sub renderer encountered.");
+			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshes -> NULL sub mesh encountered.");
 
-			// get the full transform of the scene object, including those of all ancestors
-			SceneObjectTransform full;
-			sceneObject.InitSceneObjectTransform(&full);
+			model.SetTo(sceneObject.GetProcessingTransform());
+			modelView.SetTo(model);
+			// concatenate modelTransform with inverted viewTransform
+			modelView.PreTransformBy(viewTransformInverse);
+			modelViewProjection.SetTo(modelView);
+			modelViewProjection.PreTransformBy(camera.GetProjectionTransform());
 
-			// check if this mesh should be culled from this light.
-			if(light.IsDirectional() || !ShouldCullFromLight(light, lightPosition, full, *mesh))
+			// activate the material, which will switch the GPU's active shader to
+			// the one associated with the material
+			ActivateMaterial(currentMaterial);
+			SendActiveMaterialUniformsToShader();
+			// send light data to the active shader
+			currentMaterial->SendLightToShader(&light, &lightPosition);
+
+			// pass concatenated modelViewTransform and projection transforms to shader
+			SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform(), modelViewProjection);
+
+			// if this sub mesh has already been rendered by this camera, then we want to use
+			// additive blending to combine it with the output from other lights. Otherwise
+			// turn off blending and render.
+			bool rendered = renderedObjects[subMesh->GetObjectID()];
+			if(rendered)
 			{
-				model.SetTo(sceneObject.GetProcessingTransform());
-				modelView.SetTo(model);
-				// concatenate modelTransform with inverted viewTransform
-				modelView.PreTransformBy(viewTransformInverse);
-
-				// activate the material, which will switch the GPU's active shader to
-				// the one associated with the material
-				ActivateMaterial(currentMaterial);
-				SendActiveMaterialUniformsToShader();
-				// send light data to the active shader
-				currentMaterial->SendLightToShader(&light, &lightPosition);
-
-				// pass concatenated modelViewTransform and projection transforms to shader
-				SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform());
-
-				// if this sub mesh has already been rendered by this camera, then we want to use
-				// additive blending to combine it with the output from other lights. Otherwise
-				// turn off blending and render.
-				bool rendered = renderedObjects[subMesh->GetObjectID()];
-				if(rendered)
-				{
-					graphics->EnableBlending(true);
-				}
-				else
-				{
-					graphics->EnableBlending(false);
-				}
-
-				// render the current mesh
-				subRenderer->Render();
-				// flag the current mesh as being rendered (at least once)
-				renderedObjects[subMesh->GetObjectID()] = true;
+				graphics->EnableBlending(true);
 			}
+			else
+			{
+				graphics->EnableBlending(false);
+			}
+
+			// render the current mesh
+			subRenderer->Render();
+			// flag the current mesh as being rendered (at least once)
+			renderedObjects[subMesh->GetObjectID()] = true;
 
 			// Advance material index. Renderer can have any number of materials > 0; it does not have to match
 			// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
@@ -429,6 +467,84 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			{
 				materialIndex = 0;
 			}
+		}
+	}
+}
+
+void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& shadowVolumeViewProjection,
+												         const Transform& viewTransformInverse, const Camera& camera)
+{
+	Mesh3DRenderer * renderer = NULL;
+	Transform modelViewProjection;
+	Transform model;
+
+	// check if current scene object has a mesh & renderer
+	if(sceneObject.GetMesh3DRenderer().IsValid())
+	{
+		renderer = sceneObject.GetMesh3DRenderer().GetPtr();
+	}
+	else if(sceneObject.GetSkinnedMesh3DRenderer().IsValid())
+	{
+		renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
+	}
+
+	if(renderer != NULL)
+	{
+		Mesh3DRef mesh = renderer->GetMesh();
+
+		ASSERT_RTRN(mesh.IsValid(),"RenderManager::RenderSceneObjectMeshesShadowVolumes -> renderer returned NULL mesh.");
+		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderSceneObjectMeshesShadowVolumes -> Sub mesh count does not match sub renderer count!.");
+		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderSceneObjectMeshesShadowVolumes -> renderer has no materials.");
+
+		unsigned int materialIndex = 0;
+		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
+		{
+			MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
+			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
+			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
+
+			ASSERT_RTRN(currentMaterial.IsValid(),"RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL material encountered.")
+			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL sub renderer encountered.");
+			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL sub mesh encountered.");
+
+			model.SetTo(sceneObject.GetProcessingTransform());
+			modelViewProjection.SetTo(model);
+			modelViewProjection.PreTransformBy(shadowVolumeViewProjection);
+
+			// activate the material, which will switch the GPU's active shader to
+			// the one associated with the material
+			ActivateMaterial(shadowVolumeMaterial);
+			SendActiveMaterialUniformsToShader();
+			// send light data to the active shader
+			currentMaterial->SendLightToShader(&light, &lightPosition);
+
+			// pass special shadow volume model-view-matrix to shader
+			SendModelViewProjectionToShader(modelViewProjection);
+
+			Point3 modelLocalLightPos = lightPosition;
+			Vector3 modelLocalLightDir = light.GetDirection();
+
+			model.Invert();
+			model.TransformPoint(modelLocalLightPos);
+			model.TransformVector(modelLocalLightDir);
+
+			Vector3 lightPosDir;
+			if(light.IsDirectional())
+			{
+				lightPosDir.x = modelLocalLightDir.x;
+				lightPosDir.y = modelLocalLightDir.y;
+				lightPosDir.z = modelLocalLightDir.z;
+			}
+			else
+			{
+				lightPosDir.x = modelLocalLightPos.x;
+				lightPosDir.y = modelLocalLightPos.y;
+				lightPosDir.z = modelLocalLightPos.z;
+			}
+
+			subRenderer->BuildShadowVolume(lightPosDir, light.IsDirectional());
+			// render the shadow volume
+			subRenderer->RenderShadowVolume();
 		}
 	}
 }
@@ -514,7 +630,7 @@ bool RenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosi
  * Send the ModelView matrix in [modelView] and Projection matrix in [projection] to the active shader.
  * The binding information stored in the active material holds the shader variable locations for these matrices.
  */
-void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection)
+void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection,  const Transform& modelViewProjection)
 {
 	MaterialRef activeMaterial = graphics->GetActiveMaterial();
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
@@ -522,14 +638,25 @@ void RenderManager::SendTransformUniformsToShader(const Transform& model, const 
 	ShaderRef shader = activeMaterial->GetShader();
 	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendTransformUniformsToShader -> material contains NULL shader.");
 
-	Transform mvpTransform;
-	mvpTransform.TransformBy(modelView);
-	mvpTransform.TransformBy(projection);
-
 	activeMaterial->SendModelMatrixToShader(&model.matrix);
 	activeMaterial->SendModelViewMatrixToShader(&modelView.matrix);
 	activeMaterial->SendProjectionMatrixToShader(&projection.matrix);
-	activeMaterial->SendMVPMatrixToShader(&mvpTransform.matrix);
+	activeMaterial->SendMVPMatrixToShader(&modelViewProjection.matrix);
+}
+
+/*
+ * Send only the full model-view-projection matrix stored in [modelViewProjection] to the active shader.
+ * The binding information stored in the active material holds the shader variable location for this matrix;
+ */
+void RenderManager::SendModelViewProjectionToShader(const Transform& modelViewProjection)
+{
+	MaterialRef activeMaterial = graphics->GetActiveMaterial();
+	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendModelViewProjectionToShader -> activeMaterial is NULL.");
+
+	ShaderRef shader = activeMaterial->GetShader();
+	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendModelViewProjectionToShader -> material contains NULL shader.");
+
+	activeMaterial->SendMVPMatrixToShader(&modelViewProjection.matrix);
 }
 
 /*

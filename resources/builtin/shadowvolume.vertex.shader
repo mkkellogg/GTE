@@ -1,11 +1,9 @@
-uniform mat4 MVP_MATRIX; 
-attribute vec4 POSITION;
-uniform vec4 LightPos;
+uniform mat4 MODELVIEWPROJECTION_MATRIX;; 
+attribute vec4 SHADOW_POSITION;
+uniform vec4 LIGHT_POSITION;
 
-vec4 dir;
- 
 void main()
 {	
-	dir = POSITION.w == 0.0 ? vec4(POSITION.xyz * LightPos.w - LightPos.xyz, 0.0) : POSITION;
-    gl_Position = MVP_MATRIX * dir;
+	vec4 dir = SHADOW_POSITION.w == 0.0 ? vec4(SHADOW_POSITION.xyz * LIGHT_POSITION.w - LIGHT_POSITION.xyz, 0.0) : SHADOW_POSITION;
+    gl_Position = MODELVIEWPROJECTION_MATRIX * dir;
 }

@@ -85,6 +85,7 @@ void SubMesh3DRenderer::DestroyBuffers()
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::VertexColor]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture0]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture1]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::ShadowPosition]);
 }
 
 void SubMesh3DRenderer::DestroyBuffer(VertexAttrBuffer ** buffer)
@@ -145,7 +146,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	float * normalsSrcPtr = const_cast<float*>(normalsSource.GetDataPtr());
 
 
-
 	float* vertex1 = NULL;
 	float* vertex2 = NULL;
 	float* vertex3 = NULL;
@@ -162,8 +162,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	float * svBackBase = const_cast<float*>(shadowVolumeBack.GetDataPtr());
 	float * svSideBase = const_cast<float*>(shadowVolumeSides.GetDataPtr());
 
-
-
 	float * edgeV1 = NULL;
 	float * edgeV2 = NULL;
 	unsigned int adjacentFaceVertexIndex = 0;
@@ -172,7 +170,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	Vector3 * adjacentFaceNormal = NULL;
 
 
-
+	faceToLightDir.Normalize();
 	faceToLightDir.Invert();
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
@@ -182,9 +180,9 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 		faceVertexIndex = face->FirstVertexIndex;
 
 		faceNormal = normalsSource.GetVector(faceVertexIndex);
-		vertex1 = positionsSrcPtr+faceVertexIndex;
-		vertex2 = positionsSrcPtr+faceVertexIndex+3;
-		vertex3 = positionsSrcPtr+faceVertexIndex+6;
+		vertex1 = positionsSrcPtr+(faceVertexIndex*4);
+		vertex2 = positionsSrcPtr+(faceVertexIndex*4)+4;
+		vertex3 = positionsSrcPtr+(faceVertexIndex*4)+8;
 
 		if(!directional)
 		{
@@ -198,15 +196,23 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 		if(faceToLightDot > 0 )
 		{
 			BaseVector4_QuickCopy(vertex1, svFrontBase);
+			svFrontBase+=4;
 			BaseVector4_QuickCopy(vertex2, svFrontBase);
+			svFrontBase+=4;
 			BaseVector4_QuickCopy(vertex3, svFrontBase);
+			svFrontBase+=4;
+
 			currentFrontFaceVertexIndex += 3;
 		}
 		else
 		{
 			BaseVector4_QuickCopy_ZeroW(vertex1, svBackBase);
+			svBackBase+=4;
 			BaseVector4_QuickCopy_ZeroW(vertex2, svBackBase);
+			svBackBase+=4;
 			BaseVector4_QuickCopy_ZeroW(vertex3, svBackBase);
+			svBackBase+=4;
+
 			currentBackFaceVertexIndex += 3;
 		}
 
@@ -251,12 +257,18 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 					if(dot < 0)
 					{
 						BaseVector4_QuickCopy(edgeV1, svSideBase);
+						svSideBase+=4;
 						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+						svSideBase+=4;
 						BaseVector4_QuickCopy(edgeV2, svSideBase);
+						svSideBase+=4;
 
 						BaseVector4_QuickCopy(edgeV1, svSideBase);
+						svSideBase+=4;
 						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+						svSideBase+=4;
 						BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
+						svSideBase+=4;
 
 						currentSideVertexIndex += 6;
 					}
@@ -269,6 +281,12 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	shadowVolumeSides.SetCount(currentSideVertexIndex);
 }
 
+void SubMesh3DRenderer::SetShadowVolumePositionData(Point3Array * points)
+{
+	VertexAttrBuffer * buf = attributeBuffers[(int)StandardAttribute::ShadowPosition];
+	const float * ptr = points->GetDataPtr();
+	buf->SetData(ptr);
+}
 
 void SubMesh3DRenderer::SetPositionData(Point3Array * points)
 {
@@ -336,17 +354,23 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 
 	storedVertexCount = mesh->GetTotalVertexCount();
 
-	bool shadowVolumeInitSuccess = true;
-	shadowVolumeInitSuccess = shadowVolumeFront.Init(storedVertexCount);
-	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(storedVertexCount);
-	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 2);
+	Mesh3DRef parentMesh = containerRenderer->GetMesh();
+	//if(parentMesh.IsValid() && parentMesh->GetCastShadows())
+	//{
 
-	if(!shadowVolumeInitSuccess)
-	{
-		Debug::PrintError("SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
-		DestroyBuffers();
-		return false;
-	}
+		bool shadowVolumeInitSuccess = true;
+		shadowVolumeInitSuccess = shadowVolumeFront.Init(storedVertexCount);
+		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(storedVertexCount);
+		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 2);
+		shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition,4,0);
+
+		if(!shadowVolumeInitSuccess)
+		{
+			Debug::PrintError("SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
+			DestroyBuffers();
+			return false;
+		}
+	//}
 
 	return true;
 }
@@ -449,7 +473,7 @@ void SubMesh3DRenderer::UpdateFromMesh()
 	CopyMeshData();
 }
 
-bool SubMesh3DRenderer::UseMaterial(MaterialRef material)
+bool SubMesh3DRenderer::UseMaterial(MaterialRef material, bool forShadowVoume)
 {
 	if(material == activeMaterial)return true;
 
@@ -461,19 +485,26 @@ bool SubMesh3DRenderer::UseMaterial(MaterialRef material)
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.", false);
 
-	StandardAttributeSet materialAttributes = material->GetStandardAttributes();
-	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
-
-	for(int i=0; i<(int)StandardAttribute::_Last; i++)
+	if(forShadowVoume)
 	{
-		StandardAttribute attr = (StandardAttribute)i;
 
-		if(StandardAttributes::HasAttribute(materialAttributes, attr))
+	}
+	else
+	{
+		StandardAttributeSet materialAttributes = material->GetStandardAttributes();
+		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+
+		for(int i=0; i<(int)StandardAttribute::_Last; i++)
 		{
-			if(!StandardAttributes::HasAttribute(meshAttributes, attr))
+			StandardAttribute attr = (StandardAttribute)i;
+
+			if(StandardAttributes::HasAttribute(materialAttributes, attr))
 			{
-				std::string msg = std::string("Shader was expecting attribute") + StandardAttributes::GetAttributeName(attr) + std::string("but mesh does not have it.");
-				Debug::PrintWarning(msg);
+				if(!StandardAttributes::HasAttribute(meshAttributes, attr))
+				{
+					std::string msg = std::string("Shader was expecting attribute") + StandardAttributes::GetAttributeName(attr) + std::string("but mesh does not have it.");
+					Debug::PrintWarning(msg);
+				}
 			}
 		}
 	}
