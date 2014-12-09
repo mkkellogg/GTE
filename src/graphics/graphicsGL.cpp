@@ -89,10 +89,10 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     // TODO: think of a better place for these calls
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     glClearColor(0,0,0,0);
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
-    glDepthFunc(GL_LEQUAL);
     glCullFace(GL_BACK);
     glDisable(GL_BLEND);
     blendingEnabled = false;

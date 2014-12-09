@@ -174,7 +174,6 @@ void Game::Init()
 
 
 
-
 	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/island/island.fbx", 1 );
 	if(modelSceneObject.IsValid())
 	{
@@ -400,7 +399,7 @@ void Game::Init()
 	sceneObject = objectManager->CreateSceneObject();
 
 	light = objectManager->CreateLight();
-	light->SetDirection(-.8,-1.7,-.8);
+	light->SetDirection(-.8,-1.7,-2);
 	light->SetIntensity(1.2);
 	light->SetIsDirectional(true);
 	sceneObject->SetLight(light);

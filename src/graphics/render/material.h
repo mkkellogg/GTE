@@ -25,6 +25,7 @@ class VertexAttrBuffer;
 class Light;
 class Texture;
 class Point3;
+class Vector3;
 
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
@@ -131,7 +132,8 @@ class Material : public EngineObject
     void SendModelViewMatrixToShader(const Matrix4x4 * mat);
     void SendProjectionMatrixToShader(const Matrix4x4 * mat);
     void SendMVPMatrixToShader(const Matrix4x4 * mat);
-    void SendLightToShader(const Light * light, const Point3 * position);
+    void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
+    void SendLightOrientationToShader(const Point3 * position, const Vector3 * direction, bool direcitonal);
 
     bool VerifySetVars(int vertexCount);
 };

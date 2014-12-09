@@ -333,13 +333,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	lightInverse.SetTo(lightFullTransform);
 	lightInverse.Invert();
 
-	Matrix4x4 shadowVolumePerspectiveMatrix;
-	Transform::BuildProjectionMatrixInfiniteFar(shadowVolumePerspectiveMatrix, 70, 1, -1);
-
 	Transform shadowVolmeViewProjection;
-	shadowVolmeViewProjection.PreTransformBy(lightInverse);
-	shadowVolmeViewProjection.PreTransformBy(shadowVolumePerspectiveMatrix);
-	shadowVolmeViewProjection.PreTransformBy(lightFullTransform);
 	shadowVolmeViewProjection.PreTransformBy(viewTransformInverse);
 	shadowVolmeViewProjection.PreTransformBy(camera.GetProjectionTransform());
 
@@ -437,7 +431,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			ActivateMaterial(currentMaterial);
 			SendActiveMaterialUniformsToShader();
 			// send light data to the active shader
-			currentMaterial->SendLightToShader(&light, &lightPosition);
+			currentMaterial->SendLightToShader(&light, &lightPosition, NULL);
 
 			// pass concatenated modelViewTransform and projection transforms to shader
 			SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform(), modelViewProjection);
@@ -496,14 +490,12 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderSceneObjectMeshesShadowVolumes -> Sub mesh count does not match sub renderer count!.");
 		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderSceneObjectMeshesShadowVolumes -> renderer has no materials.");
 
-		unsigned int materialIndex = 0;
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
-			MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
-			ASSERT_RTRN(currentMaterial.IsValid(),"RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL material encountered.")
+			ASSERT_RTRN(shadowVolumeMaterial.IsValid(),"RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL material encountered.")
 			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL sub renderer encountered.");
 			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL sub mesh encountered.");
 
@@ -515,8 +507,6 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 			// the one associated with the material
 			ActivateMaterial(shadowVolumeMaterial);
 			SendActiveMaterialUniformsToShader();
-			// send light data to the active shader
-			currentMaterial->SendLightToShader(&light, &lightPosition);
 
 			// pass special shadow volume model-view-matrix to shader
 			SendModelViewProjectionToShader(modelViewProjection);
@@ -543,6 +533,9 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 			}
 
 			subRenderer->BuildShadowVolume(lightPosDir, light.IsDirectional());
+
+			shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
+
 			// render the shadow volume
 			subRenderer->RenderShadowVolume();
 		}

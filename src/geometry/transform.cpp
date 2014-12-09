@@ -260,7 +260,6 @@ void Transform::BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio,
     data[3 * 4 + 2] = (2.0f * farP * nearP) / (nearP - farP);
     data[2 * 4 + 3] = -1.0f;
     data[3 * 4 + 3] = 0.0f;
-
     matrix.SetTo(data);
 }
 
@@ -280,7 +279,6 @@ void Transform::BuildProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, f
     data[3 * 4 + 2] = -2.0 * nearP;
     data[2 * 4 + 3] = -1.0f;
     data[3 * 4 + 3] = 0.0f;
-
     matrix.SetTo(data);
 }
 

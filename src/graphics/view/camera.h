@@ -15,7 +15,7 @@ class Camera : public SceneObjectComponent
 
     unsigned int clearBufferMask;
 
-    Transform projectionTransform;
+    Transform projection;
     Graphics * graphics;
 
     protected:

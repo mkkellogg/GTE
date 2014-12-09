@@ -21,7 +21,7 @@ varying vec3 vLightDir;
 void main()
 {
 	texColor = texture2D(TEXTURE0, vUVTexture0);
-	float DiffuseTerm = 1;
+	float DiffuseTerm = 1.0;
 	if(LIGHT_ISDIRECTIONAL == 0)
 	{
 		vec3 normalized_normal = normalize(vNormal);

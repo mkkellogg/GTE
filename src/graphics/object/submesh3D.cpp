@@ -90,7 +90,6 @@ void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result)
 void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC)
 {
 	ASSERT_RTRN(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> faceIndex is out range.");
-
 	const SubMesh3DFace * face = faces.GetFace(faceIndex);
 
 	int faceVertexIndex = face->FirstVertexIndex;
@@ -123,6 +122,20 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 			if(Point3::AreStrictlyEqual(compareVertexB, faceVertexC) && Point3::AreStrictlyEqual(compareVertexA, faceVertexA)){edgeC = f;edgesSet++;}
 			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexC) && Point3::AreStrictlyEqual(compareVertexB, faceVertexA)){edgeC = f;edgesSet++;}
 			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexC) && Point3::AreStrictlyEqual(compareVertexC, faceVertexA)){edgeC = f;edgesSet++;}
+
+
+			if(Point3::AreStrictlyEqual(compareVertexA,faceVertexA) && Point3::AreStrictlyEqual(compareVertexB,faceVertexB)){edgeA = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexB, faceVertexA) && Point3::AreStrictlyEqual(compareVertexC,faceVertexB)){edgeA = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexA) && Point3::AreStrictlyEqual(compareVertexA, faceVertexB)){edgeA = f;edgesSet++;}
+
+			if(Point3::AreStrictlyEqual(compareVertexA, faceVertexB) && Point3::AreStrictlyEqual(compareVertexB, faceVertexC)){edgeB = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexB, faceVertexB) && Point3::AreStrictlyEqual(compareVertexC, faceVertexC)){edgeB = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexB) && Point3::AreStrictlyEqual(compareVertexA, faceVertexC)){edgeB = f;edgesSet++;}
+
+			if(Point3::AreStrictlyEqual(compareVertexA, faceVertexC) && Point3::AreStrictlyEqual(compareVertexB, faceVertexA)){edgeC = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexB, faceVertexC) && Point3::AreStrictlyEqual(compareVertexC, faceVertexA)){edgeC = f;edgesSet++;}
+			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexC) && Point3::AreStrictlyEqual(compareVertexA, faceVertexA)){edgeC = f;edgesSet++;}
+
 
 			if(edgesSet >=3)return;
 		}

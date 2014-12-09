@@ -20,9 +20,9 @@ Camera::Camera(Graphics * graphics)
 
 	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
 
-	Transform::BuildProjectionMatrix(proj, 65, ratio, 10, 100);
-
-	projectionTransform.SetTo(proj);
+	//Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 100);
+	Transform::BuildProjectionMatrixInfiniteFar(proj, 65, ratio, 5);
+	projection.SetTo(proj);
 }
 
 Camera::~Camera()
@@ -47,7 +47,7 @@ unsigned int Camera::GetClearBufferMask() const
 
 const Transform& Camera::GetProjectionTransform() const
 {
-	return projectionTransform;
+	return projection;
 }
 
 

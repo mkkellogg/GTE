@@ -256,7 +256,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 					// the adjacent face points away from the light
 					if(dot < 0)
 					{
-						BaseVector4_QuickCopy(edgeV1, svSideBase);
+						/*BaseVector4_QuickCopy(edgeV1, svSideBase);
 						svSideBase+=4;
 						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
 						svSideBase+=4;
@@ -268,6 +268,20 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
 						svSideBase+=4;
 						BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
+						svSideBase+=4;*/
+
+						BaseVector4_QuickCopy(edgeV2, svSideBase);
+						svSideBase+=4;
+						BaseVector4_QuickCopy(edgeV1, svSideBase);
+						svSideBase+=4;
+						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+						svSideBase+=4;
+
+						BaseVector4_QuickCopy(edgeV1, svSideBase);
+						svSideBase+=4;
+						BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
+						svSideBase+=4;
+						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
 						svSideBase+=4;
 
 						currentSideVertexIndex += 6;
