@@ -12,9 +12,10 @@ class Light;
 
 enum class LightType
 {
-	Directional,
-	Point,
-	Spot
+	Directional = 1,
+	Point = 2,
+	Spot = 3,
+	Ambient = 4
 };
 
 enum class LightCullType
@@ -34,7 +35,7 @@ class Light : public SceneObjectComponent
 	float intensity;
 	float attenuation;
 	float range;
-	bool isDirectional;
+	bool shadowsEnabled;
 
 	protected:
 
@@ -67,8 +68,8 @@ class Light : public SceneObjectComponent
 	void SetAttenuation(float attenuation);
 	float GetAttenuation() const ;
 
-	void SetIsDirectional(bool isDirectional);
-	bool IsDirectional() const ;
+	void SetShadowsEnabled(bool enabled);
+	bool GetShadowsEnabled() const;
 };
 
 #endif

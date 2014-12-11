@@ -235,6 +235,16 @@ void Transform::Scale(float x, float y, float z,  bool local)
 	else matrix.Scale(x,y,z);
 }
 
+void Transform::Rotate(const Vector3& vector, float a)
+{
+	matrix.Rotate(vector, a);
+}
+
+void Transform::Rotate(float x, float y, float z, float a)
+{
+	matrix.Rotate(x,y,z,a);
+}
+
 /*
  * Utility function to create a projection matrix. An existing Matrix4x4 object is passed in via [matrix],
  * and its data is set to contain the projection matrix.

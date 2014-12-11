@@ -59,7 +59,9 @@ class RenderManager
 	DataStack<Matrix4x4> modelTransformStack;
 
 	unsigned int lightCount;
+	unsigned int ambientLightCount;
 	RenderAffector sceneLights[MAX_LIGHTS];
+	RenderAffector ambientLights[MAX_LIGHTS];
 
 	unsigned int cameraCount;
 	RenderAffector sceneCameras[MAX_CAMERAS];
@@ -70,7 +72,7 @@ class RenderManager
 	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
 	void RenderSceneFromCamera(unsigned int cameraIndex);
 	void ForwardRenderScene(const Transform& viewTransformInverse, const Camera& camera);
-	void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera);
+	void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete);
 	void RenderSceneObjectMeshes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera);
 	void RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& shadowVolumeViewProjection,
 											  const Transform& viewTransformInverse, const Camera& camera);

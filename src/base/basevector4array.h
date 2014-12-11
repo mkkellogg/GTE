@@ -55,6 +55,7 @@ class BaseVector4Array
 	BaseVector4Array(BaseVector4Factory * factory);
     virtual ~BaseVector4Array();
 
+    BaseVector4 * GetBaseVector(unsigned int index);
     const float * GetDataPtr() const;
     bool Init(unsigned int reservedCount);
     unsigned int GetReservedCount();

@@ -560,11 +560,13 @@ void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
 void Material::SendLightToShader(const Light * light, const Point3 * position,  const Vector3 * altDirection)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SendLightToShader -> shader is NULL");
+	ASSERT_RTRN(light != NULL,"Material::SendLightToShader -> light is NULL");
+	ASSERT_RTRN(position != NULL,"Material::SendLightToShader -> position is NULL");
 
-	int varID = GetStandardUniformBinding(StandardUniform::LightIsDirectional);
+	int varID = GetStandardUniformBinding(StandardUniform::LightType);
 	if(varID >=0 )
 	{
-		shader->SendUniformToShader(varID, light->IsDirectional() ? 1 : 0);
+		shader->SendUniformToShader(varID, (int)light->GetType());
 		SetUniformSetValue(varID, 1);
 	}
 
@@ -602,32 +604,6 @@ void Material::SendLightToShader(const Light * light, const Point3 * position,  
 	{
 		shader->SendUniformToShader(varID, light->GetAttenuation());
 		SetUniformSetValue(varID, 1);
-	}
-}
-
-void Material::SendLightOrientationToShader(const Point3 * position, const Vector3 * direction, bool directional)
-{
-	ASSERT_RTRN(shader.IsValid(),"Material::SendLightToShader -> shader is NULL");
-
-	int varID = GetStandardUniformBinding(StandardUniform::LightIsDirectional);
-	if(varID >=0 )
-	{
-		shader->SendUniformToShader(varID, directional ? 1 : 0);
-		SetUniformSetValue(varID, 1);
-	}
-
-	varID = GetStandardUniformBinding(StandardUniform::LightPosition);
-	if(varID >=0 )
-	{
-		shader->SendUniformToShader(varID, position);
-		SetUniformSetValue(varID, 4);
-	}
-
-	varID = GetStandardUniformBinding(StandardUniform::LightDirection);
-	if(varID >=0 )
-	{
-		shader->SendUniformToShader(varID, direction);
-		SetUniformSetValue(varID, 4);
 	}
 }
 

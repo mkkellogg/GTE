@@ -75,6 +75,13 @@ bool BaseVector4Array::Init(unsigned int reservedCount)
 	return true;
 }
 
+BaseVector4 * BaseVector4Array::GetBaseVector(unsigned int index)
+{
+	ASSERT(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", NULL);
+
+	return objects[index];
+}
+
 const float * BaseVector4Array::GetDataPtr() const
 {
 	return (const float *)data;

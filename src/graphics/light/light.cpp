@@ -18,8 +18,8 @@ Light::Light()
 	direction.Set(1,-1,0);
 	intensity = 1;
 	attenuation = 1;
-	isDirectional = false;
 	SetRange(30);
+	shadowsEnabled = false;
 }
 
 Light::~Light()
@@ -113,13 +113,13 @@ float Light::GetAttenuation() const
 	return attenuation;
 }
 
-void Light::SetIsDirectional(bool isDirectional)
+void Light::SetShadowsEnabled(bool enabled)
 {
-	this->isDirectional = isDirectional;
+	shadowsEnabled = enabled;
 }
 
-bool Light::IsDirectional() const
+bool Light::GetShadowsEnabled() const
 {
-	return isDirectional;
+	return shadowsEnabled;
 }
 

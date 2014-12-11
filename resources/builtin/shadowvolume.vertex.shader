@@ -2,16 +2,15 @@ uniform mat4 MODELVIEWPROJECTION_MATRIX;
 attribute vec4 SHADOW_POSITION;
 uniform vec4 LIGHT_POSITION;
 uniform vec4 LIGHT_DIRECTION;
-uniform int LIGHT_ISDIRECTIONAL;
+uniform int LIGHT_TYPE;
 
 void main()
 {	
 	//vec4 dir = SHADOW_POSITION.w == 0.0 ? vec4(SHADOW_POSITION.xyz * LIGHT_POSITION.w - LIGHT_POSITION.xyz, 0.0) : SHADOW_POSITION;
 	vec4 dir = vec4(0.0,0.0,0.0,0.0);
-	if(LIGHT_ISDIRECTIONAL == 1)
+	if(LIGHT_TYPE == 1)
 	{
 		dir = SHADOW_POSITION.w == 0.0 ? vec4(LIGHT_DIRECTION.xyz, 0.0) : SHADOW_POSITION;
-		//dir = SHADOW_POSITION.w == 0.0 ? vec4(-1.0,0.0,0.0, 0.0) : SHADOW_POSITION;
 	}
 	else
 	{

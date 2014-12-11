@@ -39,6 +39,7 @@ RenderManager::RenderManager(Graphics * graphics, EngineObjectManager * objectMa
 	this->objectManager = objectManager;
 
 	lightCount = 0;
+	ambientLightCount = 0;
 	cameraCount = 0;
 	sceneMeshCount = 0;
 	cycleCount = 0;
@@ -83,7 +84,7 @@ bool RenderManager::Init()
 void RenderManager::ClearBuffersForCamera(const Camera& camera) const
 {
 	unsigned int clearBufferMask = camera.GetClearBufferMask();
-	graphics->ClearBuffers(clearBufferMask);
+	graphics->ClearRenderBuffers(clearBufferMask);
 }
 
 /*
@@ -136,6 +137,7 @@ void RenderManager::RenderAll()
 void RenderManager::ProcessScene()
 {
 	lightCount = 0;
+	ambientLightCount = 0;
 	cameraCount = 0;
 	sceneMeshCount = 0;
 
@@ -200,13 +202,27 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 			}
 
 			LightRef light = child->GetLight();
-			if(light.IsValid() && lightCount < MAX_LIGHTS)
+			if(light.IsValid())
 			{
-				// add a scene light
-				sceneLights[lightCount].AffectorTransform.SetTo(aggregateTransform);
-				sceneLights[lightCount].AffectorLight = light.GetPtr();
-
-				lightCount++;
+				if(light->GetType() == LightType::Ambient)
+				{
+					if(ambientLightCount < MAX_LIGHTS)
+					{
+						ambientLights[ambientLightCount].AffectorTransform.SetTo(aggregateTransform);
+						ambientLights[ambientLightCount].AffectorLight = light.GetPtr();
+						ambientLightCount++;
+					}
+				}
+				else
+				{
+					if(lightCount < MAX_LIGHTS)
+					{
+						// add a scene light
+						sceneLights[lightCount].AffectorTransform.SetTo(aggregateTransform);
+						sceneLights[lightCount].AffectorLight = light.GetPtr();
+						lightCount++;
+					}
+				}
 			}
 
 			Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
@@ -303,7 +319,22 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 	renderedObjects.clear();
 
 	graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
-	// loop through each active light and render sub mesh for that light, if in range
+	bool renderedAmbient = false;
+	// loop through each ambient light and render sub mesh for that light
+	for(unsigned int l = 0; l < ambientLightCount; l++)
+	{
+		Light * light = ambientLights[l].AffectorLight;
+		if(light == NULL)
+		{
+			Debug::PrintError("RenderManager::ForwardRenderScene -> ambient light is NULL");
+			continue;
+		}
+
+		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera, l > 0);
+		renderedAmbient = true;
+	}
+
+	// loop through each regular light and render sub mesh for that light, if in range
 	for(unsigned int l = 0; l < lightCount; l++)
 	{
 		Light * light = sceneLights[l].AffectorLight;
@@ -313,15 +344,16 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 			continue;
 		}
 
-		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera);
+		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera, renderedAmbient);
 	}
+	graphics->SetDepthBufferReadonly(false);
 }
 
 /*
  * Render all the meshes found in ProcessScene() for a single light [light] from the perspective of
  * [viewTransformInverse], which the inverse of the view transform.
  */
-void RenderManager::RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete)
 {
 	Transform modelView;
 	Transform model;
@@ -337,45 +369,63 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	shadowVolmeViewProjection.PreTransformBy(viewTransformInverse);
 	shadowVolmeViewProjection.PreTransformBy(camera.GetProjectionTransform());
 
-	for(unsigned int s = 0; s < sceneMeshCount; s++)
+	//Engine::Instance()->GetGraphicsEngine()->SetDepthBufferEnabled(depthBufferComplete);
+	if(depthBufferComplete)graphics->SetDepthBufferReadonly(true);
+	else graphics->SetDepthBufferReadonly(false);
+
+	for(int pass = 0; pass < 2; pass++)
 	{
-		SceneObject * child = meshObjects[s];
-
-		if(child == NULL)
+		// shadow volume pass
+		if(pass == 0)
 		{
-			Debug::PrintError("RenderManager::RenderSceneForLight -> NULL scene object encountered.");
+			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
+			{
+				unsigned int clearBufferMask = 0;
+				IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
+				//Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
+			}
 		}
-		else if(child->IsActive())
+
+		for(unsigned int s = 0; s < sceneMeshCount; s++)
 		{
-			Mesh3DRenderer * renderer = NULL;
+			SceneObject * child = meshObjects[s];
 
-			// check if current scene object has a mesh & renderer
-			if(child->GetMesh3DRenderer().IsValid())
+			if(child == NULL)
 			{
-				renderer =child->GetMesh3DRenderer().GetPtr();
+				Debug::PrintError("RenderManager::RenderSceneForLight -> NULL scene object encountered.");
 			}
-			else if(child->GetSkinnedMesh3DRenderer().IsValid())
+			else if(child->IsActive())
 			{
-				renderer = (Mesh3DRenderer *)child->GetSkinnedMesh3DRenderer().GetPtr();
-			}
+				Mesh3DRenderer * renderer = NULL;
 
-			if(renderer != NULL)
-			{
-				Mesh3DRef mesh = renderer->GetMesh();
+				// check if current scene object has a mesh & renderer
+				if(child->GetMesh3DRenderer().IsValid())renderer =child->GetMesh3DRenderer().GetPtr();
+				else if(child->GetSkinnedMesh3DRenderer().IsValid())renderer = (Mesh3DRenderer *)child->GetSkinnedMesh3DRenderer().GetPtr();
 
-				// get the full transform of the scene object, including those of all ancestors
-				SceneObjectTransform full;
-				child->InitSceneObjectTransform(&full);
-
-				// check if this mesh should be culled from this light.
-				if(light.IsDirectional() || !ShouldCullFromLight(light, lightPosition, full, *mesh))
+				if(renderer != NULL)
 				{
-					if(mesh->GetCastShadows())
-					{
-						RenderSceneObjectMeshesShadowVolumes(*child, light, lightPosition, shadowVolmeViewProjection, viewTransformInverse, camera);
-					}
+					Mesh3DRef mesh = renderer->GetMesh();
 
-					RenderSceneObjectMeshes(*child, light, lightPosition, viewTransformInverse, camera);
+					// get the full transform of the scene object, including those of all ancestors
+					SceneObjectTransform full;
+					child->InitSceneObjectTransform(&full);
+
+					// check if this mesh should be culled from this light.
+					if( light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient || !ShouldCullFromLight(light, lightPosition, full, *mesh))
+					{
+						// shadow volume pass
+						if(pass == 0)
+						{
+							if(mesh->GetCastShadows() && light.GetType() != LightType::Ambient)
+							{
+								RenderSceneObjectMeshesShadowVolumes(*child, light, lightPosition, shadowVolmeViewProjection, viewTransformInverse, camera);
+							}
+						}
+						else if(pass == 1) // normal rendering pass
+						{
+							RenderSceneObjectMeshes(*child, light, lightPosition, viewTransformInverse, camera);
+						}
+					}
 				}
 			}
 		}
@@ -442,11 +492,11 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			bool rendered = renderedObjects[subMesh->GetObjectID()];
 			if(rendered)
 			{
-				graphics->EnableBlending(true);
+				graphics->SetBlendingEnabled(true);
 			}
 			else
 			{
-				graphics->EnableBlending(false);
+				graphics->SetBlendingEnabled(false);
 			}
 
 			// render the current mesh
@@ -519,7 +569,7 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 			model.TransformVector(modelLocalLightDir);
 
 			Vector3 lightPosDir;
-			if(light.IsDirectional())
+			if(light.GetType() == LightType::Directional)
 			{
 				lightPosDir.x = modelLocalLightDir.x;
 				lightPosDir.y = modelLocalLightDir.y;
@@ -532,10 +582,11 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 				lightPosDir.z = modelLocalLightPos.z;
 			}
 
-			subRenderer->BuildShadowVolume(lightPosDir, light.IsDirectional());
+			subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional);
 
 			shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
 
+			graphics->SetBlendingEnabled(false);
 			// render the shadow volume
 			subRenderer->RenderShadowVolume();
 		}

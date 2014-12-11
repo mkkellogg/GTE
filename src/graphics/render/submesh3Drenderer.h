@@ -63,7 +63,7 @@ class SubMesh3DRenderer : public EngineObject
     void DestroyBuffer(VertexAttrBuffer ** buffer);
     void SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride);
 
-    bool InitAttributeData(StandardAttribute attr, int componentCount,  int stride);
+    bool InitAttributeData(StandardAttribute attr, int length, int componentCount,  int stride);
 
     void SetShadowVolumePositionData(Point3Array * points);
     void SetPositionData(Point3Array * points);

@@ -127,10 +127,10 @@ void Game::Init()
 	cameraObject->SetCamera(camera);
 
 
-	sceneObject = objectManager->CreateSceneObject();
-	sceneObject->GetLocalTransform().Scale(3,3,3, true);
-	sceneObject->GetLocalTransform().RotateAround(0, 0, 0, 0, 1, 0, 45);
-	sceneObject->GetLocalTransform().Translate(-15, 0, -12, false);
+	cube = objectManager->CreateSceneObject();
+	cube->GetLocalTransform().Scale(1.5, 1.5,1.5, true);
+	//cube->GetLocalTransform().RotateAround(0, 0, 0, 0, 1, 0, 45);
+	cube->GetLocalTransform().Translate(2, -7, 21, false);
 
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
@@ -141,7 +141,7 @@ void Game::Init()
 
     renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
-	sceneObject->SetMesh3DRenderer(renderer);
+	cube->SetMesh3DRenderer(renderer);
 
 	meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
@@ -150,21 +150,22 @@ void Game::Init()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 
 	mesh = GameUtil::CreateCubeMesh(meshAttributes);
-	sceneObject->SetMesh3D(mesh);
+	cube->SetMesh3D(mesh);
 
-	Mesh3DRef firstMesh = FindFirstMesh(sceneObject);
+	Mesh3DRef firstMesh = FindFirstMesh(cube);
 	firstMesh->SetCastShadows(true);
 	firstMesh->SetReceiveShadows(true);
 
-	childSceneObject = objectManager->CreateSceneObject();
-	sceneObject->AddChild(childSceneObject);
+
+	// ----- second cube ------
+	/*childSceneObject = objectManager->CreateSceneObject();
 
 	childSceneObject->SetMesh3D(mesh);
 	childSceneObject->SetMesh3DRenderer(renderer);
 
 	childSceneObject->GetLocalTransform().Translate(-2, 3, 0, true);
 	childSceneObject->GetLocalTransform().Scale(1.5,1.5,1.5, true);
-	//childSceneObject->GetTransform()->Translate(9, 0, 0, false);
+	//childSceneObject->GetTransform()->Translate(9, 0, 0, false);*/
 
 
 
@@ -185,8 +186,8 @@ void Game::Init()
 		return;
 	}
 	firstMesh = FindFirstMesh(modelSceneObject);
-	firstMesh->SetCastShadows(true);
-	firstMesh->SetReceiveShadows(true);
+	//firstMesh->SetCastShadows(true);
+	//firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(0,-10,0,false);
 	modelSceneObject->GetLocalTransform().Scale(.07,.05,.07, true);
 
@@ -203,8 +204,8 @@ void Game::Init()
 		return;
 	}
 	firstMesh = FindFirstMesh(modelSceneObject);
-	firstMesh->SetCastShadows(true);
-	firstMesh->SetReceiveShadows(true);
+	//firstMesh->SetCastShadows(true);
+	//firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(10,-10,-10,false);
 	modelSceneObject->GetLocalTransform().Scale(.05,.05,.05, true);
 
@@ -220,8 +221,8 @@ void Game::Init()
 		return;
 	}
 	firstMesh = FindFirstMesh(modelSceneObject);
-	firstMesh->SetCastShadows(true);
-	firstMesh->SetReceiveShadows(true);
+	//firstMesh->SetCastShadows(true);
+	//firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(-10,-10,20,false);
 	modelSceneObject->GetLocalTransform().Scale(.09,.09,.09, true);
 
@@ -380,7 +381,9 @@ void Game::Init()
 	sceneObject->GetLocalTransform().Translate(5, -30, 45, false);
 */
 
-	/*sceneObject = objectManager->CreateSceneObject();
+
+
+	sceneObject = objectManager->CreateSceneObject();
 	renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
 	sceneObject->SetMesh3DRenderer(renderer);
@@ -389,26 +392,29 @@ void Game::Init()
 	light->SetDirection(1,-1,-1);
 	light->SetIntensity(1.7);
 	light->SetRange(25);
+	light->SetShadowsEnabled(true);
+	light->SetType(LightType::Point);
 	sceneObject->SetLight(light);
 
 	sceneObject->SetMesh3D(mesh);
 	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	sceneObject->GetLocalTransform().Translate(-10, 0, 40, false);*/
+	sceneObject->GetLocalTransform().Translate(5, 0, 20, false);
 
 
 	sceneObject = objectManager->CreateSceneObject();
+	light = objectManager->CreateLight();
+	light->SetIntensity(.30);
+	light->SetType(LightType::Ambient);
+	sceneObject->SetLight(light);
+
+
+/*	sceneObject = objectManager->CreateSceneObject();
 
 	light = objectManager->CreateLight();
 	light->SetDirection(-.8,-1.7,-2);
 	light->SetIntensity(1.2);
-	light->SetIsDirectional(true);
-	sceneObject->SetLight(light);
-
-	//sceneObject->SetMesh3D(mesh);
-	//sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	//sceneObject->GetLocalTransform().Translate(45, -30, 5, false);
-
-
+	light->SetType(LightType::Directional);
+	sceneObject->SetLight(light);*/
 
 
 	InitializePlayerPosition();
@@ -444,6 +450,8 @@ void Game::Update()
 	 player->CrossFade(koopaWalk, 2);*/
 
 	 //float realTime = Time::GetRealTimeSinceStartup();
+
+	cube->GetLocalTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
 
 	UpdatePlayerMovementDirection();
 	UpdatePlayerAnimation();

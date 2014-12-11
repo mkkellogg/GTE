@@ -9,6 +9,7 @@ class Game
 {
 	SceneObjectRef cameraObject;
 	SceneObjectRef playerObject;
+	SceneObjectRef cube;
 	SkinnedMesh3DRendererRef koopaRenderer;
 	AnimationRef koopaAnim;
 	AnimationRef koopaWait, koopaWalk, koopaJump, koopaRoar;

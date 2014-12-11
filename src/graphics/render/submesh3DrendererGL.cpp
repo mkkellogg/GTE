@@ -85,10 +85,20 @@ void SubMesh3DRendererGL::RenderShadowVolume()
 		SetShadowVolumePositionData(&shadowVolumeSides);
 		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
 		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeSides.GetCount());
-
-		/*SetShadowVolumePositionData(&shadowVolumeFront);
-		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
-		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeFront.GetCount());*/
 	}
+
+	/*if(shadowVolumeFront.GetCount() > 0)
+	{
+		SetShadowVolumePositionData(&shadowVolumeFront);
+		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
+		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeFront.GetCount());
+	}
+
+	if(shadowVolumeBack.GetCount() > 0)
+	{
+		SetShadowVolumePositionData(&shadowVolumeBack);
+		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
+		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeBack.GetCount());
+	}*/
 }
 

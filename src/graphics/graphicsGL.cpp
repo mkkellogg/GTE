@@ -24,6 +24,7 @@
 #include "render/submesh3Drenderer.h"
 #include "render/submesh3DrendererGL.h"
 #include "render/rendertarget.h"
+#include "render/renderbuffer.h"
 #include "render/rendertargetGL.h"
 #include "render/attributetransformer.h"
 #include "image/imageloader.h"
@@ -95,7 +96,14 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glDisable(GL_BLEND);
-    blendingEnabled = false;
+
+    SetBlendingEnabled(false);
+    SetDepthBufferEnabled(true);
+    SetDepthBufferReadonly(false);
+
+   /* SetRenderBufferEnabled(RenderBufferType::Color, true);
+    SetRenderBufferEnabled(RenderBufferType::Depth, true);
+    SetRenderBufferEnabled(RenderBufferType::Stencil, false);*/
 
     return true;
 }
@@ -109,6 +117,9 @@ GraphicsGL::GraphicsGL() : Graphics()
 {
 	openGLVersion = 0;
 	blendingEnabled = false;
+	colorBufferEnabled = false;
+	depthBufferEnabled = false;
+	stencilBufferEnabled = false;
 }
 
 Shader * GraphicsGL::CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
@@ -132,16 +143,79 @@ void GraphicsGL::DestroyShader(Shader * shader)
     delete shader;
 }
 
-void GraphicsGL::ClearBuffers(unsigned int bufferMask) const
+void GraphicsGL::ClearRenderBuffers(unsigned int bufferMask) const
 {
 	GLbitfield glClearMask = 0;
 	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Color))
 		glClearMask |= GL_COLOR_BUFFER_BIT;
 	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Depth))
 		glClearMask |= GL_DEPTH_BUFFER_BIT;
+	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Stencil))
+			glClearMask |= GL_STENCIL_BUFFER_BIT;
 
 	glClear(glClearMask);
 }
+
+void GraphicsGL::SetDepthBufferEnabled(bool enabled)
+{
+	if(depthBufferEnabled != enabled)
+	{
+		if(enabled)glEnable(GL_DEPTH_TEST);
+		else glDisable(GL_DEPTH_TEST);
+		depthBufferEnabled = enabled;
+	}
+}
+
+void GraphicsGL::SetDepthBufferReadonly(bool readOnly)
+{
+	if(readOnly)glDepthMask(GL_FALSE);
+	else glDepthMask(GL_TRUE);
+}
+
+void GraphicsGL::SetDepthBufferFunction(DepthBufferFunction function)
+{
+	switch(function)
+	{
+		case DepthBufferFunction::Always:
+			glDepthFunc(GL_ALWAYS);
+		break;
+		case DepthBufferFunction::Greater:
+			glDepthFunc(GL_GEQUAL);
+		break;
+		case DepthBufferFunction::GreaterThanOrEqual:
+			glDepthFunc(GL_ALWAYS);
+		break;
+		case DepthBufferFunction::Less:
+			glDepthFunc(GL_LESS);
+		break;
+		case DepthBufferFunction::LessThanOrEqual:
+			glDepthFunc(GL_LEQUAL);
+		break;
+	}
+}
+
+/*
+void GraphicsGL::SetRenderBufferEnabled(RenderBufferType buffer, bool enabled) const
+{
+	if(buffer == RenderBufferType::Color && enabled != colorBufferEnabled)
+	{
+		if(enabled)glColorMask(1,1,1,1);
+		else glColorMask(0,0,0,0);
+		colorBufferEnabled = enabled;
+	}
+	else if(buffer == RenderBufferType::Depth && enabled != depthBufferEnabled)
+	{
+		if(enabled)glDepthMask(GL_TRUE);
+		else glDepthMask(GL_FALSE);
+		depthBufferEnabled = enabled;
+	}
+	else if(buffer == RenderBufferType::Stencil && enabled != stencilBufferEnabled)
+	{
+		if(enabled)glStencilMask(GL_TRUE);
+		else glStencilMask(GL_FALSE);
+		stencilBufferEnabled = enabled;
+	}
+}*/
 
 SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer(AttributeTransformer * attrTransformer)
 {
@@ -292,7 +366,7 @@ void GraphicsGL::DestroyRenderTarget(RenderTarget * target)
 	}
 }
 
-void GraphicsGL::EnableBlending(bool enabled)
+void GraphicsGL::SetBlendingEnabled(bool enabled)
 {
 	if(blendingEnabled == enabled)return;
 	if(enabled)glEnable(GL_BLEND);

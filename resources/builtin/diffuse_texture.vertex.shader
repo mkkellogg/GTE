@@ -8,7 +8,7 @@ attribute vec4 POSITION;
 attribute vec2 UVTEXTURE0;
 attribute vec4 NORMAL;
 uniform vec4 LIGHT_DIRECTION;
-uniform int LIGHT_ISDIRECTIONAL;
+uniform int LIGHT_TYPE;
  
 varying vec2 vUVTexture0;
 varying vec3 vNormal;
@@ -17,7 +17,7 @@ varying vec3 vLightDir;
  
 void main()
 {
-	if(LIGHT_ISDIRECTIONAL == 1)
+	if(LIGHT_TYPE == 1)
 	{
 		vLightDir = normalize(LIGHT_DIRECTION.xyz);
 	}

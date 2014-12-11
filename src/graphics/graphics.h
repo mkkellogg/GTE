@@ -22,6 +22,7 @@ class RenderTarget;
 #include <string>
 #include "object/enginetypes.h"
 #include "base/intmask.h"
+#include "render/rendertarget.h"
 
 enum class BlendingProperty
 {
@@ -82,9 +83,13 @@ class Graphics
     virtual RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height) = 0;
     virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 
-    virtual void ClearBuffers(unsigned int bufferMask) const = 0;
+    virtual void ClearRenderBuffers(unsigned int bufferMask) const = 0;
 
-    virtual void EnableBlending(bool enabled) = 0;
+    virtual void SetDepthBufferEnabled(bool enabled) = 0;
+    virtual void SetDepthBufferReadonly(bool readOnly) = 0;
+    virtual void SetDepthBufferFunction(DepthBufferFunction function) = 0;
+
+    virtual void SetBlendingEnabled(bool enabled) = 0;
     virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
     virtual void ActivateMaterial(MaterialRef material);
     MaterialRef GetActiveMaterial() const;

@@ -117,13 +117,13 @@ bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, 
 	return true;
 }
 
-bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int componentCount,  int stride)
+bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int length, int componentCount,  int stride)
 {
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	if(mesh.IsValid())
 	{
 		DestroyBuffer(&attributeBuffers[(int)attr]);
-		bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], mesh->GetTotalVertexCount(), componentCount, stride);
+		bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], length, componentCount, stride);
 		if(!initSuccess)return false;
 	}
 	return true;
@@ -149,7 +149,13 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	float* vertex1 = NULL;
 	float* vertex2 = NULL;
 	float* vertex3 = NULL;
+	float* aVertex1 = NULL;
+	float* aVertex2 = NULL;
+	float* aVertex3 = NULL;
+	Point3 vertexAvg;
+
 	Vector3 faceToLightDir = lightPosDir;
+	Vector3 adjFaceToLightDir;
 	SubMesh3DFaces& faces = mesh->GetFaces();
 	unsigned int faceCount = faces.GetFaceCount();
 	unsigned int faceVertexIndex = 0;
@@ -172,28 +178,44 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 	faceToLightDir.Normalize();
 	faceToLightDir.Invert();
+	adjFaceToLightDir = faceToLightDir;
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
 		face = faces.GetFace(f);
 		if(face == NULL)continue;
 
 		faceVertexIndex = face->FirstVertexIndex;
-
 		faceNormal = normalsSource.GetVector(faceVertexIndex);
 		vertex1 = positionsSrcPtr+(faceVertexIndex*4);
 		vertex2 = positionsSrcPtr+(faceVertexIndex*4)+4;
 		vertex3 = positionsSrcPtr+(faceVertexIndex*4)+8;
 
+		vertexAvg.Set(vertex1[0],vertex1[1],vertex1[2]);
+
+		vertexAvg.x += vertex2[0];
+		vertexAvg.y += vertex2[1];
+		vertexAvg.z += vertex2[2];
+
+		vertexAvg.x += vertex3[0];
+		vertexAvg.y += vertex3[1];
+		vertexAvg.z += vertex3[2];
+
+		vertexAvg.x *= .33333333;
+		vertexAvg.y *= .33333333;
+		vertexAvg.z *= .33333333;
+
 		if(!directional)
 		{
-			faceToLightDir.x = lightPosDir.x - vertex1[0];
-			faceToLightDir.y = lightPosDir.y - vertex1[1];
-			faceToLightDir.z = lightPosDir.z - vertex1[2];
+			faceToLightDir.x = lightPosDir.x - vertexAvg.x;
+			faceToLightDir.y = lightPosDir.y - vertexAvg.y;
+			faceToLightDir.z = lightPosDir.z - vertexAvg.z;
+			faceToLightDir.Normalize();
 		}
 
 		float faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
 
-		if(faceToLightDot > 0 )
+		bool currentFaceIsFront = false;
+		if(faceToLightDot >= 0 )
 		{
 			BaseVector4_QuickCopy(vertex1, svFrontBase);
 			svFrontBase+=4;
@@ -203,6 +225,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			svFrontBase+=4;
 
 			currentFrontFaceVertexIndex += 3;
+			currentFaceIsFront = true;
 		}
 		else
 		{
@@ -216,78 +239,108 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			currentBackFaceVertexIndex += 3;
 		}
 
-		if(faceToLightDot > 0)
+		int facesFound = 0;
+		for(unsigned int ai = 0; ai < 3; ai++)
 		{
-			for(unsigned int ai = 0; ai < 3; ai++)
+			adjacentFaceIndex = -1;
+			edgeV1 = edgeV2 = NULL;
+
+			if(ai == 0)
 			{
-				adjacentFaceIndex = -1;
-				edgeV1 = edgeV2 = NULL;
-
-				if(ai == 0 && face->AdjacentFaceIndex1 >= 0)
-				{
-					adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex1;
-					edgeV1 = vertex1;
-					edgeV2 = vertex2;
-				}
-				else if(ai == 1 && face->AdjacentFaceIndex2 >= 0)
-				{
-					adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex2;
-					edgeV1 = vertex2;
-					edgeV2 = vertex3;
-				}
-				else if(ai == 2 && face->AdjacentFaceIndex3 >= 0)
-				{
-					adjacentFaceIndex = (unsigned int)face->AdjacentFaceIndex3;
-					edgeV1 = vertex3;
-					edgeV2 = vertex1;
-				}
-
-				if(adjacentFaceIndex >= 0)
-				{
-					adjacentFace = faces.GetFace(adjacentFaceIndex);
-					if(adjacentFace == NULL)continue;
-
-					adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
-					adjacentFaceNormal = normalsSource.GetVector(adjacentFaceVertexIndex);
-
-					float dot = Vector3::Dot(faceToLightDir, *adjacentFaceNormal);
-
-					// angle between light vector and adjacent face normal is > 180, so
-					// the adjacent face points away from the light
-					if(dot < 0)
-					{
-						/*BaseVector4_QuickCopy(edgeV1, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy(edgeV2, svSideBase);
-						svSideBase+=4;
-
-						BaseVector4_QuickCopy(edgeV1, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
-						svSideBase+=4;*/
-
-						BaseVector4_QuickCopy(edgeV2, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy(edgeV1, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-						svSideBase+=4;
-
-						BaseVector4_QuickCopy(edgeV1, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
-						svSideBase+=4;
-						BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-						svSideBase+=4;
-
-						currentSideVertexIndex += 6;
-					}
-				}
+				adjacentFaceIndex = face->AdjacentFaceIndex1;
+				edgeV1 = vertex1;
+				edgeV2 = vertex2;
 			}
+			else if(ai == 1)
+			{
+				adjacentFaceIndex = face->AdjacentFaceIndex2;
+				edgeV1 = vertex2;
+				edgeV2 = vertex3;
+			}
+			else if(ai == 2)
+			{
+				adjacentFaceIndex = face->AdjacentFaceIndex3;
+				edgeV1 = vertex3;
+				edgeV2 = vertex1;
+			}
+
+			float adjFaceToLightDot = 0;
+			if(adjacentFaceIndex >= 0)
+			{
+				facesFound++;
+				adjacentFace = faces.GetFace(adjacentFaceIndex);
+				if(adjacentFace == NULL)continue;
+
+				adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
+				adjacentFaceNormal = normalsSource.GetVector(adjacentFaceVertexIndex);
+				aVertex1 = positionsSrcPtr+(adjacentFaceVertexIndex*4);
+				aVertex2 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+4;
+				aVertex3 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+8;
+
+				vertexAvg.Set(aVertex1[0],aVertex1[1],aVertex1[2]);
+
+				vertexAvg.x += aVertex2[0];
+				vertexAvg.y += aVertex2[1];
+				vertexAvg.z += aVertex2[2];
+
+				vertexAvg.x += aVertex3[0];
+				vertexAvg.y += aVertex3[1];
+				vertexAvg.z += aVertex3[2];
+
+				vertexAvg.x *= .333333333;
+				vertexAvg.y *= .333333333;
+				vertexAvg.z *= .333333333;
+
+				if(!directional)
+				{
+					adjFaceToLightDir.x = lightPosDir.x - vertexAvg.x;
+					adjFaceToLightDir.y = lightPosDir.y - vertexAvg.y;
+					adjFaceToLightDir.z = lightPosDir.z - vertexAvg.z;
+					adjFaceToLightDir.Normalize();
+				}
+
+				adjFaceToLightDot = Vector3::Dot(adjFaceToLightDir, *adjacentFaceNormal);
+			}
+			else adjFaceToLightDot = -1;
+
+			if(adjFaceToLightDot <= 0 && currentFaceIsFront)
+			{
+				BaseVector4_QuickCopy(edgeV2, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy(edgeV1, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+				svSideBase+=4;
+
+				BaseVector4_QuickCopy(edgeV1, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+				svSideBase+=4;
+
+				currentSideVertexIndex += 6;
+			}
+			else if(adjFaceToLightDot >= 0 && !currentFaceIsFront)
+			{
+				BaseVector4_QuickCopy(edgeV1, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy(edgeV2, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+				svSideBase+=4;
+
+				BaseVector4_QuickCopy(edgeV1, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
+				svSideBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
+				svSideBase+=4;
+
+				currentSideVertexIndex +=6;
+			}
+
+
 		}
 	}
 	shadowVolumeFront.SetCount(currentFrontFaceVertexIndex);
@@ -361,7 +414,7 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 			int stride =0;
 		//	if(attr == StandardAttribute::Normal)stride = 1;
 
-			int initSuccess = InitAttributeData(attr, componentCount, stride);
+			int initSuccess = InitAttributeData(attr, mesh->GetTotalVertexCount(), componentCount, stride);
 			if(!initSuccess)StandardAttributes::AddAttribute(&err,attr);
 		}
 	}
@@ -375,8 +428,8 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 		bool shadowVolumeInitSuccess = true;
 		shadowVolumeInitSuccess = shadowVolumeFront.Init(storedVertexCount);
 		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(storedVertexCount);
-		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 2);
-		shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition,4,0);
+		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 6);
+		shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 6, 4,0);
 
 		if(!shadowVolumeInitSuccess)
 		{

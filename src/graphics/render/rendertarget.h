@@ -2,13 +2,7 @@
 #define _RENDER_TARGET_H_
 
 #include "base/intmask.h"
-
-enum class RenderBufferType
-{
-	Color=1,
-	Depth=2,
-	Stencil=4
-};
+#include "renderbuffer.h"
 
 class RenderTarget
 {
