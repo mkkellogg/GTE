@@ -30,9 +30,13 @@ class GraphicsGL : public Graphics
     protected:
 
     bool blendingEnabled;
-    bool colorBufferEnabled;
+
     bool depthBufferEnabled;
+    bool depthBufferReadOnly;
+
+    bool colorBufferEnabled;
     bool stencilBufferEnabled;
+    bool initialized;
 
     GraphicsGL();
     ~GraphicsGL();
@@ -51,11 +55,13 @@ class GraphicsGL : public Graphics
     RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height);
     void DestroyRenderTarget(RenderTarget * target);
 
-    void ClearRenderBuffers(unsigned int bufferMask) const;
+    void ClearRenderBuffers(unsigned int bufferMask);
 
     void SetDepthBufferEnabled(bool enabled);
-    void SetDepthBufferReadonly(bool readOnly);
+    void SetDepthBufferReadOnly(bool readOnly);
     void SetDepthBufferFunction(DepthBufferFunction function);
+
+    void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
 
     void SetBlendingEnabled(bool enabled);
     void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);

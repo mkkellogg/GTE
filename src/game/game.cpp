@@ -130,7 +130,7 @@ void Game::Init()
 	cube = objectManager->CreateSceneObject();
 	cube->GetLocalTransform().Scale(1.5, 1.5,1.5, true);
 	//cube->GetLocalTransform().RotateAround(0, 0, 0, 0, 1, 0, 45);
-	cube->GetLocalTransform().Translate(2, -7, 21, false);
+	cube->GetLocalTransform().Translate(2, -7, 10, false);
 
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
@@ -241,8 +241,8 @@ void Game::Init()
 
 	SkinnedMesh3DRendererRef meshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	firstMesh = meshRenderer->GetMesh();
-	firstMesh->SetCastShadows(true);
-	firstMesh->SetReceiveShadows(true);
+	//firstMesh->SetCastShadows(true);
+	//firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
@@ -383,7 +383,7 @@ void Game::Init()
 
 
 
-	sceneObject = objectManager->CreateSceneObject();
+	/*sceneObject = objectManager->CreateSceneObject();
 	renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
 	sceneObject->SetMesh3DRenderer(renderer);
@@ -398,7 +398,7 @@ void Game::Init()
 
 	sceneObject->SetMesh3D(mesh);
 	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	sceneObject->GetLocalTransform().Translate(5, 0, 20, false);
+	sceneObject->GetLocalTransform().Translate(5, 0, 20, false);*/
 
 
 	sceneObject = objectManager->CreateSceneObject();
@@ -408,13 +408,15 @@ void Game::Init()
 	sceneObject->SetLight(light);
 
 
-/*	sceneObject = objectManager->CreateSceneObject();
+	sceneObject = objectManager->CreateSceneObject();
 
 	light = objectManager->CreateLight();
-	light->SetDirection(-.8,-1.7,-2);
+//	light->SetDirection(-.8,-1.7,-2);
+	light->SetDirection(0,-1,0);
 	light->SetIntensity(1.2);
+	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Directional);
-	sceneObject->SetLight(light);*/
+	sceneObject->SetLight(light);
 
 
 	InitializePlayerPosition();

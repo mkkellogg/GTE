@@ -1,3 +1,5 @@
+precision highp float;
+
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 attribute vec4 SHADOW_POSITION;
 uniform vec4 LIGHT_POSITION;

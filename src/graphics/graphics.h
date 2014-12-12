@@ -30,7 +30,16 @@ enum class BlendingProperty
 	SrcAlpha,
 	OneMinusSrcAlpha,
 	DstAlpha,
-	OneMinusDstAlpha
+	OneMinusDstAlpha,
+	Zero
+};
+
+enum class ColorChannel
+{
+	Red,
+	Green,
+	Blue,
+	Alpha
 };
 
 class GraphicsAttributes
@@ -83,11 +92,13 @@ class Graphics
     virtual RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height) = 0;
     virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 
-    virtual void ClearRenderBuffers(unsigned int bufferMask) const = 0;
+    virtual void ClearRenderBuffers(unsigned int bufferMask) = 0;
 
     virtual void SetDepthBufferEnabled(bool enabled) = 0;
-    virtual void SetDepthBufferReadonly(bool readOnly) = 0;
+    virtual void SetDepthBufferReadOnly(bool readOnly) = 0;
     virtual void SetDepthBufferFunction(DepthBufferFunction function) = 0;
+
+    virtual void SetColorBufferChannelState(bool r, bool g, bool b, bool a) = 0;
 
     virtual void SetBlendingEnabled(bool enabled) = 0;
     virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;

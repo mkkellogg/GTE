@@ -318,7 +318,6 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 {
 	renderedObjects.clear();
 
-	graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
 	bool renderedAmbient = false;
 	// loop through each ambient light and render sub mesh for that light
 	for(unsigned int l = 0; l < ambientLightCount; l++)
@@ -346,7 +345,6 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 
 		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera, renderedAmbient);
 	}
-	graphics->SetDepthBufferReadonly(false);
 }
 
 /*
@@ -369,10 +367,10 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	shadowVolmeViewProjection.PreTransformBy(viewTransformInverse);
 	shadowVolmeViewProjection.PreTransformBy(camera.GetProjectionTransform());
 
-	//Engine::Instance()->GetGraphicsEngine()->SetDepthBufferEnabled(depthBufferComplete);
-	if(depthBufferComplete)graphics->SetDepthBufferReadonly(true);
-	else graphics->SetDepthBufferReadonly(false);
+	//if(depthBufferComplete)graphics->SetDepthBufferReadOnly(true);
+	//else graphics->SetDepthBufferReadOnly(false);
 
+	bool doShadows = false;
 	for(int pass = 0; pass < 2; pass++)
 	{
 		// shadow volume pass
@@ -380,10 +378,58 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 		{
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
 			{
+				graphics->SetColorBufferChannelState(false,false,false,false);
+				graphics->SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+				//graphics->SetDepthBufferReadOnly(true);
+				glDepthMask(GL_FALSE);
+				glDisable(GL_CULL_FACE);
+
 				unsigned int clearBufferMask = 0;
-				IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
+				//IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
 				//Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
+				glClear(GL_STENCIL_BUFFER_BIT);
+				glEnable(GL_STENCIL_TEST);
+
+				// We need the stencil test to be enabled but we want it
+				// to succeed always. Only the depth test matters.
+				glStencilFunc(GL_ALWAYS, 0, 0xff);
+
+				// Set the stencil test per the depth fail algorithm
+				glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+				glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+				doShadows = true;
 			}
+			else
+			{
+				glDisable(GL_STENCIL_TEST);
+			}
+		}
+		else if(pass == 1)
+		{
+			glDepthMask(GL_TRUE);
+			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
+			{
+				glEnable(GL_STENCIL_TEST);
+				 // Draw only if the corresponding stencil value is zero
+				glStencilFunc(GL_EQUAL, 0x0, 0xFF);
+
+				// prevent update to the stencil buffer
+				 glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+				graphics->SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+			}
+			else if(light.GetType() == LightType::Ambient)
+			{
+				glDisable(GL_STENCIL_TEST);
+				graphics->SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+			}
+
+			graphics->SetColorBufferChannelState(true,true,true,true);
+
+			//graphics->SetDepthBufferReadOnly(false);
+
+			glEnable(GL_CULL_FACE);
 		}
 
 		for(unsigned int s = 0; s < sceneMeshCount; s++)
@@ -414,12 +460,9 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 					if( light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient || !ShouldCullFromLight(light, lightPosition, full, *mesh))
 					{
 						// shadow volume pass
-						if(pass == 0)
+						if(pass == 0 && doShadows && mesh->GetCastShadows())
 						{
-							if(mesh->GetCastShadows() && light.GetType() != LightType::Ambient)
-							{
-								RenderSceneObjectMeshesShadowVolumes(*child, light, lightPosition, shadowVolmeViewProjection, viewTransformInverse, camera);
-							}
+							RenderSceneObjectMeshesShadowVolumes(*child, light, lightPosition, shadowVolmeViewProjection, viewTransformInverse, camera);
 						}
 						else if(pass == 1) // normal rendering pass
 						{
@@ -430,6 +473,8 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 			}
 		}
 	}
+
+	 glDisable(GL_STENCIL_TEST);
 }
 
 void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera)
@@ -493,6 +538,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			if(rendered)
 			{
 				graphics->SetBlendingEnabled(true);
+				graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
 			}
 			else
 			{
@@ -520,6 +566,7 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 {
 	Mesh3DRenderer * renderer = NULL;
 	Transform modelViewProjection;
+	Transform modelView;
 	Transform model;
 
 	// check if current scene object has a mesh & renderer
@@ -542,6 +589,7 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
+			MaterialRef currentMaterial = renderer->GetMaterial(0);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
@@ -550,8 +598,11 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL sub mesh encountered.");
 
 			model.SetTo(sceneObject.GetProcessingTransform());
-			modelViewProjection.SetTo(model);
-			modelViewProjection.PreTransformBy(shadowVolumeViewProjection);
+			modelView.SetTo(model);
+			// concatenate modelTransform with inverted viewTransform
+			modelView.PreTransformBy(viewTransformInverse);
+			modelViewProjection.SetTo(modelView);
+			modelViewProjection.PreTransformBy(camera.GetProjectionTransform());
 
 			// activate the material, which will switch the GPU's active shader to
 			// the one associated with the material
@@ -586,7 +637,6 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 			shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
 
-			graphics->SetBlendingEnabled(false);
 			// render the shadow volume
 			subRenderer->RenderShadowVolume();
 		}

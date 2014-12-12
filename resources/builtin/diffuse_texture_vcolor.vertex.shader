@@ -1,4 +1,5 @@
- 
+precision highp float;
+
 uniform mat4 MODEL_MATRIX;
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 PROJECTION_MATRIX;
@@ -16,7 +17,8 @@ varying vec2 vUVTexture0;
 varying vec3 vNormal;
 varying vec4 vPosition;
 varying vec3 vLightDir;
- 
+
+
 void main()
 {
 	if(LIGHT_TYPE == 1)

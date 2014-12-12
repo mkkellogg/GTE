@@ -16,7 +16,8 @@ enum class DepthBufferFunction
 	Less=1,
 	LessThanOrEqual=2,
 	Greater=3,
-	GreaterThanOrEqual
+	GreaterThanOrEqual=4,
+	Equal=5
 
 };
 

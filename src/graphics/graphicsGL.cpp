@@ -89,8 +89,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glutIdleFunc(&_glutIdleFunc);
 
     // TODO: think of a better place for these calls
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+
     glClearColor(0,0,0,0);
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
@@ -98,13 +97,20 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glDisable(GL_BLEND);
 
     SetBlendingEnabled(false);
+
     SetDepthBufferEnabled(true);
-    SetDepthBufferReadonly(false);
+    SetDepthBufferReadOnly(false);
+    SetDepthBufferFunction(DepthBufferFunction::Equal);
 
    /* SetRenderBufferEnabled(RenderBufferType::Color, true);
     SetRenderBufferEnabled(RenderBufferType::Depth, true);
     SetRenderBufferEnabled(RenderBufferType::Stencil, false);*/
 
+   /* int dbits;
+    glGetIntegerv(GL_DEPTH_BITS, &dbits);
+    printf("dbits: %d\n", dbits);*/
+
+    initialized = true;
     return true;
 }
 
@@ -118,8 +124,12 @@ GraphicsGL::GraphicsGL() : Graphics()
 	openGLVersion = 0;
 	blendingEnabled = false;
 	colorBufferEnabled = false;
+
 	depthBufferEnabled = false;
+	depthBufferReadOnly = false;
+
 	stencilBufferEnabled = false;
+	initialized = false;
 }
 
 Shader * GraphicsGL::CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
@@ -143,22 +153,29 @@ void GraphicsGL::DestroyShader(Shader * shader)
     delete shader;
 }
 
-void GraphicsGL::ClearRenderBuffers(unsigned int bufferMask) const
+void GraphicsGL::ClearRenderBuffers(unsigned int bufferMask)
 {
 	GLbitfield glClearMask = 0;
 	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Color))
+	{
 		glClearMask |= GL_COLOR_BUFFER_BIT;
+	}
 	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Depth))
+	{
+		SetDepthBufferReadOnly(false);
 		glClearMask |= GL_DEPTH_BUFFER_BIT;
+	}
 	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Stencil))
-			glClearMask |= GL_STENCIL_BUFFER_BIT;
+	{
+		glClearMask |= GL_STENCIL_BUFFER_BIT;
+	}
 
 	glClear(glClearMask);
 }
 
 void GraphicsGL::SetDepthBufferEnabled(bool enabled)
 {
-	if(depthBufferEnabled != enabled)
+	if(depthBufferEnabled != enabled || !initialized)
 	{
 		if(enabled)glEnable(GL_DEPTH_TEST);
 		else glDisable(GL_DEPTH_TEST);
@@ -166,10 +183,14 @@ void GraphicsGL::SetDepthBufferEnabled(bool enabled)
 	}
 }
 
-void GraphicsGL::SetDepthBufferReadonly(bool readOnly)
+void GraphicsGL::SetDepthBufferReadOnly(bool readOnly)
 {
-	if(readOnly)glDepthMask(GL_FALSE);
-	else glDepthMask(GL_TRUE);
+	if(depthBufferReadOnly != readOnly || !initialized)
+	{
+		if(readOnly)glDepthMask(GL_FALSE);
+		else glDepthMask(GL_TRUE);
+		depthBufferReadOnly = readOnly;
+	}
 }
 
 void GraphicsGL::SetDepthBufferFunction(DepthBufferFunction function)
@@ -180,10 +201,10 @@ void GraphicsGL::SetDepthBufferFunction(DepthBufferFunction function)
 			glDepthFunc(GL_ALWAYS);
 		break;
 		case DepthBufferFunction::Greater:
-			glDepthFunc(GL_GEQUAL);
+			glDepthFunc(GL_GREATER);
 		break;
 		case DepthBufferFunction::GreaterThanOrEqual:
-			glDepthFunc(GL_ALWAYS);
+			glDepthFunc(GL_GEQUAL);
 		break;
 		case DepthBufferFunction::Less:
 			glDepthFunc(GL_LESS);
@@ -191,7 +212,19 @@ void GraphicsGL::SetDepthBufferFunction(DepthBufferFunction function)
 		case DepthBufferFunction::LessThanOrEqual:
 			glDepthFunc(GL_LEQUAL);
 		break;
+		case DepthBufferFunction::Equal:
+			glDepthFunc(GL_EQUAL);
+		break;
 	}
+}
+
+void GraphicsGL::SetColorBufferChannelState(bool r, bool g, bool b, bool a)
+{
+	GLboolean red = r == true ? GL_TRUE : GL_FALSE;
+	GLboolean green = g == true ? GL_TRUE : GL_FALSE;
+	GLboolean blue = b == true ? GL_TRUE : GL_FALSE;
+	GLboolean alpha = a == true ? GL_TRUE : GL_FALSE;
+	glColorMask(red, green, blue, alpha);
 }
 
 /*
@@ -368,10 +401,12 @@ void GraphicsGL::DestroyRenderTarget(RenderTarget * target)
 
 void GraphicsGL::SetBlendingEnabled(bool enabled)
 {
-	if(blendingEnabled == enabled)return;
-	if(enabled)glEnable(GL_BLEND);
-	else glDisable(GL_BLEND);
-	blendingEnabled = enabled;
+	if(blendingEnabled != enabled || !initialized)
+	{
+		if(enabled)glEnable(GL_BLEND);
+		else glDisable(GL_BLEND);
+		blendingEnabled = enabled;
+	}
 }
 
 void GraphicsGL::SetBlendingFunction(BlendingProperty source, BlendingProperty dest)
@@ -397,6 +432,9 @@ GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property)
 		break;
 		case BlendingProperty::One:
 			return GL_ONE;
+		break;
+		case BlendingProperty::Zero:
+			return GL_ZERO;
 		break;
 		default:
 			return (GLenum)0xFFFFFFFF;

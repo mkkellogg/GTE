@@ -1,3 +1,5 @@
+precision highp float;
+
 uniform mat4 MODEL_MATRIX;
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 PROJECTION_MATRIX;
