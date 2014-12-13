@@ -10,7 +10,7 @@ void main()
 	vec4 dir = vec4(0.0,0.0,0.0,0.0);
 	if(LIGHT_TYPE == 1)
 	{
-		dir = SHADOW_POSITION.w == 0.0 ? vec4(LIGHT_DIRECTION.xyz, 0.0) : SHADOW_POSITION + normalize(vec4(LIGHT_DIRECTION.xyz, 0.0)) * 0.005;
+		dir = SHADOW_POSITION.w == 0.0 ? vec4(LIGHT_DIRECTION.xyz, 0.0) : SHADOW_POSITION + normalize(vec4(LIGHT_DIRECTION.xyz, 0.0)) * .005;
 	}
 	else
 	{

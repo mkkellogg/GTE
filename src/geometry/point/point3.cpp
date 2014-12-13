@@ -184,7 +184,7 @@ bool Point3::AreEqual(const Point3* a, const Point3* b)
 {
 	ASSERT(a != NULL && b != NULL, "Point3::AreEqual -> NULL point passed.", false);
 
-	float epsilon = .005;
+	float epsilon = .0005;
 	return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
 }
 

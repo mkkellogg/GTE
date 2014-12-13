@@ -10,9 +10,8 @@ class Game
 	SceneObjectRef cameraObject;
 	SceneObjectRef playerObject;
 	SceneObjectRef cube;
-	SkinnedMesh3DRendererRef koopaRenderer;
-	AnimationRef koopaAnim;
-	AnimationRef koopaWait, koopaWalk, koopaJump, koopaRoar;
+	SkinnedMesh3DRendererRef playerRenderer;
+	AnimationRef playerWait, playerWalk, playerJump, playerRoar;
 	AnimationPlayerRef animationPlayer;
 
 	float walkAnimationSpeed;

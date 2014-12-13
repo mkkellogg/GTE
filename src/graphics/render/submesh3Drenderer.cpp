@@ -131,6 +131,7 @@ bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int length, in
 
 void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional)
 {
+	float backFaceThreshold = -.1;
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT_RTRN(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> mesh is invalid.");
 
@@ -212,10 +213,22 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 		float faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
 
-
-
 		bool currentFaceIsFront = false;
-		if(faceToLightDot >= 0)
+		if(faceToLightDot >= backFaceThreshold)
+		{
+			/*BaseVector4_QuickCopy(vertex1, svFrontBase);
+			svFrontBase+=4;
+			BaseVector4_QuickCopy(vertex2, svFrontBase);
+			svFrontBase+=4;
+			BaseVector4_QuickCopy(vertex3, svFrontBase);
+			svFrontBase+=4;
+
+			currentFrontFaceVertexIndex += 3;
+			currentFaceIsFront = true;*/
+
+			continue;
+		}
+		else
 		{
 			BaseVector4_QuickCopy(vertex1, svFrontBase);
 			svFrontBase+=4;
@@ -225,10 +238,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			svFrontBase+=4;
 
 			currentFrontFaceVertexIndex += 3;
-			currentFaceIsFront = true;
-		}
-		else
-		{
+
 			BaseVector4_QuickCopy_ZeroW(vertex1, svBackBase);
 			svBackBase+=4;
 			BaseVector4_QuickCopy_ZeroW(vertex2, svBackBase);
@@ -237,6 +247,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			svBackBase+=4;
 
 			currentBackFaceVertexIndex += 3;
+			currentFaceIsFront = false;
 		}
 
 		int facesFound = 0;
@@ -304,12 +315,12 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			}
 			else adjFaceToLightDot = -1;
 
-			/*if(currentFaceIsFront  && adjFaceToLightDot < 0 )
+			if(currentFaceIsFront  && adjFaceToLightDot < backFaceThreshold && adjacentFaceIndex < 0)
 			{
 				//printf("face normal: %d\n", adjacentFaceVertexIndex);
 				//printf("face normal: %f, %f, %f\n", adjacentFaceNormal->x, adjacentFaceNormal->y, adjacentFaceNormal->z);
 
-				BaseVector4_QuickCopy(edgeV2, svSideBase);
+				/*BaseVector4_QuickCopy(edgeV2, svSideBase);
 				svSideBase+=4;
 				BaseVector4_QuickCopy(edgeV1, svSideBase);
 				svSideBase+=4;
@@ -323,9 +334,9 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
 				svSideBase+=4;
 
-				currentSideVertexIndex += 6;
+				currentSideVertexIndex += 6;*/
 			}
-			else */  if(!(currentFaceIsFront==true)  && adjFaceToLightDot >= 0)
+			else if(true || adjFaceToLightDot >= backFaceThreshold /*|| adjacentFaceIndex < 0*//*&& adjacentFaceIndex >= 0*/)
 			{
 				//printf("face normal: %d\n", adjacentFaceVertexIndex);
 				//printf("face normal: %f, %f, %f\n", adjacentFaceNormal->x, adjacentFaceNormal->y, adjacentFaceNormal->z);

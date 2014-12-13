@@ -228,7 +228,8 @@ void Game::Init()
 
 
 
-	playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
+	//playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
+	playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd.fbx", 1 );
 	if(playerObject.IsValid())
 	{
 		playerObject->SetActive(true);
@@ -241,41 +242,41 @@ void Game::Init()
 
 	SkinnedMesh3DRendererRef meshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	firstMesh = meshRenderer->GetMesh();
-	//firstMesh->SetCastShadows(true);
-	//firstMesh->SetReceiveShadows(true);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
-	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
+	playerObject->GetLocalTransform().Scale(.08, .08, .08, true);
 
 
 
 
-	koopaWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
-	koopaWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
-	koopaJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
-	koopaRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
+	playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
+	playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
+	//playerJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
+	//playerRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
 
-	koopaRenderer = FindFirstSkinnedMeshRenderer(playerObject);
+	playerRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
-	bool compatible = animManager->IsCompatible(koopaRenderer, koopaWalk);
-	compatible &= animManager->IsCompatible(koopaRenderer, koopaWait);
-	compatible &= animManager->IsCompatible(koopaRenderer, koopaJump);
-	compatible &= animManager->IsCompatible(koopaRenderer, koopaRoar);
+	bool compatible = animManager->IsCompatible(playerRenderer, playerWalk);
+	compatible &= animManager->IsCompatible(playerRenderer, playerWait);
+	//compatible &= animManager->IsCompatible(playerRenderer, playerJump);
+	//compatible &= animManager->IsCompatible(playerRenderer, playerRoar);
 
 	if(compatible)printf("animation is compatible!! :)\n");
 	else printf("animation is not compatible! boooo!\n");
 
 	if(compatible)
 	{
-		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
-		animationPlayer->AddAnimation(koopaWait);
-		animationPlayer->AddAnimation(koopaWalk);
-		animationPlayer->AddAnimation(koopaJump);
-		animationPlayer->AddAnimation(koopaRoar);
+		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
+		animationPlayer->AddAnimation(playerWait);
+		animationPlayer->AddAnimation(playerWalk);
+		//animationPlayer->AddAnimation(playerJump);
+		//animationPlayer->AddAnimation(playerRoar);
 
-		animationPlayer->SetSpeed(koopaWalk, 2);
-		animationPlayer->Play(koopaWait);
+		animationPlayer->SetSpeed(playerWalk, 2);
+		animationPlayer->Play(playerWait);
 	}
 
 
@@ -449,14 +450,14 @@ void Game::Update()
 	 /*isWalking = true;
 	 AnimationManager * animManager = AnimationManager::Instance();
 	 AnimationPlayerRef player = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
-	 player->CrossFade(koopaWalk, 2);*/
+	 player->CrossFade(playerWalk, 2);*/
 
 	 //float realTime = Time::GetRealTimeSinceStartup();
 
 	cube->GetLocalTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
 
 	UpdatePlayerMovementDirection();
-	UpdatePlayerAnimation();
+	//UpdatePlayerAnimation();
 	UpdatePlayerPosition();
 	UpdatePlayerLookDirection();
 	UpdatePlayerFollowCamera();
@@ -595,11 +596,11 @@ void Game::UpdatePlayerAnimation()
 {
 	if(moveSpeed > .1)
 	{
-		animationPlayer->CrossFade(koopaWalk, .2);
+		animationPlayer->CrossFade(playerWalk, .2);
 	}
 	else
 	{
-		animationPlayer->CrossFade(koopaWait, .3);
+		animationPlayer->CrossFade(playerWait, .3);
 	}
 }
 
