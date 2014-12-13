@@ -39,43 +39,51 @@ AnimationManager::~AnimationManager()
 }
 
 /*
- * Check if the Skeleton specified by [skeleton] is compatible with [animation]. This simply means check
- * the target Skeleton of [animation] to see if it has the same number of nodes and that those nodes
- * are ordered the same. The latter is verified by running through the node list by index and making
- * sure the node names match.
- *
+ * Check if the Skeleton specified by [skeleton] is compatible with [animation]. This simply
+ * means loop through each channel in [animation] and verify there is a corresponding node in
+ * [skeleton. This match-up is accomplished by matching the name of the channel to the name
+ * of the skeleton node.
  */
 bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation) const
 {
 	ASSERT(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false);
 	ASSERT(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false);
 
-	SkeletonRef animationSkeleton = animation->GetTarget();
-
-	ASSERT(animationSkeleton.IsValid(), "AnimationManager::IsCompatible -> Animation does not have a valid skeleton.", false);
-
 	unsigned int skeletonNodeCount = skeleton->GetNodeCount();
+	unsigned int channelCount = animation->GetChannelCount();
 
 	// verify matching node count
-	if(skeletonNodeCount != animationSkeleton->GetNodeCount())
+	if(skeletonNodeCount != channelCount)
 	{
-		std::string msg = std::string("AnimationManager::IsCompatible -> Mismatched node count: ") + std::to_string(skeletonNodeCount);
-		msg += std::string(", ") + std::to_string(animationSkeleton->GetNodeCount());
-		Debug::PrintWarning(msg);
-		return false;
+		//std::string msg = std::string("AnimationManager::IsCompatible -> Mismatched node count: ") + std::to_string(skeletonNodeCount);
+		//msg += std::string(", ") + std::to_string(channelCount);
+		//Debug::PrintWarning(msg);
+		//return false;
 	}
 
-	// verify the name of each node matches the name of the node at the same index in
-	// the other Skeleton
-	for(unsigned int n = 0; n < skeletonNodeCount; n++)
+	// verify each channel in the animation has a matching node in [skeleton]
+	for(unsigned int c = 0; c < channelCount; c++)
 	{
-		SkeletonNode * meshNode = skeleton->GetNodeFromList(n);
-		SkeletonNode * animationNode = animationSkeleton->GetNodeFromList(n);
+		bool foundNodeForChannel = false;
+		const std::string * channelName = animation->GetChannelName(c);
+		if(channelName == NULL)continue;
 
-		if(meshNode->Name != animationNode->Name)
+		for(unsigned int n = 0; n < skeletonNodeCount; n++)
 		{
-			Debug::PrintWarning("AnimationManager::IsCompatible -> Mismatched node names.");
-			return false;
+			SkeletonNode * node = skeleton->GetNodeFromList(n);
+			if(node->Name == *channelName)
+			{
+				foundNodeForChannel = true;
+				break;
+			}
+		}
+
+		if(!foundNodeForChannel)
+		{
+			//std::string msg("AnimationManager::IsCompatible -> Could not find matching node for: ");
+			//msg += *channelName;
+			//Debug::PrintWarning(msg);
+			//return false;
 		}
 	}
 

@@ -17,6 +17,7 @@ class Vector3Array;
 class VertexAttrBuffer;
 class Skeleton;
 class Matrix4x4;
+class VertexBoneMap;
 
 #include "attributetransformer.h"
 #include "skinnedmesh3Dattrtransformer.h"
@@ -35,14 +36,15 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 		Transform = 3
 	};
 
-	// the Skeleton object that contains the bone structure that determines how
-	// the mesh attributes will be transformed.
-	SkeletonRef skeleton;
+	// the renderer for which this transformer acts
+	SkinnedMesh3DRenderer* renderer;
 	// [skeleton] has an array of VertexBoneMap objects. [vertexBoneMapIndex] is the
 	// index in that array that contains the VertexBoneMap for this instance of
 	// SkinnedMesh3DAttributeTransformer.
 	int vertexBoneMapIndex;
-	// flag for each Bone object in the list of bones held by [skeleton]. the flag indicates
+
+	int boneCount;
+	// flag for each Bone object in the list of bones held by the skeleton in [renderer]. the flag indicates
 	// whether the transformation for that bone has been calculated already (bones are often visited
 	// multiple times during a single vertex skinning operation).
 	unsigned char * boneTransformed;
@@ -69,6 +71,7 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	// vertex are equal
 	unsigned char * identicalNormalFlags;
 
+	void UpdateTransformedBoneCacheSize();
 	void DestroyTransformedBoneFlagsArray();
 	bool CreateTransformedBoneFlagsArray();
 	void ClearTransformedBoneFlagsArray();
@@ -92,7 +95,7 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	SkinnedMesh3DAttributeTransformer();
     ~SkinnedMesh3DAttributeTransformer();
 
-    void SetSkeleton(SkeletonRef skeleton);
+    void SetRenderer(SkinnedMesh3DRenderer* renderer);
     void SetVertexBoneMapIndex(int index);
 
     void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut,

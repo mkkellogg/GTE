@@ -111,7 +111,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 	importer->SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
 
 	// read the model file in from disk
-	scene = importer->ReadFile(filePath ,aiProcessPreset_TargetRealtime_Quality );
+	scene = importer->ReadFile(filePath, aiProcessPreset_TargetRealtime_Quality );
 
 	// If the import failed, report it
 	if(!scene)
@@ -175,6 +175,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 				continue;
 			}
 			renderer->SetSkeleton(skeletonClone);
+			SetupVertexBoneMapForRenderer(scene, skeletonClone, renderer);
 		}
 	}
 	return root;
@@ -563,6 +564,38 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	return true;
 }
 
+void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target) const
+{
+	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	{
+		aiMesh * cMesh = scene.mMeshes[m];
+		if( cMesh != NULL && cMesh->mNumBones > 0)
+		{
+			VertexBoneMap indexBoneMap(cMesh->mNumVertices, cMesh->mNumVertices);
+
+			bool mapInitSuccess = indexBoneMap.Init();
+			if(!mapInitSuccess)
+			{
+				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not initialize index bone map.");
+			}
+
+			SetupVertexBoneMapMappingsFromAIMesh(skeleton, *cMesh, indexBoneMap);
+
+			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping( indexBoneMap, *cMesh);
+			if(fullBoneMap == NULL)
+			{
+				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not create full vertex bone map.");
+			}
+
+			target->AddVertexBoneMap(fullBoneMap);
+		}
+		else
+		{
+			target->AddVertexBoneMap(NULL);
+		}
+	}
+}
+
 void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene)
 {
 	LongMask flags = LongMaskUtil::CreateLongMask();
@@ -663,30 +696,8 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 		aiMesh * cMesh = scene.mMeshes[m];
 		if( cMesh != NULL && cMesh->mNumBones > 0)
 		{
-			VertexBoneMap indexBoneMap(cMesh->mNumVertices, cMesh->mNumVertices);
 
-			bool mapInitSuccess = indexBoneMap.Init();
-			if(!mapInitSuccess)
-			{
-				Debug::PrintError("ModelImporter::LoadSkeleton -> Could not initialize index bone map.");
-				objectManager->DestroySkeleton(target);
-				return SkeletonRef::Null();
-			}
-
-			AddBoneMappings(target, *cMesh, boneIndex, indexBoneMap);
-			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping( indexBoneMap, *cMesh);
-			if(fullBoneMap == NULL)
-			{
-				Debug::PrintError("ModelImporter::LoadSkeleton -> Could not create full vertex bone map.");
-				objectManager->DestroySkeleton(target);
-				return SkeletonRef::Null();
-			}
-
-			target->AddVertexBoneMap(fullBoneMap);
-		}
-		else
-		{
-			target->AddVertexBoneMap(NULL);
+			AddMeshBoneMappingsToSkeleton(target, *cMesh, boneIndex);
 		}
 	}
 
@@ -735,7 +746,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	return fullBoneMap;
 }
 
-void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap) const
+void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex) const
 {
 	ASSERT_RTRN(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.");
 
@@ -759,7 +770,20 @@ void ModelImporter::AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, un
 
 				currentBoneIndex++;
 			}
+		}
+	}
+}
 
+void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const
+{
+	ASSERT_RTRN(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.");
+
+	for(unsigned int b = 0; b < mesh.mNumBones; b++)
+	{
+		aiBone * cBone = mesh.mBones[b];
+		if(cBone != NULL)
+		{
+			std::string boneName = std::string(cBone->mName.C_Str());
 			unsigned int boneIndex = skeleton->GetBoneMapping(boneName);
 
 			for(unsigned int w = 0; w < cBone->mNumWeights; w++)
@@ -860,7 +884,7 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	return success;
 }
 
-AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef skeleton) const
+AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation) const
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	ASSERT(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
@@ -875,10 +899,10 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 	ASSERT(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> tickers per second is 0.", AnimationRef::Null());
 	//float duration = durationTicks / ticksPerSecond;
 
-	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond, skeleton);
+	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond);
 	ASSERT(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null());
 
-	bool initSuccess = animationRef->Init();
+	bool initSuccess = animationRef->Init(animation.mNumChannels);
 	if(!initSuccess)
 	{
 		objectManager->DestroyAnimation(animationRef);
@@ -891,8 +915,10 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, SkeletonRef s
 		aiNodeAnim * nodeAnim = animation.mChannels[n];
 		std::string nodeName(nodeAnim->mNodeName.C_Str());
 
-		int nodeIndex = skeleton->GetNodeMapping(nodeName);
+		animationRef->SetChannelName(n,nodeName);
 
+		//int nodeIndex = skeleton->GetNodeMapping(nodeName);
+		int nodeIndex = n;
 		if(nodeIndex >= 0)
 		{
 			KeyFrameSet * keyFrameSet = animationRef->GetKeyFrameSet(nodeIndex);
@@ -958,12 +984,10 @@ AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
 	const aiScene * scene = LoadAIScene(filePath);
 	ASSERT(scene != NULL, "ModelImporter::LoadAnimation -> Unable to load scene.", AnimationRef::Null());
 
-	SkeletonRef skeleton = LoadSkeleton(*scene);
-	ASSERT(skeleton.IsValid(), "ModelImporter::LoadAnimation -> Model file does not contain skeleton.", AnimationRef::Null());
 	ASSERT(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationRef::Null());
 
 	// only load the first animation
-	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), skeleton);
+	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]));
 	ASSERT(animation.IsValid(),"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null());
 
 	return animation;

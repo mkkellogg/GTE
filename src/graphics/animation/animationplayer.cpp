@@ -33,7 +33,6 @@ AnimationPlayer::AnimationPlayer(SkeletonRef target)
 	ASSERT_RTRN(target.IsValid(),"AnimationPlayer::AnimationPlayer -> Invalid target.");
 	this->target = target;
 	animationCount = 0;
-	leftOverWeight = 1;
 	playingAnimationsCount = 0;
 }
 
@@ -129,7 +128,7 @@ void AnimationPlayer::UpdateBlending()
  */
 void AnimationPlayer::CheckWeights()
 {
-	leftOverWeight = 1;
+	float leftOverWeight = 1;
 	for(unsigned int i = 0; i < registeredAnimations.size(); i++)
 	{
 		AnimationInstanceRef instance = registeredAnimations[i];
@@ -191,6 +190,10 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 	// weighted average of positions returned from each active animation
 	for(unsigned int node = 0; node < target->GetNodeCount(); node++)
 	{
+		agScale.Set(0,0,0);
+		agTranslation.Set(0,0,0);
+		agRotation = Quaternion::Identity;
+
 		playingAnimationsSeen = 0;
 		float agWeight = 0;
 
@@ -208,7 +211,12 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 				if(weight <=0)continue;
 
 				// calculate the translation, rotation, and scale for this animation at the current node
-				CalculateInterpolatedValues(instance, node, translation, rotation, scale);
+				int mappedChannel = instance->GetChannelMappingForTargetNode(node);
+				if(mappedChannel < 0)continue;
+				CalculateInterpolatedValues(instance, mappedChannel, translation, rotation, scale);
+
+				// calculate aggregate (sum of weights up until this point)
+				agWeight += weight;
 
 				// if the number of active animations is 1, indicated by playingAnimationsCount == 1, and its
 				// weight is 1, then we simply use the results from CalculateInterpolatedValues() and apply those
@@ -221,9 +229,6 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 				}
 				else // we have to apply weights across 1 or more animations
 				{
-					// calculate aggregate (sum of weights up until this point)
-					agWeight += weight;
-
 					// apply weight to each transformation
 					translation.Scale(weight);
 					scale.Scale(weight);
@@ -257,6 +262,15 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 		// only apply transformations if they were actually calculated
 		if(playingAnimationsCount > 0)
 		{
+			// if the aggregate weight of all playing animations for the current channel does not add up to 1
+			// then we use identity values to make up the difference
+			if(agWeight < 1)
+			{
+				float weightDiff = 1 - agWeight;
+				agScale.Set(agScale.x + weightDiff,agScale.y + weightDiff,agScale.z + weightDiff);
+				Quaternion::slerp(agRotation, Quaternion::Identity, weightDiff);
+			}
+
 			agRotation.normalize();
 			rotMatrix = agRotation.rotationMatrix();
 
@@ -282,13 +296,13 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 }
 
 /*
- * Use the current progress of [instance] to find the two closest key frames in the KeyFrameSet specified by [frameSetIndex].
+ * Use the current progress of [instance] to find the two closest key frames in the KeyFrameSet specified by [channel].
  * Then interpolate between those two key frames based on where the progress of [instance] lies between them, and store the
  * interpolated translation, rotation, and scale values in [translation], [rotation], and [scale].
  */
-void AnimationPlayer::CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int frameSetIndex, Vector3& translation, Quaternion& rotation, Vector3& scale) const
+void AnimationPlayer::CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
-	KeyFrameSet * frameSet = instance->SourceAnimation->GetKeyFrameSet(frameSetIndex);
+	KeyFrameSet * frameSet = instance->SourceAnimation->GetKeyFrameSet(channel);
 
 	// make sure it's an active KeyFrameSet
 	if(frameSet != NULL && frameSet->Used)

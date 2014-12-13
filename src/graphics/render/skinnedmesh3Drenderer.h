@@ -3,6 +3,7 @@
 
 // forward declarations
 class Skeleton;
+class VertexBoneMap;
 
 #include "mesh3Drenderer.h"
 #include "skinnedmesh3Dattrtransformer.h"
@@ -16,6 +17,10 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 	protected:
 
 	SkeletonRef skeleton;
+
+	// all the VertexBoneMap objects for this renderer
+	std::vector<VertexBoneMap *> vertexBoneMaps;
+
 	SkinnedMesh3DAttributeTransformer meshTransformer;
 	Mesh3DRef mesh;
 	std::unordered_map<unsigned int, unsigned int>subMeshIndexMap;
@@ -32,6 +37,9 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 	void SetMesh(Mesh3DRef mesh);
 	void UpdateFromMesh();
 	void MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, unsigned int vertexBoneMapIndex);
+
+    void AddVertexBoneMap(VertexBoneMap * map);
+    VertexBoneMap * GetVertexBoneMap(unsigned int index);
 };
 
 

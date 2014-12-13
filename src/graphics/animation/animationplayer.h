@@ -48,8 +48,6 @@ class AnimationPlayer
 	std::vector<AnimationInstanceRef> registeredAnimations;
 	// weights used for animation blending
 	std::vector<float> animationWeights;
-	// if the sum of [weights] is less than 1, the difference is stored in [leftOverWeight]
-	float leftOverWeight;
 	// active animation blending operations
 	std::queue<BlendOp*> activeBlendOperations;
 	// flags that indicate if the animation at a specified index is the target of a cross fade operation in activeBlendOperations
@@ -70,7 +68,7 @@ class AnimationPlayer
 	void UpdatePositionsFromAnimations();
 	void UpdateAnimationsProgress();
 	void UpdateAnimationInstanceProgress(AnimationInstanceRef instance) const;
-	void CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int frameSetIndex, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+	void CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
 	void CalculateInterpolatedTranslation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
 	void CalculateInterpolatedScale(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
 	void CalculateInterpolatedRotation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;

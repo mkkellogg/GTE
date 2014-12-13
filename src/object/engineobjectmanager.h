@@ -96,7 +96,7 @@ class EngineObjectManager
     SkeletonRef CloneSkeleton(SkeletonRef source);
     void DestroySkeleton(SkeletonRef skeleton);
 
-    AnimationRef CreateAnimation(float duration, float ticksPerSecond, SkeletonRef target);
+    AnimationRef CreateAnimation(float duration, float ticksPerSecond);
     void DestroyAnimation(AnimationRef animation);
     AnimationInstanceRef CreateAnimationInstance(SkeletonRef target, AnimationRef animation);
     void DestroyAnimationInstance(AnimationInstanceRef instance);

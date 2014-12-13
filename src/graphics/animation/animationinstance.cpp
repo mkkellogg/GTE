@@ -22,6 +22,8 @@ AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
 	StateCount = 0;
 	FrameStates = NULL;
 
+	NodeToChannelMap = NULL;
+
 	Duration = 0;
 	Progress = 0;
 	SpeedFactor = 1;
@@ -51,6 +53,13 @@ void AnimationInstance::Destroy()
 		delete[] FrameStates;
 		FrameStates = NULL;
 	}
+
+	if(NodeToChannelMap != NULL)
+	{
+		delete[] NodeToChannelMap;
+		NodeToChannelMap = NULL;
+	}
+
 	StateCount = 0;
 }
 
@@ -67,20 +76,44 @@ bool AnimationInstance::Init()
 	ASSERT(SourceAnimation.IsValid(), "AnimationInstance::Init -> Animation is invalid.", false);
 
 	unsigned int nodeCount = Target->GetNodeCount();
-
-	ASSERT(nodeCount == SourceAnimation->GetKeyFrameSetCount(),"AnimationInstance::Init -> Node count does not equal animation key frame set count.",false);
+	unsigned int channelCount = SourceAnimation->GetChannelCount();
 
 	if(nodeCount <= 0)return true;
 
 	FrameStates = new FrameState[nodeCount];
 	ASSERT(FrameStates != NULL, "AnimationInstance::Init -> Unable to allocate FrameState array.", false);
 
+	NodeToChannelMap = new int[nodeCount];
+	if(NodeToChannelMap == NULL)
+	{
+		Debug::PrintError("AnimationInstance::Init -> Unable to allocate NodeToChannelMap array.");
+		Destroy();
+		return false;
+	}
+
+	StateCount = nodeCount;
+
 	for(unsigned int n = 0; n < nodeCount; n++)
 	{
-		FrameState state;
-		FrameStates[n] = state;
+		SkeletonNode * node = Target->GetNodeFromList(n);
+		int foundIndex = -1;
+
+		if(node != NULL)
+		{
+			for(unsigned int c = 0; c < channelCount; c++)
+			{
+				const std::string * channelName = SourceAnimation->GetChannelName(c);
+				if(channelName == NULL)continue;
+
+				if(node->Name == *channelName)
+				{
+					foundIndex = c;
+				}
+			}
+		}
+
+		NodeToChannelMap[n] = foundIndex;
 	}
-	StateCount = nodeCount;
 
 	DurationTicks = SourceAnimation->GetDurationTicks();
 	Duration = DurationTicks / SourceAnimation->GetTicksPerSecond();
@@ -118,6 +151,14 @@ AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int st
 	}
 
 	return FrameStates + stateIndex;
+}
+
+int AnimationInstance::GetChannelMappingForTargetNode(unsigned int nodeIndex)
+{
+	ASSERT(Target.IsValid(), "AnimationInstance::GetChannelMappingForTargetNode -> target skeleton is not valid.", -1);
+	ASSERT(nodeIndex < Target->GetNodeCount(), "AnimationInstance::GetChannelMappingForTargetNode -> nodeIndex is out of range.", -1);
+
+	return NodeToChannelMap[nodeIndex];
 }
 
 void AnimationInstance::SetSpeed(float speedFactor)

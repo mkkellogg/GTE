@@ -28,30 +28,32 @@ class Animation : public EngineObject
 	// A KeyFrameSet for each node in the target skeleton
 	KeyFrameSet * keyFrames;
 
-	// store the number of KeyFrameSet objects that have been allocated, this should
-	// match the number of nodes in the target skeleton
-	unsigned int keyFrameSetCount;
+	// the channel name of each key frame set, used in animation targeting
+	// 1:1 correspondence with [keyFrames]
+	std::string * channelNames;
 
-	// the target skeleton
-	SkeletonRef target;
+	// store the number of KeyFrameSet objects that have been allocated, which
+	// is also the length of [channelNames]
+	unsigned int channelCount;
 
 	// the duration of this animation in  device/clock independent ticks
 	float durationTicks;
 	// map the ticks duration to actual time
 	float ticksPerSecond;
 
-	Animation(float durationTicks, float ticksPerSecond, SkeletonRef target);
+	Animation(float durationTicks, float ticksPerSecond);
 	~Animation();
 	void Destroy();
-	bool Init();
+	bool Init(unsigned int channelCount);
 
 	public:
 
-	unsigned int GetKeyFrameSetCount();
+	unsigned int GetChannelCount();
 	KeyFrameSet * GetKeyFrameSet(unsigned int nodeIndex);
+	const std::string * GetChannelName(unsigned int index);
+	void SetChannelName(unsigned int index, const std::string& name);
 	float GetDurationTicks() const;
 	float GetTicksPerSecond() const;
-	SkeletonRef GetTarget();
 };
 
 #endif

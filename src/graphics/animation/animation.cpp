@@ -12,13 +12,13 @@
 /*
  * Single constructor, which initializes all member variables of this animation.
  */
-Animation::Animation(float durationTicks, float ticksPerSecond, SkeletonRef target)
+Animation::Animation(float durationTicks, float ticksPerSecond)
 {
 	keyFrames = NULL;
 	this->durationTicks = durationTicks;
 	this->ticksPerSecond = ticksPerSecond;
-	this->target = target;
-	keyFrameSetCount = 0;
+	channelCount = 0;
+	channelNames = NULL;
 }
 
 /*
@@ -30,7 +30,7 @@ Animation::~Animation()
 }
 
 /*
- * This method destroys the member array of KeyFrameSet objects and invalidates the array pointer.
+ * This method destroys [channelNames] and [keyFrames] and invalidates their pointers
  */
 void Animation::Destroy()
 {
@@ -39,24 +39,35 @@ void Animation::Destroy()
 		delete[] keyFrames;
 		keyFrames = NULL;
 	}
-	keyFrameSetCount = 0;
+
+	if(channelNames != NULL)
+	{
+		delete[] channelNames;
+		channelNames = NULL;
+	}
+
+	channelCount = 0;
 }
 
 /*
- * Initialize this animation. This method will validate the target skeleton [target] and allocate
- * a KeyFrameSet object for each node in [target] in [keyframes].
+ * Initialize this animation. This method will allocate [keyFrameSetCount]] key frame sets.
  */
-bool Animation::Init()
+bool Animation::Init(unsigned int channelCount)
 {
 	Destroy();
 
-	ASSERT(target.IsValid(),"Animation::Init -> Animation target is not valid.",false);
-	if(target->GetNodeCount() == 0)return true;
+	this->channelCount = channelCount;
 
-	keyFrames = new KeyFrameSet[target->GetNodeCount()];
+	keyFrames = new KeyFrameSet[channelCount];
 	ASSERT(keyFrames != NULL,"Animation::Init -> Could not allocate key frame set array", false);
 
-	keyFrameSetCount = target->GetNodeCount();
+	channelNames = new std::string[channelCount];
+	if(channelNames == NULL)
+	{
+		Destroy();
+		Debug::PrintError("Animation::Init -> Could not allocate channel name set array");
+		return false;
+	}
 
 	return true;
 }
@@ -64,9 +75,9 @@ bool Animation::Init()
 /*
  * Return the number of KeyFrameSet objects in [keyFrames].
  */
-unsigned int Animation::GetKeyFrameSetCount()
+unsigned int Animation::GetChannelCount()
 {
-	return keyFrameSetCount;
+	return channelCount;
 }
 
 /*
@@ -74,8 +85,20 @@ unsigned int Animation::GetKeyFrameSetCount()
  */
 KeyFrameSet * Animation::GetKeyFrameSet(unsigned int nodeIndex)
 {
-	ASSERT(nodeIndex < keyFrameSetCount,"Animation::GetKeyFrameSet -> Node index is out of range.", NULL);
+	ASSERT(nodeIndex < channelCount,"Animation::GetKeyFrameSet -> Node index is out of range.", NULL);
 	return keyFrames + nodeIndex;
+}
+
+const std::string * Animation::GetChannelName(unsigned int index)
+{
+	ASSERT(index < channelCount, "Animation::GetChannelName -> index is out of range.", NULL);
+	return channelNames + index;
+}
+
+void Animation::SetChannelName(unsigned int index, const std::string& name)
+{
+	ASSERT_RTRN(index < channelCount, "Animation::SetChannelName -> index is out of range.");
+	channelNames[index] = name;
 }
 
 /*
@@ -92,12 +115,4 @@ float Animation::GetDurationTicks() const
 float Animation::GetTicksPerSecond() const
 {
 	return ticksPerSecond;
-}
-
-/*
- * Get a reference to the target of this animation.
- */
-SkeletonRef Animation::GetTarget()
-{
-	return target;
 }

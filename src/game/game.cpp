@@ -242,18 +242,19 @@ void Game::Init()
 
 	SkinnedMesh3DRendererRef meshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	firstMesh = meshRenderer->GetMesh();
-	firstMesh->SetCastShadows(true);
-	firstMesh->SetReceiveShadows(true);
+	//firstMesh->SetCastShadows(true);
+	//firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
-	playerObject->GetLocalTransform().Scale(.08, .08, .08, true);
+	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
 
 
 
-
-	playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
-	playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
+	playerWait = importer->LoadAnimation("../../models/cartoonnerd/human@idleneutral.fbx");
+	playerWalk = importer->LoadAnimation("../../models/cartoonnerd/human@walk.fbx");
+	//playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
+	//playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
 	//playerJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
 	//playerRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
 
@@ -457,7 +458,7 @@ void Game::Update()
 	cube->GetLocalTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
 
 	UpdatePlayerMovementDirection();
-	//UpdatePlayerAnimation();
+	UpdatePlayerAnimation();
 	UpdatePlayerPosition();
 	UpdatePlayerLookDirection();
 	UpdatePlayerFollowCamera();

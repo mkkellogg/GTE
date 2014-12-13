@@ -506,8 +506,6 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 		unsigned int materialIndex = 0;
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
-			if(i == 0 || renderer->GetSubRendererCount() <= 5)
-			{
 			MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -551,7 +549,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			subRenderer->Render();
 			// flag the current mesh as being rendered (at least once)
 			renderedObjects[subMesh->GetObjectID()] = true;
-			}
+
 			// Advance material index. Renderer can have any number of materials > 0; it does not have to match
 			// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
 			materialIndex++;
@@ -591,8 +589,6 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
-			if(i==0 || renderer->GetSubRendererCount() <= 5 )
-			{
 			MaterialRef currentMaterial = renderer->GetMaterial(0);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -643,7 +639,6 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 			// render the shadow volume
 			subRenderer->RenderShadowVolume();
-			}
 		}
 	}
 }

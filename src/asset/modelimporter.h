@@ -88,13 +88,15 @@ class ModelImporter
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor) const;
+	void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target) const;
 
 	SkeletonRef LoadSkeleton(const aiScene& scene) const;
 	VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh) const;
-	void AddBoneMappings(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex, VertexBoneMap& vertexIndexBoneMap) const;
+	void AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex) const;
+	void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
 	unsigned CountBones(const aiScene& scene) const;
 	bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
-	AnimationRef LoadAnimation (aiAnimation& animation, SkeletonRef skeleton) const;
+	AnimationRef LoadAnimation (aiAnimation& animation) const;
 
 	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback) const;
 	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback) const;

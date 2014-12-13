@@ -57,6 +57,9 @@ class AnimationInstance
 
 	private:
 
+	// map each node in [Target] to a channel in [SourceAnimation]
+	int * NodeToChannelMap;
+
 	// the target of this instance
 	SkeletonRef Target;
 	// the Animation for which this is an instance
@@ -103,6 +106,7 @@ class AnimationInstance
     void Reset();
 
     FrameState * GetFrameState(unsigned int stateIndex);
+    int GetChannelMappingForTargetNode(unsigned int nodeIndex);
 };
 
 #endif

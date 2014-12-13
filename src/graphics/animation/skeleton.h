@@ -41,11 +41,10 @@ class Skeleton : public EngineObject
 	Bone * bones;
 	// map from bone name to index in [bones] for the matching Bone object
 	std::unordered_map<std::string, unsigned int> boneNameMap;
-	// all the VertexBoneMap objects for this skeleton
-	std::vector<VertexBoneMap *> vertexBoneMaps;
 
 	// map from node name to index in [nodeList] for the mtching SkeletonNode object
 	std::unordered_map<std::string, unsigned int> nodeNameMap;
+
 	// indexed list of all the nodes in this skeleton
 	std::vector<SkeletonNode *> nodeList;
 
@@ -74,10 +73,6 @@ class Skeleton : public EngineObject
     int GetNodeMapping(std::string& name);
     SkeletonNode * GetNodeFromList(unsigned int nodeIndex);
     void AddNodeToList(SkeletonNode * node);
-
-
-    void AddVertexBoneMap(VertexBoneMap * map);
-    VertexBoneMap * GetVertexBoneMap(unsigned int index);
 
     Skeleton * FullClone();
 };

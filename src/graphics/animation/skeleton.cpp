@@ -34,15 +34,6 @@ Skeleton::~Skeleton()
  */
 void Skeleton::Destroy()
 {
-	// loop through each VertexBoneMap and delete
-	for(unsigned int i = 0; i < vertexBoneMaps.size(); i++)
-	{
-		VertexBoneMap * map = vertexBoneMaps[i];
-		SAFE_DELETE(map);
-		vertexBoneMaps[i] = NULL;
-	}
-	vertexBoneMaps.clear();
-
 	// delete all Bone objects
 	if(bones != NULL)
 	{
@@ -149,11 +140,7 @@ int Skeleton::GetBoneMapping(std::string& name)
  */
 Bone* Skeleton::GetBone(unsigned int boneIndex)
 {
-	if(boneIndex >= boneCount)
-	{
-		Debug::PrintError("Skeleton::GetBone -> Index is out of range.");
-		return NULL;
-	}
+	ASSERT(boneIndex < boneCount, "Skeleton::GetBone -> Index is out of range.", NULL);
 
 	return bones + boneIndex;
 }
@@ -204,28 +191,6 @@ void Skeleton::AddNodeToList(SkeletonNode * node)
 }
 
 /*
- * Add a VertexBoneMap object to this skeleton.
- */
-void Skeleton::AddVertexBoneMap(VertexBoneMap * map)
-{
-	vertexBoneMaps.push_back(map);
-}
-
-/*
- * Retrieve the VertexBoneMap object stored at [index] in [vertexBoneMaps].
- */
-VertexBoneMap * Skeleton::GetVertexBoneMap(unsigned int index)
-{
-	if(index >= vertexBoneMaps.size())
-	{
-		Debug::PrintError("Skeleton::GetVertexBoneMap -> Index out of range.");
-		return NULL;
-	}
-
-	return vertexBoneMaps[index];
-}
-
-/*
  * Create a full (deep) clone of this Skeleton object.
  */
 Skeleton * Skeleton::FullClone()
@@ -250,28 +215,6 @@ Skeleton * Skeleton::FullClone()
 
 	// copy over the bone name map
 	newSkeleton->boneNameMap = boneNameMap;
-
-	// loop through each VertexBoneMap in this skeleton, create a full clone
-	// of it, and then add to the new skeleton.
-	for(unsigned int i = 0; i < vertexBoneMaps.size(); i++)
-	{
-		VertexBoneMap * existing = vertexBoneMaps[i];
-		VertexBoneMap * clone = NULL;
-
-		if(existing != NULL)
-		{
-			// create full clone of VertexBoneMap object
-			clone = existing->FullClone();
-			if(clone == NULL)
-			{
-				Debug::PrintError("Skeleton::FullClone -> Could not clone vertex bone map.");
-				delete newSkeleton;
-				return NULL;
-			}
-		}
-
-		newSkeleton->vertexBoneMaps.push_back(clone);
-	}
 
 	// get the TreeNode object that contains the root node of the existing skeleton
 	Tree<SkeletonNode *>::TreeNode * rootTreeNode = skeleton.GetRoot();
