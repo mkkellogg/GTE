@@ -768,6 +768,12 @@ void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const ai
 				skeleton->GetBone(currentBoneIndex)->ID = currentBoneIndex;
 				skeleton->GetBone(currentBoneIndex)->OffsetMatrix.SetTo(offsetMatrix);
 
+				/*printf("offset: %f,%f,%f,%f,   %f,%f,%f,%f,   %f,%f,%f,%f,   %f,%f,%f,%f\n", offsetMatrix.A0, offsetMatrix.A1, offsetMatrix.A2, offsetMatrix.A3,
+																							  offsetMatrix.B0, offsetMatrix.B1, offsetMatrix.B2, offsetMatrix.B3,
+																							  offsetMatrix.C0, offsetMatrix.C1, offsetMatrix.C2, offsetMatrix.C3,
+																							  offsetMatrix.D0, offsetMatrix.D1, offsetMatrix.D2, offsetMatrix.D3);*/
+
+
 				currentBoneIndex++;
 			}
 		}
@@ -799,6 +805,7 @@ void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, c
 					desc->UniqueVertexIndex = vertexID;
 					desc->BoneIndex[desc->BoneCount] = boneIndex;
 					desc->Weight[desc->BoneCount] = weight;
+					desc->Name[desc->BoneCount] = boneName;
 					desc->BoneCount++;
 				}
 			}

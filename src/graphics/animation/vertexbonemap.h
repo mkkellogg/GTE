@@ -40,6 +40,8 @@ class VertexBoneMap
 		unsigned int BoneIndex[Constants::MaxBonesPerVertex];
 		// weight of each bone attachment, should add up to 1
 		float Weight[Constants::MaxBonesPerVertex];
+		// name of the bones, used for rebind to different skeletons
+		std::string Name[Constants::MaxBonesPerVertex];
 
 		// make this VertexMappingDexcriptor object identical to [desc].
 		void SetTo(VertexMappingDescriptor* desc)
@@ -50,6 +52,10 @@ class VertexBoneMap
 			this->UniqueVertexIndex = desc->UniqueVertexIndex;
 			memcpy(this->BoneIndex, desc->BoneIndex, sizeof(unsigned int) * Constants::MaxBonesPerVertex);
 			memcpy(this->Weight, desc->Weight, sizeof(float) * Constants::MaxBonesPerVertex);
+			for(unsigned int b = 0; b < Constants::MaxBonesPerVertex; b++)
+			{
+				Name[b] = desc->Name[b];
+			}
 		}
 	};
 
@@ -72,6 +78,7 @@ class VertexBoneMap
 	VertexMappingDescriptor* GetDescriptor(unsigned int index);
 	unsigned int GetVertexCount();
 	unsigned int GetUniqueVertexCount();
+	void BindTo(SkeletonRef skeleton);
 	VertexBoneMap * FullClone();
 };
 

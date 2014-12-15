@@ -212,7 +212,11 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 
 				// calculate the translation, rotation, and scale for this animation at the current node
 				int mappedChannel = instance->GetChannelMappingForTargetNode(node);
-				if(mappedChannel < 0)continue;
+				if(mappedChannel < 0)
+					{
+						continue;
+					}
+
 				CalculateInterpolatedValues(instance, mappedChannel, translation, rotation, scale);
 
 				// calculate aggregate (sum of weights up until this point)
@@ -303,6 +307,7 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 void AnimationPlayer::CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
 	KeyFrameSet * frameSet = instance->SourceAnimation->GetKeyFrameSet(channel);
+	ASSERT_RTRN(frameSet != NULL, "AnimationPlayer::CalculateInterpolatedValues -> frameSet is NULL.");
 
 	// make sure it's an active KeyFrameSet
 	if(frameSet != NULL && frameSet->Used)
@@ -367,7 +372,7 @@ void AnimationPlayer::CalculateInterpolatedTranslation(AnimationInstanceRef inst
 
 	unsigned int previousIndex, nextIndex;
 	float interFrameProgress;
-	bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Rotation);
+	bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Translation);
 
 	// did we successfully find 2 frames between which to interpolate?
 	if(foundFrames)
@@ -400,7 +405,7 @@ void AnimationPlayer::CalculateInterpolatedScale(AnimationInstanceRef instance, 
 
 	unsigned int previousIndex, nextIndex;
 	float interFrameProgress;
-	bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Rotation);
+	bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Scale);
 
 	// did we successfully find 2 frames between which to interpolate?
 	if(foundFrames)

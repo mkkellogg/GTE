@@ -175,7 +175,13 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 	{
 		SceneObjectRef child = parent.GetChildAt(i);
 
-		if(child.IsValid() && child->IsActive())
+		if(!child.IsValid())
+		{
+			Debug::PrintError("RenderManager::RenderAll -> NULL scene object encountered.");
+			continue;
+		}
+
+		if(child->IsActive())
 		{
 			//if(cycleCount <= 0)printf("node: %s\n", child->GetName());
 
@@ -275,10 +281,6 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 
 			// restore previous view transform
 			PopTransformData(aggregateTransform, viewTransformStack);
-		}
-		else
-		{
-			Debug::PrintError("RenderManager::RenderAll -> NULL scene object encountered.");
 		}
 	}
 }

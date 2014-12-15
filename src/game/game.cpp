@@ -20,6 +20,7 @@
 #include "graphics/animation/animationinstance.h"
 #include "graphics/animation/animationplayer.h"
 #include "graphics/animation/bone.h"
+#include "graphics/animation/vertexbonemap.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
@@ -228,8 +229,21 @@ void Game::Init()
 
 
 
+
+
+	SceneObjectRef defaultObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
+	SkinnedMesh3DRendererRef defaultMeshRenderer = FindFirstSkinnedMeshRenderer(defaultObject);
+	SkeletonRef defaultSkeleton = defaultMeshRenderer->GetSkeleton();
+
+
+
+
+
 	//playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
-	playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd.fbx", 1 );
+	playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd2.fbx", 1 );
+	//playerObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
+	SkinnedMesh3DRendererRef playerMeshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
+	SkeletonRef playerSkeleton = playerMeshRenderer->GetSkeleton();
 	if(playerObject.IsValid())
 	{
 		playerObject->SetActive(true);
@@ -240,16 +254,24 @@ void Game::Init()
 		return;
 	}
 
-	SkinnedMesh3DRendererRef meshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
-	firstMesh = meshRenderer->GetMesh();
+
+
+	/*defaultSkeleton->OverrideBonesFrom(playerMeshRenderer->GetSkeleton(), false, true);
+	playerMeshRenderer->SetSkeleton(defaultSkeleton);
+	for(unsigned int s =0; s < playerMeshRenderer->GetSubRendererCount(); s++)
+	{
+		playerMeshRenderer->GetVertexBoneMap(s)->BindTo(defaultSkeleton);
+	}*/
+
+
+
+	firstMesh = playerMeshRenderer->GetMesh();
 	//firstMesh->SetCastShadows(true);
 	//firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
 	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
-
-
 
 	playerWait = importer->LoadAnimation("../../models/cartoonnerd/human@idleneutral.fbx");
 	playerWalk = importer->LoadAnimation("../../models/cartoonnerd/human@walk.fbx");
@@ -273,12 +295,15 @@ void Game::Init()
 		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
 		animationPlayer->AddAnimation(playerWait);
 		animationPlayer->AddAnimation(playerWalk);
+
 		//animationPlayer->AddAnimation(playerJump);
 		//animationPlayer->AddAnimation(playerRoar);
 
-		animationPlayer->SetSpeed(playerWalk, 2);
-		animationPlayer->Play(playerWait);
+		//animationPlayer->SetSpeed(playerWalk, 2);
+		//animationPlayer->Play(playerWait);
 	}
+
+
 
 
 
@@ -458,7 +483,7 @@ void Game::Update()
 	cube->GetLocalTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
 
 	UpdatePlayerMovementDirection();
-	UpdatePlayerAnimation();
+	//UpdatePlayerAnimation();
 	UpdatePlayerPosition();
 	UpdatePlayerLookDirection();
 	UpdatePlayerFollowCamera();

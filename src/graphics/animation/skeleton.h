@@ -28,6 +28,7 @@ class Transform;
 #include <string>
 #include <unordered_map>
 #include "object/engineobject.h"
+#include "object/enginetypes.h"
 #include "skeletonnode.h"
 #include "util/tree.h"
 
@@ -73,6 +74,9 @@ class Skeleton : public EngineObject
     int GetNodeMapping(std::string& name);
     SkeletonNode * GetNodeFromList(unsigned int nodeIndex);
     void AddNodeToList(SkeletonNode * node);
+
+    void OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode);
+    void OverrideBonesFrom(Skeleton * skeleton, bool takeOffset, bool takeNode);
 
     Skeleton * FullClone();
 };

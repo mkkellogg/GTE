@@ -9,6 +9,7 @@
 #include "bone.h"
 #include "vertexbonemap.h"
 #include "util/tree.h"
+#include "object/enginetypes.h"
 #include "global/global.h"
 #include "ui/debug.h"
 
@@ -191,13 +192,43 @@ void Skeleton::AddNodeToList(SkeletonNode * node)
 }
 
 /*
+ * Replace the bones in this skeleton with matching bones from [skeleton].
+ */
+void Skeleton::OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode)
+{
+	ASSERT_RTRN(skeleton.IsValid(),"Skeleton::OverrideBonesFrom -> skeleton is not valid.");
+	OverrideBonesFrom(skeleton.GetPtr(), takeOffset, takeNode);
+}
+
+/*
+ * Replace the bones in this skeleton with matching bones from [skeleton].
+ */
+void Skeleton::OverrideBonesFrom(Skeleton * skeleton, bool takeOffset, bool takeNode)
+{
+	for(unsigned int n = 0; n < skeleton->GetBoneCount(); n++)
+	{
+		Bone * newBone = skeleton->GetBone(n);
+		for(unsigned int c = 0; c < GetBoneCount(); c++)
+		{
+			Bone * currentBone = GetBone(c);
+			if(currentBone != NULL && newBone != NULL && newBone->Name == currentBone->Name)
+			{
+				if(takeOffset)currentBone->OffsetMatrix = newBone->OffsetMatrix;
+				if(takeNode)currentBone->Node = newBone->Node;
+				break;
+			}
+		}
+	}
+}
+
+/*
  * Create a full (deep) clone of this Skeleton object.
  */
 Skeleton * Skeleton::FullClone()
 {
 	// allocate new Skeleton object
 	Skeleton * newSkeleton = new Skeleton(boneCount);
-	ASSERT(newSkeleton != NULL,"Skeleton::FullClone -> could not allocate skeleton",NULL);
+	ASSERT(newSkeleton != NULL,"Skeleton::FullClone -> could not allocate skeleton.",NULL);
 
 	// initialize new skeleton
 	bool initSuccess = newSkeleton->Init();

@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "vertexbonemap.h"
+#include "skeleton.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/submesh3D.h"
 #include "global/global.h"
@@ -83,6 +84,24 @@ unsigned int VertexBoneMap::GetVertexCount()
 unsigned int VertexBoneMap::GetUniqueVertexCount()
 {
 	return uniqueVertexCount;
+}
+
+/*
+ * Update the bone indices in this map to match that of [skeleton]
+ */
+void VertexBoneMap::BindTo(SkeletonRef skeleton)
+{
+	ASSERT_RTRN(skeleton.IsValid(), "VertexBoneMap::BindTo -> skeleton is not valid.");
+
+	for(unsigned int v = 0; v < vertexCount; v++)
+	{
+		VertexBoneMap::VertexMappingDescriptor * desc = GetDescriptor(v);
+		for(unsigned int b = 0; b < desc->BoneCount; b++)
+		{
+			int boneIndex = skeleton->GetBoneMapping(desc->Name[b]);
+			desc->BoneIndex[b] = boneIndex;
+		}
+	}
 }
 
 /*
