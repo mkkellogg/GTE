@@ -481,7 +481,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 			if(cacheFlags[desc->UniqueVertexIndex] == 1)
 			{
 				transformedPositionsPtr = transformedPositionsPtrBase+(desc->UniqueVertexIndex*4);
-				BaseVector4_QuickCopy(transformedPositionsPtr, currentPositionPtr);
+				BaseVector4_QuickCopy(transformedPositionsPtr, currentPositionPtr)
 
 				transformedNormalsPtr = transformedNormalsPtrBase+(desc->UniqueVertexIndex*4);
 				if(identicalNormalFlags[desc->UniqueVertexIndex])
@@ -491,7 +491,8 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 				else savedTransforms[desc->UniqueVertexIndex].Transform(currentNormalPtr);
 
 				transformedStraightNormalsPtr = transformedStraightNormalsPtrBase+(desc->UniqueVertexIndex*4);
-				BaseVector4_QuickCopy(transformedStraightNormalsPtr, currentStraightNormalPtr);
+				//BaseVector4_QuickCopy(transformedStraightNormalsPtr, currentStraightNormalPtr);
+				if(i%3==0)savedTransforms[desc->UniqueVertexIndex].Transform(currentStraightNormalPtr);
 			}
 			else
 			{

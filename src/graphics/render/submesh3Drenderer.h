@@ -46,6 +46,7 @@ class SubMesh3DRenderer : public EngineObject
     bool doAttributeTransform;
     bool doPositionTransform;
     bool doNormalTransform;
+    bool done = false;
 
     AttributeTransformer * attributeTransformer;
     Point3Array transformedPositions;

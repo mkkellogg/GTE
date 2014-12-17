@@ -231,16 +231,16 @@ void Game::Init()
 
 
 
-	SceneObjectRef defaultObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
-	SkinnedMesh3DRendererRef defaultMeshRenderer = FindFirstSkinnedMeshRenderer(defaultObject);
-	SkeletonRef defaultSkeleton = defaultMeshRenderer->GetSkeleton();
+	//SceneObjectRef defaultObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
+	//SkinnedMesh3DRendererRef defaultMeshRenderer = FindFirstSkinnedMeshRenderer(defaultObject);
+	//SkeletonRef defaultSkeleton = defaultMeshRenderer->GetSkeleton();
 
 
 
 
 
-	//playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
-	playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd2.fbx", 1 );
+	playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
+	//playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd2.fbx", 1 );
 	//playerObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
 	SkinnedMesh3DRendererRef playerMeshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	SkeletonRef playerSkeleton = playerMeshRenderer->GetSkeleton();
@@ -266,17 +266,18 @@ void Game::Init()
 
 
 	firstMesh = playerMeshRenderer->GetMesh();
-	//firstMesh->SetCastShadows(true);
-	//firstMesh->SetReceiveShadows(true);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
 	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
 
-	playerWait = importer->LoadAnimation("../../models/cartoonnerd/human@idleneutral.fbx");
-	playerWalk = importer->LoadAnimation("../../models/cartoonnerd/human@walk.fbx");
-	//playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
-	//playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
+	//playerWait = importer->LoadAnimation("../../models/cartoonnerd/human@idleneutral.fbx");
+	//playerWalk = importer->LoadAnimation("../../models/cartoonnerd/human@walk.fbx");
+
+	playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
+	playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
 	//playerJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
 	//playerRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
 
@@ -299,8 +300,8 @@ void Game::Init()
 		//animationPlayer->AddAnimation(playerJump);
 		//animationPlayer->AddAnimation(playerRoar);
 
-		//animationPlayer->SetSpeed(playerWalk, 2);
-		//animationPlayer->Play(playerWait);
+		animationPlayer->SetSpeed(playerWalk, 2);
+		animationPlayer->Play(playerWait);
 	}
 
 
@@ -410,7 +411,7 @@ void Game::Init()
 
 
 
-	/*sceneObject = objectManager->CreateSceneObject();
+	sceneObject = objectManager->CreateSceneObject();
 	renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
 	sceneObject->SetMesh3DRenderer(renderer);
@@ -425,7 +426,7 @@ void Game::Init()
 
 	sceneObject->SetMesh3D(mesh);
 	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	sceneObject->GetLocalTransform().Translate(5, 0, 20, false);*/
+	sceneObject->GetLocalTransform().Translate(5, 0, 20, false);
 
 
 	sceneObject = objectManager->CreateSceneObject();
@@ -435,15 +436,14 @@ void Game::Init()
 	sceneObject->SetLight(light);
 
 
-	sceneObject = objectManager->CreateSceneObject();
-
+	/*sceneObject = objectManager->CreateSceneObject();
 	light = objectManager->CreateLight();
 //	light->SetDirection(-.8,-1.7,-2);
 	light->SetDirection(0,-1,0);
 	light->SetIntensity(1.2);
 	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Directional);
-	sceneObject->SetLight(light);
+	sceneObject->SetLight(light);*/
 
 
 	InitializePlayerPosition();
@@ -483,7 +483,7 @@ void Game::Update()
 	cube->GetLocalTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
 
 	UpdatePlayerMovementDirection();
-	//UpdatePlayerAnimation();
+	UpdatePlayerAnimation();
 	UpdatePlayerPosition();
 	UpdatePlayerLookDirection();
 	UpdatePlayerFollowCamera();

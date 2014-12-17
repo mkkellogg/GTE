@@ -366,8 +366,9 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	lightInverse.Invert();
 
 	Transform shadowVolmeViewProjection;
-	shadowVolmeViewProjection.PreTransformBy(viewTransformInverse);
-	shadowVolmeViewProjection.PreTransformBy(camera.GetProjectionTransform());
+	shadowVolmeViewProjection.TransformBy(lightInverse);
+	shadowVolmeViewProjection.Scale(.99,.99,1, false);
+	shadowVolmeViewProjection.TransformBy(lightFullTransform);
 
 	//if(depthBufferComplete)graphics->SetDepthBufferReadOnly(true);
 	//else graphics->SetDepthBufferReadOnly(false);
@@ -518,6 +519,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 
 			model.SetTo(sceneObject.GetProcessingTransform());
 			modelView.SetTo(model);
+
 			// concatenate modelTransform with inverted viewTransform
 			modelView.PreTransformBy(viewTransformInverse);
 			modelViewProjection.SetTo(modelView);
@@ -601,6 +603,8 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 			model.SetTo(sceneObject.GetProcessingTransform());
 			modelView.SetTo(model);
+
+			modelView.PreTransformBy(shadowVolumeViewProjection);
 			// concatenate modelTransform with inverted viewTransform
 			modelView.PreTransformBy(viewTransformInverse);
 			modelViewProjection.SetTo(modelView);

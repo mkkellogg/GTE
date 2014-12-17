@@ -123,7 +123,6 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexC) && Point3::AreStrictlyEqual(compareVertexB, faceVertexA)){edgeC = f;edgesSet++;}
 			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexC) && Point3::AreStrictlyEqual(compareVertexC, faceVertexA)){edgeC = f;edgesSet++;}
 
-
 			/*if(Point3::AreStrictlyEqual(compareVertexA,faceVertexA) && Point3::AreStrictlyEqual(compareVertexB,faceVertexB)){edgeA = f;edgesSet++;}
 			else if(Point3::AreStrictlyEqual(compareVertexB, faceVertexA) && Point3::AreStrictlyEqual(compareVertexC,faceVertexB)){edgeA = f;edgesSet++;}
 			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexA) && Point3::AreStrictlyEqual(compareVertexA, faceVertexB)){edgeA = f;edgesSet++;}
@@ -136,9 +135,7 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 			else if(Point3::AreStrictlyEqual(compareVertexB, faceVertexC) && Point3::AreStrictlyEqual(compareVertexC, faceVertexA)){edgeC = f;edgesSet++;}
 			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexC) && Point3::AreStrictlyEqual(compareVertexA, faceVertexA)){edgeC = f;edgesSet++;}
 */
-
-
-			if(edgesSet >=3)return;
+			//if(edgesSet >=3)return;
 		}
 	}
 }
@@ -155,11 +152,16 @@ void SubMesh3D::BuildFaces()
 		vertexIndex += 3;
 	}
 
+	unsigned int missingAdjacent = 0;
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
 		SubMesh3DFace * face = faces.GetFace(f);
 		FindAdjacentFaceIndex(f, face->AdjacentFaceIndex1, face->AdjacentFaceIndex2, face->AdjacentFaceIndex3);
 		//printf("adj: %d, %d, %d\n",face->AdjacentFaceIndex1, face->AdjacentFaceIndex2, face->AdjacentFaceIndex3);
+		if(face->AdjacentFaceIndex1 < 0 || face->AdjacentFaceIndex2 < 0 || face->AdjacentFaceIndex3 < 0)
+		{
+			missingAdjacent++;
+		}
 	}
 }
 
