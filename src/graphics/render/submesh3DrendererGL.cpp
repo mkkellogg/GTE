@@ -66,8 +66,8 @@ void SubMesh3DRendererGL::Render()
 	}
 
 	if(!currentMaterial->VerifySetVars(mesh->GetTotalVertexCount()))return;
-
-	glDrawArrays(GL_TRIANGLES, 0, mesh->GetTotalVertexCount());
+	unsigned int totalCount = mesh->GetTotalVertexCount();
+	glDrawArrays(GL_TRIANGLES, 0, totalCount);
 }
 
 void SubMesh3DRendererGL::RenderShadowVolume()

@@ -478,10 +478,12 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 			// current instance. The value of desc->UVertexIndex indicates the current vertex's unique
 			// vertex value (multiple vertices in multiple triangles may actually be the same vertex, just
 			// duplicated for each triangle)
+
 			if(cacheFlags[desc->UniqueVertexIndex] == 1)
 			{
 				transformedPositionsPtr = transformedPositionsPtrBase+(desc->UniqueVertexIndex*4);
 				BaseVector4_QuickCopy(transformedPositionsPtr, currentPositionPtr)
+				//savedTransforms[desc->UniqueVertexIndex].Transform(currentPositionPtr);
 
 				transformedNormalsPtr = transformedNormalsPtrBase+(desc->UniqueVertexIndex*4);
 				if(identicalNormalFlags[desc->UniqueVertexIndex])

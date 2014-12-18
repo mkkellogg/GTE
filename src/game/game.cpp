@@ -68,6 +68,8 @@ Game::Game()
 
 	basePlayerForward = Vector3(0,0,1);
 	baseCameraForward = Vector3(0,0,-1);
+
+	playerType = PlayerType::Nerd;
 }
 
 Game::~Game()
@@ -154,8 +156,8 @@ void Game::Init()
 	cube->SetMesh3D(mesh);
 
 	Mesh3DRef firstMesh = FindFirstMesh(cube);
-	firstMesh->SetCastShadows(true);
-	firstMesh->SetReceiveShadows(true);
+	//firstMesh->SetCastShadows(true);
+	//firstMesh->SetReceiveShadows(true);
 
 
 	// ----- second cube ------
@@ -228,20 +230,18 @@ void Game::Init()
 	modelSceneObject->GetLocalTransform().Scale(.09,.09,.09, true);
 
 
-
-
-
 	//SceneObjectRef defaultObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
 	//SkinnedMesh3DRendererRef defaultMeshRenderer = FindFirstSkinnedMeshRenderer(defaultObject);
 	//SkeletonRef defaultSkeleton = defaultMeshRenderer->GetSkeleton();
 
 
+	playerType = PlayerType::Koopa;
 
 
-
-	playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
-	//playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd2.fbx", 1 );
+	if(playerType == PlayerType::Koopa)playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
+	else if(playerType == PlayerType::Nerd) playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd2.fbx", 1 );
 	//playerObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
+
 	SkinnedMesh3DRendererRef playerMeshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	SkeletonRef playerSkeleton = playerMeshRenderer->GetSkeleton();
 	if(playerObject.IsValid())
@@ -255,6 +255,7 @@ void Game::Init()
 	}
 
 
+	if(playerType == PlayerType::Koopa)playerMeshRenderer->GetSubRenderer(1)->SetUseBadGeometryShadowFix(true);
 
 	/*defaultSkeleton->OverrideBonesFrom(playerMeshRenderer->GetSkeleton(), false, true);
 	playerMeshRenderer->SetSkeleton(defaultSkeleton);
@@ -264,22 +265,27 @@ void Game::Init()
 	}*/
 
 
-
 	firstMesh = playerMeshRenderer->GetMesh();
 	firstMesh->SetCastShadows(true);
 	firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
-	playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
+	if(playerType == PlayerType::Koopa)playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
+	else if(playerType == PlayerType::Nerd) playerObject->GetLocalTransform().Scale(.08, .08, .08, true);
 
-	//playerWait = importer->LoadAnimation("../../models/cartoonnerd/human@idleneutral.fbx");
-	//playerWalk = importer->LoadAnimation("../../models/cartoonnerd/human@walk.fbx");
-
-	playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
-	playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
-	//playerJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
-	//playerRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
+	if(playerType == PlayerType::Koopa)
+	{
+		playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
+		playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
+		playerJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
+		playerRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
+	}
+	else if(playerType == PlayerType::Nerd)
+	{
+		playerWait = importer->LoadAnimation("../../models/cartoonnerd/human@idleneutral.fbx");
+		playerWalk = importer->LoadAnimation("../../models/cartoonnerd/human@walk.fbx");
+	}
 
 	playerRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
@@ -297,13 +303,14 @@ void Game::Init()
 		animationPlayer->AddAnimation(playerWait);
 		animationPlayer->AddAnimation(playerWalk);
 
-		//animationPlayer->AddAnimation(playerJump);
-		//animationPlayer->AddAnimation(playerRoar);
-
-		animationPlayer->SetSpeed(playerWalk, 2);
-		animationPlayer->Play(playerWait);
+		if(playerType == PlayerType::Koopa)
+		{
+			animationPlayer->AddAnimation(playerJump);
+			animationPlayer->AddAnimation(playerRoar);
+			animationPlayer->SetSpeed(playerWalk, 2);
+			animationPlayer->Play(playerWait);
+		}
 	}
-
 
 
 
@@ -436,14 +443,13 @@ void Game::Init()
 	sceneObject->SetLight(light);
 
 
-	/*sceneObject = objectManager->CreateSceneObject();
+	sceneObject = objectManager->CreateSceneObject();
 	light = objectManager->CreateLight();
-//	light->SetDirection(-.8,-1.7,-2);
-	light->SetDirection(0,-1,0);
-	light->SetIntensity(1.2);
+	light->SetDirection(-.8,-1.7,-2);
+	light->SetIntensity(.8);
 	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Directional);
-	sceneObject->SetLight(light);*/
+	sceneObject->SetLight(light);
 
 
 	InitializePlayerPosition();
@@ -483,7 +489,7 @@ void Game::Update()
 	cube->GetLocalTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
 
 	UpdatePlayerMovementDirection();
-	UpdatePlayerAnimation();
+	if(playerType == PlayerType::Koopa)UpdatePlayerAnimation();
 	UpdatePlayerPosition();
 	UpdatePlayerLookDirection();
 	UpdatePlayerFollowCamera();

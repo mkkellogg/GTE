@@ -46,7 +46,7 @@ class SubMesh3DRenderer : public EngineObject
     bool doAttributeTransform;
     bool doPositionTransform;
     bool doNormalTransform;
-    bool done = false;
+    bool useBadGeometryShadowFix;
 
     AttributeTransformer * attributeTransformer;
     Point3Array transformedPositions;
@@ -87,6 +87,8 @@ class SubMesh3DRenderer : public EngineObject
     virtual ~SubMesh3DRenderer();
 
     public:
+
+    void SetUseBadGeometryShadowFix(bool useFix);
 
     void BuildShadowVolume(Vector3& lightPosDir, bool directional);
     void UpdateFromMesh();

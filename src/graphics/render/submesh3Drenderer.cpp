@@ -54,6 +54,7 @@ SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, Graphics * graphics, Att
 	doAttributeTransform = attributeTransformer == NULL ? false : true;
 	doPositionTransform = false;
 	doNormalTransform = false;
+	useBadGeometryShadowFix = false;
 }
 
 SubMesh3DRenderer::~SubMesh3DRenderer()
@@ -129,6 +130,12 @@ bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int length, in
 	return true;
 }
 
+
+void SubMesh3DRenderer::SetUseBadGeometryShadowFix(bool useFix)
+{
+	useBadGeometryShadowFix = useFix;
+}
+
 void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional)
 {
 	float backFaceThreshold = 0;
@@ -175,6 +182,19 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	int adjacentFaceIndex = -1;
 	SubMesh3DFace * adjacentFace = NULL;
 	Vector3 * adjacentFaceNormal = NULL;
+
+	//if(!done)
+	/*for(unsigned int v = 0; v < positions->GetReservedCount()-3; v+=3)
+	{
+		if(v >= 0 && v <= 0)
+		{
+		positions->GetPoint(v)->Set(0,-30,0);
+		positions->GetPoint(v+1)->Set(0,-30,0);
+		positions->GetPoint(v+2)->Set(0,-30,0);
+		}
+	}*/
+
+	//memset(const_cast<float*>(positions->GetDataPtr()), 0, sizeof(float) * positions->GetReservedCount() * 4);
 
 
 	faceToLightDir.Normalize();
@@ -234,7 +254,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			currentFrontFaceVertexIndex += 3;*/
 
 			currentFaceIsFront = true;
-			//continue;
+			continue;
 		}
 		else
 		{
@@ -257,7 +277,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			currentBackFaceVertexIndex += 3;
 			currentFaceIsFront = false;
 		}
-
 
 		int facesFound = 0;
 		for(unsigned int ai = 0; ai < 3; ai++)
@@ -324,8 +343,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			}
 			else adjFaceToLightDot = 1;
 
-
-			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0))
+			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{
 				//printf("face normal: %d\n", adjacentFaceVertexIndex);
 				//printf("face normal: %f, %f, %f\n", adjacentFaceNormal->x, adjacentFaceNormal->y, adjacentFaceNormal->z);
@@ -365,7 +383,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	shadowVolumeFront.SetCount(currentFrontFaceVertexIndex);
 	shadowVolumeBack.SetCount(currentBackFaceVertexIndex);
 	shadowVolumeSides.SetCount(currentSideVertexIndex);
-	done = true;
 }
 
 void SubMesh3DRenderer::SetShadowVolumePositionData(Point3Array * points)

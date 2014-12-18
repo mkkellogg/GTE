@@ -7,6 +7,14 @@
 
 class Game
 {
+	enum class PlayerType
+	{
+		Koopa = 0,
+		Nerd = 1
+	};
+
+	PlayerType playerType;
+
 	SceneObjectRef cameraObject;
 	SceneObjectRef playerObject;
 	SceneObjectRef cube;
