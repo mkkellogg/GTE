@@ -156,8 +156,8 @@ void Game::Init()
 	cube->SetMesh3D(mesh);
 
 	Mesh3DRef firstMesh = FindFirstMesh(cube);
-	//firstMesh->SetCastShadows(true);
-	//firstMesh->SetReceiveShadows(true);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 
 
 	// ----- second cube ------
@@ -224,8 +224,8 @@ void Game::Init()
 		return;
 	}
 	firstMesh = FindFirstMesh(modelSceneObject);
-	//firstMesh->SetCastShadows(true);
-	//firstMesh->SetReceiveShadows(true);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(-10,-10,20,false);
 	modelSceneObject->GetLocalTransform().Scale(.09,.09,.09, true);
 

@@ -365,13 +365,13 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	lightInverse.SetTo(lightFullTransform);
 	lightInverse.Invert();
 
-	Transform shadowVolmeViewTransform;
+	Transform shadowVolumeViewTransform;
 	// transform into the light's local space, scale the X & Y ever so slightly to 'narrow' the shadow volume
 	// this mitigates artifacts where the shadow volume's sides are very close to and parallel to mesh polygons and
 	// Z-fighting occurs
-	shadowVolmeViewTransform.TransformBy(lightInverse);
-	shadowVolmeViewTransform.Scale(.99,.99,1, false);
-	shadowVolmeViewTransform.TransformBy(lightFullTransform);
+	shadowVolumeViewTransform.TransformBy(lightInverse);
+	shadowVolumeViewTransform.Scale(.99,.99,1.00, true);
+	shadowVolumeViewTransform.TransformBy(lightFullTransform);
 
 	//if(depthBufferComplete)graphics->SetDepthBufferReadOnly(true);
 	//else graphics->SetDepthBufferReadOnly(false);
@@ -473,7 +473,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 						{
 							if(doShadows && mesh->GetCastShadows())
 							{
-								RenderSceneObjectMeshesShadowVolumes(*child, light, lightPosition, shadowVolmeViewTransform, viewTransformInverse, camera);
+								RenderSceneObjectMeshesShadowVolumes(*child, light, lightPosition, shadowVolumeViewTransform, viewTransformInverse, camera);
 							}
 						}
 						else if(pass == 1) // normal rendering pass
@@ -518,8 +518,6 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 		unsigned int materialIndex = 0;
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
-			if(i==1 || renderer->GetSubRendererCount() < 5 || true)
-			{
 			MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -565,7 +563,6 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			// flag the current mesh as being rendered (at least once)
 			renderedObjects[subMesh->GetObjectID()] = true;
 
-			}
 			// Advance material index. Renderer can have any number of materials > 0; it does not have to match
 			// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
 			materialIndex++;
@@ -605,8 +602,6 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
-			if(i ==1 || true)
-			{
 			MaterialRef currentMaterial = renderer->GetMaterial(0);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -616,9 +611,9 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshesShadowVolumes -> NULL sub mesh encountered.");
 
 			model.SetTo(sceneObject.GetProcessingTransform());
-			modelView.SetTo(model);
+			modelView.SetTo(shadowVolumeViewProjection);
 
-			modelView.PreTransformBy(shadowVolumeViewProjection);
+			modelView.PreTransformBy(model);
 			// concatenate modelTransform with inverted viewTransform
 			modelView.PreTransformBy(viewTransformInverse);
 			modelViewProjection.SetTo(modelView);
@@ -659,7 +654,6 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 			// render the shadow volume
 			subRenderer->RenderShadowVolume();
-			}
 		}
 	}
 }

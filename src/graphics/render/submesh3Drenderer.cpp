@@ -183,20 +183,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	SubMesh3DFace * adjacentFace = NULL;
 	Vector3 * adjacentFaceNormal = NULL;
 
-	//if(!done)
-	/*for(unsigned int v = 0; v < positions->GetReservedCount()-3; v+=3)
-	{
-		if(v >= 0 && v <= 0)
-		{
-		positions->GetPoint(v)->Set(0,-30,0);
-		positions->GetPoint(v+1)->Set(0,-30,0);
-		positions->GetPoint(v+2)->Set(0,-30,0);
-		}
-	}*/
-
-	//memset(const_cast<float*>(positions->GetDataPtr()), 0, sizeof(float) * positions->GetReservedCount() * 4);
-
-
 	faceToLightDir.Normalize();
 	faceToLightDir.Invert();
 	adjFaceToLightDir = faceToLightDir;
@@ -345,8 +331,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{
-				//printf("face normal: %d\n", adjacentFaceVertexIndex);
-				//printf("face normal: %f, %f, %f\n", adjacentFaceNormal->x, adjacentFaceNormal->y, adjacentFaceNormal->z);
 
 				BaseVector4_QuickCopy(edgeV1, svSideBase);
 				svSideBase+=4;
@@ -361,20 +345,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 				svSideBase+=4;
 				BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
 				svSideBase+=4;
-
-				/*BaseVector4_QuickCopy(edgeV2, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy(edgeV1, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-				svSideBase+=4;
-
-				BaseVector4_QuickCopy(edgeV1, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-				svSideBase+=4;*/
 
 				currentSideVertexIndex +=6;
 			}
@@ -577,7 +547,7 @@ void SubMesh3DRenderer::UpdateFromMesh()
 	CopyMeshData();
 }
 
-bool SubMesh3DRenderer::UseMaterial(MaterialRef material, bool forShadowVoume)
+bool SubMesh3DRenderer::UseMaterial(MaterialRef material, bool forShadowVolume)
 {
 	if(material == activeMaterial)return true;
 
@@ -589,7 +559,7 @@ bool SubMesh3DRenderer::UseMaterial(MaterialRef material, bool forShadowVoume)
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.", false);
 
-	if(forShadowVoume)
+	if(forShadowVolume)
 	{
 
 	}
