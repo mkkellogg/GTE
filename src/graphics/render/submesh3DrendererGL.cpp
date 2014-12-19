@@ -80,25 +80,11 @@ void SubMesh3DRendererGL::RenderShadowVolume()
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
 
-	if(shadowVolumeSides.GetCount() > 0)
+	if(shadowVolumePositions.GetCount() > 0)
 	{
-		SetShadowVolumePositionData(&shadowVolumeSides);
+		SetShadowVolumePositionData(&shadowVolumePositions);
 		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
-		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeSides.GetCount());
-	}
-
-	if(shadowVolumeFront.GetCount() > 0)
-	{
-		SetShadowVolumePositionData(&shadowVolumeFront);
-		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
-		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeFront.GetCount());
-	}
-
-	if(shadowVolumeBack.GetCount() > 0)
-	{
-		SetShadowVolumePositionData(&shadowVolumeBack);
-		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
-		glDrawArrays(GL_TRIANGLES, 0, shadowVolumeBack.GetCount());
+		glDrawArrays(GL_TRIANGLES, 0, shadowVolumePositions.GetCount());
 	}
 }
 

@@ -87,6 +87,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     glutDisplayFunc(&_glutDisplayFunc);
     glutIdleFunc(&_glutIdleFunc);
+    glutReshapeFunc(&_glutReshapeFunc);
 
     // TODO: think of a better place for these calls
 
@@ -109,6 +110,10 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
    /* int dbits;
     glGetIntegerv(GL_DEPTH_BITS, &dbits);
     printf("dbits: %d\n", dbits);*/
+
+   /* int sbits;
+    glGetIntegerv(GL_STENCIL_BITS, &sbits);
+    printf("sbits: %d\n", sbits);*/
 
     initialized = true;
     return true;
@@ -520,7 +525,14 @@ void GraphicsGL::_glutDisplayFunc()
 
 void GraphicsGL::_glutIdleFunc()
 {
+	//printf("glut idle!\n");
 	 glutPostRedisplay();
+}
+
+void GraphicsGL::_glutReshapeFunc(int w, int h)
+{
+	//printf("glut reshape!\n");
+	glutPostRedisplay();
 }
 
 

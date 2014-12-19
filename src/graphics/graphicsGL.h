@@ -26,6 +26,7 @@ class GraphicsGL : public Graphics
 
     static void _glutDisplayFunc();
     static void _glutIdleFunc();
+    static void _glutReshapeFunc(int w, int h);
 
     protected:
 

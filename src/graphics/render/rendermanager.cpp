@@ -370,7 +370,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	// this mitigates artifacts where the shadow volume's sides are very close to and parallel to mesh polygons and
 	// Z-fighting occurs
 	shadowVolumeViewTransform.TransformBy(lightInverse);
-	shadowVolumeViewTransform.Scale(.99,.99,1.00, true);
+	//shadowVolumeViewTransform.Scale(.99,.99,1.00, true);
 	shadowVolumeViewTransform.TransformBy(lightFullTransform);
 
 	//if(depthBufferComplete)graphics->SetDepthBufferReadOnly(true);
@@ -395,6 +395,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 				//IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
 				//Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
 				glClear(GL_STENCIL_BUFFER_BIT);
+				//glClearStencil(0);
 				glEnable(GL_STENCIL_TEST);
 
 				// We need the stencil test to be enabled but we want it
@@ -518,6 +519,8 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 		unsigned int materialIndex = 0;
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
+			if( true || i == 0 || renderer->GetSubRendererCount() < 5)
+			{
 			MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -562,6 +565,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			subRenderer->Render();
 			// flag the current mesh as being rendered (at least once)
 			renderedObjects[subMesh->GetObjectID()] = true;
+			}
 
 			// Advance material index. Renderer can have any number of materials > 0; it does not have to match
 			// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
@@ -602,6 +606,8 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
+			if(true || i == 0 || renderer->GetSubRendererCount() < 5)
+			{
 			MaterialRef currentMaterial = renderer->GetMaterial(0);
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -654,6 +660,7 @@ void RenderManager::RenderSceneObjectMeshesShadowVolumes(SceneObject& sceneObjec
 
 			// render the shadow volume
 			subRenderer->RenderShadowVolume();
+			}
 		}
 	}
 }

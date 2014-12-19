@@ -16,6 +16,7 @@ class Game
 	PlayerType playerType;
 
 	SceneObjectRef cameraObject;
+	SceneObjectRef pointLightObject;
 	SceneObjectRef playerObject;
 	SceneObjectRef cube;
 	SkinnedMesh3DRendererRef playerRenderer;

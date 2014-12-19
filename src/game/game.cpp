@@ -238,7 +238,7 @@ void Game::Init()
 	playerType = PlayerType::Koopa;
 
 
-	if(playerType == PlayerType::Koopa)playerObject = importer->LoadModelDirect("../../models/koopa/model/koopa.fbx", 1 );
+	if(playerType == PlayerType::Koopa)playerObject = importer->LoadModelDirect("../../models/koopa/koopa.fbx", 1 );
 	else if(playerType == PlayerType::Nerd) playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd2.fbx", 1 );
 	//playerObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
 
@@ -255,7 +255,12 @@ void Game::Init()
 	}
 
 
-	if(playerType == PlayerType::Koopa)playerMeshRenderer->GetSubRenderer(1)->SetUseBadGeometryShadowFix(true);
+	if(playerType == PlayerType::Koopa)
+	{
+		//playerMeshRenderer->GetSubRenderer(1)->SetUseBadGeometryShadowFix(true);
+		//playerMeshRenderer->GetSubRenderer(0)->SetUseBadGeometryShadowFix(true);
+		//playerMeshRenderer->GetSubRenderer(5)->SetUseBadGeometryShadowFix(true);
+	}
 
 	/*defaultSkeleton->OverrideBonesFrom(playerMeshRenderer->GetSkeleton(), false, true);
 	playerMeshRenderer->SetSkeleton(defaultSkeleton);
@@ -271,7 +276,7 @@ void Game::Init()
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
 	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
-	if(playerType == PlayerType::Koopa)playerObject->GetLocalTransform().Scale(.15, .15, .15, true);
+	if(playerType == PlayerType::Koopa)playerObject->GetLocalTransform().Scale(.05, .05, .05, true);
 	else if(playerType == PlayerType::Nerd) playerObject->GetLocalTransform().Scale(.08, .08, .08, true);
 
 	if(playerType == PlayerType::Koopa)
@@ -418,10 +423,10 @@ void Game::Init()
 
 
 
-	sceneObject = objectManager->CreateSceneObject();
+	pointLightObject = objectManager->CreateSceneObject();
 	renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
-	sceneObject->SetMesh3DRenderer(renderer);
+	pointLightObject->SetMesh3DRenderer(renderer);
 
 	light = objectManager->CreateLight();
 	light->SetDirection(1,-1,-1);
@@ -429,11 +434,11 @@ void Game::Init()
 	light->SetRange(25);
 	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Point);
-	sceneObject->SetLight(light);
+	pointLightObject->SetLight(light);
 
-	sceneObject->SetMesh3D(mesh);
-	sceneObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	sceneObject->GetLocalTransform().Translate(5, 0, 20, false);
+	pointLightObject->SetMesh3D(mesh);
+	pointLightObject->GetLocalTransform().Scale(.4,.4,.4, true);
+	pointLightObject->GetLocalTransform().Translate(5, 0, 20, false);
 
 
 	sceneObject = objectManager->CreateSceneObject();
@@ -476,6 +481,8 @@ void Game::Update()
 	SceneObjectTransform cameraTransform;
 	cameraObject->InitSceneObjectTransform(&cameraTransform);
 	cameraTransform.TransformPoint(cameraPos);
+
+	//pointLightObject->GetLocalTransform().RotateAround(10,5,20,0,1,0,60 * Time::GetDeltaTime());
 
 	 //cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,12 * Time::GetDeltaTime() * rotationDir);
 

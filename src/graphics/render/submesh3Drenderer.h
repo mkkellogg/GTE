@@ -54,9 +54,7 @@ class SubMesh3DRenderer : public EngineObject
     Vector3Array transformedStraightNormals;
     Point3 transformedCenter;
 
-    Point3Array shadowVolumeFront;
-    Point3Array shadowVolumeBack;
-    Point3Array shadowVolumeSides;
+    Point3Array shadowVolumePositions;
 
     bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount,  int stride);
     void Destroy();

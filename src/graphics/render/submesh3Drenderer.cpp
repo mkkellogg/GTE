@@ -169,12 +169,8 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	Vector3 * faceNormalB;
 	Vector3 * faceNormalC;
 	SubMesh3DFace * face = NULL;
-	unsigned int currentFrontFaceVertexIndex = 0;
-	unsigned int currentBackFaceVertexIndex = 0;
-	unsigned int currentSideVertexIndex = 0;
-	float * svFrontBase = const_cast<float*>(shadowVolumeFront.GetDataPtr());
-	float * svBackBase = const_cast<float*>(shadowVolumeBack.GetDataPtr());
-	float * svSideBase = const_cast<float*>(shadowVolumeSides.GetDataPtr());
+	unsigned int currentPositionVertexIndex = 0;
+	float * svPositionBase =  const_cast<float*>(shadowVolumePositions.GetDataPtr());
 
 	float * edgeV1 = NULL;
 	float * edgeV2 = NULL;
@@ -230,37 +226,29 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 		bool currentFaceIsFront = false;
 		if(faceToLightDotA >= backFaceThreshold)
 		{
-			/*BaseVector4_QuickCopy(vertex1, svFrontBase);
-			svFrontBase+=4;
-			BaseVector4_QuickCopy(vertex2, svFrontBase);
-			svFrontBase+=4;
-			BaseVector4_QuickCopy(vertex3, svFrontBase);
-			svFrontBase+=4;
-
-			currentFrontFaceVertexIndex += 3;*/
-
 			currentFaceIsFront = true;
 			continue;
 		}
 		else
 		{
-			BaseVector4_QuickCopy(vertex3, svFrontBase);
-			svFrontBase+=4;
-			BaseVector4_QuickCopy(vertex2, svFrontBase);
-			svFrontBase+=4;
-			BaseVector4_QuickCopy(vertex1, svFrontBase);
-			svFrontBase+=4;
+			BaseVector4_QuickCopy(vertex3, svPositionBase);
+			svPositionBase+=4;
+			BaseVector4_QuickCopy(vertex2, svPositionBase);
+			svPositionBase+=4;
+			BaseVector4_QuickCopy(vertex1, svPositionBase);
+			svPositionBase+=4;
 
-			currentFrontFaceVertexIndex += 3;
+			currentPositionVertexIndex += 3;
 
-			BaseVector4_QuickCopy_ZeroW(vertex1, svBackBase);
-			svBackBase+=4;
-			BaseVector4_QuickCopy_ZeroW(vertex2, svBackBase);
-			svBackBase+=4;
-			BaseVector4_QuickCopy_ZeroW(vertex3, svBackBase);
-			svBackBase+=4;
+			BaseVector4_QuickCopy_ZeroW(vertex1, svPositionBase);
+			svPositionBase+=4;
+			BaseVector4_QuickCopy_ZeroW(vertex2, svPositionBase);
+			svPositionBase+=4;
+			BaseVector4_QuickCopy_ZeroW(vertex3, svPositionBase);
+			svPositionBase+=4;
 
-			currentBackFaceVertexIndex += 3;
+			currentPositionVertexIndex += 3;
+
 			currentFaceIsFront = false;
 		}
 
@@ -331,28 +319,25 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{
+				BaseVector4_QuickCopy(edgeV1, svPositionBase);
+				svPositionBase+=4;
+				BaseVector4_QuickCopy(edgeV2, svPositionBase);
+				svPositionBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV2, svPositionBase);
+				svPositionBase+=4;
 
-				BaseVector4_QuickCopy(edgeV1, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy(edgeV2, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-				svSideBase+=4;
+				BaseVector4_QuickCopy(edgeV1, svPositionBase);
+				svPositionBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV2, svPositionBase);
+				svPositionBase+=4;
+				BaseVector4_QuickCopy_ZeroW(edgeV1, svPositionBase);
+				svPositionBase+=4;
 
-				BaseVector4_QuickCopy(edgeV1, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV2, svSideBase);
-				svSideBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV1, svSideBase);
-				svSideBase+=4;
-
-				currentSideVertexIndex +=6;
+				currentPositionVertexIndex +=6;
 			}
 		}
 	}
-	shadowVolumeFront.SetCount(currentFrontFaceVertexIndex);
-	shadowVolumeBack.SetCount(currentBackFaceVertexIndex);
-	shadowVolumeSides.SetCount(currentSideVertexIndex);
+	shadowVolumePositions.SetCount(currentPositionVertexIndex);
 }
 
 void SubMesh3DRenderer::SetShadowVolumePositionData(Point3Array * points)
@@ -431,11 +416,8 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 	Mesh3DRef parentMesh = containerRenderer->GetMesh();
 	//if(parentMesh.IsValid() && parentMesh->GetCastShadows())
 	//{
-
 		bool shadowVolumeInitSuccess = true;
-		shadowVolumeInitSuccess = shadowVolumeFront.Init(storedVertexCount);
-		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeBack.Init(storedVertexCount);
-		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumeSides.Init(storedVertexCount * 6);
+		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumePositions.Init(storedVertexCount * 8);
 		shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 6, 4,0);
 
 		if(!shadowVolumeInitSuccess)
