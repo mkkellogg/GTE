@@ -385,17 +385,14 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
 			{
 				graphics->SetColorBufferChannelState(false,false,false,false);
-				graphics->SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
-				//graphics->SetDepthBufferReadOnly(true);
-				glDepthMask(GL_FALSE);
+				graphics->SetDepthBufferFunction(DepthBufferFunction::GreaterThanOrEqual);
+				graphics->SetDepthBufferReadOnly(true);
 				glDisable(GL_CULL_FACE);
 				glEnable(GL_DEPTH_CLAMP);
 
 				unsigned int clearBufferMask = 0;
-				//IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
-				//Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
-				glClear(GL_STENCIL_BUFFER_BIT);
-				//glClearStencil(0);
+				IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
+				Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
 				glEnable(GL_STENCIL_TEST);
 
 				// We need the stencil test to be enabled but we want it
@@ -416,7 +413,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 		}
 		else if(pass == 1)
 		{
-			glDepthMask(GL_TRUE);
+			graphics->SetDepthBufferReadOnly(false);
 			glDisable(GL_DEPTH_CLAMP);
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
 			{
@@ -436,8 +433,6 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 			}
 
 			graphics->SetColorBufferChannelState(true,true,true,true);
-
-			//graphics->SetDepthBufferReadOnly(false);
 
 			glEnable(GL_CULL_FACE);
 		}

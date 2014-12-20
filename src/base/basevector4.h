@@ -26,6 +26,22 @@
   (dest)-=3;							   		   \
 }
 
+#define BaseVector4_QuickCopy_IncDest(source, dest)\
+{                                          		   \
+  *(dest) = *(source);                      	   \
+  (source)++;					       		   	   \
+  (dest)++;						   		   		   \
+  *(dest) = *(source);                      	   \
+  (source)++;					       		   	   \
+  (dest)++;							   		   	   \
+  *(dest) = *(source);                      	   \
+  (source)++;					       		   	   \
+  (dest)++;							   		   	   \
+  *(dest) = *(source);                      	   \
+  (source)-=3;					       		   	   \
+  (dest)++;							   		   	   \
+}
+
 #define BaseVector4_QuickCopy_ZeroW(source, dest)  \
 {                                          		   \
   *(dest) = *(source);                      	   \
@@ -39,6 +55,21 @@
   (dest)++;					   		   		       \
   *(dest) = 0;                      	   		   \
   (dest)-=3;						   		   	   \
+}
+
+#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)\
+{                                          		   \
+  *(dest) = *(source);                      	   \
+  (source)++;					       		   	   \
+  (dest)++;						   		   		   \
+  *(dest) = *(source);                      	   \
+  (source)++;					       		   	   \
+  (dest)++;							   		   	   \
+  *(dest) = *(source);                      	   \
+  (source)-=2;					       		   	   \
+  (dest)++;					   		   		       \
+  *(dest) = 0;                      	   		   \
+  (dest)++;					   		   		       \
 }
 
 class BaseVector4

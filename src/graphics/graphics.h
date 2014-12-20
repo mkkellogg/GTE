@@ -63,6 +63,7 @@ class Graphics
 
     float fpsTime;
     int frames;
+    float currentFPS;
 
     Graphics();
     virtual ~Graphics();
@@ -77,6 +78,7 @@ class Graphics
     public :
 
     RenderManager * GetRenderManager();
+    float GetCurrentFPS();
 
     virtual bool Init(const GraphicsAttributes& attributes);
 

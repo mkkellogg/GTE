@@ -71,8 +71,8 @@ void Graphics::UpdateFPS()
 	frames++;
 	if(fpsTime >= 1)
 	{
-		float fps = (float)frames/fpsTime;
-		//printf("fps: %f\n", fps);
+		currentFPS = (float)frames/fpsTime;
+		//printf("fps: %f\n", currentFPS);
 		fpsTime = 0;
 		frames = 0;
 	}
@@ -97,6 +97,11 @@ MaterialRef Graphics::GetActiveMaterial() const
 RenderManager * Graphics::GetRenderManager()
 {
 	return renderManager;
+}
+
+float Graphics::GetCurrentFPS()
+{
+	return currentFPS;
 }
 
 const GraphicsAttributes& Graphics::GetAttributes() const

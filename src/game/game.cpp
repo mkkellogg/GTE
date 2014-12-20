@@ -207,8 +207,8 @@ void Game::Init()
 		return;
 	}
 	firstMesh = FindFirstMesh(modelSceneObject);
-	//firstMesh->SetCastShadows(true);
-	//firstMesh->SetReceiveShadows(true);
+	firstMesh->SetCastShadows(true);
+	firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(10,-10,-10,false);
 	modelSceneObject->GetLocalTransform().Scale(.05,.05,.05, true);
 

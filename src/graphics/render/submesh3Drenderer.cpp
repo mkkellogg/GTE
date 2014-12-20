@@ -138,9 +138,10 @@ void SubMesh3DRenderer::SetUseBadGeometryShadowFix(bool useFix)
 
 void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional)
 {
-	float backFaceThreshold = 0;
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
 	ASSERT_RTRN(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> mesh is invalid.");
+
+	float backFaceThreshold = 0;
 
 	Point3Array * positions = mesh->GetPostions();
 	ASSERT_RTRN(positions, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL positions array.");
@@ -150,7 +151,6 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	Vector3Array * normals = mesh->GetStraightNormals();
 	ASSERT_RTRN(normals, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL straight normals array.");
 	Vector3Array& normalsSource = doNormalTransform == true ? transformedStraightNormals : *normals;
-	float * normalsSrcPtr = const_cast<float*>(normalsSource.GetDataPtr());
 
 	float* vertex1 = NULL;
 	float* vertex2 = NULL;
@@ -165,9 +165,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	SubMesh3DFaces& faces = mesh->GetFaces();
 	unsigned int faceCount = faces.GetFaceCount();
 	unsigned int faceVertexIndex = 0;
-	Vector3 * faceNormalA;
-	Vector3 * faceNormalB;
-	Vector3 * faceNormalC;
+	Vector3 * faceNormal;
 	SubMesh3DFace * face = NULL;
 	unsigned int currentPositionVertexIndex = 0;
 	float * svPositionBase =  const_cast<float*>(shadowVolumePositions.GetDataPtr());
@@ -189,27 +187,15 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 		faceVertexIndex = face->FirstVertexIndex;
 
-		faceNormalA = normalsSource.GetVector(faceVertexIndex);
-		faceNormalB = normalsSource.GetVector(faceVertexIndex+1);
-		faceNormalC = normalsSource.GetVector(faceVertexIndex+2);
+		faceNormal = normalsSource.GetVector(faceVertexIndex);
 
-		vertex1 = positionsSrcPtr+(faceVertexIndex*4);
-		vertex2 = positionsSrcPtr+(faceVertexIndex*4)+4;
-		vertex3 = positionsSrcPtr+(faceVertexIndex*4)+8;
+		vertex1 = positionsSrcPtr+(faceVertexIndex << 2);
+		vertex2 = positionsSrcPtr+(faceVertexIndex << 2)+4;
+		vertex3 = positionsSrcPtr+(faceVertexIndex << 2)+8;
 
-		vertexAvg.Set(vertex1[0],vertex1[1],vertex1[2]);
-
-		vertexAvg.x += vertex2[0];
-		vertexAvg.y += vertex2[1];
-		vertexAvg.z += vertex2[2];
-
-		vertexAvg.x += vertex3[0];
-		vertexAvg.y += vertex3[1];
-		vertexAvg.z += vertex3[2];
-
-		vertexAvg.x *= .33333333;
-		vertexAvg.y *= .33333333;
-		vertexAvg.z *= .33333333;
+		vertexAvg.x = (vertex1[0] + vertex2[0] + vertex3[0]) / 3;
+		vertexAvg.y = (vertex1[1] + vertex2[1] + vertex3[1]) / 3;
+		vertexAvg.z = (vertex1[2] + vertex2[2] + vertex3[2]) / 3;
 
 		if(!directional)
 		{
@@ -219,52 +205,36 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			faceToLightDir.Normalize();
 		}
 
-		float faceToLightDotA = Vector3::Dot(faceToLightDir, *faceNormalA);
-		float faceToLightDotB = Vector3::Dot(faceToLightDir, *faceNormalB);
-		float faceToLightDotC = Vector3::Dot(faceToLightDir, *faceNormalC);
+		float faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
 
 		bool currentFaceIsFront = false;
-		if(faceToLightDotA >= backFaceThreshold)
+		if(faceToLightDot >= backFaceThreshold)
 		{
 			currentFaceIsFront = true;
 			continue;
 		}
 		else
 		{
-			BaseVector4_QuickCopy(vertex3, svPositionBase);
-			svPositionBase+=4;
-			BaseVector4_QuickCopy(vertex2, svPositionBase);
-			svPositionBase+=4;
-			BaseVector4_QuickCopy(vertex1, svPositionBase);
-			svPositionBase+=4;
+			BaseVector4_QuickCopy_IncDest(vertex3, svPositionBase);
+			BaseVector4_QuickCopy_IncDest(vertex2, svPositionBase);
+			BaseVector4_QuickCopy_IncDest(vertex1, svPositionBase);
 
-			currentPositionVertexIndex += 3;
+			BaseVector4_QuickCopy_ZeroW_IncDest(vertex1, svPositionBase);
+			BaseVector4_QuickCopy_ZeroW_IncDest(vertex2, svPositionBase);
+			BaseVector4_QuickCopy_ZeroW_IncDest(vertex3, svPositionBase);
 
-			BaseVector4_QuickCopy_ZeroW(vertex1, svPositionBase);
-			svPositionBase+=4;
-			BaseVector4_QuickCopy_ZeroW(vertex2, svPositionBase);
-			svPositionBase+=4;
-			BaseVector4_QuickCopy_ZeroW(vertex3, svPositionBase);
-			svPositionBase+=4;
-
-			currentPositionVertexIndex += 3;
-
+			currentPositionVertexIndex += 6;
 			currentFaceIsFront = false;
 		}
 
 		int facesFound = 0;
 		for(unsigned int ai = 0; ai < 3; ai++)
 		{
-			adjacentFaceIndex = -1;
-			edgeV1 = edgeV2 = NULL;
+			adjacentFaceIndex = face->AdjacentFaceIndex1;
+			edgeV1 = vertex1;
+			edgeV2 = vertex2;
 
-			if(ai == 0)
-			{
-				adjacentFaceIndex = face->AdjacentFaceIndex1;
-				edgeV1 = vertex1;
-				edgeV2 = vertex2;
-			}
-			else if(ai == 1)
+			if(ai == 1)
 			{
 				adjacentFaceIndex = face->AdjacentFaceIndex2;
 				edgeV1 = vertex2;
@@ -290,19 +260,9 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 					aVertex2 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+4;
 					aVertex3 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+8;
 
-					vertexAvg.Set(aVertex1[0],aVertex1[1],aVertex1[2]);
-
-					vertexAvg.x += aVertex2[0];
-					vertexAvg.y += aVertex2[1];
-					vertexAvg.z += aVertex2[2];
-
-					vertexAvg.x += aVertex3[0];
-					vertexAvg.y += aVertex3[1];
-					vertexAvg.z += aVertex3[2];
-
-					vertexAvg.x *= .333333333;
-					vertexAvg.y *= .333333333;
-					vertexAvg.z *= .333333333;
+					vertexAvg.x = (aVertex1[0] + aVertex2[0] + aVertex3[0]) / 3;
+					vertexAvg.y = (aVertex1[1] + aVertex2[1] + aVertex3[1]) / 3;
+					vertexAvg.z = (aVertex1[2] + aVertex2[2] + aVertex3[2]) / 3;
 
 					if(!directional)
 					{
@@ -319,19 +279,13 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{
-				BaseVector4_QuickCopy(edgeV1, svPositionBase);
-				svPositionBase+=4;
-				BaseVector4_QuickCopy(edgeV2, svPositionBase);
-				svPositionBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV2, svPositionBase);
-				svPositionBase+=4;
+				BaseVector4_QuickCopy_IncDest(edgeV1, svPositionBase);
+				BaseVector4_QuickCopy_IncDest(edgeV2, svPositionBase);
+				BaseVector4_QuickCopy_ZeroW_IncDest(edgeV2, svPositionBase);
 
-				BaseVector4_QuickCopy(edgeV1, svPositionBase);
-				svPositionBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV2, svPositionBase);
-				svPositionBase+=4;
-				BaseVector4_QuickCopy_ZeroW(edgeV1, svPositionBase);
-				svPositionBase+=4;
+				BaseVector4_QuickCopy_IncDest(edgeV1, svPositionBase);
+				BaseVector4_QuickCopy_ZeroW_IncDest(edgeV2, svPositionBase);
+				BaseVector4_QuickCopy_ZeroW_IncDest(edgeV1, svPositionBase);
 
 				currentPositionVertexIndex +=6;
 			}
