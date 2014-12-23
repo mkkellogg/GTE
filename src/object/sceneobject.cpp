@@ -76,12 +76,12 @@ void SceneObject::InitSceneObjectTransform(SceneObjectTransform * transform)
 	transform->SetLocalTransform(&this->transform);
 }
 
-void SceneObject::SetProcessingTransform(Transform& transform)
+void SceneObject::SetAggregateTransform(Transform& transform)
 {
 	processingTransform.SetTo(transform);
 }
 
-const Transform& SceneObject::GetProcessingTransform() const
+const Transform& SceneObject::GetAggregateTransform() const
 {
 	return processingTransform;
 }

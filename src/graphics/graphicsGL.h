@@ -36,7 +36,16 @@ class GraphicsGL : public Graphics
     bool depthBufferReadOnly;
 
     bool colorBufferEnabled;
+
     bool stencilBufferEnabled;
+    bool stencilTestEnabled;
+
+    bool faceCullingEnabled;
+
+    int redBits, greenBits, blueBits, alphaBits;
+    int depthBufferBits;
+    int stencilBufferBits;
+
     bool initialized;
 
     GraphicsGL();
@@ -58,17 +67,24 @@ class GraphicsGL : public Graphics
 
     void ClearRenderBuffers(unsigned int bufferMask);
 
+    void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
+
     void SetDepthBufferEnabled(bool enabled);
     void SetDepthBufferReadOnly(bool readOnly);
     void SetDepthBufferFunction(DepthBufferFunction function);
 
-    void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
+    void SetStencilBufferEnabled(bool enabled);
+    void SetStencilTestEnabled(bool enabled);
+
+    void SetFaceCullingEnabled(bool enabled);
 
     void SetBlendingEnabled(bool enabled);
     void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
     GLenum GetGLBlendProperty(BlendingProperty property);
     void ActivateMaterial(MaterialRef material);
     MaterialRef GetActiveMaterial();
+
+    void EnterRenderMode(RenderMode renderMode);
 
     void PreProcessScene();
     void RenderScene();

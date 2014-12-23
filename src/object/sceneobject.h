@@ -41,7 +41,7 @@ class SceneObject : public EngineObject
 	SceneObject();
     virtual ~SceneObject();
 
-    void SetProcessingTransform(Transform& transform);
+    void SetAggregateTransform(Transform& transform);
 
 	public:
 
@@ -52,7 +52,7 @@ class SceneObject : public EngineObject
 
     Transform& GetLocalTransform() ;
     void InitSceneObjectTransform(SceneObjectTransform * transform);
-    const Transform& GetProcessingTransform() const;
+    const Transform& GetAggregateTransform() const;
 
     bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
     bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);

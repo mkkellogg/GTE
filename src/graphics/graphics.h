@@ -42,6 +42,13 @@ enum class ColorChannel
 	Alpha
 };
 
+enum class RenderMode
+{
+	Standard,
+	StandardWithShadowVolumeTest,
+	ShadowVolumeRender
+};
+
 class GraphicsAttributes
 {
 	public:
@@ -96,11 +103,16 @@ class Graphics
 
     virtual void ClearRenderBuffers(unsigned int bufferMask) = 0;
 
+    virtual void SetColorBufferChannelState(bool r, bool g, bool b, bool a) = 0;
+
     virtual void SetDepthBufferEnabled(bool enabled) = 0;
     virtual void SetDepthBufferReadOnly(bool readOnly) = 0;
     virtual void SetDepthBufferFunction(DepthBufferFunction function) = 0;
 
-    virtual void SetColorBufferChannelState(bool r, bool g, bool b, bool a) = 0;
+    virtual void SetStencilBufferEnabled(bool enabled) = 0;
+    virtual void SetStencilTestEnabled(bool enabled) = 0;
+
+    virtual void SetFaceCullingEnabled(bool enabled) = 0;
 
     virtual void SetBlendingEnabled(bool enabled) = 0;
     virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
@@ -108,6 +120,8 @@ class Graphics
     MaterialRef GetActiveMaterial() const;
 
     virtual const GraphicsAttributes& GetAttributes() const;
+
+    virtual void EnterRenderMode(RenderMode renderMode) = 0;
 };
 
 #endif

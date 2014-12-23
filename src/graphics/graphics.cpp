@@ -29,12 +29,13 @@ Graphics::Graphics()
 	renderManager = NULL;
     fpsTime =0;
 	frames =0;
+	currentFPS = 0.0;
 }
 
 bool Graphics::Init(const GraphicsAttributes& attributes)
 {
 	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
-	renderManager = new RenderManager(this, engineObjectManager);
+	renderManager = new RenderManager();
 	ASSERT(renderManager != NULL, "Graphics::Init -> Unable to allocate render manager", false);
 
 	bool renderInitSuccess = renderManager->Init();

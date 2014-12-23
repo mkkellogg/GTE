@@ -32,7 +32,7 @@ const Transform * SceneObjectSkeletonNode::GetFullTransform() const
 {
 	ASSERT(Target.IsValid(),"SceneObjectSkeletonNode::GetFullTransform -> Node does not have a valid target.", NULL);
 
-	const Transform& ref = Target->GetProcessingTransform();
+	const Transform& ref = Target->GetAggregateTransform();
 	return &ref;
 }
 

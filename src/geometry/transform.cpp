@@ -224,7 +224,7 @@ void Transform::Scale(Vector3 * mag,  bool local)
 
 /*
  * Scale this transform by [x], [y], [z]. If [local] is true then the operation is
- * performed in local space, otherwise it is performed in local space.
+ * performed in local space, otherwise it is performed in world space.
  */
 void Transform::Scale(float x, float y, float z,  bool local)
 {

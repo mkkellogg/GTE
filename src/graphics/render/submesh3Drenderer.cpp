@@ -152,34 +152,36 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	ASSERT_RTRN(normals, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL straight normals array.");
 	Vector3Array& normalsSource = doNormalTransform == true ? transformedStraightNormals : *normals;
 
+	unsigned int currentPositionVertexIndex = 0;
+	float * svPositionBase =  const_cast<float*>(shadowVolumePositions.GetDataPtr());
+
 	float* vertex1 = NULL;
 	float* vertex2 = NULL;
 	float* vertex3 = NULL;
-	float* aVertex1 = NULL;
-	float* aVertex2 = NULL;
-	float* aVertex3 = NULL;
-	Point3 vertexAvg;
-
 	Vector3 faceToLightDir = lightPosDir;
-	Vector3 adjFaceToLightDir;
 	SubMesh3DFaces& faces = mesh->GetFaces();
 	unsigned int faceCount = faces.GetFaceCount();
 	unsigned int faceVertexIndex = 0;
 	Vector3 * faceNormal;
 	SubMesh3DFace * face = NULL;
-	unsigned int currentPositionVertexIndex = 0;
-	float * svPositionBase =  const_cast<float*>(shadowVolumePositions.GetDataPtr());
 
 	float * edgeV1 = NULL;
 	float * edgeV2 = NULL;
+	float* adjVertex1 = NULL;
+	float* adjVertex2 = NULL;
+	float* adjVertex3 = NULL;
+	Vector3 adjFaceToLightDir;
 	unsigned int adjacentFaceVertexIndex = 0;
 	int adjacentFaceIndex = -1;
 	SubMesh3DFace * adjacentFace = NULL;
 	Vector3 * adjacentFaceNormal = NULL;
 
+	Point3 vertexAvg;
+
 	faceToLightDir.Normalize();
 	faceToLightDir.Invert();
 	adjFaceToLightDir = faceToLightDir;
+
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
 		face = faces.GetFace(f);
@@ -256,13 +258,13 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 				{
 					adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
 					adjacentFaceNormal = normalsSource.GetVector(adjacentFaceVertexIndex);
-					aVertex1 = positionsSrcPtr+(adjacentFaceVertexIndex*4);
-					aVertex2 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+4;
-					aVertex3 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+8;
+					adjVertex1 = positionsSrcPtr+(adjacentFaceVertexIndex*4);
+					adjVertex2 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+4;
+					adjVertex3 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+8;
 
-					vertexAvg.x = (aVertex1[0] + aVertex2[0] + aVertex3[0]) / 3;
-					vertexAvg.y = (aVertex1[1] + aVertex2[1] + aVertex3[1]) / 3;
-					vertexAvg.z = (aVertex1[2] + aVertex2[2] + aVertex3[2]) / 3;
+					vertexAvg.x = (adjVertex1[0] + adjVertex2[0] + adjVertex3[0]) / 3;
+					vertexAvg.y = (adjVertex1[1] + adjVertex2[1] + adjVertex3[1]) / 3;
+					vertexAvg.z = (adjVertex1[2] + adjVertex2[2] + adjVertex3[2]) / 3;
 
 					if(!directional)
 					{

@@ -93,9 +93,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     glClearColor(0,0,0,0);
     glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    glDisable(GL_BLEND);
 
     SetBlendingEnabled(false);
 
@@ -103,17 +101,20 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     SetDepthBufferReadOnly(false);
     SetDepthBufferFunction(DepthBufferFunction::Equal);
 
-   /* SetRenderBufferEnabled(RenderBufferType::Color, true);
-    SetRenderBufferEnabled(RenderBufferType::Depth, true);
-    SetRenderBufferEnabled(RenderBufferType::Stencil, false);*/
+    SetStencilBufferEnabled(false);
 
-   /* int dbits;
-    glGetIntegerv(GL_DEPTH_BITS, &dbits);
-    printf("dbits: %d\n", dbits);*/
+    SetFaceCullingEnabled(true);
 
-   /* int sbits;
-    glGetIntegerv(GL_STENCIL_BITS, &sbits);
-    printf("sbits: %d\n", sbits);*/
+    glGetIntegerv(GL_RED_BITS, &redBits);
+    glGetIntegerv(GL_GREEN_BITS, &greenBits);
+    glGetIntegerv(GL_BLUE_BITS, &blueBits);
+    glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
+
+    glGetIntegerv(GL_DEPTH_BITS, &depthBufferBits);
+    //printf("depthBufferBits: %d\n", depthBufferBits);
+
+    glGetIntegerv(GL_STENCIL_BITS, &stencilBufferBits);
+   // printf("stencilBufferBits: %d\n", stencilBufferBits);
 
     initialized = true;
     return true;
@@ -133,8 +134,19 @@ GraphicsGL::GraphicsGL() : Graphics()
 	depthBufferEnabled = false;
 	depthBufferReadOnly = false;
 
+	stencilTestEnabled = false;
 	stencilBufferEnabled = false;
+
+	faceCullingEnabled = false;
+
 	initialized = false;
+
+	redBits = -1;
+	greenBits = -1;
+	blueBits = -1;
+	alphaBits = -1;
+	depthBufferBits = -1;
+	stencilBufferBits = -1;
 }
 
 Shader * GraphicsGL::CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
@@ -176,6 +188,15 @@ void GraphicsGL::ClearRenderBuffers(unsigned int bufferMask)
 	}
 
 	glClear(glClearMask);
+}
+
+void GraphicsGL::SetColorBufferChannelState(bool r, bool g, bool b, bool a)
+{
+	GLboolean red = r == true ? GL_TRUE : GL_FALSE;
+	GLboolean green = g == true ? GL_TRUE : GL_FALSE;
+	GLboolean blue = b == true ? GL_TRUE : GL_FALSE;
+	GLboolean alpha = a == true ? GL_TRUE : GL_FALSE;
+	glColorMask(red, green, blue, alpha);
 }
 
 void GraphicsGL::SetDepthBufferEnabled(bool enabled)
@@ -223,13 +244,34 @@ void GraphicsGL::SetDepthBufferFunction(DepthBufferFunction function)
 	}
 }
 
-void GraphicsGL::SetColorBufferChannelState(bool r, bool g, bool b, bool a)
+void GraphicsGL::SetStencilBufferEnabled(bool enabled)
 {
-	GLboolean red = r == true ? GL_TRUE : GL_FALSE;
-	GLboolean green = g == true ? GL_TRUE : GL_FALSE;
-	GLboolean blue = b == true ? GL_TRUE : GL_FALSE;
-	GLboolean alpha = a == true ? GL_TRUE : GL_FALSE;
-	glColorMask(red, green, blue, alpha);
+	if(stencilBufferEnabled != enabled || !initialized)
+	{
+		if(enabled)glEnable(GL_STENCIL_BUFFER);
+		else glDisable(GL_STENCIL_BUFFER);
+		stencilBufferEnabled = enabled;
+	}
+}
+
+void GraphicsGL::SetStencilTestEnabled(bool enabled)
+{
+	if(stencilTestEnabled != enabled || !initialized)
+	{
+		if(enabled)glEnable(GL_STENCIL_TEST);
+		else glDisable(GL_STENCIL_TEST);
+		stencilTestEnabled = enabled;
+	}
+}
+
+void GraphicsGL::SetFaceCullingEnabled(bool enabled)
+{
+	if(faceCullingEnabled != enabled || !initialized)
+	{
+		if(enabled)glEnable(GL_CULL_FACE);
+		else glDisable(GL_CULL_FACE);
+		faceCullingEnabled = enabled;
+	}
 }
 
 /*
@@ -484,6 +526,88 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 		{
 			glUseProgram(shaderGL->GetProgramID());
 		}
+	}
+}
+
+void GraphicsGL::EnterRenderMode(RenderMode renderMode)
+{
+	unsigned int clearBufferMask = 0;
+
+	switch(renderMode)
+	{
+		case RenderMode::ShadowVolumeRender:
+
+			// disable rendering to the color buffer
+			SetColorBufferChannelState(false,false,false,false);
+			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+			SetDepthBufferReadOnly(true);
+			SetFaceCullingEnabled(false);
+
+			// GL_DEPTH_CLAMP == true means no near or far clipping, achieves same effect
+			// as infinite far place projection matrix, which is necessary because the back
+			// vertices of the shadow volume will be projected to infinity.
+			glEnable(GL_DEPTH_CLAMP);
+
+			clearBufferMask = 0;
+			IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
+			Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
+			SetStencilBufferEnabled(true);
+			SetStencilTestEnabled(true);
+
+			// We need the stencil test to be enabled but we want it
+			// to succeed always. Only the depth test matters.
+			glStencilFunc(GL_ALWAYS, 0, 0xff);
+			glStencilMask( 0xff );
+
+			// Set the stencil test per the depth fail algorithm
+			glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+			glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+			SetBlendingEnabled(false);
+
+		break;
+		case RenderMode::StandardWithShadowVolumeTest:
+
+			SetDepthBufferReadOnly(false);
+
+			// enable near & far clipping planes
+			glDisable(GL_DEPTH_CLAMP);
+
+			SetStencilTestEnabled(true);
+
+			 // Draw only if the corresponding stencil value is zero
+			glStencilFunc(GL_EQUAL, 0x0, 0xFF);
+
+			// prevent update to the stencil buffer
+			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+
+			// enable color buffer rendering
+			SetColorBufferChannelState(true,true,true,true);
+			SetFaceCullingEnabled(true);
+
+			SetBlendingEnabled(false);
+
+		break;
+		default:
+		case RenderMode::Standard:
+
+			SetDepthBufferReadOnly(false);
+
+			// enable near & far clipping planes
+			glDisable(GL_DEPTH_CLAMP);
+
+			SetStencilTestEnabled(false);
+			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+
+			// enable color buffer rendering
+			SetColorBufferChannelState(true,true,true,true);
+			SetFaceCullingEnabled(true);
+
+			SetBlendingEnabled(false);
+
+		break;
 	}
 }
 
