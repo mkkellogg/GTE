@@ -47,6 +47,12 @@ bool SubMesh3DFaces::Init(unsigned int faceCount)
 
 SubMesh3DFace * SubMesh3DFaces::GetFace(unsigned int index)
 {
-	ASSERT(index < faceCount, "SubMesh3DFaces::Face * SubMesh3DFaces::GetFace -> Index is out of range.", NULL);
+	ASSERT(index < faceCount, "SubMesh3DFaces::GetFace -> Index is out of range.", NULL);
 	return faces + index;
+}
+
+const SubMesh3DFace * SubMesh3DFaces::GetFaceConst(unsigned int index) const
+{
+	ASSERT(index < faceCount, "SubMesh3DFaces::GetFaceConst -> Index is out of range.", NULL);
+	return (const SubMesh3DFace *)(faces + index);
 }

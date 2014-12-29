@@ -61,16 +61,16 @@ void SubMesh3D::SetSubIndex(int index)
 	subIndex = index;
 }
 
-void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result)
+void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const
 {
 	ASSERT_RTRN(faceIndex < totalVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> faceIndex is out range.");
 
 	Vector3 a,b,c;
 
 	// get Point3 objects for each vertex
-	Point3 *pa = positions.GetPoint(faceIndex);
-	Point3 *pb = positions.GetPoint(faceIndex+1);
-	Point3 *pc = positions.GetPoint(faceIndex+2);
+	const Point3 *pa = positions.GetPointConst(faceIndex);
+	const Point3 *pb = positions.GetPointConst(faceIndex+1);
+	const Point3 *pc = positions.GetPointConst(faceIndex+2);
 
 	ASSERT_RTRN(pa != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
 	ASSERT_RTRN(pb != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
@@ -87,29 +87,29 @@ void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result)
 	result.Set(c.x,c.y,c.z);
 }
 
-void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC)
+void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const
 {
 	ASSERT_RTRN(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> faceIndex is out range.");
-	const SubMesh3DFace * face = faces.GetFace(faceIndex);
+	const SubMesh3DFace * face = faces.GetFaceConst(faceIndex);
 
 	int faceVertexIndex = face->FirstVertexIndex;
-	Point3 * faceVertexA = positions.GetPoint(faceVertexIndex);
-	Point3 * faceVertexB = positions.GetPoint(faceVertexIndex + 1);
-	Point3 * faceVertexC = positions.GetPoint(faceVertexIndex + 2);
+	const Point3 * faceVertexA = positions.GetPointConst(faceVertexIndex);
+	const Point3 * faceVertexB = positions.GetPointConst(faceVertexIndex + 1);
+	const Point3 * faceVertexC = positions.GetPointConst(faceVertexIndex + 2);
 
 	int edgesSet = 0;
 	for(unsigned int f = 0; f < faces.GetFaceCount(); f++)
 	{
 		if(faceIndex != f)
 		{
-			const SubMesh3DFace * compareFace = faces.GetFace(f);
+			const SubMesh3DFace * compareFace = faces.GetFaceConst(f);
 			int compareVertexIndex = compareFace->FirstVertexIndex;
 
 			if(compareVertexIndex < 0)continue;
 
-			Point3 * compareVertexA = positions.GetPoint(compareVertexIndex);
-			Point3 * compareVertexB = positions.GetPoint(compareVertexIndex+1);
-			Point3 * compareVertexC = positions.GetPoint(compareVertexIndex+2);
+			const Point3 * compareVertexA = positions.GetPointConst(compareVertexIndex);
+			const Point3 * compareVertexB = positions.GetPointConst(compareVertexIndex+1);
+			const Point3 * compareVertexC = positions.GetPointConst(compareVertexIndex+2);
 
 			if(Point3::AreStrictlyEqual(compareVertexB,faceVertexA) && Point3::AreStrictlyEqual(compareVertexA,faceVertexB)){edgeA = f;edgesSet++;}
 			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexA) && Point3::AreStrictlyEqual(compareVertexB,faceVertexB)){edgeA = f;edgesSet++;}

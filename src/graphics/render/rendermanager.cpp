@@ -118,11 +118,13 @@ unsigned int RenderManager::RenderDepth(const DataStack<Matrix4x4>& transformSta
 }
 
 /*
- * Kick off rendering of the entire scene. This method starts with the root object
- * in the scene and kicks off a method that renders all objects in the scene.
+ * Kick off rendering of the entire scene. This method first processes the scene hierarchy and
+ * stores a list of all cameras, lights, and meshes in the scene. After that it renders the scene
+ * from the perspective of each camera.
  */
 void RenderManager::RenderAll()
 {
+	// find all the cameras, lights, and meshes in the scene
 	ProcessScene();
 
 	// render the scene from the perspective of each camera found in ProcessScene()
@@ -145,7 +147,7 @@ void RenderManager::ProcessScene()
 	Transform cameraModelView;
 
 	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
-	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderAll -> sceneRoot is NULL.");
+	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::ProcessScene -> sceneRoot is NULL.");
 
 	// gather information about the cameras, lights, and renderable meshes in the scene
 	ProcessScene(sceneRoot.GetRef(), cameraModelView);
@@ -154,18 +156,23 @@ void RenderManager::ProcessScene()
 }
 
 /*
- * Recursively visits each object in the scene that is reachable from [parent]. For each SceneObject
- * that is visited during this search, this method saves references to:
+ * ProcessScene:
  *
- *   1. Camera objects
- *   2. Light objects
- *   3. Mesh3DRenderer and SkinnedMesh3DRenderer objects
+ * Recursively visits each object in the scene that is reachable from [parent]. The transforms of each
+ * scene object are concatenated as progress moves down the scene object tree and passed to the current
+ * invocation via [aggregateTransform]. These aggregate transforms are saved to each SceneObject via
+ * SceneObject::SetAggregateTransform().
+ *
+ * Additionally, for each SceneObject that is visited during this search, this method saves references to:
+ *
+ *   1. Camera objects -> saved to [sceneCameras]
+ *   2. Light objects -> saved to [sceneAmbientLights] or [sceneLights]
+ *   3. Mesh3DRenderer and SkinnedMesh3DRenderer objects -> saved to [sceneMeshObjects]
+ *
+ * For each of the above objects, a copy of the aggregate transform of the containing SceneObject is saved along
+ * with a reference to the object.
  *
  * Later, the entire scene is rendered from the perspective of each camera in that list via RenderSceneFromCamera().
- *
- * The transforms of each scene object are concatenated as progress moves down the scene object tree
- * and passed to the current invocation via [aggregateTransform]. These aggregate transforms are saved to
- * each SceneObject via SceneObject::SetAggregateTransform().
  *
  * For each Mesh3DRender and SkinnedMesh3DRenderer that is visited, the method loops through each sub-renderer
  * and calls the SubMesh3DRenderer::PreRender() Method. For skinned meshes, this method will perform the
@@ -187,7 +194,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 
 		if(!child.IsValid())
 		{
-			Debug::PrintError("RenderManager::RenderAll -> NULL scene object encountered.");
+			Debug::PrintError("RenderManager::ProcessScene -> NULL scene object encountered.");
 			continue;
 		}
 
@@ -332,8 +339,12 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
  */
 void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, const Camera& camera)
 {
+	// clear the list of objects that have been rendered at least once. this list is used to
+	// determine if blending should be turned on or off. if an object is being rendered for the
+	// first time, blending should be off; otherwise it should be on.
 	renderedObjects.clear();
 
+	// we have not yet rendered any ambient lights
 	bool renderedAmbient = false;
 
 	// loop through each ambient light and render the scene for that light
@@ -360,6 +371,8 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 			continue;
 		}
 
+		// if [renderedAmbient] is true, the RenderSceneForLight() method will have the depth buffer already
+		// set up for shadow rendering
 		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera, renderedAmbient);
 	}
 }
@@ -391,6 +404,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	{
 		if(pass == 0) // shadow volume pass
 		{
+			// check if this light can cast shadows; if not we skip this pass
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
 				graphics->EnterRenderMode(RenderMode::ShadowVolumeRender);
 			else
@@ -398,12 +412,14 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 		}
 		else if(pass == 1) // normal rendering pass
 		{
+			// check if this light can cast shadows, if not do standard (shadow-less) rendering
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
 				graphics->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
 			else if(light.GetType() == LightType::Ambient)
 				graphics->EnterRenderMode(RenderMode::Standard);
 		}
 
+		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
 		for(unsigned int s = 0; s < sceneMeshCount; s++)
 		{
 			SceneObject * child = sceneMeshObjects[s];
@@ -418,7 +434,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 
 			Mesh3DRenderer * renderer = NULL;
 
-			// check if current scene object has a mesh & renderer
+			// check if current SceneObject has a mesh & renderer
 			if(child->GetMesh3DRenderer().IsValid())renderer =child->GetMesh3DRenderer().GetPtr();
 			else if(child->GetSkinnedMesh3DRenderer().IsValid())renderer = (Mesh3DRenderer *)child->GetSkinnedMesh3DRenderer().GetPtr();
 			else
@@ -435,7 +451,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 				continue;
 			}
 
-			// get the full transform of the scene object, including those of all ancestors
+			// copy the full transform of the scene object, including those of all ancestors
 			SceneObjectTransform full;
 			child->InitSceneObjectTransform(&full);
 
@@ -469,7 +485,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 	Transform model;
 	Transform modelInverse;
 
-	// check if current scene object has a mesh & renderer
+	// check if [sceneObject] has a mesh & renderer
 	if(sceneObject.GetMesh3DRenderer().IsValid())
 	{
 		renderer = sceneObject.GetMesh3DRenderer().GetPtr();
@@ -501,9 +517,10 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshes -> NULL sub mesh encountered.");
 
 			model.SetTo(sceneObject.GetAggregateTransform());
-			modelView.SetTo(model);
 
-			// concatenate modelTransform with inverted viewTransform
+			// concatenate model transform with inverted view transform, and then with
+			// the camera's projection transform.
+			modelView.SetTo(model);
 			modelView.PreTransformBy(viewTransformInverse);
 			modelViewProjection.SetTo(modelView);
 			modelViewProjection.PreTransformBy(camera.GetProjectionTransform());
@@ -511,10 +528,10 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			// activate the material, which will switch the GPU's active shader to
 			// the one associated with the material
 			ActivateMaterial(currentMaterial);
+			// send uniforms set for the new material to its shader
 			SendActiveMaterialUniformsToShader();
 			// send light data to the active shader
 			currentMaterial->SendLightToShader(&light, &lightPosition, NULL);
-
 			// pass concatenated modelViewTransform and projection transforms to shader
 			SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform(), modelViewProjection);
 
@@ -562,7 +579,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 	Transform model;
 	Transform modelInverse;
 
-	// check if current scene object has a mesh & renderer
+	// check if [sceneObject] has a mesh & renderer
 	if(sceneObject.GetMesh3DRenderer().IsValid())
 	{
 		renderer = sceneObject.GetMesh3DRenderer().GetPtr();
@@ -580,7 +597,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.");
 		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderShadowVolumesForSceneObject -> renderer has no materials.");
 
-		// loop through each sub-renderer and render its the shadow volume for its mesh(es)
+		// loop through each sub-renderer and render the shadow volume for its mesh(es)
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
 			MaterialRef currentMaterial = renderer->GetMaterial(0);
@@ -609,8 +626,6 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			// activate the material, which will switch the GPU's active shader to
 			// the one associated with the material
 			ActivateMaterial(shadowVolumeMaterial);
-			SendActiveMaterialUniformsToShader();
-
 			// pass special shadow volume model-view-matrix to shader
 			SendModelViewProjectionToShader(modelViewProjection);
 

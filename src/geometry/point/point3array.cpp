@@ -28,6 +28,11 @@ Point3 * Point3Array::GetPoint(int index)
 	return (Point3*)objects[index];
 }
 
+const Point3 * Point3Array::GetPointConst(int index) const
+{
+	return (const Point3*)objects[index];
+}
+
 Point3 ** Point3Array::GetPoints()
 {
 	return (Point3**)objects;

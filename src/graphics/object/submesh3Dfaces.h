@@ -35,6 +35,7 @@ class SubMesh3DFaces
     unsigned int GetFaceCount() const;
     bool Init(unsigned int faceCount);
     SubMesh3DFace * GetFace(unsigned int index);
+    const SubMesh3DFace * GetFaceConst(unsigned int index) const;
 };
 
 #endif

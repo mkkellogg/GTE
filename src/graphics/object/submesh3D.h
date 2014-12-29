@@ -55,10 +55,9 @@ class SubMesh3D : public EngineObject
     SubMesh3D(StandardAttributeSet attributes);
     virtual ~SubMesh3D();
 
-    void CalculateFaceNormal(unsigned int faceIndex, Vector3& result);
-    void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC);
+    void CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const;
+    void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
     void BuildFaces();
-
 
     void CalcSphereOfInfluence();
     void CalculateNormals(float smoothingThreshhold);

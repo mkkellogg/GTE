@@ -155,26 +155,27 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	unsigned int currentPositionVertexIndex = 0;
 	float * svPositionBase =  const_cast<float*>(shadowVolumePositions.GetDataPtr());
 
+	SubMesh3DFaces& faces = mesh->GetFaces();
+	unsigned int faceCount = faces.GetFaceCount();
+
 	float* vertex1 = NULL;
 	float* vertex2 = NULL;
 	float* vertex3 = NULL;
 	Vector3 faceToLightDir = lightPosDir;
-	SubMesh3DFaces& faces = mesh->GetFaces();
-	unsigned int faceCount = faces.GetFaceCount();
 	unsigned int faceVertexIndex = 0;
 	Vector3 * faceNormal;
 	SubMesh3DFace * face = NULL;
 
-	float * edgeV1 = NULL;
-	float * edgeV2 = NULL;
+	float * edgeVertex1 = NULL;
+	float * edgeVertex2 = NULL;
 	float* adjVertex1 = NULL;
 	float* adjVertex2 = NULL;
 	float* adjVertex3 = NULL;
 	Vector3 adjFaceToLightDir;
 	unsigned int adjacentFaceVertexIndex = 0;
 	int adjacentFaceIndex = -1;
-	SubMesh3DFace * adjacentFace = NULL;
 	Vector3 * adjacentFaceNormal = NULL;
+	SubMesh3DFace * adjacentFace = NULL;
 
 	Point3 vertexAvg;
 
@@ -233,20 +234,20 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 		for(unsigned int ai = 0; ai < 3; ai++)
 		{
 			adjacentFaceIndex = face->AdjacentFaceIndex1;
-			edgeV1 = vertex1;
-			edgeV2 = vertex2;
+			edgeVertex1 = vertex1;
+			edgeVertex2 = vertex2;
 
 			if(ai == 1)
 			{
 				adjacentFaceIndex = face->AdjacentFaceIndex2;
-				edgeV1 = vertex2;
-				edgeV2 = vertex3;
+				edgeVertex1 = vertex2;
+				edgeVertex2 = vertex3;
 			}
 			else if(ai == 2)
 			{
 				adjacentFaceIndex = face->AdjacentFaceIndex3;
-				edgeV1 = vertex3;
-				edgeV2 = vertex1;
+				edgeVertex1 = vertex3;
+				edgeVertex2 = vertex1;
 			}
 
 			float adjFaceToLightDot = 0;
@@ -281,13 +282,13 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{
-				BaseVector4_QuickCopy_IncDest(edgeV1, svPositionBase);
-				BaseVector4_QuickCopy_IncDest(edgeV2, svPositionBase);
-				BaseVector4_QuickCopy_ZeroW_IncDest(edgeV2, svPositionBase);
+				BaseVector4_QuickCopy_IncDest(edgeVertex1, svPositionBase);
+				BaseVector4_QuickCopy_IncDest(edgeVertex2, svPositionBase);
+				BaseVector4_QuickCopy_ZeroW_IncDest(edgeVertex2, svPositionBase);
 
-				BaseVector4_QuickCopy_IncDest(edgeV1, svPositionBase);
-				BaseVector4_QuickCopy_ZeroW_IncDest(edgeV2, svPositionBase);
-				BaseVector4_QuickCopy_ZeroW_IncDest(edgeV1, svPositionBase);
+				BaseVector4_QuickCopy_IncDest(edgeVertex1, svPositionBase);
+				BaseVector4_QuickCopy_ZeroW_IncDest(edgeVertex2, svPositionBase);
+				BaseVector4_QuickCopy_ZeroW_IncDest(edgeVertex1, svPositionBase);
 
 				currentPositionVertexIndex +=6;
 			}
@@ -370,19 +371,18 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 	storedVertexCount = mesh->GetTotalVertexCount();
 
 	Mesh3DRef parentMesh = containerRenderer->GetMesh();
-	//if(parentMesh.IsValid() && parentMesh->GetCastShadows())
-	//{
-		bool shadowVolumeInitSuccess = true;
-		shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumePositions.Init(storedVertexCount * 8);
-		shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 6, 4,0);
 
-		if(!shadowVolumeInitSuccess)
-		{
-			Debug::PrintError("SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
-			DestroyBuffers();
-			return false;
-		}
-	//}
+	// TODO: current shadow volume data memory is allocated for all mesh renderers, regardless if they cast a
+	// shadow or not. This could be quite wasteful, so implement a way to avoid this excess memory usage.
+	bool shadowVolumeInitSuccess = true;
+	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumePositions.Init(storedVertexCount * 8);
+	shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 6, 4,0);
+	if(!shadowVolumeInitSuccess)
+	{
+		Debug::PrintError("SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
+		DestroyBuffers();
+		return false;
+	}
 
 	return true;
 }

@@ -31,6 +31,10 @@ Vector3 * Vector3Array::GetVector(int index)
 	return (Vector3*)objects[index];
 }
 
+const Vector3 * Vector3Array::GetVectorConst(int index) const
+{
+	return (const Vector3*)objects[index];
+}
 Vector3 ** Vector3Array::GetVectors()
 {
 	return (Vector3**)objects;

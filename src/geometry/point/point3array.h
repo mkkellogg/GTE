@@ -15,6 +15,7 @@ class Point3Array : public BaseVector4Array
 
     void SetData(const float * data, bool includeW);
     Point3 * GetPoint(int index);
+    const Point3 * GetPointConst(int index) const;
     Point3 ** GetPoints();
 };
 
