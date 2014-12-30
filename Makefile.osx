@@ -1,0 +1,15 @@
+#ASSIMP_LIB=../assimp/lib
+#ASSIMP_INC=../assimp/include
+#DEVIL_LIB=/usr/local/lib
+#DEVIL_INC=../DevIL/DevIL/include
+#OPENGL_LIB=/usr/lib/nvidia-331-updates/ #this needs to be changed to your own OpenGL lib path
+
+#LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -L$(DEVIL_LIB) -lassimp -lm -framework OpenGL -framework GLUT  -lGLEW -lIL 
+#CFLAGS= -Isrc -I$(ASSIMP_INC) -I$(DEVIL_INC) -stdlib=libc++  -std=c++11 -Wall 
+#CC= g++
+
+LIBS= -lassimp -lm -framework OpenGL -framework GLUT -lGLEW -lIL 
+CFLAGS= -Isrc -stdlib=libc++  -std=c++11 -Wall 
+CC= g++
+
+include Makefile.base

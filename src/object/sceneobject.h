@@ -18,6 +18,7 @@ class Light;
 #include "enginetypes.h"
 #include <vector>
 #include <memory>
+#include <string>
 
 class SceneObject : public EngineObject
 {

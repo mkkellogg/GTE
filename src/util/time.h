@@ -7,12 +7,8 @@
  *
  */
 
-#ifndef _TIME_H_
-#define _TIME_H_
-
-//forward declarations
-
-#include <string>
+#ifndef _GTE_TIME_H_
+#define _GTE_TIME_H_
 
 class Time
 {

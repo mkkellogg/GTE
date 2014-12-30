@@ -36,7 +36,7 @@ template <class T> class Tree
 
 		TreeNode* GetChild(unsigned int index)
 		{
-			if(index >= GetChildCount)return NULL;
+			if(index >= GetChildCount())return NULL;
 			return children[index];
 		}
 

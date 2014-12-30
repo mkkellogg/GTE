@@ -22,6 +22,7 @@ class AnimationPlayer;
 class RenderTarget;
 
 #include <memory>
+#include <functional>
 
 template <typename T> class EngineObjectRef
 {
