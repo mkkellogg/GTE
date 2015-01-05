@@ -6,7 +6,6 @@
 #include <math.h>
  
 #include "debug.h"
-#include "gte.h"
 
 void Debug::PrintMessage(const char * message)
 {

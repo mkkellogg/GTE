@@ -21,7 +21,6 @@
 #include "graphics/color/color4.h"
 #include "ui/debug.h"
 #include "global/global.h"
-#include "gte.h"
 #include "uniformdesc.h"
 #include "attributedesc.h"
 #include <string>

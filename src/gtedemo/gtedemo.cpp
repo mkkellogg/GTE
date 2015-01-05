@@ -43,8 +43,8 @@
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
 #include "util/time.h"
-#include "gte.h"
-#include "game/game.h"
+#include "gtedemo.h"
+#include "gtedemo/game.h"
 
 Game * game = NULL;
 class CustomEngineCallbacks: public EngineCallbacks

@@ -8,7 +8,6 @@
 #include <GL/glut.h>
  
 #include "shadersource.h"
-#include "gte.h"
 #include "global/global.h"
 
 ShaderSource::ShaderSource(const std::string& filePath)

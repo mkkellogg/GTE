@@ -6,7 +6,6 @@
 #include <math.h>
  
 #include "shader.h"
-#include "gte.h"
 
 Shader::Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath)
 {

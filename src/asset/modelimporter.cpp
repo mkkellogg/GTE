@@ -15,11 +15,13 @@
 #include "graphics/stdattributes.h"
 #include <IL/il.h>
 #include "assimp/cimport.h"
+#include "assimp/config.h"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "assimp/Importer.hpp"
 #include "assimp/DefaultLogger.hpp"
 #include "assimp/LogStream.hpp"
+
 #include "modelimporter.h"
 #include "importutil.h"
 #include "engine.h"
