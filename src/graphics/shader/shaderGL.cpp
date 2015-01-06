@@ -600,7 +600,7 @@ unsigned int ShaderGL::GetUniformCount() const
  */
 const UniformDescriptor * ShaderGL::GetUniformDescriptor(unsigned int index) const
 {
-	if(index >=0 && index < uniformCount)
+	if(index < uniformCount)
 	{
 		return (const UniformDescriptor *)uniforms[index];
 	}
@@ -626,7 +626,7 @@ unsigned int ShaderGL::GetAttributeCount() const
  */
 const AttributeDescriptor * ShaderGL::GetAttributeDescriptor(unsigned int index) const
 {
-	if(index >=0 && index < attributeCount)
+	if(index < attributeCount)
 	{
 		const AttributeDescriptor * desc = (const AttributeDescriptor *)attributes[index];
 		return desc;

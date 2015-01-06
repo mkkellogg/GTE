@@ -130,9 +130,15 @@ bool SceneObject::SetMesh3D(Mesh3DRef mesh)
 
 	mesh->sceneObject = thisRef;
 	this->mesh3D = mesh;
+
 	if(this->renderer3D.IsValid())
 	{
 		this->renderer3D->UpdateFromMesh();
+	}
+
+	if(this->skinnedRenderer3D.IsValid())
+	{
+		this->skinnedRenderer3D->UpdateFromMesh();
 	}
 
 

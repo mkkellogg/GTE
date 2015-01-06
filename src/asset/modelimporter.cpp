@@ -278,7 +278,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			}
 
 			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
-			skinnedMeshRenderer->SetMesh(mesh3D);
+			sceneObject->SetMesh3D(mesh3D);
 		}
 		else
 		{
@@ -488,14 +488,13 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 			texAttributes.FilterMode = TextureFilter::TriLinear;
 			texAttributes.MipMapLevel = 4;
 
-
 			if(fileSystem->FileExists(originalFilePath)) // attempt to find texture using full path specified by model
 			{
 				diffuseTexture = engineObjectManager->CreateTexture(originalFilePath.c_str(),texAttributes);
 			}
 			else // try loading texture looking in the model's directory
 			{
-				unsigned int pos = texPath.find_last_of(AssimpPathDelimiter);
+				std::string::size_type pos = texPath.find_last_of(AssimpPathDelimiter);
 				filename = (std::string::npos == pos) ? "" : texPath.substr(pos+1);
 
 				if(!(std::string::npos == pos))

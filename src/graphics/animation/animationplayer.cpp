@@ -490,9 +490,9 @@ bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, cons
 		if(component == TransformationCompnent::Translation)
 			keyRealTime = keyFrameSet.TranslationKeyFrames[f].RealTime;
 		else if(component == TransformationCompnent::Rotation)
-			 keyRealTime = keyFrameSet.RotationKeyFrames[f].RealTime;
+			keyRealTime = keyFrameSet.RotationKeyFrames[f].RealTime;
 		else if(component == TransformationCompnent::Scale)
-			keyFrameSet.ScaleKeyFrames[f].RealTime;
+			keyRealTime = keyFrameSet.ScaleKeyFrames[f].RealTime;
 
 		// if the RealTime value for this key frame is greater than [progress], then the previous key frame and the current key frame
 		// are the frames we want

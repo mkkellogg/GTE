@@ -415,7 +415,7 @@ void Material::SendSetUniformToShader(unsigned int index)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SendSetUniformToShader -> shader is NULL");
 
-	if(index >=0 && index < setUniforms.size())
+	if(index < setUniforms.size())
 	{
 		UniformDescriptor * desc = setUniforms[index];
 		ASSERT_RTRN(desc != NULL, "Material::SendSetUniformToShader -> uniform descriptor is NULL");

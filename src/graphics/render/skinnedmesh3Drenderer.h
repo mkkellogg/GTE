@@ -22,7 +22,6 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 	std::vector<VertexBoneMap *> vertexBoneMaps;
 
 	SkinnedMesh3DAttributeTransformer meshTransformer;
-	Mesh3DRef mesh;
 	std::unordered_map<unsigned int, unsigned int>subMeshIndexMap;
 
 	SkinnedMesh3DRenderer();
@@ -32,9 +31,6 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 
 	void SetSkeleton(SkeletonRef skeleton);
 	SkeletonRef GetSkeleton();
-	Mesh3DRef GetMesh();
-	SubMesh3DRef GetSubMesh(unsigned int index);
-	void SetMesh(Mesh3DRef mesh);
 	void UpdateFromMesh();
 	void MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, unsigned int vertexBoneMapIndex);
 

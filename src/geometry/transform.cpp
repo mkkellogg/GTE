@@ -172,21 +172,21 @@ void Transform::Translate(Vector3& vector, bool local)
 }
 
 /*
- * Rotate around a specific world point and orientation vector.
+ * Rotate around a specific local point and orientation vector.
  */
-void Transform::RotateAround(Point3 * point, Vector3 * axis, float angle)
+void Transform::RotateAround(const Point3& point, const Vector3& axis, float angle)
 {
-	RotateAround(point->x, point->y, point->z, axis->x, axis->y, axis->z, angle);
+	RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle);
 }
 
  /*
- * Rotate around a specific world point and orientation vector.
+ * Rotate around a specific local point and orientation vector.
  *
- * The world point is specified by [px], [py], and [pz].
+ * The local point is specified by [px], [py], and [pz].
  *
  * The orientation vector is specified by [ax], [ay], and [az].
  *
- * Pre-multiplication operations are used to achieve the effect in world space.
+ * Post-multiplication operations are used to achieve the effect in local space.
  */
 void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle)
 {
@@ -208,18 +208,21 @@ void Transform::RotateAround(float px, float py, float pz, float ax, float ay, f
 	matrix.Rotate(rotVector[0],rotVector[1],rotVector[2],angle);
 	matrix.Translate(-diffX,-diffY,-diffZ);*/
 
-	matrix.PreTranslate(-px,-py,-pz);
+	/*matrix.PreTranslate(-px,-py,-pz);
 	matrix.PreRotate(ax,ay,az,angle);
-	matrix.PreTranslate(px,py,pz);
+	matrix.PreTranslate(px,py,pz);*/
+
+	matrix.Translate(px,py,pz);
+	matrix.Rotate(ax,ay,az,angle);
+	matrix.Translate(-px,-py,-pz);
 }
 
 /*
  * Scale this transform by the x,y, and z components of [mag]
  */
-void Transform::Scale(Vector3 * mag,  bool local)
+void Transform::Scale(const Vector3& mag,  bool local)
 {
-	ASSERT_RTRN(mag != NULL, "Transform::Scale -> mag is null.");
-	Scale(mag->x, mag->y, mag->z, local);
+	Scale(mag.x, mag.y, mag.z, local);
 }
 
 /*

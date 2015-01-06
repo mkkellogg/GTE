@@ -19,7 +19,6 @@
 #include "global/global.h"
 #include "ui/debug.h"
 
-
 SkinnedMesh3DRenderer::SkinnedMesh3DRenderer()
 {
 
@@ -47,31 +46,10 @@ SkeletonRef SkinnedMesh3DRenderer::GetSkeleton()
 	return skeleton;
 }
 
-Mesh3DRef SkinnedMesh3DRenderer::GetMesh()
-{
-	return mesh;
-}
-
-SubMesh3DRef SkinnedMesh3DRenderer::GetSubMesh(unsigned int index)
-{
-	ASSERT(sceneObject.IsValid(),"SkinnedMesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
-
-	ASSERT(mesh.IsValid(),"SkinnedMesh3DRenderer::GetSubMesh -> mesh is NULL.", SubMesh3DRef::Null());
-
-	SubMesh3DRef subMesh = mesh->GetSubMesh(index);
-	ASSERT(subMesh.IsValid(),"SkinnedMesh3DRenderer::GetSubMesh -> subMesh is NULL.", SubMesh3DRef::Null());
-
-	return subMesh;
-}
-
-void SkinnedMesh3DRenderer::SetMesh(Mesh3DRef mesh)
-{
-	this->mesh = mesh;
-	UpdateFromMesh();
-}
-
 void SkinnedMesh3DRenderer::UpdateFromMesh()
 {
+	Mesh3DRef mesh = sceneObject->GetMesh3D();
+
 	if(mesh.IsValid())
 	{
 		Mesh3DRenderer::UpdateFromMesh(mesh);
@@ -113,7 +91,6 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 		}
 	}
 }
-
 
 /*
  * Add a VertexBoneMap object to this renderer.

@@ -379,11 +379,11 @@ void Matrix4x4::MultiplyMM(const float * lhs, const float *rhs, float * out)
 {
     for (int i=0 ; i<DIM_SIZE ; i++) 
     {
-        register const float rhs_i0 = rhs[ I(i,0) ];
-        register float ri0 = lhs[ I(0,0) ] * rhs_i0;
-        register float ri1 = lhs[ I(0,1) ] * rhs_i0;
-        register float ri2 = lhs[ I(0,2) ] * rhs_i0;
-        register float ri3 = lhs[ I(0,3) ] * rhs_i0;
+        const float rhs_i0 = rhs[ I(i,0) ];
+        float ri0 = lhs[ I(0,0) ] * rhs_i0;
+        float ri1 = lhs[ I(0,1) ] * rhs_i0;
+        float ri2 = lhs[ I(0,2) ] * rhs_i0;
+        float ri3 = lhs[ I(0,3) ] * rhs_i0;
         for (int j=1 ; j<DIM_SIZE ; j++) 
         {
             register const float rhs_ij = rhs[ I(i,j) ];

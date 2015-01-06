@@ -23,8 +23,8 @@ class SubMesh3DRenderer;
 
 class SubMesh3D : public EngineObject
 {
-	friend EngineObjectManager;
-	friend Mesh3D;
+	friend class EngineObjectManager;
+	friend class Mesh3D;
 
 	StandardAttributeSet attributeSet;
 	unsigned int totalVertexCount;

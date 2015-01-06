@@ -69,7 +69,10 @@ Game::Game()
 	basePlayerForward = Vector3(0,0,1);
 	baseCameraForward = Vector3(0,0,-1);
 
-	playerType = PlayerType::Nerd;
+	playerType = PlayerType::Koopa;
+
+	pointLightSegmentTime = 0;
+	pointLightSegment = 0;
 }
 
 Game::~Game()
@@ -137,7 +140,7 @@ void Game::Init()
 
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	texture = objectManager->CreateTexture("textures/cartoonTex03.png", texAttributes);
+	texture = objectManager->CreateTexture("../../textures/cartoonTex03.png", texAttributes);
 
 	MaterialRef material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
 	material->SetTexture(texture, "TEXTURE0");
@@ -193,7 +196,6 @@ void Game::Init()
 	//firstMesh->SetReceiveShadows(true);
 	modelSceneObject->GetLocalTransform().Translate(0,-10,0,false);
 	modelSceneObject->GetLocalTransform().Scale(.07,.05,.07, true);
-
 
 
 	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/castle/Tower_01.fbx", 1 );
@@ -482,7 +484,32 @@ void Game::Update()
 	cameraObject->InitSceneObjectTransform(&cameraTransform);
 	cameraTransform.TransformPoint(cameraPos);
 
-	//pointLightObject->GetLocalTransform().RotateAround(10,5,20,0,1,0,60 * Time::GetDeltaTime());
+	pointLightSegmentTime += Time::GetDeltaTime();
+	if(pointLightSegmentTime >= 5)
+	{
+		pointLightSegmentTime = pointLightSegmentTime - 5;
+		if(pointLightSegment == 1)pointLightSegment = 0;
+		else pointLightSegment = 1;
+	}
+
+	Point3 leftRotatePoint(-10,5,18);
+	Point3 rightRotatePoint(10,5,18);
+
+	Transform lightInverse;
+	lightInverse.SetTo(pointLightObject->GetLocalTransform());
+	lightInverse.Invert();
+
+	lightInverse.TransformPoint(leftRotatePoint);
+	lightInverse.TransformPoint(rightRotatePoint);
+
+	if(pointLightSegment == 0 || true)
+	{
+		pointLightObject->GetLocalTransform().RotateAround(rightRotatePoint.x, rightRotatePoint.y, rightRotatePoint.z,0,1,0,80 * Time::GetDeltaTime());
+	}
+	else if(pointLightSegment == 1)
+	{
+		pointLightObject->GetLocalTransform().RotateAround(leftRotatePoint.x, leftRotatePoint.y, leftRotatePoint.z,0,1,0,60 * Time::GetDeltaTime());
+	}
 
 	 //cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,12 * Time::GetDeltaTime() * rotationDir);
 

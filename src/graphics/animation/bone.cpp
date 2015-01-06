@@ -12,7 +12,7 @@ Bone::Bone()
 {
 	Node = NULL;
 	this->Name = std::string("");
-	this->ID = ID;
+	this->ID = -1;
 }
 
 /*

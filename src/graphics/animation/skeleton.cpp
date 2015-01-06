@@ -295,7 +295,7 @@ Skeleton * Skeleton::FullClone()
 			{
 				Debug::PrintError("Skeleton::FullClone -> Could not allocate new node.");
 				allocateTreeSuccess = false;
-				return NULL;
+				return false;
 			}
 			newNodeMap[node] = newNode;
 
@@ -335,7 +335,7 @@ Skeleton * Skeleton::FullClone()
 				{
 					Debug::PrintError("Skeleton::FullClone -> Could not clone node in skeletal tree.");
 					cloneTreeSuccess = false;
-					return NULL;
+					return false;
 				}
 			}
 

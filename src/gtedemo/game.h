@@ -23,6 +23,9 @@ class Game
 	AnimationRef playerWait, playerWalk, playerJump, playerRoar;
 	AnimationPlayerRef animationPlayer;
 
+	float pointLightSegmentTime;
+	int pointLightSegment;
+
 	float walkAnimationSpeed;
 	float walkSpeed;
 	float runAnimationSpeed;

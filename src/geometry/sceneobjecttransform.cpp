@@ -40,7 +40,7 @@ SceneObjectTransform::SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4
 /*
  * Copy constructor
  */
-SceneObjectTransform::SceneObjectTransform(SceneObjectTransform & sceneObjectTransform) :  Transform(sceneObjectTransform)
+SceneObjectTransform::SceneObjectTransform(SceneObjectTransform & sceneObjectTransform) : Transform(sceneObjectTransform)
 {
 	this->sceneObject = sceneObjectTransform.sceneObject;
 }
@@ -147,6 +147,7 @@ void SceneObjectTransform::UpdateFullTransform()
 	full.TransformBy(this->localMatrix);
 	SetTo(&full);
 }
+
 /*
  * Apply translation transformation to this transform's matrix. The parameter [local]
  * determines if the transformation is relative to world coordinates or the transform's
@@ -173,7 +174,7 @@ void SceneObjectTransform::Translate(float x, float y, float z, bool local)
 /*
  * Rotate around a specific world point and orientation vector.
  */
-void SceneObjectTransform::RotateAround(Point3& point, Vector3& axis, float angle)
+void SceneObjectTransform::RotateAround(const Point3& point, const Vector3& axis, float angle)
 {
 	RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle);
 }
@@ -217,7 +218,7 @@ void SceneObjectTransform::RotateAround(float px, float py, float pz, float ax, 
 /*
  * Scale this transform by the x,y, and z components of [mag]
  */
-void SceneObjectTransform::Scale(Vector3& mag,  bool local)
+void SceneObjectTransform::Scale(const Vector3& mag,  bool local)
 {
 	Scale(mag.x, mag.y, mag.z, local);
 }

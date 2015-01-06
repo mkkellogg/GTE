@@ -593,6 +593,12 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 	{
 		Mesh3DRef mesh = renderer->GetMesh();
 
+		if(mesh->GetSubMeshCount() != renderer->GetSubRendererCount())
+		{
+			printf("renderer->GetSubRendererCount(): %d\n", renderer->GetSubRendererCount());
+			printf("mesh->GetSubMeshCount(): %d\n",mesh->GetSubMeshCount());
+		}
+
 		ASSERT_RTRN(mesh.IsValid(),"RenderManager::RenderShadowVolumesForSceneObject -> renderer returned NULL mesh.");
 		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.");
 		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderShadowVolumesForSceneObject -> renderer has no materials.");
