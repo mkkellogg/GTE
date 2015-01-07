@@ -29,6 +29,8 @@ SceneObject::SceneObject() : EngineObject()
 	isActive = true;
 
 	transform.SetIdentity();
+	transform.SetSceneObject(this);
+
 	processingTransform.SetIdentity();
 }
 
@@ -57,23 +59,9 @@ const std::string& SceneObject::GetName()
 	return name;
 }
 
-Transform& SceneObject::GetLocalTransform()
+SceneObjectTransform& SceneObject::GetTransform()
 {
 	return transform;
-}
-
-/*
- * Attach the SceneObjectTransform [transform] to this scene object.
- */
-void SceneObject::InitSceneObjectTransform(SceneObjectTransform * transform)
-{
-	ASSERT_RTRN(transform != NULL,"SceneObject::GetFullTransform -> transform is NULL.");
-
-	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-	ASSERT_RTRN(thisRef.IsValid(),"SceneObject::InitSceneObjectTransform -> Could not find matching reference for scene object");
-
-	transform->AttachTo(thisRef);
-	transform->SetLocalTransform(&this->transform);
 }
 
 void SceneObject::SetAggregateTransform(Transform& transform)

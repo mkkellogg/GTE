@@ -29,7 +29,7 @@ class SceneObject : public EngineObject
 
 	std::string name;
 	bool isActive;
-	Transform transform;
+	SceneObjectTransform transform;
 	Transform processingTransform;
 	std::vector<SceneObjectRef > children;
 	SceneObjectRef parent;
@@ -51,8 +51,7 @@ class SceneObject : public EngineObject
     void SetName(const std::string& name);
     const std::string& GetName();
 
-    Transform& GetLocalTransform() ;
-    void InitSceneObjectTransform(SceneObjectTransform * transform);
+    SceneObjectTransform& GetTransform();
     const Transform& GetAggregateTransform() const;
 
     bool SetMesh3DRenderer(Mesh3DRendererRef renderer);

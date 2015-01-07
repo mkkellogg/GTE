@@ -46,7 +46,7 @@ class RenderManager
 	};
 
 	unsigned int sceneMeshCount;
-	SceneObject * sceneMeshObjects[MAX_SCENE_MESHES];
+	SceneObjectRef sceneMeshObjects[MAX_SCENE_MESHES];
 
 	int cycleCount;
 

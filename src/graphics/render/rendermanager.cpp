@@ -206,7 +206,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 			PushTransformData(aggregateTransform, viewTransformStack);
 
 			// concatenate the current view transform with that of the current scene object
-			Transform& localTransform = child->GetLocalTransform();
+			Transform& localTransform = child->GetTransform();
 			aggregateTransform.TransformBy(localTransform);
 
 			CameraRef camera = child->GetCamera();
@@ -254,7 +254,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 
 			if(meshRenderer.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
 			{
-				sceneMeshObjects[sceneMeshCount] = child.GetPtr();
+				sceneMeshObjects[sceneMeshCount] = child;
 
 				model.SetTo(aggregateTransform);
 				modelInverse.SetTo(model);
@@ -275,7 +275,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 
 			if(skinnedMeshRenderer.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
 			{
-				sceneMeshObjects[sceneMeshCount] = child.GetPtr();
+				sceneMeshObjects[sceneMeshCount] = child;
 
 				model.SetTo(aggregateTransform);
 				modelInverse.SetTo(model);
@@ -422,13 +422,15 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
 		for(unsigned int s = 0; s < sceneMeshCount; s++)
 		{
-			SceneObject * child = sceneMeshObjects[s];
+			SceneObjectRef childRef = sceneMeshObjects[s];
 
-			if(child == NULL)
+			if(!childRef.IsValid())
 			{
 				Debug::PrintWarning("RenderManager::RenderSceneForLight -> NULL scene object encountered.");
 				continue;
 			}
+
+			SceneObject * child = childRef.GetPtr();
 
 			if(!child->IsActive())continue;
 
@@ -452,8 +454,8 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 			}
 
 			// copy the full transform of the scene object, including those of all ancestors
-			SceneObjectTransform full;
-			child->InitSceneObjectTransform(&full);
+			Transform full;
+			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
 
 			// check if this mesh should be culled from this light.
 			if( light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient || !ShouldCullFromLight(light, lightPosition, full, *mesh))

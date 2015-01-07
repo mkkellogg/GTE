@@ -43,7 +43,7 @@ Transform * SceneObjectSkeletonNode::GetLocalTransform()
 {
 	ASSERT(Target.IsValid(),"SceneObjectSkeletonNode::GetLocalTransform -> Node does not have a valid target.", NULL);
 
-	Transform& ref = Target->GetLocalTransform();
+	Transform& ref = Target->GetTransform();
 	return &ref;
 }
 

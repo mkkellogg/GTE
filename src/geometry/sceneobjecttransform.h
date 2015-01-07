@@ -23,31 +23,28 @@ class SceneObjectTransform : public Transform
 {
 	friend class SceneObject;
 
-	SceneObjectRef sceneObject;
-	Matrix4x4 localMatrix;
+	SceneObject * sceneObject;
 
 	void GetInheritedTransform(Transform& transform, bool invert);
-	void UpdateTarget();
-	void UpdateFullTransform();
+	void SetSceneObject(SceneObject* sceneObject);
 
     public:
 
 	SceneObjectTransform();
-	SceneObjectTransform(SceneObjectRef sceneObject);
-	SceneObjectTransform(SceneObjectRef sceneObject, Matrix4x4& m);
-	SceneObjectTransform(SceneObjectTransform& sceneObjectTransform);
+	SceneObjectTransform(SceneObject* sceneObject);
+	SceneObjectTransform(SceneObject* sceneObject, Matrix4x4& m);
     ~SceneObjectTransform();
 
-    void AttachTo(SceneObjectRef sceneObject);
-    void SetLocalTransform(const Transform& localTransform);
-    void SetLocalMatrix(const Matrix4x4& localMatrix);
+    static void GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert);
+    static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, bool includeSelf,  bool invert);
 
     void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
     void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
 
     void Translate(float x, float y, float z, bool local);
-    void RotateAround(const Point3& point, const Vector3& axis, float angle);
-    void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
+    void Translate(Vector3& vector, bool local);
+    void RotateAround(const Point3& point, const Vector3& axis, float angle, bool local);
+    void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle, bool local);
     void Scale(const Vector3& mag,  bool local);
     void Scale(float x, float y, float z,  bool local);
 };

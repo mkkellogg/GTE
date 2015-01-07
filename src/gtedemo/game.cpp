@@ -126,7 +126,7 @@ void Game::Init()
 
 	cameraObject = objectManager->CreateSceneObject();
 	CameraRef camera = objectManager->CreateCamera();
-	cameraObject->GetLocalTransform().Translate(0, 5, 25, true);
+	cameraObject->GetTransform().Translate(0, 5, 25, true);
 	// cameraObject->GetTransform()->RotateAround(0,0,-12,0,1,0,90);
 	camera->AddClearBuffer(RenderBufferType::Color);
 	camera->AddClearBuffer(RenderBufferType::Depth);
@@ -134,9 +134,9 @@ void Game::Init()
 
 
 	cube = objectManager->CreateSceneObject();
-	cube->GetLocalTransform().Scale(1.5, 1.5,1.5, true);
+	cube->GetTransform().Scale(1.5, 1.5,1.5, true);
 	//cube->GetLocalTransform().RotateAround(0, 0, 0, 0, 1, 0, 45);
-	cube->GetLocalTransform().Translate(2, -7, 10, false);
+	cube->GetTransform().Translate(2, -7, 10, false);
 
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
@@ -194,8 +194,8 @@ void Game::Init()
 	firstMesh = FindFirstMesh(modelSceneObject);
 	//firstMesh->SetCastShadows(true);
 	//firstMesh->SetReceiveShadows(true);
-	modelSceneObject->GetLocalTransform().Translate(0,-10,0,false);
-	modelSceneObject->GetLocalTransform().Scale(.07,.05,.07, true);
+	modelSceneObject->GetTransform().Translate(0,-10,0,false);
+	modelSceneObject->GetTransform().Scale(.07,.05,.07, true);
 
 
 	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/castle/Tower_01.fbx", 1 );
@@ -211,8 +211,8 @@ void Game::Init()
 	firstMesh = FindFirstMesh(modelSceneObject);
 	firstMesh->SetCastShadows(true);
 	firstMesh->SetReceiveShadows(true);
-	modelSceneObject->GetLocalTransform().Translate(10,-10,-10,false);
-	modelSceneObject->GetLocalTransform().Scale(.05,.05,.05, true);
+	modelSceneObject->GetTransform().Translate(10,-10,-10,false);
+	modelSceneObject->GetTransform().Scale(.05,.05,.05, true);
 
 
 	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/castle/MushRoom_01.fbx", 1 );
@@ -228,8 +228,8 @@ void Game::Init()
 	firstMesh = FindFirstMesh(modelSceneObject);
 	firstMesh->SetCastShadows(true);
 	firstMesh->SetReceiveShadows(true);
-	modelSceneObject->GetLocalTransform().Translate(-10,-10,20,false);
-	modelSceneObject->GetLocalTransform().Scale(.09,.09,.09, true);
+	modelSceneObject->GetTransform().Translate(-10,-10,20,false);
+	modelSceneObject->GetTransform().Scale(.09,.09,.09, true);
 
 
 	//SceneObjectRef defaultObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
@@ -277,9 +277,9 @@ void Game::Init()
 	firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);
 	//modelSceneObject->GetLocalTransform().RotateAround(0,0,0,0,1,0,-90);
-	playerObject->GetLocalTransform().Translate(0,-10,-2,false);
-	if(playerType == PlayerType::Koopa)playerObject->GetLocalTransform().Scale(.05, .05, .05, true);
-	else if(playerType == PlayerType::Nerd) playerObject->GetLocalTransform().Scale(.08, .08, .08, true);
+	playerObject->GetTransform().Translate(0,-10,-2,false);
+	if(playerType == PlayerType::Koopa)playerObject->GetTransform().Scale(.05, .05, .05, true);
+	else if(playerType == PlayerType::Nerd) playerObject->GetTransform().Scale(.08, .08, .08, true);
 
 	if(playerType == PlayerType::Koopa)
 	{
@@ -439,8 +439,8 @@ void Game::Init()
 	pointLightObject->SetLight(light);
 
 	pointLightObject->SetMesh3D(mesh);
-	pointLightObject->GetLocalTransform().Scale(.4,.4,.4, true);
-	pointLightObject->GetLocalTransform().Translate(5, 0, 20, false);
+	pointLightObject->GetTransform().Scale(.4,.4,.4, true);
+	pointLightObject->GetTransform().Translate(5, 0, 20, false);
 
 
 	sceneObject = objectManager->CreateSceneObject();
@@ -464,8 +464,8 @@ void Game::Init()
 
 void Game::InitializePlayerPosition()
 {
-	SceneObjectTransform playerTransform;
-	playerObject->InitSceneObjectTransform(&playerTransform);
+	Transform playerTransform;
+	SceneObjectTransform::GetWorldTransform(playerTransform, playerObject, true, false);
 
 	Vector3 playerForward = basePlayerForward;
 	playerTransform.TransformVector(playerForward);
@@ -480,8 +480,8 @@ void Game::Update()
 	Point3 cameraPos;
 	Point3 playerPos;
 
-	SceneObjectTransform cameraTransform;
-	cameraObject->InitSceneObjectTransform(&cameraTransform);
+	Transform cameraTransform;
+	SceneObjectTransform::GetWorldTransform(cameraTransform, cameraObject, true, false);
 	cameraTransform.TransformPoint(cameraPos);
 
 	pointLightSegmentTime += Time::GetDeltaTime();
@@ -496,19 +496,19 @@ void Game::Update()
 	Point3 rightRotatePoint(10,5,18);
 
 	Transform lightInverse;
-	lightInverse.SetTo(pointLightObject->GetLocalTransform());
+	lightInverse.SetTo(pointLightObject->GetTransform());
 	lightInverse.Invert();
 
-	lightInverse.TransformPoint(leftRotatePoint);
-	lightInverse.TransformPoint(rightRotatePoint);
+	//lightInverse.TransformPoint(leftRotatePoint);
+	//lightInverse.TransformPoint(rightRotatePoint);
 
 	if(pointLightSegment == 0 || true)
 	{
-		pointLightObject->GetLocalTransform().RotateAround(rightRotatePoint.x, rightRotatePoint.y, rightRotatePoint.z,0,1,0,80 * Time::GetDeltaTime());
+		pointLightObject->GetTransform().RotateAround(rightRotatePoint.x, rightRotatePoint.y, rightRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
 	}
 	else if(pointLightSegment == 1)
 	{
-		pointLightObject->GetLocalTransform().RotateAround(leftRotatePoint.x, leftRotatePoint.y, leftRotatePoint.z,0,1,0,60 * Time::GetDeltaTime());
+		pointLightObject->GetTransform().RotateAround(leftRotatePoint.x, leftRotatePoint.y, leftRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
 	}
 
 	 //cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,12 * Time::GetDeltaTime() * rotationDir);
@@ -520,7 +520,7 @@ void Game::Update()
 
 	 //float realTime = Time::GetRealTimeSinceStartup();
 
-	cube->GetLocalTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
+	cube->GetTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
 
 	UpdatePlayerMovementDirection();
 	if(playerType == PlayerType::Koopa)UpdatePlayerAnimation();
@@ -534,12 +534,12 @@ void Game::UpdatePlayerMovementDirection()
 	Point3 cameraPos;
 	Point3 playerPos;
 
-	SceneObjectTransform cameraTransform;
-	cameraObject->InitSceneObjectTransform(&cameraTransform);
+	Transform cameraTransform;
+	SceneObjectTransform::GetWorldTransform(cameraTransform, cameraObject, true, false);
 	cameraTransform.TransformPoint(cameraPos);
 
-	SceneObjectTransform playerTransform;
-	playerObject->InitSceneObjectTransform(&playerTransform);
+	Transform playerTransform;
+	SceneObjectTransform::GetWorldTransform(playerTransform, playerObject, true, false);
 	playerTransform.TransformPoint(playerPos);
 
 	Vector3 playerForward = basePlayerForward;
@@ -615,7 +615,7 @@ void Game::UpdatePlayerPosition()
 	{
 		Vector3 move = lookDirection;
 		move.Scale(moveSpeed * Time::GetDeltaTime() );
-		playerObject->GetLocalTransform().Translate(move, false);
+		playerObject->GetTransform().Translate(move, false);
 	}
 }
 
@@ -623,8 +623,8 @@ void Game::UpdatePlayerLookDirection()
 {
 //	if(lookDirection.SquareMagnitude() > .00001)
 	//{
-		SceneObjectTransform playerTransform;
-		playerObject->InitSceneObjectTransform(&playerTransform);
+		Transform playerTransform;
+		SceneObjectTransform::GetWorldTransform(playerTransform, playerObject, true, false);
 
 		Vector3 playerForward = basePlayerForward;
 		playerTransform.TransformVector(playerForward);
@@ -653,8 +653,8 @@ void Game::UpdatePlayerLookDirection()
 		Vector3 currentTranslation;
 		Vector3 currentScale;
 
-		playerTransform.GetLocalComponents(currentTranslation, currentRotation, currentScale);
-		playerTransform.SetLocalComponents(currentTranslation, modRotation, currentScale);
+		playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
+		playerObject->GetTransform().SetLocalComponents(currentTranslation, modRotation, currentScale);
 	//}
 }
 
@@ -678,15 +678,15 @@ void Game::UpdatePlayerFollowCamera()
 	Point3 playerPosCameraMoveTarget;
 	Vector3 cameraForward;
 
-	SceneObjectTransform cameraTransform;
-	cameraObject->InitSceneObjectTransform(&cameraTransform);
+	Transform cameraTransform;
+	SceneObjectTransform::GetWorldTransform(cameraTransform, cameraObject, true, false);
 	cameraTransform.TransformPoint(cameraPos);
 	cameraForward = baseCameraForward;
 	cameraTransform.TransformVector(cameraForward);
 	cameraForward.Normalize();
 
-	SceneObjectTransform playerTransform;
-	playerObject->InitSceneObjectTransform(&playerTransform);
+	Transform playerTransform;
+	SceneObjectTransform::GetWorldTransform(playerTransform, playerObject, true, false);
 	playerTransform.TransformPoint(playerPos);
 
 	playerPosCameraLookTarget = playerPos;
@@ -721,7 +721,6 @@ void Game::UpdatePlayerFollowCamera()
 	Vector3 cameraMove;
 	Point3::Subtract(newCameraPos, cameraPos, cameraMove);
 
-
 	cameraToPlayerMove.Normalize();
 
 	Quaternion cameraRotationA;
@@ -732,10 +731,8 @@ void Game::UpdatePlayerFollowCamera()
 	Vector3 currentTranslation;
 	Vector3 currentScale;
 
-	cameraTransform.GetLocalComponents(currentTranslation, currentRotation, currentScale);
-	cameraTransform.SetLocalComponents(currentTranslation, cameraRotationA, currentScale);
+	cameraObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
+	cameraObject->GetTransform().SetLocalComponents(currentTranslation, cameraRotationA, currentScale);
 
-	cameraObject->GetLocalTransform().Translate(cameraMove, false);
-
-
+	cameraObject->GetTransform().Translate(cameraMove, false);
 }

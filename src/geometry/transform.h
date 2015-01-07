@@ -43,11 +43,10 @@ class Transform
     void TransformBy(const Transform& transform);
     void PreTransformBy(const Transform& transform);
 
-
     virtual void Translate(float x, float y, float z, bool local);
     virtual void Translate(Vector3& vector, bool local);
-    virtual void RotateAround(const Point3& point, const Vector3& axis, float angle);
-    virtual void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle);
+    virtual void RotateAround(const Point3& point, const Vector3& axis, float angle, bool local);
+    virtual void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle, bool local);
     virtual void Scale(const Vector3& mag,  bool local);
     virtual void Scale(float x, float y, float z,  bool local);
     virtual void Rotate(const Vector3& vector, float a);

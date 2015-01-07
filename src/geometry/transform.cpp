@@ -138,13 +138,6 @@ void Transform::Translate(float x, float y, float z, bool local)
 {
 	if(!local)
 	{
-		/*float trans[] = {x,y,z,0};
-		Transform full;
-		full.SetTo(this);
-		full.Invert();
-		full.GetMatrix()->Transform(trans);
-		matrix.Translate(trans[0], trans[1], trans[2]);*/
-
 		matrix.PreTranslate(x,y,z);
 	}
 	else matrix.Translate(x,y,z);
@@ -159,62 +152,45 @@ void Transform::Translate(Vector3& vector, bool local)
 {
 	if(!local)
 	{
-		/*float trans[] = {x,y,z,0};
-		Transform full;
-		full.SetTo(this);
-		full.Invert();
-		full.GetMatrix()->Transform(trans);
-		matrix.Translate(trans[0], trans[1], trans[2]);*/
-
 		matrix.PreTranslate(vector);
 	}
 	else matrix.Translate(vector);
 }
 
 /*
- * Rotate around a specific local point and orientation vector.
+ * Rotate around a specific point and orientation vector.  The parameter [local] determines whether
+ * local or world space is used.
  */
-void Transform::RotateAround(const Point3& point, const Vector3& axis, float angle)
+void Transform::RotateAround(const Point3& point, const Vector3& axis, float angle, bool local)
 {
-	RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle);
+	RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle, local);
 }
 
  /*
- * Rotate around a specific local point and orientation vector.
+ * Rotate around a specific point and orientation vector.
  *
- * The local point is specified by [px], [py], and [pz].
+ * The point is specified by [px], [py], and [pz].
  *
  * The orientation vector is specified by [ax], [ay], and [az].
  *
- * Post-multiplication operations are used to achieve the effect in local space.
+ * Post-multiplication operations are used to achieve the effect in local space, and pre-multiplication
+ * is used to achieved the effect in local space. The parameter [local] determines which of those cases
+ * to use.
  */
-void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle)
+void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle, bool local)
 {
-	/*float pointTrans[] = {px,py,pz,1};
-	float rotVector[] = {ax,ay,az,0};
-
-	Transform mod;
-	mod.SetTo(this);
-
-	mod.Invert();
-	mod.GetMatrix()->Transform(pointTrans);
-	mod.GetMatrix()->Transform(rotVector);
-
-	float diffX = pointTrans[0];
-	float diffY = pointTrans[1];
-	float diffZ = pointTrans[2];
-
-	matrix.Translate(diffX,diffY,diffZ);
-	matrix.Rotate(rotVector[0],rotVector[1],rotVector[2],angle);
-	matrix.Translate(-diffX,-diffY,-diffZ);*/
-
-	/*matrix.PreTranslate(-px,-py,-pz);
-	matrix.PreRotate(ax,ay,az,angle);
-	matrix.PreTranslate(px,py,pz);*/
-
-	matrix.Translate(px,py,pz);
-	matrix.Rotate(ax,ay,az,angle);
-	matrix.Translate(-px,-py,-pz);
+	if(local)
+	{
+		matrix.Translate(px,py,pz);
+		matrix.Rotate(ax,ay,az,angle);
+		matrix.Translate(-px,-py,-pz);
+	}
+	else
+	{
+		matrix.PreTranslate(-px,-py,-pz);
+		matrix.PreRotate(ax,ay,az,angle);
+		matrix.PreTranslate(px,py,pz);
+	}
 }
 
 /*

@@ -318,7 +318,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	// update the scene object's local transform
 	std::string name(node.mName.C_Str());
 	sceneObject->SetName(name);
-	sceneObject->GetLocalTransform().SetTo(mat);
+	sceneObject->GetTransform().SetTo(mat);
 	current->AddChild(sceneObject);
 	createdSceneObjects.push_back(sceneObject);
 
