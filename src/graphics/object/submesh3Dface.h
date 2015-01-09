@@ -9,8 +9,8 @@
 *
 ***********************************************/
 
-#ifndef _SUBMESH3D_FACE_H_
-#define _SUBMESH3D_FACE_H_
+#ifndef _GTE_SUBMESH3D_FACE_H_
+#define _GTE_SUBMESH3D_FACE_H_
 
 #include <vector>
 #include <string>

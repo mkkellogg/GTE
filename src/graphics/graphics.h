@@ -1,5 +1,5 @@
-#ifndef _GRAPHICS_H_
-#define _GRAPHICS_H_
+#ifndef _GTE_GRAPHICS_H_
+#define _GTE_GRAPHICS_H_
 
 //forward declarations
 class ViewSystem;

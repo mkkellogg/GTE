@@ -7,8 +7,8 @@
  * functions and wrappers for it.
  */
 
-#ifndef _TRANSFORM_H_
-#define _TRANSFORM_H_
+#ifndef _GTE_TRANSFORM_H_
+#define _GTE_TRANSFORM_H_
 
 // forward declarations
 class Transform;

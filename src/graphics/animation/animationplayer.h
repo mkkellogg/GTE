@@ -8,8 +8,8 @@
 *
 ***********************************************/
 
-#ifndef _ANIMATION_PLAYER_H_
-#define _ANIMATION_PLAYER_H_
+#ifndef _GTE_ANIMATION_PLAYER_H_
+#define _GTE_ANIMATION_PLAYER_H_
 
 //forward declarations
 class Transform;

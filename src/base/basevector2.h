@@ -1,5 +1,5 @@
-#ifndef _BASEVECTOR2_H_
-#define _BASEVECTOR2_H_
+#ifndef _GTE_BASEVECTOR2_H_
+#define _GTE_BASEVECTOR2_H_
 
 class BaseVector2
 {

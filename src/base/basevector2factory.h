@@ -1,5 +1,5 @@
-#ifndef _BASEVECTOR2_FACTORY_H_
-#define _BASEVECTOR2_FACTORY_H_
+#ifndef _GTE_BASEVECTOR2_FACTORY_H_
+#define _GTE_BASEVECTOR2_FACTORY_H_
 
 // forward declarations
 class BaseVector2;

@@ -8,8 +8,8 @@
  * to them.
  */
 
-#ifndef _RENDER_MANAGER_H
-#define _RENDER_MANAGER_H
+#ifndef _GTE_RENDER_MANAGER_H
+#define _GTE_RENDER_MANAGER_H
 
 // forward declaration
 class SceneObject;

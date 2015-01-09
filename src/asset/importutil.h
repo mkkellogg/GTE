@@ -1,5 +1,5 @@
-#ifndef _IMPORT_UTIL_H
-#define _IMPORT_UTIL_H
+#ifndef _GTE_IMPORT_UTIL_H
+#define _GTE_IMPORT_UTIL_H
 
 //forward declarations
 class RawImage;

@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _SHADER_MANAGER_H_
-#define _SHADER_MANAGER_H_
+#ifndef _GTE_SHADER_MANAGER_H_
+#define _GTE_SHADER_MANAGER_H_
 
 //forward declarations
 class Shader;

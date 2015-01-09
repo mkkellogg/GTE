@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _VECTOR3_H_
-#define _VECTOR3_H_
+#ifndef _GTE_VECTOR3_H_
+#define _GTE_VECTOR3_H_
 
 #include "base/basevector4.h"
 

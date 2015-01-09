@@ -1,5 +1,5 @@
-#ifndef _BASEVECTOR2ARRAY_H_
-#define _BASEVECTOR2ARRAY_H_
+#ifndef _GTE_BASEVECTOR2ARRAY_H_
+#define _GTE_BASEVECTOR2ARRAY_H_
 
 // forward declarations
 class BaseVector2;

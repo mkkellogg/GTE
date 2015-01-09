@@ -1,5 +1,5 @@
-#ifndef _MESH3D_H_
-#define _MESH3D_H_
+#ifndef _GTE_MESH3D_H_
+#define _GTE_MESH3D_H_
 
 //forward declarations
 class EngineObjectManager;
@@ -17,8 +17,8 @@ class SceneObjectComponent;
 
 class Mesh3D : public SceneObjectComponent
 {
-	friend EngineObjectManager;
-	friend SubMesh3D;
+	friend class EngineObjectManager;
+	friend class SubMesh3D;
 
 	protected :
 

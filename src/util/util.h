@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _UTIL_H_
-#define _UTIL_H_
+#ifndef _GTE_UTIL_H_
+#define _GTE_UTIL_H_
 
 //forward declarations
 class Matrix4x4;

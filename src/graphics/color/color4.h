@@ -1,5 +1,5 @@
-#ifndef _COLOR4_H_
-#define _COLOR4_H_
+#ifndef _GTE_COLOR4_H_
+#define _GTE_COLOR4_H_
 
 #include "base/basevector4.h"
 

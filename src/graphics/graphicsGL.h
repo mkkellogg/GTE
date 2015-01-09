@@ -1,5 +1,5 @@
-#ifndef _GRAPHICS_GL_H_
-#define _GRAPHICS_GL_H_
+#ifndef _GTE_GRAPHICS_GL_H_
+#define _GTE_GRAPHICS_GL_H_
 
 //forward declarations
 class Shader;

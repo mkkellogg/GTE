@@ -1,5 +1,5 @@
-#ifndef _LONGMASK_H_
-#define _LONGMASK_H_
+#ifndef _GTE_LONGMASK_H_
+#define _GTE_LONGMASK_H_
 
 typedef unsigned long LongMask;
 

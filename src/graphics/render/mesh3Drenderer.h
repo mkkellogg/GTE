@@ -1,5 +1,5 @@
-#ifndef _MESH3D_RENDERER_H_
-#define _MESH3D_RENDERER_H_
+#ifndef _GTE_MESH3D_RENDERER_H_
+#define _GTE_MESH3D_RENDERER_H_
 
 //forward declarations
 class EngineObjectManager;

@@ -1,5 +1,5 @@
-#ifndef _GLOBAL_H_
-#define _GLOBAL_H_
+#ifndef _GTE_GLOBAL_H_
+#define _GTE_GLOBAL_H_
 
 #define GL_GLEXT_PROTOTYPES
 

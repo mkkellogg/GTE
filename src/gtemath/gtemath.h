@@ -1,5 +1,5 @@
-#ifndef _GTEMATH_H_
-#define _GTEMATH_H_
+#ifndef _GTE_GTEMATH_H_
+#define _GTE_GTEMATH_H_
 
 class GTEMath 
 {

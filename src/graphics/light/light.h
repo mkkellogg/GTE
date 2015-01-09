@@ -1,5 +1,5 @@
-#ifndef _LIGHT_H_
-#define _LIGHT_H_
+#ifndef _GTE_LIGHT_H_
+#define _GTE_LIGHT_H_
 
 //forward declarations
 class Light;

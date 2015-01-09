@@ -1,5 +1,5 @@
-#ifndef _ATTRIBUTE_TRANSFORMER_H
-#define _ATTRIBUTE_TRANSFORMER_H
+#ifndef _GTE_ATTRIBUTE_TRANSFORMER_H
+#define _GTE_ATTRIBUTE_TRANSFORMER_H
 
 //forward declarations
 class Point3Array;

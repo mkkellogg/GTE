@@ -1,5 +1,5 @@
-#ifndef _MODEL_IMPORTER_H_
-#define _MODEL_IMPORTER_H_
+#ifndef _GTE_MODEL_IMPORTER_H_
+#define _GTE_MODEL_IMPORTER_H_
 
 //forward declarations
 class Matrix4x4;
@@ -26,7 +26,7 @@ namespace Assimp { class Importer; }
 
 class ModelImporter
 {
-	friend EngineObjectManager;
+	friend class EngineObjectManager;
 
 	protected :
 

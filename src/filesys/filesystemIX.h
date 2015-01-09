@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _FILE_SYSTEM_IX_H_
-#define _FILE_SYSTEM_IX_H_
+#ifndef _GTE_FILE_SYSTEM_IX_H_
+#define _GTE_FILE_SYSTEM_IX_H_
 
 //forward declarations
 

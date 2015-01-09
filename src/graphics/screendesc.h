@@ -1,5 +1,5 @@
-#ifndef _SCREENDESC_H_
-#define _SCREENDESC_H_
+#ifndef _GTE_SCREENDESC_H_
+#define _GTE_SCREENDESC_H_
 
 // forward declarations
 

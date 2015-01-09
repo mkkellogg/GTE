@@ -1,5 +1,5 @@
-#ifndef _SCENEOBJECT_H_
-#define _SCENEOBJECT_H_
+#ifndef _GTE_SCENEOBJECT_H_
+#define _GTE_SCENEOBJECT_H_
 
 //forward declarations
 class EngineObjectManager;

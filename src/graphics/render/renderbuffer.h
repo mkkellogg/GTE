@@ -1,5 +1,5 @@
-#ifndef _RENDER_BUFFER_H_
-#define _RENDER_BUFFER_H_
+#ifndef _GTE_RENDER_BUFFER_H_
+#define _GTE_RENDER_BUFFER_H_
 
 #include "base/intmask.h"
 

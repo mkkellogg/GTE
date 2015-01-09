@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _TEXTURE_GL_H_
-#define _TEXTURE_GL_H_
+#ifndef _GTE_TEXTURE_GL_H_
+#define _GTE_TEXTURE_GL_H_
 
 //forward declarations
 class TextureGL;

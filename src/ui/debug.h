@@ -1,5 +1,5 @@
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#ifndef _GTE_DEBUG_H_
+#define _GTE_DEBUG_H_
 
 #include <GL/glew.h>
 #include <GL/glut.h>

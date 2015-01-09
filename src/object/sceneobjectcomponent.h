@@ -1,5 +1,5 @@
-#ifndef _SCENEOBJECTCOMPONENT_H_
-#define _SCENEOBJECTCOMPONENT_H_
+#ifndef _GTE_SCENEOBJECTCOMPONENT_H_
+#define _GTE_SCENEOBJECTCOMPONENT_H_
 
 // forward declaration
 class SceneObjectComponent;

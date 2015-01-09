@@ -1,5 +1,5 @@
-#ifndef _TREE_H_
-#define _TREE_H_
+#ifndef _GTE_TREE_H_
+#define _GTE_TREE_H_
 
 //forward declarations
 

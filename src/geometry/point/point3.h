@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _POINT3_H_
-#define _POINT3_H_
+#ifndef _GTE_POINT3_H_
+#define _GTE_POINT3_H_
 
 //forward declarations
 class Vector3;

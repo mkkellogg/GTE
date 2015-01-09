@@ -1,5 +1,5 @@
-#ifndef _UV2_FACTORY_H_
-#define _UV2_FACTORY_H_
+#ifndef _GTE_UV2_FACTORY_H_
+#define _GTE_UV2_FACTORY_H_
 
 #include "base/basevector2factory.h"
 #include "uv2.h"

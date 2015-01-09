@@ -1,5 +1,5 @@
-#ifndef _UNIFORMS_H_
-#define _UNIFORMS_H_
+#ifndef _GTE_UNIFORMS_H_
+#define _GTE_UNIFORMS_H_
 
 enum class StandardUniformMaskComponent
 {

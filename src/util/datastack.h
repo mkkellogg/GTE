@@ -1,5 +1,5 @@
-#ifndef _DATASTACK_
-#define _DATASTACK_
+#ifndef _GTE_DATASTACK_
+#define _GTE_DATASTACK_
 
 #include "global/global.h"
 

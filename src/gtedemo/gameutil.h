@@ -1,5 +1,5 @@
-#ifndef _GAMEUTIL_H_
-#define _GAMEUTIL_H_
+#ifndef _GTE_GAMEUTIL_H_
+#define _GTE_GAMEUTIL_H_
 
 #include "object/enginetypes.h"
 #include "graphics/stdattributes.h"

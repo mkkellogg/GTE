@@ -9,8 +9,8 @@
 *
 ***********************************************/
 
-#ifndef _ANIMATION_H_
-#define _ANIMATION_H_
+#ifndef _GTE_ANIMATION_H_
+#define _GTE_ANIMATION_H_
 
 #include "object/engineobject.h"
 #include "object/enginetypes.h"

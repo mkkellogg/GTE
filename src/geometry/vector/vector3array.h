@@ -1,5 +1,5 @@
-#ifndef _VECTOR3ARRAY_H_
-#define _VECTOR3ARRAY_H_
+#ifndef _GTE_VECTOR3ARRAY_H_
+#define _GTE_VECTOR3ARRAY_H_
 
 //forward declarations
 class Vector3;

@@ -1,5 +1,5 @@
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
+#ifndef _GTE_CAMERA_H_
+#define _GTE_CAMERA_H_
 
 //forward declarations
 class Camera;

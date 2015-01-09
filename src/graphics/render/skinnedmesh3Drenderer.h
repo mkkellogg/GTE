@@ -1,5 +1,5 @@
-#ifndef _SKINNED_MESH3D_RENDERER_H_
-#define _SKINNED_MESH3D_RENDERER_H_
+#ifndef _GTE_SKINNED_MESH3D_RENDERER_H_
+#define _GTE_SKINNED_MESH3D_RENDERER_H_
 
 // forward declarations
 class Skeleton;

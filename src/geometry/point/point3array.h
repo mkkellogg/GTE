@@ -1,5 +1,5 @@
-#ifndef _POINT3ARRAY_H_
-#define _POINT3ARRAY_H_
+#ifndef _GTE_POINT3ARRAY_H_
+#define _GTE_POINT3ARRAY_H_
 
 //forward declarations
 class Point3;

@@ -19,8 +19,8 @@
  * or uniform is the unique identifier assigned by OpenGL.
  */
 
-#ifndef _SHADER_GL_H_
-#define _SHADER_GL_H_
+#ifndef _GTE_SHADER_GL_H_
+#define _GTE_SHADER_GL_H_
 
 #include <GL/glew.h>
 #include <GL/glut.h>

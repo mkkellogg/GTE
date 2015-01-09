@@ -8,8 +8,8 @@
  * transformation occurs, the transforms of each ancestor of said SceneObject are factored in.
  */
 
-#ifndef _SCENEOBJECT_TRANSFORM_H_
-#define _SCENEOBJECT_TRANSFORM_H_
+#ifndef _GTE_SCENEOBJECT_TRANSFORM_H_
+#define _GTE_SCENEOBJECT_TRANSFORM_H_
 
 // forward declarations
 class Transform;

@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef _IMAGE_LOADER_H_
-#define _IMAGE_LOADER_H_
+#ifndef _GTE_IMAGE_LOADER_H_
+#define _GTE_IMAGE_LOADER_H_
 
 //forward declarations
 class RawImage;

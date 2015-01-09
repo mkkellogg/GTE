@@ -15,8 +15,8 @@
  * the variable is 'NORMAL'.
  */
 
-#ifndef _MATERIAL_H_
-#define _MATERIAL_H_
+#ifndef _GTE_MATERIAL_H_
+#define _GTE_MATERIAL_H_
 
 //forward declarations
 class Graphics;

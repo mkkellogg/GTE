@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _TEXTUREATTR_H_
-#define _TEXTUREATTR_H_
+#ifndef _GTE_TEXTUREATTR_H_
+#define _GTE_TEXTUREATTR_H_
 
 //forward declarations
 

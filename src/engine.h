@@ -1,5 +1,5 @@
-#ifndef _ENGINE_H_
-#define _ENGINE_H_
+#ifndef _GTE_ENGINE_H_
+#define _GTE_ENGINE_H_
 
 //forward declarations
 class Graphics;

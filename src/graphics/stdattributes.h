@@ -1,5 +1,5 @@
-#ifndef _ATTRIBUTES_H_
-#define _ATTRIBUTES_H_
+#ifndef _GTE_ATTRIBUTES_H_
+#define _GTE_ATTRIBUTES_H_
 
 enum class StandardAttributeMaskComponent
 {

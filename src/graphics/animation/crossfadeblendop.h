@@ -8,8 +8,8 @@
 *
 ***********************************************/
 
-#ifndef _CROSSFADE_BLENDOP_H_
-#define _CROSSFADE_BLENDOP_H_
+#ifndef _GTE_CROSSFADE_BLENDOP_H_
+#define _GTE_CROSSFADE_BLENDOP_H_
 
 //forward declarations
 class Transform;

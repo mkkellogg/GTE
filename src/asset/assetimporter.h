@@ -1,5 +1,5 @@
-#ifndef _ASSET_IMPORTER_H_
-#define _ASSET_IMPORTER_H_
+#ifndef _GTE_ASSET_IMPORTER_H_
+#define _GTE_ASSET_IMPORTER_H_
 
 #include "object/engineobjectmanager.h"
 #include "object/enginetypes.h"
@@ -7,7 +7,7 @@
 
 class AssetImporter
 {
-	friend EngineObjectManager;
+	friend class EngineObjectManager;
 
 	public:
 

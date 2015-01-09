@@ -1,5 +1,5 @@
-#ifndef _VERTEX_ATTR_BUFFER_H_
-#define _VERTEX_ATTR_BUFFER_H_
+#ifndef _GTE_VERTEX_ATTR_BUFFER_H_
+#define _GTE_VERTEX_ATTR_BUFFER_H_
 
 class VertexAttrBuffer
 {

@@ -8,8 +8,8 @@
 *
 ***********************************************/
 
-#ifndef _KEYFRAMESET_H_
-#define _KEYFRAMESET_H_
+#ifndef _GTE_KEYFRAMESET_H_
+#define _GTE_KEYFRAMESET_H_
 
 #include "translationkeyframe.h"
 #include "scalekeyframe.h"

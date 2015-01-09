@@ -8,8 +8,8 @@
 *
 ***********************************************/
 
-#ifndef _SUBMESH3D_FACES_H_
-#define _SUBMESH3D_FACES_H_
+#ifndef _GTE_SUBMESH3D_FACES_H_
+#define _GTE_SUBMESH3D_FACES_H_
 
 // forward declarations
 class SubMesh3DFace;

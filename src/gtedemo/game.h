@@ -1,5 +1,5 @@
-#ifndef _GAME_H_
-#define _GAME_H_
+#ifndef _GTE_GAME_H_
+#define _GTE_GAME_H_
 
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"

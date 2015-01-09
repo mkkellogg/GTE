@@ -1,5 +1,5 @@
-#ifndef _INPUT_MANAGER_H_
-#define _INPUT_MANAGER_H_
+#ifndef _GTE_INPUT_MANAGER_H_
+#define _GTE_INPUT_MANAGER_H_
 
 //forward declarations
 

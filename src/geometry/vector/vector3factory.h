@@ -1,5 +1,5 @@
-#ifndef _VECTOR3_FACTORY_H_
-#define _VECTOR3_FACTORY_H_
+#ifndef _GTE_VECTOR3_FACTORY_H_
+#define _GTE_VECTOR3_FACTORY_H_
 
 // forward declarations
 class Vector3;

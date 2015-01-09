@@ -1,5 +1,5 @@
-#ifndef _UV2_H_
-#define _UV2_H_
+#ifndef _GTE_UV2_H_
+#define _GTE_UV2_H_
 
 #include "uv2.h"
 #include "base/basevector2.h"

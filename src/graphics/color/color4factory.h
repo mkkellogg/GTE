@@ -1,5 +1,5 @@
-#ifndef _COLOR4_FACTORY_H_
-#define _COLOR4_FACTORY_H_
+#ifndef _GTE_COLOR4_FACTORY_H_
+#define _GTE_COLOR4_FACTORY_H_
 
 //forward declarations
 class Color4Factory;

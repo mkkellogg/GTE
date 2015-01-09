@@ -8,8 +8,8 @@
 *
 ***********************************************/
 
-#ifndef _TRANSLATION_KEYFRAME_H_
-#define _TRANSLATION_KEYFRAME_H_
+#ifndef _GTE_TRANSLATION_KEYFRAME_H_
+#define _GTE_TRANSLATION_KEYFRAME_H_
 
 #include "keyframe.h"
 #include "geometry/vector/vector3.h"

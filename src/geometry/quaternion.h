@@ -1,5 +1,5 @@
-#ifndef QUATERNION_H
-#define QUATERNION_H
+#ifndef _GTE_QUATERNION_H
+#define _GTE_QUATERNION_H
 
 // forward declarations
 class Matrix4x4;

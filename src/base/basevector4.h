@@ -7,8 +7,8 @@
  * functionality that is shared by all of them.
  */
 
-#ifndef _BASEVECTOR4_H_
-#define _BASEVECTOR4_H_
+#ifndef _GTE_BASEVECTOR4_H_
+#define _GTE_BASEVECTOR4_H_
 
 #define BaseVector4_QuickCopy(source, dest)        \
 {                                          		   \

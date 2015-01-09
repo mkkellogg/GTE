@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _RAWIMAGE_H_
-#define _RAWIMAGE_H_
+#ifndef _GTE_RAWIMAGE_H_
+#define _GTE_RAWIMAGE_H_
 
 //forward declarations
 

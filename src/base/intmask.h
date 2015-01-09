@@ -1,5 +1,5 @@
-#ifndef _INTMASK_H_
-#define _INTMASK_H_
+#ifndef _GTE_INTMASK_H_
+#define _GTE_INTMASK_H_
 
 typedef unsigned int IntMask;
 

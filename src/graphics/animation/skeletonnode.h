@@ -13,8 +13,8 @@
 *
 ***********************************************/
 
-#ifndef _SKELETON_NODE_H_
-#define _SKELETON_NODE_H_
+#ifndef _GTE_SKELETON_NODE_H_
+#define _GTE_SKELETON_NODE_H_
 
 //forward declarations
 class Bone;

@@ -1,5 +1,5 @@
-#ifndef _ENGINE_TYPES_H_
-#define _ENGINE_TYPES_H_
+#ifndef _GTE_ENGINE_TYPES_H_
+#define _GTE_ENGINE_TYPES_H_
 
 //forward declarations
 class Shader;

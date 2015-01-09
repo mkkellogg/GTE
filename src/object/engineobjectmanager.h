@@ -1,5 +1,5 @@
-#ifndef _ENGINEOBJECTMANAGER_H_
-#define _ENGINEOBJECTMANAGER_H_
+#ifndef _GTE_ENGINEOBJECTMANAGER_H_
+#define _GTE_ENGINEOBJECTMANAGER_H_
 
 // forward declarations
 class EngineObject;

@@ -9,8 +9,8 @@
 *
 ***********************************************/
 
-#ifndef _SCENEOBJECT_BONE_H_
-#define _SCENEOBJECT_BONE_H_
+#ifndef _GTE_SCENEOBJECT_BONE_H_
+#define _GTE_SCENEOBJECT_BONE_H_
 
 //forward declarations
 class Transform;

@@ -9,8 +9,8 @@
 *
 ***********************************************/
 
-#ifndef _KEYFRAME_H_
-#define _KEYFRAME_H_
+#ifndef _GTE_KEYFRAME_H_
+#define _GTE_KEYFRAME_H_
 
 class KeyFrame
 {

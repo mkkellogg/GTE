@@ -1,5 +1,5 @@
-#ifndef _CONSTANTS_H_
-#define _CONSTANTS_H_
+#ifndef _GTE_CONSTANTS_H_
+#define _GTE_CONSTANTS_H_
 
 class Constants
 {

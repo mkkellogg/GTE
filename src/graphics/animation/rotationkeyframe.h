@@ -8,8 +8,8 @@
 *
 ***********************************************/
 
-#ifndef _ROTATION_KEYFRAME_H_
-#define _ROTATION_KEYFRAME_H_
+#ifndef _GTE_ROTATION_KEYFRAME_H_
+#define _GTE_ROTATION_KEYFRAME_H_
 
 #include "keyframe.h"
 #include "geometry/quaternion.h"

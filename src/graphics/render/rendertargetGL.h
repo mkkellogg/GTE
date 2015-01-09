@@ -1,5 +1,5 @@
-#ifndef _RENDER_TARGET_GL_H_
-#define _RENDER_TARGET_GL_H_
+#ifndef _GTE_RENDER_TARGET_GL_H_
+#define _GTE_RENDER_TARGET_GL_H_
 
 #include <GL/glew.h>
 #include <GL/glut.h>

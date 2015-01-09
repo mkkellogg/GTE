@@ -1,5 +1,5 @@
-#ifndef _COLOR4_ARRAY_H_
-#define _COLOR4_ARRAY_H_
+#ifndef _GTE_COLOR4_ARRAY_H_
+#define _GTE_COLOR4_ARRAY_H_
 
 //forward declarations
 class Color4;

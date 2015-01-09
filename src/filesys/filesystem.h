@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef _FILE_SYSTEM_H_
-#define _FILE_SYSTEM_H_
+#ifndef _GTE_FILE_SYSTEM_H_
+#define _GTE_FILE_SYSTEM_H_
 
 //forward declarations
 

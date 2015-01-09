@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _UNIFORM_DESCRIPTOR_H_
-#define _UNIFORM_DESCRIPTOR_H_
+#ifndef _GTE_UNIFORM_DESCRIPTOR_H_
+#define _GTE_UNIFORM_DESCRIPTOR_H_
 
 //forward declarations
 class Texture;

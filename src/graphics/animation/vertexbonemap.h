@@ -10,8 +10,8 @@
 *
 ***********************************************/
 
-#ifndef _VERTEX_BONE_MAP_H_
-#define _VERTEX_BONE_MAP_H_
+#ifndef _GTE_VERTEX_BONE_MAP_H_
+#define _GTE_VERTEX_BONE_MAP_H_
 
 // forward declarations
 class Skeleton;

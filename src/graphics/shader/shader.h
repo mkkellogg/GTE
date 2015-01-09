@@ -12,8 +12,8 @@
  * shader. A Shader is not complete unless it has both of those components.
  */
 
-#ifndef _SHADER_H_
-#define _SHADER_H_
+#ifndef _GTE_SHADER_H_
+#define _GTE_SHADER_H_
 
 // forward declarations
 class VertexAttrBuffer;

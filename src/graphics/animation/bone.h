@@ -8,8 +8,8 @@
 *
 ***********************************************/
 
-#ifndef _BONE_H_
-#define _BONE_H_
+#ifndef _GTE_BONE_H_
+#define _GTE_BONE_H_
 
 //forward declarations
 class Transform;
