@@ -499,9 +499,6 @@ void Game::Update()
 	lightInverse.SetTo(pointLightObject->GetTransform());
 	lightInverse.Invert();
 
-	//lightInverse.TransformPoint(leftRotatePoint);
-	//lightInverse.TransformPoint(rightRotatePoint);
-
 	if(pointLightSegment == 0 || true)
 	{
 		pointLightObject->GetTransform().RotateAround(rightRotatePoint.x, rightRotatePoint.y, rightRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
@@ -511,16 +508,7 @@ void Game::Update()
 		pointLightObject->GetTransform().RotateAround(leftRotatePoint.x, leftRotatePoint.y, leftRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
 	}
 
-	 //cameraObject->GetLocalTransform().RotateAround(0,0,-12,0,1,0,12 * Time::GetDeltaTime() * rotationDir);
-
-	 /*isWalking = true;
-	 AnimationManager * animManager = AnimationManager::Instance();
-	 AnimationPlayerRef player = animManager->RetrieveOrCreateAnimationPlayer(koopaRenderer);
-	 player->CrossFade(playerWalk, 2);*/
-
-	 //float realTime = Time::GetRealTimeSinceStartup();
-
-	cube->GetTransform().Rotate(0,1,0,20 * Time::GetDeltaTime());
+	cube->GetTransform().Rotate(0,1,0,20 * Time::GetDeltaTime(), true);
 
 	UpdatePlayerMovementDirection();
 	if(playerType == PlayerType::Koopa)UpdatePlayerAnimation();

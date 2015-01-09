@@ -4,8 +4,8 @@
  * author: Mark Kellogg
  *
  * A SceneObjectTransform is an extension of Transform. A SceneObjectTransform is
- * different in that it is connected to a SceneObject, and whenever a transformation
- * is applied, the transforms of each ancestor of said SceneObject are factored in.
+ * different in that it is connected to a SceneObject, and whenever a world-space
+ * transformation occurs, the transforms of each ancestor of said SceneObject are factored in.
  */
 
 #ifndef _SCENEOBJECT_TRANSFORM_H_
@@ -25,14 +25,14 @@ class SceneObjectTransform : public Transform
 
 	SceneObject * sceneObject;
 
-	void GetInheritedTransform(Transform& transform, bool invert);
+	void GetInheritedTransform(Transform& transform, bool invert) const;
 	void SetSceneObject(SceneObject* sceneObject);
+	void GetLocalTransformationFromWorldTransformation(const Transform& worldTransformation, Transform& localTransformation);
 
     public:
 
 	SceneObjectTransform();
 	SceneObjectTransform(SceneObject* sceneObject);
-	SceneObjectTransform(SceneObject* sceneObject, Matrix4x4& m);
     ~SceneObjectTransform();
 
     static void GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert);
@@ -47,6 +47,12 @@ class SceneObjectTransform : public Transform
     void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle, bool local);
     void Scale(const Vector3& mag,  bool local);
     void Scale(float x, float y, float z,  bool local);
+    void Rotate(const Vector3& vector, float a,  bool local);
+    void Rotate(float x, float y, float z, float a,  bool local);
+
+    void TransformVector(Vector3& vector) const;
+    void TransformPoint(Point3& point3) const;
+    void TransformVector4f(float * vector) const;
 };
 
 #endif

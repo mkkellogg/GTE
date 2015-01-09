@@ -28,8 +28,7 @@ class Transform
     public:
 
     Transform();
-    Transform(const Matrix4x4& m);
-    Transform(Transform *);
+    Transform(const Transform *);
     virtual ~Transform();
 
     void CopyMatrix(Matrix4x4& dest) const;
@@ -49,14 +48,14 @@ class Transform
     virtual void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle, bool local);
     virtual void Scale(const Vector3& mag,  bool local);
     virtual void Scale(float x, float y, float z,  bool local);
-    virtual void Rotate(const Vector3& vector, float a);
-    virtual void Rotate(float x, float y, float z, float a);
+    virtual void Rotate(const Vector3& vector, float a,  bool local);
+    virtual void Rotate(float x, float y, float z, float a,  bool local);
 
-    void TransformVector(Vector3& vector) const;
-    void TransformPoint(Point3& point3) const;
-    void TransformVector4f(float * vector) const;
+    virtual void TransformVector(Vector3& vector) const;
+    virtual void TransformPoint(Point3& point3) const;
+    virtual void TransformVector4f(float * vector) const;
+
     static Transform * CreateIdentityTransform();
-
     static void BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP);
     static void BuildProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP);
     static void BuildLookAtMatrix(Matrix4x4& matrix, float posX, float posY, float posZ, float lookAtX, float lookAtY, float lookAtZ);

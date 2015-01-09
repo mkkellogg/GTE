@@ -207,6 +207,11 @@ bool Matrix4x4::IsAffine(void) const
    return D0 == 0 && D1 == 0 && D2 == 0 && D3 == 1;
 }
 
+bool Matrix4x4::IsAffine(const float * data)
+{
+	return data[3] == 0 && data[7] == 0 && data[11] == 0 && data[15] == 1;
+}
+
 /*
  * Overloaded assignment operator
  */
@@ -386,7 +391,7 @@ void Matrix4x4::MultiplyMM(const float * lhs, const float *rhs, float * out)
         float ri3 = lhs[ I(0,3) ] * rhs_i0;
         for (int j=1 ; j<DIM_SIZE ; j++) 
         {
-            register const float rhs_ij = rhs[ I(i,j) ];
+            const float rhs_ij = rhs[ I(i,j) ];
             ri0 += lhs[ I(j,0) ] * rhs_ij;
             ri1 += lhs[ I(j,1) ] * rhs_ij;
             ri2 += lhs[ I(j,2) ] * rhs_ij;
@@ -460,6 +465,12 @@ bool Matrix4x4::Invert(Matrix4x4& out)
  */
 bool Matrix4x4::Invert(const float * source, float * dest)
 {
+	// we need to know if the matrix is affine so that we can make it affine
+	// once again after the inversion. the inversion process can introduce very small
+	// precision errors that accumulate over time and eventually
+	// result in a non-affine matrix
+	bool isAffine = Matrix4x4::IsAffine(source);
+
 	ASSERT(source != NULL, "Matrix4x4::Invert -> source is NULL", false);
 	ASSERT(dest != NULL, "Matrix4x4::Invert -> dest is NULL", false);
 
@@ -552,6 +563,16 @@ bool Matrix4x4::Invert(const float * source, float * dest)
     det = 1 / det;
     for (int j = 0; j < DATA_SIZE; j++)
         dest[j] = dst[j] * det;
+
+    // if the matrix was affine before inversion, make it affine again
+    // to avoid accumulating preicision errors
+    if(isAffine)
+    {
+    	dest[3] = 0;
+    	dest[7] = 0;
+    	dest[11] = 0;
+    	dest[15] = 1;
+    }
 
     return true;
 }

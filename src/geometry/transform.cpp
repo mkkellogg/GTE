@@ -27,17 +27,9 @@ Transform::Transform()
 }
 
 /*
- * Constructor to build Transform from Matrix4x4
- */
-Transform::Transform(const Matrix4x4& m) : Transform()
-{
-	matrix.SetTo(m);
-}
-
-/*
  * Copy constructor
  */
-Transform::Transform(Transform * transform) : Transform()
+Transform::Transform(const Transform * transform) : Transform()
 {
 	ASSERT_RTRN(transform != NULL, "Transform::copy constructor -> NULL transform passed.");
 	transform->CopyMatrix(matrix);
@@ -214,14 +206,26 @@ void Transform::Scale(float x, float y, float z,  bool local)
 	else matrix.Scale(x,y,z);
 }
 
-void Transform::Rotate(const Vector3& vector, float a)
+/*
+ * Rotate this transform around [vector]. If [local] is true, perform in
+ * local space, otherwise perform in world space.
+ */
+void Transform::Rotate(const Vector3& vector, float a, bool local)
 {
-	matrix.Rotate(vector, a);
+	Rotate(vector.x, vector.y, vector.z, a, local);
 }
 
-void Transform::Rotate(float x, float y, float z, float a)
+/*
+ * Rotate this transform around the vector specified by [x], [y], [z].
+ * If [local] is true, perform in local space, otherwise perform in world space.
+ */
+void Transform::Rotate(float x, float y, float z, float a, bool local)
 {
-	matrix.Rotate(x,y,z,a);
+	if(!local)
+	{
+		 matrix.PreRotate(x,y,z,a);
+	}
+	else matrix.Rotate(x,y,z,a);
 }
 
 /*
@@ -335,7 +339,8 @@ void Transform::BuildLookAtMatrix(Matrix4x4& matrix, float posX, float posY, flo
 }
 
 /*
- * Shortcut to transform [vector] by [matrix].
+ * Shortcut to transform [vector] by [matrix]. This performs a
+ * local transformation via post-multiplication.
  */
 void Transform::TransformVector(Vector3& vector) const
 {
@@ -343,7 +348,8 @@ void Transform::TransformVector(Vector3& vector) const
 }
 
 /*
- * Shortcut to transform [point] by [matrix]
+ * Shortcut to transform [point] by [matrix]. This performs a
+ * local transformation via post-multiplication.
  */
 void Transform::TransformPoint(Point3& point) const
 {
@@ -351,7 +357,8 @@ void Transform::TransformPoint(Point3& point) const
 }
 
 /*
- * Shortcut to transform [vector] by [matrix]
+ * Shortcut to transform [vector] by [matrix]. This performs a
+ * local transformation via post-multiplication.
  */
 void Transform::TransformVector4f(float * vector) const
 {
