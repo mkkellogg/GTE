@@ -526,8 +526,7 @@ void EngineObjectManager::DeleteRenderTarget(RenderTarget * target)
 
 CameraRef EngineObjectManager::CreateCamera()
 {
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-	Camera * camera = new Camera(graphics);
+	Camera * camera = new Camera();
 	ASSERT(camera != NULL, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef::Null());
 	camera->SetObjectID(GetNextObjectID());
 

@@ -1,6 +1,15 @@
-# Your assimp installation needs to include the ability to load FBX files.
-# The variables ASSIMP_LIB and ASSIMP_INC were defined to point to a custom 
-# version of the library that has this ability and the corresponding include files. 
+# Required Libraries:
+#
+# - Asset import library (Assimp)
+#
+# 		Your assimp installation needs to include the ability to load FBX files.
+# 		The variables ASSIMP_LIB and ASSIMP_INC were defined to point to a custom 
+# 		version of the library that has this ability and the corresponding include files. 
+#
+# - DevIL image loading library
+# - GLUT (OpenGL Utility Toolkit)
+# - GLEW (OpenGL Extension Wrangler library)
+
 
 #ASSIMP_LIB=../assimp/lib
 #ASSIMP_INC=../assimp/include

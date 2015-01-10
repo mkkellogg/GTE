@@ -17,7 +17,6 @@ class Transform;
 #include "object/enginetypes.h"
 #include "transform.h"
 #include "matrix4x4.h"
-#include "util/datastack.h"
 
 class SceneObjectTransform : public Transform
 {

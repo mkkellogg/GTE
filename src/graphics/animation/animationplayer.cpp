@@ -385,7 +385,7 @@ void AnimationPlayer::CalculateInterpolatedTranslation(AnimationInstanceRef inst
 		vector.z = ((nextFrame.Translation.z - previousFrame.Translation.z) * interFrameProgress) + previousFrame.Translation.z;
 
 	}
-	else //we did not find 2 frames, so set scale equal to the first frame
+	else //we did not find 2 frames, so set translation equal to the first frame
 	{
 		const TranslationKeyFrame& firstFrame = keyFrameSet.TranslationKeyFrames[0];
 		vector.Set(firstFrame.Translation.x,firstFrame.Translation.y,firstFrame.Translation.y);
@@ -743,11 +743,22 @@ void AnimationPlayer::Resume(unsigned int  animationIndex)
 	instance->Play();
 }
 
+/*
+ * Cross-fade any currently playing animations over to the target animation [target].
+ */
 void AnimationPlayer::CrossFade(AnimationRef target, float duration)
 {
 	CrossFade(target, duration, false);
 }
 
+/*
+ * Cross-fade any currently playing animations over to the target animation [target].
+ *
+ * This method initiates the cross-fade process, which means that all actively playing
+ * animations that are not [target] will be faded/blended out over [duration] seconds.
+ * At the same time the target animation will be faded/blended in at the same rate,
+ * creating a smooth transition to [target].
+ */
 void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued)
 {
 	if(animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
@@ -758,7 +769,7 @@ void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued
 		AnimationInstanceRef instance = registeredAnimations[targetIndex];
 		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CrossFade -> Target animation is invalid.");
 
-		// if the current blending operation is a crossfade with the same target, then do nothing
+		// if a crossfade operation is currently active with the same target, then do nothing
 		if(crossFadeTargets[targetIndex] == 1)return;
 
 		CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
@@ -828,7 +839,8 @@ void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued
 			playingAnimationsCount = 1;
 		});
 
-		// clear the current queue if [queued] == false
+		// If [queued] == false, then we want to start the cross-fade immediately. This
+		// means we need to clear the
 		if(!queued)ClearBlendOpQueue();
 
 		QueueBlendOperation(blendOp);

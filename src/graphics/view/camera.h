@@ -16,11 +16,10 @@ class Camera : public SceneObjectComponent
     unsigned int clearBufferMask;
 
     Transform projection;
-    Graphics * graphics;
 
     protected:
 
-    Camera(Graphics * graphics);
+    Camera();
     ~Camera();
 
     public:
@@ -29,6 +28,7 @@ class Camera : public SceneObjectComponent
     void AddClearBuffer(RenderBufferType buffer);
     void RemoveClearBuffer(RenderBufferType buffer);
     unsigned int GetClearBufferMask() const;
+    void UpdateDisplay();
 };
 
 #endif

@@ -14,7 +14,6 @@
 class Transform;
 
 #include "matrix4x4.h"
-#include "util/datastack.h"
 
 class Transform
 {
@@ -23,6 +22,7 @@ class Transform
 
 	protected:
 
+	// the 4x4 matrix that is encapsulated by this transform
 	Matrix4x4 matrix;
 
     public:

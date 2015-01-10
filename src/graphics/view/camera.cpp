@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "camera.h"
+#include "engine.h"
 #include "graphics/render/rendertarget.h"
 #include "graphics/graphics.h"
 #include "graphics/screendesc.h"
@@ -10,19 +11,10 @@
 #include "geometry/transform.h"
 #include "geometry/matrix4x4.h"
 
-Camera::Camera(Graphics * graphics)
+Camera::Camera()
 {
 	clearBufferMask = 0;
-	this->graphics = graphics;
-
-	Matrix4x4 proj;
-	const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
-
-	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
-
-	Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 100);
-	//Transform::BuildProjectionMatrixInfiniteFar(proj, 65, ratio, 3);
-	projection.SetTo(proj);
+	UpdateDisplay();
 }
 
 Camera::~Camera()
@@ -48,6 +40,19 @@ unsigned int Camera::GetClearBufferMask() const
 const Transform& Camera::GetProjectionTransform() const
 {
 	return projection;
+}
+
+void Camera::UpdateDisplay()
+{
+	Matrix4x4 proj;
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
+
+	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
+
+	Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 100);
+	//Transform::BuildProjectionMatrixInfiniteFar(proj, 65, ratio, 3);
+	projection.SetTo(proj);
 }
 
 

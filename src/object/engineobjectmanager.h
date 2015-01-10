@@ -37,7 +37,7 @@ class EngineObjectManager
 {
 	friend class Engine;
 
-	const char* builtinPath ="resources/builtin/";
+	const char* builtinPath ="resources/shaders/builtin/";
 
 	std::unordered_map<ObjectID, SceneObjectRef> sceneObjectDirectory;
 

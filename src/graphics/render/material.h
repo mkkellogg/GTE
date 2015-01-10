@@ -6,7 +6,7 @@
  * A Material represents an instance of a Shader along with a set of values for the custom uniforms
  * that shader exposes.
  *
- * A Material, like other engine objects (such as Shader and Mesh3D), utilize the notion of standard attributes
+ * A Material, like other engine objects (such as Shader and Mesh3D), utilizes the notion of standard attributes
  * and standard uniforms. These are shader variables that are very common, sometimes required,
  * and are supplied to a shader by the engine, not explicitly by the developer using the engine.
  * An example is mesh vertex normals. The developer does not explicitly set these each frame; the

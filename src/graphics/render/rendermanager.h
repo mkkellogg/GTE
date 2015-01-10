@@ -50,9 +50,6 @@ class RenderManager
 
 	int cycleCount;
 
-	Graphics * graphics;
-	EngineObjectManager * objectManager;
-
 	MaterialRef shadowVolumeMaterial;
 
 	DataStack<Matrix4x4> viewTransformStack;

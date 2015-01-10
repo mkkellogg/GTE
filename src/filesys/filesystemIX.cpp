@@ -78,7 +78,8 @@ bool FileSystemIX::FileExists(const std::string& fullPath) const
    {
        f.close();
        return true;
-   } else
+   }
+   else
    {
        f.close();
        return false;

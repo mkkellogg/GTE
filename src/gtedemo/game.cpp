@@ -140,9 +140,9 @@ void Game::Init()
 
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	texture = objectManager->CreateTexture("../../textures/cartoonTex03.png", texAttributes);
+	texture = objectManager->CreateTexture("resources/textures/cartoonTex03.png", texAttributes);
 
-	MaterialRef material = objectManager->CreateMaterial("BasicMaterial", "resources/basic.vertex.shader","resources/basic.fragment.shader");
+	MaterialRef material = objectManager->CreateMaterial("BasicMaterial", "resources/shaders/basic.vertex.shader","resources/shaders/basic.fragment.shader");
 	material->SetTexture(texture, "TEXTURE0");
 
     renderer = objectManager->CreateMesh3DRenderer();
@@ -181,7 +181,7 @@ void Game::Init()
 
 
 
-	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/island/island.fbx", 1 );
+	modelSceneObject = importer->LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 );
 	if(modelSceneObject.IsValid())
 	{
 		modelSceneObject->SetActive(true);
@@ -198,7 +198,7 @@ void Game::Init()
 	modelSceneObject->GetTransform().Scale(.07,.05,.07, true);
 
 
-	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/castle/Tower_01.fbx", 1 );
+	modelSceneObject = importer->LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx", 1 );
 	if(modelSceneObject.IsValid())
 	{
 		modelSceneObject->SetActive(true);
@@ -215,7 +215,7 @@ void Game::Init()
 	modelSceneObject->GetTransform().Scale(.05,.05,.05, true);
 
 
-	modelSceneObject = importer->LoadModelDirect("../../models/toonlevel/castle/MushRoom_01.fbx", 1 );
+	modelSceneObject = importer->LoadModelDirect("resources/models/toonlevel/mushroom/MushRoom_01.fbx", 1 );
 	if(modelSceneObject.IsValid())
 	{
 		modelSceneObject->SetActive(true);
@@ -232,7 +232,7 @@ void Game::Init()
 	modelSceneObject->GetTransform().Scale(.09,.09,.09, true);
 
 
-	//SceneObjectRef defaultObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
+	//SceneObjectRef defaultObject = importer->LoadModelDirect("resources/models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
 	//SkinnedMesh3DRendererRef defaultMeshRenderer = FindFirstSkinnedMeshRenderer(defaultObject);
 	//SkeletonRef defaultSkeleton = defaultMeshRenderer->GetSkeleton();
 
@@ -240,9 +240,9 @@ void Game::Init()
 	playerType = PlayerType::Koopa;
 
 
-	if(playerType == PlayerType::Koopa)playerObject = importer->LoadModelDirect("../../models/koopa/koopa.fbx", 1 );
-	else if(playerType == PlayerType::Nerd) playerObject = importer->LoadModelDirect("../../models/cartoonnerd/cartoonnerd2.fbx", 1 );
-	//playerObject = importer->LoadModelDirect("../../models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
+	if(playerType == PlayerType::Koopa)playerObject = importer->LoadModelDirect("resources/models/koopa/koopa.fbx", 1 );
+	else if(playerType == PlayerType::Nerd) playerObject = importer->LoadModelDirect("resources/models/cartoonnerd/cartoonnerd2.fbx", 1 );
+	//playerObject = importer->LoadModelDirect("resources/models/cartoonnerd/DefaultAvatar/DefaultAvatar.fbx", 1 );
 
 	SkinnedMesh3DRendererRef playerMeshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	SkeletonRef playerSkeleton = playerMeshRenderer->GetSkeleton();
@@ -283,15 +283,15 @@ void Game::Init()
 
 	if(playerType == PlayerType::Koopa)
 	{
-		playerWait = importer->LoadAnimation("../../models/koopa/model/koopa@wait.fbx");
-		playerWalk = importer->LoadAnimation("../../models/koopa/model/koopa@walk.fbx");
-		playerJump = importer->LoadAnimation("../../models/koopa/model/koopa@jump.fbx");
-		playerRoar = importer->LoadAnimation("../../models/koopa/model/koopa@roar3.fbx");
+		playerWait = importer->LoadAnimation("resources/models/koopa/model/koopa@wait.fbx");
+		playerWalk = importer->LoadAnimation("resources/models/koopa/model/koopa@walk.fbx");
+		playerJump = importer->LoadAnimation("resources/models/koopa/model/koopa@jump.fbx");
+		playerRoar = importer->LoadAnimation("resources/models/koopa/model/koopa@roar3.fbx");
 	}
 	else if(playerType == PlayerType::Nerd)
 	{
-		playerWait = importer->LoadAnimation("../../models/cartoonnerd/human@idleneutral.fbx");
-		playerWalk = importer->LoadAnimation("../../models/cartoonnerd/human@walk.fbx");
+		playerWait = importer->LoadAnimation("resources/models/cartoonnerd/human@idleneutral.fbx");
+		playerWalk = importer->LoadAnimation("resources/models/cartoonnerd/human@walk.fbx");
 	}
 
 	playerRenderer = FindFirstSkinnedMeshRenderer(playerObject);
@@ -331,7 +331,7 @@ void Game::Init()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 	mesh = GameUtil::CreateCubeMesh(meshAttributes);
 
-	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", "resources/builtin/selflit.vertex.shader","resources/builtin/selflit.fragment.shader");
+	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", "resources/shaders/builtin/selflit.vertex.shader","resources/shaders/builtin/selflit.fragment.shader");
 
 
 	/*

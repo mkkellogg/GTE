@@ -47,11 +47,16 @@ OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3
 
 OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEDEMOOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ)
 
-all: gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem inputmanager
+all: obj bin gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem inputmanager 
 	$(CC) -o bin/gtedemo $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
 
+obj: 
+	mkdir obj
+	
+bin:
+	mkdir bin
 
 
 # ==================================

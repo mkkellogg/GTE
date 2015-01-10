@@ -94,7 +94,7 @@ bool Vector3::operator==(const Vector3 & source)
  */
 bool Vector3::AreStrictlyEqual(const Vector3* a, const Vector3* b)
 {
-	ASSERT(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> NULL point passed.", false);
+	ASSERT(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> NULL vector passed.", false);
 
 	return a->x == b->x && a->y == b->y && a->z == b->z;
 }
@@ -169,7 +169,7 @@ void Vector3::Normalize()
 
 /*
  * Convert this vector to a unity vector, but use the hacky cheat QuickMagnitude(),
- * which is not ass accurate (or correct) as Magnitude()
+ * which is not as accurate (or correct) as Magnitude()
  */
 void Vector3::QuickNormlize()
 {

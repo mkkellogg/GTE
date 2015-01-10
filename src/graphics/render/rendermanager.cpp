@@ -36,9 +36,6 @@
 RenderManager::RenderManager() : viewTransformStack(Constants::MaxObjectRecursionDepth, 1),
 								 modelTransformStack(Constants::MaxObjectRecursionDepth, 1)
 {
-	this->graphics = Engine::Instance()->GetGraphicsEngine();
-	this->objectManager = Engine::Instance()->GetEngineObjectManager();
-
 	lightCount = 0;
 	ambientLightCount = 0;
 	cameraCount = 0;
@@ -72,7 +69,7 @@ bool RenderManager::Init()
 	}
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", "resources/builtin/shadowvolume.vertex.shader","resources/builtin/shadowvolume.fragment.shader");
+	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", "resources/shaders/builtin/shadowvolume.vertex.shader","resources/shaders/builtin/shadowvolume.fragment.shader");
 	ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.", false);
 
 	return true;
@@ -85,7 +82,7 @@ bool RenderManager::Init()
 void RenderManager::ClearBuffersForCamera(const Camera& camera) const
 {
 	unsigned int clearBufferMask = camera.GetClearBufferMask();
-	graphics->ClearRenderBuffers(clearBufferMask);
+	Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
 }
 
 /*
@@ -146,7 +143,7 @@ void RenderManager::ProcessScene()
 
 	Transform cameraModelView;
 
-	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
+	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::ProcessScene -> sceneRoot is NULL.");
 
 	// gather information about the cameras, lights, and renderable meshes in the scene
@@ -320,7 +317,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 
 	// clear the appropriate render buffers this camera
 	ClearBuffersForCamera(camera);
-	SceneObjectRef sceneRoot = (SceneObjectRef)objectManager->GetSceneRoot();
+	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
 	// render the scene using the view transform of the current camera
@@ -406,7 +403,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 		{
 			// check if this light can cast shadows; if not we skip this pass
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
-				graphics->EnterRenderMode(RenderMode::ShadowVolumeRender);
+				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::ShadowVolumeRender);
 			else
 				continue;
 		}
@@ -414,9 +411,9 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 		{
 			// check if this light can cast shadows, if not do standard (shadow-less) rendering
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
-				graphics->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
+				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
 			else if(light.GetType() == LightType::Ambient)
-				graphics->EnterRenderMode(RenderMode::Standard);
+				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
 		}
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
@@ -543,12 +540,12 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			bool rendered = renderedObjects[subMesh->GetObjectID()];
 			if(rendered)
 			{
-				graphics->SetBlendingEnabled(true);
-				graphics->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+				Engine::Instance()->GetGraphicsEngine()->SetBlendingEnabled(true);
+				Engine::Instance()->GetGraphicsEngine()->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
 			}
 			else
 			{
-				graphics->SetBlendingEnabled(false);
+				Engine::Instance()->GetGraphicsEngine()->SetBlendingEnabled(false);
 			}
 
 			// render the current mesh
@@ -817,7 +814,7 @@ bool RenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosi
  */
 void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection,  const Transform& modelViewProjection)
 {
-	MaterialRef activeMaterial = graphics->GetActiveMaterial();
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
 
 	ShaderRef shader = activeMaterial->GetShader();
@@ -835,7 +832,7 @@ void RenderManager::SendTransformUniformsToShader(const Transform& model, const 
  */
 void RenderManager::SendModelViewProjectionToShader(const Transform& modelViewProjection)
 {
-	MaterialRef activeMaterial = graphics->GetActiveMaterial();
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendModelViewProjectionToShader -> activeMaterial is NULL.");
 
 	ShaderRef shader = activeMaterial->GetShader();
@@ -849,7 +846,7 @@ void RenderManager::SendModelViewProjectionToShader(const Transform& modelViewPr
  */
 void RenderManager::SendActiveMaterialUniformsToShader()
 {
-	MaterialRef activeMaterial = graphics->GetActiveMaterial();
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendCustomUniformsToShader -> activeMaterial is not valid.");
 	activeMaterial->SendAllSetUniformsToShader();
 }
@@ -862,6 +859,6 @@ void RenderManager::ActivateMaterial(MaterialRef material)
 {
 	// We MUST notify the graphics system about the change in active material because other
 	// components (like Mesh3DRenderer) need to know about the active material
-	graphics->ActivateMaterial(material);
+	Engine::Instance()->GetGraphicsEngine()->ActivateMaterial(material);
 }
 
