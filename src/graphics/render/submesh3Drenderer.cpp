@@ -27,7 +27,7 @@
 #include "object/engineobjectmanager.h"
 #include "attributetransformer.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 SubMesh3DRenderer::SubMesh3DRenderer(Graphics * graphics, AttributeTransformer * attributeTransformer) : SubMesh3DRenderer(false, graphics, attributeTransformer)
 {

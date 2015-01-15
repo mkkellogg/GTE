@@ -3,22 +3,25 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
+#include <string>
 
 #include "assetimporter.h"
-#include <string>
+#include "shadersourceloaderGL.h"
 #include "object/enginetypes.h"
 #include "modelimporter.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 AssetImporter::AssetImporter()
 {
-
+	// TODO: Make this choose the correct implementation based on platform.
+	// For now we go with OpenGL by default
+	shaderSourceLoader = new ShaderSourceLoaderGL();
 }
 
 AssetImporter::~AssetImporter()
 {
-
+	SAFE_DELETE(shaderSourceLoader);
 }
 
 SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float importScale) const
@@ -31,6 +34,12 @@ AnimationRef AssetImporter::LoadAnimation(const std::string& filePath) const
 {
 	ModelImporter importer;
 	return importer.LoadAnimation(filePath);
+}
+
+void AssetImporter::LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource)
+{
+	ASSERT_RTRN(shaderSourceLoader != NULL, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is NULL.");
+	shaderSourceLoader->LoadShaderSouce(name, shaderSource);
 }
 
 

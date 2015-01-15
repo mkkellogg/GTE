@@ -21,6 +21,7 @@ class Skeleton;
 class Animation;
 class AnimationInstance;
 class RenderTarget;
+class ShaderSource;
 
 #include <vector>
 #include <memory>
@@ -29,7 +30,7 @@ class RenderTarget;
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
 #include "graphics/texture/textureattr.h"
-#include "shadermanager.h"
+#include "shaderorganizer.h"
 #include "base/longmask.h"
 #include "base/intmask.h"
 
@@ -37,11 +38,9 @@ class EngineObjectManager
 {
 	friend class Engine;
 
-	const char* builtinPath ="resources/shaders/builtin/";
-
 	std::unordered_map<ObjectID, SceneObjectRef> sceneObjectDirectory;
 
-	ShaderManager loadedShaders;
+	ShaderOrganizer loadedShaders;
 	std::vector<EngineObject *> engineObjects;
 	SceneObject sceneRoot;
 	SceneObjectRef sceneRootRef;
@@ -70,9 +69,12 @@ class EngineObjectManager
 	void DeleteAnimationPlayer(AnimationPlayer * player);
 	void DeleteRenderTarget(RenderTarget * target);
 
+	bool InitBuiltinShaders();
+
     public :
 
-    bool InitBuiltinShaders();
+	bool Init();
+
     ShaderRef GetLoadedShader(LongMask properties);
 
     SceneObjectRef FindSceneObjectInDirectory(unsigned long objectID);
@@ -103,13 +105,15 @@ class EngineObjectManager
     AnimationPlayerRef CreateAnimationPlayer(SkeletonRef target);
     void DestroyAnimationPlayer(AnimationPlayerRef player);
 
-    ShaderRef CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath);
+    ShaderRef CreateShader(const ShaderSource& shaderSource);
     void DestroyShader(ShaderRef shader);
     TextureRef CreateTexture(const char * sourcePath, TextureAttributes attributes);
     TextureRef CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
     void DestroyTexture(TextureRef texture);
     MaterialRef CreateMaterial(const char *name, ShaderRef shader);
-    MaterialRef CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath);
+    MaterialRef CreateMaterial(const char *name, const ShaderSource& shaderSource);
+    MaterialRef CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
+
     void DestroyMaterial(MaterialRef material);
     RenderTargetRef CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height);
     void DestroyRenderTarget(RenderTargetRef buffer);

@@ -1,13 +1,16 @@
 #ifndef _GTE_ASSET_IMPORTER_H_
 #define _GTE_ASSET_IMPORTER_H_
 
+//forward declarations
+class ShaderSourceLoader;
+
 #include "object/engineobjectmanager.h"
 #include "object/enginetypes.h"
 #include <string>
 
 class AssetImporter
 {
-	friend class EngineObjectManager;
+	ShaderSourceLoader * shaderSourceLoader;
 
 	public:
 
@@ -16,6 +19,7 @@ class AssetImporter
 
 	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale) const;
 	AnimationRef LoadAnimation(const std::string& filePath) const;
+	void LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource);
 };
 
 #endif

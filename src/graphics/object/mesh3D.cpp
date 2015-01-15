@@ -16,7 +16,7 @@
 #include "submesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 
 Mesh3D::Mesh3D(unsigned int subMeshCount)

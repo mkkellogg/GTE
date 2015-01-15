@@ -16,7 +16,7 @@
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include "util/time.h"
 
 Graphics::~Graphics()
@@ -40,13 +40,6 @@ bool Graphics::Init(const GraphicsAttributes& attributes)
 
 	bool renderInitSuccess = renderManager->Init();
 	if(!renderInitSuccess)return false;
-
-	bool builtinShadersInitSuccess = engineObjectManager->InitBuiltinShaders();
-	if(!builtinShadersInitSuccess)
-	{
-		Debug::PrintError("Graphics::Init -> could not init built-in shaders");
-		return false;
-	}
 
 	return true;
 }

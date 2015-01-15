@@ -8,7 +8,7 @@
 #include "point3.h"
 #include "point3factory.h"
 #include "base/basevector4array.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 Point3Array::Point3Array() : BaseVector4Array(Point3Factory::Instance())
 {

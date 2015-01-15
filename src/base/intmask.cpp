@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "intmask.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 IntMask IntMaskUtil::InvertBitsForIndexMask(IntMask index)
 {

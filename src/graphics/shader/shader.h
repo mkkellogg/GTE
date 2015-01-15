@@ -27,6 +27,7 @@ class AttributeDescriptor;
 
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
+#include "shadersource.h"
 #include <string>
 
 enum class ShaderType
@@ -39,9 +40,11 @@ class Shader : public EngineObject
 {
     protected: 
 
+    ShaderSource shaderSource;
+
     public :
 
-    Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath);
+    Shader(const ShaderSource& shaderSource);
     virtual ~Shader();
     virtual bool Load() = 0;
     virtual bool IsLoaded() = 0;

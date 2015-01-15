@@ -4,7 +4,6 @@ BASESRC= src/base
 GTEDEMOSRC= src/gtedemo
 GTEMATHSRC= src/gtemath
 GEOMETRYSRC= src/geometry
-UTILSRC= src/util
 GRAPHICSSRC= src/graphics
 LIGHTSRC= $(GRAPHICSSRC)/light
 SHADERSRC= $(GRAPHICSSRC)/shader
@@ -17,8 +16,10 @@ IMAGESRC= $(GRAPHICSSRC)/image
 ENGINEOBJECTSRC= src/object
 ASSETSRC= src/asset
 UTILSRC= src/util
+DEBUGSRC= src/debug
 FILESYSTEMSRC= src/filesys
 INPUTSRC= src/input
+ERRORSRC= src/error
 
 ENGINEOBJ = obj/engine.o
 GLOBALOBJ = obj/constants.o
@@ -27,7 +28,7 @@ GTEDEMOOBJ= obj/gtedemo.o obj/game.o obj/gameutil.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o
-UIOBJ= obj/debug.o 
+DEBUGOBJ= obj/debug.o 
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/rendertarget.o obj/rendertargetGL.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
@@ -37,17 +38,18 @@ LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
-ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shadermanager.o
-ASSETOBJ= obj/assetimporter.o obj/importutil.o obj/modelimporter.o
+ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shaderorganizer.o
+ASSETOBJ= obj/assetimporter.o obj/importutil.o obj/modelimporter.o obj/shadersourceloader.o obj/shadersourceloaderGL.o
 UTILOBJ= obj/datastack.o obj/util.o obj/time.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 INPUTOBJ= obj/inputmanager.o obj/inputmanagerGL.o
+ERROROBJ= obj/errormanager.o
 
 OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
 
-OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEDEMOOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(UIOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ)
+OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEDEMOOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)
 
-all: obj bin gtemain engine graphics animation ui geometry gtemath base global engineobjects asset util image filesystem inputmanager 
+all: obj bin gtemain engine graphics animation debug geometry gtemath base global engineobjects asset util image filesystem inputmanager error
 	$(CC) -o bin/gtedemo $(OBJECTFILES) $(LIBS) 
 	rm -rf bin/resources
 	cp -r resources bin/
@@ -83,6 +85,16 @@ global: $(GLOBALOBJ)
 
 obj/constants.o: $(GLOBALSRC)/constants.cpp $(GLOBALSRC)/constants.h
 	$(CC) $(CFLAGS) -o obj/constants.o -c $(GLOBALSRC)/constants.cpp 
+	
+
+# ==================================
+# Error
+# ==================================	
+
+error: $(ERROROBJ)
+
+obj/errormanager.o: $(ERRORSRC)/errormanager.cpp $(ERRORSRC)/errormanager.h
+	$(CC) $(CFLAGS) -o obj/errormanager.o -c $(ERRORSRC)/errormanager.cpp 
 	
 
 # ==================================
@@ -127,8 +139,8 @@ obj/engine.o: $(ENGINESRC)/engine.cpp $(ENGINESRC)/engine.h
 
 engineobjects: $(ENGINEOBJECTOBJ)
 	
-obj/shadermanager.o: $(ENGINEOBJECTSRC)/shadermanager.cpp $(ENGINEOBJECTSRC)/shadermanager.h 
-	$(CC) $(CFLAGS) -o obj/shadermanager.o -c $(ENGINEOBJECTSRC)/shadermanager.cpp
+obj/shaderorganizer.o: $(ENGINEOBJECTSRC)/shaderorganizer.cpp $(ENGINEOBJECTSRC)/shaderorganizer.h 
+	$(CC) $(CFLAGS) -o obj/shaderorganizer.o -c $(ENGINEOBJECTSRC)/shaderorganizer.cpp
 	
 obj/sceneobjectcomponent.o: $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp $(ENGINEOBJECTSRC)/sceneobjectcomponent.h 
 	$(CC) $(CFLAGS) -o obj/sceneobjectcomponent.o -c $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp
@@ -154,6 +166,12 @@ obj/assetimporter.o: $(ASSETSRC)/assetimporter.cpp $(ASSETSRC)/assetimporter.h
 	
 obj/modelimporter.o: $(ASSETSRC)/modelimporter.cpp $(ASSETSRC)/modelimporter.h 
 	$(CC) $(CFLAGS) -o obj/modelimporter.o -c $(ASSETSRC)/modelimporter.cpp
+
+obj/shadersourceloader.o: $(ASSETSRC)/shadersourceloader.cpp $(ASSETSRC)/shadersourceloader.h 
+	$(CC) $(CFLAGS) -o obj/shadersourceloader.o -c $(ASSETSRC)/shadersourceloader.cpp
+	
+obj/shadersourceloaderGL.o: $(ASSETSRC)/shadersourceloaderGL.cpp $(ASSETSRC)/shadersourceloaderGL.h 
+	$(CC) $(CFLAGS) -o obj/shadersourceloaderGL.o -c $(ASSETSRC)/shadersourceloaderGL.cpp
 	
 obj/importutil.o: $(ASSETSRC)/importutil.cpp $(ASSETSRC)/importutil.h 
 	$(CC) $(CFLAGS) -o obj/importutil.o -c $(ASSETSRC)/importutil.cpp
@@ -373,13 +391,13 @@ obj/submesh3Dface.o: $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp $(GRAPHICSOBJECTSRC)
 	$(CC) $(CFLAGS) -o obj/submesh3Dface.o -c $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp	
 	
 # ==================================
-# UI
+# Debug
 # ==================================	
 
-ui: $(UIOBJ)
+debug: $(DEBUGOBJ)
 
-obj/debug.o: src/ui/debug.cpp src/ui/debug.h
-	$(CC) $(CFLAGS) -o obj/debug.o -c src/ui/debug.cpp 
+obj/debug.o: $(DEBUGSRC)/debug.cpp $(DEBUGSRC)/debug.h
+	$(CC) $(CFLAGS) -o obj/debug.o -c  $(DEBUGSRC)/debug.cpp 
 
 
 # ==================================

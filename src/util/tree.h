@@ -8,7 +8,7 @@
 #include <stack>
 #include <string>
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 template <class T> class Tree
 {

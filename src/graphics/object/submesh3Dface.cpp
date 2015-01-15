@@ -5,7 +5,7 @@
 #include <string>
 #include "submesh3Dface.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 SubMesh3DFace::SubMesh3DFace()
 {

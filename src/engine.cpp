@@ -11,9 +11,10 @@
 #include "graphics/animation/animationmanager.h"
 #include "input/inputmanager.h"
 #include "input/inputmanagerGL.h"
+#include "error/errormanager.h"
 #include "global/global.h"
 #include "util/time.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 Engine * Engine::theInstance = NULL;
 
@@ -23,11 +24,13 @@ Engine::Engine()
 	graphicsEngine = NULL;
 	animationManager = NULL;
 	inputManager = NULL;
+	errorManager = NULL;
 	callbacks = NULL;
 }
 
 Engine::~Engine()
 {
+	SAFE_DELETE(errorManager);
 	SAFE_DELETE(inputManager);
 	SAFE_DELETE(animationManager);
 	SAFE_DELETE(graphicsEngine);
@@ -52,8 +55,16 @@ Engine * Engine::Instance()
 
 bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes)
 {
+	// The error manager must be initialized before any other engine component so that errors
+	// during initialization of those components can be reported
+	errorManager = new ErrorManager();
+	ASSERT(errorManager != NULL, "Engine::Init -> Unable to create error manager.", false);
+
 	engineObjectManager = new EngineObjectManager();
 	ASSERT(engineObjectManager != NULL, "Engine::Init -> Unable to create engine object manager.", false);
+
+	bool engineObjectManagerInitSuccess = engineObjectManager->Init();
+	ASSERT(engineObjectManagerInitSuccess == true, "Engine::Init -> Unable to initialize engine object manager.", false);
 
 	// TODO: add switch to detect correct type for platform
 	// for now, only support OpenGL
@@ -63,9 +74,16 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 	bool graphicsInitSuccess = graphicsEngine->Init(graphicsAtrributes);
 	ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.", false);
 
+	// This portion of the initialization of the engine object manager must be called
+	// after the graphics engine is initialized
+	bool initShadersSuccess = engineObjectManager->InitBuiltinShaders();
+	ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initiliaze built-in shaders", false);
+
 	animationManager = new AnimationManager();
 	ASSERT(animationManager != NULL, "Engine::Init -> Unable to create animation manager.", false);
 
+	// TODO: add switch to detect correct type for platform
+	// for now, only support OpenGL
 	inputManager = new InputManagerGL();
 	ASSERT(inputManager != NULL, "Engine::Init -> Unable to create input manager.", false);
 
@@ -143,5 +161,10 @@ AnimationManager * Engine::GetAnimationManager()
 InputManager * Engine::GetInputManager()
 {
 	return inputManager;
+}
+
+ErrorManager * Engine::GetErrorManager()
+{
+	return errorManager;
 }
 

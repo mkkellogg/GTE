@@ -8,7 +8,7 @@
 #include "basevector4.h"
 #include "basevector4factory.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 BaseVector4Array::BaseVector4Array(BaseVector4Factory * factory) : reservedCount(0), count(0), data(NULL), objects(NULL), baseFactory(factory)
 {

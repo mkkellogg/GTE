@@ -26,7 +26,7 @@
 #include "importutil.h"
 #include "engine.h"
 #include "object/engineobjectmanager.h"
-#include "object/shadermanager.h"
+#include "object/shaderorganizer.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
@@ -58,7 +58,7 @@
 #include "base/longmask.h"
 #include "util/time.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include "util/util.h"
 
 const std::string ModelImporter::AssimpPathDelimiter = std::string("/");

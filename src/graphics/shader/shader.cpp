@@ -7,7 +7,7 @@
  
 #include "shader.h"
 
-Shader::Shader(const std::string& vertexSourcePath, const std::string& fragmentSourcePath)
+Shader::Shader(const ShaderSource& shaderSource) : shaderSource(shaderSource)
 {
 
 }

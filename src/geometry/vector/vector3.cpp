@@ -6,7 +6,7 @@
  
 #include "vector3.h"
 #include "gtemath/gtemath.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include "global/global.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"

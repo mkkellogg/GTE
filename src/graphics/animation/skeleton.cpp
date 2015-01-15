@@ -11,7 +11,7 @@
 #include "util/tree.h"
 #include "object/enginetypes.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 /*
  * Only constructor.

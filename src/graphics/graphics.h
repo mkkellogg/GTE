@@ -18,6 +18,7 @@ class TextureAttributes;
 class RawImage;
 class AttributeTransformer;
 class RenderTarget;
+class ShaderSource;
 
 #include <string>
 #include "object/enginetypes.h"
@@ -89,7 +90,7 @@ class Graphics
 
     virtual bool Init(const GraphicsAttributes& attributes);
 
-    virtual Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) = 0;
+    virtual Shader * CreateShader(const ShaderSource& shaderSource) = 0;
     virtual void DestroyShader(Shader * shader) = 0;
     virtual SubMesh3DRenderer * CreateMeshRenderer(AttributeTransformer * attrTransformer)  = 0;
     virtual void DestroyMeshRenderer(SubMesh3DRenderer * buffer) = 0;

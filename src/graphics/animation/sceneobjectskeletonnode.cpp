@@ -5,7 +5,7 @@
 #include "object/sceneobject.h"
 #include "sceneobjectskeletonnode.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include <string>
 
 /*

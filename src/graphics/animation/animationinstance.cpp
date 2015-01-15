@@ -8,7 +8,7 @@
 #include "graphics/animation/animation.h"
 #include "graphics/animation/skeleton.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include <string>
 
 /*

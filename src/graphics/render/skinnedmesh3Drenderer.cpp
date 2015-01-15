@@ -17,7 +17,7 @@
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/skinnedmesh3Dattrtransformer.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 SkinnedMesh3DRenderer::SkinnedMesh3DRenderer()
 {

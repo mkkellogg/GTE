@@ -19,7 +19,7 @@
 #include "graphics/texture/texture.h"
 #include "graphics/texture/textureGL.h"
 #include "graphics/color/color4.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include "global/global.h"
 #include "uniformdesc.h"
 #include "attributedesc.h"
@@ -28,19 +28,15 @@
 /*
  * Only constructor.
  *
- * [vertexShaderPath] - Full or relative path to the source code for the vertex shader.
- * [fragmentShaderPath] - Full or relative path to the source code for the fragment shader.
+ * [shaderSource] - Container for the shader's source code
  */
-ShaderGL::ShaderGL(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) : Shader(vertexShaderPath, fragmentShaderPath)
+ShaderGL::ShaderGL(const ShaderSource& shaderSource) : Shader(shaderSource)
 {
     ready = false;
 
     programID = 0;
     vertexShaderID = 0;
     fragmentShaderID = 0;
-
-    vertexShaderSource = new ShaderSource(vertexShaderPath.c_str());
-    fragmentShaderSource = new ShaderSource(fragmentShaderPath.c_str());
 
     attributeCount = 0;
     uniformCount = 0;
@@ -54,9 +50,6 @@ ShaderGL::ShaderGL(const std::string& vertexShaderPath, const std::string& fragm
  */
 ShaderGL::~ShaderGL() 
 {
-   SAFE_DELETE(vertexShaderSource);
-   SAFE_DELETE(fragmentShaderSource);
-
    DestroyComponents();
 }
 
@@ -147,11 +140,13 @@ void ShaderGL::DestroyUniformAndAttributeInfo()
 bool ShaderGL::Load()
 {
 	// attempt to load the shaders' source code
-    bool vertexSrcLoaded = vertexShaderSource->Load();
-    bool fragmentSrcLoaded = fragmentShaderSource->Load();
+    bool shaderSourceLoaded = shaderSource.IsLoaded();
 
-    ASSERT(vertexSrcLoaded, "Unable to load vertex shader source file.", false);
-    ASSERT(fragmentSrcLoaded, "Unable to load fragment shader source file.", false);
+    if(!shaderSourceLoaded)
+    {
+    	shaderSourceLoaded = shaderSource.Load();
+    }
+    ASSERT(shaderSourceLoaded == true, "ShaderGL::Load -> Unable to load shader source.", false);
 
     // Create the OpenGL objects that will hold each shader
     vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -166,8 +161,8 @@ bool ShaderGL::Load()
         return false;
     }
 
-    const char * vertexSourceString = (const char *)vertexShaderSource->GetSourceString();
-    const char * fragmentSourceString = (const char *)fragmentShaderSource->GetSourceString();
+    const char * vertexSourceString = shaderSource.GetVertexSourceString().c_str();
+    const char * fragmentSourceString = shaderSource.GetFragmentSourceString().c_str();
  
     // point OpenGL to the source for each shader
     glShaderSource(vertexShaderID, 1, &vertexSourceString,NULL);

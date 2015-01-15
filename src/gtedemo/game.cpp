@@ -35,6 +35,7 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2.h"
 #include "graphics/uv/uv2array.h"
+#include "graphics/shader/shadersource.h"
 #include "base/basevector4.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/quaternion.h"
@@ -43,7 +44,7 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
@@ -51,6 +52,7 @@
 #include "global/global.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
+#include "filesys/filesystem.h"
 
 
 Game::Game()
@@ -114,6 +116,11 @@ Mesh3DRef Game::FindFirstMesh(SceneObjectRef ref)
 
 void Game::Init()
 {
+	AssetImporter * importer = new AssetImporter();
+
+	FileSystem * fileSystem = FileSystem::Instance();
+	std::string shaderPath = fileSystem->GetPathFromIXPath("resources/shaders");
+
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	Mesh3DRendererRef renderer;
@@ -142,7 +149,9 @@ void Game::Init()
 	texAttributes.MipMapLevel = 4;
 	texture = objectManager->CreateTexture("resources/textures/cartoonTex03.png", texAttributes);
 
-	MaterialRef material = objectManager->CreateMaterial("BasicMaterial", "resources/shaders/basic.vertex.shader","resources/shaders/basic.fragment.shader");
+	ShaderSource basicShaderSource;
+	importer->LoadBuiltInShaderSource("basic", basicShaderSource);
+	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
 
     renderer = objectManager->CreateMesh3DRenderer();
@@ -175,8 +184,6 @@ void Game::Init()
 
 
 
-
-	AssetImporter * importer = new AssetImporter();
 	SceneObjectRef modelSceneObject;
 
 
@@ -331,7 +338,9 @@ void Game::Init()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 	mesh = GameUtil::CreateCubeMesh(meshAttributes);
 
-	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", "resources/shaders/builtin/selflit.vertex.shader","resources/shaders/builtin/selflit.fragment.shader");
+	ShaderSource selfLitShaderSource;
+	importer->LoadBuiltInShaderSource("selflit", selfLitShaderSource);
+	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
 
 
 	/*

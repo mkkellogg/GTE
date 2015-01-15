@@ -32,7 +32,7 @@ enum class ShaderMaterialCharacteristic
 	VertexNormals=8
 };
 
-class ShaderManager
+class ShaderOrganizer
 {
 	std::map<LongMask, ShaderRef> loadedShaders;
 
@@ -40,8 +40,8 @@ class ShaderManager
 
 	public:
 
-	ShaderManager();
-	~ShaderManager();
+	ShaderOrganizer();
+	~ShaderOrganizer();
 
 	void AddShader(LongMask properties, ShaderRef shader);
 	ShaderRef GetShader(LongMask flags);

@@ -5,6 +5,13 @@
 #include <GL/glut.h>
 #include <string>
 
+enum class DebugLevel
+{
+	Normal = 0,
+	Warning = 1,
+	Error = 2
+};
+
 class Debug
 {
     public :
@@ -16,6 +23,9 @@ class Debug
     static void PrintMessage(std::string& message);
     static void PrintWarning(std::string& message);
     static void PrintError(std::string& message);
+
+    static void PrintAtLevel(const std::string& message, DebugLevel level);
+    static void PrintAtLevel(const char* message, DebugLevel level);
 };
 
 #endif

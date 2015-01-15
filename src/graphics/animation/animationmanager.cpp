@@ -18,7 +18,7 @@
 #include "global/global.h"
 #include "global/constants.h"
 #include "util/time.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include <string>
 #include <unordered_map>
 

@@ -44,10 +44,6 @@ class ShaderGL : public Shader
 
     std::string name;
 
-    // pointers to the source code for each type of shader
-    ShaderSource * vertexShaderSource;
-    ShaderSource * fragmentShaderSource;
-
     // OpenGL identifier for the linked shader program
     GLuint programID;
 
@@ -82,7 +78,7 @@ class ShaderGL : public Shader
 
     protected:
 
-    ShaderGL(const std::string& vertexSourcePath, const std::string& fragmentSourcePath);
+    ShaderGL(const ShaderSource& shaderSource);
     virtual ~ShaderGL();
 
     public :

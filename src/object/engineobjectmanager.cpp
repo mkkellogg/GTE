@@ -25,11 +25,14 @@
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationinstance.h"
 #include "graphics/animation/animationplayer.h"
-#include "ui/debug.h"
+#include "asset/assetimporter.h"
+#include "debug/debug.h"
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
 #include "base/intmask.h"
 #include "util/util.h"
+#include "filesys/filesystem.h"
+#include "global/constants.h"
 #include <string>
 
 EngineObjectManager::EngineObjectManager()
@@ -54,34 +57,42 @@ unsigned long EngineObjectManager::GetNextObjectID()
 	return currentEngineObjectID++;
 }
 
+bool EngineObjectManager::Init()
+{
+	return true;
+}
+
 bool EngineObjectManager::InitBuiltinShaders()
 {
 	std::string vertexSource;
 	std::string fragmentSource;
+	ShaderSource shaderSource;
 	ShaderRef shader;
+	AssetImporter assetImporter;
+
+	FileSystem * fileSystem = FileSystem::Instance();
+	std::string builtinPath = fileSystem->GetPathFromIXPath(Constants::BuiltinShaderPath);
 
 	LongMask shaderProperties;
-	vertexSource = std::string(builtinPath) + std::string("diffuse.vertex.shader");
-	fragmentSource = std::string(builtinPath) + std::string("diffuse.fragment.shader");
-	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+
+	assetImporter.LoadBuiltInShaderSource("diffuse", shaderSource);
+	shader = CreateShader(shaderSource);
 	ASSERT(shader.IsValid(),"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseColored);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
 	loadedShaders.AddShader(shaderProperties,shader);
 
-	vertexSource = std::string(builtinPath) + std::string("diffuse_texture.vertex.shader");
-	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture.fragment.shader");
-	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	assetImporter.LoadBuiltInShaderSource("diffuse_texture", shaderSource);
+	shader = CreateShader(shaderSource);
 	ASSERT(shader.IsValid(),"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
 	loadedShaders.AddShader(shaderProperties,shader);
 
-	vertexSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.vertex.shader");
-	fragmentSource = std::string(builtinPath) + std::string("diffuse_texture_vcolor.fragment.shader");
-	shader = CreateShader(vertexSource.c_str(),fragmentSource.c_str());
+	assetImporter.LoadBuiltInShaderSource("diffuse_texture_vcolor", shaderSource);
+	shader = CreateShader(shaderSource);
 	ASSERT(shader.IsValid(),"EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors", false);
 	shaderProperties = LongMaskUtil::CreateLongMask();
 	LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
@@ -378,10 +389,10 @@ void EngineObjectManager::DeleteAnimationPlayer(AnimationPlayer * player)
 	delete player;
 }
 
-ShaderRef EngineObjectManager::CreateShader(const char * vertexSourcePath, const char * fragmentSourcePath)
+ShaderRef EngineObjectManager::CreateShader(const ShaderSource& shaderSource)
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-	Shader * shader = graphics->CreateShader(vertexSourcePath,fragmentSourcePath);
+	Shader * shader = graphics->CreateShader(shaderSource);
 	ASSERT(shader != NULL,"EngineObjectManager::CreateShader -> could not create new Shader object.", ShaderRef::Null());
 	shader->SetObjectID(GetNextObjectID());
 
@@ -460,9 +471,9 @@ MaterialRef EngineObjectManager::CreateMaterial(const char *name, ShaderRef shad
 	});
 }
 
-MaterialRef EngineObjectManager::CreateMaterial(const char *name, const char * shaderVertexSourcePath, const char * shaderFragmentSourcePath)
+MaterialRef EngineObjectManager::CreateMaterial(const char *name, const ShaderSource& shaderSource)
 {
-	ShaderRef shader= CreateShader(shaderVertexSourcePath, shaderFragmentSourcePath);
+	ShaderRef shader= CreateShader(shaderSource);
 	if(!shader.IsValid())return MaterialRef::Null();
 
 	Material * m = new Material(name);
@@ -480,6 +491,11 @@ MaterialRef EngineObjectManager::CreateMaterial(const char *name, const char * s
 	{
 		  DeleteMaterial(m);
 	});
+}
+
+MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, const ShaderSource& shaderSource)
+{
+	return CreateMaterial(name.c_str(), shaderSource);
 }
 
 void EngineObjectManager::DestroyMaterial(MaterialRef material)

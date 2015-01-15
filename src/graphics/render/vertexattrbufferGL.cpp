@@ -9,7 +9,7 @@
 
 #include "vertexattrbufferGL.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 int VertexAttrBufferGL::CalcFloatCount() const
 {

@@ -9,7 +9,7 @@
 #include "bone.h"
 #include "util/tree.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 /*
  * Only constructor.

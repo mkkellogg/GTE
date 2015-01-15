@@ -8,7 +8,7 @@
 #include "vector3.h"
 #include "vector3factory.h"
 #include "base/basevector4array.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 Vector3Array::Vector3Array() : BaseVector4Array(Vector3Factory::Instance())
 {

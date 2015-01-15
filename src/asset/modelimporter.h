@@ -13,7 +13,7 @@ class VertexBoneMap;
 namespace Assimp { class Importer; }
 
 #include "object/sceneobjectcomponent.h"
-#include "object/shadermanager.h"
+#include "object/shaderorganizer.h"
 #include "object/enginetypes.h"
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
@@ -26,7 +26,7 @@ namespace Assimp { class Importer; }
 
 class ModelImporter
 {
-	friend class EngineObjectManager;
+	friend class AssetImporter;
 
 	protected :
 
@@ -80,6 +80,9 @@ class ModelImporter
 	static const std::string AssimpPathDelimiter;
 	Assimp::Importer * importer;
 
+	ModelImporter();
+	~ModelImporter();
+
 	bool InitImporter();
 	const aiScene * LoadAIScene(const std::string& filePath);
 
@@ -107,9 +110,6 @@ class ModelImporter
 	static std::string GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property);
 
 	public:
-
-	ModelImporter();
-	~ModelImporter();
 
 	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale);
 	AnimationRef LoadAnimation(const std::string& filePath);

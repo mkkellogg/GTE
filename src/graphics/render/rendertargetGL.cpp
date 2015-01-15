@@ -4,7 +4,7 @@
 #include "rendertargetGL.h"
 #include "base/intmask.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 RenderTargetGL::RenderTargetGL(IntMask bufferTypes, unsigned int width, unsigned int height) : RenderTarget(bufferTypes, width, height)
 {

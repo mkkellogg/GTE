@@ -53,7 +53,7 @@ class GraphicsGL : public Graphics
 
     unsigned int openGLVersion;
 
-    Shader * CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
+    Shader * CreateShader(const ShaderSource& shaderSource);
     void DestroyShader(Shader * shader);
     SubMesh3DRenderer * CreateMeshRenderer(AttributeTransformer * attrTransformer);
     void DestroyMeshRenderer(SubMesh3DRenderer * buffer);

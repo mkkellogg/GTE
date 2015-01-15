@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string>
 
-#include "shadermanager.h"
+#include "shaderorganizer.h"
 #include "graphics/stduniforms.h"
 #include "assimp/scene.h"
 #include "assimp/cimport.h"
@@ -17,19 +17,19 @@
 #include "graphics/shader/shader.h"
 #include "base/longmask.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
-ShaderManager::ShaderManager()
+ShaderOrganizer::ShaderOrganizer()
 {
 
 }
 
-ShaderManager::~ShaderManager()
+ShaderOrganizer::~ShaderOrganizer()
 {
 
 }
 
-void ShaderManager::AddShader(LongMask properties, ShaderRef shader)
+void ShaderOrganizer::AddShader(LongMask properties, ShaderRef shader)
 {
 	ASSERT_RTRN(shader.IsValid(),"ShaderManager::AddShader -> shader is NULL.");
 
@@ -46,7 +46,7 @@ void ShaderManager::AddShader(LongMask properties, ShaderRef shader)
 // Ultimately we want it to return a shader that doesn't have any ADDITIONAL properties
 // beyond what is specified by [flags], but it's ok to have less. However, EXACT
 // matching is preferred for best results.
-ShaderRef ShaderManager::GetShader(LongMask flags)
+ShaderRef ShaderOrganizer::GetShader(LongMask flags)
 {
 	if(loadedShaders.find(flags) != loadedShaders.end())
 	{

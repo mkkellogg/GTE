@@ -24,10 +24,12 @@
 #include "graphics/object/submesh3D.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
+#include "filesys/filesystem.h"
+#include "asset/assetimporter.h"
 #include "util/datastack.h"
 #include "global/global.h"
 #include "global/constants.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 /*
  * Single constructor, which requires pointers the Graphics and EngineObjectManager
@@ -69,7 +71,11 @@ bool RenderManager::Init()
 	}
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", "resources/shaders/builtin/shadowvolume.vertex.shader","resources/shaders/builtin/shadowvolume.fragment.shader");
+
+	AssetImporter assetImporter;
+	ShaderSource shaderSource;
+	assetImporter.LoadBuiltInShaderSource("shadowvolume", shaderSource);
+	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);
 	ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.", false);
 
 	return true;

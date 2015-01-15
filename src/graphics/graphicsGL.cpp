@@ -12,7 +12,7 @@
 #include "graphics/screendesc.h"
 #include "graphics/animation/animationmanager.h"
 #include "render/material.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include "shader/shaderGL.h"
 #include "shader/shader.h"
 #include "texture/textureGL.h"
@@ -149,15 +149,14 @@ GraphicsGL::GraphicsGL() : Graphics()
 	stencilBufferBits = -1;
 }
 
-Shader * GraphicsGL::CreateShader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
+Shader * GraphicsGL::CreateShader(const ShaderSource& shaderSource)
 {
-    Shader * shader = new ShaderGL(vertexShaderPath, fragmentShaderPath);
+    Shader * shader = new ShaderGL(shaderSource);
     bool loadSuccess = shader->Load();
 	if(!loadSuccess)
 	{
 		std::string msg = "GraphicsGL::CreateShader -> could not load shader: ";
-		std::string singleQuote = std::string("'");
-		msg += singleQuote + vertexShaderPath + singleQuote + std::string(" or ") + singleQuote +fragmentShaderPath + singleQuote;
+		msg += std::string(shaderSource.GetName());
 		Debug::PrintError(msg);
 		return NULL;
     }

@@ -8,7 +8,7 @@
 #include "uv2.h"
 #include "uv2factory.h"
 #include "base/basevector2array.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 UV2Array::UV2Array() : BaseVector2Array(UV2Factory::GetInstance())
 {

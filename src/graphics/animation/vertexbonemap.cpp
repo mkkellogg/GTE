@@ -9,7 +9,7 @@
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/submesh3D.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 /*
  * Only constructor, parameterized.

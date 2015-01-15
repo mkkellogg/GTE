@@ -26,17 +26,17 @@ std::string FileSystemIX::ConcatenatePaths(const std::string& pathA, const std::
 	std::string pathATrimmed = Util::Trim(pathA);
 	std::string pathBTrimmed = Util::Trim(pathB);
 
-	if(pathBTrimmed.substr(0,1).compare("/") == 0)
+	while(pathBTrimmed.size() > 0 && pathBTrimmed.substr(0,1).compare("/") == 0)
 	{
-		return std::string("");
+		pathBTrimmed = pathBTrimmed.substr(1, pathBTrimmed.size()-1);
 	}
 
-	if(pathATrimmed.substr(pathATrimmed.size()-1,1).compare("/") == 0)
+	while(pathATrimmed.size() > 0 && pathATrimmed.substr(pathATrimmed.size()-1,1).compare("/") == 0)
 	{
-		pathATrimmed += "/";
+		pathATrimmed = pathATrimmed.substr(0,pathATrimmed.size()-1);
 	}
 
-	return pathATrimmed + pathBTrimmed;
+	return pathATrimmed + std::string("/") + pathBTrimmed;
 }
 
 std::string FileSystemIX::GetBasePath(const std::string& path) const

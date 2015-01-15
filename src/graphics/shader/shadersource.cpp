@@ -4,34 +4,117 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
  
 #include "shadersource.h"
 #include "global/global.h"
 
-ShaderSource::ShaderSource(const std::string& filePath)
+ShaderSource::ShaderSource()
 {
-    loaded = false;
-    sourcePath = filePath;
-    sourceString = NULL;
+	initialized = false;
+}
+
+ShaderSource::ShaderSource(const std::string& vertexSource, const std::string& fragmentSource, ShaderSourceType sourceType, const std::string& name)
+{
+	Init(vertexSource, fragmentSource, sourceType, name);
+}
+
+ShaderSource::ShaderSource(const ShaderSource& source)
+{
+	if(this == &source)return;
+	CopyToThis(source);
+}
+
+ShaderSource& ShaderSource::operator= (const ShaderSource& source)
+{
+	if(this == &source)return *this;
+	CopyToThis(source);
+	return *this;
 }
 
 ShaderSource::~ShaderSource()
 {
-	SAFE_DELETE(sourceString);
+
+}
+
+void ShaderSource::CopyToThis(const ShaderSource& source)
+{
+	if(this == &source)return;
+	this->loaded = source.loaded;
+	this->sourceType = source.sourceType;
+	this->vertexSourcePath = source.vertexSourcePath;
+	this->vertexSourceString = source.vertexSourceString;
+	this->fragmentSourcePath = source.fragmentSourcePath;
+	this->fragmentSourceString = source.fragmentSourceString;
+}
+
+void ShaderSource::Init(const std::string& vertexSource, const std::string& fragmentSource, ShaderSourceType sourceType, const std::string& name)
+{
+	this->name = name;
+	this->sourceType = sourceType;
+	if(sourceType == ShaderSourceType::File)
+	{
+		loaded = false;
+		vertexSourcePath= vertexSource;
+		fragmentSourcePath= fragmentSource;
+		vertexSourceString = std::string("");
+		fragmentSourceString = std::string("");
+	}
+	else if(sourceType == ShaderSourceType::String)
+	{
+		loaded = true;
+		vertexSourcePath= std::string("");
+		fragmentSourcePath= std::string("");
+		vertexSourceString = vertexSource;
+		fragmentSourceString = fragmentSource;
+	}
+
+	initialized = true;
 }
 
 bool ShaderSource::Load()
 {
-    sourceString = ReadShaderSource(sourcePath.c_str());
-    loaded = sourceString != NULL ? true : false;
+	if(sourceType != ShaderSourceType::File)return true;
+    char * vTemp = ReadShaderSource(vertexSourcePath.c_str());
+    char * fTemp = ReadShaderSource(fragmentSourcePath.c_str());
+    loaded = vTemp != NULL && fTemp != NULL ? true : false;
+    if(loaded)
+    {
+    	vertexSourceString = std::string(vTemp);
+    	fragmentSourceString = std::string(fTemp);
+    }
+    else
+    {
+    	if(vTemp == NULL)
+    	{
+    		std::string errMsg = std::string("Could not load vertex shader: ") + vertexSourcePath;
+    		Engine::Instance()->GetErrorManager()->SetAndReportError(ShaderSourceError::LoadError, errMsg);
+    		return false;
+    	}
+
+    	if(fTemp)
+		{
+			std::string errMsg = std::string("Could not load fragment shader: ") + fragmentSourcePath;
+			Engine::Instance()->GetErrorManager()->SetAndReportError(ShaderSourceError::LoadError, errMsg);
+			return false;
+		}
+    }
+
     return loaded;
 }
 
-char * ShaderSource::GetSourceString()
+const std::string& ShaderSource::GetVertexSourceString() const
 {
-    return sourceString;
+    return vertexSourceString;
+}
+
+const std::string& ShaderSource::GetFragmentSourceString() const
+{
+    return fragmentSourceString;
+}
+
+const std::string& ShaderSource::GetName() const
+{
+	return name;
 }
 
 char * ShaderSource::ReadShaderSource(const char *fn)

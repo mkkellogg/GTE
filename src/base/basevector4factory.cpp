@@ -7,7 +7,7 @@
 #include "basevector4factory.h"
 #include "basevector4.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 BaseVector4Factory::BaseVector4Factory()
 {

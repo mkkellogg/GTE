@@ -28,7 +28,7 @@
 #include "geometry/vector/vector3array.h"
 #include "gtemath/gtemath.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 #include "global/constants.h"
 
 SubMesh3D::SubMesh3D() : SubMesh3D (StandardAttributes::CreateAttributeSet())

@@ -37,3 +37,24 @@ void Debug::PrintError(std::string& message)
 	PrintError((const char *)message.c_str());
 }
 
+void Debug::PrintAtLevel(const std::string& message, DebugLevel level)
+{
+	PrintAtLevel(message.c_str(), level);
+}
+
+void Debug::PrintAtLevel(const char* message, DebugLevel level)
+{
+	switch(level)
+	{
+		case DebugLevel::Normal:
+			PrintMessage(message);
+		break;
+		case DebugLevel::Warning:
+			PrintWarning(message);
+		break;
+		case DebugLevel::Error:
+			PrintError(message);
+		break;
+	}
+}
+

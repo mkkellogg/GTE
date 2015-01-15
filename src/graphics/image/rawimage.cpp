@@ -6,7 +6,7 @@
 
 #include "rawimage.h"
 #include "global/global.h"
-#include "ui/debug.h"
+#include "debug/debug.h"
 
 
 RawImage::RawImage(unsigned int width, unsigned int height)
