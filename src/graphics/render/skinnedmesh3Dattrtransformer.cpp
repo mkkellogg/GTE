@@ -122,11 +122,11 @@ void SkinnedMesh3DAttributeTransformer::DestroyCache(CacheType target)
 	{
 
 	}
-	else if(target == CacheType::Normal)
+	else if(target == CacheType::VertexNormal)
 	{
 
 	}
-	else if(target == CacheType::StraightNormal)
+	else if(target == CacheType::FaceNormal)
 	{
 
 	}
@@ -165,17 +165,17 @@ bool SkinnedMesh3DAttributeTransformer::CreateCache(CacheType target)
 
 		return true;
 	}
-	else if(target == CacheType::Normal)
+	else if(target == CacheType::VertexNormal)
 	{
-		bool initSuccess = transformedNormals.Init(count);
-		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed normal array.", false);
+		bool initSuccess = transformedVertexNormals.Init(count);
+		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed vertex normal array.", false);
 
 		return true;
 	}
-	else if(target == CacheType::StraightNormal)
+	else if(target == CacheType::FaceNormal)
 	{
-		bool initSuccess = transformedStraightNormals.Init(count);
-		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed straight normal array.", false);
+		bool initSuccess = transformedFaceNormals.Init(count);
+		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed face normal array.", false);
 
 		return true;
 	}
@@ -214,11 +214,17 @@ void SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags(unsigned char 
 	memset(cacheFlags, value, sizeof(unsigned char) * count);
 }
 
+/*
+ * Destroy the identical normal flags array.
+ */
 void SkinnedMesh3DAttributeTransformer:: DestroyIdenticalNormalsFlags()
 {
 	SAFE_DELETE(identicalNormalFlags);
 }
 
+/*
+ * Create the identical normal flags array.
+ */
 bool SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags()
 {
 	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags -> renderer is NULL.", false);
@@ -235,6 +241,9 @@ bool SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags()
 	return true;
 }
 
+/*
+ * Clear the identical normal flags array.
+ */
 void SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags()
 {
 	ASSERT_RTRN(renderer != NULL, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags -> renderer is NULL.");
@@ -259,11 +268,11 @@ void SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags()
  * if the normals for all instances of a unique vertex are the same, and therefore can
  * have the transformation calculation performed once and the result applied to each instance.
  *
- *   -or-
+ *   - or -
  *
  * if there are non-equivalent normals among the instances of a unique vertex (e.g. in the case
  * where angles between faces are too sharp for smoothed normals and therefore the transformation
- * for each instance must be calculated individually.
+ * for each instance must be calculated individually).
  */
 bool SkinnedMesh3DAttributeTransformer::FindIdenticalNormals(Vector3Array& fullNormalList)
 {
@@ -313,6 +322,17 @@ bool SkinnedMesh3DAttributeTransformer::FindIdenticalNormals(Vector3Array& fullN
 	return true;
 }
 
+/*
+ * Create all the caches needed by the TransformXXX() methods. This means create and initialize a cache for:
+ *
+ *   1. Transformed bones
+ *   2. Transformed vertex positions
+ *   3. Transformed vertex normals
+ *   4. Transformed face normals
+ *   5. Per-vertex Transforms
+ *
+ *  This method also initializes the [cacheFlags] array, which is used to flag which entries in all the other caches are valid.
+ */
 bool SkinnedMesh3DAttributeTransformer::CreateCaches()
 {
 	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> renderer is NULL.", false);
@@ -330,13 +350,13 @@ bool SkinnedMesh3DAttributeTransformer::CreateCaches()
 	bool createSuccess = CreateCache(CacheType::Position);
 	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create position transform flags array.", false);
 
-	DestroyCache(CacheType::Normal);
-	createSuccess = CreateCache(CacheType::Normal);
-	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create normal transform flags array.", false);
+	DestroyCache(CacheType::VertexNormal);
+	createSuccess = CreateCache(CacheType::VertexNormal);
+	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create vertex normal transform flags array.", false);
 
-	DestroyCache(CacheType::StraightNormal);
-	createSuccess = CreateCache(CacheType::StraightNormal);
-	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create straight normal transform flags array.", false);
+	DestroyCache(CacheType::FaceNormal);
+	createSuccess = CreateCache(CacheType::FaceNormal);
+	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create face normal transform flags array.", false);
 
 	DestroyCache(CacheType::Transform);
 	createSuccess = CreateCache(CacheType::Transform);
@@ -345,12 +365,15 @@ bool SkinnedMesh3DAttributeTransformer::CreateCaches()
 	return true;
 }
 
+/*
+ * Deallocate & destroy all of the transformation caches.
+ */
 void SkinnedMesh3DAttributeTransformer::DestroyCaches()
 {
 	SAFE_DELETE(cacheFlags);
 	DestroyCache(CacheType::Position);
-	DestroyCache(CacheType::Normal);
-	DestroyCache(CacheType::StraightNormal);
+	DestroyCache(CacheType::VertexNormal);
+	DestroyCache(CacheType::FaceNormal);
 	DestroyCache(CacheType::Transform);
 }
 
@@ -374,14 +397,13 @@ void SkinnedMesh3DAttributeTransformer::SetVertexBoneMapIndex(int index)
  * Perform transformation (skinning) for both vertex positions and normals in a single function.
  *
  * [positionsIn] is a copy of the existing mesh positions, [positionsOut] is the array in which the transformed positions are placed.
- * [normalsIn] is a copy of the existing mesh normals, [normalsOut] is the array in which the transformed normals are placed.
- * [straightNormalsIn] is a copy of the existing mesh straight normals, [straightNormalsOut] is the array in which the transformed
- *                     straight normals are placed.
+ * [vertexNormalsIn] is a copy of the existing mesh vertex normals, [vertexNormalsOut] is the array in which the transformed vertex normals are placed.
+ * [faceNormalsIn] is a copy of the existing mesh face normals, [faceNormalsOut] is the array in which the transformed face normals are placed.
  * [centerIn] is a copy of the existing center of the mesh, [centerOut] is where the transformed center is placed.
  */
 void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut,
-																	 const Vector3Array& normalsIn, Vector3Array& normalsOut,
-																	 const Vector3Array& straightNormalsIn, Vector3Array& straightNormalsOut,
+																	 const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
+																	 const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
 																	 const Point3& centerIn, Point3& centerOut)
 {
 	// make sure the target skeleton is valid and has a VertexBoneMap object for this instance
@@ -390,12 +412,12 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		// copy existing positions to output array and the perform transformations
 		// directly on output array
 		positionsIn.CopyTo(&positionsOut);
-		// copy existing normals to output array and the perform transformations
+		// copy existing vertex normals to output array and the perform transformations
 		// directly on output array
-		normalsIn.CopyTo(&normalsOut);
-		// copy existing straight normals to output array and the perform transformations
+		vertexNormalsIn.CopyTo(&vertexNormalsOut);
+		// copy existing face normals to output array and the perform transformations
 		// directly on output array
-		straightNormalsIn.CopyTo(&straightNormalsOut);
+		faceNormalsIn.CopyTo(&faceNormalsOut);
 		// copy existing center to output center and perform transformation
 		// directly on output center
 		centerOut.Set(centerIn.x,centerIn.y,centerIn.z);
@@ -419,8 +441,8 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		unsigned int fullVertexCount = vertexBoneMap->GetVertexCount();
 
 		ASSERT_RTRN(positionsOut.GetCount() == fullVertexCount &&
-				    normalsOut.GetCount() == fullVertexCount &&
-				    straightNormalsOut.GetCount() == fullVertexCount,
+				    vertexNormalsOut.GetCount() == fullVertexCount &&
+				    faceNormalsOut.GetCount() == fullVertexCount,
 				    "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Mismatched vertex counts.")
 
 		// initialize the position transformation flags array, saved transformed position array,
@@ -435,7 +457,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 			createSuccess = CreateIdenticalNormalsFlags();
 			ASSERT_RTRN(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Unable to create identical normal caches.");
 
-			FindIdenticalNormals(normalsOut);
+			FindIdenticalNormals(vertexNormalsOut);
 
 			currentCacheSize = uniqueVertexCount;
 		}
@@ -453,23 +475,23 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		ClearCacheFlags();
 
 		float* transformedPositionsPtrBase =  const_cast<float*>(transformedPositions.GetDataPtr());
-		float* transformedNormalsPtrBase = const_cast<float*>(transformedNormals.GetDataPtr());
-		float* transformedStraightNormalsPtrBase = const_cast<float*>(transformedStraightNormals.GetDataPtr());
+		float* transformedVertexNormalsPtrBase = const_cast<float*>(transformedVertexNormals.GetDataPtr());
+		float* transformedFaceNormalsPtrBase = const_cast<float*>(transformedFaceNormals.GetDataPtr());
 		float* transformedPositionsPtr = NULL;
-		float* transformedNormalsPtr = NULL;
-		float* transformedStraightNormalsPtr = NULL;
+		float* transformedVertexNormalsPtr = NULL;
+		float* transformedFaceNormalsPtr = NULL;
 
 		float * positionsOutBase = const_cast<float*>(positionsOut.GetDataPtr());
-		float * normalsOutBase = const_cast<float*>(normalsOut.GetDataPtr());
-		float * straightNormalsOutBase = const_cast<float*>(straightNormalsOut.GetDataPtr());
+		float * vertexNormalsOutBase = const_cast<float*>(vertexNormalsOut.GetDataPtr());
+		float * faceNormalsOutBase = const_cast<float*>(faceNormalsOut.GetDataPtr());
 
 		unsigned int fullPositionCount = vertexBoneMap->GetVertexCount();
 		// loop through each vertex
 		for(unsigned int i = 0; i < fullPositionCount; i++)
 		{
 			float * currentPositionPtr = positionsOutBase + (i*4);//positionsIteratorCurrent.GetDataPtr();
-			float * currentNormalPtr =  normalsOutBase + (i*4); //normalsIteratorCurrent.GetDataPtr();
-			float * currentStraightNormalPtr =  straightNormalsOutBase + (i*4); //straightNormalsIteratorCurrent.GetDataPtr();
+			float * currentVertexNormalPtr =  vertexNormalsOutBase + (i*4); //vertexNormalsIteratorCurrent.GetDataPtr();
+			float * currentFaceNormalPtr =  faceNormalsOutBase + (i*4); //faceNormalsIteratorCurrent.GetDataPtr();
 
 			// get the mapping information for the current vertex
 			VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
@@ -485,16 +507,15 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 				BaseVector4_QuickCopy(transformedPositionsPtr, currentPositionPtr)
 				//savedTransforms[desc->UniqueVertexIndex].Transform(currentPositionPtr);
 
-				transformedNormalsPtr = transformedNormalsPtrBase+(desc->UniqueVertexIndex*4);
+				transformedVertexNormalsPtr = transformedVertexNormalsPtrBase+(desc->UniqueVertexIndex*4);
 				if(identicalNormalFlags[desc->UniqueVertexIndex])
 				{
-					BaseVector4_QuickCopy(transformedNormalsPtr, currentNormalPtr);
+					BaseVector4_QuickCopy(transformedVertexNormalsPtr, currentVertexNormalPtr);
 				}
-				else savedTransforms[desc->UniqueVertexIndex].Transform(currentNormalPtr);
+				else savedTransforms[desc->UniqueVertexIndex].Transform(currentVertexNormalPtr);
 
-				transformedStraightNormalsPtr = transformedStraightNormalsPtrBase+(desc->UniqueVertexIndex*4);
-				//BaseVector4_QuickCopy(transformedStraightNormalsPtr, currentStraightNormalPtr);
-				if(i%3==0)savedTransforms[desc->UniqueVertexIndex].Transform(currentStraightNormalPtr);
+				transformedFaceNormalsPtr = transformedFaceNormalsPtrBase+(desc->UniqueVertexIndex*4);
+				if(i%3==0)savedTransforms[desc->UniqueVertexIndex].Transform(currentFaceNormalPtr);
 			}
 			else
 			{
@@ -544,17 +565,17 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 				}
 
 				full.Transform(currentPositionPtr);
-				full.Transform(currentNormalPtr);
-				full.Transform(currentStraightNormalPtr);
+				full.Transform(currentVertexNormalPtr);
+				full.Transform(currentFaceNormalPtr);
 
 				// update saved positions & normals
 				transformedPositionsPtr = transformedPositionsPtrBase+(desc->UniqueVertexIndex*4);
-				transformedNormalsPtr = transformedNormalsPtrBase+(desc->UniqueVertexIndex*4);
-				transformedStraightNormalsPtr = transformedStraightNormalsPtrBase+(desc->UniqueVertexIndex*4);
+				transformedVertexNormalsPtr = transformedVertexNormalsPtrBase+(desc->UniqueVertexIndex*4);
+				transformedFaceNormalsPtr = transformedFaceNormalsPtrBase+(desc->UniqueVertexIndex*4);
 
-				BaseVector4_QuickCopy(currentNormalPtr, transformedNormalsPtr);
+				BaseVector4_QuickCopy(currentVertexNormalPtr, transformedVertexNormalsPtr);
 				BaseVector4_QuickCopy(currentPositionPtr, transformedPositionsPtr);
-				BaseVector4_QuickCopy(currentStraightNormalPtr, transformedStraightNormalsPtr);
+				BaseVector4_QuickCopy(currentFaceNormalPtr, transformedFaceNormalsPtr);
 
 				savedTransforms[desc->UniqueVertexIndex] = full;
 
@@ -666,9 +687,9 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 	}
 }
 
-void SkinnedMesh3DAttributeTransformer::TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut,
-														 const Vector3Array& straightNormalsIn, Vector3Array& straightNormalsOut)
+void SkinnedMesh3DAttributeTransformer::TransformNormals(const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
+														 const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut)
 {
-	normalsIn.CopyTo(&normalsOut);
-	straightNormalsIn.CopyTo(&straightNormalsOut);
+	vertexNormalsIn.CopyTo(&vertexNormalsOut);
+	faceNormalsIn.CopyTo(&faceNormalsOut);
 }

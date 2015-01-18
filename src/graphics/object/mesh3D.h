@@ -17,6 +17,9 @@ class SceneObjectComponent;
 
 class Mesh3D : public SceneObjectComponent
 {
+	// Since this ultimately derives from EngineObject, we make this class
+	// a friend of EngineObjectManager, and the constructor & destructor
+	// protected so its life-cycle can be handled completely by EngineObjectManager.
 	friend class EngineObjectManager;
 	friend class SubMesh3D;
 

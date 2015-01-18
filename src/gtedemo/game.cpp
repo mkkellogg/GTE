@@ -279,7 +279,7 @@ void Game::Init()
 	}*/
 
 
-	firstMesh = playerMeshRenderer->GetMesh();
+	firstMesh = playerMeshRenderer->GetTargetMesh();
 	firstMesh->SetCastShadows(true);
 	firstMesh->SetReceiveShadows(true);
 	//playerObject->GetLocalTransform().RotateAround(0,0,0,1,0,0,45);

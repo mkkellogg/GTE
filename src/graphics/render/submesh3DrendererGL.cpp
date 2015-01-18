@@ -29,12 +29,12 @@
 #include "debug/debug.h"
 
 
-SubMesh3DRendererGL::SubMesh3DRendererGL(Graphics * graphics, AttributeTransformer * attributeTransformer) : SubMesh3DRendererGL(false, graphics, attributeTransformer)
+SubMesh3DRendererGL::SubMesh3DRendererGL(AttributeTransformer * attributeTransformer) : SubMesh3DRendererGL(false, attributeTransformer)
 {
 
 }
 
-SubMesh3DRendererGL::SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer) : SubMesh3DRenderer(buffersOnGPU, graphics, attributeTransformer)
+SubMesh3DRendererGL::SubMesh3DRendererGL(bool buffersOnGPU, AttributeTransformer * attributeTransformer) : SubMesh3DRenderer(buffersOnGPU, attributeTransformer)
 {
 
 }
@@ -46,13 +46,12 @@ SubMesh3DRendererGL::~SubMesh3DRendererGL()
 
 void SubMesh3DRendererGL::Render()
 {
-	MaterialRef currentMaterial = graphics->GetActiveMaterial();
-	UseMaterial(currentMaterial, false);
-
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
 
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
+
+	MaterialRef currentMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
@@ -65,20 +64,20 @@ void SubMesh3DRendererGL::Render()
 		}
 	}
 
-	if(!currentMaterial->VerifySetVars(mesh->GetTotalVertexCount()))return;
+	if(!ValidateMaterial(currentMaterial))return;
+
 	unsigned int totalCount = mesh->GetTotalVertexCount();
 	glDrawArrays(GL_TRIANGLES, 0, totalCount);
 }
 
 void SubMesh3DRendererGL::RenderShadowVolume()
 {
-	MaterialRef currentMaterial = graphics->GetActiveMaterial();
-	UseMaterial(currentMaterial, true);
-
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> containerRenderer is NULL.");
 
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
+
+	MaterialRef currentMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 
 	if(shadowVolumePositions.GetCount() > 0)
 	{

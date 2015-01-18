@@ -31,8 +31,8 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	enum class CacheType
 	{
 		Position = 0,
-		Normal = 1,
-		StraightNormal = 2,
+		VertexNormal = 1,
+		FaceNormal = 2,
 		Transform = 3
 	};
 
@@ -61,11 +61,11 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	// saved values of vertices that have been transformed
 	Point3Array transformedPositions;
 
-	// saved values of normals that have been transformed
-	Vector3Array transformedNormals;
+	// saved values of vertex normals that have been transformed
+	Vector3Array transformedVertexNormals;
 
-	// saved values of straight normals that have been transformed
-	Vector3Array transformedStraightNormals;
+	// saved values of face normals that have been transformed
+	Vector3Array transformedFaceNormals;
 
 	// flag for each (unique) vertex that indicates whether the normals for all instances of that
 	// vertex are equal
@@ -99,12 +99,12 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
     void SetVertexBoneMapIndex(int index);
 
     void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut,
-    		 	 	 	 	 	 	  const Vector3Array& normalsIn, Vector3Array& normalsOut,
-    		 	 	 	 	 	 	  const Vector3Array& straightNormalsIn, Vector3Array& straightNormalsOut,
+    		 	 	 	 	 	 	  const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
+    		 	 	 	 	 	 	  const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
     		 	 	 	 	 	 	  const Point3& centerIn, Point3& centerOut);
     void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut, const Point3& centerIn, Point3& centerOut);
-    void TransformNormals(const Vector3Array& normalsIn, Vector3Array& normalsOut,
-    					  const Vector3Array& straightNormalsIn, Vector3Array& straightNormalsOut);
+    void TransformNormals(const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
+    					  const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut);
 };
 
 #endif

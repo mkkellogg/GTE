@@ -197,13 +197,13 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		Vector3 normal;
 		CalculateFaceNormal(v, normal);
 
-		normals.GetVector(v)->Set(normal.x,normal.y,normal.z);
-		normals.GetVector(v+1)->Set(normal.x,normal.y,normal.z);
-		normals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
+		vertexNormals.GetVector(v)->Set(normal.x,normal.y,normal.z);
+		vertexNormals.GetVector(v+1)->Set(normal.x,normal.y,normal.z);
+		vertexNormals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
 
-		straightNormals.GetVector(v)->Set(normal.x,normal.y,normal.z);
-		straightNormals.GetVector(v+1)->Set(normal.x,normal.y,normal.z);
-		straightNormals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
+		faceNormals.GetVector(v)->Set(normal.x,normal.y,normal.z);
+		faceNormals.GetVector(v+1)->Set(normal.x,normal.y,normal.z);
+		faceNormals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
 	}
 
 	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
@@ -233,7 +233,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		}
 
 		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[targetPoint];
-		Vector3 * normal = normals.GetVector(v);
+		Vector3 * normal = vertexNormals.GetVector(v);
 
 		// add the normal at index [v] to the normal group linked to [targetPoint]
 		list->push_back(normal);
@@ -246,7 +246,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	{
 		// get existing normal for this vertex
 		Vector3 oNormal;
-		oNormal = *(normals.GetVector(v));
+		oNormal = *(vertexNormals.GetVector(v));
 		oNormal.Normalize();
 
 		// get vertex position
@@ -312,7 +312,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	{
 		Vector3 avg = averageNormals[v];
 		// set the normal for this vertex to the averaged normal
-		normals.GetVector(v)->Set(avg.x,avg.y,avg.z);
+		vertexNormals.GetVector(v)->Set(avg.x,avg.y,avg.z);
 	}
 }
 
@@ -390,8 +390,8 @@ bool SubMesh3D::Init(unsigned int totalVertexCount)
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Normal))
 	{
-		initSuccess = normals.Init(totalVertexCount) && initSuccess;
-		initSuccess = straightNormals.Init(totalVertexCount) && initSuccess;
+		initSuccess = vertexNormals.Init(totalVertexCount) && initSuccess;
+		initSuccess = faceNormals.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
 	}
 
@@ -453,14 +453,14 @@ Point3Array * SubMesh3D::GetPostions()
 	return &positions;
 }
 
-Vector3Array * SubMesh3D::GetNormals()
+Vector3Array * SubMesh3D::GetVertexNormals()
 {
-	return &normals;
+	return &vertexNormals;
 }
 
-Vector3Array * SubMesh3D::GetStraightNormals()
+Vector3Array * SubMesh3D::GetFaceNormals()
 {
-	return &straightNormals;
+	return &faceNormals;
 }
 
 Color4Array * SubMesh3D::GetColors()

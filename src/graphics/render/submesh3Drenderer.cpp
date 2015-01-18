@@ -29,21 +29,28 @@
 #include "global/global.h"
 #include "debug/debug.h"
 
-SubMesh3DRenderer::SubMesh3DRenderer(Graphics * graphics, AttributeTransformer * attributeTransformer) : SubMesh3DRenderer(false, graphics, attributeTransformer)
+/*
+ * Constructor with pointer to an attribute transformer, buffersOnGPU = false by default
+ */
+SubMesh3DRenderer::SubMesh3DRenderer(AttributeTransformer * attributeTransformer) : SubMesh3DRenderer(false, attributeTransformer)
 {
 
 }
 
-SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer)
+/*
+ * Constructor with pointer to an attribute transformer, and parameter to choose CPU-side or GPU-side vertex attribute buffers
+ */
+SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, AttributeTransformer * attributeTransformer)
 {
-	this->graphics = graphics;
 	this->containerRenderer = NULL;
-	this->subIndex = -1;
+	this->targetSubMeshIndex = -1;
 
 	memset(attributeBuffers,0,sizeof(VertexAttrBuffer*) * MAX_ATTRIBUTE_BUFFERS);
 
-	attributeBuffers[(int)StandardAttribute::Position]= NULL;
-	attributeBuffers[(int)StandardAttribute::VertexColor]= NULL;
+	for(unsigned int i =0; i < (unsigned int)StandardAttribute::_Last; i++)
+	{
+		attributeBuffers[i] = NULL;
+	}
 
 	storedVertexCount = 0;
 	storedAttributes = StandardAttributes::CreateAttributeSet();
@@ -57,28 +64,44 @@ SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, Graphics * graphics, Att
 	useBadGeometryShadowFix = false;
 }
 
+/*
+ * Clean-up
+ */
 SubMesh3DRenderer::~SubMesh3DRenderer()
 {
 	Destroy();
 }
 
-void SubMesh3DRenderer::SetSubIndex(unsigned int index)
+/*
+ * Specify the index of this sub-renderer's target sub-mesh in the target
+ * mesh.
+ */
+void SubMesh3DRenderer::SetTargetSubMeshIndex(unsigned int index)
 {
-	subIndex = index;
+	targetSubMeshIndex = index;
 }
 
+/*
+ * Set the pointer to the containing Mesh3DRender.
+ */
 void SubMesh3DRenderer::SetContainerRenderer(Mesh3DRenderer * renderer)
 {
 	ASSERT_RTRN(renderer != NULL, "SubMesh3DRenderer::SetContainerRenderer -> renderer is NULL");
 	this->containerRenderer = renderer;
 }
 
+/*
+ * Deallocate and destroy all data & objects created by this sub-renderer.
+ */
 void SubMesh3DRenderer::Destroy()
 {
 	DestroyBuffers();
 	SAFE_DELETE(attributeTransformer);
 }
 
+/*
+ * Destroy all vertex attribute buffers that have been allocated.
+ */
 void SubMesh3DRenderer::DestroyBuffers()
 {
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Position]);
@@ -89,83 +112,127 @@ void SubMesh3DRenderer::DestroyBuffers()
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::ShadowPosition]);
 }
 
+/*
+ * Destroy a single vertex attribute buffer and set its pointer to NULL.
+ */
 void SubMesh3DRenderer::DestroyBuffer(VertexAttrBuffer ** buffer)
 {
 	if((*buffer) != NULL)
 	{
-		graphics->DestroyVertexAttributeBuffer(*buffer);
+		Engine::Instance()->GetGraphicsEngine()->DestroyVertexAttributeBuffer(*buffer);
 	}
 	*buffer = NULL;
 }
 
-void SubMesh3DRenderer::SetVertexData(VertexAttrBuffer * buffer, const float * data, int componentCount, int totalCount, int stride)
-{
-
-
-}
-
+/*
+ * Create and initialize an instance of VertexAttrBuffer.
+ */
 bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount, int stride)
 {
 	ASSERT(buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false);
 
+	// if the buffer has already been created, destroy it first.
 	DestroyBuffer(buffer);
 
-	*buffer = graphics->CreateVertexAttributeBuffer();
+	// create the vertex attribute buffer
+	*buffer = Engine::Instance()->GetGraphicsEngine()->CreateVertexAttributeBuffer();
 	ASSERT(*buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Graphics::CreateVertexAttrBuffer() returned NULL.", false);
-
+	// initialize the vertex attribute buffer
 	(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, NULL);
 
 	return true;
 }
 
+/*
+ * Create & initialize the vertex attribute buffer in [attributeBuffers] that corresponds to [attr].
+ */
 bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int length, int componentCount,  int stride)
 {
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
-	if(mesh.IsValid())
-	{
-		DestroyBuffer(&attributeBuffers[(int)attr]);
-		bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], length, componentCount, stride);
-		if(!initSuccess)return false;
-	}
-	return true;
+	// if the buffer already exists, destroy it first
+	DestroyBuffer(&attributeBuffers[(int)attr]);
+	// create and initialize buffer
+	bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], length, componentCount, stride);
+
+	return initSuccess;
 }
 
-
+/*
+ * Specify whether or not to use the fix for shadow volume artifacts that arise when mesh geometry is bad.
+ */
 void SubMesh3DRenderer::SetUseBadGeometryShadowFix(bool useFix)
 {
 	useBadGeometryShadowFix = useFix;
 }
 
+/*
+ * Build a shadow volume for this mesh. For point lights, the position of the light is in
+ * [lightPosDir], for directional lights the direction is also in [lightPosDir]. The boolean
+ * flag [directional] indicates if the light is directional or not.
+ *
+ * The algorithm utilized in this method was inspired by the method used in the GPU gems article:
+ *
+ * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch11.html
+ *
+ * However, in order to reduce Z-fighting artifacts with mesh polygons that face the light, this
+ * method uses a modified approach: Light-facing polygons are ignored completely. The front cap of the shadow volume
+ * is actually made up of the back-facing polygons (polygons facing away from the light). This still
+ * produces the correct effect with out the front-facing Z-fighting issues.
+ *
+ * The algorithm in this method also uses a couple techniques to get around the typical requirement that
+ * the mesh for which the shadow volume is being generated be closed. By this, we mean the mesh has triangles
+ * that don't have adjacent triangles on every edge. When a triangle with an edge that doesn't have an
+ * adjacent face is encountered, the algorithm treats the problematic edge as if it were an edge separating
+ * front and back facing triangles, and generates side polygons for that edge.
+ *
+ * The above work-around doesn't fix all meshes and there is one more option for bad-meshes that still
+ * show artifacts. If the [useBadGeometryShadowFix] member variable is set, this algorithm generates a shadow volume
+ * for each back-facing triangle individually. This results in much more complex shadow volume geometry that incurs
+ * a significant performance penalty, but it will fix artifacts from really bad meshes.
+ */
 void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional)
 {
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> mesh is invalid.");
 
-	float backFaceThreshold = 0;
-
+	// if this sub-renderer is utilizing an attribute transformer, we want to use the positions that result
+	// from that transformation to build the shadow volume. otherwise we want to use the original positions
+	// from the target sub-mesh.
 	Point3Array * positions = mesh->GetPostions();
 	ASSERT_RTRN(positions, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL positions array.");
 	Point3Array& positionsSource = doPositionTransform == true ? transformedPositions : *positions;
 	float * positionsSrcPtr = const_cast<float*>(positionsSource.GetDataPtr());
 
-	Vector3Array * normals = mesh->GetStraightNormals();
-	ASSERT_RTRN(normals, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL straight normals array.");
-	Vector3Array& normalsSource = doNormalTransform == true ? transformedStraightNormals : *normals;
+	// if this sub-renderer is utilizing an attribute transformer, we want to use the normals that result
+	// from that transformation to build the shadow volume.
+	Vector3Array * normals = mesh->GetFaceNormals();
+	ASSERT_RTRN(normals, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL face normals array.");
+	Vector3Array& normalsSource = doNormalTransform == true ? transformedFaceNormals : *normals;
 
+	// dot product result threshold distinguishing front and back facing polygons
+	// the dot product is calculated between a trinagle's normal, and the direction
+	// vector to the light
+	float backFaceThreshold = 0;
+
+	// currentPositionVertexIndex = current number of process shadow volume vertices
 	unsigned int currentPositionVertexIndex = 0;
+	// use a raw pointer to the shadow volume position data because it's faster
 	float * svPositionBase =  const_cast<float*>(shadowVolumePositions.GetDataPtr());
 
+	// structure that describes that relationship of the mesh faces, specifically which faces are adjacent
 	SubMesh3DFaces& faces = mesh->GetFaces();
 	unsigned int faceCount = faces.GetFaceCount();
 
-	float* vertex1 = NULL;
-	float* vertex2 = NULL;
-	float* vertex3 = NULL;
+	// temp working variables
+	float* faceVertex1 = NULL;
+	float* faceVertex2 = NULL;
+	float* faceVertex3 = NULL;
 	Vector3 faceToLightDir = lightPosDir;
 	unsigned int faceVertexIndex = 0;
 	Vector3 * faceNormal;
 	SubMesh3DFace * face = NULL;
+	Point3 vertexAvg;
 
+	// temp working variables related to adjacency processing
 	float * edgeVertex1 = NULL;
 	float * edgeVertex2 = NULL;
 	float* adjVertex1 = NULL;
@@ -177,29 +244,34 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	Vector3 * adjacentFaceNormal = NULL;
 	SubMesh3DFace * adjacentFace = NULL;
 
-	Point3 vertexAvg;
-
+	// treat as directional light for now
 	faceToLightDir.Normalize();
 	faceToLightDir.Invert();
 	adjFaceToLightDir = faceToLightDir;
 
+	// loop through each face in [faces]
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
 		face = faces.GetFace(f);
 		if(face == NULL)continue;
 
+		// face->FirstVertexIndex is the index of the face's first vertex in [positions] & [normals]
 		faceVertexIndex = face->FirstVertexIndex;
 
+		// get the face's normal
 		faceNormal = normalsSource.GetVector(faceVertexIndex);
 
-		vertex1 = positionsSrcPtr+(faceVertexIndex << 2);
-		vertex2 = positionsSrcPtr+(faceVertexIndex << 2)+4;
-		vertex3 = positionsSrcPtr+(faceVertexIndex << 2)+8;
+		// copy the three vertices of the face to [vertex1], [vertex2], and [vertex3]
+		faceVertex1 = positionsSrcPtr+(faceVertexIndex << 2);
+		faceVertex2 = positionsSrcPtr+(faceVertexIndex << 2)+4;
+		faceVertex3 = positionsSrcPtr+(faceVertexIndex << 2)+8;
 
-		vertexAvg.x = (vertex1[0] + vertex2[0] + vertex3[0]) / 3;
-		vertexAvg.y = (vertex1[1] + vertex2[1] + vertex3[1]) / 3;
-		vertexAvg.z = (vertex1[2] + vertex2[2] + vertex3[2]) / 3;
+		// compute average of three vertices
+		vertexAvg.x = (faceVertex1[0] + faceVertex2[0] + faceVertex3[0]) / 3;
+		vertexAvg.y = (faceVertex1[1] + faceVertex2[1] + faceVertex3[1]) / 3;
+		vertexAvg.z = (faceVertex1[2] + faceVertex2[2] + faceVertex3[2]) / 3;
 
+		// if we have a point light, use the average of the vertices to calculate the direction to it
 		if(!directional)
 		{
 			faceToLightDir.x = lightPosDir.x - vertexAvg.x;
@@ -208,65 +280,83 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			faceToLightDir.Normalize();
 		}
 
+		// calculate dot product between face normal and direction to light
 		float faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
 
 		bool currentFaceIsFront = false;
+
+		// faceToLightDot >= backFaceThreshold means we have a front (light) facing triangle, so we ignore it
 		if(faceToLightDot >= backFaceThreshold)
 		{
 			currentFaceIsFront = true;
 			continue;
 		}
-		else
+		else // we have a back facing triangle (facing away from the light)
 		{
-			BaseVector4_QuickCopy_IncDest(vertex3, svPositionBase);
-			BaseVector4_QuickCopy_IncDest(vertex2, svPositionBase);
-			BaseVector4_QuickCopy_IncDest(vertex1, svPositionBase);
+			// copy the three face vertices into the shadow volume position array [svPositionBase]
+			BaseVector4_QuickCopy_IncDest(faceVertex3, svPositionBase);
+			BaseVector4_QuickCopy_IncDest(faceVertex2, svPositionBase);
+			BaseVector4_QuickCopy_IncDest(faceVertex1, svPositionBase);
 
-			BaseVector4_QuickCopy_ZeroW_IncDest(vertex1, svPositionBase);
-			BaseVector4_QuickCopy_ZeroW_IncDest(vertex2, svPositionBase);
-			BaseVector4_QuickCopy_ZeroW_IncDest(vertex3, svPositionBase);
+			// copy the three face vertices into the shadow volume position array again, but zero out
+			// the 4th component of the position vector. this allows the shadow volume shader to project
+			// the points to infinity to create the back cap of the shadow volume
+			BaseVector4_QuickCopy_ZeroW_IncDest(faceVertex1, svPositionBase);
+			BaseVector4_QuickCopy_ZeroW_IncDest(faceVertex2, svPositionBase);
+			BaseVector4_QuickCopy_ZeroW_IncDest(faceVertex3, svPositionBase);
 
 			currentPositionVertexIndex += 6;
 			currentFaceIsFront = false;
 		}
 
 		int facesFound = 0;
+		// loop through each edge of the face and examine the adjacent face
 		for(unsigned int ai = 0; ai < 3; ai++)
 		{
 			adjacentFaceIndex = face->AdjacentFaceIndex1;
-			edgeVertex1 = vertex1;
-			edgeVertex2 = vertex2;
+			edgeVertex1 = faceVertex1;
+			edgeVertex2 = faceVertex2;
 
 			if(ai == 1)
 			{
 				adjacentFaceIndex = face->AdjacentFaceIndex2;
-				edgeVertex1 = vertex2;
-				edgeVertex2 = vertex3;
+				edgeVertex1 = faceVertex2;
+				edgeVertex2 = faceVertex3;
 			}
 			else if(ai == 2)
 			{
 				adjacentFaceIndex = face->AdjacentFaceIndex3;
-				edgeVertex1 = vertex3;
-				edgeVertex2 = vertex1;
+				edgeVertex1 = faceVertex3;
+				edgeVertex2 = faceVertex1;
 			}
 
 			float adjFaceToLightDot = 0;
+
+			// adjacentFaceIndex >=0 means we found an adjacent face
 			if(adjacentFaceIndex >= 0)
 			{
+				// adjacentFaceIndex will be the index in [faces] of the adjacent face
 				facesFound++;
 				adjacentFace = faces.GetFace(adjacentFaceIndex);
 				if(adjacentFace != NULL)
 				{
+					// adjacentFaceVertexIndex is the index of the adjacent face's first vertex in [positions] & [normals]
 					adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
+
+					// get the adjacent face's normal
 					adjacentFaceNormal = normalsSource.GetVector(adjacentFaceVertexIndex);
+
+					// copy the three vertices of the adjacent face to [adjVertex1], [adjVertex2], and [adjVertex3]
 					adjVertex1 = positionsSrcPtr+(adjacentFaceVertexIndex*4);
 					adjVertex2 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+4;
 					adjVertex3 = positionsSrcPtr+(adjacentFaceVertexIndex*4)+8;
 
+					// compute average of three vertices
 					vertexAvg.x = (adjVertex1[0] + adjVertex2[0] + adjVertex3[0]) / 3;
 					vertexAvg.y = (adjVertex1[1] + adjVertex2[1] + adjVertex3[1]) / 3;
 					vertexAvg.z = (adjVertex1[2] + adjVertex2[2] + adjVertex3[2]) / 3;
 
+					// if we have a point light, use the average of the vertices to calculate the direction to it
 					if(!directional)
 					{
 						adjFaceToLightDir.x = lightPosDir.x - vertexAvg.x;
@@ -275,11 +365,18 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 						adjFaceToLightDir.Normalize();
 					}
 
+					// calculate dot product between adjacent face normal and direction to light
 					adjFaceToLightDot = Vector3::Dot(adjFaceToLightDir, *adjacentFaceNormal);
 				}
 			}
 			else adjFaceToLightDot = 1;
 
+			// if the current face is back facing, and either:
+			//    1. The adjacent face on the current edge is front facing (adjFaceToLightDot >= backFaceThreshold)
+			//    2. There is no adjacent face (adjacentFaceIndex < 0)
+			//    3. [useBadGeometryShadowFix] == true
+			// we create two side polygons to link the current face, which will be a front cap triangle,
+			// to the back cap triangle, which is the current face projected to infinity, on the current edge
 			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{
 				BaseVector4_QuickCopy_IncDest(edgeVertex1, svPositionBase);
@@ -297,60 +394,71 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	shadowVolumePositions.SetCount(currentPositionVertexIndex);
 }
 
+/*
+ * Set the vertex attribute buffer data for the shadow volume positions.
+ */
 void SubMesh3DRenderer::SetShadowVolumePositionData(Point3Array * points)
 {
-	VertexAttrBuffer * buf = attributeBuffers[(int)StandardAttribute::ShadowPosition];
-	const float * ptr = points->GetDataPtr();
-	buf->SetData(ptr);
+	attributeBuffers[(int)StandardAttribute::ShadowPosition]->SetData(points->GetDataPtr());
 }
 
+/*
+ * Set the vertex attribute buffer data for the mesh vertex positions.
+ */
 void SubMesh3DRenderer::SetPositionData(Point3Array * points)
 {
-	VertexAttrBuffer * buf = attributeBuffers[(int)StandardAttribute::Position];
-	const float * ptr = points->GetDataPtr();
-	buf->SetData(ptr);
+	attributeBuffers[(int)StandardAttribute::Position]->SetData(points->GetDataPtr());
 }
 
+/*
+ * Set the vertex attribute buffer data for the mesh vertex normals.
+ */
 void SubMesh3DRenderer::SetNormalData(Vector3Array * normals)
 {
 	attributeBuffers[(int)StandardAttribute::Normal]->SetData(normals->GetDataPtr());
 }
 
+/*
+ * Set the vertex attribute buffer data for the mesh vertex colors.
+ */
 void SubMesh3DRenderer::SetVertexColorData(Color4Array * colors)
 {
 	attributeBuffers[(int)StandardAttribute::VertexColor]->SetData(colors->GetDataPtr());
 }
 
+/*
+ * Set the vertex attribute buffer data for the mesh UV coordinates set 1.
+ */
 void SubMesh3DRenderer::SetUV1Data(UV2Array * uvs)
 {
 	attributeBuffers[(int)StandardAttribute::UVTexture0]->SetData(uvs->GetDataPtr());
 }
 
+/*
+ * Set the vertex attribute buffer data for the mesh UV coordinates set 2.
+ */
 void SubMesh3DRenderer::SetUV2Data(UV2Array * uvs)
 {
 	attributeBuffers[(int)StandardAttribute::UVTexture1]->SetData(uvs->GetDataPtr());
 }
 
+/*
+ * Update the vertex attribute buffers of this sub-renderer to reflect type & size of the attribute
+ * data in the target sub-mesh.
+ */
 bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 {
+	// if vertex attribute buffers are already created, destroy them
 	DestroyBuffers();
 	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::UpdateMeshAttributeBuffers -> containerRenderer is NULL.",false);
 
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not find matching sub mesh for sub renderer.",false);
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
 
-	if(err != 0)
-	{
-		std::string msg("SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error initializing attribute buffer(s):  ");
-		msg += std::to_string(err);
-		Debug::PrintError(msg);
-		DestroyBuffers();
-		return false;
-	}
-
+	// loop through each standard attribute and create/initialize vertex attribute buffer for each
 	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
 		StandardAttribute attr = (StandardAttribute)i;
@@ -368,14 +476,13 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 		}
 	}
 
+	// update the local vertex count
 	storedVertexCount = mesh->GetTotalVertexCount();
-
-	Mesh3DRef parentMesh = containerRenderer->GetMesh();
 
 	// TODO: current shadow volume data memory is allocated for all mesh renderers, regardless if they cast a
 	// shadow or not. This could be quite wasteful, so implement a way to avoid this excess memory usage.
 	bool shadowVolumeInitSuccess = true;
-	shadowVolumeInitSuccess = shadowVolumeInitSuccess && shadowVolumePositions.Init(storedVertexCount * 8);
+	shadowVolumeInitSuccess = shadowVolumePositions.Init(storedVertexCount * 8);
 	shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 6, 4,0);
 	if(!shadowVolumeInitSuccess)
 	{
@@ -387,9 +494,14 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 	return true;
 }
 
+/*
+ * If the attribute transformer for this sub-renderer is active, then it needs to allocate the
+ * correct amount of space to store the transformed copies of those attributes. This method
+ * accomplishes that.
+ */
 bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 {
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UpdateAttributeTransformerData -> Could not find matching sub mesh for sub renderer.",false);
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
@@ -424,11 +536,11 @@ bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Normal) &&
 		StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
 		{
-			Vector3Array * normals = mesh->GetNormals();
+			Vector3Array * normals = mesh->GetVertexNormals();
 			unsigned int normalCount = normals->GetCount();
-			if(transformedNormals.GetCount() != normalCount)
+			if(transformedVertexNormals.GetCount() != normalCount)
 			{
-				if(!transformedNormals.Init(normalCount) || !transformedStraightNormals.Init(normalCount))
+				if(!transformedVertexNormals.Init(normalCount) || !transformedFaceNormals.Init(normalCount))
 				{
 					doAttributeTransform = false;
 					doPositionTransform = false;
@@ -445,85 +557,105 @@ bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 	return true;
 }
 
+/*
+ * Copy the attribute data from the target sub-mesh into the local vertex attribute buffers.
+ */
 void SubMesh3DRenderer::CopyMeshData()
 {
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRenderer::CopyMeshData -> containerRenderer is NULL.");
 
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRenderer::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
-	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetNormals());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetVertexNormals());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetVertexColorData(mesh->GetColors());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVsTexture0());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVsTexture1());
 }
 
+/*
+ * Update this sub-renderer to be consistent with the current state of its target sub-mesh. Whenever the target sub-mesh
+ * is updated (e.g. vertex positions are modified, or UV coordinates are added), the vertex attribute buffers in this
+ * sub-renderer need to be updated to contain the same data. This method makes sure the size of the of the vertex attribute
+ * buffers match the size of the corresponding attribute arrays in the target sub-mesh, and copies over the data afterwards.
+ *
+ * Mesh3D has an Update() that can be called manually whenever the attributes of any sub-meshes are modified. That method
+ * will in turn trigger the Update() method of each sub-mesh, which will in-turn call UpdateFromMesh() on the corresponding
+ * sub-renderer.
+ */
 void SubMesh3DRenderer::UpdateFromMesh()
 {
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRenderer::UpdateFromMesh -> containerRenderer is NULL.");
 
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRenderer::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
 	bool updateSuccess = true;
+
+	// if the vertex count of this sub-renderer does not match that of the target sub-mesh, call
+	// the UpdateMeshAttributeBuffers() method to resize
 	if(mesh->GetTotalVertexCount() != storedVertexCount || mesh->GetAttributeSet() != storedAttributes)
 	{
 		updateSuccess = updateSuccess && UpdateMeshAttributeBuffers();
 	}
 
+	// update this sub-renderer's attribute transformer so that its storage space for transformed vertex attributes
+	// is large enough for the target sub-mesh
 	updateSuccess = updateSuccess && UpdateAttributeTransformerData();
 
-	if(!updateSuccess)
-	{
-		Debug::PrintError("SubMesh3DRenderer::UpdateFromMesh -> Error occurred while updating mesh structure and data.");
-		return;
-	}
+	ASSERT_RTRN(updateSuccess == true, "SubMesh3DRenderer::UpdateFromMesh -> Error occurred while updating mesh structure and data.");
 
+	// copy over the data from the target sub-mesh
 	CopyMeshData();
 }
 
-bool SubMesh3DRenderer::UseMaterial(MaterialRef material, bool forShadowVolume)
+/*
+ * Validate [material] to be used with this sub-renderer and its target sub-mesh. This means making sure that the attributes
+ * expected by the shader belonging to [material] match the attributes that are supplied by the target sub-mesh. It also
+ * means calling VerifySetVars() to ensure all uniforms & attributes expected by the shader have been set correctly.
+ */
+bool SubMesh3DRenderer::ValidateMaterial(MaterialRef material)
 {
-	if(material == activeMaterial)return true;
+	// don't bother validating this material if it has already been validated
+	if(material == lastUsedMaterial)return true;
 
-	ASSERT(material.IsValid(), "SubMesh3DRenderer::UseMaterial -> material is NULL", false);
-	this->activeMaterial = material;
+	lastUsedMaterial = material;
 
 	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::UseMaterial -> containerRenderer is NULL.", false);
 
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.", false);
 
-	if(forShadowVolume)
-	{
+	StandardAttributeSet materialAttributes = material->GetStandardAttributes();
+	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
-	}
-	else
+	// look for mismatched shader variables and mesh attributes
+	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
-		StandardAttributeSet materialAttributes = material->GetStandardAttributes();
-		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttribute attr = (StandardAttribute)i;
 
-		for(int i=0; i<(int)StandardAttribute::_Last; i++)
+		if(StandardAttributes::HasAttribute(materialAttributes, attr))
 		{
-			StandardAttribute attr = (StandardAttribute)i;
-
-			if(StandardAttributes::HasAttribute(materialAttributes, attr))
+			if(!StandardAttributes::HasAttribute(meshAttributes, attr))
 			{
-				if(!StandardAttributes::HasAttribute(meshAttributes, attr))
-				{
-					std::string msg = std::string("Shader was expecting attribute ") + StandardAttributes::GetAttributeName(attr) + std::string(" but mesh does not have it.");
-					Debug::PrintWarning(msg);
-				}
+				std::string msg = std::string("Shader was expecting attribute ") + StandardAttributes::GetAttributeName(attr) + std::string(" but mesh does not have it.");
+				Debug::PrintWarning(msg);
 			}
 		}
 	}
 
+	// validate the shader variables (attributes and uniforms) that have been set
+	if(!material->VerifySetVars(mesh->GetTotalVertexCount()))return false;
+
 	return true;
 }
 
+/*
+ * Set the attribute transformer to be used by this sub-renderer.
+ */
 void SubMesh3DRenderer::SetAttributeTransformer(AttributeTransformer * attributeTransformer)
 {
 	this->attributeTransformer = attributeTransformer;
@@ -539,40 +671,59 @@ void SubMesh3DRenderer::SetAttributeTransformer(AttributeTransformer * attribute
 	}
 }
 
+/*
+ * Get the attribute transformer that is used
+ */
 AttributeTransformer * SubMesh3DRenderer::GetAttributeTransformer()
 {
 	return attributeTransformer;
 }
 
+/*
+ * Return the [doAttributeTransform] flag.
+ */
 bool SubMesh3DRenderer::DoesAttributeTransform()
 {
 	return doAttributeTransform;
 }
 
+/*
+ * Perform all processing & transformations that need to occur before the target sub-mesh is
+ * actually rendered. This includes invoking the attribute transformer, if one exists.
+ *
+ * [model] - The model matrix for the target sub-mesh. This matrix contains the local->world-space transformation.
+ * [modelInverse] - The inverse of [model].
+ */
 void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& modelInverse)
 {
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRenderer::PreRender -> containerRenderer is NULL.");
 
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRenderer::PreRender -> Could not find matching sub mesh for sub renderer.");
 
 	if(doAttributeTransform)
 	{
+		// pass the local->world-space transformation matrix and its inverse to the attribute transformer
 		attributeTransformer->SetModelMatrix(model, modelInverse);
 
 		if(doPositionTransform && doNormalTransform)
 		{
 			Point3Array * positions = mesh->GetPostions();
-			Vector3Array * normals = mesh->GetNormals();
-			Vector3Array * straightNormals = mesh->GetStraightNormals();
+			Vector3Array * vertexNormals = mesh->GetVertexNormals();
+			Vector3Array * faceNormals = mesh->GetFaceNormals();
 
-			ASSERT_RTRN(positions != NULL && normals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL positions or normals.");
-			ASSERT_RTRN(normals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL normals.");
-			ASSERT_RTRN(straightNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL straight normals.");
+			ASSERT_RTRN(positions != NULL && vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL positions or normals.");
+			ASSERT_RTRN(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL vertex normals.");
+			ASSERT_RTRN(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL face normals.");
 
-			attributeTransformer->TransformPositionsAndNormals(*positions, transformedPositions, *normals, transformedNormals, *straightNormals, transformedStraightNormals, mesh->GetCenter(), transformedCenter);
+			// invoke the attribute transformer
+			attributeTransformer->TransformPositionsAndNormals(*positions, transformedPositions, *vertexNormals, transformedVertexNormals, *faceNormals, transformedFaceNormals, mesh->GetCenter(), transformedCenter);
+
+			// update the positions vertex attribute buffer with transformed positions
 			SetPositionData(&transformedPositions);
-			SetNormalData(&transformedNormals);
+
+			// update the normals vertex attribute buffer with transformed normals
+			SetNormalData(&transformedVertexNormals);
 		}
 		else
 		{
@@ -581,28 +732,39 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 				Point3Array * positions = mesh->GetPostions();
 				ASSERT_RTRN(positions != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL positions.");
 
+				// invoke the attribute transformer
 				attributeTransformer->TransformPositions(*positions, transformedPositions,  mesh->GetCenter(), transformedCenter);
+
+				// update the positions vertex attribute buffer with transformed positions
 				SetPositionData(&transformedPositions);
 			}
 
 			if(doNormalTransform)
 			{
-				Vector3Array * normals = mesh->GetNormals();
-				Vector3Array * straightNormals = mesh->GetStraightNormals();
+				Vector3Array * vertexNormals = mesh->GetVertexNormals();
+				Vector3Array * faceNormals = mesh->GetFaceNormals();
 
-				ASSERT_RTRN(normals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL normals.");
-				ASSERT_RTRN(straightNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL straight normals.");
+				ASSERT_RTRN(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL vertex normals.");
+				ASSERT_RTRN(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL face normals.");
 
-				attributeTransformer->TransformNormals(*normals, transformedNormals, *straightNormals, transformedStraightNormals);
-				SetNormalData(&transformedNormals);
+				// invoke the attribute transformer
+				attributeTransformer->TransformNormals(*vertexNormals, transformedVertexNormals, *faceNormals, transformedFaceNormals);
+
+				// update the normals vertex attribute buffer with transformed normals
+				SetNormalData(&transformedVertexNormals);
 			}
 		}
 	}
 }
 
+/*
+ * Get the position of the center of the target sub-mesh after attribute transformation. If the
+ * attribute transformer is not being used, then this value will be the same as the target
+ * sub-mesh's existing center.
+ */
 const Point3* SubMesh3DRenderer::GetFinalCenter()
 {
-	SubMesh3DRef mesh = containerRenderer->GetSubMesh(subIndex);
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::Render -> Could not find matching sub mesh for sub renderer.", NULL);
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();

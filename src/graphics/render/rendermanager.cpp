@@ -35,14 +35,12 @@
  * Single constructor, which requires pointers the Graphics and EngineObjectManager
  * singleton instances.
  */
-RenderManager::RenderManager() : viewTransformStack(Constants::MaxObjectRecursionDepth, 1),
-								 modelTransformStack(Constants::MaxObjectRecursionDepth, 1)
+RenderManager::RenderManager() : sceneProcessingStack(Constants::MaxObjectRecursionDepth, 1)
 {
 	lightCount = 0;
 	ambientLightCount = 0;
 	cameraCount = 0;
 	sceneMeshCount = 0;
-	cycleCount = 0;
 }
 
 /*
@@ -58,15 +56,9 @@ RenderManager::~RenderManager()
  */
 bool RenderManager::Init()
 {
-	if(!viewTransformStack.Init())
+	if(!sceneProcessingStack.Init())
 	{
 		Debug::PrintError("RenderManager::Init -> unable to initialize view transform stack.");
-		return false;
-	}
-
-	if(!modelTransformStack.Init())
-	{
-		Debug::PrintError("RenderManager::Init -> unable to initialize model transform stack.");
 		return false;
 	}
 
@@ -154,8 +146,6 @@ void RenderManager::ProcessScene()
 
 	// gather information about the cameras, lights, and renderable meshes in the scene
 	ProcessScene(sceneRoot.GetRef(), cameraModelView);
-
-	cycleCount++;
 }
 
 /*
@@ -183,13 +173,11 @@ void RenderManager::ProcessScene()
  */
 void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransform)
 {
-	Transform viewInverse;
-	Transform identity;
 	Transform model;
 	Transform modelInverse;
 
 	// enforce max recursion depth
-	if(RenderDepth(viewTransformStack) >= Constants::MaxObjectRecursionDepth - 1)return;
+	if(RenderDepth(sceneProcessingStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
 	for(unsigned int i = 0; i < parent.GetChildrenCount(); i++)
 	{
@@ -203,10 +191,8 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 
 		if(child->IsActive())
 		{
-			//if(cycleCount <= 0)printf("node: %s\n", child->GetName());
-
 			// save the existing view transform
-			PushTransformData(aggregateTransform, viewTransformStack);
+			PushTransformData(aggregateTransform, sceneProcessingStack);
 
 			// concatenate the current view transform with that of the current scene object
 			Transform& localTransform = child->GetTransform();
@@ -215,15 +201,8 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 			CameraRef camera = child->GetCamera();
 			if(camera.IsValid() && cameraCount < MAX_CAMERAS)
 			{
-				// we invert the viewTransform because at the shader level, the viewTransform is
-				// really moving the world relative to the camera, rather than moving the camera
-				// in the world
-				viewInverse.SetTo(aggregateTransform);
-				viewInverse.Invert();
-
 				// add a scene camera from which to render the scene
-				sceneCameras[cameraCount].AffectorTransform.SetTo(viewInverse);
-				sceneCameras[cameraCount].AffectorCamera = camera.GetPtr();
+				sceneCameras[cameraCount] = child;
 
 				cameraCount++;
 			}
@@ -235,8 +214,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 				{
 					if(ambientLightCount < MAX_LIGHTS)
 					{
-						sceneAmbientLights[ambientLightCount].AffectorTransform.SetTo(aggregateTransform);
-						sceneAmbientLights[ambientLightCount].AffectorLight = light.GetPtr();
+						sceneAmbientLights[ambientLightCount] = child;
 						ambientLightCount++;
 					}
 				}
@@ -245,8 +223,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 					if(lightCount < MAX_LIGHTS)
 					{
 						// add a scene light
-						sceneLights[lightCount].AffectorTransform.SetTo(aggregateTransform);
-						sceneLights[lightCount].AffectorLight = light.GetPtr();
+						sceneLights[lightCount] = child;
 						lightCount++;
 					}
 				}
@@ -304,7 +281,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 			ProcessScene(child.GetRef(), aggregateTransform);
 
 			// restore previous view transform
-			PopTransformData(aggregateTransform, viewTransformStack);
+			PopTransformData(aggregateTransform, sceneProcessingStack);
 		}
 	}
 }
@@ -317,18 +294,29 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 {
 	ASSERT_RTRN(cameraIndex < cameraCount,"RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds");
 
-	Camera * cameraPtr = sceneCameras[cameraIndex].AffectorCamera;
-	ASSERT_RTRN(cameraPtr != NULL,"RenderManager::RenderSceneFromCamera -> camera in NULL");
-	Camera& camera = *cameraPtr;
+	SceneObjectRef objectRef= sceneCameras[cameraIndex];
+	ASSERT_RTRN(objectRef.IsValid(),"RenderManager::RenderSceneFromCamera -> Camera's scene object is not valid.");
 
-	// clear the appropriate render buffers this camera
+	CameraRef cameraRef = objectRef->GetCamera();
+	ASSERT_RTRN(cameraRef.IsValid(),"RenderManager::RenderSceneFromCamera -> Camera is not valid.");
+	Camera& camera = cameraRef.GetRef();
+
+	// clear the appropriate render buffers for this camera
 	ClearBuffersForCamera(camera);
 	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
 	// render the scene using the view transform of the current camera
-	Transform& cameraTransform = sceneCameras[cameraIndex].AffectorTransform;
-	ForwardRenderScene(cameraTransform, camera);
+	const Transform& cameraTransform = objectRef->GetAggregateTransform();
+
+	// we invert the camera's transform because at the shader level, the view transform is
+	// really moving the world relative to the camera, rather than moving the camera
+	// in the world
+	Transform viewInverse;
+	viewInverse.SetTo(cameraTransform);
+	viewInverse.Invert();
+
+	ForwardRenderScene(viewInverse, camera);
 }
 
 /*
@@ -353,30 +341,28 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 	// loop through each ambient light and render the scene for that light
 	for(unsigned int l = 0; l < ambientLightCount; l++)
 	{
-		Light * light = sceneAmbientLights[l].AffectorLight;
-		if(light == NULL)
-		{
-			Debug::PrintWarning("RenderManager::ForwardRenderScene -> ambient light is NULL");
-			continue;
-		}
+		SceneObjectRef lightObject = sceneAmbientLights[l];
+		ASSERT_RTRN(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light's scene object is not valid.");
 
-		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera, l > 0);
+		LightRef lightRef = lightObject->GetLight();
+		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.");
+
+		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewTransformInverse, camera, l > 0);
 		renderedAmbient = true;
 	}
 
 	// loop through each regular light and render scene for that light
 	for(unsigned int l = 0; l < lightCount; l++)
 	{
-		Light * light = sceneLights[l].AffectorLight;
-		if(light == NULL)
-		{
-			Debug::PrintWarning("RenderManager::ForwardRenderScene -> light is NULL");
-			continue;
-		}
+		SceneObjectRef lightObject = sceneLights[l];
+		ASSERT_RTRN(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Light's scene object is not valid.");
+
+		LightRef lightRef = lightObject->GetLight();
+		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Light is not valid.");
 
 		// if [renderedAmbient] is true, the RenderSceneForLight() method will have the depth buffer already
 		// set up for shadow rendering
-		RenderSceneForLight(*light, sceneLights[l].AffectorTransform, viewTransformInverse, camera, renderedAmbient);
+		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewTransformInverse, camera, renderedAmbient);
 	}
 }
 
@@ -448,7 +434,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 				continue;
 			}
 
-			Mesh3DRef mesh = renderer->GetMesh();
+			Mesh3DRef mesh = renderer->GetTargetMesh();
 
 			if(!mesh.IsValid())
 			{
@@ -502,7 +488,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 
 	if(renderer != NULL)
 	{
-		Mesh3DRef mesh = renderer->GetMesh();
+		Mesh3DRef mesh = renderer->GetTargetMesh();
 
 		ASSERT_RTRN(mesh.IsValid(),"RenderManager::RenderSceneObjectMeshes -> renderer returned NULL mesh.");
 		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderSceneObjectMeshes -> Sub mesh count does not match sub renderer count!.");
@@ -596,7 +582,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 
 	if(renderer != NULL)
 	{
-		Mesh3DRef mesh = renderer->GetMesh();
+		Mesh3DRef mesh = renderer->GetTargetMesh();
 
 		if(mesh->GetSubMeshCount() != renderer->GetSubRendererCount())
 		{

@@ -10,6 +10,9 @@ class SceneObject;
 
 class SceneObjectComponent : public EngineObject
 {
+	// Since this derives from EngineObject, we make this class
+	// a friend of EngineObjectManager, and the constructor & destructor
+	// protected so its life-cycle can be handled completely by EngineObjectManager.
 	friend class EngineObjectManager;
 	friend class SceneObject;
 

@@ -23,6 +23,9 @@ class SubMesh3DRenderer;
 
 class SubMesh3D : public EngineObject
 {
+	// Since this derives from EngineObject, we make this class
+	// a friend of EngineObjectManager, and the constructor & destructor
+	// protected so its life-cycle can be handled completely by EngineObjectManager.
 	friend class EngineObjectManager;
 	friend class Mesh3D;
 
@@ -33,8 +36,8 @@ class SubMesh3D : public EngineObject
 	SubMesh3DFaces faces;
 
     Point3Array positions;
-    Vector3Array normals;
-    Vector3Array straightNormals;
+    Vector3Array vertexNormals;
+    Vector3Array faceNormals;
     Color4Array colors;
     UV2Array uvsTexture0;
     UV2Array uvsTexture1;
@@ -80,8 +83,8 @@ class SubMesh3D : public EngineObject
     StandardAttributeSet GetAttributeSet() const ;
 
     Point3Array * GetPostions();
-    Vector3Array * GetNormals();
-    Vector3Array * GetStraightNormals();
+    Vector3Array * GetVertexNormals();
+    Vector3Array * GetFaceNormals();
     Color4Array * GetColors();
     UV2Array * GetUVsTexture0();
     UV2Array * GetUVsTexture1();

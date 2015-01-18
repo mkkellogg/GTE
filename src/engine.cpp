@@ -16,8 +16,12 @@
 #include "util/time.h"
 #include "debug/debug.h"
 
+// set singleton instance to NULL by default
 Engine * Engine::theInstance = NULL;
 
+/*
+ * Default constructor
+ */
 Engine::Engine()
 {
 	engineObjectManager = NULL;
@@ -26,8 +30,13 @@ Engine::Engine()
 	inputManager = NULL;
 	errorManager = NULL;
 	callbacks = NULL;
+
+	initialized = false;
 }
 
+/*
+ * Clean-up
+ */
 Engine::~Engine()
 {
 	SAFE_DELETE(errorManager);
@@ -42,6 +51,9 @@ EngineCallbacks::~EngineCallbacks()
 
 }
 
+/*
+ * Singleton accessor
+ */
 Engine * Engine::Instance()
 {
 	//TODO: make thread-safe & add double checked locking
@@ -53,7 +65,18 @@ Engine * Engine::Instance()
     return theInstance;
 }
 
-bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes)
+/*
+ * Initialization method. This method is private, but is accessible via a call to the public
+ * initialization method Init(). This method is responsible for creating and initializing each
+ * of the core components of the engine.
+ *
+ * [callbacks] - An instance of EngineCallbacks that implements methods to be called for the
+ * 				 various life-cycle events of the engine.
+ *
+ * [graphicsAttributes] - Describes the settings that will be used to initialize the graphics
+ * 						  engine component
+ */
+bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAttributes)
 {
 	// The error manager must be initialized before any other engine component so that errors
 	// during initialization of those components can be reported
@@ -71,7 +94,7 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 	graphicsEngine = new GraphicsGL();
 	ASSERT(graphicsEngine != NULL, "Engine::Init -> Unable to allocate graphics enigne.", false);
 
-	bool graphicsInitSuccess = graphicsEngine->Init(graphicsAtrributes);
+	bool graphicsInitSuccess = graphicsEngine->Init(graphicsAttributes);
 	ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.", false);
 
 	// This portion of the initialization of the engine object manager must be called
@@ -92,11 +115,17 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 
 	this->callbacks = callbacks;
 
+	initialized = true;
+
 	if(callbacks!=NULL)callbacks->OnInit();
 
 	return true;
 }
 
+/*
+ * Public initialization method. This method first makes sure the singleton instance has
+ * been created successfully, then calls the private initialization function _Init();
+ */
 bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes)
 {
 	Engine * engine = Engine::Instance();
@@ -105,6 +134,9 @@ bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphic
 	return engine->_Init(callbacks, graphicsAtrributes);
 }
 
+/*
+ * This method is the core update method of the engine and drives all engine events.
+ */
 void Engine::Update()
 {
 	graphicsEngine->PreProcessScene();
@@ -115,25 +147,43 @@ void Engine::Update()
 	Time::Update();
 }
 
+/*
+ * This method is called when the engine's update loop stops.
+ */
 void Engine::Quit()
 {
 	if(callbacks!=NULL)callbacks->OnQuit();
 }
 
+/*
+ * Public method to start the engine update loop. It first checks to make sure the
+ * singleton instance has been created and properly initialized, and then calls the
+ * private method _Start().
+ */
 void Engine::Start()
 {
 	Engine * engine = Engine::Instance();
 	ASSERT_RTRN(engine != NULL, "Engine::Start retrieve Engine instance.");
+
+	ASSERT_RTRN(engine->IsInitialized(), "Engine::Start -> Engine instance is not initialized.");
+
 	engine->_Start();
 
 }
 
+/*
+ * Private method to kick of the engine update loop.
+ */
 void Engine::_Start()
 {
 	if(graphicsEngine != NULL)graphicsEngine->Run();
 	Quit();
 }
 
+/*
+ * This is a method that is called externally to shutdown the engine
+ * and deallocate any resources.
+ */
 void Engine::ShutDown()
 {
 	Engine * engine = Engine::Instance();
@@ -143,26 +193,49 @@ void Engine::ShutDown()
 	theInstance = NULL;
 }
 
+/*
+ * Has the Init() method been called successfully?
+ */
+bool Engine::IsInitialized()
+{
+	return initialized;
+}
+
+/*
+ * Access the EngineObjectManager component.
+ */
 EngineObjectManager * Engine::GetEngineObjectManager()
 {
 	return engineObjectManager;
 }
 
+/*
+ * Access the GraphicsEngine component.
+ */
 Graphics * Engine::GetGraphicsEngine()
 {
 	return graphicsEngine;
 }
 
+/*
+ * Access the AnimationManager component.
+ */
 AnimationManager * Engine::GetAnimationManager()
 {
 	return animationManager;
 }
 
+/*
+ * Access the InputManager component.
+ */
 InputManager * Engine::GetInputManager()
 {
 	return inputManager;
 }
 
+/*
+ * Access the ErrorManager component.
+ */
 ErrorManager * Engine::GetErrorManager()
 {
 	return errorManager;

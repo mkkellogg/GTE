@@ -8,6 +8,8 @@ typedef unsigned int ObjectID;
 
 class EngineObject
 {
+	// all instances of EngineObject and classes that derive from
+	// EngineObject should have their life-cycle managed by EngineObjectManager
 	friend class EngineObjectManager;
 
 	ObjectID objectID;

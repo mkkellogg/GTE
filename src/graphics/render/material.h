@@ -38,6 +38,9 @@ class Vector3;
 
 class Material : public EngineObject
 {
+	// Since this derives from EngineObject, we make this class
+	// a friend of EngineObjectManager, and the constructor & destructor
+	// protected so its life-cycle can be handled completely by EngineObjectManager.
 	friend class EngineObjectManager;
 
 	// length of the array that contains binding information for stand attributes & uniforms

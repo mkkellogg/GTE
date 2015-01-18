@@ -36,33 +36,34 @@ class RenderManager
 	static const int MAX_CAMERAS = 8;
 	static const int MAX_SCENE_MESHES = 128;
 
-	class RenderAffector
-	{
-		public:
-
-		Transform AffectorTransform;
-		Camera * AffectorCamera = NULL;
-		Light * AffectorLight = NULL;
-	};
-
-	unsigned int sceneMeshCount;
-	SceneObjectRef sceneMeshObjects[MAX_SCENE_MESHES];
-
-	int cycleCount;
-
+	// material for rendering shadow volumes
 	MaterialRef shadowVolumeMaterial;
 
-	DataStack<Matrix4x4> viewTransformStack;
-	DataStack<Matrix4x4> modelTransformStack;
+	// transform stack used for processing scene hierarchy
+	DataStack<Matrix4x4> sceneProcessingStack;
 
+	// number of meshes found in the scene during ProcessScene()
+	unsigned int sceneMeshCount;
+	// number of lights found in the scene during ProcessScene()
 	unsigned int lightCount;
+	// number of ambient lights found in the scene during  ProcessScene()
 	unsigned int ambientLightCount;
-	RenderAffector sceneLights[MAX_LIGHTS];
-	RenderAffector sceneAmbientLights[MAX_LIGHTS];
-
+	// number of cameras found in the scene during  ProcessScene()
 	unsigned int cameraCount;
-	RenderAffector sceneCameras[MAX_CAMERAS];
 
+	// list of meshes found in the scene during ProcessScene()
+	SceneObjectRef sceneMeshObjects[MAX_SCENE_MESHES];
+	// list of lights found in the scene during ProcessScene()
+	SceneObjectRef sceneLights[MAX_LIGHTS];
+	// list of ambient lights found in the scene during ProcessScene()
+	SceneObjectRef sceneAmbientLights[MAX_LIGHTS];
+	// list of cameras found in the scene during ProcessScene()
+	SceneObjectRef sceneCameras[MAX_CAMERAS];
+
+	// keep track of objects that have been rendered
+	// TODO: re-implement this using a true hash map (e.g. unordered_map). This map is
+	// accessed for every mesh so we can move from what is now O(n * log(n)) to O (n),
+	// hash table access should be O(1)
 	std::map<ObjectID, bool> renderedObjects;
 
 	void ProcessScene();

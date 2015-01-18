@@ -298,7 +298,7 @@ void GraphicsGL::SetRenderBufferEnabled(RenderBufferType buffer, bool enabled) c
 
 SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer(AttributeTransformer * attrTransformer)
 {
-	return new SubMesh3DRendererGL(this, attrTransformer);
+	return new SubMesh3DRendererGL(attrTransformer);
 }
 
 void GraphicsGL::DestroyMeshRenderer(SubMesh3DRenderer * renderer)

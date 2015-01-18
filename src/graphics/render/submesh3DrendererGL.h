@@ -22,8 +22,8 @@ class SubMesh3DRendererGL : public SubMesh3DRenderer
 {
 	friend class GraphicsGL;
 
-	SubMesh3DRendererGL(Graphics * graphics, AttributeTransformer * attributeTransformer);
-	SubMesh3DRendererGL(bool buffersOnGPU, Graphics * graphics, AttributeTransformer * attributeTransformer);
+	SubMesh3DRendererGL(AttributeTransformer * attributeTransformer);
+	SubMesh3DRendererGL(bool buffersOnGPU, AttributeTransformer * attributeTransformer);
 	~SubMesh3DRendererGL();
 
     public:

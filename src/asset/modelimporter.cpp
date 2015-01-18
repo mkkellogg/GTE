@@ -413,7 +413,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 			if(mesh.mNormals != NULL)
 			{
 				aiVector3D& srcNormal = mesh.mNormals[vIndex];
-				mesh3D->GetNormals()->GetVector(vertexIndex)->Set(srcNormal.x,srcNormal.y,srcNormal.z);
+				mesh3D->GetVertexNormals()->GetVector(vertexIndex)->Set(srcNormal.x,srcNormal.y,srcNormal.z);
 			}
 
 			// copy vertex colors (if present)
