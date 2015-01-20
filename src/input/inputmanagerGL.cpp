@@ -9,7 +9,7 @@
 #include "inputmanagerGL.h"
 #include "global/global.h"
 #include "util/time.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 InputManagerGL * _thisPtr = NULL;
 void _keyboardFunc(unsigned char key, int x, int y)

@@ -11,7 +11,7 @@
 #include "geometry/vector/vector3.h"
 #include "graphics/shader/shader.h"
 #include "graphics/stdattributes.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "global/global.h"
 #include "graphics/shader/uniformdesc.h"
 #include "graphics/shader/attributedesc.h"

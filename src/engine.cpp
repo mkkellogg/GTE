@@ -14,7 +14,7 @@
 #include "error/errormanager.h"
 #include "global/global.h"
 #include "util/time.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 // set singleton instance to NULL by default
 Engine * Engine::theInstance = NULL;

@@ -11,7 +11,7 @@
 #include "assimp/cimport.h"
 #include "assimp/scene.h"
 #include "geometry/matrix4x4.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "global/global.h"
 #include "graphics/image/rawimage.h"
 

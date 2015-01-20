@@ -1,3 +1,14 @@
+/*
+ * class: Mesh3D
+ *
+ * author: Mark Kellogg
+ *
+ * Mesh3D is a container for multiple SubMesh3D objects. SubMesh3D contains
+ * the actual vertex attribute data (vertex positions, vertex normals, UV
+ * coordinates, etc...) for a mesh, and Mesh3D acts to organize them into
+ * a single object.
+ */
+
 #ifndef _GTE_MESH3D_H_
 #define _GTE_MESH3D_H_
 
@@ -25,24 +36,34 @@ class Mesh3D : public SceneObjectComponent
 
 	protected :
 
+	// type of light culling to perform on this mesh
 	LightCullType lightCullType;
 
+	// local center position for entire mesh, calculated by averaging
+	// centers of each sub-mesh.
 	Point3 center;
+	// radius of the sphere of influence along the X-axis
 	Vector3 sphereOfInfluenceX;
+	// radius of the sphere of influence along the Y-axis
 	Vector3 sphereOfInfluenceY;
+	// radius of the sphere  of influence along the Z-axis
 	Vector3 sphereOfInfluenceZ;
 
+	// numnber of sub-meshes managed by the Mesh3D instance
 	unsigned int subMeshCount;
+	// container for the submeshes
 	std::vector<SubMesh3DRef> subMeshes;
 
+	// should this mesh cast shadows?
 	bool castShadows;
+	// should this mesh receive shadows?
 	bool receiveShadows;
 
     Mesh3D(unsigned int subMeshCount);
     ~Mesh3D();
     void Destroy();
 
-    void SendDataToRenderer(unsigned int subIndex);
+    void UpdateRenderer(unsigned int subIndex);
     void CalculateSphereOfInfluence();
 
 	public:

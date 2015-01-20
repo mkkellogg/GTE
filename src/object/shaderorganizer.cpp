@@ -17,7 +17,7 @@
 #include "graphics/shader/shader.h"
 #include "base/longmask.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 ShaderOrganizer::ShaderOrganizer()
 {

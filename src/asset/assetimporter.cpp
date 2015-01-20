@@ -10,7 +10,7 @@
 #include "object/enginetypes.h"
 #include "modelimporter.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 AssetImporter::AssetImporter()
 {

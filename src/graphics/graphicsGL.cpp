@@ -12,7 +12,7 @@
 #include "graphics/screendesc.h"
 #include "graphics/animation/animationmanager.h"
 #include "render/material.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "shader/shaderGL.h"
 #include "shader/shader.h"
 #include "texture/textureGL.h"

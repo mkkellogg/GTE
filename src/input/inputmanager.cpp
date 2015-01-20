@@ -7,7 +7,7 @@
 #include "inputmanager.h"
 #include "global/global.h"
 #include "util/time.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 InputManager::InputManager()
 {

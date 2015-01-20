@@ -8,7 +8,7 @@
 #include "color4.h"
 #include "color4factory.h"
 #include "base/basevector4array.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 Color4Array::Color4Array() : BaseVector4Array(Color4Factory::GetInstance())
 {

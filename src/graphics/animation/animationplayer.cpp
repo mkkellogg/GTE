@@ -20,7 +20,7 @@
 #include "graphics/animation/blendop.h"
 #include "global/global.h"
 #include "global/constants.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "util/time.h"
 #include <string>
 #include <unordered_map>

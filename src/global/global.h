@@ -3,7 +3,7 @@
 
 #include "error/errormanager.h"
 #include "engine.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 #define GL_GLEXT_PROTOTYPES
 

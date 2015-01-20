@@ -23,7 +23,7 @@
 #include <memory.h>
 #include <math.h>
  
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "matrix4x4.h"
 #include "quaternion.h"
 #include "point/point3.h"

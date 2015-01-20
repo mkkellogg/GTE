@@ -19,7 +19,7 @@
 #include "graphics/texture/texture.h"
 #include "graphics/texture/textureGL.h"
 #include "graphics/color/color4.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "global/global.h"
 #include "uniformdesc.h"
 #include "attributedesc.h"

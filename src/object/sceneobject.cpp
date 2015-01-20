@@ -19,7 +19,7 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/render/rendermanager.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "global/global.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"

@@ -6,7 +6,7 @@
  
 #include "basevector4.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 /*
  * Initialize - Store [x], [y], [z], and [w] as the base data.

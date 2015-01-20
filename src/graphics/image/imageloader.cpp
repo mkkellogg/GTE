@@ -9,7 +9,7 @@
 #include "lodepng/lodepng.h"
 #include "lodepng/lodepng_util.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include <IL/il.h>
 
 bool ImageLoader::ilInitialized = false;

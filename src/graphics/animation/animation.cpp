@@ -6,7 +6,7 @@
 #include "animation.h"
 #include "skeleton.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include <string>
 
 /*

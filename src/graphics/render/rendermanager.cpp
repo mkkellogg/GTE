@@ -29,7 +29,7 @@
 #include "util/datastack.h"
 #include "global/global.h"
 #include "global/constants.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 /*
  * Single constructor, which requires pointers the Graphics and EngineObjectManager

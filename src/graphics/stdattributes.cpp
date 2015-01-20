@@ -6,7 +6,7 @@
 
 #include "base/intmask.h"
 #include "stdattributes.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 const char* const StandardAttributes::attributeNames[] = {"POSITION", "SHADOW_POSITION", "NORMAL","COLOR","UVTEXTURE0","UVTEXTURE1", "UVNORMALMAP"};
 

@@ -5,7 +5,7 @@
 #include <memory.h>
 #include <math.h>
  
-#include "debug.h"
+#include "gtedebug.h"
 
 void Debug::PrintMessage(const char * message)
 {

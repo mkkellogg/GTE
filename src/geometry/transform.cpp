@@ -3,7 +3,7 @@
 #include <memory.h>
 #include "transform.h"
 #include "matrix4x4.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "global/constants.h"
 #include "global/global.h"
 #include "vector/vector3.h"

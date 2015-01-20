@@ -26,7 +26,7 @@
 #include "graphics/animation/animationinstance.h"
 #include "graphics/animation/animationplayer.h"
 #include "asset/assetimporter.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
 #include "base/intmask.h"

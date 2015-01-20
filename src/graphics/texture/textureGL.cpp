@@ -8,7 +8,7 @@
 #include "textureGL.h"
 #include "textureattr.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include <GL/glew.h>
 #include <GL/glut.h>
 

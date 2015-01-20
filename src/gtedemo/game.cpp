@@ -44,7 +44,7 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"

@@ -27,7 +27,7 @@
 #include "object/engineobjectmanager.h"
 #include "attributetransformer.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 /*
  * Constructor with pointer to an attribute transformer, buffersOnGPU = false by default
@@ -466,10 +466,8 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 		{
 			int componentCount = 4;
 			if(attr == StandardAttribute::UVTexture0 || attr == StandardAttribute::UVTexture1)componentCount = 2;
-		//	if(attr == StandardAttribute::Normal)componentCount = 3;
 
 			int stride =0;
-		//	if(attr == StandardAttribute::Normal)stride = 1;
 
 			int initSuccess = InitAttributeData(attr, mesh->GetTotalVertexCount(), componentCount, stride);
 			if(!initSuccess)StandardAttributes::AddAttribute(&err,attr);

@@ -15,6 +15,10 @@
  * does its rendering. An example would be SkinnedMesh3DRenderer, which supplies a special
  * kind of AttributeTransformer that performs vertex skinning.
  *
+ * Certain functionality for performing rendering, such as making the call into the chosen
+ * API to actually draw the target sub-mesh's triangles, will vary from platform to
+ * platform (e.g. from OpenGL to DirectX). SubMesh3DRenderer is designed so that this
+ * platform specific code should be in a deriving class (such as SubMesh3DRendererGL for OpenGL).
  */
 
 

@@ -26,24 +26,35 @@
 #include "object/engineobjectmanager.h"
 #include "attributetransformer.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
-
+/*
+ * Constructor with pointer to an attribute transformer, buffersOnGPU = false by default
+ */
 SubMesh3DRendererGL::SubMesh3DRendererGL(AttributeTransformer * attributeTransformer) : SubMesh3DRendererGL(false, attributeTransformer)
 {
 
 }
 
+/*
+ * Constructor with pointer to an attribute transformer, and parameter to choose CPU-side or GPU-side vertex attribute buffers
+ */
 SubMesh3DRendererGL::SubMesh3DRendererGL(bool buffersOnGPU, AttributeTransformer * attributeTransformer) : SubMesh3DRenderer(buffersOnGPU, attributeTransformer)
 {
 
 }
 
+/*
+ * Clean-up
+ */
 SubMesh3DRendererGL::~SubMesh3DRendererGL()
 {
 
 }
 
+/*
+ * Implement rendering of the target sub-mesh with OpenGL calls.
+ */
 void SubMesh3DRendererGL::Render()
 {
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
@@ -53,8 +64,8 @@ void SubMesh3DRendererGL::Render()
 
 	MaterialRef currentMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 
+	// send the target sub-mesh's attributes to the shader
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
-
 	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
 		StandardAttribute attr = (StandardAttribute)i;
@@ -64,12 +75,18 @@ void SubMesh3DRendererGL::Render()
 		}
 	}
 
+	// make sure all required shader variables have been set correctly
 	if(!ValidateMaterial(currentMaterial))return;
 
 	unsigned int totalCount = mesh->GetTotalVertexCount();
+
+	// render the mesh
 	glDrawArrays(GL_TRIANGLES, 0, totalCount);
 }
 
+/*
+ * Implement rendering of the target sub-mesh's shadow volume with OpenGL calls.
+ */
 void SubMesh3DRendererGL::RenderShadowVolume()
 {
 	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> containerRenderer is NULL.");
@@ -81,8 +98,11 @@ void SubMesh3DRendererGL::RenderShadowVolume()
 
 	if(shadowVolumePositions.GetCount() > 0)
 	{
+		// set the shadow volume vertex attribute buffer data
 		SetShadowVolumePositionData(&shadowVolumePositions);
+		// send shadow volume vertex positions to the shader
 		currentMaterial->SendStandardAttributeBufferToShader(StandardAttribute::ShadowPosition, attributeBuffers[(int)StandardAttribute::ShadowPosition]);
+		// render the shadow volume
 		glDrawArrays(GL_TRIANGLES, 0, shadowVolumePositions.GetCount());
 	}
 }

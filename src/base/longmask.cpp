@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "longmask.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 LongMask LongMaskUtil::InvertBitsForIndexMask(unsigned short index)
 {

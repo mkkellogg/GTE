@@ -7,7 +7,7 @@
 #include "basevector2factory.h"
 #include "basevector2.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 BaseVector2Factory::BaseVector2Factory()
 {

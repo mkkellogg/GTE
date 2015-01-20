@@ -58,7 +58,7 @@
 #include "base/longmask.h"
 #include "util/time.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "util/util.h"
 
 const std::string ModelImporter::AssimpPathDelimiter = std::string("/");

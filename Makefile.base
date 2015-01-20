@@ -28,7 +28,7 @@ GTEDEMOOBJ= obj/gtedemo.o obj/game.o obj/gameutil.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o
-DEBUGOBJ= obj/debug.o 
+DEBUGOBJ= obj/gtedebug.o 
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/rendertarget.o obj/rendertargetGL.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
@@ -396,8 +396,8 @@ obj/submesh3Dface.o: $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp $(GRAPHICSOBJECTSRC)
 
 debug: $(DEBUGOBJ)
 
-obj/debug.o: $(DEBUGSRC)/debug.cpp $(DEBUGSRC)/debug.h
-	$(CC) $(CFLAGS) -o obj/debug.o -c  $(DEBUGSRC)/debug.cpp 
+obj/gtedebug.o: $(DEBUGSRC)/gtedebug.cpp $(DEBUGSRC)/gtedebug.h
+	$(CC) $(CFLAGS) -o obj/gtedebug.o -c  $(DEBUGSRC)/gtedebug.cpp 
 
 
 # ==================================

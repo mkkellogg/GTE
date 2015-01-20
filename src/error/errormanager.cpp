@@ -1,7 +1,7 @@
 
 #include "errormanager.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 ErrorManager::ErrorManager()
 {

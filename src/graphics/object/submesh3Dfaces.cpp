@@ -6,7 +6,7 @@
 #include "submesh3Dface.h"
 #include "submesh3Dfaces.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 SubMesh3DFaces::SubMesh3DFaces()
 {

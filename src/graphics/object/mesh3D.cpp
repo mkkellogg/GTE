@@ -16,9 +16,12 @@
 #include "submesh3D.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
-
+/*
+ * Single constructor, only parameter [subMeshCount] is the number of
+ * sub-meshes that will be managed by this Mesh3D instance.
+ */
 Mesh3D::Mesh3D(unsigned int subMeshCount)
 {
 	if(subMeshCount<=0)subMeshCount=1;
@@ -28,25 +31,40 @@ Mesh3D::Mesh3D(unsigned int subMeshCount)
 	receiveShadows = false;
 }
 
+/*
+ * Clean-up.
+ */
 Mesh3D::~Mesh3D()
 {
 	Destroy();
 }
 
+/*
+ * Deallocate and destroy all objects created by this instance.
+ */
 void Mesh3D::Destroy()
 {
 	subMeshes.clear();
 }
 
+/*
+ * Get the number of sub-meshes managed by this instance of Mesh3D.
+ */
 unsigned int Mesh3D::GetSubMeshCount()
 {
 	return subMeshCount;
 }
 
+/*
+ * Initialize this instance. This method will pre-allocate [subMeshCount] entries
+ * in [subMeshes], to be set at a later time.
+ */
 bool Mesh3D::Init()
 {
+	// if this instance has already been initialized, we must first destroy this instance.
 	Destroy();
 
+	// push-back (preallocated) [subMeshCount] entries in [subMeshes]
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
 		subMeshes.push_back(SubMesh3DRef::Null());
@@ -55,34 +73,47 @@ bool Mesh3D::Init()
 	return true;
 }
 
-void Mesh3D::SendDataToRenderer(unsigned int index)
+/*
+ * This method causes a Mesh3DRenderer that is attached to the same scene object as this
+ * instance of Mesh3D to update the sub-renderer it contains at [index].
+ *
+ * It first validates the existence of a sub-mesh at [index], then verifies that a
+ * Mesh3DRenderer is attached to the same instance of SceneObject.Once those checks
+ * have passed, it calls UpdateFromSubMesh() on the Mesh3DRenderer passing in [index].
+ */
+void Mesh3D::UpdateRenderer(unsigned int index)
 {
-	if( index >= subMeshCount)
-	{
-		Debug::PrintError("Mesh3D::SendDataToRenderer -> Index out of range.");
-		return;
-	}
+	ASSERT_RTRN(index < subMeshCount, "Mesh3D::UpdateRenderer -> Index out of range.");
 
-	ASSERT_RTRN(sceneObject.IsValid()," Mesh3D::SendDataToRenderer -> sceneObject is NULL.");
+	ASSERT_RTRN(sceneObject.IsValid()," Mesh3D::UpdateRenderer -> sceneObject is NULL.");
 
 	SubMesh3DRef subMesh = subMeshes[index];
-	ASSERT_RTRN(subMesh.IsValid()," Mesh3D::SendDataToRenderer -> subMesh is NULL.");
+	ASSERT_RTRN(subMesh.IsValid()," Mesh3D::UpdateRenderer -> subMesh is NULL.");
 
-	ASSERT_RTRN(IsAttachedToSceneObject()," Mesh3D::SendDataToRenderer -> Mesh is not attached to a scene object.");
+	ASSERT_RTRN(IsAttachedToSceneObject()," Mesh3D::UpdateRenderer -> Mesh is not attached to a scene object.");
 
 	Mesh3DRendererRef renderer = sceneObject->GetMesh3DRenderer();
-	ASSERT_RTRN(renderer.IsValid()," Mesh3D::SendDataToRenderer -> renderer is NULL.");
+	ASSERT_RTRN(renderer.IsValid()," Mesh3D::UpdateRenderer -> renderer is NULL.");
 
 	renderer->UpdateFromSubMesh(index);
 }
 
+/*
+ * Calculate the collective sphere (spheroid) of influence for all the sub-meshes in this
+ * instance of Mesh3D,
+ *
+ * The sphere of influence is a less than perfect way to cull meshes from being rendered for
+ * lights that are too far away. It is basically a sphere that is guaranteed to contain all the
+ * sub-meshes in this Mesh3D object.
+ */
 void Mesh3D::CalculateSphereOfInfluence()
 {
 	Point3 average;
 	unsigned int validSubMeshes = 0;
+
+	// loop through each sub-mesh to calculate average center position
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
-
 		SubMesh3DRef subMesh = subMeshes[i];
 		if(subMesh.IsValid())
 		{
@@ -94,6 +125,7 @@ void Mesh3D::CalculateSphereOfInfluence()
 		}
 	}
 
+	// calculate the average position
 	if(validSubMeshes > 0)
 	{
 		average.x /= (float)validSubMeshes;
@@ -106,6 +138,10 @@ void Mesh3D::CalculateSphereOfInfluence()
 	float maxSoiX = 0;
 	float maxSoiY = 0;
 	float maxSoiZ = 0;
+
+	// loop through each sub-mesh and determine the maximum distance away from
+	// the averaged center it extends along each axis. Store those values
+	// in [maxSoiX], [maxSoiY], and [maxSoiX] respectively.
 	for(unsigned int i = 0; i < subMeshCount; i++)
 	{
 		SubMesh3DRef subMesh = subMeshes[i];
@@ -113,25 +149,36 @@ void Mesh3D::CalculateSphereOfInfluence()
 		{
 			const Point3 temp = subMesh->GetCenter();
 
+			// calculate the distance from the averaged center to the sub-meshes center
 			float offsetX = GTEMath::Abs(center.x - temp.x);
 			float offsetY = GTEMath::Abs(center.y - temp.y);
 			float offsetZ = GTEMath::Abs(center.z - temp.z);
 
+			// use the sphere of influence values already calculated for each sub-mesh
+			// and add them to the the center offset
 			float soiX = offsetX + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().x);
 			float soiY = offsetY + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().y);
 			float soiZ = offsetZ + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().z);
 
+			// compare to max values and update if necessary
 			if(soiX > maxSoiX)maxSoiX = soiX;
 			if(soiY > maxSoiY)maxSoiY = soiY;
 			if(soiZ > maxSoiZ)maxSoiZ = soiZ;
 		}
 	}
 
+	// set the final values for each axis
 	sphereOfInfluenceX.Set(maxSoiX,0,0);
 	sphereOfInfluenceY.Set(0,maxSoiY,0);
 	sphereOfInfluenceZ.Set(0,0,maxSoiZ);
 }
 
+/*
+ * Update any objects and data structures that are dependent on this mesh's data. This
+ * method loops through each sub-mesh and calls its Update() method, which will ultimately
+ * update the corresponding sub-renderer in the Mesh3DRenderer attached to the same scene
+ * object (if there is one).
+ */
 void Mesh3D::Update()
 {
 	for(unsigned int i = 0; i < subMeshCount; i++)
@@ -143,6 +190,9 @@ void Mesh3D::Update()
 	}
 }
 
+/*
+ *Set the sub-mesh at [index] to be [mesh].
+ */
 void Mesh3D::SetSubMesh(SubMesh3DRef mesh, unsigned int index)
 {
 	ASSERT_RTRN(mesh.IsValid(),"Mesh3D::SetSubMesh -> mesh is NULL.");
@@ -161,6 +211,9 @@ void Mesh3D::SetSubMesh(SubMesh3DRef mesh, unsigned int index)
 	}
 }
 
+/*
+ * Get a reference to the sub-mesh at [index].
+ */
 SubMesh3DRef Mesh3D::GetSubMesh(unsigned int index)
 {
 	if(index < subMeshCount)
@@ -174,11 +227,18 @@ SubMesh3DRef Mesh3D::GetSubMesh(unsigned int index)
 	}
 }
 
+/*
+ * Is this mesh current attached to an instance of SceneObject?
+ */
 bool Mesh3D::IsAttachedToSceneObject()
 {
 	return sceneObject.IsValid();
 }
 
+/*
+ * If this mesh is attached to an instance of SceneObject, does that instance
+ * have an instance of Mesh3DRenderer attached to it?
+ */
 bool Mesh3D::SceneObjectHasRenderer()
 {
 	if(!IsAttachedToSceneObject())return false;
@@ -186,46 +246,74 @@ bool Mesh3D::SceneObjectHasRenderer()
 	return true;
 }
 
+/*
+ * Get the calculated and averaged center of all sub-meshes contained by this
+ * instance.
+ */
 const Point3& Mesh3D::GetCenter() const
 {
 	return center;
 }
 
+/*
+ * Get the size of the sphere of influence along the local x-axis.
+ */
 const Vector3& Mesh3D::GetSphereOfInfluenceX() const
 {
 	return sphereOfInfluenceX;
 }
 
+/*
+ * Get the size of the sphere of influence along the local y-axis.
+ */
 const Vector3& Mesh3D::GetSphereOfInfluenceY() const
 {
 	return sphereOfInfluenceY;
 }
 
+/*
+ * Get the size of the sphere of influence along the local z-axis.
+ */
 const Vector3& Mesh3D::GetSphereOfInfluenceZ() const
 {
 	return sphereOfInfluenceZ;
 }
 
+/*
+ * Get the type of light culling that should be used for this mesh.
+ */
 LightCullType Mesh3D::GetLightCullType() const
 {
 	return lightCullType;
 }
 
+/*
+ * Specify whether or not this mesh should cast shadows.
+ */
 void Mesh3D::SetCastShadows(bool castShadows)
 {
 	this->castShadows = castShadows;
 }
 
+/*
+ * Should this mesh cast shadows?
+ */
 bool Mesh3D::GetCastShadows()
 {
 	return castShadows;
 }
 
+/*
+ * Specify whether or not this mesh should receive shadows.
+ */
 void Mesh3D::SetReceiveShadows(bool receiveShadows)
 {
 	this->receiveShadows = receiveShadows;
 }
 
+/*
+ * Should this mesh receive shadows?
+ */
 bool Mesh3D::GetReceiveShadows()
 {
 	return receiveShadows;

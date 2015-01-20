@@ -28,14 +28,20 @@
 #include "geometry/vector/vector3array.h"
 #include "gtemath/gtemath.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 #include "global/constants.h"
 
+/*
+ * Default constructor
+ */
 SubMesh3D::SubMesh3D() : SubMesh3D (StandardAttributes::CreateAttributeSet())
 {
 
 }
 
+/*
+ * Constructor that allows you to specify the attributes this sub-mesh will hold.
+ */
 SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 {
 	attributeSet = attributes;
@@ -46,21 +52,36 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 	subIndex = -1;
 }
 
+/*
+ * Clean-up
+ */
 SubMesh3D::~SubMesh3D()
 {
 	Destroy();
 }
 
+/*
+ * Set the container mesh for this sub-mesh
+ */
 void SubMesh3D::SetContainerMesh(Mesh3D * containerMesh)
 {
 	this->containerMesh = containerMesh;
 }
 
+/*
+ * Set this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
+ */
 void SubMesh3D::SetSubIndex(int index)
 {
 	subIndex = index;
 }
 
+/*
+ * For a given face in the sub-mesh specified by [faceIndex], calculate the face's
+ * normal and store the result in [result]. [faceIndex] will be the index of the
+ * face's first vertex in [positions], the next two will be at [faceIndex] + 1,
+ * and [faceIndex] + 2.
+ */
 void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const
 {
 	ASSERT_RTRN(faceIndex < totalVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> faceIndex is out range.");
@@ -87,17 +108,25 @@ void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result) con
 	result.Set(c.x,c.y,c.z);
 }
 
+/*
+ * For a given face in the sub-mesh specified by [faceIndex], find up to three adjacent faces, and
+ * store the index of the adjacency edge's first vertex in [edgeA], [edgeB], and [edgeC].
+ */
 void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const
 {
 	ASSERT_RTRN(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> faceIndex is out range.");
 	const SubMesh3DFace * face = faces.GetFaceConst(faceIndex);
 
 	int faceVertexIndex = face->FirstVertexIndex;
+
+	// get pointers to the three vertices that make up the face
 	const Point3 * faceVertexA = positions.GetPointConst(faceVertexIndex);
 	const Point3 * faceVertexB = positions.GetPointConst(faceVertexIndex + 1);
 	const Point3 * faceVertexC = positions.GetPointConst(faceVertexIndex + 2);
 
 	int edgesSet = 0;
+
+	// loop through each face and compare its edges to the edges of the face specified by [faceIndex].
 	for(unsigned int f = 0; f < faces.GetFaceCount(); f++)
 	{
 		if(faceIndex != f)
@@ -126,6 +155,9 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 	}
 }
 
+/*
+ * Populate the [faces] data structure, and find  the adjacent faces for each face.
+ */
 void SubMesh3D::BuildFaces()
 {
 	unsigned int faceCount = faces.GetFaceCount();
@@ -138,19 +170,18 @@ void SubMesh3D::BuildFaces()
 		vertexIndex += 3;
 	}
 
-	unsigned int missingAdjacent = 0;
+	// loop through each face and call FindAdjacentFaceIndex() to find the
+	// adjacent faces
 	for(unsigned int f = 0; f < faceCount; f++)
 	{
 		SubMesh3DFace * face = faces.GetFace(f);
 		FindAdjacentFaceIndex(f, face->AdjacentFaceIndex1, face->AdjacentFaceIndex2, face->AdjacentFaceIndex3);
-		//printf("adj: %d, %d, %d\n",face->AdjacentFaceIndex1, face->AdjacentFaceIndex2, face->AdjacentFaceIndex3);
-		if(face->AdjacentFaceIndex1 < 0 || face->AdjacentFaceIndex2 < 0 || face->AdjacentFaceIndex3 < 0)
-		{
-			missingAdjacent++;
-		}
 	}
 }
 
+/*
+ * Calculate the sphere of influence for this sub-mesh.
+ */
 void SubMesh3D::CalcSphereOfInfluence()
 {
 	float maxX,maxY,maxZ,minX,minY,minZ;
@@ -186,6 +217,13 @@ void SubMesh3D::CalcSphereOfInfluence()
 	sphereOfInfluenceZ.Set(0,0,depth * .6125);
 }
 
+/*
+ * Calculate vertex normals using the two incident edges to calculate the
+ * cross product. For all triangles that share a given vertex,the method will
+ * calculate the average normal for that vertex as long as the difference between
+ * the un-averaged normals is less than [smoothingThreshhold]. [smoothingThreshhold]
+ * is specified in degrees.
+ */
 void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 {
 	if(!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))return;
@@ -316,36 +354,61 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	}
 }
 
+/*
+ * Deallocate all memory used by this sub-mesh.
+ */
 void SubMesh3D::Destroy()
 {
 
 }
 
+/*
+ * Return the SubMesh3DFaces structure that describes the faces of this sub-mesh.
+ */
 SubMesh3DFaces& SubMesh3D::GetFaces()
 {
 	return faces;
 }
 
+/*
+ * Get the center of this sub-mesh, which is calculated as the average of the
+ * vertex positions.
+ */
 const Point3& SubMesh3D::GetCenter() const
 {
 	return center;
 }
 
+/*
+ * Get the size of the sphere of influence along the local x-axis.
+ */
 const Vector3& SubMesh3D::GetSphereOfInfluenceX() const
 {
 	return sphereOfInfluenceX;
 }
 
+/*
+ * Get the size of the sphere of influence along the local y-axis.
+ */
 const Vector3& SubMesh3D::GetSphereOfInfluenceY() const
 {
 	return sphereOfInfluenceY;
 }
 
+/*
+ * Get the size of the sphere of influence along the local z-axis.
+ */
 const Vector3& SubMesh3D::GetSphereOfInfluenceZ() const
 {
 	return sphereOfInfluenceZ;
 }
 
+/*
+ * Update any objects and data structures that are dependent on this sub-mesh's data.
+ * Any time the attributes of this sub-mesh are updated, this method should be called.
+ * It can be indirectly called by calling the Update() method of the containing Mesh3D
+ * instance.
+ */
 void SubMesh3D::Update()
 {
 	CalcSphereOfInfluence();
@@ -360,21 +423,31 @@ void SubMesh3D::Update()
 			containerMesh->SceneObjectHasRenderer())
 		{
 			if(subIndex >=0)
-				containerMesh->SendDataToRenderer((unsigned int)subIndex);
+				containerMesh->UpdateRenderer((unsigned int)subIndex);
 		}
 	}
 }
 
+/*
+ * Get the total number of vertices contained in this sub-mesh.
+ */
 unsigned int SubMesh3D::GetTotalVertexCount() const
 {
 	return totalVertexCount;
 }
 
+/*
+ * Get a StandardAttributeSet that describes the attributes possessed by
+ * this sub0mesh.
+ */
 StandardAttributeSet SubMesh3D::GetAttributeSet() const
 {
 	return attributeSet;
 }
 
+/*
+ * Initialize this sub-mesh to contain space for [totalVertexCount] vertices.
+ */
 bool SubMesh3D::Init(unsigned int totalVertexCount)
 {
 	this->totalVertexCount = totalVertexCount;
@@ -434,45 +507,61 @@ bool SubMesh3D::Init(unsigned int totalVertexCount)
 	return true;
 }
 
+/*
+ * Set the threshold angle (in degrees) to be used when calculating averaged
+ * face normals for smoothed shading.
+ */
 void SubMesh3D::SetNormalsSmoothingThreshold(unsigned int threshhold)
 {
 	if(threshhold > 180)threshhold = 180;
 	this->normalsSmoothingThreshold = threshhold;
 }
 
-inline bool ArePointsEqual(const Point3* a, const Point3* b)
-{
-	ASSERT(a != NULL && b != NULL, "ArePointsEqual -> NULL point passed.", false);
-
-	float epsilon = .005;
-	return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
-}
-
+/*
+ * Get the vertex positions for this sub-mesh.
+ */
 Point3Array * SubMesh3D::GetPostions()
 {
 	return &positions;
 }
 
+/*
+ * Get the vertex positions for this sub-mesh. These may or may not
+ * be averaged for smooth shading.
+ */
 Vector3Array * SubMesh3D::GetVertexNormals()
 {
 	return &vertexNormals;
 }
 
+/*
+ * Get the face normals for this sub-mesh. The face normals are the
+ * same as the original un-averaged vertex normals.
+ */
 Vector3Array * SubMesh3D::GetFaceNormals()
 {
 	return &faceNormals;
 }
 
+/*
+ * Get the vertex colors for this sub-mesh.
+ */
 Color4Array * SubMesh3D::GetColors()
 {
 	return &colors;
 }
 
+/*
+ * Get UV coordinates array 1 for this sub-mesh.
+ */
 UV2Array * SubMesh3D::GetUVsTexture0()
 {
 	return &uvsTexture0;
 }
 
+/*
+ * Get UV coordinates array 2 for this sub-mesh.
+ */
 UV2Array * SubMesh3D::GetUVsTexture1()
 {
 	return &uvsTexture1;

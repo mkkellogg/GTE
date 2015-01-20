@@ -1,3 +1,16 @@
+/*
+ * class: SubMesh3DRendererGL
+ *
+ * author: Mark Kellogg
+ *
+ * SubMesh3DRendererGL is an implementation of SubMesh3DRenderer specifically
+ * for the OpenGL platform. It implements Render() and RenderShadowVolume(),
+ * which are pure virtual functions in SubMesh3DRenderer, and uses OpenGL
+ * calls such as glDrawArrays() to carry out the rendering.
+ *
+ */
+
+
 #ifndef _GTE_SUBMESH3D_RENDERER_GL_H_
 #define _GTE_SUBMESH3D_RENDERER_GL_H_
 

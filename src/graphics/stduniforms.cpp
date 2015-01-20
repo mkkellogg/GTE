@@ -6,7 +6,7 @@
 
 #include "base/intmask.h"
 #include "stduniforms.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 const char* const StandardUniforms::uniformNames[] = {"MODEL_MATRIX","MODELVIEW_MATRIX","MODELVIEWPROJECTION_MATRIX","PROJECTION_MATRIX","LIGHT_POSITION", "LIGHT_DIRECTION", "LIGHT_COLOR", "LIGHT_INTENSITY", "LIGHT_ATTENUATION", "LIGHT_TYPE", "EMISSIVECOLOR", "TEXTURE0", "TEXTURE1", "NORMALMAP", "DO_SHADOW_VOLUME_RENDER"};
 

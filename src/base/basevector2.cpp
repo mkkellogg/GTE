@@ -6,7 +6,7 @@
  
 #include "basevector2.h"
 #include "global/global.h"
-#include "debug/debug.h"
+#include "debug/gtedebug.h"
 
 void BaseVector2::Init(float *target, bool permAttach)
 {
