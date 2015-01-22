@@ -389,6 +389,8 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	lightInverse.SetTo(lightFullTransform);
 	lightInverse.Invert();
 
+	RenderMode currentRenderMode = RenderMode::None;
+
 	for(int pass = 0; pass < 2; pass++)
 	{
 		if(pass == 0) // shadow volume pass
@@ -398,14 +400,6 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::ShadowVolumeRender);
 			else
 				continue;
-		}
-		else if(pass == 1) // normal rendering pass
-		{
-			// check if this light can cast shadows, if not do standard (shadow-less) rendering
-			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
-				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
-			else if(light.GetType() == LightType::Ambient)
-				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
 		}
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
@@ -458,6 +452,21 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 				}
 				else if(pass == 1) // normal rendering pass
 				{
+					// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
+					if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && mesh->GetReceiveShadows())
+					{
+						if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
+						{
+							currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
+							Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
+						}
+					}
+					else if(currentRenderMode != RenderMode::Standard)
+					{
+						currentRenderMode = RenderMode::Standard;
+						Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
+					}
+
 					RenderSceneObjectMeshes(*child, light, lightPosition, viewTransformInverse, camera);
 				}
 			}

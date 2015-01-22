@@ -126,14 +126,14 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 	return scene;
 }
 
-SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float importScale)
+SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows)
 {
 	// the global Assimp scene object
 	const aiScene* scene = LoadAIScene(filePath);
 
 	if(scene != NULL)
 	{
-		SceneObjectRef result =  ProcessModelScene(filePath, *scene, importScale);
+		SceneObjectRef result =  ProcessModelScene(filePath, *scene, importScale, castShadows, receiveShadows);
 		return result;
 	}
 	else
@@ -142,7 +142,7 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float
 	}
 }
 
-SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale) const
+SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale, bool castShadows, bool receiveShadows) const
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
@@ -163,7 +163,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	SkeletonRef skeleton = LoadSkeleton(scene);
 
 	std::vector<SceneObjectRef> createdSceneObjects;
-	RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root,  materialImportDescriptors, skeleton, createdSceneObjects);
+	RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root,  materialImportDescriptors, skeleton, createdSceneObjects, castShadows, receiveShadows);
 
 	for(unsigned int s = 0; s < createdSceneObjects.size(); s++)
 	{
@@ -189,7 +189,9 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 											   SceneObjectRef current,
 											   std::vector<MaterialImportDescriptor>& materialImportDescriptors,
 											   SkeletonRef skeleton,
-											   std::vector<SceneObjectRef>& createdSceneObjects) const
+											   std::vector<SceneObjectRef>& createdSceneObjects,
+											   bool castShadows,
+											   bool receiveShadows) const
 {
 	Matrix4x4 mat;
 
@@ -226,6 +228,9 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
 			return;
 		}
+
+		mesh3D->SetCastShadows(castShadows);
+		mesh3D->SetReceiveShadows(receiveShadows);
 
 		if(hasSkeleton)
 		{
@@ -325,7 +330,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{
 		const aiNode *childNode = node.mChildren[i];
-		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, sceneObject, materialImportDescriptors, skeleton, createdSceneObjects);
+		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, sceneObject, materialImportDescriptors, skeleton, createdSceneObjects, castShadows, receiveShadows);
 	}
 }
 

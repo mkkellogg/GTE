@@ -602,6 +602,7 @@ void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 			glDisable(GL_DEPTH_CLAMP);
 
 			SetStencilTestEnabled(false);
+
 			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
 
 			// enable color buffer rendering

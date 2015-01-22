@@ -18,6 +18,7 @@ class AssetImporter
 	~AssetImporter();
 
 	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale) const;
+	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows) const;
 	AnimationRef LoadAnimation(const std::string& filePath) const;
 	void LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource);
 };

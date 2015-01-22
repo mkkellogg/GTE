@@ -34,7 +34,6 @@ Graphics::Graphics()
 
 bool Graphics::Init(const GraphicsAttributes& attributes)
 {
-	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 	renderManager = new RenderManager();
 	ASSERT(renderManager != NULL, "Graphics::Init -> Unable to allocate render manager", false);
 

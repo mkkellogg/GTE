@@ -26,8 +26,13 @@ AssetImporter::~AssetImporter()
 
 SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float importScale) const
 {
+	return LoadModelDirect(filePath, importScale, true, true);
+}
+
+SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows) const
+{
 	ModelImporter importer;
-	return importer.LoadModelDirect(filePath, importScale);
+	return importer.LoadModelDirect(filePath, importScale, castShadows, receiveShadows);
 }
 
 AnimationRef AssetImporter::LoadAnimation(const std::string& filePath) const

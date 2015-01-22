@@ -45,9 +45,10 @@ enum class ColorChannel
 
 enum class RenderMode
 {
-	Standard,
-	StandardWithShadowVolumeTest,
-	ShadowVolumeRender
+	Standard = 1,
+	StandardWithShadowVolumeTest = 2,
+	ShadowVolumeRender = 3,
+	None = 0
 };
 
 class GraphicsAttributes

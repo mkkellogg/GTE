@@ -7,54 +7,33 @@
 
 #include <memory>
 #include "engine.h"
-#include "asset/assetimporter.h"
-#include "graphics/graphics.h"
-#include "graphics/stdattributes.h"
-#include "graphics/object/submesh3D.h"
-#include "graphics/animation/skeleton.h"
-#include "graphics/animation/animation.h"
-#include "graphics/animation/animationmanager.h"
-#include "graphics/animation/animationinstance.h"
-#include "graphics/animation/animationplayer.h"
-#include "graphics/animation/bone.h"
-#include "graphics/render/submesh3Drenderer.h"
-#include "graphics/render/skinnedmesh3Drenderer.h"
-#include "graphics/render/mesh3Drenderer.h"
-#include "graphics/render/rendertarget.h"
-#include "graphics/render/material.h"
-#include "graphics/shader/shader.h"
-#include "graphics/view/camera.h"
-#include "graphics/light/light.h"
-#include "graphics/texture/textureattr.h"
-#include "graphics/texture/texture.h"
-#include "graphics/color/color4.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2.h"
-#include "graphics/uv/uv2array.h"
-#include "geometry/matrix4x4.h"
-#include "base/basevector4.h"
-#include "geometry/transform.h"
-#include "geometry/sceneobjecttransform.h"
-#include "geometry/point/point3.h"
-#include "geometry/vector/vector3.h"
-#include "geometry/point/point3array.h"
 #include "debug/gtedebug.h"
-#include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
-#include "util/time.h"
 #include "gtedemo.h"
 #include "gtedemo/game.h"
 
-Game * game = NULL;
+/*
+ * Custom implementation of EngineCallbacks to handle GTE engine events.
+ */
 class CustomEngineCallbacks: public EngineCallbacks
 {
+	Game * game = NULL;
+
 	public:
 
 	CustomEngineCallbacks(){}
-	void OnInit(){}
+
+	void OnInit()
+	{
+		// instantiate the main Game instance
+		game = new Game();
+
+		// initialize the main game instance
+		game->Init();
+	}
+
 	void OnUpdate()
 	{
+		// pass the Update event to the main Game instance
 		game->Update();
 	}
 
@@ -62,29 +41,36 @@ class CustomEngineCallbacks: public EngineCallbacks
 	virtual ~CustomEngineCallbacks(){}
 };
 
+/*
+ * Entry point for the GTE Demo. This method is minimal; its only purpose
+ * is to initialize and start the engine.
+ */
 int main(int argc, char** argv)
 {
+	// instance CustomEngineCallbacks to handle engine events
 	CustomEngineCallbacks engineCallbacks;
 
-	game = new Game();
-
+	// specify basic graphics attributes
 	GraphicsAttributes graphicsAttributes;
 	graphicsAttributes.WindowWidth = 1280;
 	graphicsAttributes.WindowHeight = 800;
 	graphicsAttributes.WindowTitle = "GTE Test";
 
+	// initialize the engine
 	bool initSuccess = Engine::Init(&engineCallbacks, graphicsAttributes);
 
 	if(initSuccess)
 	{
-		game->Init();
+		// start the engine
 		Engine::Start();
 	}
 	else
 	{
 		Debug::PrintError("Error occurred while initializing engine.");
+		return EXIT_FAILURE;
 	}
 
+	// shutdown the engine
 	Engine::ShutDown();
 	return EXIT_SUCCESS;
 }

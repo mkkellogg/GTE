@@ -86,8 +86,10 @@ class ModelImporter
 	bool InitImporter();
 	const aiScene * LoadAIScene(const std::string& filePath);
 
-	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,   std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton, std::vector<SceneObjectRef>& createdSceneObjects) const;
-	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale) const;
+	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,
+									std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton,
+									std::vector<SceneObjectRef>& createdSceneObjects,  bool castShadows, bool receiveShadows) const;
+	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale, bool castShadows, bool receiveShadows) const;
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor) const;
@@ -111,7 +113,7 @@ class ModelImporter
 
 	public:
 
-	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale);
+	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows);
 	AnimationRef LoadAnimation(const std::string& filePath);
 
 };
