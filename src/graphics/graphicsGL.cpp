@@ -89,7 +89,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glutIdleFunc(&_glutIdleFunc);
     glutReshapeFunc(&_glutReshapeFunc);
 
-    // TODO: think of a better place for these calls
+    // TODO: think of a better place for these initial calls
 
     glClearColor(0,0,0,0);
     glFrontFace(GL_CW);

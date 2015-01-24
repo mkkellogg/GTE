@@ -59,20 +59,28 @@
 #include "util/time.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
+#include "error/errormanager.h"
 #include "util/util.h"
 
-const std::string ModelImporter::AssimpPathDelimiter = std::string("/");
-
+/*
+ * Default constructor.
+ */
 ModelImporter::ModelImporter()
 {
 	importer = NULL;
 }
 
+/*
+ * Clean-up.
+ */
 ModelImporter::~ModelImporter()
 {
 	SAFE_DELETE(importer);
 }
 
+/*
+ * Initialize the Assimp importer object (if it has not already been done so).
+ */
 bool ModelImporter::InitImporter()
 {
 	if(importer == NULL)
@@ -84,6 +92,11 @@ bool ModelImporter::InitImporter()
 	return true;
 }
 
+/*
+ * Load an Assimp compatible model/scene located at [filePath]. [filePath] Must be a native file-system
+ * compatible path, so the the engine's FileSystem singleton should be used to derive the correct platform-specific
+ * path before calling this method.
+ */
 const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 {
 	// the global Assimp scene object
@@ -91,11 +104,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 
 	// Create an instance of the Importer class
 	bool initSuccess = InitImporter();
-	if(!initSuccess)
-	{
-		Debug::PrintError("Could not initialize importer.");
-		return NULL;
-	}
+	ASSERT(initSuccess == true," ModelImporter::LoadAIScene -> Could not initialize importer." , NULL);
 
 	// Check if file exists
 	std::ifstream fin(filePath.c_str());
@@ -105,11 +114,12 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 	}
 	else
 	{
-		std::string msg = std::string("AssetImporter::LoadAIScene -> Could not find file: ") + filePath;
-		Debug::PrintError(msg);
+		std::string msg = std::string("AssetImporter -> Could not find file: ") + filePath;
+		Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::ModelFileNotFound, msg);
 		return NULL;
 	}
 
+	// tell Assimp not to create extra nodes when importing FBX files
 	importer->SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
 
 	// read the model file in from disk
@@ -119,21 +129,31 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 	if(!scene)
 	{
 		std::string msg = std::string("AssetImporter::LoadAIScene -> Could not import file: ") + std::string(importer->GetErrorString());
-		Debug::PrintError(msg);
+		Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::ModelFileLoadFailed, msg);
 		return NULL;
 	}
 
 	return scene;
 }
 
-SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows)
+/*
+ * Load an Assimp compatible model/scene located at [modelPath]. [modelPath] Must be a native file-system
+ * compatible path, so the the engine's FileSystem singleton should be used to derive the correct platform-specific
+ * path before calling this method.
+ *
+ * [importScale] - Allows for the adjustment of the model's scale
+ * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
+ * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
+ */
+SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows)
 {
 	// the global Assimp scene object
-	const aiScene* scene = LoadAIScene(filePath);
+	const aiScene* scene = LoadAIScene(modelPath);
 
 	if(scene != NULL)
 	{
-		SceneObjectRef result =  ProcessModelScene(filePath, *scene, importScale, castShadows, receiveShadows);
+		// the model has been loaded from disk into Assimp data structures, now convert to engine-native structures
+		SceneObjectRef result =  ProcessModelScene(modelPath, *scene, importScale, castShadows, receiveShadows);
 		return result;
 	}
 	else
@@ -142,8 +162,20 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& filePath, float
 	}
 }
 
+/*
+ * Convert an Assimp aiScene structure into an engine-native scene hierarchy.
+ *
+ * [modelPath] - Native file-system compatible path that points to the model/scene file in the file system. This is
+ * 				 necessary to know because this is one of the locations that will be searched to find auxiliary resources
+ * 				 such as textures.
+ * [scene] - The Assimp aiScene structure that has been loaded from disk.
+ * [importScale] - The factor by which the original size of the model should be adjusted.
+ * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
+ * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
+ */
 SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale, bool castShadows, bool receiveShadows) const
 {
+	// get a pointer to the Engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	std::vector<MaterialImportDescriptor> materialImportDescriptors;
@@ -359,10 +391,10 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 
 	int diffuseTextureUVIndex = -1;
 	// update the StandardAttributeSet to contain appropriate attributes (UV coords) for a diffuse texture
-	if(materialImportDescriptor.UVMappingHasKey(ShaderMaterialCharacteristic::DiffuseTextured))
+	if(materialImportDescriptor.meshSpecificProperties[meshIndex].UVMappingHasKey(TextureType::Diffuse))
 	{
-		StandardAttributes::AddAttribute(&meshAttributes, MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic::DiffuseTextured));
-		diffuseTextureUVIndex = materialImportDescriptor.uvMapping[ShaderMaterialCharacteristic::DiffuseTextured];
+		StandardAttributes::AddAttribute(&meshAttributes, MapTextureTypeToAttribute(TextureType::Diffuse));
+		diffuseTextureUVIndex = materialImportDescriptor.meshSpecificProperties[meshIndex].uvMapping[TextureType::Diffuse];
 	}
 
 	// add normals regardless of whether the mesh has them or not. if the mesh does not
@@ -432,7 +464,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 			if(diffuseTextureUVIndex >= 0)
 			{
 				UV2Array *uvs = GetMeshUVArrayForShaderMaterialCharacteristic(*mesh3D,ShaderMaterialCharacteristic::DiffuseTextured);
-				if(materialImportDescriptor.invertVCoords)uvs->GetCoordinate(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1-mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
+				if(materialImportDescriptor.meshSpecificProperties[meshIndex].invertVCoords)uvs->GetCoordinate(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1-mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 				else uvs->GetCoordinate(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 			}
 
@@ -446,6 +478,20 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int 
 	return mesh3D;
 }
 
+/**
+ * Process the Assimp materials (instances of aiMaterial) in the Assimp scene [scene]. This method loops through each
+ * Assimp material and then examines which Assimp meshes use it. For each Assimp mesh that uses an Assimp material,
+ * a unique (and equivalent) engine-native Material instance is created.
+ *
+ * For each mesh that uses a given Assimp material, we MUST create a unique engine-native Material object. Engine-native
+ * Material objects are linked to shaders, and since different meshes may have different attributes, they may potentially
+ * require DIFFERENT SHADERS. For example: Two meshes may share an Assimp material, but only one mesh might have vertex
+ * colors. In this case two different shaders are needed: one that supports vertex colors and one that doesn't require them.
+ *
+ * [modelPath] - Native file-system compatible path that points to the model file in the file system.
+ * [scene] - The Assimp model/scene.
+ * [materialImportDescriptors] - A vector of MaterialImportDescriptor structures that will be populated by ProcessMaterials().
+ */
 bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const
 {
 	// TODO: Implement support for embedded textures
@@ -456,152 +502,221 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	}
 
 	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
-	FileSystem * fileSystem = FileSystem::Instance();
-	std::string basepath = fileSystem->GetBasePath(modelPath);
 
 	// loop through each scene material and extract relevant textures and
 	// other properties and create a MaterialDescriptor object that will hold those
 	// properties and all corresponding Material objects
 	for (unsigned int m=0; m < scene.mNumMaterials; m++)
 	{
-		aiReturn texFound = AI_SUCCESS;
 		aiString aiTexturePath;
 
-		aiMaterial * material = scene.mMaterials[m];
-		ASSERT(material != NULL, "AssetImporter::ProcessMaterials -> scene contains a NULL material.", false);
+		aiMaterial * assimpMaterial = scene.mMaterials[m];
+		ASSERT(assimpMaterial != NULL, "AssetImporter::ProcessMaterials -> scene contains a NULL material.", false);
 
 		aiString mtName;
-		material->Get(AI_MATKEY_NAME,mtName);
+		assimpMaterial->Get(AI_MATKEY_NAME,mtName);
 
 		// build an import descriptor for this material
 		MaterialImportDescriptor materialImportDescriptor;
-		GetImportDetails(material, materialImportDescriptor, scene);
+		GetImportDetails(assimpMaterial, materialImportDescriptor, scene);
+
+		aiReturn texFound = AI_SUCCESS;
 
 		TextureRef diffuseTexture;
-	//	Texture * bumpTexture = NULL;
+		//	TextureRef bumpTexture;
+		//	TextureRef specularTexture;
 
 		// get diffuse texture (for now support only 1)
-		texFound = material->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexturePath);
-		std::string filename;
-		if(texFound == AI_SUCCESS)
+		texFound = assimpMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexturePath);
+		if(texFound == AI_SUCCESS)diffuseTexture = LoadAITexture(*assimpMaterial, aiTextureType_DIFFUSE, modelPath);
+		if(!diffuseTexture.IsValid())
 		{
-			// load & create diffuse texture
-			std::string texPath = fileSystem->FixupPath(std::string(aiTexturePath.data));
-			std::string originalFilePath = fileSystem->ConcatenatePaths(basepath, texPath);
-
-			TextureAttributes texAttributes;
-			texAttributes.FilterMode = TextureFilter::TriLinear;
-			texAttributes.MipMapLevel = 4;
-
-			if(fileSystem->FileExists(originalFilePath)) // attempt to find texture using full path specified by model
-			{
-				diffuseTexture = engineObjectManager->CreateTexture(originalFilePath.c_str(),texAttributes);
-			}
-			else // try loading texture looking in the model's directory
-			{
-				std::string::size_type pos = texPath.find_last_of(AssimpPathDelimiter);
-				filename = (std::string::npos == pos) ? "" : texPath.substr(pos+1);
-
-				if(!(std::string::npos == pos))
-				{
-					filename = fileSystem->ConcatenatePaths(basepath, filename);
-					if(fileSystem->FileExists(filename))
-					{
-						diffuseTexture = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
-					}
-				}
-			}
-
-			if(!diffuseTexture.IsValid())
-			{
-				std::string msg = std::string("Could not load texture file: ") + originalFilePath;
-				Debug::PrintWarning(msg);
-			}
+			std::string msg = "AssetImporter::ProcessMaterials -> Could not load diffuse texture.";
+			Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::MaterialImportFailure, msg);
+			materialImportDescriptors.clear();
+			return false;
 		}
 
 		// loop through each mesh in the scene and check if it uses [material]. If so,
 		// create a unique Material object for the mesh and attach it to [materialImportDescriptor]
+		//
+		// The [materialImportDescriptor] structure describes the unique per-mesh properties we need to be
+		// concerned about when creating unique instances of a material for a mesh.
 		for(unsigned int i = 0; i < scene.mNumMeshes; i++)
 		{
 			if(materialImportDescriptor.UsedByMesh(i))
 			{
-				// see if we can match a loaded shader to the properties of this material
-				// if we can't find one...well we can't really load this material
+				// see if we can match a loaded shader to the properties of this material and the current mesh
 				ShaderRef loadedShader = engineObjectManager->GetLoadedShader(materialImportDescriptor.meshSpecificProperties[i].shaderProperties);
-				if(loadedShader.IsValid())
-				{
-					// create a new Material engine object
-					MaterialRef newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
-					ASSERT(newMaterial.IsValid(), "AssetImporter::ProcessMaterials -> Could not create new Material object.", false);
 
-					// if there is a diffuse texture, set it and get the appropriate mapping
-					// to UV coordinates
-					if(diffuseTexture.IsValid())
-					{
-						// get the name of the shader uniform that handles diffuse textures
-						std::string diffuseTextureName = GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic::DiffuseTextured);
-						if(!diffuseTextureName.empty())newMaterial->SetTexture(diffuseTexture, diffuseTextureName);
-
-						int mappedIndex;
-
-						// get the assimp UV channel for this diffuse texture. the mapping will be used later when
-						// importing meshes
-						if(AI_SUCCESS==aiGetMaterialInteger(material,AI_MATKEY_UVWSRC(aiTextureType_DIFFUSE,0),&mappedIndex))
-							materialImportDescriptor.uvMapping[ShaderMaterialCharacteristic::DiffuseTextured] = mappedIndex;
-						else
-							materialImportDescriptor.uvMapping[ShaderMaterialCharacteristic::DiffuseTextured] = 0;
-					}
-
-					// add new material and corresponding import descriptor to list for this model
-					materialImportDescriptor.meshSpecificProperties[i].material = newMaterial;
-				}
-				else
+				// if we can't find a loaded shader that matches the properties of this material and
+				// the current mesh...well we can't really load this material
+				if(!loadedShader.IsValid())
 				{
 					std::string msg = "Could not find loaded shader for: ";
 					msg += std::bitset<64>(materialImportDescriptor.meshSpecificProperties[i].shaderProperties).to_string();
-					Debug::PrintError(msg);
+					Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::MaterialShaderMatchFailure, msg);
+					materialImportDescriptors.clear();
 					return false;
+				}
+
+				// create a new Material engine object
+				MaterialRef newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
+				if(!newMaterial.IsValid())
+				{
+					std::string msg = "AssetImporter::ProcessMaterials -> Could not create new Material object.";
+					Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::MaterialImportFailure, msg);
+					materialImportDescriptors.clear();
+					return false;
+				}
+
+				// map new material to its corresponding mesh
+				materialImportDescriptor.meshSpecificProperties[i].material = newMaterial;
+
+				// if there is a diffuse texture, set it up in the new material
+				if(diffuseTexture.IsValid())
+				{
+					// Add [diffuseTexture] to the new material (and for the appropriate shader variable), and store
+					// Assimp UV channel for it in [materialImportDescriptor] for later processing of the mesh
+					bool setupSuccess = SetupMeshSpecificMaterialWithTexture(*assimpMaterial, TextureType::Diffuse, diffuseTexture, i, materialImportDescriptor);
+					if(!setupSuccess)
+					{
+						std::string msg ="ModelImporter::ProcessMaterials -> Could not set up diffuse texture.";
+						Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::MaterialImportFailure, msg);
+						materialImportDescriptors.clear();
+						return false;
+					}
 				}
 			}
 		}
+
+		// add the new MaterialImportDescriptor instance to [materialImportDescriptors]
 		materialImportDescriptors.push_back(materialImportDescriptor);
 	}
 
 	return true;
 }
 
-void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target) const
+/**
+ * Take an Assimp material [assimpMaterial] and use its properties to create and load an engine-native Texture instance
+ * for it that matches the type specified by [textureType].
+ *
+ * This method looks in two places in the file system for the image files for the texture:
+ *
+ *    1. Using the full path that is specified in the [assimpMaterial] structure.
+ *    2. In [modelPath], which is the location in the file system of model/scene to which [assimpMaterial] belongs.
+ *
+ * [modelPath] - Native file-system compatible path that points to the model file in the file system.
+ * [assimpMaterial] - The Assimp material.
+ * [textureType] - The type of texture to look for (diffuse, specular, normal map, etc...)
+ */
+TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureType textureType, const std::string& modelPath) const
 {
-	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	// temp variables
+	TextureRef texture;
+	aiString aiTexturePath;
+	aiReturn texFound = AI_SUCCESS;
+
+	// get a pointer to the engine's object manager
+	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
+	FileSystem * fileSystem = FileSystem::Instance();
+
+	// get the path to the directory that contains the scene/model
+	std::string modelDirectory = fileSystem->GetBasePath(modelPath);
+
+	// retrieve the first texture descriptor (at index 0) matching [textureType] from the Assimp material
+	texFound = assimpMaterial.GetTexture(textureType, 0, &aiTexturePath);
+
+	ASSERT(texFound == AI_SUCCESS, "ModelImporter::LoadAITexture -> Assimp material does not have desired texture type.", TextureRef::Null(), ModelImporterErrorCodes::AssimpTextureNotFound);
+
+	// build the full path to the texture image as specified by the Assimp material
+	std::string texPath = fileSystem->FixupPath(std::string(aiTexturePath.data));
+	std::string fullTextureFilePath = fileSystem->ConcatenatePaths(modelDirectory, texPath);
+
+	TextureAttributes texAttributes;
+	texAttributes.FilterMode = TextureFilter::TriLinear;
+	texAttributes.MipMapLevel = 4;
+
+	// check if the file specified by the full path in the Assimp material exists
+	if(fileSystem->FileExists(fullTextureFilePath))
 	{
-		aiMesh * cMesh = scene.mMeshes[m];
-		if( cMesh != NULL && cMesh->mNumBones > 0)
+		texture = engineObjectManager->CreateTexture(fullTextureFilePath.c_str(),texAttributes);
+	}
+	// if it does not exist, try looking for the texture image file in the model's directory
+	else
+	{
+		// get just the filename portion of the path
+		std::string filename = fileSystem->GetFileName(fullTextureFilePath);
+		if(!(filename.length() <= 0))
 		{
-			VertexBoneMap indexBoneMap(cMesh->mNumVertices, cMesh->mNumVertices);
+			// concatenate the file name with the model's directory location
+			filename = fileSystem->ConcatenatePaths(modelDirectory, filename);
 
-			bool mapInitSuccess = indexBoneMap.Init();
-			if(!mapInitSuccess)
+			// check if the image file is in the same directory as the model and if so, load it
+			if(fileSystem->FileExists(filename))
 			{
-				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not initialize index bone map.");
+				texture = engineObjectManager->CreateTexture(filename.c_str(),texAttributes);
 			}
-
-			SetupVertexBoneMapMappingsFromAIMesh(skeleton, *cMesh, indexBoneMap);
-
-			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping( indexBoneMap, *cMesh);
-			if(fullBoneMap == NULL)
-			{
-				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not create full vertex bone map.");
-			}
-
-			target->AddVertexBoneMap(fullBoneMap);
-		}
-		else
-		{
-			target->AddVertexBoneMap(NULL);
 		}
 	}
+
+	// did texture fail to load?
+	if(!texture.IsValid())
+	{
+		std::string msg = std::string("ModelImporter::LoadAITexture -> Could not load texture file: ") + fullTextureFilePath;
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::TextureFileLoadFailed, msg);
+		return TextureRef::Null();
+	}
+
+	return texture;
 }
 
+/*
+ * Set the material for the mesh specified by [meshIndex] in a material import descriptor [materialImportDesc] with an instance of
+ * Texture that has already been loaded [texture]. This method determines the correct shader variable name for the texture based on
+ * the type of texture [textureType], and sets that variable in the material for the mesh specified by [meshIndex] with [texture].
+ * The method then locates the Assimp UV data for that texture and stores that in the mesh-specific properties of
+ * [materialImportDesc].
+ */
+bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, TextureType textureType, const TextureRef texture,
+		 	 	 	 	 	 	 	 	 	 	 	 	 unsigned int meshIndex, MaterialImportDescriptor& materialImportDesc) const
+{
+	// get the Assimp material key for textures of type [textureType]
+	unsigned int aiTextureKey = ConvertTextureTypeToAITextureKey(textureType);
+
+	// get the name of the shader uniform that handles textures of [textureType]
+	std::string textureName = GetBuiltinVariableNameForTextureType(textureType);
+
+	// if we can't find a shader variable for the diffuse texture, then the load of this material has failed
+	if(textureName.empty())
+	{
+		std::string msg ="ModelImporter::SetupImportedMaterialTexture -> Could not locate shader variable for texture.";
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::MaterialShaderVariableMatchFailure, msg);
+		return false;
+	}
+
+	// set the diffuse texture in the material for the mesh specified by [meshIndex]
+	materialImportDesc.meshSpecificProperties[meshIndex].material->SetTexture(texture, textureName);
+
+	int mappedIndex;
+
+	// get the Assimp UV channel for the texture. the mapping will be used later when
+	// processing the meshes in the scene
+	if(AI_SUCCESS==aiGetMaterialInteger(&assimpMaterial,AI_MATKEY_UVWSRC(aiTextureKey,0),&mappedIndex))
+		materialImportDesc.meshSpecificProperties[meshIndex].uvMapping[textureType] = mappedIndex;
+	else
+		materialImportDesc.meshSpecificProperties[meshIndex].uvMapping[textureType] = 0;
+
+	return true;
+}
+
+/*
+ * Get the global import properties for an Assimp material [mtl], and store in the global section  of the
+ * supplied MaterialImportDescriptor instance [materialImportDesc].
+ *
+ * Additionally, get the mesh-specific properties for the Assimp material and store in the mesh-specific
+ * properties section of the supplied MaterialImportDescriptor instance.
+ */
 void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene)
 {
 	LongMask flags = LongMaskUtil::CreateLongMask();
@@ -651,27 +766,57 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	//
 	// This loop runs through each Assimp mesh that uses [mtl] and determines the unique
 	// material properties of that mesh to form a final LongMask value that holds the
-	// active ShaderMaterialCharacteristic values for that mesh
+	// active ShaderMaterialCharacteristic values for that mesh.
 	for(unsigned int i = 0; i < scene.mNumMeshes; i++)
 	{
 		// copy the existing set of ShaderMaterialCharacteristic values
 		LongMask meshFlags = flags;
 		// get mesh
 		const aiMesh * mesh = scene.mMeshes[i];
-		unsigned int materialIndex = mesh->mMaterialIndex;
 
-		// compare current meshes material to [mtl]
-		if(scene.mMaterials[materialIndex] == mtl)
+		// does the current mesh use [mtl] ?
+		if(scene.mMaterials[mesh->mMaterialIndex] == mtl)
 		{
-			unsigned int meshSpecificIndex = i;
 			// for now only support one set of vertex colors, and look at index 0 for it
 			if(mesh->HasVertexColors(0))
 			{
 				LongMaskUtil::SetBit(&meshFlags, (short)ShaderMaterialCharacteristic::VertexColors);
-				materialImportDesc.meshSpecificProperties[meshSpecificIndex].vertexColorsIndex = 0;
+				materialImportDesc.meshSpecificProperties[i].vertexColorsIndex = 0;
 			}
 			// set mesh specific ShaderMaterialCharacteristic values
-			materialImportDesc.meshSpecificProperties[meshSpecificIndex].shaderProperties = meshFlags;
+			materialImportDesc.meshSpecificProperties[i].shaderProperties = meshFlags;
+		}
+	}
+}
+
+void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target) const
+{
+	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	{
+		aiMesh * cMesh = scene.mMeshes[m];
+		if( cMesh != NULL && cMesh->mNumBones > 0)
+		{
+			VertexBoneMap indexBoneMap(cMesh->mNumVertices, cMesh->mNumVertices);
+
+			bool mapInitSuccess = indexBoneMap.Init();
+			if(!mapInitSuccess)
+			{
+				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not initialize index bone map.");
+			}
+
+			SetupVertexBoneMapMappingsFromAIMesh(skeleton, *cMesh, indexBoneMap);
+
+			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping( indexBoneMap, *cMesh);
+			if(fullBoneMap == NULL)
+			{
+				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not create full vertex bone map.");
+			}
+
+			target->AddVertexBoneMap(fullBoneMap);
+		}
+		else
+		{
+			target->AddVertexBoneMap(NULL);
 		}
 	}
 }
@@ -1076,6 +1221,36 @@ StandardAttribute ModelImporter::MapShaderMaterialCharacteristicToAttribute(Shad
 	return StandardAttribute::_None;
 }
 
+StandardUniform ModelImporter::MapTextureTypeToUniform(TextureType textureType)
+{
+	switch(textureType)
+	{
+		case TextureType::Diffuse:
+			return StandardUniform::Texture0;
+		break;
+		default:
+			return StandardUniform::_None;
+		break;
+	}
+
+	return StandardUniform::_None;
+}
+
+StandardAttribute ModelImporter::MapTextureTypeToAttribute(TextureType textureType)
+{
+	switch(textureType)
+	{
+		case TextureType::Diffuse:
+			return StandardAttribute::UVTexture0;
+		break;
+		default:
+			return StandardAttribute::_None;
+		break;
+	}
+
+	return StandardAttribute::_None;
+}
+
 std::string ModelImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property)
 {
 
@@ -1088,4 +1263,37 @@ std::string ModelImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic
 
 	return "";
 }
+
+std::string ModelImporter::GetBuiltinVariableNameForTextureType(TextureType textureType)
+{
+
+	StandardUniform uniform = MapTextureTypeToUniform(textureType);
+
+	if(uniform != StandardUniform::_None)
+	{
+		return StandardUniforms::GetUniformName(uniform);
+	}
+
+	return "";
+}
+
+ModelImporter::TextureType ModelImporter::ConvertAITextureKeyToTextureType(int aiTextureKey)
+{
+	TextureType textureType = TextureType::_None;
+	if(aiTextureKey == aiTextureType_SPECULAR)textureType = TextureType::Specular;
+	else if(aiTextureKey == aiTextureType_NORMALS)textureType = TextureType::BumpMap;
+	else if(aiTextureKey == aiTextureType_DIFFUSE)textureType = TextureType::Diffuse;
+	return textureType;
+
+}
+
+int ModelImporter::ConvertTextureTypeToAITextureKey(TextureType textureType)
+{
+	int aiTextureKey = -1;
+	if(textureType == TextureType::Specular)aiTextureKey = aiTextureType_SPECULAR;
+	else if(textureType == TextureType::BumpMap)aiTextureKey = aiTextureType_NORMALS;
+	else if(textureType == TextureType::Diffuse)aiTextureKey = aiTextureType_DIFFUSE;
+	return aiTextureKey;
+}
+
 

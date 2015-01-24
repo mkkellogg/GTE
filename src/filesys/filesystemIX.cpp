@@ -68,7 +68,7 @@ std::string FileSystemIX::FixupPath(const std::string& path) const
 std::string FileSystemIX::GetFileName(const std::string& fullPath) const
 {
 	size_t pos = fullPath.find_last_of("/");
-	return (std::string::npos == pos) ? "" : fullPath.substr(pos+1);
+	return (std::string::npos == pos) ? std::string() : fullPath.substr(pos+1);
 }
 
 bool FileSystemIX::FileExists(const std::string& fullPath) const

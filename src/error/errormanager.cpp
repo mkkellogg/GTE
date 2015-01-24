@@ -35,6 +35,17 @@ void ErrorManager::SetAndReportError(int code, const char * message)
 	SetAndReportError(code, std::string(message));
 }
 
+void ErrorManager::SetAndReportWarning(int code, const std::string& message)
+{
+	SetError(code, message);
+	Debug::PrintAtLevel(message, DebugLevel::Warning);
+}
+
+void ErrorManager::SetAndReportWarning(int code, const char * message)
+{
+	SetAndReportWarning(code, std::string(message));
+}
+
 void ErrorManager::Reset()
 {
 	errorCode = -1;

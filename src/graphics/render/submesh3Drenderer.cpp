@@ -179,8 +179,8 @@ void SubMesh3DRenderer::SetUseBadGeometryShadowFix(bool useFix)
  * produces the correct effect with out the front-facing Z-fighting issues.
  *
  * The algorithm in this method also uses a couple techniques to get around the typical requirement that
- * the mesh for which the shadow volume is being generated be closed. By this, we mean the mesh has triangles
- * that don't have adjacent triangles on every edge. When a triangle with an edge that doesn't have an
+ * the mesh for which the shadow volume is being generated needs to be closed. By closed, we mean a mesh where
+ * each triangle has an adjacent triangles on every edge. When a triangle with an edge that doesn't have an
  * adjacent face is encountered, the algorithm treats the problematic edge as if it were an edge separating
  * front and back facing triangles, and generates side polygons for that edge.
  *
@@ -208,9 +208,9 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	ASSERT_RTRN(normals, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL face normals array.");
 	Vector3Array& normalsSource = doNormalTransform == true ? transformedFaceNormals : *normals;
 
-	// dot product result threshold distinguishing front and back facing polygons
-	// the dot product is calculated between a trinagle's normal, and the direction
-	// vector to the light
+	// dot product result threshold distinguishing front and back facing polygons.
+	// the dot product is calculated between a triangle's normal, and the direction
+	// vector to the light.
 	float backFaceThreshold = 0;
 
 	// currentPositionVertexIndex = current number of process shadow volume vertices
@@ -300,7 +300,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 			// copy the three face vertices into the shadow volume position array again, but zero out
 			// the 4th component of the position vector. this allows the shadow volume shader to project
-			// the points to infinity to create the back cap of the shadow volume
+			// the points to infinity to create the back cap of the shadow volume.
 			BaseVector4_QuickCopy_ZeroW_IncDest(faceVertex1, svPositionBase);
 			BaseVector4_QuickCopy_ZeroW_IncDest(faceVertex2, svPositionBase);
 			BaseVector4_QuickCopy_ZeroW_IncDest(faceVertex3, svPositionBase);
@@ -375,7 +375,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			//    1. The adjacent face on the current edge is front facing (adjFaceToLightDot >= backFaceThreshold)
 			//    2. There is no adjacent face (adjacentFaceIndex < 0)
 			//    3. [useBadGeometryShadowFix] == true
-			// we create two side polygons to link the current face, which will be a front cap triangle,
+			// then we create two side polygons to link the current face, which will be a front cap triangle,
 			// to the back cap triangle, which is the current face projected to infinity, on the current edge
 			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{

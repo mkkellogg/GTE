@@ -456,6 +456,8 @@ void EngineObjectManager::DeleteTexture(Texture * texture)
 MaterialRef EngineObjectManager::CreateMaterial(const char *name, ShaderRef shader)
 {
 	Material * m = new Material(name);
+	ASSERT(m != NULL, "EngineObjectManager::CreateMaterial -> Unable to allocate material.", MaterialRef::Null());
+
 	bool initSuccess = m->Init(shader);
 	if(!initSuccess)
 	{

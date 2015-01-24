@@ -1,3 +1,13 @@
+/*
+ * Class: ModelImporter
+ *
+ * Author: Mark Kellogg
+ *
+ * This class utilizes the functions and data structures in Assimp to
+ * load models from disk and convert them into equivalent engine-native
+ * scene object hierarchies with meshes and materials.
+ */
+
 #ifndef _GTE_MODEL_IMPORTER_H_
 #define _GTE_MODEL_IMPORTER_H_
 
@@ -10,6 +20,8 @@ class Material;
 class UV2Array;
 class Skeleton;
 class VertexBoneMap;
+
+// forward declaration for Assimp
 namespace Assimp { class Importer; }
 
 #include "object/sceneobjectcomponent.h"
@@ -24,11 +36,34 @@ namespace Assimp { class Importer; }
 #include <string>
 #include <vector>
 
+enum ModelImporterErrorCodes
+{
+	ModelFileNotFound = 1,
+	ModelFileLoadFailed = 2,
+	AssimpTextureNotFound = 3,
+	TextureFileNotFound = 4,
+	TextureFileLoadFailed = 5,
+	MaterialImportFailure = 6,
+	MaterialTextureLoadFailure = 7,
+	MaterialShaderMatchFailure = 8,
+	MaterialShaderVariableMatchFailure = 9
+
+
+};
+
 class ModelImporter
 {
 	friend class AssetImporter;
 
 	protected :
+
+	enum class TextureType
+	{
+		Diffuse = 0,
+		Specular = 1,
+		BumpMap = 2,
+		_None = 3
+	};
 
 	enum class SceneTraverseOrder
 	{
@@ -42,11 +77,20 @@ class ModelImporter
 		int vertexColorsIndex;
 		LongMask shaderProperties;
 		MaterialRef material;
+		bool invertVCoords;
+		std::map<TextureType, int> uvMapping;
 
 		MeshSpecificMaterialDescriptor()
 		{
 			vertexColorsIndex = -1;
 			shaderProperties = 0L;
+			invertVCoords = true;
+		}
+
+		bool UVMappingHasKey(TextureType key)
+		{
+			if(uvMapping.find(key) != uvMapping.end())return true;
+			return false;
 		}
 	};
 
@@ -56,28 +100,13 @@ class ModelImporter
 
 		std::map<int,MeshSpecificMaterialDescriptor> meshSpecificProperties;
 
-		bool invertVCoords;
-		std::map<ShaderMaterialCharacteristic, int> uvMapping;
-
-		bool UVMappingHasKey(ShaderMaterialCharacteristic key)
-		{
-			if(uvMapping.find(key) != uvMapping.end())return true;
-			return false;
-		}
-
 		bool UsedByMesh(int index)
 		{
 			if(meshSpecificProperties.find(index) != meshSpecificProperties.end())return true;
 			return false;
 		}
-
-		MaterialImportDescriptor()
-		{
-			invertVCoords = true;
-		}
 	};
 
-	static const std::string AssimpPathDelimiter;
 	Assimp::Importer * importer;
 
 	ModelImporter();
@@ -91,6 +120,9 @@ class ModelImporter
 									std::vector<SceneObjectRef>& createdSceneObjects,  bool castShadows, bool receiveShadows) const;
 	SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale, bool castShadows, bool receiveShadows) const;
 	bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
+	TextureRef LoadAITexture(aiMaterial& material, aiTextureType textureType, const std::string& modelPath) const;
+	bool SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, const TextureType textureType, TextureRef texture,
+			 	 	 	 	 	 	 	 	  unsigned int meshIndex, MaterialImportDescriptor& materialImportDesc) const;
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
 	SubMesh3DRef ConvertAssimpMesh(const aiMesh& mesh, unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor) const;
 	void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target) const;
@@ -108,12 +140,17 @@ class ModelImporter
 
 	static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 	static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);
+	static StandardUniform MapTextureTypeToUniform(TextureType textureType);
+	static StandardAttribute MapTextureTypeToAttribute(TextureType textureType);
 	static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property);
 	static std::string GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property);
+	static std::string GetBuiltinVariableNameForTextureType(TextureType textureType);
+	static TextureType ConvertAITextureKeyToTextureType(int aiTextureKey);
+	static int ConvertTextureTypeToAITextureKey(TextureType textureType);
 
 	public:
 
-	SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows);
+	SceneObjectRef LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows);
 	AnimationRef LoadAnimation(const std::string& filePath);
 
 };
