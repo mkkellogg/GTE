@@ -32,7 +32,7 @@
 	
 		make -f <makefile>
 		
-	Where <makefile> is the makefile that is appropriate for your platform. Currently there are two:
+	Where `makefile` is the makefile that is appropriate for your platform. Currently there are two:
 		
 		Makefile.osx - Apple OSX
 		Makefile.unix - Unix & Linux systems
