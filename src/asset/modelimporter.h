@@ -44,11 +44,9 @@ enum ModelImporterErrorCodes
 	TextureFileNotFound = 4,
 	TextureFileLoadFailed = 5,
 	MaterialImportFailure = 6,
-	MaterialTextureLoadFailure = 7,
-	MaterialShaderMatchFailure = 8,
-	MaterialShaderVariableMatchFailure = 9
-
-
+	MaterialShaderMatchFailure = 7,
+	MaterialShaderVariableMatchFailure = 8,
+	ProcessMaterialsFailed = 9
 };
 
 class ModelImporter

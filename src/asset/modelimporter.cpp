@@ -62,7 +62,7 @@
 #include "error/errormanager.h"
 #include "util/util.h"
 
-/*
+/**
  * Default constructor.
  */
 ModelImporter::ModelImporter()
@@ -70,7 +70,7 @@ ModelImporter::ModelImporter()
 	importer = NULL;
 }
 
-/*
+/**
  * Clean-up.
  */
 ModelImporter::~ModelImporter()
@@ -78,7 +78,7 @@ ModelImporter::~ModelImporter()
 	SAFE_DELETE(importer);
 }
 
-/*
+/**
  * Initialize the Assimp importer object (if it has not already been done so).
  */
 bool ModelImporter::InitImporter()
@@ -92,7 +92,7 @@ bool ModelImporter::InitImporter()
 	return true;
 }
 
-/*
+/**
  * Load an Assimp compatible model/scene located at [filePath]. [filePath] Must be a native file-system
  * compatible path, so the the engine's FileSystem singleton should be used to derive the correct platform-specific
  * path before calling this method.
@@ -102,11 +102,11 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 	// the global Assimp scene object
 	const aiScene* scene = NULL;
 
-	// Create an instance of the Importer class
+	// Create an instance of the Assimp Importer class
 	bool initSuccess = InitImporter();
-	ASSERT(initSuccess == true," ModelImporter::LoadAIScene -> Could not initialize importer." , NULL);
+	ASSERT(initSuccess == true," ModelImporter::LoadAIScene -> Could not initialize Assimp importer." , NULL);
 
-	// Check if file exists
+	// Check if model file exists
 	std::ifstream fin(filePath.c_str());
 	if(!fin.fail())
 	{
@@ -136,7 +136,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 	return scene;
 }
 
-/*
+/**
  * Load an Assimp compatible model/scene located at [modelPath]. [modelPath] Must be a native file-system
  * compatible path, so the the engine's FileSystem singleton should be used to derive the correct platform-specific
  * path before calling this method.
@@ -162,7 +162,7 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, floa
 	}
 }
 
-/*
+/**
  * Convert an Assimp aiScene structure into an engine-native scene hierarchy.
  *
  * [modelPath] - Native file-system compatible path that points to the model/scene file in the file system. This is
@@ -178,36 +178,60 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	// get a pointer to the Engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
+	// container for MaterialImportDescriptor instances that describe the engine-native
+	// materials that get created during the call to ProcessMaterials()
 	std::vector<MaterialImportDescriptor> materialImportDescriptors;
-	if(!ProcessMaterials(modelPath, scene, materialImportDescriptors))
-	{
-		return SceneObjectRef::Null();
-	}
 
+	// verify that we have a valid scene
 	ASSERT(scene.mRootNode != NULL,"AssetImporter::ProcessModelScene -> Assimp scene root is NULL.", SceneObjectRef::Null());
-
 	SceneObjectRef root = objectManager->CreateSceneObject();
 	ASSERT(root.IsValid(),"AssetImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
 
+	// process all the Assimp materials in [scene] and create equivalent engine native materials.
+	// store those materials and their properties in MaterialImportDescriptor instances, which get
+	// added to [materialImportDescriptors]
+	bool processMaterialsSuccess = ProcessMaterials(modelPath, scene, materialImportDescriptors);
+	if(!processMaterialsSuccess)
+	{
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::ProcessMaterialsFailed, "ModelImporter::ProcessModelScene -> ProcessMaterials() returned an error.");
+		return SceneObjectRef::Null();
+	}
+
+	// deactivate the root scene object so that it is not immediately
+	// active or visible in the scene after it has been loaded
 	root->SetActive(false);
 	Matrix4x4 baseTransform;
 
+	// pull the skeleton data from the scene/model (if it exists)
 	SkeletonRef skeleton = LoadSkeleton(scene);
 
+	// container for all the SceneObject instances that get created during this process
 	std::vector<SceneObjectRef> createdSceneObjects;
+
+	// recursively move down the Assimp scene hierarchy and process each node one by one.
+	// all instances of SceneObject that are generated get stored in [createdSceneObjects].
+	// any time meshes or mesh renderers are created, the information in [materialImportDescriptors]
+	// will be used to link their materials and textures as appropriate.
 	RecursiveProcessModelScene(scene, *(scene.mRootNode), importScale, root,  materialImportDescriptors, skeleton, createdSceneObjects, castShadows, receiveShadows);
 
+	// loop through each instance of SceneObject that was created in the call to RecursiveProcessModelScene()
+	// and for each instance that contains a SkinnedMesh3DRenderer instance, clone the Skeleton instance
+	// created earlier in the call to LoadSkeleton() and assign the cloned skeleton to that renderer.
 	for(unsigned int s = 0; s < createdSceneObjects.size(); s++)
 	{
+		// does the SceneObject instance have a SkinnedMesh3DRenderer ?
 		SkinnedMesh3DRendererRef renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
 		if(renderer.IsValid())
 		{
+			// clone [skeleton]
 			SkeletonRef skeletonClone = objectManager->CloneSkeleton(skeleton);
 			if(!skeletonClone.IsValid())
 			{
 				Debug::PrintWarning("ModelImporter::ProcessModelScene -> Could not clone scene skeleton.");
 				continue;
 			}
+
+			// assign the clones skeleton to [renderer]
 			renderer->SetSkeleton(skeletonClone);
 			SetupVertexBoneMapForRenderer(scene, skeletonClone, renderer);
 		}
@@ -226,12 +250,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 											   bool receiveShadows) const
 {
 	Matrix4x4 mat;
-
 	aiMatrix4x4 matBaseTransformation = node.mTransformation;
-	//aiMatrix4x4 matScaling;
-	//aiMatrix4x4::Scaling(aiVector3D(scale, scale, scale), matScaling);
-
-//	matBaseTransformation = matBaseTransformation;
 	ImportUtil::ConvertAssimpMatrix(matBaseTransformation,mat);
 
 	scale = 1;
@@ -671,7 +690,7 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
 	return texture;
 }
 
-/*
+/**
  * Set the material for the mesh specified by [meshIndex] in a material import descriptor [materialImportDesc] with an instance of
  * Texture that has already been loaded [texture]. This method determines the correct shader variable name for the texture based on
  * the type of texture [textureType], and sets that variable in the material for the mesh specified by [meshIndex] with [texture].
@@ -710,7 +729,7 @@ bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assim
 	return true;
 }
 
-/*
+/**
  * Get the global import properties for an Assimp material [mtl], and store in the global section  of the
  * supplied MaterialImportDescriptor instance [materialImportDesc].
  *
