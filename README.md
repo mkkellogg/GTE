@@ -45,7 +45,7 @@
 	- Glut: freeglut3-dev
 	- Glew: libglew-dev
 
-	On certain Linux distros you might encounter linkage errors if you have intalled proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Linux makefile, a variable called OPENGL_LIB is defined to point to such a location.
+	On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location.
 
 	2.3 OSX Notes
 	
