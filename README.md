@@ -30,7 +30,7 @@
 	
 	2.3 OSX Notes
 	
-	On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Brew package management utility, although the package names vary slightly from the official names mentioned above. The actual names of the packages you need to install are as follows:
+	On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Brew package management utility, and the version of Assimp available through Brew seems to support FBX models. The one caveat is that Brew package names vary slightly from the official names mentioned above. The actual names of the packages you need to install are as follows:
 	
 	- Assimp: assimp
 	- DevIL: devil
