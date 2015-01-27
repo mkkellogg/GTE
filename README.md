@@ -22,7 +22,7 @@
 		- GLUT (OpenGL Utility Toolkit)
 		- GLEW (OpenGL Extension Wrangler library)
 	
-	Your Assimp installation needs to include the ability to load FBX files in order to run the demo included in the project. The variables ASSIMP_LIB and ASSIMP_INC in the make files were defined to point to a custom version of the library that has this ability.
+	Your Assimp installation needs to include the ability to load FBX files in order to run the demo included in the project.
 
 	2.2 Linux notes
 	
@@ -77,5 +77,7 @@
 	Before running the demo, make sure you have downloaded the models and textures that it needs. They can be found at: http://projects.markkellogg.org/downloads/models-textures.zip. Uncompress the archive in the 'resources' sub-folder, the process should create two new folders: 'resources/models' and 'resources/textures'.
 
 	To run the demo, do not run the 'gtedemo' executable directly. Instead, execute the 'rungtedemo.sh' script that is in the root of the GTE installation, which will ensure the demo's working directory is correctly set up.
+	
+	Note: On certain Linux distros you might encounter linkage errors if you have intalled proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Linux makefile, a variable called OPENGL_LIB is defined to point to such a location.
 
 
