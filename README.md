@@ -1,9 +1,7 @@
 
 
 1. Overview
-	
-	GTE - Ghost Tree Engine
-	
+
 	Basic graphics engine developed in C++ that currently supports the following features:
 	
 		- Scene-graph API
