@@ -10,11 +10,9 @@
 # - GLUT (OpenGL Utility Toolkit)
 # - GLEW (OpenGL Extension Wrangler library)
 
-#this needs to be updated to your own Assimp path
-#ASSIMP_LIB=../assimp/lib
-#this needs to be updated to your own Assimp path
-#ASSIMP_INC=../assimp/include
-#this needs to be changed to your own OpenGL lib path
+#ASSIMP_LIB=~/assimp/lib
+#ASSIMP_INC=~/assimp/include
+#this needs to be changed to your own OpenGL lib path (or removed)
 OPENGL_LIB=/usr/lib/nvidia-331-updates/
 
 LIBS= -L$(OPENGL_LIB) -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL 

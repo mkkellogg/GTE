@@ -10,10 +10,8 @@
 # - GLUT (OpenGL Utility Toolkit)
 # - GLEW (OpenGL Extension Wrangler library)
 
-
-#ASSIMP_LIB=../assimp/lib
-#ASSIMP_INC=../assimp/include
-
+#ASSIMP_LIB=~/assimp/lib
+#ASSIMP_INC=~/assimp/include
 #LIBS= -L$(ASSIMP_LIB) -lassimp -lm -framework OpenGL -framework GLUT  -lGLEW -lIL 
 #CFLAGS= -Isrc -I$(ASSIMP_INC) -stdlib=libc++ -std=c++11 -Wall 
 

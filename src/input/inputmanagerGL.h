@@ -21,6 +21,7 @@ class InputManagerGL : public InputManager
 
     bool Init();
     void KeyboardFunction(unsigned char key, int x, int y);
+    void KeyboardFunctionUp(unsigned char key, int x, int y);
     void SpecialInputUp(int key, int x, int y);
     void SpecialInput(int key, int x, int y);
 };

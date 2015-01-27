@@ -68,6 +68,11 @@ Game::Game()
 	baseCameraForward = Vector3(0,0,-1);
 
 	playerType = PlayerType::Koopa;
+	playerState = PlayerState::Waiting;
+	for(unsigned int i = 0; i < MAX_PLAYER_STATES; i++)
+	{
+		stateActivationTime[i] = 0;
+	}
 }
 
 /*
@@ -435,6 +440,8 @@ void Game::Update()
  */
 void Game::UpdatePlayerMovementDirection()
 {
+	if(playerState == PlayerState::Roaring)return;
+
 	Point3 cameraPos;
 	Point3 playerPos;
 
@@ -524,6 +531,8 @@ void Game::UpdatePlayerMovementDirection()
  */
 void Game::UpdatePlayerPosition()
 {
+	if(playerState == PlayerState::Roaring)return;
+
 	if(moveSpeed > .1)
 	{
 		Vector3 move = lookDirection;
@@ -537,6 +546,8 @@ void Game::UpdatePlayerPosition()
  */
 void Game::UpdatePlayerLookDirection()
 {
+	if(playerState == PlayerState::Roaring)return;
+
 	// axis around which to rotate player object
 	Vector3 rotationAxis(0,1,0);
 
@@ -554,18 +565,42 @@ void Game::UpdatePlayerLookDirection()
 	playerObject->GetTransform().SetLocalComponents(currentTranslation, modRotation, currentScale);
 }
 
+
 /*
  * Update the player's active animation based on its current action.
  */
 void Game::UpdatePlayerAnimation()
 {
-	if(moveSpeed > .1)
+	if(Engine::Instance()->GetInputManager()->GetKeyState(120))
 	{
-		animationPlayer->CrossFade(playerWalk, .2);
+		if(playerState != PlayerState::Roaring)
+		{
+			animationPlayer->CrossFade(playerRoar, .2);
+			ActivateState(PlayerState::Roaring);
+		}
 	}
-	else
+
+	if(playerState == PlayerState::Roaring)
 	{
-		animationPlayer->CrossFade(playerWait, .3);
+		float roarTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::Roaring] ;
+		if(roarTime > 6)
+		{
+			ActivateState(PlayerState::Waiting);
+		}
+	}
+
+	if(playerState != PlayerState::Roaring)
+	{
+		if(moveSpeed > .1)
+		{
+			animationPlayer->CrossFade(playerWalk, .2);
+			ActivateState(PlayerState::Walking);
+		}
+		else
+		{
+			animationPlayer->CrossFade(playerWait, .3);
+			ActivateState(PlayerState::Waiting);
+		}
 	}
 }
 
@@ -653,4 +688,10 @@ void Game::UpdatePlayerFollowCamera()
 
 	// move the camera's position along the lerp'd movement vector calculated earlier [cameraMove]
 	cameraObject->GetTransform().Translate(cameraMove, false);
+}
+
+void Game::ActivateState(PlayerState state)
+{
+	playerState = state;
+	stateActivationTime[(int) state] = Time::GetRealTimeSinceStartup();
 }

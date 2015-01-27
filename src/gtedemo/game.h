@@ -25,6 +25,21 @@ class Game
 		Nerd = 1
 	};
 
+	enum class PlayerState
+	{
+		Waiting = 0,
+		Walking = 1,
+		Roaring = 2
+	};
+
+	static const unsigned int MAX_PLAYER_STATES = 32;
+
+	// time at which a state was most recently activated
+	float stateActivationTime[MAX_PLAYER_STATES];
+
+	// player's current state
+	PlayerState playerState;
+
 	// specify which model to load for player object
 	PlayerType playerType;
 
@@ -71,6 +86,7 @@ class Game
 	void UpdatePlayerPosition();
 	void UpdatePlayerLookDirection();
 	void UpdatePlayerFollowCamera();
+	void ActivateState(PlayerState state);
 
 	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
 

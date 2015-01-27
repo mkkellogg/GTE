@@ -17,6 +17,11 @@ void _keyboardFunc(unsigned char key, int x, int y)
 	if(_thisPtr != NULL)_thisPtr->KeyboardFunction(key, x, y);
 }
 
+void _keyboardFuncUp(unsigned char key, int x, int y)
+{
+	if(_thisPtr != NULL)_thisPtr->KeyboardFunctionUp(key, x, y);
+}
+
 void _specialInputUp(int key, int x, int y)
 {
 	if(_thisPtr != NULL)_thisPtr->SpecialInputUp(key, x, y);
@@ -40,6 +45,7 @@ InputManagerGL::~InputManagerGL()
 bool InputManagerGL::Init()
 {
 	glutKeyboardFunc(_keyboardFunc);
+	glutKeyboardUpFunc(_keyboardFuncUp);
 	glutSpecialUpFunc(_specialInputUp);
 	glutSpecialFunc(_specialInput);
 	return true;
@@ -47,7 +53,14 @@ bool InputManagerGL::Init()
 
 void InputManagerGL::KeyboardFunction(unsigned char key, int x, int y)
 {
-	//printf("key: %d, x:%d, y:%d\n", key,x,y);
+	SetKeyState((int)key, 0x1);
+	//printf("key down: %d, x:%d, y:%d\n", key,x,y);
+}
+
+void InputManagerGL::KeyboardFunctionUp(unsigned char key, int x, int y)
+{
+	SetKeyState((int)key, 0x0);
+	//printf("key up: %d, x:%d, y:%d\n", key,x,y);
 }
 
 void InputManagerGL::SpecialInput(int key, int x, int y)

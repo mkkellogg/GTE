@@ -253,36 +253,37 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	aiMatrix4x4 matBaseTransformation = node.mTransformation;
 	ImportUtil::ConvertAssimpMatrix(matBaseTransformation,mat);
 
-	scale = 1;
-
+	// get a pointer to the Engine's object manager
 	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
 
 	// create new scene object to hold the Mesh3D object and its renderer
 	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
 	ASSERT_RTRN(sceneObject.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
+	// determine if [skeleton] is valid
 	bool hasSkeleton = skeleton.IsValid() && skeleton->GetBoneCount() ? true : false;
+
 	Mesh3DRenderer * rendererPtr = NULL;
 	SkinnedMesh3DRendererRef skinnedMeshRenderer;
 	Mesh3DRendererRef meshRenderer;
 
-	//printf("node: %s\n",node.mName.C_Str());
-
+	// are there any meshes in the model/scene?
 	if(node.mNumMeshes > 0)
 	{
+		// create a containing Mesh3D object that will hold all sub-meshes created for this node.
+		// for each Assimp mesh, one SubMesh3D will be created added to the Mesh3D instance.
 		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
 		ASSERT_RTRN(mesh3D.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
 
+		// initialize the new Mesh3D instance
 		bool meshInitSuccess = mesh3D->Init();
-		if(!meshInitSuccess)
-		{
-			Debug::PrintError("AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
-			return;
-		}
+		ASSERT_RTRN(meshInitSuccess,"AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
 
+		// set shadow properties
 		mesh3D->SetCastShadows(castShadows);
 		mesh3D->SetReceiveShadows(receiveShadows);
 
+		// if [skeleton] is valid, then we create a SkinnedMesh3DRenderer instead of a Mesh3DRenderer
 		if(hasSkeleton)
 		{
 			skinnedMeshRenderer = engineObjectManager->CreateSkinnedMesh3DRenderer();
@@ -296,19 +297,16 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			rendererPtr = meshRenderer.GetPtr();
 		}
 
-		std::unordered_map<unsigned int, unsigned int> subMeshInmdexToVertexBoneMap;
+		// loop through each Assimp mesh attached to the current Assimp node and
+		// create a SubMesh3D instance for it
 		for (unsigned int n=0; n < node.mNumMeshes; n++)
 		{
+			// get the index of the sub-mesh in the master list of meshes
 			unsigned int sceneMeshIndex = node.mMeshes[n];
-			subMeshInmdexToVertexBoneMap[n] = sceneMeshIndex;
+
+			// get a pointer to the Assimp mesh
 			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
-			if(mesh == NULL)
-			{
-				std::string msg("AssetImporter::RecursiveProcessModelScene -> Mesh is NULL at index: ");
-				msg += std::to_string(sceneMeshIndex);
-				Debug::PrintError(msg);
-				return;
-			}
+			ASSERT_RTRN(mesh != NULL, "AssetImporter::RecursiveProcessModelScene -> Node mesh is NULL.");
 
 			int materialIndex = mesh->mMaterialIndex;
 			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
@@ -326,16 +324,19 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			mesh3D->SetSubMesh(subMesh3D, n);
 		}
 
+		// set the SkinnedMesh3DRenderer instance and Mesh3D instance if this scene/model
+		// has a skeleton
 		if(hasSkeleton)
 		{
 			for (unsigned int n=0; n < node.mNumMeshes; n++)
 			{
-				skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, subMeshInmdexToVertexBoneMap[n]);
+				skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, node.mMeshes[n]);
 			}
 
 			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
 			sceneObject->SetMesh3D(mesh3D);
 		}
+		// set the Mesh3DRenderer instance and Mesh3D instance
 		else
 		{
 			sceneObject->SetMesh3DRenderer(meshRenderer);
@@ -359,12 +360,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 					{
 						// if this skeleton node has a SceneObject target, then set it to [sceneObject]
 						SceneObjectSkeletonNode *soskNode = dynamic_cast<SceneObjectSkeletonNode*>(skNode);
-						if(soskNode != NULL)
-						{
-							//const float * data = sceneObject->GetLocalTransform().GetMatrix()->GetDataPtr();
-							//printf("mapped: %s [%f,%f,%f,%f]\n",node.mName.C_Str(), data[0], data[5], data[10], data[15]);
-							soskNode->Target = sceneObject;
-						}
+						if(soskNode != NULL)soskNode->Target = sceneObject;
 					}
 				}
 			}
