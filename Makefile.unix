@@ -11,14 +11,14 @@
 # - GLEW (OpenGL Extension Wrangler library)
 
 #this needs to be updated to your own Assimp path
-ASSIMP_LIB=../assimp/lib
+#ASSIMP_LIB=../assimp/lib
 #this needs to be updated to your own Assimp path
-ASSIMP_INC=../assimp/include
+#ASSIMP_INC=../assimp/include
 #this needs to be changed to your own OpenGL lib path
 OPENGL_LIB=/usr/lib/nvidia-331-updates/
 
-LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL 
-CFLAGS=-Isrc -I$(ASSIMP_INC) -std=c++11 -Wall
+LIBS= -L$(OPENGL_LIB) -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL 
+CFLAGS=-Isrc -std=c++11 -Wall
 CC=g++
 
 include Makefile.base
