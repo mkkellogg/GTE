@@ -28,6 +28,23 @@
 	
 	On multiple flavors of Linux the Assimp package that is available through standard package management channels seems to not have the ability to load FBX files. Therefore if you are trying to build GTE on Linux you will probably have to build Assimp from source.
 	
+	Building Assimp on Linux can be accomplished throug hte following steps:
+	
+	- Make sure CMake is installed.
+	- Make sure you have the cmake-gui package installed
+	- Use cmake-gui to configure the CMake build for Assimp
+	- In a terminal window, navigate to the root of your Assimp repo and run:
+	
+		cmake -G "Unix Makefiles"
+	
+	- Now run make, followed by make install
+	
+	DeVIL, Glut, and Glew are available through standard package management channels, although the package names differ from the official names:
+
+	- DevIL: devil
+	- Glut: freeglut3-dev
+	- Glew: glew
+	
 	2.3 OSX Notes
 	
 	On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Brew package management utility, and the version of Assimp available through Brew seems to support FBX models. The one caveat is that Brew package names vary slightly from the official names mentioned above. The actual names of the packages you need to install are as follows:
