@@ -39,11 +39,11 @@
 	
 	- Now run make, followed by make install
 	
-	DeVIL, Glut, and Glew are available through standard package management channels, although the package names differ from the official names:
+	DeVIL, GLUT, and GLEW are available through standard package management channels, although the package names differ from the official names:
 
 	- DevIL: libdevil-dev
-	- Glut: freeglut3-dev
-	- Glew: libglew-dev
+	- GLUT: freeglut3-dev
+	- GLEW: libglew-dev
 
 	On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location.
 
@@ -53,8 +53,8 @@
 	
 	- Assimp: assimp
 	- DevIL: devil
-	- Glut: freeglut
-	- Glew: glew
+	- GLUT: freeglut
+	- GLEW: glew
 	
 	You will also need to make sure to have 'gcc' and 'g++' installed on your machine.
 	
