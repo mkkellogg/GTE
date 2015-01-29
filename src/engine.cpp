@@ -143,6 +143,7 @@ void Engine::Update()
 	if(callbacks!=NULL)callbacks->OnUpdate();
 	graphicsEngine->Update();
 	animationManager->Update();
+	inputManager->Update();
 	graphicsEngine->RenderScene();
 	Time::Update();
 }

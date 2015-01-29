@@ -571,7 +571,7 @@ void Game::UpdatePlayerLookDirection()
  */
 void Game::UpdatePlayerAnimation()
 {
-	if(Engine::Instance()->GetInputManager()->GetKeyState(120))
+	if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::X))
 	{
 		if(playerState != PlayerState::Roaring)
 		{

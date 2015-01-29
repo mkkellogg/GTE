@@ -16,10 +16,16 @@ class InputManagerGL : public InputManager
 	InputManagerGL();
     ~InputManagerGL();
     DigitalInput MapSpecialInputToDigitalInput(int key);
+    int MapSpecialInputToKeyIndex(int key);
+    int MapModifierToKeyIndex(int modifier);
+    void DetectModifiers();
+    unsigned int GetKeyIndexForNonCharacterKey(NonCharacterKey key);
+    unsigned int GetKeyIndexFromCharacter(unsigned char key);
 
     public :
 
     bool Init();
+    void Update();
     void KeyboardFunction(unsigned char key, int x, int y);
     void KeyboardFunctionUp(unsigned char key, int x, int y);
     void SpecialInputUp(int key, int x, int y);

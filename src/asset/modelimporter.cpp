@@ -239,10 +239,28 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	return root;
 }
 
+/**
+ * Recursively traverse the Assimp scene/model hierarchy and convert Assimp objects into
+ * engine-native objects. This method will create instances of SceneObject for each Assimp node,
+ * and instances of Mesh3D for Assimp meshes. Additionally it will create either Mesh3DRenderer or
+ * SkinnedMesh3DRenderer instances for those meshes, depending on whether or no they have
+ * skeletal data.
+ *
+ * [scene] - The Assimp aiScene structure that has been loaded from disk.
+ * [node] - The current Assimp node, represented by an aiNode structure
+ * [scale] - The factor by which the original size of the model should be adjusted.
+ * [parent] - The parent SceneObject instance to which any child instances should be attached.
+ * [materialImportDescriptors] - container for MaterialImportDescriptor instances that describe the
+ * 								 engine-native materials to be linked with any meshes that are created.
+ * [skeleton] - Instance of Skeleton for this scene/model (may be null)
+ * [createdSceneObjects] - Container in which to store reference to SceneObject instances that get created.
+ * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
+ * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
+ */
 void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 											   const aiNode& node,
 											   float scale,
-											   SceneObjectRef current,
+											   SceneObjectRef parent,
 											   std::vector<MaterialImportDescriptor>& materialImportDescriptors,
 											   SkeletonRef skeleton,
 											   std::vector<SceneObjectRef>& createdSceneObjects,
@@ -317,7 +335,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			rendererPtr->AddMaterial(material);
 
 			// convert Assimp mesh to a Mesh3D object
-			SubMesh3DRef subMesh3D = ConvertAssimpMesh(*mesh, sceneMeshIndex, materialImportDescriptor);
+			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor);
 			ASSERT_RTRN(subMesh3D.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 			// add the mesh to the newly created scene object
@@ -368,10 +386,11 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	}
 
 	// update the scene object's local transform
+	sceneObject->GetTransform().SetTo(mat);
+
 	std::string name(node.mName.C_Str());
 	sceneObject->SetName(name);
-	sceneObject->GetTransform().SetTo(mat);
-	current->AddChild(sceneObject);
+	parent->AddChild(sceneObject);
 	createdSceneObjects.push_back(sceneObject);
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
@@ -381,21 +400,22 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	}
 }
 
-SubMesh3DRef ModelImporter::ConvertAssimpMesh(const aiMesh& mesh,  unsigned int meshIndex, MaterialImportDescriptor& materialImportDescriptor) const
+/**
+ * Convert an Assimp mesh to an engine-native SubMesh3D instance.
+ *
+ * [meshIndex] - The index of the target Assimp mesh in the scene's list of meshes
+ * [scene] - The Assimp scene/model.
+ * [materialImportDescriptor] - Descriptor for the mesh's material.
+ */
+SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor) const
 {
-	unsigned int vertexCount = 0;
+	ASSERT(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DRef::Null());
 
-	// loop through each face in the mesh to get a count of all the vertices
-	for (unsigned int faceIndex = 0; faceIndex < mesh.mNumFaces; faceIndex++)
-	{
-		const aiFace* face = mesh.mFaces + faceIndex;
-		if(face == NULL)
-		{
-			Debug::PrintError("AssetImporter::ConvertAssimpMesh -> For some reason, mesh has a NULL face!");
-			return SubMesh3DRef::Null();
-		}
-		vertexCount += face->mNumIndices;
-	}
+	unsigned int vertexCount = 0;
+	aiMesh & mesh = *scene.mMeshes[meshIndex];
+
+	// get the vertex count for the mesh
+	vertexCount = mesh.mNumFaces * 3;
 
 	// create a set of standard attributes that will dictate the standard attributes
 	// to be used by the Mesh3D object created by this function.

@@ -424,10 +424,14 @@ void GraphicsGL::DestroyTexture(Texture * texture)
 	ASSERT_RTRN(texture != NULL, "GraphicsGL::DestroyTexture -> texture is NULL");
 
 	TextureGL * texGL = dynamic_cast<TextureGL*>(texture);
-	if(texGL != NULL)
+	ASSERT_RTRN(texGL != NULL, "GraphicsGL::DestroyTexture -> texture is not OpenGL compatible");
+
+	GLuint textureID = texGL->GetTextureID();
+	if(glIsTexture(textureID))
 	{
-		delete texGL;
+		glDeleteTextures(1,&textureID);
 	}
+	delete texGL;
 }
 
 RenderTarget * GraphicsGL::CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height)

@@ -185,9 +185,9 @@ void SubMesh3DRenderer::SetUseBadGeometryShadowFix(bool useFix)
  * front and back facing triangles, and generates side polygons for that edge.
  *
  * The above work-around doesn't fix all meshes and there is one more option for bad-meshes that still
- * show artifacts. If the [useBadGeometryShadowFix] member variable is set, this algorithm generates a shadow volume
- * for each back-facing triangle individually. This results in much more complex shadow volume geometry that incurs
- * a significant performance penalty, but it will fix artifacts from really bad meshes.
+ * show artifacts (such as meshes with degenerate triangles). If the [useBadGeometryShadowFix] member variable is set,
+ * this algorithm generates a shadow volume for each back-facing triangle individually. This results in much more
+ * complex shadow volume geometry that incurs a significant performance penalty, but it will fix artifacts from really bad meshes.
  */
 void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional)
 {
