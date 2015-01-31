@@ -397,6 +397,25 @@ void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, Verte
 }
 
 /*
+ * Send an array of vertex attributes held in [buffer] to this material's shader.
+ * This method skips the step of mapping a standard attribute to shader variable,
+ * as in SendStandardAttributeBufferToShader(), and simply uses [varID] as the
+ * shader variable.
+ *
+ */
+void Material::SendAttributeBufferToShader(int varID, VertexAttrBuffer *buffer)
+{
+	ASSERT_RTRN(buffer != NULL, "Material::SendAttributeBufferToShader -> buffer is NULL.");
+	ASSERT_RTRN(varID >= 0, "Material::SendAttributeBufferToShader -> varID cannot be less than 0.");
+
+	if(varID >= 0)
+	{
+		shader->SendBufferToShader(varID, buffer);
+		SetAttributeSetValue(varID, buffer->GetVertexCount());
+	}
+}
+
+/*
  * Get a bit mask that indicates which standard uniforms are used by this material's shader
  */
 StandardUniformSet Material::GetStandardUniforms() const

@@ -24,6 +24,7 @@ class ShaderSource;
 #include "object/enginetypes.h"
 #include "base/intmask.h"
 #include "render/rendertarget.h"
+#include "render/material.h"
 
 enum class BlendingProperty
 {
@@ -93,8 +94,6 @@ class Graphics
 
     virtual Shader * CreateShader(const ShaderSource& shaderSource) = 0;
     virtual void DestroyShader(Shader * shader) = 0;
-    virtual SubMesh3DRenderer * CreateMeshRenderer(AttributeTransformer * attrTransformer)  = 0;
-    virtual void DestroyMeshRenderer(SubMesh3DRenderer * buffer) = 0;
     virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
     virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
     virtual Texture * CreateTexture(const std::string& sourcePath, TextureAttributes attributes) = 0;
@@ -118,12 +117,16 @@ class Graphics
 
     virtual void SetBlendingEnabled(bool enabled) = 0;
     virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
+
     virtual void ActivateMaterial(MaterialRef material);
     MaterialRef GetActiveMaterial() const;
 
     virtual const GraphicsAttributes& GetAttributes() const;
 
     virtual void EnterRenderMode(RenderMode renderMode) = 0;
+
+    virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate) = 0;
+
 };
 
 #endif

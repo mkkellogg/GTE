@@ -53,10 +53,15 @@ class GraphicsGL : public Graphics
 
     unsigned int openGLVersion;
 
+    void PreProcessScene();
+    void RenderScene();
+    bool Run();
+    void Update();
+
+    public :
+
     Shader * CreateShader(const ShaderSource& shaderSource);
     void DestroyShader(Shader * shader);
-    SubMesh3DRenderer * CreateMeshRenderer(AttributeTransformer * attrTransformer);
-    void DestroyMeshRenderer(SubMesh3DRenderer * buffer);
     VertexAttrBuffer * CreateVertexAttributeBuffer();
     void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
     Texture * CreateTexture(const std::string& sourcePath,  TextureAttributes attributes);
@@ -82,19 +87,13 @@ class GraphicsGL : public Graphics
     void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
     GLenum GetGLBlendProperty(BlendingProperty property);
     void ActivateMaterial(MaterialRef material);
-    MaterialRef GetActiveMaterial();
 
     void EnterRenderMode(RenderMode renderMode);
 
-    void PreProcessScene();
-    void RenderScene();
-    bool Run();
-    void Update();
-
-    public :
-
     bool Init(const GraphicsAttributes& attributes);
     unsigned int GetOpenGLVersion();
+
+    void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate);
 };
 
 #endif

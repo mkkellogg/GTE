@@ -36,10 +36,12 @@ class SubMesh3D;
 class Material;
 class Matrix4x4;
 
+#include <vector>
 #include "object/sceneobjectcomponent.h"
 #include "object/enginetypes.h"
 #include "submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
+#include "graphics/render/material.h"
 #include "attributetransformer.h"
 #include "geometry/vector/vector3array.h"
 #include "geometry/point/point3array.h"
@@ -50,6 +52,7 @@ class SubMesh3DRenderer : public EngineObject
 	// need to set Mesh3DRenderer as a friend so it can call the
 	// protected method SetContainerRenderer()
 	friend class Mesh3DRenderer;
+	friend class EngineObjectManager;
 
 	protected:
 
@@ -65,6 +68,8 @@ class SubMesh3DRenderer : public EngineObject
 	// a manner that is more suitable for delivery to the GPU
 	const static int MAX_ATTRIBUTE_BUFFERS = 64;
     VertexAttrBuffer * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
+    std::vector<VertexAttrBufferBinding> boundAttributeBuffers;
+    std::vector<VertexAttrBufferBinding> boundShadowVolumeAttributeBuffers;
 
     // number of vertices for which vertex attributes in [attributeBuffers] are stored
 	unsigned int storedVertexCount;
@@ -115,7 +120,7 @@ class SubMesh3DRenderer : public EngineObject
     void SetUV1Data(UV2Array * uvs);
     void SetUV2Data(UV2Array * uvs);
 
-    bool ValidateMaterial(MaterialRef material);
+    bool ValidateMaterialForMesh(MaterialRef material);
     bool UpdateMeshAttributeBuffers();
     bool UpdateAttributeTransformerData();
 
@@ -143,8 +148,8 @@ class SubMesh3DRenderer : public EngineObject
 
     void PreRender(const Matrix4x4& modelView, const Matrix4x4& modelViewInverse);
 
-    virtual void Render() = 0;
-    virtual void RenderShadowVolume() = 0;
+    void Render();
+    void RenderShadowVolume();
 };
 
 #endif

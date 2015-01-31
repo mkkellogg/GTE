@@ -458,6 +458,7 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
 
+	boundAttributeBuffers.clear();
 	// loop through each standard attribute and create/initialize vertex attribute buffer for each
 	for(int i=0; i<(int)StandardAttribute::_Last; i++)
 	{
@@ -471,6 +472,9 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 
 			int initSuccess = InitAttributeData(attr, mesh->GetTotalVertexCount(), componentCount, stride);
 			if(!initSuccess)StandardAttributes::AddAttribute(&err,attr);
+
+			VertexAttrBufferBinding binding(attributeBuffers[i], attr, -1);
+			boundAttributeBuffers.push_back(binding);
 		}
 	}
 
@@ -488,6 +492,10 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 		DestroyBuffers();
 		return false;
 	}
+
+	boundShadowVolumeAttributeBuffers.clear();
+	VertexAttrBufferBinding shadowVolumePositionBinding(attributeBuffers[(int)StandardAttribute::ShadowPosition], StandardAttribute::ShadowPosition, -1);
+	boundShadowVolumeAttributeBuffers.push_back(shadowVolumePositionBinding);
 
 	return true;
 }
@@ -615,7 +623,7 @@ void SubMesh3DRenderer::UpdateFromMesh()
  * expected by the shader belonging to [material] match the attributes that are supplied by the target sub-mesh. It also
  * means calling VerifySetVars() to ensure all uniforms & attributes expected by the shader have been set correctly.
  */
-bool SubMesh3DRenderer::ValidateMaterial(MaterialRef material)
+bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialRef material)
 {
 	// don't bother validating this material if it has already been validated
 	if(material == lastUsedMaterial)return true;
@@ -644,9 +652,6 @@ bool SubMesh3DRenderer::ValidateMaterial(MaterialRef material)
 			}
 		}
 	}
-
-	// validate the shader variables (attributes and uniforms) that have been set
-	if(!material->VerifySetVars(mesh->GetTotalVertexCount()))return false;
 
 	return true;
 }
@@ -779,4 +784,40 @@ const Point3* SubMesh3DRenderer::GetFinalCenter()
 	}
 
 	return &(mesh->GetCenter());
+}
+
+/*
+ * Render the target sub-mesh.
+ */
+void SubMesh3DRenderer::Render()
+{
+	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
+
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
+
+	MaterialRef currentMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
+	ASSERT_RTRN(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
+
+	Engine::Instance()->GetGraphicsEngine()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);
+}
+
+/*
+ * Render the target sub-mesh's shadow volume.
+ */
+void SubMesh3DRenderer::RenderShadowVolume()
+{
+	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> containerRenderer is NULL.");
+
+	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
+
+	if(shadowVolumePositions.GetCount() > 0)
+	{
+		// set the shadow volume vertex attribute buffer data
+		SetShadowVolumePositionData(&shadowVolumePositions);
+
+		// render shadow volume
+		Engine::Instance()->GetGraphicsEngine()->RenderTriangles(boundShadowVolumeAttributeBuffers, shadowVolumePositions.GetCount(), false);
+	}
 }

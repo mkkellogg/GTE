@@ -30,7 +30,7 @@ GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vec
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o
 DEBUGOBJ= obj/gtedebug.o 
 VIEWSYSOBJ= obj/camera.o 
-RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/rendertarget.o obj/rendertargetGL.o obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
+RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/rendertarget.o  obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
 GRAPHICSOBJ= obj/graphics.o obj/color4.o obj/color4factory.o obj/color4array.o obj/uv2.o obj/uv2factory.o obj/uv2array.o obj/stdattributes.o obj/stduniforms.o obj/screendesc.o 
 ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o obj/sceneobjectskeletonnode.o obj/keyframeset.o obj/keyframe.o obj/translationkeyframe.o obj/scalekeyframe.o \
               obj/rotationkeyframe.o obj/animation.o obj/animationmanager.o obj/animationinstance.o obj/animationplayer.o obj/blendop.o obj/crossfadeblendop.o
@@ -45,7 +45,7 @@ FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
 INPUTOBJ= obj/inputmanager.o obj/inputmanagerGL.o
 ERROROBJ= obj/errormanager.o
 
-OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/submesh3DrendererGL.o obj/textureGL.o
+OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/textureGL.o obj/rendertargetGL.o
 
 OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEDEMOOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)
 
@@ -346,9 +346,6 @@ obj/skinnedmesh3Drenderer.o: $(RENDERSRC)/skinnedmesh3Drenderer.cpp $(RENDERSRC)
 	
 obj/submesh3Drenderer.o: $(RENDERSRC)/submesh3Drenderer.cpp $(RENDERSRC)/submesh3Drenderer.h
 	$(CC) $(CFLAGS) -o obj/submesh3Drenderer.o -c $(RENDERSRC)/submesh3Drenderer.cpp
-	
-obj/submesh3DrendererGL.o: $(RENDERSRC)/submesh3DrendererGL.cpp $(RENDERSRC)/submesh3DrendererGL.h
-	$(CC) $(CFLAGS) -o obj/submesh3DrendererGL.o -c $(RENDERSRC)/submesh3DrendererGL.cpp
 	
 obj/material.o: $(RENDERSRC)/material.cpp $(RENDERSRC)/material.h
 	$(CC) $(CFLAGS) -o obj/material.o -c $(RENDERSRC)/material.cpp

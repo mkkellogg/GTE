@@ -22,7 +22,6 @@
 #include "render/vertexattrbuffer.h"
 #include "render/vertexattrbufferGL.h"
 #include "render/submesh3Drenderer.h"
-#include "render/submesh3DrendererGL.h"
 #include "render/rendertarget.h"
 #include "render/renderbuffer.h"
 #include "render/rendertargetGL.h"
@@ -295,22 +294,6 @@ void GraphicsGL::SetRenderBufferEnabled(RenderBufferType buffer, bool enabled) c
 		stencilBufferEnabled = enabled;
 	}
 }*/
-
-SubMesh3DRenderer * GraphicsGL::CreateMeshRenderer(AttributeTransformer * attrTransformer)
-{
-	return new SubMesh3DRendererGL(attrTransformer);
-}
-
-void GraphicsGL::DestroyMeshRenderer(SubMesh3DRenderer * renderer)
-{
-	ASSERT_RTRN(renderer != NULL, "GraphicsGL::DestroyMeshRenderer -> renderer is NULL");
-
-	SubMesh3DRendererGL * rendererGL = dynamic_cast<SubMesh3DRendererGL*>(renderer);
-	if(rendererGL != NULL)
-	{
-		delete rendererGL;
-	}
-}
 
 VertexAttrBuffer * GraphicsGL::CreateVertexAttributeBuffer()
 {
@@ -667,5 +650,24 @@ void GraphicsGL::_glutReshapeFunc(int w, int h)
 	glutPostRedisplay();
 }
 
+void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate)
+{
+	MaterialRef currentMaterial = GetActiveMaterial();
 
+	VertexAttrBufferBinding binding;
+	for(unsigned int b = 0; b < boundBuffers.size(); b++)
+	{
+		binding = boundBuffers[b];
+		if(binding.Attribute != StandardAttribute::_None)
+		{
+			currentMaterial->SendStandardAttributeBufferToShader(binding.Attribute, binding.Buffer);
+		}
+	}
+
+	// validate the shader variables (attributes and uniforms) that have been set
+	if(validate && !currentMaterial->VerifySetVars(vertexCount))return;
+
+	// render the mesh
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+}
 

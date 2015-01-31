@@ -258,8 +258,7 @@ SubMesh3DRendererRef  EngineObjectManager::CreateSubMesh3DRenderer()
 
 SubMesh3DRendererRef EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
 {
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-	SubMesh3DRenderer * renderer = graphics->CreateMeshRenderer(attrTransformer);
+	SubMesh3DRenderer * renderer = new SubMesh3DRenderer(attrTransformer);
 
 	ASSERT(renderer != NULL,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.", SubMesh3DRendererRef::Null());
 	renderer->SetObjectID(GetNextObjectID());
@@ -277,9 +276,9 @@ void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer
 
 void EngineObjectManager::DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer)
 {
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	ASSERT_RTRN(renderer != NULL,"EngineObjectManager::DeleteSubMesh3DRenderer -> renderer is NULL.");
-	graphics->DestroyMeshRenderer(renderer);
+
+	delete renderer;
 }
 
 SkeletonRef EngineObjectManager::CreateSkeleton(unsigned int boneCount)

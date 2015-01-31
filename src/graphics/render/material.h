@@ -34,7 +34,30 @@ class Vector3;
 #include "graphics/shader/uniformdesc.h"
 #include <vector>
 #include <map>
+#include <string>
 
+class VertexAttrBufferBinding
+{
+	public:
+
+	VertexAttrBuffer * Buffer;
+	StandardAttribute Attribute;
+	int AltBinding;
+
+	VertexAttrBufferBinding()
+	{
+		Attribute = StandardAttribute::_None;
+		Buffer = NULL;
+		AltBinding = -1;
+	}
+
+	VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute attribute, int altBinding)
+	{
+		this->Buffer = buffer;
+		this->Attribute = attribute;
+		this->AltBinding = altBinding;
+	}
+};
 
 class Material : public EngineObject
 {
@@ -123,6 +146,7 @@ class Material : public EngineObject
 
     StandardAttributeSet GetStandardAttributes() const;
     void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
+    void SendAttributeBufferToShader(int varID, VertexAttrBuffer *buffer);
 
     StandardUniformSet GetStandardUniforms() const;
 
