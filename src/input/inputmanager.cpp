@@ -69,7 +69,7 @@ KeyState InputManager::GetKeyState(Key key)
 		break;
 		case Key::C:
 			if(GetKeyState((unsigned char)'C') == KeyState::Down)return KeyState::Down;
-			if(GetKeyState((unsigned char)'C') == KeyState::Down)return KeyState::Down;
+			if(GetKeyState((unsigned char)'c') == KeyState::Down)return KeyState::Down;
 		break;
 		case Key::D:
 			if(GetKeyState((unsigned char)'D') == KeyState::Down)return KeyState::Down;
