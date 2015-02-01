@@ -29,8 +29,13 @@ class Game
 	{
 		Waiting = 0,
 		Walking = 1,
-		Roaring = 2
+		Roaring = 2,
+		JumpStart = 3,
+		Jump = 4,
+		JumpFall = 5,
+		JumpEnd = 6
 	};
+
 
 	static const unsigned int MAX_PLAYER_STATES = 32;
 
@@ -54,7 +59,7 @@ class Game
 	//The SkinnedMesh3DRenderer that render the player's skinned mesh
 	SkinnedMesh3DRendererRef playerRenderer;
 	// player animations
-	AnimationRef playerWait, playerWalk, playerJump, playerRoar;
+	AnimationRef playerWait, playerWalk, playerJump, playerJumpStart, playerJumpEnd, playerJumpFall, playerRoar;
 	// The AnimationPlayer responsible for managing the animations of the player character
 	AnimationPlayerRef animationPlayer;
 
@@ -66,7 +71,10 @@ class Game
 	float rotateSpeed;
 	float speedSmoothing;
 	float moveSpeed;
+	float playerBaseY;
+	float playerVelocityY;
 	bool isMoving;
+	bool playerGrounded;
 
 	Vector3 moveDirection;
 	Vector3 lookDirection;
@@ -81,12 +89,13 @@ class Game
 	void SetupLights(AssetImporter& importer);
 
 	void InitializePlayerPosition();
-	void UpdatePlayerMovementDirection();
+	void UpdatePlayerMovementSpeedAndDirection();
 	void UpdatePlayerAnimation();
 	void UpdatePlayerPosition();
 	void UpdatePlayerLookDirection();
 	void UpdatePlayerFollowCamera();
-	void ActivateState(PlayerState state);
+	void ActivatePlayerState(PlayerState state);
+	void ManagePlayerState();
 
 	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
 

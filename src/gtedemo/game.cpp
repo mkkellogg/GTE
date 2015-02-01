@@ -61,6 +61,9 @@ Game::Game()
 	runSpeed = 6.0;
 	rotateSpeed = 200;
 	speedSmoothing = 10;
+	playerBaseY = 0;
+	playerVelocityY = 0;
+	playerGrounded = false;
 
 	// original player forward is looking down the positive z-axis
 	basePlayerForward = Vector3(0,0,1);
@@ -305,17 +308,24 @@ void Game::SetupPlayer(AssetImporter& importer)
 	//
 	//========================================================
 
-	playerWait = importer.LoadAnimation("resources/models/koopa/model/koopa@wait.fbx");
-	playerWalk = importer.LoadAnimation("resources/models/koopa/model/koopa@walk.fbx");
-	playerJump = importer.LoadAnimation("resources/models/koopa/model/koopa@jump.fbx");
-	playerRoar = importer.LoadAnimation("resources/models/koopa/model/koopa@roar3.fbx");
+	playerWait = importer.LoadAnimation("resources/models/koopa/model/koopa@wait.fbx", true);
+	playerWalk = importer.LoadAnimation("resources/models/koopa/model/koopa@walk.fbx", true);
+	playerRoar = importer.LoadAnimation("resources/models/koopa/model/koopa@roar3.fbx", false);
+
+	playerJump = importer.LoadAnimation("resources/models/koopa/model/koopa@jump.fbx", false);
+	playerJumpStart = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpstart.fbx", false);
+	playerJumpEnd = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpend.fbx", false);
+	playerJumpFall = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpfall.fbx", false);
 
 	playerRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
 	bool compatible = animManager->IsCompatible(playerRenderer, playerWalk);
 	compatible &= animManager->IsCompatible(playerRenderer, playerWait);
-	//compatible &= animManager->IsCompatible(playerRenderer, playerJump);
-	//compatible &= animManager->IsCompatible(playerRenderer, playerRoar);
+	compatible &= animManager->IsCompatible(playerRenderer, playerJump);
+	compatible &= animManager->IsCompatible(playerRenderer, playerRoar);
+	compatible &= animManager->IsCompatible(playerRenderer, playerJumpStart);
+	compatible &= animManager->IsCompatible(playerRenderer, playerJumpEnd);
+	compatible &= animManager->IsCompatible(playerRenderer, playerJumpFall);
 
 	if(compatible)printf("animation is compatible!! :)\n");
 	else printf("animation is not compatible! boooo!\n");
@@ -323,17 +333,20 @@ void Game::SetupPlayer(AssetImporter& importer)
 	// create an animation player and some animations to it for the player object.
 	if(compatible)
 	{
+		playerJumpFall->ClipEnds(playerJumpFall->GetDuration() - .05, playerJumpFall->GetDuration());
+
 		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
 		animationPlayer->AddAnimation(playerWait);
 		animationPlayer->AddAnimation(playerWalk);
-
-		if(playerType == PlayerType::Koopa)
-		{
-			animationPlayer->AddAnimation(playerJump);
-			animationPlayer->AddAnimation(playerRoar);
-			animationPlayer->SetSpeed(playerWalk, 2);
-			animationPlayer->Play(playerWait);
-		}
+		animationPlayer->AddAnimation(playerJump);
+		animationPlayer->AddAnimation(playerJumpStart);
+		animationPlayer->AddAnimation(playerJumpEnd);
+		animationPlayer->AddAnimation(playerJumpFall);
+		animationPlayer->AddAnimation(playerRoar);
+		animationPlayer->SetSpeed(playerWalk, 2);
+		animationPlayer->SetSpeed(playerJumpStart, 4);
+		animationPlayer->SetPlaybackMode(playerJumpFall, PlaybackMode::Clamp);
+		animationPlayer->Play(playerWait);
 	}
 }
 
@@ -412,6 +425,13 @@ void Game::InitializePlayerPosition()
 	playerForward.Normalize();
 
 	lookDirection = playerForward;
+
+	Quaternion currentRotation;
+	Vector3 currentTranslation;
+	Vector3 currentScale;
+
+	playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
+	playerBaseY = currentTranslation.y;
 }
 
 /*
@@ -427,20 +447,27 @@ void Game::Update()
 	// rotate the cube around its center and the y-axis
 	cubeSceneObject->GetTransform().Rotate(0,1,0,20 * Time::GetDeltaTime(), true);
 
-	UpdatePlayerMovementDirection();
+	UpdatePlayerMovementSpeedAndDirection();
 	UpdatePlayerAnimation();
 	UpdatePlayerPosition();
 	UpdatePlayerLookDirection();
 	UpdatePlayerFollowCamera();
+	ManagePlayerState();
 }
 
 /*
  * Update the direction in which the player is moving and the player's
  * move speed based on user input.
  */
-void Game::UpdatePlayerMovementDirection()
+void Game::UpdatePlayerMovementSpeedAndDirection()
 {
-	if(playerState == PlayerState::Roaring)return;
+	float curSmooth = speedSmoothing * Time::GetDeltaTime();
+
+	if(playerState != PlayerState::Walking && playerState != PlayerState::Waiting)
+	{
+		moveSpeed = GTEMath::Lerp(moveSpeed, 0, curSmooth);
+		return;
+	}
 
 	Point3 cameraPos;
 	Point3 playerPos;
@@ -513,11 +540,10 @@ void Game::UpdatePlayerMovementDirection()
 		lookDirection.Normalize();
 	}
 
-	// if the player is on the ground, apply movement in the new facing direction
+	// if the player is on the ground, apply movement
 	if(isGrounded)
 	{
 		float targetSpeed = 0;
-		float curSmooth = speedSmoothing * Time::GetDeltaTime();
 		if(isMoving)
 		{
 			targetSpeed = walkSpeed;
@@ -531,7 +557,47 @@ void Game::UpdatePlayerMovementDirection()
  */
 void Game::UpdatePlayerPosition()
 {
-	if(playerState == PlayerState::Roaring)return;
+	Quaternion currentRotation;
+	Vector3 currentTranslation;
+	Vector3 currentScale;
+
+	playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
+
+	bool movingUp = playerVelocityY > 0;
+
+	if(playerGrounded && playerState == PlayerState::Jump)
+	{
+		float jumpTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::Jump] ;
+		if(jumpTime > .2)
+		{
+			playerVelocityY = .6;
+			playerGrounded = false;
+		}
+	}
+
+	if(!playerGrounded)playerVelocityY -= 1 * Time::GetDeltaTime();
+
+	// reached jump apex
+	if(playerVelocityY <= 0 && movingUp)
+	{
+		ActivatePlayerState(PlayerState::JumpFall);
+	}
+
+	if(currentTranslation.y < playerBaseY + 1 && playerVelocityY < 0 && !playerGrounded)
+	{
+		playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
+		currentTranslation.y = playerBaseY;
+		playerObject->GetTransform().SetLocalComponents(currentTranslation, currentRotation, currentScale);
+		playerVelocityY = 0;
+		ActivatePlayerState(PlayerState::JumpEnd);
+		playerGrounded = true;
+	}
+
+	if(!playerGrounded)
+	{
+		Vector3 move(0, playerVelocityY, 0);
+		playerObject->GetTransform().Translate(move, false);
+	}
 
 	if(moveSpeed > .1)
 	{
@@ -546,7 +612,7 @@ void Game::UpdatePlayerPosition()
  */
 void Game::UpdatePlayerLookDirection()
 {
-	if(playerState == PlayerState::Roaring)return;
+	if(playerState != PlayerState::Walking && playerState != PlayerState::Waiting)return;
 
 	// axis around which to rotate player object
 	Vector3 rotationAxis(0,1,0);
@@ -571,12 +637,54 @@ void Game::UpdatePlayerLookDirection()
  */
 void Game::UpdatePlayerAnimation()
 {
+	if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
+	{
+		if(moveSpeed > .1)
+		{
+			animationPlayer->CrossFade(playerWalk, .2);
+		}
+		else
+		{
+			animationPlayer->CrossFade(playerWait, .3);
+		}
+	}
+	else if(playerState == PlayerState::Roaring)
+	{
+		animationPlayer->CrossFade(playerRoar, .2);
+	}
+	else if(playerState == PlayerState::JumpStart)
+	{
+		animationPlayer->CrossFade(playerJumpStart, .1);
+	}
+	else if(playerState == PlayerState::Jump)
+	{
+		animationPlayer->CrossFade(playerJump, .2);
+	}
+	else if(playerState == PlayerState::JumpFall)
+	{
+		animationPlayer->CrossFade(playerJumpFall, .4);
+	}
+	else if(playerState == PlayerState::JumpEnd)
+	{
+		animationPlayer->CrossFade(playerJumpEnd, .05);
+	}
+}
+
+void Game::ManagePlayerState()
+{
+	if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::C))
+	{
+		if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
+		{
+			ActivatePlayerState(PlayerState::Roaring);
+		}
+	}
+
 	if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::X))
 	{
-		if(playerState != PlayerState::Roaring)
+		if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
 		{
-			animationPlayer->CrossFade(playerRoar, .2);
-			ActivateState(PlayerState::Roaring);
+			ActivatePlayerState(PlayerState::JumpStart);
 		}
 	}
 
@@ -585,21 +693,37 @@ void Game::UpdatePlayerAnimation()
 		float roarTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::Roaring] ;
 		if(roarTime > 6)
 		{
-			ActivateState(PlayerState::Waiting);
+			ActivatePlayerState(PlayerState::Waiting);
 		}
 	}
 
-	if(playerState != PlayerState::Roaring)
+	if(playerState == PlayerState::JumpStart)
+	{
+		float startTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::JumpStart] ;
+		if(startTime > .3)
+		{
+			ActivatePlayerState(PlayerState::Jump);
+		}
+	}
+
+	if(playerState == PlayerState::JumpEnd)
+		{
+			float startTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::JumpEnd] ;
+			if(startTime > .5)
+			{
+				ActivatePlayerState(PlayerState::Waiting);
+			}
+		}
+
+	if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
 	{
 		if(moveSpeed > .1)
 		{
-			animationPlayer->CrossFade(playerWalk, .2);
-			ActivateState(PlayerState::Walking);
+			ActivatePlayerState(PlayerState::Walking);
 		}
 		else
 		{
-			animationPlayer->CrossFade(playerWait, .3);
-			ActivateState(PlayerState::Waiting);
+			ActivatePlayerState(PlayerState::Waiting);
 		}
 	}
 }
@@ -690,8 +814,10 @@ void Game::UpdatePlayerFollowCamera()
 	cameraObject->GetTransform().Translate(cameraMove, false);
 }
 
-void Game::ActivateState(PlayerState state)
+void Game::ActivatePlayerState(PlayerState state)
 {
 	playerState = state;
 	stateActivationTime[(int) state] = Time::GetRealTimeSinceStartup();
 }
+
+
