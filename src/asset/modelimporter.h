@@ -131,7 +131,7 @@ class ModelImporter
 	void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
 	unsigned CountBones(const aiScene& scene) const;
 	bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
-	AnimationRef LoadAnimation (aiAnimation& animation) const;
+	AnimationRef LoadAnimation (aiAnimation& animation,  bool addLoopPadding) const;
 
 	void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback) const;
 	void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback) const;
@@ -149,7 +149,7 @@ class ModelImporter
 	public:
 
 	SceneObjectRef LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows);
-	AnimationRef LoadAnimation(const std::string& filePath);
+	AnimationRef LoadAnimation(const std::string& filePath, bool addLoopPadding);
 
 };
 

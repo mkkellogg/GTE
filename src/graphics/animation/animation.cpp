@@ -10,15 +10,35 @@
 #include <string>
 
 /*
- * Single constructor, which initializes all member variables of this animation.
+ * Simple constructor, calls the main constructor with [startOffsetTicks] = 0 && [earlyEndTicks] = [durationTicks]
  */
-Animation::Animation(float durationTicks, float ticksPerSecond)
+Animation::Animation(float durationTicks, float ticksPerSecond) : Animation(durationTicks, ticksPerSecond, 0, durationTicks)
 {
+
+}
+
+/*
+ * Main constructor - initializes all member variables of this animation.
+ */
+Animation::Animation(float durationTicks, float ticksPerSecond, float startOffsetTicks, float earlyEndTicks)
+{
+	//force ticksPerSecond > 0
+	if(ticksPerSecond <=0)ticksPerSecond = 1;
+
 	keyFrames = NULL;
 	this->durationTicks = durationTicks;
 	this->ticksPerSecond = ticksPerSecond;
+	this->startOffsetTicks = startOffsetTicks;
+	this->earlyEndTicks = earlyEndTicks;
 	channelCount = 0;
 	channelNames = NULL;
+
+	if(this->durationTicks <0)this->durationTicks = 0;
+	if(this->startOffsetTicks < 0)this->startOffsetTicks = 0;
+	if(this->earlyEndTicks < 0)this->earlyEndTicks = 0;
+
+	if(this->earlyEndTicks > this->durationTicks)this->earlyEndTicks = this->durationTicks;
+	if(this->startOffsetTicks > this->earlyEndTicks)this->startOffsetTicks = this->earlyEndTicks;
 }
 
 /*
@@ -73,6 +93,19 @@ bool Animation::Init(unsigned int channelCount)
 }
 
 /*
+ * Clip the beginning [startOffset] seconds from the animation, and the end
+ * [earlyEnd] seconds from the animation.
+ */
+void Animation::ClipEnds(float startOffset, float earlyEnd)
+{
+	this->startOffsetTicks = startOffset * ticksPerSecond;
+	this->earlyEndTicks = earlyEnd * ticksPerSecond;
+
+	if(this->earlyEndTicks < 0) this->earlyEndTicks = 0;
+	if(this->startOffsetTicks < 0) this->startOffsetTicks = 0;
+}
+
+/*
  * Return the number of KeyFrameSet objects in [keyFrames].
  */
 unsigned int Animation::GetChannelCount()
@@ -115,4 +148,44 @@ float Animation::GetDurationTicks() const
 float Animation::GetTicksPerSecond() const
 {
 	return ticksPerSecond;
+}
+
+/*
+ * Get the start offset of this animation in ticks.
+ */
+float Animation::GetStartOffsetTicks() const
+{
+	return startOffsetTicks;
+}
+
+/*
+ * Get the point where this animation ends relative to its full duration in ticks.
+ */
+float Animation::GetEarlyEndTicks() const
+{
+	return earlyEndTicks;
+}
+
+/*
+ * Get the duration of this animation in seconds.
+ */
+float Animation::GetDuration() const
+{
+	return durationTicks/ticksPerSecond;
+}
+
+/*
+ * Get the start offset of this animation in seconds.
+ */
+float Animation::GetStartOffset() const
+{
+	return startOffsetTicks/ticksPerSecond;
+}
+
+/*
+ * Get the point where this animation ends relative to its full duration in seconds.
+ */
+float Animation::GetEarlyEnd() const
+{
+	return earlyEndTicks/ticksPerSecond;
 }

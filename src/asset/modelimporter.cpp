@@ -1077,17 +1077,20 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	return success;
 }
 
-AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation) const
+AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopPadding) const
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	ASSERT(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
 
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
+
 	// adding little extra time to the animation allows for the interpolation between the last
 	// and the first frame, which smoothes out looping animations
 	// TODO: figure out a better way to do this, possibly a setting for smoothing looped animations
 	float loopPadding = ticksPerSecond * .05;
-	float durationTicks = (float)animation.mDuration + loopPadding;
+	float durationTicks = (float)animation.mDuration;
+
+	if(addLoopPadding) durationTicks += loopPadding;
 
 	ASSERT(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> tickers per second is 0.", AnimationRef::Null());
 	//float duration = durationTicks / ticksPerSecond;
@@ -1168,8 +1171,9 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation) const
 
 /*
  * Currently this loads only the first animation found in the model file.
+ *
  */
-AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
+AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding)
 {
 	bool initSuccess = InitImporter();
 	ASSERT(initSuccess, "ModelImporter::LoadAnimation -> Unable to initialize importer.", AnimationRef::Null());
@@ -1180,7 +1184,7 @@ AnimationRef ModelImporter::LoadAnimation(const std::string& filePath)
 	ASSERT(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationRef::Null());
 
 	// only load the first animation
-	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]));
+	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), addLoopPadding);
 	ASSERT(animation.IsValid(),"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null());
 
 	return animation;

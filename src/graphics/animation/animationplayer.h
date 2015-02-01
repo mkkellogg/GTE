@@ -33,6 +33,13 @@ enum class TransformationCompnent
 	Scale = 2
 };
 
+enum class PlaybackMode
+{
+	Repeat = 0,
+	Clamp = 1,
+	PingPong = 2
+};
+
 class AnimationPlayer
 {
 	friend class EngineObjectManager;
@@ -67,12 +74,13 @@ class AnimationPlayer
 	void CheckWeights();
 	void UpdatePositionsFromAnimations();
 	void UpdateAnimationsProgress();
-	void UpdateAnimationInstanceProgress(AnimationInstanceRef instance) const;
+	void UpdateAnimationInstanceProgress(AnimationInstanceRef instance);
 	void CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
 	void CalculateInterpolatedTranslation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
 	void CalculateInterpolatedScale(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
 	void CalculateInterpolatedRotation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
 	bool CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, unsigned int& lastIndex, unsigned int& nextIndex, float& interFrameProgress, TransformationCompnent component) const;
+	float GetKeyFrameTime(TransformationCompnent transformationComponent, int frameIndex, const KeyFrameSet& keyFrameSet) const;
 
 	void SetSpeed(unsigned int animationIndex, float speedFactor);
 	void Play(unsigned int animationIndex);
@@ -90,6 +98,8 @@ class AnimationPlayer
 	void Resume(AnimationRef animation);
 	void CrossFade(AnimationRef target, float duration);
 	void CrossFade(AnimationRef target, float duration, bool queued);
+
+	void SetPlaybackMode(AnimationRef target, PlaybackMode playbackMode);
 };
 
 #endif

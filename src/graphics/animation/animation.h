@@ -41,19 +41,32 @@ class Animation : public EngineObject
 	// map the ticks duration to actual time
 	float ticksPerSecond;
 
+	// we can have the animation start with progress > 0
+	float startOffsetTicks;
+
+	// we can have the animation end earlier than [durationTicks]
+	float earlyEndTicks;
+
 	Animation(float durationTicks, float ticksPerSecond);
+	Animation(float durationTicks, float ticksPerSecond, float startOffsetTicks, float earlyEndTicks);
 	~Animation();
 	void Destroy();
 	bool Init(unsigned int channelCount);
 
 	public:
 
+	void ClipEnds(float startOffsetTicks, float earlyEndTicks);
 	unsigned int GetChannelCount();
 	KeyFrameSet * GetKeyFrameSet(unsigned int nodeIndex);
 	const std::string * GetChannelName(unsigned int index);
 	void SetChannelName(unsigned int index, const std::string& name);
-	float GetDurationTicks() const;
 	float GetTicksPerSecond() const;
+	float GetDurationTicks() const;
+	float GetStartOffsetTicks() const;
+	float GetEarlyEndTicks() const;
+	float GetDuration() const;
+	float GetStartOffset() const;
+	float GetEarlyEnd() const;
 };
 
 #endif

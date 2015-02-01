@@ -31,8 +31,16 @@ AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
 	DurationTicks = 0;
 	ProgressTicks = 0;
 
+	EarlyEndTicks = 0;
+	EarlyEnd = 0;
+
+	StartOffsetTicks = 0;
+	StartOffset = 0;
+
 	Playing = false;
 	Paused = false;
+
+	PlayBackMode = PlaybackMode::Repeat;
 }
 
 /*
@@ -115,11 +123,17 @@ bool AnimationInstance::Init()
 		NodeToChannelMap[n] = foundIndex;
 	}
 
+	EarlyEndTicks = SourceAnimation->GetEarlyEndTicks();
+	EarlyEnd = EarlyEndTicks / SourceAnimation->GetTicksPerSecond();
+
+	StartOffsetTicks = SourceAnimation->GetStartOffsetTicks();
+	StartOffset = StartOffsetTicks / SourceAnimation->GetTicksPerSecond();
+
 	DurationTicks = SourceAnimation->GetDurationTicks();
 	Duration = DurationTicks / SourceAnimation->GetTicksPerSecond();
 
-	Progress = 0;
-	ProgressTicks = 0L;
+	Progress = StartOffset;
+	ProgressTicks = StartOffsetTicks;
 
 	return true;
 }
@@ -135,8 +149,8 @@ void AnimationInstance::Reset()
 		FrameStates[s].Reset();
 	}
 
-	Progress = 0;
-	ProgressTicks = 0;
+	Progress = StartOffset;
+	ProgressTicks = StartOffsetTicks;
 }
 
 /*

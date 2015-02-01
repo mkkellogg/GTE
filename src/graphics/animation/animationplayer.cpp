@@ -264,13 +264,13 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 		}
 
 		// only apply transformations if they were actually calculated
-		if(playingAnimationsCount > 0)
+		if(playingAnimationsSeen > 0)
 		{
 			// if the aggregate weight of all playing animations for the current channel does not add up to 1
 			// then we use identity values to make up the difference
 			if(agWeight < 1)
 			{
-				float weightDiff = 1 - agWeight;
+				float weightDiff = (float)1.0 - agWeight;
 				agScale.Set(agScale.x + weightDiff,agScale.y + weightDiff,agScale.z + weightDiff);
 				Quaternion::slerp(agRotation, Quaternion::Identity, weightDiff);
 			}
@@ -340,7 +340,7 @@ void AnimationPlayer::UpdateAnimationsProgress()
 /*
  * Drive the progress of [instance].
  */
-void AnimationPlayer::UpdateAnimationInstanceProgress(AnimationInstanceRef instance) const
+void AnimationPlayer::UpdateAnimationInstanceProgress(AnimationInstanceRef instance)
 {
 	// make sure the animation is active
 	if(instance->Playing && !instance->Paused)
@@ -348,11 +348,25 @@ void AnimationPlayer::UpdateAnimationInstanceProgress(AnimationInstanceRef insta
 		// update animation instance progress
 		instance->Progress += Time::GetDeltaTime() * instance->SpeedFactor;
 
-		//TODO: update to either stop or loop based on settings. for now auto-loop.
-		if(instance->Progress > instance->Duration)
+		float effectiveEnd = (instance->Duration > instance->EarlyEnd) ? instance->EarlyEnd : instance->Duration;
+		float effectiveStart = (instance->StartOffset > 0 ) ? instance->StartOffset : 0;
+
+		// has the animation reached the end?
+		if(instance->Progress > effectiveEnd)
 		{
-			instance->Progress = instance->Progress - instance->Duration;
-			if(instance->Progress < 0) instance->Progress = 0;
+			if(instance->PlayBackMode == PlaybackMode::Repeat)
+			{
+				instance->Progress = instance->Progress - effectiveEnd + effectiveStart;
+				if(instance->Progress < effectiveStart) instance->Progress = effectiveStart;
+			}
+			else if(instance->PlayBackMode == PlaybackMode::Clamp)
+			{
+				instance->Progress = effectiveEnd;
+			}
+			else
+			{
+				instance->Progress = effectiveEnd;
+			}
 		}
 
 		instance->ProgressTicks = instance->Progress * instance->SourceAnimation->GetTicksPerSecond();
@@ -484,15 +498,8 @@ bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, cons
 		KeyFrame * previousFrame = NULL;
 		KeyFrame * nextFrame = NULL;
 
-		float keyRealTime = 0;
-
 		// get the correct time stamp for this frame, which depends on [component]
-		if(component == TransformationCompnent::Translation)
-			keyRealTime = keyFrameSet.TranslationKeyFrames[f].RealTime;
-		else if(component == TransformationCompnent::Rotation)
-			keyRealTime = keyFrameSet.RotationKeyFrames[f].RealTime;
-		else if(component == TransformationCompnent::Scale)
-			keyRealTime = keyFrameSet.ScaleKeyFrames[f].RealTime;
+		float keyRealTime = GetKeyFrameTime(component, f, keyFrameSet);
 
 		// if the RealTime value for this key frame is greater than [progress], then the previous key frame and the current key frame
 		// are the frames we want
@@ -511,6 +518,22 @@ bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, cons
 			{
 				previousIndex = f;
 				nextIndex = 0;
+
+				// if the start offset for this animation is > 0, then we can't assume the
+				// next frame will be at index 0. in this case we must loop through each
+				// frame to find which one has a timestamp greater than StartOffset.
+				if(instance->StartOffset > 0)
+				{
+					for(unsigned int ff = 0; ff < frameCount; ff++)
+					{
+						// get the correct time stamp for for frame [ff], which depends on [component]
+						float nextKeyRealTime = GetKeyFrameTime(component, ff, keyFrameSet);
+						if(nextKeyRealTime > instance->StartOffset  || ff == frameCount-1)
+						{
+							nextIndex = ff;
+						}
+					}
+				}
 				overShoot = true;
 			}
 
@@ -550,6 +573,22 @@ bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, cons
 	}
 
 	return false;
+}
+
+/*
+ * Get the key frame time for the frame at [frameIndex] for the desired transformation component [transformationComponent].
+ */
+float AnimationPlayer::GetKeyFrameTime(TransformationCompnent transformationComponent, int frameIndex, const KeyFrameSet& keyFrameSet) const
+{
+	float keyFrameTime = 0;
+	if(transformationComponent == TransformationCompnent::Translation)
+		keyFrameTime = keyFrameSet.TranslationKeyFrames[frameIndex].RealTime;
+	else if(transformationComponent == TransformationCompnent::Rotation)
+		keyFrameTime = keyFrameSet.RotationKeyFrames[frameIndex].RealTime;
+	else if(transformationComponent == TransformationCompnent::Scale)
+		keyFrameTime = keyFrameSet.ScaleKeyFrames[frameIndex].RealTime;
+
+	return keyFrameTime;
 }
 
 /*
@@ -786,8 +825,8 @@ void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued
 		crossFadeTargets[targetIndex] = 1;
 		blendOp->SetOnStartCallback([targetIndex, this](CrossFadeBlendOp * op)
 		{
-			AnimationInstanceRef instance = registeredAnimations[targetIndex];
-			if(!instance.IsValid())
+			AnimationInstanceRef targetInstance = registeredAnimations[targetIndex];
+			if(!targetInstance.IsValid())
 			{
 				Debug::PrintError("AnimationPlayer::CrossFade::SetOnStartCallback -> Invalid target animation.");
 				return;
@@ -800,11 +839,11 @@ void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued
 				return;
 			}
 
-			if(!instance->Playing)
+			if(!targetInstance->Playing)
 			{
 				playingAnimationsCount++;
-				instance->Reset();
-				instance->Play();
+				targetInstance->Reset();
+				targetInstance->Play();
 			}
 		});
 
@@ -844,5 +883,20 @@ void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued
 		if(!queued)ClearBlendOpQueue();
 
 		QueueBlendOperation(blendOp);
+	}
+}
+
+
+void AnimationPlayer::SetPlaybackMode(AnimationRef target, PlaybackMode playbackMode)
+{
+	if(animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
+	{
+		unsigned int targetIndex = animationIndexMap[target->GetObjectID()];
+		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::SetPlaybackMode -> invalid animation index found in index map.");
+
+		AnimationInstanceRef instance = registeredAnimations[targetIndex];
+		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::SetPlaybackMode -> Target animation is invalid.");
+
+		instance->PlayBackMode = playbackMode;
 	}
 }

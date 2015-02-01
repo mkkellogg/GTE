@@ -35,10 +35,10 @@ SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float
 	return importer.LoadModelDirect(filePath, importScale, castShadows, receiveShadows);
 }
 
-AnimationRef AssetImporter::LoadAnimation(const std::string& filePath) const
+AnimationRef AssetImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding) const
 {
 	ModelImporter importer;
-	return importer.LoadAnimation(filePath);
+	return importer.LoadAnimation(filePath, addLoopPadding);
 }
 
 void AssetImporter::LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource)

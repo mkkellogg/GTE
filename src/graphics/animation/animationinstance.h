@@ -13,6 +13,7 @@
 #define _GTE_ANIMATION_INSTANCE_H_
 
 #include "object/enginetypes.h"
+#include "animationplayer.h"
 #include <vector>
 #include <string>
 
@@ -84,11 +85,24 @@ class AnimationInstance
 	// current progress (in ticks) of this instance
 	float ProgressTicks;
 
+	// we can have the animation start with progress > 0
+	float StartOffset;
+	// equivalent of [StartOffset] in ticks
+	float StartOffsetTicks;
+
+	// we can have the animation end earlier than [Duration]
+	float EarlyEnd;
+	// equivalent of [EarlyEnd] in ticks
+	float EarlyEndTicks;
+
 	// is the animation playing?
 	bool Playing;
 
 	// is the animation paused?
 	bool Paused;
+
+	// what should happen when playback reaches the end of the clip?
+	PlaybackMode PlayBackMode;
 
 	AnimationInstance(SkeletonRef target, AnimationRef animation);
 	~AnimationInstance();
