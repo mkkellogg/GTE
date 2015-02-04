@@ -197,6 +197,37 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 		playingAnimationsSeen = 0;
 		float agWeight = 0;
 
+		// loop through each playing animation and calculate the
+		// total/aggregate weight
+		for(int i = registeredAnimations.size()-1; i >= 0; i--)
+		{
+			AnimationInstanceRef instance = registeredAnimations[i];
+
+			// include this animation only if it is playing
+			if(instance.IsValid() && instance->Playing)
+			{
+				// retrieve this animation's weight
+				float weight = animationWeights[i];
+				// if this animation's weight is 0, then ignore it
+				if(weight <=0)continue;
+
+				agWeight += weight;
+			}
+		}
+
+		// if the aggregate weight is very small, we won't even bother applying
+		// the animations
+		if(agWeight < .01)return;
+
+		// if agWeight < 1, we need to make it equal to one otherwise the animations
+		// will look weird. so we calculate weightScale, which is the factor by
+		// which each individual weight will need to change to create agWeight == 1
+		float weightScale = 1;
+		if(agWeight < .99)weightScale = ((float)1.0) / agWeight;
+
+		// reset agWeight for the main loop
+		agWeight = 0;
+
 		// loop through all registered animations
 		for(int i = registeredAnimations.size()-1; i >= 0; i--)
 		{
@@ -213,11 +244,14 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 				// calculate the translation, rotation, and scale for this animation at the current node
 				int mappedChannel = instance->GetChannelMappingForTargetNode(node);
 				if(mappedChannel < 0)
-					{
-						continue;
-					}
+				{
+					continue;
+				}
 
 				CalculateInterpolatedValues(instance, mappedChannel, translation, rotation, scale);
+
+				// adjust weight by [weightScale]
+				weight *= weightScale;
 
 				// calculate aggregate (sum of weights up until this point)
 				agWeight += weight;
@@ -266,28 +300,19 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 		// only apply transformations if they were actually calculated
 		if(playingAnimationsSeen > 0)
 		{
-			// if the aggregate weight of all playing animations for the current channel does not add up to 1
-			// then we use identity values to make up the difference
-			if(agWeight < 1)
-			{
-				float weightDiff = (float)1.0 - agWeight;
-				agScale.Set(agScale.x + weightDiff,agScale.y + weightDiff,agScale.z + weightDiff);
-				Quaternion::slerp(agRotation, Quaternion::Identity, weightDiff);
-			}
-
-			agRotation.normalize();
-			rotMatrix = agRotation.rotationMatrix();
+			// get the Skeleton node corresponding to the current node index
+			SkeletonNode * targetNode = target->GetNodeFromList(node);
 
 			matrix.SetIdentity();
 			// apply interpolated scale
 			matrix.Scale(agScale.x,agScale.y,agScale.z);
 			// apply interpolated rotation
+			agRotation.normalize();
+			rotMatrix = agRotation.rotationMatrix();
 			matrix.PreMultiply(rotMatrix);
 			// apply interpolated translation
 			matrix.PreTranslate(agTranslation.x, agTranslation.y, agTranslation.z);
 
-			// get the Skeleton node corresponding to the current node index
-			SkeletonNode * targetNode = target->GetNodeFromList(node);
 			if(targetNode->HasTarget())
 			{
 				// get the local transform of the target of this node and apply
