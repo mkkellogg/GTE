@@ -75,6 +75,8 @@ class Game
 	float playerVelocityY;
 	bool isMoving;
 	bool playerGrounded;
+	bool playerJumpApexReached;
+	bool playerLanded;
 
 	Vector3 moveDirection;
 	Vector3 lookDirection;

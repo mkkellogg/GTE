@@ -64,6 +64,8 @@ Game::Game()
 	playerBaseY = 0;
 	playerVelocityY = 0;
 	playerGrounded = false;
+	playerJumpApexReached = false;
+	playerLanded = false;
 
 	// original player forward is looking down the positive z-axis
 	basePlayerForward = Vector3(0,0,1);
@@ -463,7 +465,7 @@ void Game::UpdatePlayerMovementSpeedAndDirection()
 {
 	float curSmooth = speedSmoothing * Time::GetDeltaTime();
 
-	if(playerState != PlayerState::Walking && playerState != PlayerState::Waiting)
+	if(playerState == PlayerState::Roaring)
 	{
 		moveSpeed = GTEMath::Lerp(moveSpeed, 0, curSmooth);
 		return;
@@ -553,7 +555,7 @@ void Game::UpdatePlayerMovementSpeedAndDirection()
 }
 
 /*
- * Update the player's position base on its current speed and facing direction.
+ * Update the player's position base on its current speed, facing direction, and gravity.
  */
 void Game::UpdatePlayerPosition()
 {
@@ -561,10 +563,18 @@ void Game::UpdatePlayerPosition()
 	Vector3 currentTranslation;
 	Vector3 currentScale;
 
+	playerJumpApexReached = false;
+	playerLanded = false;
+
+	// get the current position, rotation, and scale
 	playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
 
+	// is the player currently moving upwards (y velocity > 0) ?
 	bool movingUp = playerVelocityY > 0;
 
+	// if the player is currently on the ground, but is in the jump state
+	// we set the player's Y velocity to a positive number if the player
+	// has been in the jump state for a sufficient amount of time
 	if(playerGrounded && playerState == PlayerState::Jump)
 	{
 		float jumpTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::Jump] ;
@@ -575,22 +585,25 @@ void Game::UpdatePlayerPosition()
 		}
 	}
 
+	// apply gravity to the player's Y velocity
 	if(!playerGrounded)playerVelocityY -= 1 * Time::GetDeltaTime();
 
-	// reached jump apex
+	// if the player was moving upwards but now is not after the application
+	// of gravity, then the jump's apex has been reached.
 	if(playerVelocityY <= 0 && movingUp)
 	{
-		ActivatePlayerState(PlayerState::JumpFall);
+		playerJumpApexReached = true;
 	}
 
+	// check if the player has landed from the jump or fall
 	if(currentTranslation.y < playerBaseY + 1 && playerVelocityY < 0 && !playerGrounded)
 	{
 		playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
 		currentTranslation.y = playerBaseY;
 		playerObject->GetTransform().SetLocalComponents(currentTranslation, currentRotation, currentScale);
 		playerVelocityY = 0;
-		ActivatePlayerState(PlayerState::JumpEnd);
 		playerGrounded = true;
+		playerLanded = true;
 	}
 
 	if(!playerGrounded)
@@ -612,7 +625,7 @@ void Game::UpdatePlayerPosition()
  */
 void Game::UpdatePlayerLookDirection()
 {
-	if(playerState != PlayerState::Walking && playerState != PlayerState::Waiting)return;
+	if(playerState == PlayerState::Roaring)return;
 
 	// axis around which to rotate player object
 	Vector3 rotationAxis(0,1,0);
@@ -700,20 +713,34 @@ void Game::ManagePlayerState()
 	if(playerState == PlayerState::JumpStart)
 	{
 		float startTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::JumpStart] ;
-		if(startTime > .3)
+		if(startTime > .2)
 		{
 			ActivatePlayerState(PlayerState::Jump);
 		}
 	}
 
+	if(playerJumpApexReached)
+	{
+		ActivatePlayerState(PlayerState::JumpFall);
+	}
+
+	if(playerLanded)
+	{
+		ActivatePlayerState(PlayerState::JumpEnd);
+	}
+
 	if(playerState == PlayerState::JumpEnd)
+	{
+		float startTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::JumpEnd] ;
+		if(startTime > .1 && moveSpeed > .3)
 		{
-			float startTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::JumpEnd] ;
-			if(startTime > .5)
-			{
-				ActivatePlayerState(PlayerState::Waiting);
-			}
+			ActivatePlayerState(PlayerState::Waiting);
 		}
+		else if(startTime > .3)
+		{
+			ActivatePlayerState(PlayerState::Waiting);
+		}
+	}
 
 	if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
 	{
