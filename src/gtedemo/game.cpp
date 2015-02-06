@@ -52,18 +52,17 @@
 Game::Game()
 {
 	// initialize player movement variables
-	moveSpeed = 0;
-	isMoving = false;
-	isGrounded = true;
-	walkAnimationSpeed = 2;
-	walkSpeed = 6.0;
-	runAnimationSpeed = 3;
-	runSpeed = 6.0;
-	rotateSpeed = 200;
-	speedSmoothing = 10;
+	playerMoveSpeed = 0;
+	playerIsMoving = false;
+	playerWalkAnimationSpeed = 2;
+	playerWalkSpeed = 6.0;
+	playerRunAnimationSpeed = 3;
+	playerRunSpeed = 6.0;
+	playerRotateSpeed = 200;
+	playerSpeedSmoothing = 10;
 	playerBaseY = 0;
 	playerVelocityY = 0;
-	playerGrounded = false;
+	playerIsGrounded = false;
 	playerJumpApexReached = false;
 	playerLanded = false;
 
@@ -426,7 +425,7 @@ void Game::InitializePlayerPosition()
 	playerForward.y = 0;
 	playerForward.Normalize();
 
-	lookDirection = playerForward;
+	playerLookDirection = playerForward;
 
 	Quaternion currentRotation;
 	Vector3 currentTranslation;
@@ -463,11 +462,11 @@ void Game::Update()
  */
 void Game::UpdatePlayerMovementSpeedAndDirection()
 {
-	float curSmooth = speedSmoothing * Time::GetDeltaTime();
+	float curSmooth = playerSpeedSmoothing * Time::GetDeltaTime();
 
 	if(playerState == PlayerState::Roaring)
 	{
-		moveSpeed = GTEMath::Lerp(moveSpeed, 0, curSmooth);
+		playerMoveSpeed = GTEMath::Lerp(playerMoveSpeed, 0, curSmooth);
 		return;
 	}
 
@@ -506,7 +505,7 @@ void Game::UpdatePlayerMovementSpeedAndDirection()
 	if(inputManager->GetDigitalInputState(DigitalInput::Up))v += 1;
 	if(inputManager->GetDigitalInputState(DigitalInput::Down))v -= 1;
 
-	isMoving = GTEMath::Abs(h) > .1 || GTEMath::Abs(v) > .1;
+	playerIsMoving = GTEMath::Abs(h) > .1 || GTEMath::Abs(v) > .1;
 
 	// scale right vector according to horizontal input
 	Vector3 cameraRightScaled = cameraRight;
@@ -526,31 +525,31 @@ void Game::UpdatePlayerMovementSpeedAndDirection()
 	{
 		// rotate from the current facing vector to the target facing vector, instead of jumping directly to it to
 		// create smooth rotation
-		bool success = Vector3::RotateTowards(lookDirection, targetDirection,  rotateSpeed * Time::GetDeltaTime(), moveDirection);
+		bool success = Vector3::RotateTowards(playerLookDirection, targetDirection,  playerRotateSpeed * Time::GetDeltaTime(), playerMoveDirection);
 
 		// the RotateTowards() operation can fail if the 'from' and 'to' vectors are opposite (180 degrees from each other).
 		// in such a case we create a new target direction that is degrees from the current facing vector to
 		// either the left or right (as appropriate).
 		if(!success)
 		{
-			Vector3::Cross(Vector3::Up, lookDirection, targetDirection);
-			Vector3::RotateTowards(lookDirection, targetDirection,  rotateSpeed * Time::GetDeltaTime(), moveDirection);
+			Vector3::Cross(Vector3::Up, playerLookDirection, targetDirection);
+			Vector3::RotateTowards(playerLookDirection, targetDirection,  playerRotateSpeed * Time::GetDeltaTime(), playerMoveDirection);
 		}
 
-		lookDirection = moveDirection;
-		lookDirection.y = 0;
-		lookDirection.Normalize();
+		playerLookDirection = playerMoveDirection;
+		playerLookDirection.y = 0;
+		playerLookDirection.Normalize();
 	}
 
 	// if the player is on the ground, apply movement
-	if(isGrounded)
+	if(playerIsGrounded)
 	{
 		float targetSpeed = 0;
-		if(isMoving)
+		if(playerIsMoving)
 		{
-			targetSpeed = walkSpeed;
+			targetSpeed = playerWalkSpeed;
 		}
-		moveSpeed = GTEMath::Lerp(moveSpeed, targetSpeed, curSmooth);
+		playerMoveSpeed = GTEMath::Lerp(playerMoveSpeed, targetSpeed, curSmooth);
 	}
 }
 
@@ -575,18 +574,18 @@ void Game::UpdatePlayerPosition()
 	// if the player is currently on the ground, but is in the jump state
 	// we set the player's Y velocity to a positive number if the player
 	// has been in the jump state for a sufficient amount of time
-	if(playerGrounded && playerState == PlayerState::Jump)
+	if(playerIsGrounded && playerState == PlayerState::Jump)
 	{
 		float jumpTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::Jump] ;
 		if(jumpTime > .2)
 		{
 			playerVelocityY = .6;
-			playerGrounded = false;
+			playerIsGrounded = false;
 		}
 	}
 
 	// apply gravity to the player's Y velocity
-	if(!playerGrounded)playerVelocityY -= 1 * Time::GetDeltaTime();
+	if(!playerIsGrounded)playerVelocityY -= 1 * Time::GetDeltaTime();
 
 	// if the player was moving upwards but now is not after the application
 	// of gravity, then the jump's apex has been reached.
@@ -596,26 +595,27 @@ void Game::UpdatePlayerPosition()
 	}
 
 	// check if the player has landed from the jump or fall
-	if(currentTranslation.y < playerBaseY + 1 && playerVelocityY < 0 && !playerGrounded)
+	if(currentTranslation.y < playerBaseY + 1 && playerVelocityY < 0 && !playerIsGrounded)
 	{
 		playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
 		currentTranslation.y = playerBaseY;
 		playerObject->GetTransform().SetLocalComponents(currentTranslation, currentRotation, currentScale);
 		playerVelocityY = 0;
-		playerGrounded = true;
+		playerIsGrounded = true;
 		playerLanded = true;
 	}
 
-	if(!playerGrounded)
+	// apply player's Y velocity
+	if(!playerIsGrounded)
 	{
 		Vector3 move(0, playerVelocityY, 0);
 		playerObject->GetTransform().Translate(move, false);
 	}
 
-	if(moveSpeed > .1)
+	if(playerMoveSpeed > .1)
 	{
-		Vector3 move = lookDirection;
-		move.Scale(moveSpeed * Time::GetDeltaTime());
+		Vector3 move = playerLookDirection;
+		move.Scale(playerMoveSpeed * Time::GetDeltaTime());
 		playerObject->GetTransform().Translate(move, false);
 	}
 }
@@ -632,7 +632,7 @@ void Game::UpdatePlayerLookDirection()
 
 	// get a quaternion that represents the rotation from the player object's original forward vector
 	// to [lookDirection] in world space.
-	Quaternion modRotation = Quaternion::getRotation(basePlayerForward, lookDirection, rotationAxis);
+	Quaternion modRotation = Quaternion::getRotation(basePlayerForward, playerLookDirection, rotationAxis);
 	modRotation.normalize();
 
 	Quaternion currentRotation;
@@ -652,7 +652,7 @@ void Game::UpdatePlayerAnimation()
 {
 	if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
 	{
-		if(moveSpeed > .1)
+		if(playerMoveSpeed > .1)
 		{
 			animationPlayer->CrossFade(playerWalk, .2);
 		}
@@ -732,7 +732,7 @@ void Game::ManagePlayerState()
 	if(playerState == PlayerState::JumpEnd)
 	{
 		float startTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::JumpEnd] ;
-		if(startTime > .1 && moveSpeed > .3)
+		if(startTime > .1 && playerMoveSpeed > .3)
 		{
 			ActivatePlayerState(PlayerState::Waiting);
 		}
@@ -744,7 +744,7 @@ void Game::ManagePlayerState()
 
 	if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
 	{
-		if(moveSpeed > .1)
+		if(playerMoveSpeed > .1)
 		{
 			ActivatePlayerState(PlayerState::Walking);
 		}

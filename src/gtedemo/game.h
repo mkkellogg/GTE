@@ -36,7 +36,6 @@ class Game
 		JumpEnd = 6
 	};
 
-
 	static const unsigned int MAX_PLAYER_STATES = 32;
 
 	// time at which a state was most recently activated
@@ -64,26 +63,26 @@ class Game
 	AnimationPlayerRef animationPlayer;
 
 	// movement variables
-	float walkAnimationSpeed;
-	float walkSpeed;
-	float runAnimationSpeed;
-	float runSpeed;
-	float rotateSpeed;
-	float speedSmoothing;
-	float moveSpeed;
+	float playerWalkAnimationSpeed;
+	float playerWalkSpeed;
+	float playerRunAnimationSpeed;
+	float playerRunSpeed;
+	float playerRotateSpeed;
+	float playerSpeedSmoothing;
+	float playerMoveSpeed;
 	float playerBaseY;
 	float playerVelocityY;
-	bool isMoving;
-	bool playerGrounded;
+	bool playerIsMoving;
+	bool playerIsGrounded;
+
+	// booleans that are only true during the frame they become true
 	bool playerJumpApexReached;
 	bool playerLanded;
 
-	Vector3 moveDirection;
-	Vector3 lookDirection;
+	Vector3 playerMoveDirection;
+	Vector3 playerLookDirection;
 	Vector3 basePlayerForward;
 	Vector3 baseCameraForward;
-
-	bool isGrounded;
 
 	void SetupCamera();
 	void SetupScenery(AssetImporter& importer);
