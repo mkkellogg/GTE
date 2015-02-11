@@ -15,3 +15,8 @@ SceneObjectComponent::~SceneObjectComponent()
 {
 
 }
+
+SceneObjectRef SceneObjectComponent::GetSceneObject()
+{
+	return sceneObject;
+}

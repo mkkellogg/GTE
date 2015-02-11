@@ -287,67 +287,112 @@ void Game::SetupPlayer(AssetImporter& importer)
 {
 	//========================================================
 	//
-	// Load Koopa model
+	// Load player model
 	//
 	//========================================================
 
 	Mesh3DRef firstMesh;
-	playerType = PlayerType::Koopa;
-	playerObject = importer.LoadModelDirect("resources/models/koopa/koopa.fbx", 1 );
-	ASSERT_RTRN(playerObject.IsValid(), "Could not load Koopa model!\n");
+	playerType = PlayerType::Warrior;
+	playerState = PlayerState::Waiting;
+	playerIsGrounded = true;
+
+	if(playerType == PlayerType::Koopa)playerObject = importer.LoadModelDirect("resources/models/koopa/koopa.fbx", 1 );
+	else if(playerType == PlayerType::Warrior)playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx", 1 );
+	ASSERT_RTRN(playerObject.IsValid(), "Could not load player model!\n");
 
 	playerObject->SetActive(true);
 	SkinnedMesh3DRendererRef playerMeshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
+	SceneObjectRef playerSceneObject = playerMeshRenderer->GetSceneObject();
+	Mesh3DRef skinnedMesh = playerSceneObject->GetMesh3D();
 
 	// move the player object to its starting location
-	playerObject->GetTransform().Translate(0,-10,-2,false);
-	playerObject->GetTransform().Scale(.05, .05, .05, true);
+
+	if(playerType == PlayerType::Koopa)
+	{
+		playerObject->GetTransform().Translate(0,-10,-2,false);
+		playerObject->GetTransform().Scale(.05, .05, .05, true);
+	}
+	else if(playerType == PlayerType::Warrior)
+	{
+		playerObject->GetTransform().Translate(0,-10,-2,false);
+		playerObject->GetTransform().Scale(6, 6, 6, true);
+	}
+
 
 	//========================================================
 	//
-	// Load Koopa animations
+	// Load player animations
 	//
 	//========================================================
 
-	playerWait = importer.LoadAnimation("resources/models/koopa/model/koopa@wait.fbx", true);
-	playerWalk = importer.LoadAnimation("resources/models/koopa/model/koopa@walk.fbx", true);
-	playerRoar = importer.LoadAnimation("resources/models/koopa/model/koopa@roar3.fbx", false);
+	if(playerType == PlayerType::Koopa)
+	{
+		playerWait = importer.LoadAnimation("resources/models/koopa/model/koopa@wait.fbx", true);
+		playerWalk = importer.LoadAnimation("resources/models/koopa/model/koopa@walk.fbx", true);
+		playerRoar = importer.LoadAnimation("resources/models/koopa/model/koopa@roar3.fbx", false);
 
-	playerJump = importer.LoadAnimation("resources/models/koopa/model/koopa@jump.fbx", false);
-	playerJumpStart = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpstart.fbx", false);
-	playerJumpEnd = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpend.fbx", false);
-	playerJumpFall = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpfall.fbx", false);
+		playerJump = importer.LoadAnimation("resources/models/koopa/model/koopa@jump.fbx", false);
+		playerJumpStart = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpstart.fbx", false);
+		playerJumpEnd = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpend.fbx", false);
+		playerJumpFall = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpfall.fbx", false);
+	}
+	else if(playerType == PlayerType::Warrior)
+	{
+		playerWait = importer.LoadAnimation("resources/models/toonwarrior/animations/idle.fbx", true);
+		playerWalk = importer.LoadAnimation("resources/models/toonwarrior/animations/walk.fbx", true);
+	}
+
 
 	playerRenderer = FindFirstSkinnedMeshRenderer(playerObject);
 	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
-	bool compatible = animManager->IsCompatible(playerRenderer, playerWalk);
-	compatible &= animManager->IsCompatible(playerRenderer, playerWait);
-	compatible &= animManager->IsCompatible(playerRenderer, playerJump);
-	compatible &= animManager->IsCompatible(playerRenderer, playerRoar);
-	compatible &= animManager->IsCompatible(playerRenderer, playerJumpStart);
-	compatible &= animManager->IsCompatible(playerRenderer, playerJumpEnd);
-	compatible &= animManager->IsCompatible(playerRenderer, playerJumpFall);
+	bool compatible = true;
 
-	if(compatible)printf("animation is compatible!! :)\n");
-	else printf("animation is not compatible! boooo!\n");
+	if(playerType == PlayerType::Koopa)
+	{
+		compatible = animManager->IsCompatible(playerRenderer, playerWalk);
+		compatible &= animManager->IsCompatible(playerRenderer, playerWait);
+		compatible &= animManager->IsCompatible(playerRenderer, playerJump);
+		compatible &= animManager->IsCompatible(playerRenderer, playerRoar);
+		compatible &= animManager->IsCompatible(playerRenderer, playerJumpStart);
+		compatible &= animManager->IsCompatible(playerRenderer, playerJumpEnd);
+		compatible &= animManager->IsCompatible(playerRenderer, playerJumpFall);
+	}
+	else if(playerType == PlayerType::Warrior)
+	{
+		compatible = animManager->IsCompatible(playerRenderer, playerWalk);
+		compatible &= animManager->IsCompatible(playerRenderer, playerWait);
+	}
+
+	if(compatible)printf("animations are compatible!! :)\n");
+	else printf("animations are not compatible! boooo!\n");
 
 	// create an animation player and some animations to it for the player object.
 	if(compatible)
 	{
-		playerJumpFall->ClipEnds(playerJumpFall->GetDuration() - .05, playerJumpFall->GetDuration());
+		if(playerType == PlayerType::Koopa)
+		{
+			playerJumpFall->ClipEnds(playerJumpFall->GetDuration() - .05, playerJumpFall->GetDuration());
 
-		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
-		animationPlayer->AddAnimation(playerWait);
-		animationPlayer->AddAnimation(playerWalk);
-		animationPlayer->AddAnimation(playerJump);
-		animationPlayer->AddAnimation(playerJumpStart);
-		animationPlayer->AddAnimation(playerJumpEnd);
-		animationPlayer->AddAnimation(playerJumpFall);
-		animationPlayer->AddAnimation(playerRoar);
-		animationPlayer->SetSpeed(playerWalk, 2);
-		animationPlayer->SetSpeed(playerJumpStart, 4);
-		animationPlayer->SetPlaybackMode(playerJumpFall, PlaybackMode::Clamp);
-		animationPlayer->Play(playerWait);
+			animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
+			animationPlayer->AddAnimation(playerWait);
+			animationPlayer->AddAnimation(playerWalk);
+			animationPlayer->AddAnimation(playerJump);
+			animationPlayer->AddAnimation(playerJumpStart);
+			animationPlayer->AddAnimation(playerJumpEnd);
+			animationPlayer->AddAnimation(playerJumpFall);
+			animationPlayer->AddAnimation(playerRoar);
+			animationPlayer->SetSpeed(playerWalk, 2);
+			animationPlayer->SetSpeed(playerJumpStart, 4);
+			animationPlayer->SetPlaybackMode(playerJumpFall, PlaybackMode::Clamp);
+			animationPlayer->Play(playerWait);
+		}
+		else if(playerType == PlayerType::Warrior)
+		{
+			animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
+			animationPlayer->AddAnimation(playerWait);
+			animationPlayer->AddAnimation(playerWalk);
+			animationPlayer->Play(playerWait);
+		}
 	}
 }
 
@@ -568,6 +613,7 @@ void Game::UpdatePlayerPosition()
 	// get the current position, rotation, and scale
 	playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
 
+
 	// is the player currently moving upwards (y velocity > 0) ?
 	bool movingUp = playerVelocityY > 0;
 
@@ -579,13 +625,13 @@ void Game::UpdatePlayerPosition()
 		float jumpTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::Jump] ;
 		if(jumpTime > .2)
 		{
-			playerVelocityY = .6;
+			playerVelocityY = 50;
 			playerIsGrounded = false;
 		}
 	}
 
 	// apply gravity to the player's Y velocity
-	if(!playerIsGrounded)playerVelocityY -= 1 * Time::GetDeltaTime();
+	if(!playerIsGrounded)playerVelocityY -= 95 * Time::GetDeltaTime();
 
 	// if the player was moving upwards but now is not after the application
 	// of gravity, then the jump's apex has been reached.
@@ -608,7 +654,7 @@ void Game::UpdatePlayerPosition()
 	// apply player's Y velocity
 	if(!playerIsGrounded)
 	{
-		Vector3 move(0, playerVelocityY, 0);
+		Vector3 move(0, playerVelocityY * Time::GetDeltaTime(), 0);
 		playerObject->GetTransform().Translate(move, false);
 	}
 

@@ -22,7 +22,8 @@ class Game
 	enum class PlayerType
 	{
 		Koopa = 0,
-		Nerd = 1
+		Nerd = 1,
+		Warrior=2
 	};
 
 	enum class PlayerState

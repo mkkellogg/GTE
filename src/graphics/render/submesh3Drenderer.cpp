@@ -377,7 +377,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			//    3. [useBadGeometryShadowFix] == true
 			// then we create two side polygons to link the current face, which will be a front cap triangle,
 			// to the back cap triangle, which is the current face projected to infinity, on the current edge
-			if(currentFaceIsFront == false && (adjFaceToLightDot >= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
+			if(currentFaceIsFront == false && (adjFaceToLightDot > backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix))
 			{
 				BaseVector4_QuickCopy_IncDest(edgeVertex1, svPositionBase);
 				BaseVector4_QuickCopy_IncDest(edgeVertex2, svPositionBase);
@@ -485,7 +485,7 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 	// shadow or not. This could be quite wasteful, so implement a way to avoid this excess memory usage.
 	bool shadowVolumeInitSuccess = true;
 	shadowVolumeInitSuccess = shadowVolumePositions.Init(storedVertexCount * 8);
-	shadowVolumeInitSuccess = InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 6, 4,0);
+	shadowVolumeInitSuccess &= InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 8, 4,0);
 	if(!shadowVolumeInitSuccess)
 	{
 		Debug::PrintError("SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");

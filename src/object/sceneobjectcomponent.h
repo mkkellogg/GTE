@@ -24,6 +24,8 @@ class SceneObjectComponent : public EngineObject
     virtual ~SceneObjectComponent();
 
     public :
+
+    SceneObjectRef GetSceneObject();
 };
 
 #endif
