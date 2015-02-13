@@ -280,14 +280,28 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 	// determine if [skeleton] is valid
 	bool hasSkeleton = skeleton.IsValid() && skeleton->GetBoneCount() ? true : false;
+	bool requiresSkinnedRenderer = false;
 
 	Mesh3DRenderer * rendererPtr = NULL;
 	SkinnedMesh3DRendererRef skinnedMeshRenderer;
 	Mesh3DRendererRef meshRenderer;
 
+	std::vector<unsigned int> boneCounts;
+
 	// are there any meshes in the model/scene?
 	if(node.mNumMeshes > 0)
 	{
+		// loop through each mesh on this node and check for any bones.
+		// if there is a mesh with bones, then we will create a SkinnedMesh3DRenderer
+		// for all the meshes on this node.
+		for (unsigned int n=0; n < node.mNumMeshes; n++)
+		{
+			unsigned int sceneMeshIndex = node.mMeshes[n];
+			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
+			boneCounts.push_back(mesh->mNumBones);
+			if(mesh->mNumBones > 0)requiresSkinnedRenderer = true && hasSkeleton;
+		}
+
 		// create a containing Mesh3D object that will hold all sub-meshes created for this node.
 		// for each Assimp mesh, one SubMesh3D will be created added to the Mesh3D instance.
 		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
@@ -301,12 +315,20 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		mesh3D->SetCastShadows(castShadows);
 		mesh3D->SetReceiveShadows(receiveShadows);
 
-		// if [skeleton] is valid, then we create a SkinnedMesh3DRenderer instead of a Mesh3DRenderer
-		if(hasSkeleton)
+		// if there are meshes with bones on this node, then we create a SkinnedMesh3DRenderer instead of a Mesh3DRenderer
+		if(requiresSkinnedRenderer)
 		{
 			skinnedMeshRenderer = engineObjectManager->CreateSkinnedMesh3DRenderer();
 			ASSERT_RTRN(skinnedMeshRenderer.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.");
 			rendererPtr = (Mesh3DRenderer*)skinnedMeshRenderer.GetPtr();
+
+			// set the vertex bone map for each sub renderer to "none" (-1)
+			// this means skinning for a given sub-mesh will be turned off until
+			// a valid VertexBoneMap instance is set for it
+			for (unsigned int n=0; n < node.mNumMeshes; n++)
+			{
+				skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n,-1);
+			}
 		}
 		else
 		{
@@ -342,13 +364,14 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			mesh3D->SetSubMesh(subMesh3D, n);
 		}
 
-		// set the SkinnedMesh3DRenderer instance and Mesh3D instance if this scene/model
-		// has a skeleton
-		if(hasSkeleton)
+		// set the SkinnedMesh3DRenderer instance and Mesh3D instance if any meshes on
+		// this node have bones
+		if(requiresSkinnedRenderer)
 		{
+			// for each mesh that has bones, activate the vertex bone map for the corresponding sub-renderer
 			for (unsigned int n=0; n < node.mNumMeshes; n++)
 			{
-				skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, node.mMeshes[n]);
+				if(boneCounts[n] > 0)skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, node.mMeshes[n]);
 			}
 
 			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
@@ -362,36 +385,43 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		}
 	}
 
+	// update the scene object's local transform
+	sceneObject->GetTransform().SetTo(mat);
+
+	std::string nodeName(node.mName.C_Str());
+	sceneObject->SetName(nodeName);
+	parent->AddChild(sceneObject);
+	createdSceneObjects.push_back(sceneObject);
+
 	if(hasSkeleton)
 	{
-		if(node.mName.C_Str() != NULL)
+		int nodeMapping = skeleton->GetNodeMapping(nodeName);
+		if(nodeMapping>=0)
 		{
-			std::string boneName(node.mName.C_Str());
-			int boneMapping = skeleton->GetBoneMapping(boneName);
-			if(boneMapping>=0)
+			SkeletonNode * node = skeleton->GetNodeFromList(nodeMapping);
+			if(node != NULL)
 			{
-				Bone * bone = skeleton->GetBone(boneMapping);
-				if(bone != NULL)
+				node->InitialTransform = mat;
+
+				Vector3 scale;
+				Vector3 translation;
+				Quaternion rotation;
+
+				mat.Decompose(translation,rotation,scale);
+
+				node->InitialTranslation = translation;
+				node->InitialRotation = rotation;
+				node->InitialScale = scale;
+
+				// if this skeleton node has a SceneObject target, then set it to [sceneObject]
+				SceneObjectSkeletonNode *soskNode = dynamic_cast<SceneObjectSkeletonNode*>(node);
+				if(soskNode != NULL)
 				{
-					SkeletonNode * skNode = bone->Node;
-					if(skNode != NULL)
-					{
-						// if this skeleton node has a SceneObject target, then set it to [sceneObject]
-						SceneObjectSkeletonNode *soskNode = dynamic_cast<SceneObjectSkeletonNode*>(skNode);
-						if(soskNode != NULL)soskNode->Target = sceneObject;
-					}
+					soskNode->Target = sceneObject;
 				}
 			}
 		}
 	}
-
-	// update the scene object's local transform
-	sceneObject->GetTransform().SetTo(mat);
-
-	std::string name(node.mName.C_Str());
-	sceneObject->SetName(name);
-	parent->AddChild(sceneObject);
-	createdSceneObjects.push_back(sceneObject);
 
 	for(unsigned int i=0; i <node.mNumChildren; i++)
 	{
@@ -1111,6 +1141,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 		aiNodeAnim * nodeAnim = animation.mChannels[n];
 		std::string nodeName(nodeAnim->mNodeName.C_Str());
 
+
 		animationRef->SetChannelName(n,nodeName);
 
 		//int nodeIndex = skeleton->GetNodeMapping(nodeName);
@@ -1142,6 +1173,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 
 			for(unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++)
 			{
+
 				aiVectorKey& vectorKey = *(nodeAnim->mScalingKeys + s);
 
 				ScaleKeyFrame keyFrame;

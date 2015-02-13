@@ -61,6 +61,10 @@ bool SceneObjectSkeletonNode::HasTarget() const
 SkeletonNode * SceneObjectSkeletonNode::FullClone() const
 {
 	SkeletonNode * newNode = new SceneObjectSkeletonNode(Target, BoneIndex, Name);
+	newNode->InitialTransform = this->InitialTransform;
+	newNode->InitialTranslation = this->InitialTranslation;
+	newNode->InitialScale = this->InitialScale;
+	newNode->InitialRotation = this->InitialRotation;
 	ASSERT(newNode != NULL,"SceneObjectSkeletonNode::FullClone -> Could not allocate new node",NULL);
 
 	return newNode;

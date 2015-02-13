@@ -70,9 +70,9 @@ class AnimationPlayer
 	void ClearBlendOpQueue();
 
 	void Update();
-	void UpdateBlending();
+	void UpdateBlendingOperations();
 	void CheckWeights();
-	void UpdatePositionsFromAnimations();
+	void ApplyActiveAnimations();
 	void UpdateAnimationsProgress();
 	void UpdateAnimationInstanceProgress(AnimationInstanceRef instance);
 	void CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const;

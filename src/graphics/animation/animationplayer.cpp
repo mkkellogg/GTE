@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "animationplayer.h"
+#include "bone.h"
 #include "engine.h"
 #include "object/enginetypes.h"
 #include "object/engineobject.h"
@@ -88,7 +89,7 @@ void AnimationPlayer::ClearBlendOpQueue()
  * Update & drive the blending operation that is at the head of the queue of
  * active blending operations.
  */
-void AnimationPlayer::UpdateBlending()
+void AnimationPlayer::UpdateBlendingOperations()
 {
 	// check if there are any active blending operations
 	if(activeBlendOperations.size() > 0)
@@ -147,12 +148,12 @@ void AnimationPlayer::CheckWeights()
 void AnimationPlayer::Update()
 {
 	// update current blending operation
-	UpdateBlending();
+	UpdateBlendingOperations();
 	// validate animation weights
 	CheckWeights();
 	// update the positions of all nodes in the target skeleton based on
 	// active animations
-	UpdatePositionsFromAnimations();
+	ApplyActiveAnimations();
 	// drive the progress of active animations
 	UpdateAnimationsProgress();
 }
@@ -166,7 +167,7 @@ void AnimationPlayer::Update()
  * those transformations based on the weight of each active animation stored in member [weights] and
  * applies the final transformation to the node.
  */
-void AnimationPlayer::UpdatePositionsFromAnimations()
+void AnimationPlayer::ApplyActiveAnimations()
 {
 	Vector3 translation;
 	Vector3 scale;
@@ -197,36 +198,8 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 		playingAnimationsSeen = 0;
 		float agWeight = 0;
 
-		// loop through each playing animation and calculate the
-		// total/aggregate weight
-		for(int i = registeredAnimations.size()-1; i >= 0; i--)
-		{
-			AnimationInstanceRef instance = registeredAnimations[i];
-
-			// include this animation only if it is playing
-			if(instance.IsValid() && instance->Playing)
-			{
-				// retrieve this animation's weight
-				float weight = animationWeights[i];
-				// if this animation's weight is 0, then ignore it
-				if(weight <=0)continue;
-
-				agWeight += weight;
-			}
-		}
-
-		// if the aggregate weight is very small, we won't even bother applying
-		// the animations
-		if(agWeight < .01)return;
-
-		// if agWeight < 1, we need to make it equal to one otherwise the animations
-		// will look weird. so we calculate weightScale, which is the factor by
-		// which each individual weight will need to change to create agWeight == 1
-		float weightScale = 1;
-		if(agWeight < .99)weightScale = ((float)1.0) / agWeight;
-
-		// reset agWeight for the main loop
-		agWeight = 0;
+		// get the Skeleton node corresponding to the current node index
+		SkeletonNode * targetNode = target->GetNodeFromList(node);
 
 		// loop through all registered animations
 		for(int i = registeredAnimations.size()-1; i >= 0; i--)
@@ -236,25 +209,31 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 			// include this animation only if it is playing
 			if(instance.IsValid() && instance->Playing)
 			{
+				// if this node does not have an animation channel for it in the current animation, then ignore
+				int mappedChannel = instance->GetChannelMappingForTargetNode(node);
+
 				// retrieve this animation's weight
 				float weight = animationWeights[i];
+
 				// if this animation's weight is 0, then ignore it
 				if(weight <=0)continue;
 
-				// calculate the translation, rotation, and scale for this animation at the current node
-				int mappedChannel = instance->GetChannelMappingForTargetNode(node);
-				if(mappedChannel < 0)
-				{
-					continue;
-				}
-
-				CalculateInterpolatedValues(instance, mappedChannel, translation, rotation, scale);
-
-				// adjust weight by [weightScale]
-				weight *= weightScale;
-
 				// calculate aggregate (sum of weights up until this point)
 				agWeight += weight;
+
+				// calculate the translation, rotation, and scale for this animation at the current node
+				if(mappedChannel >= 0)
+				{
+					CalculateInterpolatedValues(instance, mappedChannel, translation, rotation, scale);
+				}
+				// if there is no channel in the current animation for this node, use the
+				// default transformation values for this node
+				else
+				{
+					translation = targetNode->InitialTranslation;
+					rotation = targetNode->InitialRotation;
+					scale = targetNode->InitialScale;
+				}
 
 				// if the number of active animations is 1, indicated by playingAnimationsCount == 1, and its
 				// weight is 1, then we simply use the results from CalculateInterpolatedValues() and apply those
@@ -300,9 +279,6 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 		// only apply transformations if they were actually calculated
 		if(playingAnimationsSeen > 0)
 		{
-			// get the Skeleton node corresponding to the current node index
-			SkeletonNode * targetNode = target->GetNodeFromList(node);
-
 			matrix.SetIdentity();
 			// apply interpolated scale
 			matrix.Scale(agScale.x,agScale.y,agScale.z);
@@ -315,6 +291,15 @@ void AnimationPlayer::UpdatePositionsFromAnimations()
 
 			if(targetNode->HasTarget())
 			{
+				// if the agWeight for some reason is less than one, compensate by using
+				// the initial transformation values for the node
+				if(agWeight < .99)
+				{
+					Matrix4x4 temp = targetNode->InitialTransform;
+					temp.MultiplyByScalar(((float)1.0-agWeight));
+					matrix.Add(temp);
+				}
+
 				// get the local transform of the target of this node and apply
 				// [matrix], which contains the interpolated scale, rotation, and translation
 				Transform * localTransform = targetNode->GetLocalTransform();

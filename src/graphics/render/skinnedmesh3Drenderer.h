@@ -49,7 +49,7 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 	// maps each sub-mesh in the target mesh of this renderer to its corresponding
 	// VertexBoneMap structure, which describe the attachment of mesh vertices to
 	// the bones in [skeleton]
-	std::unordered_map<unsigned int, unsigned int>subMeshIndexMap;
+	std::unordered_map<unsigned int, int>subMeshIndexMap;
 
 	SkinnedMesh3DRenderer();
 	~SkinnedMesh3DRenderer();
@@ -59,7 +59,7 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 	void SetSkeleton(SkeletonRef skeleton);
 	SkeletonRef GetSkeleton();
 	void UpdateFromMesh();
-	void MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, unsigned int vertexBoneMapIndex);
+	void MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, int vertexBoneMapIndex);
 
     void AddVertexBoneMap(VertexBoneMap * map);
     VertexBoneMap * GetVertexBoneMap(unsigned int index);

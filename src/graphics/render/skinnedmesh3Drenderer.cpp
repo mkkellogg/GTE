@@ -83,7 +83,7 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 			SubMesh3DRendererRef subRenderer = this->GetSubRenderer(i);
 
 			// does the sub-mesh at index [i] have a corresponding VertexBoneMap object?
-			if(subMeshIndexMap.find(i) != subMeshIndexMap.end())
+			if(subMeshIndexMap.find(i) != subMeshIndexMap.end() && subMeshIndexMap[i] >=0)
 			{
 				vertexBoneMapIndex = subMeshIndexMap[i];
 
@@ -142,9 +142,11 @@ VertexBoneMap * SkinnedMesh3DRenderer::GetVertexBoneMap(unsigned int index)
 /*
  * Map the sub-mesh at [subMeshIndex] in the target mesh of this renderer to the VertexBoneMap structure at
  * [vertexBoneMapIndex] in the member list of VertexBoneMap objects: [vertexBoneMaps]. This establishes the link
- * between
+ * between a sub-mesh (and therefore sub-renderer) and the corresponding VertexBoneMap instance.
+ *
+ * Setting vertexBoneMapIndex to -1 effectively turns off skinning for the specified sub-mesh
  */
-void SkinnedMesh3DRenderer::MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, unsigned int vertexBoneMapIndex)
+void SkinnedMesh3DRenderer::MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, int vertexBoneMapIndex)
 {
 	subMeshIndexMap[subMeshIndex] = vertexBoneMapIndex;
 }

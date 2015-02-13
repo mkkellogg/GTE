@@ -21,6 +21,9 @@ class Bone;
 
 #include <vector>
 #include <string>
+#include "geometry/matrix4x4.h"
+#include "geometry/vector/vector3.h"
+#include "geometry/quaternion.h"
 
 class SkeletonNode
 {
@@ -31,6 +34,11 @@ class SkeletonNode
 	int BoneIndex;
 	// the name of this node
 	std::string Name;
+	// save the original transformations
+	Matrix4x4 InitialTransform;
+	Vector3 InitialTranslation;
+	Vector3 InitialScale;
+	Quaternion InitialRotation;
 
 	SkeletonNode(int boneIndex, const std::string& name);
 	virtual ~SkeletonNode();
