@@ -111,7 +111,7 @@ class ModelImporter
 	~ModelImporter();
 
 	bool InitImporter();
-	const aiScene * LoadAIScene(const std::string& filePath);
+	const aiScene * LoadAIScene(const std::string& filePath, bool preserveFBXPivots);
 
 	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,
 									std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton,
@@ -148,8 +148,8 @@ class ModelImporter
 
 	public:
 
-	SceneObjectRef LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows);
-	AnimationRef LoadAnimation(const std::string& filePath, bool addLoopPadding);
+	SceneObjectRef LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots);
+	AnimationRef LoadAnimation(const std::string& filePath, bool addLoopPadding, bool preserveFBXPivots);
 
 };
 

@@ -17,6 +17,11 @@ AssetImporter::AssetImporter()
 	// TODO: Make this choose the correct implementation based on platform.
 	// For now we go with OpenGL by default
 	shaderSourceLoader = new ShaderSourceLoaderGL();
+
+	for(unsigned int i = 0; i < (unsigned int)AssetImporterBoolProperty::_Count; i++)
+	{
+		boolProperties[i] = false;
+	}
 }
 
 AssetImporter::~AssetImporter()
@@ -32,19 +37,29 @@ SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float
 SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows) const
 {
 	ModelImporter importer;
-	return importer.LoadModelDirect(filePath, importScale, castShadows, receiveShadows);
+	return importer.LoadModelDirect(filePath, importScale, castShadows, receiveShadows, GetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots));
 }
 
 AnimationRef AssetImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding) const
 {
 	ModelImporter importer;
-	return importer.LoadAnimation(filePath, addLoopPadding);
+	return importer.LoadAnimation(filePath, addLoopPadding, GetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots));
 }
 
 void AssetImporter::LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource)
 {
 	ASSERT_RTRN(shaderSourceLoader != NULL, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is NULL.");
 	shaderSourceLoader->LoadShaderSouce(name, shaderSource);
+}
+
+void AssetImporter::SetBoolProperty(AssetImporterBoolProperty prop, bool value)
+{
+	boolProperties[(unsigned int)prop] = value;
+}
+
+bool AssetImporter::GetBoolProperty(AssetImporterBoolProperty prop) const
+{
+	return boolProperties[(unsigned int)prop];
 }
 
 

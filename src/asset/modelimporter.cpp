@@ -97,7 +97,7 @@ bool ModelImporter::InitImporter()
  * compatible path, so the the engine's FileSystem singleton should be used to derive the correct platform-specific
  * path before calling this method.
  */
-const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
+const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool preserveFBXPivots)
 {
 	// the global Assimp scene object
 	const aiScene* scene = NULL;
@@ -120,7 +120,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
 	}
 
 	// tell Assimp not to create extra nodes when importing FBX files
-	importer->SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
+	importer->SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, preserveFBXPivots ? 1 : 0);
 
 	// read the model file in from disk
 	scene = importer->ReadFile(filePath, aiProcessPreset_TargetRealtime_Quality );
@@ -145,10 +145,10 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath)
  * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
  * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
  */
-SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows)
+SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots)
 {
 	// the global Assimp scene object
-	const aiScene* scene = LoadAIScene(modelPath);
+	const aiScene* scene = LoadAIScene(modelPath, preserveFBXPivots);
 
 	if(scene != NULL)
 	{
@@ -1141,7 +1141,6 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 		aiNodeAnim * nodeAnim = animation.mChannels[n];
 		std::string nodeName(nodeAnim->mNodeName.C_Str());
 
-
 		animationRef->SetChannelName(n,nodeName);
 
 		//int nodeIndex = skeleton->GetNodeMapping(nodeName);
@@ -1205,12 +1204,12 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
  * Currently this loads only the first animation found in the model file.
  *
  */
-AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding)
+AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding, bool preserveFBXPivots)
 {
 	bool initSuccess = InitImporter();
 	ASSERT(initSuccess, "ModelImporter::LoadAnimation -> Unable to initialize importer.", AnimationRef::Null());
 
-	const aiScene * scene = LoadAIScene(filePath);
+	const aiScene * scene = LoadAIScene(filePath, preserveFBXPivots);
 	ASSERT(scene != NULL, "ModelImporter::LoadAnimation -> Unable to load scene.", AnimationRef::Null());
 
 	ASSERT(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationRef::Null());
