@@ -446,6 +446,11 @@ void Material::SendSetUniformToShader(unsigned int index)
 				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->SamplerData);
 				SetUniformSetValue(desc->ShaderVarID, SAMPLER_2D_DATA_SIZE);
 			}
+			else if(desc->Type == UniformType::Float)
+			{
+				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->BasicFloatData[0]);
+				SetUniformSetValue(desc->ShaderVarID, 1);
+			}
 		}
 	}
 }
@@ -472,7 +477,7 @@ void Material::SetTexture(TextureRef texture, const std::string& varName)
 	int loc = shader->GetUniformVarID(varName);
 	if(loc < 0)
 	{
-		std::string str = std::string("Could not find shader sampler var:" ) +
+		std::string str = std::string("Material::SetTexture -> Could not find shader sampler var:" ) +
 				varName + std::string("for material: ") + materialName;
 
 		Debug::PrintError(str);
@@ -494,7 +499,45 @@ void Material::SetTexture(TextureRef texture, const std::string& varName)
 	}
 	else
 	{
-		std::string err = std::string("Invalid uniform specified: ") + varName;
+		std::string err = std::string("Material::SetTexture -> Invalid uniform specified: ") + varName;
+		Debug::PrintError(err);
+	}
+}
+
+/*
+ * Find a uniform with the name specified by [shaderVarName] and set its
+ * value to [val]
+ */
+void Material::SetUniform1f(float val, const std::string& varName)
+{
+	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform1f -> shader is NULL");
+
+	int loc = shader->GetUniformVarID(varName);
+	if(loc < 0)
+	{
+		std::string str = std::string("Material::SetUniform1f -> Could not find shader sampler var:" ) +
+				varName + std::string("for material: ") + materialName;
+
+		Debug::PrintError(str);
+		return;
+	}
+
+	// get the index in [setUniforms] that has the UniformDescriptor for the
+	// uniform named [varName]
+	int foundIndex = GetUniformIndex(varName);
+
+	if(foundIndex >= 0)
+	{
+		UniformDescriptor * desc = setUniforms[foundIndex];
+
+		desc->ShaderVarID = loc;
+		desc->Type = UniformType::Float;
+		desc->BasicFloatData[0] = val;
+		desc->IsSet = true;
+	}
+	else
+	{
+		std::string err = std::string("Material::SetUniform1f -> Invalid uniform specified: ") + varName;
 		Debug::PrintError(err);
 	}
 }

@@ -153,6 +153,7 @@ class Material : public EngineObject
     void SendSetUniformToShader(unsigned int index);
     void SendAllSetUniformsToShader();
     void SetTexture(TextureRef texture, const std::string& varName);
+    void SetUniform1f(float val, const std::string& varName);
     unsigned int GetSetUniformCount() const ;
 
     void SendModelMatrixToShader(const Matrix4x4 * mat);

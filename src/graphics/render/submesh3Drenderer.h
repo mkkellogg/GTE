@@ -85,9 +85,6 @@ class SubMesh3DRenderer : public EngineObject
     bool doPositionTransform;
     // should the attribute transform transform vertex normals?
     bool doNormalTransform;
-    // do some extra processing that will fix shadow volume artifacts that arise when mesh geometry is bad,
-    // this incurs a performance penalty because it results in a shadow volume with many more triangles
-    bool useBadGeometryShadowFix;
 
     // pointer to this sub-renderer's attribute transformer
     AttributeTransformer * attributeTransformer;
@@ -103,6 +100,12 @@ class SubMesh3DRenderer : public EngineObject
     // shadow volume vertex positions, when the shadow volume for this sub-renderer's target sub-mesh is created,
     // its geometry is stored here
     Point3Array shadowVolumePositions;
+    // do some extra processing that will fix shadow volume artifacts that arise when mesh geometry is bad,
+    // this incurs a performance penalty because it results in a shadow volume with many more triangles
+    bool useBadGeometryShadowFix;
+    // use an alternate shadow volume technique where the front caps are made up
+    // up the back-facing triangles
+    bool doBackSetShadowVolume;
 
     void SetContainerRenderer(Mesh3DRenderer * renderer);
     void SetTargetSubMeshIndex(unsigned int index);
@@ -126,18 +129,15 @@ class SubMesh3DRenderer : public EngineObject
 
     SubMesh3DRenderer(AttributeTransformer * attributeTransformer);
     SubMesh3DRenderer(bool buffersOnGPU, AttributeTransformer * attributeTransformer);
+    virtual ~SubMesh3DRenderer();
 
     void CopyMeshData();
-
-	protected:
-
-    virtual ~SubMesh3DRenderer();
 
     public:
 
     void SetUseBadGeometryShadowFix(bool useFix);
 
-    void BuildShadowVolume(Vector3& lightPosDir, bool directional);
+    void BuildShadowVolume(Vector3& lightPosDir, bool directional, bool backFacesFrontCap);
     void UpdateFromMesh();
 
     void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
@@ -150,6 +150,9 @@ class SubMesh3DRenderer : public EngineObject
 
     void Render();
     void RenderShadowVolume();
+
+    void SetUseBackSetShadowVolume(bool use);
+    bool GetUseBackSetShadowVolume();
 };
 
 #endif

@@ -627,11 +627,19 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			modelInverse.TransformVector(modelLocalLightDir);
 
 			// build special MVP transform for rendering shadow volumes
-			BuildShadowVolumeMVPTransform(light, mesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection);
+			if(subRenderer->GetUseBackSetShadowVolume())BuildShadowVolumeMVPTransform(light, mesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, .99,.99);
+			else BuildShadowVolumeMVPTransform(light, mesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, 1, 1);
 
 			// activate the material, which will switch the GPU's active shader to
 			// the one associated with the material
 			ActivateMaterial(shadowVolumeMaterial);
+
+			// set the epsilon offset for the shadow volume shader
+			if(subRenderer->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.0002, "EPSILON");
+			else shadowVolumeMaterial->SetUniform1f(.1, "EPSILON");
+
+			// send uniforms set for the shadow volume material to its shader
+			SendActiveMaterialUniformsToShader();
 			// pass special shadow volume model-view-matrix to shader
 			SendModelViewProjectionToShader(modelViewProjection);
 
@@ -649,11 +657,12 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 				lightPosDir.z = modelLocalLightPos.z;
 			}
 
-			// calculate shadow volume geometry
-			subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional);
-
 			// send shadow volume uniforms to shader
 			shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
+
+			// calculate shadow volume geometry
+			if(subRenderer->GetUseBackSetShadowVolume())subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, true);
+			else subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, false);
 
 			// render the shadow volume
 			subRenderer->RenderShadowVolume();
@@ -683,29 +692,34 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
  * [outTransform] - The output model-view-projection Transform.
  */
 void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos,
-												 const Vector3& modelLocalLightDir, const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform)
+												 const Vector3& modelLocalLightDir, const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform,
+												 float xScale, float yScale)
 {
 	Transform modelView;
 	Transform model;
+	Transform modelInverse;
 
 	// copy the mesh's local-to-world transform into [model]
 	model.SetTo(modelTransform);
+	modelInverse.SetTo(model);
+	modelInverse.Invert();
 
 	Transform shadowVolumeViewTransform;
 	Vector3 lightToMesh;
+	Point3 origin;
 
 	// calculate the vector from the mesh's center to the light's position
-	// and convert to world space
+	// in model local space
 	if(light.GetType() == LightType::Directional)
 	{
 		// if light is directional, the mesh-to-light vector will
 		// simply be the inverse of the light's direction
 		lightToMesh = light.GetDirection();
+		modelInverse.TransformVector(lightToMesh);
 	}
 	else
 	{
-		Point3::Subtract(meshCenter, modelLocalLightPos, lightToMesh);
-		model.TransformVector(lightToMesh);
+		Point3::Subtract(origin, modelLocalLightPos, lightToMesh);
 	}
 	lightToMesh.Normalize();
 	// make vector go from mesh to the light
@@ -721,7 +735,7 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 	Matrix4x4 rotMatrixInverse = rotMatrix;
 	rotMatrixInverse.Invert();
 	shadowVolumeViewTransform.TransformBy(rotMatrix);
-	shadowVolumeViewTransform.Scale(.99,.99,1.00, true);
+	shadowVolumeViewTransform.Scale(xScale,yScale,1.00, true);
 	shadowVolumeViewTransform.TransformBy(rotMatrixInverse);
 
 	// form MVP transform
@@ -731,6 +745,7 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 	outTransform.SetTo(modelView);
 	outTransform.PreTransformBy(camera.GetProjectionTransform());
 }
+
 
 /*
  * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].

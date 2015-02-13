@@ -3,6 +3,7 @@ attribute vec4 SHADOW_POSITION;
 uniform vec4 LIGHT_POSITION;
 uniform vec4 LIGHT_DIRECTION;
 uniform int LIGHT_TYPE;
+uniform float EPSILON;
 
 void main()
 {	
@@ -10,12 +11,12 @@ void main()
 	vec4 dir = vec4(0.0,0.0,0.0,0.0);
 	if(LIGHT_TYPE == 1)
 	{
-		dir = SHADOW_POSITION.w == 0.0 ? vec4(LIGHT_DIRECTION.xyz, 0.0) : SHADOW_POSITION + normalize(vec4(LIGHT_DIRECTION.xyz, 0.0)) * .00002;
+		dir = SHADOW_POSITION.w == 0.0 ? vec4(LIGHT_DIRECTION.xyz, 0.0) : SHADOW_POSITION + normalize(vec4(LIGHT_DIRECTION.xyz, 0.0)) * EPSILON;
 	}
 	else
 	{
 		vec4 dirFromLight = vec4(SHADOW_POSITION.xyz - LIGHT_POSITION.xyz, 0.0);
-		dir = SHADOW_POSITION.w == 0.0 ? dirFromLight : SHADOW_POSITION + normalize(dirFromLight) * 0.00002;
+		dir = SHADOW_POSITION.w == 0.0 ? dirFromLight : SHADOW_POSITION + normalize(dirFromLight) * EPSILON;
 	}
     gl_Position = MODELVIEWPROJECTION_MATRIX * dir;
 }
