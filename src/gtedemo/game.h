@@ -22,11 +22,10 @@ class Game
 	enum class PlayerType
 	{
 		Koopa = 0,
-		Nerd = 1,
-		Warrior=2
+		Warrior=1
 	};
 
-	enum class PlayerState
+	enum PlayerState
 	{
 		Waiting = 0,
 		Walking = 1,
@@ -34,7 +33,12 @@ class Game
 		JumpStart = 3,
 		Jump = 4,
 		JumpFall = 5,
-		JumpEnd = 6
+		JumpEnd = 6,
+		Attack1 = 7,
+		Attack2 = 8,
+		Attack3 = 9,
+		Defend1 = 10,
+		_Count = 11
 	};
 
 	static const unsigned int MAX_PLAYER_STATES = 32;
@@ -59,20 +63,18 @@ class Game
 	//The SkinnedMesh3DRenderer that render the player's skinned mesh
 	SkinnedMesh3DRendererRef playerRenderer;
 	// player animations
-	AnimationRef playerWait, playerWalk, playerJump, playerJumpStart, playerJumpEnd, playerJumpFall, playerRoar;
+	AnimationRef playerAnimations[PlayerState::_Count];
 	// The AnimationPlayer responsible for managing the animations of the player character
 	AnimationPlayerRef animationPlayer;
 
 	// movement variables
-	float playerWalkAnimationSpeed;
 	float playerWalkSpeed;
-	float playerRunAnimationSpeed;
 	float playerRunSpeed;
 	float playerRotateSpeed;
 	float playerSpeedSmoothing;
-	float playerMoveSpeed;
+	float playerHorizontalSpeed;
 	float playerBaseY;
-	float playerVelocityY;
+	float playerVerticalSpeed;
 	bool playerIsMoving;
 	bool playerIsGrounded;
 
@@ -91,9 +93,10 @@ class Game
 	void SetupLights(AssetImporter& importer);
 
 	void InitializePlayerPosition();
-	void UpdatePlayerMovementSpeedAndDirection();
+	void UpdatePlayerHorizontalSpeedAndDirection();
+	void UpdatePlayerVerticalSpeed();
 	void UpdatePlayerAnimation();
-	void UpdatePlayerPosition();
+	void ApplyPlayerMovement();
 	void UpdatePlayerLookDirection();
 	void UpdatePlayerFollowCamera();
 	void ActivatePlayerState(PlayerState state);
