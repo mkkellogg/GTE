@@ -627,8 +627,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			modelInverse.TransformVector(modelLocalLightDir);
 
 			// build special MVP transform for rendering shadow volumes
-			if(subRenderer->GetUseBackSetShadowVolume())BuildShadowVolumeMVPTransform(light, mesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, .99,.99);
-			else BuildShadowVolumeMVPTransform(light, mesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, 1, 1);
+			BuildShadowVolumeMVPTransform(light, mesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, .99,.99);
 
 			// activate the material, which will switch the GPU's active shader to
 			// the one associated with the material
@@ -719,7 +718,7 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 	}
 	else
 	{
-		Point3::Subtract(origin, modelLocalLightPos, lightToMesh);
+		Point3::Subtract(meshCenter, modelLocalLightPos, lightToMesh);
 	}
 	lightToMesh.Normalize();
 	// make vector go from mesh to the light
@@ -734,9 +733,9 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 	Matrix4x4 rotMatrix = rot.rotationMatrix();
 	Matrix4x4 rotMatrixInverse = rotMatrix;
 	rotMatrixInverse.Invert();
-	shadowVolumeViewTransform.TransformBy(rotMatrix);
-	shadowVolumeViewTransform.Scale(xScale,yScale,1.00, true);
 	shadowVolumeViewTransform.TransformBy(rotMatrixInverse);
+	shadowVolumeViewTransform.Scale(xScale,yScale,1.00, true);
+	shadowVolumeViewTransform.TransformBy(rotMatrix);
 
 	// form MVP transform
 	modelView.SetTo(shadowVolumeViewTransform);

@@ -289,17 +289,17 @@ void AnimationPlayer::ApplyActiveAnimations()
 			// apply interpolated translation
 			matrix.PreTranslate(agTranslation.x, agTranslation.y, agTranslation.z);
 
+			// if the agWeight for some reason is less than one, compensate by using
+			// the initial transformation values for the node
+			if(agWeight < .99)
+			{
+				Matrix4x4 temp = targetNode->InitialTransform;
+				temp.MultiplyByScalar(((float)1.0-agWeight));
+				matrix.Add(temp);
+			}
+
 			if(targetNode->HasTarget())
 			{
-				// if the agWeight for some reason is less than one, compensate by using
-				// the initial transformation values for the node
-				if(agWeight < .99)
-				{
-					Matrix4x4 temp = targetNode->InitialTransform;
-					temp.MultiplyByScalar(((float)1.0-agWeight));
-					matrix.Add(temp);
-				}
-
 				// get the local transform of the target of this node and apply
 				// [matrix], which contains the interpolated scale, rotation, and translation
 				Transform * localTransform = targetNode->GetLocalTransform();

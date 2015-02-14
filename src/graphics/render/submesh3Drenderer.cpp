@@ -284,7 +284,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 		// calculate dot product between face normal and direction to light
 		float faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
 
-		if(faceToLightDot >= backFaceThreshold) // we have a front facing triangle (facing the light)
+		if(faceToLightDot > backFaceThreshold) // we have a front facing triangle (facing the light)
 		{
 			// are we using back faces to build the volume front cap? if so we ignore this face
 			// since it faces the light
@@ -307,7 +307,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 			currentPositionVertexIndex += 6;
 		}
-		else // we have a back facing triangle (facing away from the light)
+		else if(faceToLightDot < backFaceThreshold)// we have a back facing triangle (facing away from the light)
 		{
 			// are we using front faces to build the volume front cap? if so we ignore this face
 			// since it faces away from the light
@@ -330,6 +330,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 
 			currentPositionVertexIndex += 6;
 		}
+		else continue ;
 
 		int facesFound = 0;
 		// loop through each edge of the face and examine the adjacent face
@@ -422,7 +423,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 				//    3. [useBadGeometryShadowFix] == true
 				// then we create two side polygons to link the current face, which will be a front cap triangle,
 				// to the back cap triangle, which is the current face projected to infinity, on the current edge
-				if(adjFaceToLightDot <= backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix)
+				if(adjFaceToLightDot < backFaceThreshold || adjacentFaceIndex < 0 || useBadGeometryShadowFix)
 				{
 					BaseVector4_QuickCopy_IncDest(edgeVertex2, svPositionBase);
 					BaseVector4_QuickCopy_IncDest(edgeVertex1, svPositionBase);
