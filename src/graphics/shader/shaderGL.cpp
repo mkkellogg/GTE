@@ -554,7 +554,7 @@ void ShaderGL::SendUniformToShader2v(int varID, const float * data)
 
 void ShaderGL::SendUniformToShader4(int varID, float x, float y, float z, float w)
 {
-
+	glUniform4f(varID, x, y, z, w);
 }
 
 void ShaderGL::SendUniformToShader3(int varID, float x, float y, float z)

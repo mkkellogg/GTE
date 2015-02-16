@@ -36,6 +36,8 @@ Material::Material(const std::string& materialName)
 
 	uniformsSetAndVerified = false;
 	uniformsSetValues = NULL;
+
+	selfLit = false;
 }
 
 /*
@@ -310,6 +312,36 @@ int Material::TestForStandardUniform(StandardUniform uniform) const
 }
 
 /*
+ * Validate the existence and binding of the shader variable specified by [name].
+ * Store the shader variable location in [loc] and mapped index in [setUniforms] of
+ * that variable in [index].
+ */
+bool Material::ValidateUniformName(const std::string& name, int& loc, int& index)
+{
+	loc = shader->GetUniformVarID(name);
+	if(loc < 0)
+	{
+		std::string str = std::string("Material::ValidateUniformName -> Could not find shader var:" ) +
+				name + std::string(" for material: ") + materialName;
+
+		Debug::PrintError(str);
+		return false;
+	}
+
+	// get the index in [setUniforms] that has the UniformDescriptor for the
+	// uniform named [varName]
+	index = GetUniformIndex(name);
+
+	if(index <  0)
+	{
+		std::string err = std::string("Material::SetUniform1f -> Invalid uniform specified: ") + name;
+		Debug::PrintError(err);
+		return false;
+	}
+	return true;
+}
+
+/*
  * Loop through all standard attributes and all standard uniforms and
  * for each:
  *
@@ -451,6 +483,11 @@ void Material::SendSetUniformToShader(unsigned int index)
 				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->BasicFloatData[0]);
 				SetUniformSetValue(desc->ShaderVarID, 1);
 			}
+			else if(desc->Type == UniformType::Float4)
+			{
+				shader->SendUniformToShader4(desc->ShaderVarID,  desc->BasicFloatData[0], desc->BasicFloatData[1], desc->BasicFloatData[2], desc->BasicFloatData[3]);
+				SetUniformSetValue(desc->ShaderVarID, 4);
+			}
 		}
 	}
 }
@@ -474,34 +511,15 @@ void Material::SetTexture(TextureRef texture, const std::string& varName)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SetTexture -> shader is NULL");
 
-	int loc = shader->GetUniformVarID(varName);
-	if(loc < 0)
-	{
-		std::string str = std::string("Material::SetTexture -> Could not find shader sampler var:" ) +
-				varName + std::string("for material: ") + materialName;
+	int loc, foundIndex;
+	bool success = ValidateUniformName(varName, loc, foundIndex);
+	if(!success)return;
 
-		Debug::PrintError(str);
-		return;
-	}
-
-	// get the index in [setUniforms] that has the UniformDescriptor for the
-	// uniform named [varName]
-	int foundIndex = GetUniformIndex(varName);
-
-	if(foundIndex >= 0)
-	{
-		UniformDescriptor * desc = setUniforms[foundIndex];
-
-		desc->ShaderVarID = loc;
-		desc->Type = UniformType::Sampler2D;
-		desc->SamplerData = texture;
-		desc->IsSet = true;
-	}
-	else
-	{
-		std::string err = std::string("Material::SetTexture -> Invalid uniform specified: ") + varName;
-		Debug::PrintError(err);
-	}
+	UniformDescriptor * desc = setUniforms[foundIndex];
+	desc->ShaderVarID = loc;
+	desc->Type = UniformType::Sampler2D;
+	desc->SamplerData = texture;
+	desc->IsSet = true;
 }
 
 /*
@@ -512,34 +530,58 @@ void Material::SetUniform1f(float val, const std::string& varName)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform1f -> shader is NULL");
 
-	int loc = shader->GetUniformVarID(varName);
-	if(loc < 0)
-	{
-		std::string str = std::string("Material::SetUniform1f -> Could not find shader sampler var:" ) +
-				varName + std::string("for material: ") + materialName;
+	int loc, foundIndex;
+	bool success = ValidateUniformName(varName, loc, foundIndex);
+	if(!success)return;
 
-		Debug::PrintError(str);
-		return;
-	}
+	UniformDescriptor * desc = setUniforms[foundIndex];
+	desc->ShaderVarID = loc;
+	desc->Type = UniformType::Float;
+	desc->BasicFloatData[0] = val;
+	desc->IsSet = true;
+}
 
-	// get the index in [setUniforms] that has the UniformDescriptor for the
-	// uniform named [varName]
-	int foundIndex = GetUniformIndex(varName);
+/*
+ * Find a uniform with the name specified by [shaderVarName] and set its
+ * value to [val]
+ */
+void Material::SetUniform4f(float v1, float v2, float v3, float v4, const std::string& varName)
+{
+	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform4f -> shader is NULL");
 
-	if(foundIndex >= 0)
-	{
-		UniformDescriptor * desc = setUniforms[foundIndex];
+	int loc, foundIndex;
+	bool success = ValidateUniformName(varName, loc, foundIndex);
+	if(!success)return;
 
-		desc->ShaderVarID = loc;
-		desc->Type = UniformType::Float;
-		desc->BasicFloatData[0] = val;
-		desc->IsSet = true;
-	}
-	else
-	{
-		std::string err = std::string("Material::SetUniform1f -> Invalid uniform specified: ") + varName;
-		Debug::PrintError(err);
-	}
+	UniformDescriptor * desc = setUniforms[foundIndex];
+	desc->ShaderVarID = loc;
+	desc->Type = UniformType::Float4;
+	desc->BasicFloatData[0] = v1;
+	desc->BasicFloatData[1] = v2;
+	desc->BasicFloatData[2] = v3;
+	desc->BasicFloatData[3] = v4;
+	desc->IsSet = true;
+}
+
+/* Find a uniform with the name specified by [shaderVarName] and set its
+* value to [val]
+*/
+void Material::SetColor(Color4 val, const std::string& varName)
+{
+	ASSERT_RTRN(shader.IsValid(),"Material::SetColor -> shader is NULL");
+
+	int loc, foundIndex;
+	bool success = ValidateUniformName(varName, loc, foundIndex);
+	if(!success)return;
+
+	UniformDescriptor * desc = setUniforms[foundIndex];
+	desc->ShaderVarID = loc;
+	desc->Type = UniformType::Float4;
+	desc->BasicFloatData[0] = val.r;
+	desc->BasicFloatData[1] = val.g;
+	desc->BasicFloatData[2] = val.b;
+	desc->BasicFloatData[3] = val.a;
+	desc->IsSet = true;
 }
 
 /*
@@ -711,6 +753,22 @@ bool Material::VerifySetVars(int vertexCount)
 	allSetUniformsandAttributesVerified = true;
 
 	return true;
+}
+
+/*
+ * Specify whether this material is self-lit or not.
+ */
+void Material::SetSelfLit(bool selfLit)
+{
+	this->selfLit = selfLit;
+}
+
+/*
+ * Is this material self-lit?
+ */
+bool Material::IsSelfLit()
+{
+	return selfLit;
 }
 
 

@@ -29,6 +29,7 @@ class Vector3;
 
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
+#include "graphics/color/color4.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "graphics/shader/uniformdesc.h"
@@ -110,6 +111,9 @@ class Material : public EngineObject
 	// map a shader variable ID/location to its index in uniformsSetValues
 	std::map<int,int> uniformLocationsToVerificationIndex;
 
+	// does this material require a light to be rendered?
+	bool selfLit;
+
 	unsigned int GetRequiredUniformSize(UniformType uniformType);
 	bool allSetUniformsandAttributesVerified;
 
@@ -128,6 +132,7 @@ class Material : public EngineObject
 	void SetStandardUniformBinding( int varID, StandardUniform uniform);
 	int GetStandardUniformBinding(StandardUniform uniform) const;
 	int TestForStandardUniform(StandardUniform uniform) const;
+	bool ValidateUniformName(const std::string& name, int& loc, int& index);
 
 	void SetAttributeSetValue(int varID, int size);
 	void SetUniformSetValue(int varID, int size);
@@ -154,6 +159,8 @@ class Material : public EngineObject
     void SendAllSetUniformsToShader();
     void SetTexture(TextureRef texture, const std::string& varName);
     void SetUniform1f(float val, const std::string& varName);
+    void SetUniform4f(float v1, float v2, float v3, float v4, const std::string& varName);
+    void SetColor(Color4 val, const std::string& varName);
     unsigned int GetSetUniformCount() const ;
 
     void SendModelMatrixToShader(const Matrix4x4 * mat);
@@ -163,6 +170,9 @@ class Material : public EngineObject
     void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
 
     bool VerifySetVars(int vertexCount);
+
+    void SetSelfLit(bool selfLit);
+    bool IsSelfLit();
 };
 
 #endif
