@@ -61,6 +61,8 @@ class SubMesh3D : public EngineObject
     // inter-face angle above which smoothing/average of vertex normals should
     // not occur
     int normalsSmoothingThreshold;
+    // invert normals every time they are calculated
+    bool invertNormals;
     // local center position for sub-mesh.
 	Point3 center;
 	// radius of the sphere of influence along the X-axis
@@ -90,6 +92,9 @@ class SubMesh3D : public EngineObject
     void SetContainerMesh(Mesh3D * mesh);
     void SetSubIndex(int index);
 
+    void ReverseAttributeComponentOrder();
+    void InvertNormals();
+
 	public:
 
     SubMesh3DFaces& GetFaces();
@@ -111,6 +116,8 @@ class SubMesh3D : public EngineObject
     Color4Array * GetColors();
     UV2Array * GetUVsTexture0();
     UV2Array * GetUVsTexture1();
+
+    void SetInvertNormals(bool invert);
 };
 
 #endif

@@ -50,6 +50,7 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 
 	containerMesh = NULL;
 	subIndex = -1;
+	invertNormals = false;
 }
 
 /*
@@ -352,6 +353,8 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		// set the normal for this vertex to the averaged normal
 		vertexNormals.GetVector(v)->Set(avg.x,avg.y,avg.z);
 	}
+
+	if(invertNormals)InvertNormals();
 }
 
 /*
@@ -505,6 +508,97 @@ bool SubMesh3D::Init(unsigned int totalVertexCount)
 	}
 
 	return true;
+}
+
+/*
+ * Reverse component order (i.e from CCW to CW or vice-versa)
+ */
+void SubMesh3D::ReverseAttributeComponentOrder()
+{
+	for(unsigned int i = 0; i< totalVertexCount; i += 3)
+	{
+		if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Position))
+		{
+			Point3 * p1 = positions.GetPoint(i);
+			Point3  p1r = *p1;
+			Point3 * p3 = positions.GetPoint(i+2);
+
+			*p1 = *p3;
+			*p3 = p1r;
+		}
+
+		if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Normal))
+		{
+			Vector3 * n1 = vertexNormals.GetVector(i);
+			Vector3  n1r = *n1;
+			Vector3 * n3 = vertexNormals.GetVector(i+2);
+
+			*n1 = *n3;
+			*n3 = n1r;
+
+			n1 = faceNormals.GetVector(i);
+			n1r = *n1;
+			n3 = faceNormals.GetVector(i+2);
+
+			*n1 = *n3;
+			*n3 = n1r;
+		}
+
+		if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::VertexColor))
+		{
+			Color4 * c1 = colors.GetColor(i);
+			Color4  c1r = *c1;
+			Color4 * c3 = colors.GetColor(i+2);
+
+			*c1 = *c3;
+			*c3 = c1r;
+		}
+
+		if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture0))
+		{
+			UV2 * u1 = uvsTexture0.GetCoordinate(i);
+			UV2  u1r = *u1;
+			UV2 * u3 = uvsTexture0.GetCoordinate(i+2);
+
+			*u1 = *u3;
+			*u3 = u1r;
+		}
+
+		if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture1))
+		{
+			UV2 * u1 = uvsTexture1.GetCoordinate(i);
+			UV2  u1r = *u1;
+			UV2 * u3 = uvsTexture1.GetCoordinate(i+2);
+
+			*u1 = *u3;
+			*u3 = u1r;
+		}
+	}
+}
+
+/*
+ * Indicate whether or not mesh normals should be inverted when they are calculated.
+ */
+void SubMesh3D::SetInvertNormals(bool invert)
+{
+	invertNormals = invert;
+}
+
+/*
+ * Reverse the direction of all normals on this mesh
+ */
+void SubMesh3D::InvertNormals()
+{
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Normal))
+	{
+		for(unsigned int i = 0; i< totalVertexCount; i++)
+		{
+			Vector3 * n1 = vertexNormals.GetVector(i);
+			n1->Invert();
+			n1 = faceNormals.GetVector(i);
+			n1->Invert();
+		}
+	}
 }
 
 /*
