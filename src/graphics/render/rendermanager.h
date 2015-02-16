@@ -32,6 +32,20 @@ class Transform;
 
 class RenderManager
 {
+	class LightingDescriptor
+	{
+		public:
+
+		const Light* LightObject;
+		const Point3* LightPosition;
+		bool SelfLit;
+
+		LightingDescriptor(const Light* lightObject, const Point3* lightPosition, bool selfLit) : LightObject(lightObject), LightPosition(lightPosition)
+		{
+			this->SelfLit = selfLit;
+		}
+	};
+
 	static const int MAX_LIGHTS = 16;
 	static const int MAX_CAMERAS = 8;
 	static const int MAX_SCENE_MESHES = 128;
@@ -68,12 +82,14 @@ class RenderManager
 
 	void ProcessScene();
 	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
-	void RenderSceneFromCamera(unsigned int cameraIndex);
-	void ForwardRenderScene(const Transform& viewTransformInverse, const Camera& camera);
+	void RenderSceneForCamera(unsigned int cameraIndex);
+	void ForwardRenderSceneForCamera(const Transform& viewTransformInverse, const Camera& camera);
 	void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete);
-	void RenderSceneObjectMeshes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera);
+	void RenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera);
+	void RenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera);
 	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& lightTransform, const Transform& lightTransformInverse,
 											  const Transform& viewTransformInverse, const Camera& camera);
+	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject);
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
 			 	 	 	 	 	 	   const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale);
 

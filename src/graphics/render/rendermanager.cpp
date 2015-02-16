@@ -125,7 +125,7 @@ void RenderManager::RenderAll()
 	// render the scene from the perspective of each camera found in ProcessScene()
 	for(unsigned int i=0; i < cameraCount; i ++)
 	{
-		RenderSceneFromCamera(i);
+		RenderSceneForCamera(i);
 	}
 }
 
@@ -290,7 +290,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
  * Render the entire scene from the perspective of a single camera. Uses [cameraIndex]
  * as an index into the array of cameras [sceneCameras] that has been found by processing the scene.
  */
-void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
+void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
 {
 	ASSERT_RTRN(cameraIndex < cameraCount,"RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds");
 
@@ -316,7 +316,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
 	viewInverse.SetTo(cameraTransform);
 	viewInverse.Invert();
 
-	ForwardRenderScene(viewInverse, camera);
+	ForwardRenderSceneForCamera(viewInverse, camera);
 }
 
 /*
@@ -328,7 +328,7 @@ void RenderManager::RenderSceneFromCamera(unsigned int cameraIndex)
  * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
  * each pass is combined with the others using additive blending.
  */
-void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformInverse, const Camera& camera)
 {
 	// clear the list of objects that have been rendered at least once. this list is used to
 	// determine if blending should be turned on or off. if an object is being rendered for the
@@ -337,6 +337,9 @@ void RenderManager::ForwardRenderScene(const Transform& viewTransformInverse, co
 
 	// we have not yet rendered any ambient lights
 	bool renderedAmbient = false;
+
+	// render all self-lit objects in the scene once
+	RenderSceneForSelfLit(viewTransformInverse, camera);
 
 	// loop through each ambient light and render the scene for that light
 	for(unsigned int l = 0; l < ambientLightCount; l++)
@@ -407,34 +410,9 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 		{
 			SceneObjectRef childRef = sceneMeshObjects[s];
 
-			if(!childRef.IsValid())
-			{
-				Debug::PrintWarning("RenderManager::RenderSceneForLight -> NULL scene object encountered.");
-				continue;
-			}
-
+			if(!ValidateSceneObjectForRendering(childRef))continue;
+			Mesh3DRef mesh = childRef->GetMesh3D();
 			SceneObject * child = childRef.GetPtr();
-
-			if(!child->IsActive())continue;
-
-			Mesh3DRenderer * renderer = NULL;
-
-			// check if current SceneObject has a mesh & renderer
-			if(child->GetMesh3DRenderer().IsValid())renderer =child->GetMesh3DRenderer().GetPtr();
-			else if(child->GetSkinnedMesh3DRenderer().IsValid())renderer = (Mesh3DRenderer *)child->GetSkinnedMesh3DRenderer().GetPtr();
-			else
-			{
-				Debug::PrintWarning("RenderManager::RenderSceneForLight -> Could not find renderer for mesh.");
-				continue;
-			}
-
-			Mesh3DRef mesh = renderer->GetTargetMesh();
-
-			if(!mesh.IsValid())
-			{
-				Debug::PrintWarning("RenderManager::RenderSceneForLight -> Invalid mesh encountered.");
-				continue;
-			}
 
 			// copy the full transform of the scene object, including those of all ancestors
 			Transform full;
@@ -467,17 +445,34 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 						Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
 					}
 
-					RenderSceneObjectMeshes(*child, light, lightPosition, viewTransformInverse, camera);
+					LightingDescriptor lightingDescriptor(&light, &lightPosition, false);
+					RenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera);
 				}
 			}
 		}
 	}
 }
 
+void RenderManager::RenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera)
+{
+	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
+	for(unsigned int s = 0; s < sceneMeshCount; s++)
+	{
+		SceneObjectRef childRef = sceneMeshObjects[s];
+
+		if(!ValidateSceneObjectForRendering(childRef))continue;
+
+		Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
+
+		LightingDescriptor lightingDescriptor(NULL, NULL, true);
+		RenderSceneObjectMeshes(childRef.GetRef(), lightingDescriptor, viewTransformInverse, camera);
+	}
+}
+
 /*
  * Render the meshes attached to [sceneObject] for [light].
  */
-void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera)
 {
 	Mesh3DRenderer * renderer = NULL;
 	Transform modelViewProjection;
@@ -516,6 +511,9 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshes -> NULL sub renderer encountered.");
 			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshes -> NULL sub mesh encountered.");
 
+			if(currentMaterial->IsSelfLit() && !lightingDescriptor.SelfLit)continue;
+			if(!currentMaterial->IsSelfLit() && lightingDescriptor.SelfLit)continue;
+
 			model.SetTo(sceneObject.GetAggregateTransform());
 
 			// concatenate model transform with inverted view transform, and then with
@@ -530,8 +528,12 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			ActivateMaterial(currentMaterial);
 			// send uniforms set for the new material to its shader
 			SendActiveMaterialUniformsToShader();
-			// send light data to the active shader
-			currentMaterial->SendLightToShader(&light, &lightPosition, NULL);
+
+			// send light data to the active shader (if not self-lit)
+			if(!lightingDescriptor.SelfLit)
+			{
+				currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, NULL);
+			}
 			// pass concatenated modelViewTransform and projection transforms to shader
 			SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform(), modelViewProjection);
 
@@ -603,7 +605,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.");
 		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderShadowVolumesForSceneObject -> renderer has no materials.");
 
-		// loop through each sub-renderer and render the shadow volume for its mesh(es)
+		// loop through each sub-renderer and render the shadow volume for its sub-mesh
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
 			MaterialRef currentMaterial = renderer->GetMaterial(0);
@@ -627,7 +629,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			modelInverse.TransformVector(modelLocalLightDir);
 
 			// build special MVP transform for rendering shadow volumes
-			BuildShadowVolumeMVPTransform(light, mesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, .99,.99);
+			BuildShadowVolumeMVPTransform(light, subMesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, .99,.99);
 
 			// activate the material, which will switch the GPU's active shader to
 			// the one associated with the material
@@ -635,7 +637,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 
 			// set the epsilon offset for the shadow volume shader
 			if(subRenderer->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.0002, "EPSILON");
-			else shadowVolumeMaterial->SetUniform1f(.1, "EPSILON");
+			else shadowVolumeMaterial->SetUniform1f(.2, "EPSILON");
 
 			// send uniforms set for the shadow volume material to its shader
 			SendActiveMaterialUniformsToShader();
@@ -667,6 +669,40 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			subRenderer->RenderShadowVolume();
 		}
 	}
+}
+
+bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject)
+{
+	if(!sceneObject.IsValid())
+	{
+		Debug::PrintWarning("RenderManager::IsSceneObjectReadyForRendering -> NULL scene object encountered.");
+		return false;
+	}
+
+	SceneObject * object = sceneObject.GetPtr();
+
+	if(!object->IsActive())return false;
+
+	Mesh3DRenderer * renderer = NULL;
+
+	// check if current SceneObject has a mesh & renderer
+	if(object->GetMesh3DRenderer().IsValid())renderer = object->GetMesh3DRenderer().GetPtr();
+	else if(object->GetSkinnedMesh3DRenderer().IsValid())renderer = (Mesh3DRenderer *)object->GetSkinnedMesh3DRenderer().GetPtr();
+	else
+	{
+		Debug::PrintWarning("RenderManager::IsSceneObjectReadyForRendering -> Could not find renderer for mesh.");
+		return false;
+	}
+
+	Mesh3DRef mesh = renderer->GetTargetMesh();
+
+	if(!mesh.IsValid())
+	{
+		Debug::PrintWarning("RenderManager::IsSceneObjectReadyForRendering -> Invalid mesh encountered.");
+		return false;
+	}
+
+	return true;
 }
 
 /*
