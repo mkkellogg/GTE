@@ -92,6 +92,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     glClearColor(0,0,0,0);
     glFrontFace(GL_CW);
+    glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     SetBlendingEnabled(false);
@@ -108,12 +109,13 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glGetIntegerv(GL_GREEN_BITS, &greenBits);
     glGetIntegerv(GL_BLUE_BITS, &blueBits);
     glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
+   // printf("color buffer Bits: %d, %d, %d, %d\n", redBits, greenBits, blueBits, alphaBits);
 
     glGetIntegerv(GL_DEPTH_BITS, &depthBufferBits);
-    //printf("depthBufferBits: %d\n", depthBufferBits);
+    //printf("depth buffer bits: %d\n", depthBufferBits);
 
     glGetIntegerv(GL_STENCIL_BITS, &stencilBufferBits);
-   // printf("stencilBufferBits: %d\n", stencilBufferBits);
+   // printf("stencil buffer bits: %d\n", stencilBufferBits);
 
     initialized = true;
     return true;
