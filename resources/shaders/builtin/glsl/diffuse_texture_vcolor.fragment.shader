@@ -44,6 +44,6 @@ void main()
 		DiffuseTerm = clamp(dot(normalized_normal, normalized_vertex_to_light_vector), 0.0, 1.0) * attenuationFactor * LIGHT_INTENSITY;
 	}
 	
-	outputF = vec4(vColor,1.0) * texColor * DiffuseTerm * vec4(1.0,1.0,1.0,1.0);
+	outputF = vec4(vColor,1.0) * texColor * DiffuseTerm * LIGHT_COLOR;
 	gl_FragColor = outputF;
 }

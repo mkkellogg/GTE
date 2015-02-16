@@ -1,10 +1,8 @@
- 
-varying vec4 vColor;
+uniform vec4 SELFCOLOR;
 vec4 outputF;
 varying vec4 vPosition;
 
 void main()
 {	
-    outputF = vColor;
-    gl_FragColor = outputF;
+    gl_FragColor = SELFCOLOR;
 }
