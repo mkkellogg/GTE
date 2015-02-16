@@ -233,7 +233,14 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 
 			// assign the clones skeleton to [renderer]
 			renderer->SetSkeleton(skeletonClone);
-			SetupVertexBoneMapForRenderer(scene, skeletonClone, renderer);
+
+			Matrix4x4 mat;
+			createdSceneObjects[s]->GetTransform().CopyMatrix(mat);
+
+			// if the transformation matrix for this scene object has an inverted scale, we need to process the
+			// vertex bone map in reverse order. we pass the [reverseVertexOrder] flag to SetupVertexBoneMapForRenderer()
+			bool reverseVertexOrder = HasInvertedScale(mat);
+			SetupVertexBoneMapForRenderer(scene, skeletonClone, renderer, reverseVertexOrder);
 		}
 	}
 	return root;
@@ -356,8 +363,11 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			// add the material to the mesh renderer
 			rendererPtr->AddMaterial(material);
 
+			// if the transformation matrix for this node has an inverted scale, we need to process the mesh
+			// differently or else it won't display correctly. we pass the [invert] flag to ConvertAssimpMesh()
+			bool invert = HasInvertedScale(mat);
 			// convert Assimp mesh to a Mesh3D object
-			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor);
+			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor, invert);
 			ASSERT_RTRN(subMesh3D.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 			// add the mesh to the newly created scene object
@@ -374,14 +384,14 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 				if(boneCounts[n] > 0)skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, node.mMeshes[n]);
 			}
 
-			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
 			sceneObject->SetMesh3D(mesh3D);
+			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
 		}
 		// set the Mesh3DRenderer instance and Mesh3D instance
 		else
 		{
-			sceneObject->SetMesh3DRenderer(meshRenderer);
 			sceneObject->SetMesh3D(mesh3D);
+			sceneObject->SetMesh3DRenderer(meshRenderer);
 		}
 	}
 
@@ -436,8 +446,9 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
  * [meshIndex] - The index of the target Assimp mesh in the scene's list of meshes
  * [scene] - The Assimp scene/model.
  * [materialImportDescriptor] - Descriptor for the mesh's material.
+ * [invert] - If true it means the mesh has an inverted scale transformation to deal with
  */
-SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor) const
+SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const
 {
 	ASSERT(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DRef::Null());
 
@@ -489,7 +500,6 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 		return SubMesh3DRef::Null();
 	}
 
-	int vertexComponentIndex = 0;
 	int vertexIndex = 0;
 
 	// loop through each face in the mesh and copy relevant vertex attributes
@@ -498,13 +508,22 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 	{
 		const aiFace* face = mesh.mFaces + faceIndex;
 
-		// ** IMPORTANT ** Iterate through face vertices in reverse order. This is necessary because
-		// vertices are stored in counter-clockwise order for each face.
-		for( int i = face->mNumIndices-1; i >=0; i--)
+		int start, end, inc;
+		if(!invert)
 		{
-			int vIndex = 0;
+			start = face->mNumIndices-1;end = -1;inc = -1;
+		}
+		else
+		{
+			start = 0;end = face->mNumIndices;inc = 1;
+		}
 
-			vIndex = face->mIndices[i];
+		// ** IMPORTANT ** Normally we iterate through face vertices in reverse order. This is
+		// necessary because vertices are stored in counter-clockwise order for each face.
+		// if [invert] == true, then we instead iterate in forward order
+		for( int i = start; i != end; i+=inc)
+		{
+			int vIndex = face->mIndices[i];
 
 			aiVector3D srcPosition = mesh.mVertices[vIndex];
 
@@ -515,7 +534,8 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 			if(mesh.mNormals != NULL)
 			{
 				aiVector3D& srcNormal = mesh.mNormals[vIndex];
-				mesh3D->GetVertexNormals()->GetVector(vertexIndex)->Set(srcNormal.x,srcNormal.y,srcNormal.z);
+				Vector3 normalCopy(srcNormal.x, srcNormal.y, srcNormal.z);
+				mesh3D->GetVertexNormals()->GetVector(vertexIndex)->Set(normalCopy.x,normalCopy.y,normalCopy.z);
 			}
 
 			// copy vertex colors (if present)
@@ -533,13 +553,11 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 				else uvs->GetCoordinate(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 			}
 
-			vertexComponentIndex+=3;
 			vertexIndex++;
 		}
 	}
-
+	if(invert)mesh3D->SetInvertNormals(true);
 	mesh3D->SetNormalsSmoothingThreshold(80);
-
 	return mesh3D;
 }
 
@@ -854,7 +872,7 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	}
 }
 
-void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target) const
+void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, bool reverseVertexOrder) const
 {
 	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
 	{
@@ -871,7 +889,7 @@ void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, Skeleton
 
 			SetupVertexBoneMapMappingsFromAIMesh(skeleton, *cMesh, indexBoneMap);
 
-			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping( indexBoneMap, *cMesh);
+			VertexBoneMap * fullBoneMap = ExpandIndexBoneMapping( indexBoneMap, *cMesh, reverseVertexOrder);
 			if(fullBoneMap == NULL)
 			{
 				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not create full vertex bone map.");
@@ -928,7 +946,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 	return target;
 }
 
-VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh) const
+VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, bool reverseVertexOrder) const
 {
 	VertexBoneMap * fullBoneMap = new VertexBoneMap(mesh.mNumFaces * 3, mesh.mNumVertices);
 	if(fullBoneMap == NULL)
@@ -949,9 +967,19 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	{
 		aiFace& face = mesh.mFaces[f];
 
+		int start, end, inc;
+		if(!reverseVertexOrder)
+		{
+			start = face.mNumIndices-1;end = -1;inc = -1;
+		}
+		else
+		{
+			start = 0;end = face.mNumIndices;inc = 1;
+		}
 		// ** IMPORTANT ** Iterate through face vertices in reverse order. This is necessary because
-		// vertices are stored in counter-clockwise order for each face.
-		for(int i = face.mNumIndices-1; i >=0; i--)
+		// vertices are stored in counter-clockwise order for each face. if [reverseVertexOrder] == true,
+		// then we iterate in normal forward order
+		for( int i = start; i != end; i+=inc)
 		{
 			unsigned int vertexIndex = face.mIndices[i];
 			fullBoneMap->GetDescriptor(fullIndex)->SetTo(indexBoneMap.GetDescriptor(vertexIndex));
@@ -1364,6 +1392,20 @@ int ModelImporter::ConvertTextureTypeToAITextureKey(TextureType textureType)
 	else if(textureType == TextureType::BumpMap)aiTextureKey = aiTextureType_NORMALS;
 	else if(textureType == TextureType::Diffuse)aiTextureKey = aiTextureType_DIFFUSE;
 	return aiTextureKey;
+}
+
+/*
+ * Determine if the scale components of [mat] are inverted.
+ */
+bool ModelImporter::HasInvertedScale(Matrix4x4& mat)
+{
+	Vector3 trans, scale;
+	Quaternion rot;
+	mat.Decompose(trans,rot,scale);
+	bool invert = false;
+	if(scale.x < 0 && scale.y < 0 && scale.z < 0)invert = true;
+	else invert = false;
+	return invert;
 }
 
 

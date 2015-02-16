@@ -122,11 +122,11 @@ class ModelImporter
 	bool SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, const TextureType textureType, TextureRef texture,
 			 	 	 	 	 	 	 	 	  unsigned int meshIndex, MaterialImportDescriptor& materialImportDesc) const;
 	static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
-	SubMesh3DRef ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor) const;
-	void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target) const;
+	SubMesh3DRef ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const;
+	void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, bool reverseVertexOrder) const;
 
 	SkeletonRef LoadSkeleton(const aiScene& scene) const;
-	VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh) const;
+	VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, bool reverseVertexOrder) const;
 	void AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex) const;
 	void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
 	unsigned CountBones(const aiScene& scene) const;
@@ -145,6 +145,8 @@ class ModelImporter
 	static std::string GetBuiltinVariableNameForTextureType(TextureType textureType);
 	static TextureType ConvertAITextureKeyToTextureType(int aiTextureKey);
 	static int ConvertTextureTypeToAITextureKey(TextureType textureType);
+
+	static bool HasInvertedScale(Matrix4x4& mat);
 
 	public:
 

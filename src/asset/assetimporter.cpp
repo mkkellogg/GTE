@@ -29,9 +29,9 @@ AssetImporter::~AssetImporter()
 	SAFE_DELETE(shaderSourceLoader);
 }
 
-SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float importScale) const
+SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath) const
 {
-	return LoadModelDirect(filePath, importScale, true, true);
+	return LoadModelDirect(filePath, 1, true, true);
 }
 
 SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows) const
