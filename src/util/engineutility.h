@@ -7,20 +7,20 @@
  *
  */
 
-#ifndef _GTE_UTIL_H_
-#define _GTE_UTIL_H_
+#ifndef _GTE_ENGINEUTIL_H_
+#define _GTE_ENGINEUTIL_H_
 
 //forward declarations
 class Matrix4x4;
 
 #include <string>
 
-class Util
+class EngineUtility
 {
 	protected:
 
-	Util();
-	~Util();
+	EngineUtility();
+	~EngineUtility();
 
 	public:
 

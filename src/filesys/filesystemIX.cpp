@@ -9,7 +9,7 @@
 
 #include "filesystem.h"
 #include "filesystemIX.h"
-#include "util/util.h"
+#include "util/engineutility.h"
 
 FileSystemIX::FileSystemIX()
 {
@@ -23,8 +23,8 @@ FileSystemIX::~FileSystemIX()
 
 std::string FileSystemIX::ConcatenatePaths(const std::string& pathA, const std::string& pathB) const
 {
-	std::string pathATrimmed = Util::Trim(pathA);
-	std::string pathBTrimmed = Util::Trim(pathB);
+	std::string pathATrimmed = EngineUtility::Trim(pathA);
+	std::string pathBTrimmed = EngineUtility::Trim(pathB);
 
 	while(pathBTrimmed.size() > 0 && pathBTrimmed.substr(0,1).compare("/") == 0)
 	{

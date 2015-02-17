@@ -61,7 +61,7 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 #include "error/errormanager.h"
-#include "util/util.h"
+#include "util/engineutility.h"
 
 /**
  * Default constructor.
@@ -422,8 +422,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 				Vector3 translation;
 				Quaternion rotation;
 
+				// set the initial transformation properties
 				mat.Decompose(translation,rotation,scale);
-
 				node->InitialTranslation = translation;
 				node->InitialRotation = rotation;
 				node->InitialScale = scale;

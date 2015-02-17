@@ -31,7 +31,7 @@
 #include "graphics/view/camera.h"
 #include "base/longmask.h"
 #include "base/intmask.h"
-#include "util/util.h"
+#include "util/engineutility.h"
 #include "filesys/filesystem.h"
 #include "global/constants.h"
 #include <string>
