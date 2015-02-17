@@ -23,6 +23,7 @@ class Transform;
 
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include "object/engineobject.h"
 #include "util/datastack.h"
@@ -32,6 +33,10 @@ class Transform;
 
 class RenderManager
 {
+	/*
+	 * Data structure that is passed to RenderSceneObjectMeshes() that describes the kind of
+	 * lighting to be used (or not used) during rendering.
+	 */
 	class LightingDescriptor
 	{
 		public:
@@ -43,6 +48,42 @@ class RenderManager
 		LightingDescriptor(const Light* lightObject, const Point3* lightPosition, bool selfLit) : LightObject(lightObject), LightPosition(lightPosition)
 		{
 			this->SelfLit = selfLit;
+		}
+	};
+
+	/*
+	 * This class is used as the key in the renderedObjects hashing structure
+	 */
+	class SceneObjectSubMesh
+	{
+		public:
+
+		ObjectID SceneObjectID;
+		ObjectID SubMeshID;
+
+		SceneObjectSubMesh(ObjectID sceneObjectID, ObjectID subMeshID)
+		{
+			SceneObjectID = sceneObjectID;
+			SubMeshID = subMeshID;
+		}
+
+		 // TODO: optimize this hashing function (implement correctly)
+		typedef struct
+		{
+			 int operator()(const SceneObjectSubMesh& s) const
+			 {
+				  return ((int)s.SceneObjectID << 1) +  ((int)s.SubMeshID << 2);
+			 }
+		}SceneObjectSubMeshHasher;
+
+		typedef struct
+		{
+		  bool operator() (const SceneObjectSubMesh& a, const SceneObjectSubMesh& b) const { return a==b; }
+		} SceneObjectSubMeshEq;
+
+		bool operator==(const SceneObjectSubMesh& s) const
+		{
+			return s.SceneObjectID == this->SceneObjectID && s.SubMeshID == this->SubMeshID;
 		}
 	};
 
@@ -75,10 +116,8 @@ class RenderManager
 	SceneObjectRef sceneCameras[MAX_CAMERAS];
 
 	// keep track of objects that have been rendered
-	// TODO: re-implement this using a true hash map (e.g. unordered_map). This map is
-	// accessed for every mesh so we can move from what is now O(n * log(n)) to O (n),
-	// hash table access should be O(1)
-	std::map<ObjectID, bool> renderedObjects;
+	// TODO: optimize usage of this hashing structure
+	std::unordered_map<SceneObjectSubMesh, bool, SceneObjectSubMesh::SceneObjectSubMeshHasher,SceneObjectSubMesh::SceneObjectSubMeshEq> renderedObjects;
 
 	void ProcessScene();
 	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
@@ -90,6 +129,7 @@ class RenderManager
 	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& lightTransform, const Transform& lightTransformInverse,
 											  const Transform& viewTransformInverse, const Camera& camera);
 	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject);
+	bool HasSceneObjectBeenRendered(SceneObjectRef sceneObject);
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
 			 	 	 	 	 	 	   const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale);
 

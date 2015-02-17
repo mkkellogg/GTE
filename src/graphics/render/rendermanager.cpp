@@ -446,6 +446,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 					}
 
 					LightingDescriptor lightingDescriptor(&light, &lightPosition, false);
+
 					RenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera);
 				}
 			}
@@ -540,7 +541,10 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			// if this sub mesh has already been rendered by this camera, then we want to use
 			// additive blending to combine it with the output from other lights. Otherwise
 			// turn off blending and render.
-			bool rendered = renderedObjects[subMesh->GetObjectID()];
+
+			SceneObjectSubMesh key(sceneObject.GetObjectID(), subMesh->GetObjectID());
+
+			bool rendered = renderedObjects[key];
 			if(rendered)
 			{
 				Engine::Instance()->GetGraphicsEngine()->SetBlendingEnabled(true);
@@ -554,8 +558,8 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			// render the current mesh
 			subRenderer->Render();
 
-			// flag the current mesh as being rendered (at least once)
-			renderedObjects[subMesh->GetObjectID()] = true;
+			// flag the current scene object as being rendered (at least once)
+			renderedObjects[key] = true;
 
 			// Advance material index. Renderer can have any number of materials > 0; it does not have to match
 			// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
