@@ -7,6 +7,7 @@ class SceneObject;
 class Shader;
 class SubMesh3D;
 class Mesh3D;
+class Mesh3DFilter;
 class SubMesh3DRenderer;
 class Mesh3DRenderer;
 class EngineObjectManager;
@@ -56,6 +57,7 @@ class EngineObjectManager
 	void DeleteLight(Light * light);
 	void DeleteCamera(Camera * light);
 	void DeleteMesh3D(Mesh3D * mesh);
+	void DeleteMesh3DFilter(Mesh3DFilter * filter);
 	void DeleteMesh3DRenderer(Mesh3DRenderer * renderer);
 	void DeleteSkinnedMesh3DRenderer(SkinnedMesh3DRenderer * renderer);
 	void DeleteSubMesh3D(SubMesh3D * mesh);
@@ -84,6 +86,8 @@ class EngineObjectManager
 
     Mesh3DRef CreateMesh3D(unsigned int subMeshCount);
     void DestroyMesh3D(Mesh3DRef mesh);
+    Mesh3DFilterRef CreateMesh3DFilter();
+    void DestroyMesh3DFilter(Mesh3DFilterRef filter);
     Mesh3DRendererRef CreateMesh3DRenderer();
     void DestroyMesh3DRenderer(Mesh3DRendererRef renderer);
     SkinnedMesh3DRendererRef CreateSkinnedMesh3DRenderer();

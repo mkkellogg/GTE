@@ -40,6 +40,7 @@
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
+#include "graphics/object/mesh3Dfilter.h"
 #include "graphics/uv/uv2array.h"
 #include "graphics/render/material.h"
 #include "graphics/image/rawimage.h"
@@ -374,6 +375,12 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			mesh3D->SetSubMesh(subMesh3D, n);
 		}
 
+		Mesh3DFilterRef filter = engineObjectManager->CreateMesh3DFilter();
+		ASSERT_RTRN(filter.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Unable to create mesh#D filter object.");
+
+		filter->SetMesh3D(mesh3D);
+		sceneObject->SetMesh3DFilter(filter);
+
 		// set the SkinnedMesh3DRenderer instance and Mesh3D instance if any meshes on
 		// this node have bones
 		if(requiresSkinnedRenderer)
@@ -384,13 +391,11 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 				if(boneCounts[n] > 0)skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, node.mMeshes[n]);
 			}
 
-			sceneObject->SetMesh3D(mesh3D);
 			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
 		}
 		// set the Mesh3DRenderer instance and Mesh3D instance
 		else
 		{
-			sceneObject->SetMesh3D(mesh3D);
 			sceneObject->SetMesh3DRenderer(meshRenderer);
 		}
 	}

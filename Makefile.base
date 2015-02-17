@@ -27,7 +27,7 @@ BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/baseve
 GTEDEMOOBJ= obj/gtedemo.o obj/game.o obj/gameutil.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
-GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o
+GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o obj/mesh3Dfilter.o
 DEBUGOBJ= obj/gtedebug.o 
 VIEWSYSOBJ= obj/camera.o 
 RENDEROBJ= obj/mesh3Drenderer.o obj/skinnedmesh3Drenderer.o obj/submesh3Drenderer.o obj/attributetransformer.o obj/skinnedmesh3Dattrtransformer.o obj/rendertarget.o  obj/vertexattrbuffer.o obj/material.o obj/rendermanager.o 
@@ -378,6 +378,9 @@ graphicsobject: $(GRAPHICSOBJECTOBJ)
 obj/mesh3D.o: $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/mesh3D.h 
 	$(CC) $(CFLAGS) -o obj/mesh3D.o -c $(GRAPHICSOBJECTSRC)/mesh3D.cpp
 	
+obj/mesh3Dfilter.o: $(GRAPHICSOBJECTSRC)/mesh3Dfilter.cpp $(GRAPHICSOBJECTSRC)/mesh3Dfilter.h 
+	$(CC) $(CFLAGS) -o obj/mesh3Dfilter.o -c $(GRAPHICSOBJECTSRC)/mesh3Dfilter.cpp
+	
 obj/submesh3D.o: $(GRAPHICSOBJECTSRC)/submesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3D.h 
 	$(CC) $(CFLAGS) -o obj/submesh3D.o -c $(GRAPHICSOBJECTSRC)/submesh3D.cpp
 
@@ -386,6 +389,7 @@ obj/submesh3Dfaces.o: $(GRAPHICSOBJECTSRC)/submesh3Dfaces.cpp $(GRAPHICSOBJECTSR
 
 obj/submesh3Dface.o: $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp $(GRAPHICSOBJECTSRC)/submesh3Dface.h 
 	$(CC) $(CFLAGS) -o obj/submesh3Dface.o -c $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp	
+	
 	
 # ==================================
 # Debug

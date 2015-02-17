@@ -28,6 +28,10 @@ class SceneObject : public EngineObject
 	friend class EngineObjectManager;
 	friend class RenderManager;
 
+	// Mesh3DFilter needs to be a friend so that it can update
+	// any attached renderer when its mesh is updated
+	friend class Mesh3DFilter;
+
 	protected:
 
 	std::string name;
@@ -40,12 +44,13 @@ class SceneObject : public EngineObject
 	LightRef light;
 	Mesh3DRendererRef renderer3D;
 	SkinnedMesh3DRendererRef skinnedRenderer3D;
-	Mesh3DRef mesh3D;
+	Mesh3DFilterRef mesh3DFilter;
 
 	SceneObject();
     virtual ~SceneObject();
 
     void SetAggregateTransform(Transform& transform);
+    void NotifyNewMesh3D();
 
 	public:
 
@@ -59,12 +64,13 @@ class SceneObject : public EngineObject
 
     bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
     bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
-    bool SetMesh3D(Mesh3DRef mesh);
+    bool SetMesh3DFilter(Mesh3DFilterRef filter);
 
     bool SetCamera(CameraRef camera);
     bool SetLight(LightRef light);
 
     Mesh3DRef GetMesh3D();
+    Mesh3DFilterRef GetMesh3DFilter();
     Mesh3DRendererRef GetMesh3DRenderer();
     SkinnedMesh3DRendererRef GetSkinnedMesh3DRenderer();
 

@@ -18,6 +18,7 @@
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
+#include "graphics/object/mesh3Dfilter.h"
 #include "graphics/render/rendermanager.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
@@ -74,6 +75,16 @@ const Transform& SceneObject::GetAggregateTransform() const
 	return processingTransform;
 }
 
+void SceneObject::NotifyNewMesh3D()
+{
+	Mesh3DRef mesh = GetMesh3D();
+	Mesh3DRendererRef mesh3DRenderer = GetMesh3DRenderer();
+	if(mesh3DRenderer.IsValid() && mesh.IsValid())mesh3DRenderer->InitializeForMesh();
+
+	SkinnedMesh3DRendererRef skinnedMesh3DRenderer = GetSkinnedMesh3DRenderer();
+	if(skinnedMesh3DRenderer.IsValid() && mesh.IsValid())skinnedMesh3DRenderer->InitializeForMesh();
+}
+
 bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 {
 	if(this->renderer3D == renderer)return true;
@@ -84,10 +95,8 @@ bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 
 	renderer->sceneObject = thisRef;
 	this->renderer3D = renderer;
-	if(this->mesh3D.IsValid())
-	{
-		this->renderer3D->UpdateFromMesh();
-	}
+
+	NotifyNewMesh3D();
 
 	return true;
 }
@@ -103,32 +112,22 @@ bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
 	renderer->sceneObject = thisRef;
 	this->skinnedRenderer3D = renderer;
 
-	this->skinnedRenderer3D->UpdateFromMesh();
+	NotifyNewMesh3D();
 
 	return true;
 }
 
-bool SceneObject::SetMesh3D(Mesh3DRef mesh)
+bool SceneObject::SetMesh3DFilter(Mesh3DFilterRef filter)
 {
-	if(this->mesh3D == mesh)return true;
-	ASSERT(mesh.IsValid(),"SceneObject::SetMesh3D -> attempted to add NULL mesh.", false);
+	ASSERT(filter.IsValid(),"SceneObject::SetMesh3DFilter -> attempted to add NULL filter.", false);
 
 	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-	ASSERT(thisRef.IsValid(),"SceneObject::SetMesh3D -> Could not find matching reference for scene object", false);
+	ASSERT(thisRef.IsValid(),"SceneObject::SetMesh3DFilter -> Could not find matching reference for scene object", false);
 
-	mesh->sceneObject = thisRef;
-	this->mesh3D = mesh;
+	filter->sceneObject = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+	this->mesh3DFilter = filter;
 
-	if(this->renderer3D.IsValid())
-	{
-		this->renderer3D->UpdateFromMesh();
-	}
-
-	if(this->skinnedRenderer3D.IsValid())
-	{
-		this->skinnedRenderer3D->UpdateFromMesh();
-	}
-
+	NotifyNewMesh3D();
 
 	return true;
 }
@@ -161,7 +160,13 @@ bool SceneObject::SetLight(LightRef light)
 
 Mesh3DRef SceneObject::GetMesh3D()
 {
-	return mesh3D;
+	if(!mesh3DFilter.IsValid())return Mesh3DRef::Null();
+	return mesh3DFilter->GetMesh3D();
+}
+
+Mesh3DFilterRef SceneObject::GetMesh3DFilter()
+{
+	return mesh3DFilter;
 }
 
 Mesh3DRendererRef SceneObject::GetMesh3DRenderer()

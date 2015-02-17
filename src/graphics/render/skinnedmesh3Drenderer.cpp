@@ -65,7 +65,7 @@ SkeletonRef SkinnedMesh3DRenderer::GetSkeleton()
  * initializing an instance of SkinnedMesh3DAttributeTransformer for each sub-mesh in the target mesh,
  * to perform vertex skinning for each.
  */
-void SkinnedMesh3DRenderer::UpdateFromMesh()
+void SkinnedMesh3DRenderer::InitializeForMesh()
 {
 	// get the target mesh
 	Mesh3DRef mesh = GetTargetMesh();
@@ -74,7 +74,7 @@ void SkinnedMesh3DRenderer::UpdateFromMesh()
 	if(mesh.IsValid())
 	{
 		// call the base method
-		Mesh3DRenderer::UpdateFromMesh(mesh);
+		Mesh3DRenderer::InitializeForMesh(mesh);
 
 		// loop through each sub-mesh in the target mesh
 		for(unsigned int i = 0; i< mesh->GetSubMeshCount(); i++)

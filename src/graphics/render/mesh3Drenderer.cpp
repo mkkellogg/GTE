@@ -103,26 +103,26 @@ void Mesh3DRenderer::AddMaterial(MaterialRef material)
 
 /*
  * This method should be triggered every time the mesh for which this renderer is responsible
- * gets updated.
+ * gets set.
  *
  * GetTargetMesh() returns the mesh in question. Typically it will be the Mesh3D object that is
  * attached to the same SceneObject as this renderer. If the target mesh is valid, it calls UpdateFromMesh()
  * specifically for that mesh.
  */
-void Mesh3DRenderer::UpdateFromMesh()
+void Mesh3DRenderer::InitializeForMesh()
 {
 	ASSERT_RTRN(sceneObject.IsValid(),"Mesh3DRenderer::UpdateFromMesh -> sceneObject is NULL.");
 
 	Mesh3DRef mesh = GetTargetMesh();
 	ASSERT_RTRN(mesh.IsValid(),"Mesh3DRenderer::UpdateFromMesh -> mesh is NULL.");
 
-	UpdateFromMesh(mesh);
+	InitializeForMesh(mesh);
 }
 
 /*
  * Update this renderer and prepare it for rendering of the sub-meshes contained in [mesh].
  */
-void Mesh3DRenderer::UpdateFromMesh(Mesh3DRef mesh)
+void Mesh3DRenderer::InitializeForMesh(Mesh3DRef mesh)
 {
 	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 	unsigned int subMeshCount =  mesh->GetSubMeshCount();

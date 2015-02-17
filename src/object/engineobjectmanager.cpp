@@ -18,6 +18,7 @@
 #include "graphics/render/attributetransformer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/object/mesh3D.h"
+#include "graphics/object/mesh3Dfilter.h"
 #include "graphics/stdattributes.h"
 #include "graphics/texture/texture.h"
 #include "graphics/image/rawimage.h"
@@ -117,7 +118,6 @@ SceneObjectRef EngineObjectManager::FindSceneObjectInDirectory(unsigned long obj
 void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref)
 {
 	ASSERT_RTRN(ref.IsValid(), "EngineObjectManager::AddSceneObjectToDirectory -> Tried to add NULL scene object reference.");
-
 	sceneObjectDirectory[objectID] = ref;
 }
 
@@ -180,6 +180,29 @@ void EngineObjectManager::DeleteMesh3D(Mesh3D * mesh)
 {
 	ASSERT_RTRN(mesh != NULL, "EngineObjectManager::DeleteMesh -> mesh is NULL.");
 	delete mesh;
+}
+
+Mesh3DFilterRef EngineObjectManager::CreateMesh3DFilter()
+{
+	Mesh3DFilter * filter =  new Mesh3DFilter();
+	ASSERT(filter != NULL,"EngineObjectManager::CreateMesh3DFilter -> could not create new Mesh3DFilter object.", Mesh3DFilterRef::Null());
+	filter->SetObjectID(GetNextObjectID());
+
+	return Mesh3DFilterRef(filter, [=](Mesh3DFilter * filter)
+	{
+		  DeleteMesh3DFilter(filter);
+	});
+}
+
+void EngineObjectManager::DestroyMesh3DFilter(Mesh3DFilterRef filter)
+{
+	filter.ForceDelete();
+}
+
+void EngineObjectManager::DeleteMesh3DFilter(Mesh3DFilter * filter)
+{
+	ASSERT_RTRN(filter != NULL, "EngineObjectManager::DeleteMesh3DFilter -> filter is NULL.");
+	delete filter;
 }
 
 Mesh3DRendererRef EngineObjectManager::CreateMesh3DRenderer()

@@ -58,7 +58,7 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 
 	void SetSkeleton(SkeletonRef skeleton);
 	SkeletonRef GetSkeleton();
-	void UpdateFromMesh();
+	void InitializeForMesh();
 	void MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, int vertexBoneMapIndex);
 
     void AddVertexBoneMap(VertexBoneMap * map);
