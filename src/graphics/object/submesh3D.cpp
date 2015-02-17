@@ -28,6 +28,7 @@
 #include "geometry/vector/vector3array.h"
 #include "gtemath/gtemath.h"
 #include "global/global.h"
+#include "util/time.h"
 #include "debug/gtedebug.h"
 #include "global/constants.h"
 
@@ -51,6 +52,8 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 	containerMesh = NULL;
 	subIndex = -1;
 	invertNormals = false;
+
+	UpdateTimeStamp();
 }
 
 /*
@@ -421,14 +424,9 @@ void SubMesh3D::Update()
 	if(containerMesh != NULL)
 	{
 		containerMesh->CalculateSphereOfInfluence();
-
-		 if(containerMesh->IsAttachedToSceneObject() &&
-			containerMesh->SceneObjectHasRenderer())
-		{
-			if(subIndex >=0)
-				containerMesh->UpdateRenderer((unsigned int)subIndex);
-		}
 	}
+
+	UpdateTimeStamp();
 }
 
 /*
@@ -441,11 +439,19 @@ unsigned int SubMesh3D::GetTotalVertexCount() const
 
 /*
  * Get a StandardAttributeSet that describes the attributes possessed by
- * this sub0mesh.
+ * this sub-mesh.
  */
 StandardAttributeSet SubMesh3D::GetAttributeSet() const
 {
 	return attributeSet;
+}
+
+/*
+ * Get the time this mesh was last updated (in seconds since startup)
+ */
+float SubMesh3D::GetTimeStamp()
+{
+	return timeStamp;
 }
 
 /*
@@ -599,6 +605,14 @@ void SubMesh3D::InvertNormals()
 			n1->Invert();
 		}
 	}
+}
+
+/*
+ * Update the time this mesh was last modified.
+ */
+void SubMesh3D::UpdateTimeStamp()
+{
+	timeStamp = Time::GetRealTimeSinceStartup();
 }
 
 /*

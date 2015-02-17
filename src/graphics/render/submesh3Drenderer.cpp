@@ -26,6 +26,7 @@
 #include "object/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "attributetransformer.h"
+#include "util/time.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
@@ -63,6 +64,8 @@ SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, AttributeTransformer * a
 	doNormalTransform = false;
 	useBadGeometryShadowFix = false;
 	doBackSetShadowVolume = true;
+
+	timeStamp = 0;
 }
 
 /*
@@ -155,6 +158,14 @@ bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int length, in
 	bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], length, componentCount, stride);
 
 	return initSuccess;
+}
+
+/*
+ * Get the time this renderer was last updated with its target sub-mesh.
+ */
+float SubMesh3DRenderer::GetTimeStamp()
+{
+	return timeStamp;
 }
 
 /*
@@ -630,6 +641,14 @@ void SubMesh3DRenderer::CopyMeshData()
 }
 
 /*
+ * Update the time this renderer was last updated with its target sub-mesh.
+ */
+void SubMesh3DRenderer::UpdateTimeStamp()
+{
+	timeStamp = Time::GetRealTimeSinceStartup();
+}
+
+/*
  * Update this sub-renderer to be consistent with the current state of its target sub-mesh. Whenever the target sub-mesh
  * is updated (e.g. vertex positions are modified, or UV coordinates are added), the vertex attribute buffers in this
  * sub-renderer need to be updated to contain the same data. This method makes sure the size of the of the vertex attribute
@@ -663,6 +682,8 @@ void SubMesh3DRenderer::UpdateFromMesh()
 
 	// copy over the data from the target sub-mesh
 	CopyMeshData();
+
+	UpdateTimeStamp();
 }
 
 /*
@@ -843,6 +864,8 @@ void SubMesh3DRenderer::Render()
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
+	if(mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
+
 	MaterialRef currentMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 	ASSERT_RTRN(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
 
@@ -858,6 +881,8 @@ void SubMesh3DRenderer::RenderShadowVolume()
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
+
+	if(mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
 
 	if(shadowVolumePositions.GetCount() > 0)
 	{

@@ -74,31 +74,6 @@ bool Mesh3D::Init()
 }
 
 /*
- * This method causes a Mesh3DRenderer that is attached to the same scene object as this
- * instance of Mesh3D to update the sub-renderer it contains at [index].
- *
- * It first validates the existence of a sub-mesh at [index], then verifies that a
- * Mesh3DRenderer is attached to the same instance of SceneObject.Once those checks
- * have passed, it calls UpdateFromSubMesh() on the Mesh3DRenderer passing in [index].
- */
-void Mesh3D::UpdateRenderer(unsigned int index)
-{
-	ASSERT_RTRN(index < subMeshCount, "Mesh3D::UpdateRenderer -> Index out of range.");
-
-	ASSERT_RTRN(sceneObject.IsValid()," Mesh3D::UpdateRenderer -> sceneObject is NULL.");
-
-	SubMesh3DRef subMesh = subMeshes[index];
-	ASSERT_RTRN(subMesh.IsValid()," Mesh3D::UpdateRenderer -> subMesh is NULL.");
-
-	ASSERT_RTRN(IsAttachedToSceneObject()," Mesh3D::UpdateRenderer -> Mesh is not attached to a scene object.");
-
-	Mesh3DRendererRef renderer = sceneObject->GetMesh3DRenderer();
-	ASSERT_RTRN(renderer.IsValid()," Mesh3D::UpdateRenderer -> renderer is NULL.");
-
-	renderer->UpdateFromSubMesh(index);
-}
-
-/*
  * Calculate the collective sphere (spheroid) of influence for all the sub-meshes in this
  * instance of Mesh3D,
  *
@@ -225,25 +200,6 @@ SubMesh3DRef Mesh3D::GetSubMesh(unsigned int index)
 		Debug::PrintError("Mesh3D::GetSubMesh -> Index out of range.");
 		return SubMesh3DRef::Null();
 	}
-}
-
-/*
- * Is this mesh current attached to an instance of SceneObject?
- */
-bool Mesh3D::IsAttachedToSceneObject()
-{
-	return sceneObject.IsValid();
-}
-
-/*
- * If this mesh is attached to an instance of SceneObject, does that instance
- * have an instance of Mesh3DRenderer attached to it?
- */
-bool Mesh3D::SceneObjectHasRenderer()
-{
-	if(!IsAttachedToSceneObject())return false;
-	if(!sceneObject->GetMesh3DRenderer().IsValid())return false;
-	return true;
 }
 
 /*

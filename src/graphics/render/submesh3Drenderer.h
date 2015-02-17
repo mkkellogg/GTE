@@ -78,6 +78,9 @@ class SubMesh3DRenderer : public EngineObject
 	// are the vertex attributes stored in GPU-based buffers?
     bool buffersOnGPU;
 
+    // last time this renderer was updated from its target sub-mesh
+    float timeStamp;
+
     // doAttributeTransform == true means this sub-renderer's attribute transformer should be used to
     // transform vertex attributes prior to rendering
     bool doAttributeTransform;
@@ -132,8 +135,11 @@ class SubMesh3DRenderer : public EngineObject
     virtual ~SubMesh3DRenderer();
 
     void CopyMeshData();
+    void UpdateTimeStamp();
 
     public:
+
+    float GetTimeStamp();
 
     void SetUseBadGeometryShadowFix(bool useFix);
 

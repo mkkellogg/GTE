@@ -75,6 +75,9 @@ class SubMesh3D : public EngineObject
 	// pointer to the containing MEsh3D object
     Mesh3D * containerMesh;
 
+    // last time this mesh was modified
+    float timeStamp;
+
     void Destroy();
 
 	protected :
@@ -94,6 +97,7 @@ class SubMesh3D : public EngineObject
 
     void ReverseAttributeComponentOrder();
     void InvertNormals();
+    void UpdateTimeStamp();
 
 	public:
 
@@ -109,6 +113,7 @@ class SubMesh3D : public EngineObject
     bool Init(unsigned int totalVertexCount);
     unsigned int GetTotalVertexCount() const;
     StandardAttributeSet GetAttributeSet() const ;
+    float GetTimeStamp();
 
     Point3Array * GetPostions();
     Vector3Array * GetVertexNormals();

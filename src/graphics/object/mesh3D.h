@@ -63,7 +63,6 @@ class Mesh3D : public SceneObjectComponent
     ~Mesh3D();
     void Destroy();
 
-    void UpdateRenderer(unsigned int subIndex);
     void CalculateSphereOfInfluence();
 
 	public:
@@ -74,8 +73,6 @@ class Mesh3D : public SceneObjectComponent
     bool Init();
     void Update();
 
-    bool IsAttachedToSceneObject();
-    bool SceneObjectHasRenderer();
 
     const Point3& GetCenter() const;
     const Vector3& GetSphereOfInfluenceX() const;
