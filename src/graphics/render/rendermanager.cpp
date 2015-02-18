@@ -73,6 +73,7 @@ bool RenderManager::Init()
 
 	assetImporter.LoadBuiltInShaderSource("depthonly", shaderSource);
 	depthOnlyMaterial = objectManager->CreateMaterial("depthOnlyVolumeMaterial", shaderSource);
+	depthOnlyMaterial->SetSelfLit(true);
 	ASSERT(depthOnlyMaterial.IsValid(), "RenderManager::Init -> Unable to create depth only material.", false);
 
 	return true;
@@ -437,10 +438,12 @@ void RenderManager::RenderSkyboxForCamera(Camera& camera, const Transform& viewT
  * [depthBufferComplete] == true means the depth buffer contains depths for all objects that will be
  * rendered.
  *
- * This method performs two passes:
+ * This method performs three passes:
  *
- * Pass 0: If [light] is not ambient, render shadow volumes for all meshes in the scene for [light] into the stencil buffer.
- * Pass 1: Perform actual rendering of all meshes in the scene for [light]. If [light] is not ambient, this pass will
+ * Pass 0: If [depthBufferComplete] is false, this pass will render all meshes in the scene for [light] only into the
+ * 		   depth buffer. The depth buffer needs to have depths for all these meshes before shadow volume rendering can occur.
+ * Pass 1: If [light] is not ambient, render shadow volumes for all meshes in the scene for [light] into the stencil buffer.
+ * Pass 2: Perform actual rendering of all meshes in the scene for [light]. If [light] is not ambient, this pass will
  *         exclude screen pixels that are hidden from [light] based on the stencil buffer contents from pass 0. Is [light]
  *         is ambient, then this pass will perform a standard render of all meshes in the scene.
  */
@@ -497,15 +500,16 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			Transform full;
 			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
 
+			if(pass == DepthRender) // depth buffer pass
+			{
+				LightingDescriptor lightingDescriptor(NULL, NULL, true);
+				ForwardRenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera, depthOnlyMaterial, false);
+			}
+
 			// check if this mesh should be culled from this light.
 			if( light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient || !ShouldCullFromLight(light, lightPosition, full, *mesh))
 			{
-				if(pass == DepthRender) // depth buffer pass
-				{
-					LightingDescriptor lightingDescriptor(NULL, NULL, true);
-					ForwardRenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera, depthOnlyMaterial, false);
-				}
-				else if(pass == ShadowVolumeRender) // shadow volume pass
+				if(pass == ShadowVolumeRender) // shadow volume pass
 				{
 					if(mesh->GetCastShadows())
 					{
