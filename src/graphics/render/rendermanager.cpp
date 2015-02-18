@@ -66,9 +66,14 @@ bool RenderManager::Init()
 
 	AssetImporter assetImporter;
 	ShaderSource shaderSource;
+
 	assetImporter.LoadBuiltInShaderSource("shadowvolume", shaderSource);
 	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);
 	ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.", false);
+
+	assetImporter.LoadBuiltInShaderSource("depthonly", shaderSource);
+	depthOnlyMaterial = objectManager->CreateMaterial("depthOnlyVolumeMaterial", shaderSource);
+	ASSERT(depthOnlyMaterial.IsValid(), "RenderManager::Init -> Unable to create depth only material.", false);
 
 	return true;
 }
@@ -342,7 +347,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	bool renderedAmbient = false;
 
 	// render all self-lit objects in the scene once
-	RenderSceneForSelfLit(viewInverse, camera);
+	ForwardRenderSceneForSelfLit(viewInverse, camera);
 
 	// loop through each ambient light and render the scene for that light
 	for(unsigned int l = 0; l < ambientLightCount; l++)
@@ -353,7 +358,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 		LightRef lightRef = lightObject->GetLight();
 		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.");
 
-		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, l > 0);
+		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, l > 0);
 		renderedAmbient = true;
 	}
 
@@ -368,7 +373,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 
 		// if [renderedAmbient] is true, the RenderSceneForLight() method will have the depth buffer already
 		// set up for shadow rendering
-		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, renderedAmbient);
+		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, renderedAmbient);
 	}
 
 	// if this camera has a skybox set up, then we want to render it
@@ -421,13 +426,13 @@ void RenderManager::RenderSkyboxForCamera(Camera& camera, const Transform& viewT
 		// render the skybox
 		skyboxObject->SetActive(true);
 		LightingDescriptor lightingDescriptor(NULL, NULL, true);
-		RenderSceneObjectMeshes(skyboxObject.GetRef(), lightingDescriptor, viewTransformInverse, camera);
+		ForwardRenderSceneObjectMeshes(skyboxObject.GetRef(), lightingDescriptor, viewTransformInverse, camera, MaterialRef::Null(), true);
 		skyboxObject->SetActive(false);
 	}
 }
 
 /*
- * Render all the meshes found in ProcessScene() for a single light [light] from the perspective
+ * Forward-Render all the meshes found in ProcessScene() for a single light [light] from the perspective
  * of [camera] using [viewTransformInverse] as the camera's position and orientation.
  * [depthBufferComplete] == true means the depth buffer contains depths for all objects that will be
  * rendered.
@@ -439,7 +444,7 @@ void RenderManager::RenderSkyboxForCamera(Camera& camera, const Transform& viewT
  *         exclude screen pixels that are hidden from [light] based on the stencil buffer contents from pass 0. Is [light]
  *         is ambient, then this pass will perform a standard render of all meshes in the scene.
  */
-void RenderManager::RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete)
+void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete)
 {
 	Transform modelView;
 	Transform model;
@@ -447,21 +452,36 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 
 	Point3 lightPosition;
 	lightFullTransform.TransformPoint(lightPosition);
-	Transform lightInverse;
-	lightInverse.SetTo(lightFullTransform);
-	lightInverse.Invert();
 
 	RenderMode currentRenderMode = RenderMode::None;
 
-	for(int pass = 0; pass < 2; pass++)
+	enum RenderPass
 	{
-		if(pass == 0) // shadow volume pass
+		DepthRender = 0,
+		ShadowVolumeRender = 1,
+		StandardRender = 2,
+		_PassCount = 3
+	};
+
+	int startPass = depthBufferComplete ? ShadowVolumeRender : DepthRender;
+
+	for(int pass = startPass; pass < RenderPass::_PassCount; pass++)
+	{
+		if(pass == ShadowVolumeRender) // shadow volume pass
 		{
 			// check if this light can cast shadows; if not we skip this pass
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
+			{
+				currentRenderMode = RenderMode::ShadowVolumeRender;
 				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::ShadowVolumeRender);
+			}
 			else
 				continue;
+		}
+		else if(pass == DepthRender) // depth buffer pass
+		{
+			currentRenderMode = RenderMode::DepthOnly;
+			Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::DepthOnly);
 		}
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
@@ -480,14 +500,19 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 			// check if this mesh should be culled from this light.
 			if( light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient || !ShouldCullFromLight(light, lightPosition, full, *mesh))
 			{
-				if(pass == 0) // shadow volume pass
+				if(pass == DepthRender) // depth buffer pass
+				{
+					LightingDescriptor lightingDescriptor(NULL, NULL, true);
+					ForwardRenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera, depthOnlyMaterial, false);
+				}
+				else if(pass == ShadowVolumeRender) // shadow volume pass
 				{
 					if(mesh->GetCastShadows())
 					{
-						RenderShadowVolumesForSceneObject(*child, light, lightPosition, lightFullTransform, lightInverse, viewTransformInverse, camera);
+						RenderShadowVolumesForSceneObject(*child, light, lightPosition, viewTransformInverse, camera);
 					}
 				}
-				else if(pass == 1) // normal rendering pass
+				else if(pass == StandardRender) // normal rendering pass
 				{
 					// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
 					if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && mesh->GetReceiveShadows())
@@ -505,8 +530,7 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 					}
 
 					LightingDescriptor lightingDescriptor(&light, &lightPosition, false);
-
-					RenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera);
+					ForwardRenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera, MaterialRef::Null(), true);
 				}
 			}
 		}
@@ -514,10 +538,10 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 }
 
 /*
- * Render all the meshes found in ProcessScene() that have self-lit materials from the perspective
+ * Forward-Render all the meshes found in ProcessScene() that have self-lit materials from the perspective
  * of [camera] using [viewTransformInverse] as the camera's position and orientation.
  */
-void RenderManager::RenderSceneForSelfLit(const Transform& viewTransformInverse , const Camera& camera)
+void RenderManager::ForwardRenderSceneForSelfLit(const Transform& viewTransformInverse , const Camera& camera)
 {
 	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
 	for(unsigned int s = 0; s < sceneMeshCount; s++)
@@ -529,14 +553,22 @@ void RenderManager::RenderSceneForSelfLit(const Transform& viewTransformInverse 
 		Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
 
 		LightingDescriptor lightingDescriptor(NULL, NULL, true);
-		RenderSceneObjectMeshes(childRef.GetRef(), lightingDescriptor, viewTransformInverse, camera);
+		ForwardRenderSceneObjectMeshes(childRef.GetRef(), lightingDescriptor, viewTransformInverse, camera, MaterialRef::Null(), true);
 	}
 }
 
 /*
- * Render the meshes attached to [sceneObject] for [light].
+ * Forward-Render the meshes attached to [sceneObject].
+ *
+ * [lightingDescriptor] - Describes the lighting to be used for rendering (if there is any).
+ * [camera] - The Camera object for which rendering is taking place.
+ * [viewTransformInverse] - The view transform for rendering. (it should be the inverse of the camera's local-to-world-space transformation).
+ * [materialOverride] - If this is valid, it will be used to render all meshes.
+ * [flagRendered] - If true, each mesh will be flagged as rendered after it is rendered, which affects how blending
+ *                  works for that mesh on future rendering passes.
  */
-void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::ForwardRenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse,
+												   const Camera& camera, MaterialRef materialOverride, bool flagRendered)
 {
 	Mesh3DRenderer * renderer = NULL;
 	Transform modelViewProjection;
@@ -563,11 +595,19 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderSceneObjectMeshes -> renderer has no materials.");
 
 		unsigned int materialIndex = 0;
+		bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
 
 		// loop through each sub-renderer and render its mesh(es)
 		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
 		{
-			MaterialRef currentMaterial = renderer->GetMaterial(materialIndex);
+			MaterialRef currentMaterial;
+
+			// if we have an override material, we use that for every mesh
+			if(doMaterialOvverride)
+				currentMaterial = materialOverride;
+			else
+				currentMaterial = renderer->GetMaterial(materialIndex);
+
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
@@ -604,9 +644,7 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			// if this sub mesh has already been rendered by this camera, then we want to use
 			// additive blending to combine it with the output from other lights. Otherwise
 			// turn off blending and render.
-
 			SceneObjectSubMesh key(sceneObject.GetObjectID(), subMesh->GetObjectID());
-
 			bool rendered = renderedObjects[key];
 			if(rendered)
 			{
@@ -622,14 +660,17 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 			subRenderer->Render();
 
 			// flag the current scene object as being rendered (at least once)
-			renderedObjects[key] = true;
+			if(flagRendered)renderedObjects[key] = true;
 
 			// Advance material index. Renderer can have any number of materials > 0; it does not have to match
 			// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
-			materialIndex++;
-			if(materialIndex >= renderer->GetMaterialCount())
+			if(!doMaterialOvverride)
 			{
-				materialIndex = 0;
+				materialIndex++;
+				if(materialIndex >= renderer->GetMaterialCount())
+				{
+					materialIndex = 0;
+				}
 			}
 		}
 	}
@@ -638,9 +679,13 @@ void RenderManager::RenderSceneObjectMeshes(SceneObject& sceneObject, const Ligh
 /*
  * Render the shadow volumes for the meshes attached to [sceneObject] for [light]. This essentially means altering the
  * stencil buffer to reflect areas of the rendered scene that are shadowed from [light] by the meshes attached to [sceneObject].
+ *
+ * [lightPosition] - The world space position of [light].
+ * [camera] - The Camera object for which rendering is taking place.
+ * [viewTransformInverse] - The view transform for rendering. (it should be the inverse of the camera's local-to-world-space transformation).
  */
-void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& lightTransform,
-														 const Transform& lightTransformInverse, const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,
+													  const Transform& viewTransformInverse, const Camera& camera)
 {
 	Mesh3DRenderer * renderer = NULL;
 	Transform modelViewProjection;
@@ -738,6 +783,11 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 	}
 }
 
+/*
+ * Validate [sceneObject] for rendering. This means making sure that there
+ * is a mesh and a mesh renderer present, and verifying that [sceneObject]
+ * is active.
+ */
 bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject)
 {
 	if(!sceneObject.IsValid())

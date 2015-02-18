@@ -94,6 +94,9 @@ class RenderManager
 	// material for rendering shadow volumes
 	MaterialRef shadowVolumeMaterial;
 
+	// material for rendering only to the depth buffer
+	MaterialRef depthOnlyMaterial;
+
 	// transform stack used for processing scene hierarchy
 	DataStack<Matrix4x4> sceneProcessingStack;
 
@@ -124,11 +127,11 @@ class RenderManager
 	void RenderSceneForCamera(unsigned int cameraIndex);
 	void ForwardRenderSceneForCamera(Camera& camera);
 	void RenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
-	void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete);
-	void RenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera);
-	void RenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera);
-	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Transform& lightTransform, const Transform& lightTransformInverse,
-											  const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete);
+	void ForwardRenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera,
+								 MaterialRef materialOverride, bool flagRendered);
+	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Transform& viewTransformInverse, const Camera& camera);
 	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject);
 	bool HasSceneObjectBeenRendered(SceneObjectRef sceneObject);
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
