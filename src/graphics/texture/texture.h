@@ -24,14 +24,17 @@ class Texture : public EngineObject
 
 	protected:
 
-	std::string sourcePath;
+	std::vector<std::string> sourcePaths;
 	TextureAttributes attributes;
 
 	Texture(TextureAttributes attributes);
 	Texture(TextureAttributes attributes, const std::string& sourcePath);
+	Texture(TextureAttributes attributes, const std::vector<std::string>& sourcePaths);
 	virtual ~Texture();
 
 	public:
+
+	TextureAttributes GetAttributes();
 };
 
 #endif

@@ -8,6 +8,8 @@ class Graphics;
 #include "geometry/transform.h"
 #include "object/sceneobjectcomponent.h"
 #include "graphics/render/rendertarget.h"
+#include "object/enginetypes.h"
+
 
 class Camera : public SceneObjectComponent
 {
@@ -20,6 +22,14 @@ class Camera : public SceneObjectComponent
 
     Transform projection;
 
+    bool skyboxSetup;
+    MaterialRef skyboxMaterial;
+    TextureRef skyboxTexture;
+    SceneObjectRef skyboxSceneObject;
+    Mesh3DRef skyboxMesh;
+    Mesh3DFilterRef skyboxMeshFilter;
+    Mesh3DRendererRef skyboxMeshRenderer;
+
     protected:
 
     Camera();
@@ -27,6 +37,9 @@ class Camera : public SceneObjectComponent
 
     public:
 
+    void SetSkybox(TextureRef cubeTexture);
+    bool HasActiveSkybox() const;
+    SceneObjectRef GetSkyboxSceneObject();
     const Transform& GetProjectionTransform() const ;
     void AddClearBuffer(RenderBufferType buffer);
     void RemoveClearBuffer(RenderBufferType buffer);

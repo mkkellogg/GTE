@@ -12,6 +12,7 @@ TextureAttributes::TextureAttributes()
 	WrapMode = TextureWrap::Repeat;
 	FilterMode = TextureFilter::Point;
 	MipMapLevel = 1;
+	IsCube = false;
 }
 
 TextureAttributes::~TextureAttributes()

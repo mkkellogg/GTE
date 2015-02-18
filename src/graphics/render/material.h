@@ -72,6 +72,7 @@ class Material : public EngineObject
 
 	// the following are values for the sizes of data required by various types of uniforms
 	static const int SAMPLER_2D_DATA_SIZE=64;
+	static const int SAMPLER_CUBE_DATA_SIZE=384;
 	static const int MATRIX4X4_DATA_SIZE=16;
 
 	// string that holds the material's name

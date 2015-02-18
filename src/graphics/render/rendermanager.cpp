@@ -328,7 +328,7 @@ void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
  * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
  * each pass is combined with the others using additive blending.
  */
-void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformInverse, Camera& camera)
 {
 	// clear the list of objects that have been rendered at least once. this list is used to
 	// determine if blending should be turned on or off. if an object is being rendered for the
@@ -367,11 +367,31 @@ void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformIn
 		// set up for shadow rendering
 		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewTransformInverse, camera, renderedAmbient);
 	}
+
+	if(camera.HasActiveSkybox())
+	{
+		SceneObjectRef skyboxObject = camera.GetSkyboxSceneObject();
+		SceneObjectRef cameraObject = camera.GetSceneObject();
+		if(skyboxObject.IsValid() && cameraObject.IsValid())
+		{
+			Point3 origin;
+			cameraObject->GetAggregateTransform().TransformPoint(origin);
+
+			Transform base;
+			base.Translate(origin.x, origin.y, origin.z, false);
+			skyboxObject->SetAggregateTransform(base);
+
+			skyboxObject->SetActive(true);
+			LightingDescriptor lightingDescriptor(NULL, NULL, true);
+			RenderSceneObjectMeshes(skyboxObject.GetRef(), lightingDescriptor, viewTransformInverse, camera);
+			skyboxObject->SetActive(false);
+		}
+	}
 }
 
 /*
- * Render all the meshes found in ProcessScene() for a single light [light] from the perspective of
- * [viewTransformInverse], which is the inverse of the view transform.
+ * Render all the meshes found in ProcessScene() for a single light [light] from the perspective
+ * of [camera] using [viewTransformInverse] as the camera's position and orientation.
  *
  * This method performs two passes:
  *
@@ -454,7 +474,11 @@ void RenderManager::RenderSceneForLight(const Light& light, const Transform& lig
 	}
 }
 
-void RenderManager::RenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera)
+/*
+ * Render all the meshes found in ProcessScene() that have self-lit materials from the perspective
+ * of [camera] using [viewTransformInverse] as the camera's position and orientation.
+ */
+void RenderManager::RenderSceneForSelfLit(const Transform& viewTransformInverse , const Camera& camera)
 {
 	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
 	for(unsigned int s = 0; s < sceneMeshCount; s++)

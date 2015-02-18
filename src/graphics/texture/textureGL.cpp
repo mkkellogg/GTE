@@ -22,6 +22,11 @@ TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID, const std::
 	this->textureID = textureID;
 }
 
+TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID,  const std::vector<std::string>& sourcePaths) : Texture(attributes, sourcePaths)
+{
+	this->textureID = textureID;
+}
+
 TextureGL::~TextureGL()
 {
 

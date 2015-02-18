@@ -35,6 +35,7 @@ class TextureAttributes
 
 	unsigned int MipMapLevel;
 	bool UseAlpha;
+	bool IsCube;
 	TextureFilter FilterMode;
 	TextureWrap WrapMode;
 

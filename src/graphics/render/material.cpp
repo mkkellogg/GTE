@@ -10,13 +10,15 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/shader/shader.h"
+#include "graphics/texture/textureattr.h"
+#include "graphics/texture/texture.h"
 #include "graphics/stdattributes.h"
-#include "debug/gtedebug.h"
-#include "global/global.h"
 #include "graphics/shader/uniformdesc.h"
 #include "graphics/shader/attributedesc.h"
 #include "graphics/render/vertexattrbuffer.h"
 #include "graphics/light/light.h"
+#include "debug/gtedebug.h"
+#include "global/global.h"
 #include "base/basevector4.h"
 #include <string>
 
@@ -72,6 +74,9 @@ unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
 	{
 		case UniformType::Sampler2D:
 			return SAMPLER_2D_DATA_SIZE;
+		break;
+		case UniformType::SamplerCube:
+			return SAMPLER_CUBE_DATA_SIZE;
 		break;
 		case UniformType::Matrix4x4:
 			return MATRIX4X4_DATA_SIZE;
@@ -476,17 +481,22 @@ void Material::SendSetUniformToShader(unsigned int index)
 			if(desc->Type == UniformType::Sampler2D)
 			{
 				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->SamplerData);
-				SetUniformSetValue(desc->ShaderVarID, SAMPLER_2D_DATA_SIZE);
+				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Sampler2D));
+			}
+			if(desc->Type == UniformType::SamplerCube)
+			{
+				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->SamplerData);
+				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::SamplerCube));
 			}
 			else if(desc->Type == UniformType::Float)
 			{
-				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->BasicFloatData[0]);
-				SetUniformSetValue(desc->ShaderVarID, 1);
+				shader->SendUniformToShader(desc->ShaderVarID, desc->BasicFloatData[0]);
+				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Float));
 			}
 			else if(desc->Type == UniformType::Float4)
 			{
 				shader->SendUniformToShader4(desc->ShaderVarID,  desc->BasicFloatData[0], desc->BasicFloatData[1], desc->BasicFloatData[2], desc->BasicFloatData[3]);
-				SetUniformSetValue(desc->ShaderVarID, 4);
+				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Float4));
 			}
 		}
 	}
@@ -510,14 +520,18 @@ void Material::SendAllSetUniformsToShader()
 void Material::SetTexture(TextureRef texture, const std::string& varName)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SetTexture -> shader is NULL");
+	ASSERT_RTRN(texture.IsValid(),"Material::SetTexture -> texture is NULL");
 
 	int loc, foundIndex;
 	bool success = ValidateUniformName(varName, loc, foundIndex);
 	if(!success)return;
 
+	TextureAttributes textureAttributes = texture->GetAttributes();
+
 	UniformDescriptor * desc = setUniforms[foundIndex];
 	desc->ShaderVarID = loc;
-	desc->Type = UniformType::Sampler2D;
+	if(textureAttributes.IsCube)desc->Type = UniformType::SamplerCube;
+	else desc->Type = UniformType::Sampler2D;
 	desc->SamplerData = texture;
 	desc->IsSet = true;
 }
@@ -605,7 +619,7 @@ void Material::SendModelMatrixToShader(const Matrix4x4 * mat)
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Matrix4x4));
 	}
 }
 
@@ -621,7 +635,7 @@ void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Matrix4x4));
 	}
 }
 
@@ -637,7 +651,7 @@ void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
 	if(varID >= 0)
 	{
 		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Matrix4x4));
 	}
 }
 
@@ -653,7 +667,7 @@ void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, mat);
-		SetUniformSetValue(varID, MATRIX4X4_DATA_SIZE);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Matrix4x4));
 	}
 }
 
@@ -671,14 +685,14 @@ void Material::SendLightToShader(const Light * light, const Point3 * position,  
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, (int)light->GetType());
-		SetUniformSetValue(varID, 1);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 	}
 
 	varID = GetStandardUniformBinding(StandardUniform::LightPosition);
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, position);
-		SetUniformSetValue(varID, 4);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 	}
 
 	varID = GetStandardUniformBinding(StandardUniform::LightDirection);
@@ -686,28 +700,28 @@ void Material::SendLightToShader(const Light * light, const Point3 * position,  
 	{
 		if(altDirection != NULL)shader->SendUniformToShader(varID, altDirection);
 		else shader->SendUniformToShader(varID, light->GetDirectionPtr());
-		SetUniformSetValue(varID, 4);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 	}
 
 	varID = GetStandardUniformBinding(StandardUniform::LightColor);
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, light->GetColorPtr());
-		SetUniformSetValue(varID, 4);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 	}
 
 	varID = GetStandardUniformBinding(StandardUniform::LightIntensity);
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, light->GetIntensity());
-		SetUniformSetValue(varID, 1);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 	}
 
 	varID = GetStandardUniformBinding(StandardUniform::LightAttenuation);
 	if(varID >=0 )
 	{
 		shader->SendUniformToShader(varID, light->GetAttenuation());
-		SetUniformSetValue(varID, 1);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 	}
 }
 

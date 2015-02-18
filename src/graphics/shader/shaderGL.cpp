@@ -343,6 +343,11 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 			// convert OpenGL uniform type to our own definition (UniformType)
 			switch(type)
 			{
+				case GL_SAMPLER_CUBE:
+					desc->Type = UniformType::SamplerCube;
+					desc->SamplerUnitIndex = samplerUnitIndex;
+					samplerUnitIndex++;
+				break;
 				case GL_SAMPLER_2D:
 					desc->Type = UniformType::Sampler2D;
 					desc->SamplerUnitIndex = samplerUnitIndex;

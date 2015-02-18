@@ -11,6 +11,7 @@ class VertexAttrBuffer;
 class TextureAttributes;
 class AttributeTransformer;
 class RenderTarget;
+class RawImage;
 
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -66,6 +67,12 @@ class GraphicsGL : public Graphics
     void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
     Texture * CreateTexture(const std::string& sourcePath,  TextureAttributes attributes);
     Texture * CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes);
+    Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+		    				    const std::string& bottom, const std::string& left, const std::string& right);
+    Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
+								RawImage * bottomData, RawImage * leftData, RawImage * rightData,
+								const std::string& front, const std::string& back, const std::string& top,
+								const std::string& bottom, const std::string& left, const std::string& right);
     void DestroyTexture(Texture * texture);
     RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height);
     void DestroyRenderTarget(RenderTarget * target);

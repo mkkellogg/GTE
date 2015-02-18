@@ -28,6 +28,7 @@ class TextureGL : public Texture
 
 	TextureGL(TextureAttributes attributes, GLuint textureID);
 	TextureGL(TextureAttributes attributes, GLuint textureID, const std::string& sourcePath);
+	TextureGL(TextureAttributes attributes, GLuint textureID, const std::vector<std::string>& sourcePaths);
 	~TextureGL();
 
 	public:

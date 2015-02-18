@@ -122,7 +122,7 @@ class RenderManager
 	void ProcessScene();
 	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
 	void RenderSceneForCamera(unsigned int cameraIndex);
-	void ForwardRenderSceneForCamera(const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneForCamera(const Transform& viewTransformInverse, Camera& camera);
 	void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete);
 	void RenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera);
 	void RenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera);

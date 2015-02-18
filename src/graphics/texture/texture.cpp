@@ -18,10 +18,21 @@ Texture::Texture(TextureAttributes attributes)
 
 Texture::Texture(TextureAttributes attributes, const std::string& sourcePath) : Texture(attributes)
 {
-	this->sourcePath = sourcePath;
+	this->sourcePaths.push_back(sourcePath);
+}
+
+Texture::Texture(TextureAttributes attributes, const std::vector<std::string>& sourcePaths) : Texture(attributes)
+{
+	this->attributes = attributes;
+	this->sourcePaths = sourcePaths;
 }
 
 Texture::~Texture()
 {
 
+}
+
+TextureAttributes Texture::GetAttributes()
+{
+	return attributes;
 }

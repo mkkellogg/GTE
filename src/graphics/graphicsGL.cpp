@@ -315,12 +315,7 @@ Texture * GraphicsGL::CreateTexture(const RawImage * imageData, const std::strin
 	glEnable(GL_TEXTURE_2D);
 	GLuint tex;
 	glGenTextures(1, &tex);
-
-	if(tex == 0)
-	{
-		Debug::PrintError("GraphicsGL::CreateTexture -> unable to gen texture");
-		return NULL;
-	}
+	ASSERT(tex > 0, "GraphicsGL::CreateTexture -> unable to generate texture", NULL);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 
@@ -393,14 +388,97 @@ Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, TextureAttrib
 	ASSERT(raw != NULL, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
 
 	TextureGL * tex = (TextureGL*)CreateTexture(raw, sourcePath, attributes);
-	if(tex == NULL)
-	{
-		Debug::PrintError("GraphicsGL::CreateTexture -> Unable to create texture.");
-		ImageLoader::DestroyRawImage(raw);
-		return NULL;
-	}
+	if(tex == NULL)Debug::PrintError("GraphicsGL::CreateTexture -> Unable to create texture.");
 
 	ImageLoader::DestroyRawImage(raw);
+	return tex;
+}
+
+Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backData,  RawImage * topData,
+										RawImage * bottomData,  RawImage * leftData,  RawImage * rightData,
+										const std::string& front, const std::string& back, const std::string& top,
+	    							    const std::string& bottom, const std::string& left, const std::string& right)
+{
+	ASSERT(frontData != NULL, "GraphicsGL::CreateCubeTexture -> Front image is NULL.", NULL);
+	ASSERT(backData != NULL, "GraphicsGL::CreateCubeTexture -> Back image is NULL.", NULL);
+	ASSERT(topData != NULL, "GraphicsGL::CreateCubeTexture -> Top image is NULL.", NULL);
+	ASSERT(bottomData != NULL, "GraphicsGL::CreateCubeTexture -> Bottom image is NULL.", NULL);
+	ASSERT(leftData != NULL, "GraphicsGL::CreateCubeTexture -> Left image is NULL.", NULL);
+	ASSERT(rightData != NULL, "GraphicsGL::CreateCubeTexture -> Right image is NULL.", NULL);
+
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	GLuint tex;
+	glGenTextures(1, &tex);
+	ASSERT(tex > 0, "GraphicsGL::CreateCubeTexture -> unable to generate texture", NULL);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, frontData->GetWidth(), frontData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frontData->GetPixels());
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, backData->GetWidth(), backData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, backData->GetPixels());
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, topData->GetWidth(), topData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, topData->GetPixels());
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, bottomData->GetWidth(), bottomData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bottomData->GetPixels());
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, leftData->GetWidth(), leftData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, leftData->GetPixels());
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, rightData->GetWidth(), rightData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, rightData->GetPixels());
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	TextureAttributes attributes;
+	attributes.WrapMode = TextureWrap::Clamp;
+	attributes.FilterMode = TextureFilter::BiLinear;
+	attributes.IsCube = true;
+	attributes.MipMapLevel = 0;
+
+	std::vector<std::string> sourcePaths;
+	sourcePaths.push_back(front);
+	sourcePaths.push_back(back);
+	sourcePaths.push_back(top);
+	sourcePaths.push_back(bottom);
+	sourcePaths.push_back(left);
+	sourcePaths.push_back(right);
+
+	TextureGL * texture = new TextureGL(attributes, tex, sourcePaths);
+	return texture;
+}
+
+Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+									    const std::string& bottom, const std::string& left, const std::string& right)
+{
+	RawImage * rawFront = ImageLoader::LoadImage(front);
+	RawImage * rawBack = ImageLoader::LoadImage(back);
+	RawImage * rawTop = ImageLoader::LoadImage(top);
+	RawImage * rawBottom = ImageLoader::LoadImage(bottom);
+	RawImage * rawLeft = ImageLoader::LoadImage(left);
+	RawImage * rawRight = ImageLoader::LoadImage(right);
+
+	TextureGL * tex = NULL;
+	if(rawFront != NULL && rawBack != NULL && rawTop != NULL &&
+	   rawBottom != NULL && rawLeft != NULL && rawRight != NULL)
+	{
+		std::vector<RawImage*> imageData;
+		std::vector<std::string> sourcePaths;
+
+		tex = (TextureGL*)CreateCubeTexture(rawFront, rawBack, rawTop,
+														rawBottom, rawLeft, rawRight,
+														front, back, top,
+														bottom, left, right);
+		if(tex == NULL)Debug::PrintError("GraphicsGL::CreateCubeTexture -> Unable to create texture.");
+	}
+	else
+	{
+		Debug::PrintError("GraphicsGL::CreateCubeTexture -> Unable to load cube map texture.");
+	}
+
+	if(rawFront != NULL)ImageLoader::DestroyRawImage(rawFront);
+	if(rawBack != NULL)ImageLoader::DestroyRawImage(rawBack);
+	if(rawTop != NULL)ImageLoader::DestroyRawImage(rawTop);
+	if(rawBottom != NULL)ImageLoader::DestroyRawImage(rawBottom);
+	if(rawLeft)ImageLoader::DestroyRawImage(rawLeft);
+	if(rawRight != NULL)ImageLoader::DestroyRawImage(rawRight);
+
 	return tex;
 }
 

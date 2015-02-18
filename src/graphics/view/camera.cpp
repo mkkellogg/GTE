@@ -3,23 +3,93 @@
 
 #include "camera.h"
 #include "engine.h"
+#include "object/engineobjectmanager.h"
+#include "object/sceneobject.h"
+#include "object/enginetypes.h"
 #include "graphics/render/rendertarget.h"
+#include "graphics/render/mesh3Drenderer.h"
 #include "graphics/graphics.h"
 #include "graphics/screendesc.h"
+#include "graphics/shader/shadersource.h"
+#include "graphics/stdattributes.h"
+#include "graphics/object/mesh3Dfilter.h"
+#include "graphics/object/mesh3D.h"
+#include "graphics/object/submesh3D.h"
 #include "base/intmask.h"
 #include "global/global.h"
 #include "geometry/transform.h"
 #include "geometry/matrix4x4.h"
+#include "asset/assetimporter.h"
+#include "util/engineutility.h"
 
 Camera::Camera()
 {
 	clearBufferMask = 0;
+	skyboxSetup = false;
 	UpdateDisplay();
 }
 
 Camera::~Camera()
 {
 
+}
+
+void Camera::SetSkybox(TextureRef cubeTexture)
+{
+	ASSERT_RTRN(cubeTexture.IsValid(), "Camera::SetSkybox -> cube texture is not valid.");
+
+	if(!skyboxSetup)
+	{
+		// instantiate an asset importer to load shaders
+		AssetImporter importer;
+
+		// get reference to the engine's object manager
+		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+		ShaderSource skyboxShaderSource;
+		importer.LoadBuiltInShaderSource("skybox", skyboxShaderSource);
+		skyboxMaterial = objectManager->CreateMaterial(std::string("SkyBox"), skyboxShaderSource);
+		ASSERT_RTRN(skyboxMaterial.IsValid(), "Camera::SetSkybox -> Unable to create skybox material.");
+
+		skyboxMaterial->SetSelfLit(true);
+		skyboxMaterial->SetTexture(cubeTexture, "SKYBOX_TEXTURE");
+
+		StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+		skyboxMesh = EngineUtility::CreateCubeMesh(meshAttributes, true);
+		ASSERT_RTRN(skyboxMesh.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh.");
+
+		skyboxMeshFilter = objectManager->CreateMesh3DFilter();
+		ASSERT_RTRN(skyboxMeshFilter.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh filter.");
+
+		skyboxMeshFilter->SetMesh3D(skyboxMesh);
+		skyboxMeshRenderer = objectManager->CreateMesh3DRenderer();
+		ASSERT_RTRN(skyboxMeshRenderer.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh renderer.");
+
+		skyboxMeshRenderer->AddMaterial(skyboxMaterial);
+
+		skyboxSceneObject = objectManager->CreateSceneObject();
+		ASSERT_RTRN(skyboxSceneObject.IsValid(), "Camera::SetSkybox -> Unable to create skybox scene object.");
+
+		skyboxSceneObject->SetMesh3DFilter(skyboxMeshFilter);
+		skyboxSceneObject->SetMesh3DRenderer(skyboxMeshRenderer);
+
+		skyboxSceneObject->SetActive(false);
+
+		skyboxSetup = true;
+	}
+}
+
+bool Camera::HasActiveSkybox() const
+{
+	return skyboxSetup;
+}
+
+SceneObjectRef Camera::GetSkyboxSceneObject()
+{
+	return skyboxSceneObject;
 }
 
 void Camera::AddClearBuffer(RenderBufferType buffer)

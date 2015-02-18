@@ -74,6 +74,11 @@ void EngineUtility::PrintMatrix(const Matrix4x4& matrix)
 
 Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes)
 {
+	return CreateCubeMesh(meshAttributes, false);
+}
+
+Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes, bool doCCW)
+{
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 	subMesh->Init(36);
@@ -220,6 +225,26 @@ Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes)
 		uvs->GetCoordinate(33)->Set(1,0);
 		uvs->GetCoordinate(34)->Set(1,1);
 		uvs-> GetCoordinate(35)->Set(0,1);
+	}
+
+	if(doCCW)
+	{
+		for(unsigned int i=0; i < 36; i+=3)
+		{
+			Point3 * p1 = points->GetPoint(i);
+			Point3  p1r = *p1;
+			Point3 * p3 = points->GetPoint(i+2);
+
+			*p1 = *p3;
+			*p3 = p1r;
+
+			UV2 * u1 = uvs->GetCoordinate(i);
+			UV2  u1r = *u1;
+			UV2 * u3 = uvs->GetCoordinate(i+2);
+
+			*u1 = *u3;
+			*u3 = u1r;
+		}
 	}
 
 	subMesh->SetNormalsSmoothingThreshold(85);
