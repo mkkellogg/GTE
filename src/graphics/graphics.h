@@ -49,6 +49,7 @@ enum class RenderMode
 	Standard = 1,
 	StandardWithShadowVolumeTest = 2,
 	ShadowVolumeRender = 3,
+	DepthOnly = 4,
 	None = 0
 };
 

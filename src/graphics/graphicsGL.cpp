@@ -660,6 +660,24 @@ void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 			SetBlendingEnabled(false);
 
 		break;
+		case RenderMode::DepthOnly:
+
+			SetDepthBufferReadOnly(false);
+
+			// enable near & far clipping planes
+			glDisable(GL_DEPTH_CLAMP);
+
+			SetStencilTestEnabled(false);
+
+			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+
+			// disable color buffer rendering
+			SetColorBufferChannelState(false,false,false,false);
+			SetFaceCullingEnabled(true);
+
+			SetBlendingEnabled(false);
+
+		break;
 		default:
 		case RenderMode::Standard:
 
