@@ -306,8 +306,25 @@ void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
 	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
+	ForwardRenderSceneForCamera(camera);
+}
+
+/*
+ * This method looks at each mesh that was found in the ProcessScene() method and renders each of
+ * them from the perspective of [camera]. The camera's inverted transform is used as the view transform.
+ * The reason the inverse is used is because on the GPU side of things the view transform is used to move
+ * the world relative to the camera, rather than move the camera in the world.
+ *
+ * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
+ * each pass is combined with the others using additive blending.
+ */
+void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
+{
+	SceneObjectRef cameraObject = camera.GetSceneObject();
+	ASSERT_RTRN(cameraObject.IsValid(),"RenderManager::ForwardRenderSceneForCamera -> Camera is not attached to a scene object.");
+
 	// render the scene using the view transform of the current camera
-	const Transform& cameraTransform = objectRef->GetAggregateTransform();
+	const Transform& cameraTransform = camera.GetSceneObject()->GetAggregateTransform();
 
 	// we invert the camera's transform because at the shader level, the view transform is
 	// really moving the world relative to the camera, rather than moving the camera
@@ -316,20 +333,6 @@ void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
 	viewInverse.SetTo(cameraTransform);
 	viewInverse.Invert();
 
-	ForwardRenderSceneForCamera(viewInverse, camera);
-}
-
-/*
- * This method looks at each mesh that was found in the ProcessScene() method and renders each of
- * them from the perspective of [viewTransformInverse], which the inverse of the view transform.
- * The reason the inverse is used is because on the GPU side of things the view transform is used to move
- * the world relative to the camera, rather than move the camera in the world.
- *
- * This method uses a forward-rendering approach. Each mesh is rendered once for each light and the output from
- * each pass is combined with the others using additive blending.
- */
-void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformInverse, Camera& camera)
-{
 	// clear the list of objects that have been rendered at least once. this list is used to
 	// determine if blending should be turned on or off. if an object is being rendered for the
 	// first time, blending should be off; otherwise it should be on.
@@ -339,7 +342,7 @@ void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformIn
 	bool renderedAmbient = false;
 
 	// render all self-lit objects in the scene once
-	RenderSceneForSelfLit(viewTransformInverse, camera);
+	RenderSceneForSelfLit(viewInverse, camera);
 
 	// loop through each ambient light and render the scene for that light
 	for(unsigned int l = 0; l < ambientLightCount; l++)
@@ -350,7 +353,7 @@ void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformIn
 		LightRef lightRef = lightObject->GetLight();
 		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.");
 
-		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewTransformInverse, camera, l > 0);
+		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, l > 0);
 		renderedAmbient = true;
 	}
 
@@ -365,33 +368,69 @@ void RenderManager::ForwardRenderSceneForCamera(const Transform& viewTransformIn
 
 		// if [renderedAmbient] is true, the RenderSceneForLight() method will have the depth buffer already
 		// set up for shadow rendering
-		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewTransformInverse, camera, renderedAmbient);
+		RenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, renderedAmbient);
 	}
 
+	// if this camera has a skybox set up, then we want to render it
 	if(camera.HasActiveSkybox())
 	{
-		SceneObjectRef skyboxObject = camera.GetSkyboxSceneObject();
+		RenderSkyboxForCamera(camera, viewInverse);
+	}
+}
+
+/*
+ * Render the skybox for [camera] using [viewTransformInverse] as the view transformation.
+ * [viewTransformation] should be the inverse of the camera's transformation.
+ * The reason the inverse is used is because on the GPU side of things the view transform is used to move
+ * the world relative to the camera, rather than move the camera in the world.
+ */
+void RenderManager::RenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse)
+{
+	// if this camera has a skybox set up, then we want to render it
+	if(camera.HasActiveSkybox())
+	{
 		SceneObjectRef cameraObject = camera.GetSceneObject();
-		if(skyboxObject.IsValid() && cameraObject.IsValid())
-		{
-			Point3 origin;
-			cameraObject->GetAggregateTransform().TransformPoint(origin);
+		ASSERT_RTRN(cameraObject.IsValid(),"RenderManager::RenderSkyboxForCamera -> Camera is not attached to a scene object.");
 
-			Transform base;
-			base.Translate(origin.x, origin.y, origin.z, false);
-			skyboxObject->SetAggregateTransform(base);
+		// retrieve the scene objects for the camera and for the camera's skybox
+		SceneObjectRef skyboxObject = camera.GetSkyboxSceneObject();
+		ASSERT_RTRN(skyboxObject.IsValid(),"RenderManager::RenderSkyboxForCamera -> Camera has invalid skybox scene object.");
 
-			skyboxObject->SetActive(true);
-			LightingDescriptor lightingDescriptor(NULL, NULL, true);
-			RenderSceneObjectMeshes(skyboxObject.GetRef(), lightingDescriptor, viewTransformInverse, camera);
-			skyboxObject->SetActive(false);
-		}
+		/// get the world space location of the camera
+		Point3 cameraOrigin;
+		cameraObject->GetAggregateTransform().TransformPoint(cameraOrigin);
+
+		// get world space location of the skybox
+		Point3 skyboxOrigin;
+		skyboxObject->GetAggregateTransform().TransformPoint(skyboxOrigin);
+
+		// calculate the distance between the camera and the center of the skybox
+		Vector3 trans;
+		Point3::Subtract(cameraOrigin, skyboxOrigin, trans);
+
+		// update the skybox's position to be equal to to the camera's position, but leave
+		// the skybox's orientation as default. if we matched the skybox's orientation to
+		// the camera's orientation, we'd always see the exact same area of the skybox, no
+		// matter where the camera was facing.
+		Transform base;
+		base.SetTo(skyboxObject->GetAggregateTransform());
+		base.Translate(trans, false);
+		skyboxObject->SetAggregateTransform(base);
+		skyboxObject->GetTransform().Translate(trans, false);
+
+		// render the skybox
+		skyboxObject->SetActive(true);
+		LightingDescriptor lightingDescriptor(NULL, NULL, true);
+		RenderSceneObjectMeshes(skyboxObject.GetRef(), lightingDescriptor, viewTransformInverse, camera);
+		skyboxObject->SetActive(false);
 	}
 }
 
 /*
  * Render all the meshes found in ProcessScene() for a single light [light] from the perspective
  * of [camera] using [viewTransformInverse] as the camera's position and orientation.
+ * [depthBufferComplete] == true means the depth buffer contains depths for all objects that will be
+ * rendered.
  *
  * This method performs two passes:
  *

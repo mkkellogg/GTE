@@ -120,7 +120,7 @@ void Camera::UpdateDisplay()
 
 	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
 
-	Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 100);
+	Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 150);
 	//Transform::BuildProjectionMatrixInfiniteFar(proj, 65, ratio, 3);
 	projection.SetTo(proj);
 }
