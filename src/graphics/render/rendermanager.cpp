@@ -347,9 +347,6 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	// we have not yet rendered any ambient lights
 	bool renderedAmbient = false;
 
-	// render all self-lit objects in the scene once
-	ForwardRenderSceneForSelfLit(viewInverse, camera);
-
 	// loop through each ambient light and render the scene for that light
 	for(unsigned int l = 0; l < ambientLightCount; l++)
 	{
@@ -372,10 +369,15 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 		LightRef lightRef = lightObject->GetLight();
 		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Light is not valid.");
 
-		// if [renderedAmbient] is true, the RenderSceneForLight() method will have the depth buffer already
-		// set up for shadow rendering
-		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, renderedAmbient);
+		// if the scene was already rendered for an ambient light, or was already rendered once
+		// on the first iteration of the loop, then the depth buffer contains depth info for all scene meshes.
+		bool depthBufferComplete = renderedAmbient || l > 0;
+
+		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, depthBufferComplete);
 	}
+
+	// render all self-lit objects in the scene once
+	ForwardRenderSceneForSelfLit(viewInverse, camera);
 
 	// if this camera has a skybox set up, then we want to render it
 	if(camera.HasActiveSkybox())
@@ -441,7 +443,8 @@ void RenderManager::RenderSkyboxForCamera(Camera& camera, const Transform& viewT
  * This method performs three passes:
  *
  * Pass 0: If [depthBufferComplete] is false, this pass will render all meshes in the scene for [light] only into the
- * 		   depth buffer. The depth buffer needs to have depths for all these meshes before shadow volume rendering can occur.
+ * 		   depth buffer. The depth buffer needs to have depths for all these meshes before shadow volume rendering can occur, and
+ * 		   so that proper depth buffer based occlusion will occur.
  * Pass 1: If [light] is not ambient, render shadow volumes for all meshes in the scene for [light] into the stencil buffer.
  * Pass 2: Perform actual rendering of all meshes in the scene for [light]. If [light] is not ambient, this pass will
  *         exclude screen pixels that are hidden from [light] based on the stencil buffer contents from pass 0. Is [light]
