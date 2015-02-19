@@ -54,6 +54,9 @@ class SubMesh3DRenderer : public EngineObject
 	friend class Mesh3DRenderer;
 	friend class EngineObjectManager;
 
+	// needed for special access during rendering
+	friend class RenderManager;
+
 	protected:
 
 	// index of this sub-renderer in containing Mesh3DRenderer instance's list of sub-renderers
@@ -119,7 +122,8 @@ class SubMesh3DRenderer : public EngineObject
     void DestroyBuffer(VertexAttrBuffer ** buffer);
     bool InitAttributeData(StandardAttribute attr, int length, int componentCount,  int stride);
 
-    void SetShadowVolumePositionData(Point3Array * points);
+    const Point3Array * GetShadowVolumePositions();
+    void SetShadowVolumePositionData(const Point3Array * points);
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);
     void SetVertexColorData(Color4Array * colors);
@@ -156,6 +160,7 @@ class SubMesh3DRenderer : public EngineObject
 
     void Render();
     void RenderShadowVolume();
+    void RenderShadowVolume(const Point3Array * shadowVolumePositions);
 
     void SetUseBackSetShadowVolume(bool use);
     bool GetUseBackSetShadowVolume();

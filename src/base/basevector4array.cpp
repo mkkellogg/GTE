@@ -87,7 +87,7 @@ const float * BaseVector4Array::GetDataPtr() const
 	return (const float *)data;
 }
 
-unsigned int BaseVector4Array::GetReservedCount()
+unsigned int BaseVector4Array::GetReservedCount() const
 {
 	return reservedCount;
 }
@@ -97,7 +97,7 @@ void BaseVector4Array::SetCount(unsigned int count)
 	this->count = count;
 }
 
-unsigned int BaseVector4Array::GetCount()
+unsigned int BaseVector4Array::GetCount() const
 {
 	return count;
 }

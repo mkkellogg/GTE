@@ -58,9 +58,9 @@ class BaseVector4Array
     BaseVector4 * GetBaseVector(unsigned int index);
     const float * GetDataPtr() const;
     bool Init(unsigned int reservedCount);
-    unsigned int GetReservedCount();
+    unsigned int GetReservedCount() const;
     void SetCount(unsigned int count);
-    unsigned int GetCount();
+    unsigned int GetCount() const;
     bool CopyTo(BaseVector4Array * dest) const;
     Iterator GetIterator(BaseVector4& targetVector);
 };

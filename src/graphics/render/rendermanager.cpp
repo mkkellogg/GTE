@@ -8,6 +8,7 @@
 #include "rendermanager.h"
 #include "material.h"
 #include "geometry/transform.h"
+#include "geometry/point/point3array.h"
 #include "geometry/quaternion.h"
 #include "geometry/sceneobjecttransform.h"
 #include "object/sceneobject.h"
@@ -48,7 +49,7 @@ RenderManager::RenderManager() : sceneProcessingStack(Constants::MaxObjectRecurs
  */
 RenderManager::~RenderManager()
 {
-
+	DestroyCachedShadowVolumes();
 }
 
 /*
@@ -655,7 +656,7 @@ void RenderManager::ForwardRenderSceneObjectMeshes(SceneObject& sceneObject, con
 			// if this sub mesh has already been rendered by this camera, then we want to use
 			// additive blending to combine it with the output from other lights. Otherwise
 			// turn off blending and render.
-			SceneObjectSubMesh key(sceneObject.GetObjectID(), subMesh->GetObjectID());
+			ObjectPairKey key(sceneObject.GetObjectID(), subMesh->GetObjectID());
 			bool rendered = renderedObjects[key];
 			if(rendered)
 			{
@@ -784,12 +785,44 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			// send shadow volume uniforms to shader
 			shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
 
-			// calculate shadow volume geometry
-			if(subRenderer->GetUseBackSetShadowVolume())subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, true);
-			else subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, false);
+			Light& castLight = const_cast<Light&>(light);
+			SceneObjectRef lightObject = castLight.GetSceneObject();
 
-			// render the shadow volume
-			subRenderer->RenderShadowVolume();
+			ObjectPairKey cacheKey;
+			bool cacheShadowRendered = false;
+			bool cacheable = sceneObject.IsStatic() && lightObject.IsValid() && lightObject->IsStatic();
+
+			if(cacheable)
+			{
+				cacheKey.ObjectAID = subRenderer->GetObjectID();
+				cacheKey.ObjectBID = light.GetObjectID();
+				if(HasCachedShadowVolume(cacheKey))
+				{
+					Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
+
+					// render the shadow volume
+					if(cachedShadowVolume != NULL)subRenderer->RenderShadowVolume(cachedShadowVolume);
+
+					cacheShadowRendered = true;
+				}
+			}
+
+			if(!cacheShadowRendered)
+			{
+				// calculate shadow volume geometry
+				if(subRenderer->GetUseBackSetShadowVolume())subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, true);
+				else subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, false);
+
+				if(cacheable)
+				{
+					cacheKey.ObjectAID = subRenderer->GetObjectID();
+					cacheKey.ObjectBID = light.GetObjectID();
+					CacheShadowVolume(cacheKey, subRenderer->GetShadowVolumePositions());
+				}
+
+				// render the shadow volume
+				subRenderer->RenderShadowVolume();
+			}
 		}
 	}
 }
@@ -909,6 +942,86 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 	outTransform.PreTransformBy(camera.GetProjectionTransform());
 }
 
+/*
+ * Store a copy of a shadow volume in [shadowVolumeCache].
+ */
+void RenderManager::CacheShadowVolume(ObjectPairKey& key, const Point3Array * shadowVolume)
+{
+	ASSERT_RTRN(shadowVolume != NULL, "RenderManager::CacheShadowVolume -> Shadow volume is NULL.");
+
+	if(HasCachedShadowVolume(key))
+	{
+		ClearCachedShadowVolume(key);
+	}
+
+	Point3Array * copy = new Point3Array();
+	ASSERT_RTRN(copy != NULL, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
+
+	bool initSuccess = copy->Init(shadowVolume->GetReservedCount());
+	ASSERT_RTRN(initSuccess, "RenderManager::CacheShadowVolume -> Unable to initialize shadow volume copy.");
+
+	copy->SetCount(shadowVolume->GetCount());
+	shadowVolume->CopyTo(copy);
+	shadowVolumeCache[key] = copy;
+}
+
+/*
+ * Remove the shadow volume cached for [objectID] (if it exists).
+ */
+void RenderManager::ClearCachedShadowVolume(ObjectPairKey& key)
+{
+	if(HasCachedShadowVolume(key))
+	{
+		Point3Array* shadowVolume =  shadowVolumeCache[key];
+		shadowVolumeCache.erase(key);
+		if(shadowVolume != NULL)
+		{
+			delete shadowVolume;
+		}
+	}
+}
+
+/*
+ * Is a shadow volume cached for an engine object with id [objectID].
+ */
+bool RenderManager::HasCachedShadowVolume(ObjectPairKey& key)
+{
+	if(shadowVolumeCache.find(key) != shadowVolumeCache.end())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+/*
+ * Get cached shadow volume for an engine object with id [id].
+ */
+Point3Array * RenderManager::GetCachedShadowVolume(ObjectPairKey& key)
+{
+	if(HasCachedShadowVolume(key))
+	{
+		return shadowVolumeCache[key];
+	}
+
+	return NULL;
+}
+
+/*
+ * Remove and delete all cached shadow volumes.
+ */
+void RenderManager::DestroyCachedShadowVolumes()
+{
+	for (unsigned i = 0; i < shadowVolumeCache.bucket_count(); ++i)
+	{
+		for (auto iter = shadowVolumeCache.begin(i); iter!= shadowVolumeCache.end(i); ++iter )
+	    {
+			Point3Array * shadowVolume = iter->second;
+			delete shadowVolume;
+	    }
+	 }
+	shadowVolumeCache.clear();
+}
 
 /*
  * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].

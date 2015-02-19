@@ -20,6 +20,7 @@ class Material;
 class SceneObjectComponent;
 class SubMesh3D;
 class Transform;
+class Point3Array;
 
 #include <vector>
 #include <map>
@@ -54,36 +55,42 @@ class RenderManager
 	/*
 	 * This class is used as the key in the renderedObjects hashing structure
 	 */
-	class SceneObjectSubMesh
+	class ObjectPairKey
 	{
 		public:
 
-		ObjectID SceneObjectID;
-		ObjectID SubMeshID;
+		ObjectID ObjectAID;
+		ObjectID ObjectBID;
 
-		SceneObjectSubMesh(ObjectID sceneObjectID, ObjectID subMeshID)
+		ObjectPairKey()
 		{
-			SceneObjectID = sceneObjectID;
-			SubMeshID = subMeshID;
+			ObjectAID = 0;
+			ObjectBID = 0;
+		}
+
+		ObjectPairKey(ObjectID objectAID, ObjectID objectBID)
+		{
+			ObjectAID = objectAID;
+			ObjectBID = objectBID;
 		}
 
 		 // TODO: optimize this hashing function (implement correctly)
 		typedef struct
 		{
-			 int operator()(const SceneObjectSubMesh& s) const
+			 int operator()(const ObjectPairKey& s) const
 			 {
-				  return ((int)s.SceneObjectID << 1) +  ((int)s.SubMeshID << 2);
+				  return ((int)s.ObjectAID << 1) +  ((int)s.ObjectBID << 2);
 			 }
-		}SceneObjectSubMeshHasher;
+		}ObjectPairKeyHasher;
 
 		typedef struct
 		{
-		  bool operator() (const SceneObjectSubMesh& a, const SceneObjectSubMesh& b) const { return a==b; }
-		} SceneObjectSubMeshEq;
+		  bool operator() (const ObjectPairKey& a, const ObjectPairKey& b) const { return a==b; }
+		} ObjectPairKeyEq;
 
-		bool operator==(const SceneObjectSubMesh& s) const
+		bool operator==(const ObjectPairKey& s) const
 		{
-			return s.SceneObjectID == this->SceneObjectID && s.SubMeshID == this->SubMeshID;
+			return s.ObjectAID == this->ObjectAID && s.ObjectBID == this->ObjectBID;
 		}
 	};
 
@@ -120,7 +127,9 @@ class RenderManager
 
 	// keep track of objects that have been rendered
 	// TODO: optimize usage of this hashing structure
-	std::unordered_map<SceneObjectSubMesh, bool, SceneObjectSubMesh::SceneObjectSubMeshHasher,SceneObjectSubMesh::SceneObjectSubMeshEq> renderedObjects;
+	std::unordered_map<ObjectPairKey, bool, ObjectPairKey::ObjectPairKeyHasher,ObjectPairKey::ObjectPairKeyEq> renderedObjects;
+
+	std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher,ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
 	void ProcessScene();
 	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
@@ -137,6 +146,11 @@ class RenderManager
 	bool HasSceneObjectBeenRendered(SceneObjectRef sceneObject);
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
 			 	 	 	 	 	 	   const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale);
+    void CacheShadowVolume(ObjectPairKey& key, const Point3Array * positions);
+    void ClearCachedShadowVolume(ObjectPairKey& key);
+    bool HasCachedShadowVolume(ObjectPairKey& key);
+    Point3Array * GetCachedShadowVolume(ObjectPairKey& key);
+    void DestroyCachedShadowVolumes();
 
     void ClearBuffersForCamera(const Camera& camera) const;
     void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);

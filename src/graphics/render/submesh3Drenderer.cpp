@@ -206,6 +206,8 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> mesh is invalid.");
 
+	if(mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
+
 	// if this sub-renderer is utilizing an attribute transformer, we want to use the positions that result
 	// from that transformation to build the shadow volume. otherwise we want to use the original positions
 	// from the target sub-mesh.
@@ -452,10 +454,15 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	shadowVolumePositions.SetCount(currentPositionVertexIndex);
 }
 
+const Point3Array * SubMesh3DRenderer::GetShadowVolumePositions()
+{
+	return &shadowVolumePositions;
+}
+
 /*
  * Set the vertex attribute buffer data for the shadow volume positions.
  */
-void SubMesh3DRenderer::SetShadowVolumePositionData(Point3Array * points)
+void SubMesh3DRenderer::SetShadowVolumePositionData(const Point3Array * points)
 {
 	attributeBuffers[(int)StandardAttribute::ShadowPosition]->SetData(points->GetDataPtr());
 }
@@ -882,15 +889,23 @@ void SubMesh3DRenderer::RenderShadowVolume()
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
 
-	if(mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
+	RenderShadowVolume(&shadowVolumePositions);
+}
 
-	if(shadowVolumePositions.GetCount() > 0)
+/*
+ * Render the shadow volume stored in [positions].
+ */
+void SubMesh3DRenderer::RenderShadowVolume(const Point3Array * shadowVolumePositions)
+{
+	ASSERT_RTRN(shadowVolumePositions != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> shadowVolumePositions is NULL.");
+
+	if(shadowVolumePositions->GetCount() > 0)
 	{
 		// set the shadow volume vertex attribute buffer data
-		SetShadowVolumePositionData(&shadowVolumePositions);
+		SetShadowVolumePositionData(shadowVolumePositions);
 
 		// render shadow volume
-		Engine::Instance()->GetGraphicsEngine()->RenderTriangles(boundShadowVolumeAttributeBuffers, shadowVolumePositions.GetCount(), false);
+		Engine::Instance()->GetGraphicsEngine()->RenderTriangles(boundShadowVolumeAttributeBuffers, shadowVolumePositions->GetCount(), false);
 	}
 }
 
