@@ -59,6 +59,7 @@ void InputManagerGL::Update()
 void InputManagerGL::KeyboardFunction(unsigned char key, int x, int y)
 {
 	SetKeyState(GetKeyIndexFromCharacter(key), KeyState::Down);
+	SetOnKeyDown(GetKeyIndexFromCharacter(key), true);
 	//printf("key down: %d, x:%d, y:%d\n", key,x,y);
 }
 

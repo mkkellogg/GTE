@@ -64,16 +64,20 @@ class InputManager
 		PageUp,PageDown,Hone,End,Insert
 	};
 
-	static const unsigned int MAX_KEYS = 512;
-	KeyState keyState[MAX_KEYS];
+	static const unsigned int MAX_KEY_INDICES = 512;
+	KeyState keyState[MAX_KEY_INDICES];
+	bool onKeyDown[MAX_KEY_INDICES];
 	bool digitalInputState[(int)DigitalInput::_Last];
 
 	InputManager();
     virtual ~InputManager();
     void ClearStates();
     void ClearDigitalInput();
+    void SetOnKeyDown(unsigned int index, bool value);
+    bool GetOnKeyDown(unsigned int index);
     void SetKeyState(unsigned int index, KeyState state);
     void SetDigitalInputState(DigitalInput input, bool state);
+    void GetKeyIndex(Key key, unsigned int * indices, unsigned int& indexCount);
     virtual unsigned int GetKeyIndexForNonCharacterKey(NonCharacterKey key) = 0;
     virtual unsigned int GetKeyIndexFromCharacter(unsigned char key) = 0;
 
@@ -82,11 +86,12 @@ class InputManager
     virtual bool Init();
     virtual void Update() = 0;
 
+    bool ShouldHandleOnKeyDown(unsigned char key);
+    bool ShouldHandleOnKeyDown(Key key);
     bool IsKeyDown(unsigned char key);
     bool IsKeyDown(Key key);
     KeyState GetKeyState(unsigned int index);
     KeyState GetKeyState(unsigned char key);
-    KeyState GetKeyState(Key key);
     bool GetDigitalInputState(DigitalInput input);
 };
 
