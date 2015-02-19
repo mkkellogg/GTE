@@ -127,7 +127,8 @@ class RenderManager
 	void RenderSceneForCamera(unsigned int cameraIndex);
 	void ForwardRenderSceneForCamera(Camera& camera);
 	void RenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
-	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete);
+	void FillDepthBuffer(const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera,
 								 MaterialRef materialOverride, bool flagRendered);

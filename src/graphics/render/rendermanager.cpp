@@ -356,9 +356,12 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 		LightRef lightRef = lightObject->GetLight();
 		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.");
 
-		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, l > 0);
+		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera);
 		renderedAmbient = true;
 	}
+
+	// fill the depth buffer (if not already done so through ambient rendering)
+	if(!renderedAmbient)FillDepthBuffer(viewInverse, camera);
 
 	// loop through each regular light and render scene for that light
 	for(unsigned int l = 0; l < lightCount; l++)
@@ -369,11 +372,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 		LightRef lightRef = lightObject->GetLight();
 		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Light is not valid.");
 
-		// if the scene was already rendered for an ambient light, or was already rendered once
-		// on the first iteration of the loop, then the depth buffer contains depth info for all scene meshes.
-		bool depthBufferComplete = renderedAmbient || l > 0;
-
-		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera, depthBufferComplete);
+		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera);
 	}
 
 	// render all self-lit objects in the scene once
@@ -435,22 +434,41 @@ void RenderManager::RenderSkyboxForCamera(Camera& camera, const Transform& viewT
 }
 
 /*
+ * Render all objects to only the depth-buffer. Render from the perspective
+ * of [camera] using [viewTransformInverse] as the camera's position and orientation.
+ */
+void RenderManager::FillDepthBuffer(const Transform& viewTransformInverse, const Camera& camera)
+{
+	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
+	for(unsigned int s = 0; s < sceneMeshCount; s++)
+	{
+		SceneObjectRef childRef = sceneMeshObjects[s];
+
+		if(!ValidateSceneObjectForRendering(childRef))continue;
+		Mesh3DRef mesh = childRef->GetMesh3D();
+		SceneObject * child = childRef.GetPtr();
+
+		// copy the full transform of the scene object, including those of all ancestors
+		Transform full;
+		SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+
+		LightingDescriptor lightingDescriptor(NULL, NULL, true);
+		ForwardRenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera, depthOnlyMaterial, false);
+	}
+}
+
+/*
  * Forward-Render all the meshes found in ProcessScene() for a single light [light] from the perspective
  * of [camera] using [viewTransformInverse] as the camera's position and orientation.
- * [depthBufferComplete] == true means the depth buffer contains depths for all objects that will be
- * rendered.
  *
- * This method performs three passes:
+ * This method performs two passes:
  *
- * Pass 0: If [depthBufferComplete] is false, this pass will render all meshes in the scene for [light] only into the
- * 		   depth buffer. The depth buffer needs to have depths for all these meshes before shadow volume rendering can occur, and
- * 		   so that proper depth buffer based occlusion will occur.
  * Pass 1: If [light] is not ambient, render shadow volumes for all meshes in the scene for [light] into the stencil buffer.
  * Pass 2: Perform actual rendering of all meshes in the scene for [light]. If [light] is not ambient, this pass will
  *         exclude screen pixels that are hidden from [light] based on the stencil buffer contents from pass 0. Is [light]
  *         is ambient, then this pass will perform a standard render of all meshes in the scene.
  */
-void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera, bool depthBufferComplete)
+void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera)
 {
 	Transform modelView;
 	Transform model;
@@ -463,15 +481,12 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 
 	enum RenderPass
 	{
-		DepthRender = 0,
-		ShadowVolumeRender = 1,
-		StandardRender = 2,
-		_PassCount = 3
+		ShadowVolumeRender = 0,
+		StandardRender = 1,
+		_PassCount = 2
 	};
 
-	int startPass = depthBufferComplete ? ShadowVolumeRender : DepthRender;
-
-	for(int pass = startPass; pass < RenderPass::_PassCount; pass++)
+	for(int pass = 0; pass < RenderPass::_PassCount; pass++)
 	{
 		if(pass == ShadowVolumeRender) // shadow volume pass
 		{
@@ -483,11 +498,6 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			}
 			else
 				continue;
-		}
-		else if(pass == DepthRender) // depth buffer pass
-		{
-			currentRenderMode = RenderMode::DepthOnly;
-			Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::DepthOnly);
 		}
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
@@ -502,12 +512,6 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			// copy the full transform of the scene object, including those of all ancestors
 			Transform full;
 			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
-
-			if(pass == DepthRender) // depth buffer pass
-			{
-				LightingDescriptor lightingDescriptor(NULL, NULL, true);
-				ForwardRenderSceneObjectMeshes(*child, lightingDescriptor, viewTransformInverse, camera, depthOnlyMaterial, false);
-			}
 
 			// check if this mesh should be culled from this light.
 			if( light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient || !ShouldCullFromLight(light, lightPosition, full, *mesh))
