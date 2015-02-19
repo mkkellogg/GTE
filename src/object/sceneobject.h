@@ -36,6 +36,7 @@ class SceneObject : public EngineObject
 
 	std::string name;
 	bool isActive;
+	bool isStatic;
 	SceneObjectTransform transform;
 	Transform processingTransform;
 	std::vector<SceneObjectRef > children;
@@ -56,6 +57,8 @@ class SceneObject : public EngineObject
 
     bool IsActive();
     void SetActive(bool active);
+    bool IsStatic();
+    void SetStatic(bool isStatic);
     void SetName(const std::string& name);
     const std::string& GetName();
 

@@ -28,6 +28,7 @@
 SceneObject::SceneObject() : EngineObject()
 {
 	isActive = true;
+	isStatic = false;
 
 	transform.SetIdentity();
 	transform.SetSceneObject(this);
@@ -48,6 +49,16 @@ bool SceneObject::IsActive()
 void SceneObject::SetActive(bool active)
 {
 	this->isActive = active;
+}
+
+bool SceneObject::IsStatic()
+{
+	return isStatic;
+}
+
+void SceneObject::SetStatic(bool isStatic)
+{
+	this->isStatic = isStatic;
 }
 
 void SceneObject::SetName(const std::string& name)
