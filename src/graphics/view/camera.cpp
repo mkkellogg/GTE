@@ -26,6 +26,7 @@ Camera::Camera()
 {
 	clearBufferMask = 0;
 	skyboxSetup = false;
+	skyboxEnabled = false;
 	UpdateDisplay();
 }
 
@@ -82,9 +83,19 @@ void Camera::SetSkybox(TextureRef cubeTexture)
 	}
 }
 
-bool Camera::HasActiveSkybox() const
+bool Camera::IsSkyboxSetup() const
 {
 	return skyboxSetup;
+}
+
+void Camera::SetSkyboxEnabled(bool enabled)
+{
+	skyboxEnabled = enabled;
+}
+
+bool Camera::IsSkyboxEnabled() const
+{
+	return skyboxEnabled;
 }
 
 SceneObjectRef Camera::GetSkyboxSceneObject()

@@ -23,6 +23,7 @@ class Camera : public SceneObjectComponent
     Transform projection;
 
     bool skyboxSetup;
+    bool skyboxEnabled;
     MaterialRef skyboxMaterial;
     TextureRef skyboxTexture;
     SceneObjectRef skyboxSceneObject;
@@ -38,7 +39,9 @@ class Camera : public SceneObjectComponent
     public:
 
     void SetSkybox(TextureRef cubeTexture);
-    bool HasActiveSkybox() const;
+    bool IsSkyboxSetup() const;
+    void SetSkyboxEnabled(bool enabled);
+    bool IsSkyboxEnabled() const;
     SceneObjectRef GetSkyboxSceneObject();
     const Transform& GetProjectionTransform() const ;
     void AddClearBuffer(RenderBufferType buffer);
