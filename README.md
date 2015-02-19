@@ -79,6 +79,26 @@
 
 	To run the demo, do not run the 'gtedemo' executable directly. Instead, execute the 'rungtedemo.sh' script that is in the root of the GTE installation, which will ensure the demo's working directory is correctly set up.
 	
-	Playing the demo is simple: The directional arrows control Koopa's movement, the 'X' key is used to jump and the 'C' key is used to display a roar animation.
+	Demo Controls:
+	
+	Arrow keys: Move the knight around the environment. Physics are not incorporated into the engine so you will be able to walk through objects and off ledges.
+	
+	'X' Key: Play stab animation.
+	
+	'C' Key: Play chop animation.
+	
+	'V' Key: Play spin attack animation.
+	
+	'B' Key: Play defend animation.
+	
+	'A' Key: Toggle ambient lighting.
+	
+	'D' Key: Toggle directional lighting.
+	
+	'P' Key: Toggle point lights in the scene.
+	
+	'S' Key: Toggle skybox rendering.
+	
+	'F' Key: Toggle printing of graphics FPS.
 	
 
