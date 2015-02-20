@@ -4,7 +4,7 @@
 #include <math.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
-
+#include <iostream>
 #include <memory>
 #include <functional>
 #include "game.h"
@@ -15,6 +15,7 @@
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/submesh3D.h"
+#include "graphics/object/mesh3Dfilter.h"
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationmanager.h"
 #include "graphics/animation/animationinstance.h"
@@ -41,6 +42,7 @@
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
 #include "util/time.h"
+#include "util/engineutility.h"
 #include "global/global.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
@@ -75,6 +77,9 @@ Game::Game()
 	{
 		stateActivationTime[i] = 0;
 	}
+
+	printFPS = false;
+	lastFPSPrintTime = 0;
 }
 
 /*
@@ -109,20 +114,19 @@ SkinnedMesh3DRendererRef Game::FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
  * Recursively search the scene hierarchy starting at [ref] for an instance of SceneObject that
  * contains a Mesh3D component.
  */
-Mesh3DRef Game::FindFirstMesh(SceneObjectRef ref)
+SceneObjectRef Game::FindFirstMesh(SceneObjectRef ref)
 {
-	if(!ref.IsValid())return Mesh3DRef::Null();
+	if(!ref.IsValid())return SceneObjectRef::Null();
 
-	if(ref->GetMesh3D().IsValid())return ref->GetMesh3D();
+	if(ref->GetMesh3D().IsValid())return ref;
 
 	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
 	{
 		SceneObjectRef childRef = ref->GetChildAt(i);
-		Mesh3DRef subRef = FindFirstMesh(childRef);
-		if(subRef.IsValid())return subRef;
+		return FindFirstMesh(childRef);
 	}
 
-	return Mesh3DRef::Null();
+	return SceneObjectRef::Null();
 }
 
 /*
@@ -152,12 +156,13 @@ void Game::Init()
 	// instantiate an asset importer to load models
 	AssetImporter importer;
 
-	SetupCamera();
 	SetupScenery(importer);
 	SetupLights(importer);
 
 	SetupPlayer(importer);
 	InitializePlayerPosition();
+
+	SetupCamera();
 }
 
 /*
@@ -178,7 +183,24 @@ void Game::SetupCamera()
 	camera->AddClearBuffer(RenderBufferType::Depth);
 
 	// move camera object to its initial position
-	cameraObject->GetTransform().Translate(0, 5, 25, true);
+	Vector3 trans;
+	Vector3 scale;
+	Quaternion rot;
+	Matrix4x4 mat;
+
+	playerObject->GetTransform().CopyMatrix(mat);
+	mat.Decompose(trans,rot,scale);
+	cameraObject->GetTransform().Translate(trans.x-20,trans.y+10,trans.z+15, true);
+
+	TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky_north.png",
+														 "resources/textures/skybox-night/nightsky_south.png",
+														 "resources/textures/skybox-night/nightsky_up.png",
+														 "resources/textures/skybox-night/nightsky_down.png",
+														 "resources/textures/skybox-night/nightsky_east.png",
+														 "resources/textures/skybox-night/nightsky_west.png");
+
+	camera->SetSkybox(skyboxTexture);
+	camera->SetSkyboxEnabled(true);
 }
 
 /*
@@ -202,7 +224,7 @@ void Game::SetupScenery(AssetImporter& importer)
 
 	//========================================================
 	//
-	// Load cube
+	// Load textured scene cube
 	//
 	//========================================================
 
@@ -226,10 +248,12 @@ void Game::SetupScenery(AssetImporter& importer)
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	cubeMesh = GameUtil::CreateCubeMesh(meshAttributes);
+	cubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
 	cubeMesh->SetCastShadows(true);
 	cubeMesh->SetReceiveShadows(true);
-	cubeSceneObject->SetMesh3D(cubeMesh);
+	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	cubeSceneObject->SetMesh3DFilter(filter);
+	filter->SetMesh3D(cubeMesh);
 
 	// create the cube mesh's renderer
 	renderer = objectManager->CreateMesh3DRenderer();
@@ -237,33 +261,167 @@ void Game::SetupScenery(AssetImporter& importer)
 	cubeSceneObject->SetMesh3DRenderer(renderer);
 
 	// scale the cube and move to its position in the scene
-	cubeSceneObject->GetTransform().Scale(1.5, 1.5,1.5, true);
+	cubeSceneObject->GetTransform().Scale(1.5, 1.5,1.5, false);
 	cubeSceneObject->GetTransform().Translate(2, -7, 10, false);
+
+	//========================================================
+	//
+	// Load foliage
+	//
+	//========================================================
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toontree/toontree2/treeplain.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tree model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	SceneObjectRef treeMeshObject = FindFirstMesh(modelSceneObject);
+	Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
+	Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
+	MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.0015,.0015,.0015, false);
+	modelSceneObject->GetTransform().Rotate(.8,0,.2, -6, false);
+	modelSceneObject->GetTransform().Translate(55,-10.5, 11,false);
+
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .10,.10,.10, 1,0,0, -85, 57, -10, 24, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .15,.15,.20, 1,0,0, -94, 61, -9, -15, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .20,.20,.30, 1,0,0, -93, 80, -9, -15, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .17,.17,.20, 1,0,0, -85, 85, -9.5, -13, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .22,.22,.38, 1,0,0, -90, 115, -9.5, 15, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .19,.19,.28, 1,0,0, -96, 105, -9.5, 8, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .18,.18,.20, 1,0,0, -87, 95, -10, 32, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
 
 
 	//========================================================
 	//
-	// Load island model
+	// Load wooden objects
+	//
+	//========================================================
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrier01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load barrier model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	SceneObjectRef fenceMeshObject = FindFirstMesh(modelSceneObject);
+	Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
+	Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
+	MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.6,.6,.6, false);
+	modelSceneObject->GetTransform().Translate(60,-10,22,false);
+
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 47,-10,14.5, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-70,true);
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 52,-10,20, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-25,true);
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 69.5,-10,21, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,15,true);
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 79.2,-10,19.3, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,5,true);
+
+
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 51,-10,-16, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-120,true);
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 55,-10,-25, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-110,true);
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 59.9,-10,-33.3, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-135,true);
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 68.2,-10,-38, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-160,true);
+	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 78,-10,-40, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-175,true);
+
+	//========================================================
+	//
+	// Load island models
 	//
 	//========================================================
 
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
 	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	SetAllObjectsStatic(modelSceneObject);
 	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
 	modelSceneObject->GetTransform().Translate(0,-10,0,false);
-	modelSceneObject->GetTransform().Scale(.07,.05,.07, true);
 
-	//========================================================
-	//
-	// Load tower model
-	//
-	//========================================================
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx", 1 );
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	SetAllObjectsStatic(modelSceneObject);
 	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
+	modelSceneObject->GetTransform().Translate(80,-10,-10,false);
+
+
+	//========================================================
+	//
+	// Load castle models
+	//
+	//========================================================
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.05,.05,.05, false);
 	modelSceneObject->GetTransform().Translate(10,-10,-10,false);
-	modelSceneObject->GetTransform().Scale(.05,.05,.05, true);
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	SceneObjectRef tower2MeshObject = FindFirstMesh(modelSceneObject);
+	Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
+	Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
+	MaterialRef towerMaterial = towerRenderer->GetMaterial(0);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.04,.03,.04, false);
+	modelSceneObject->GetTransform().Translate(65,-10,-15,false);
+
+	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,-15, true);
+	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 65,-10,6, true);
+	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,6, true);
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Left_02.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
+	modelSceneObject->GetTransform().Rotate(0,1,0,90,false);
+	modelSceneObject->GetTransform().Translate(65,-10,-8.8,false);
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Right_02.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
+	modelSceneObject->GetTransform().Rotate(0,1,0, 90,false);
+	modelSceneObject->GetTransform().Translate(65,-10,0,false);
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	SceneObjectRef wallBlockMeshObject = FindFirstMesh(modelSceneObject);
+	Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
+	Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
+	MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.06,.05,.04, false);
+	modelSceneObject->GetTransform().Translate(70,-10,6.5,false);
+
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10,6.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10,6.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 70,-10,-15.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10, -15.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10, -15.5, true);
+	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
+	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, .25, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
 
 	//========================================================
 	//
@@ -271,13 +429,72 @@ void Game::SetupScenery(AssetImporter& importer)
 	//
 	//========================================================
 
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/mushroom/MushRoom_01.fbx", 1 );
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/mushroom/MushRoom_01.fbx");
 	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load mushroom house model!\n");
+	SetAllObjectsStatic(modelSceneObject);
 	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.09,.09,.09, false);
 	modelSceneObject->GetTransform().Translate(-10,-10,20,false);
-	modelSceneObject->GetTransform().Scale(.09,.09,.09, true);
+
 }
 
+SceneObjectRef Game::AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz)
+{
+	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, false);
+}
+
+SceneObjectRef Game::AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz, bool isStatic)
+{
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();
+	meshSceneObject->SetActive(true);
+	Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
+	meshFilter->SetMesh3D(mesh);
+	meshSceneObject->SetMesh3DFilter(meshFilter);
+	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	renderer->AddMaterial(material);
+	meshSceneObject->SetMesh3DRenderer(renderer);
+
+	meshSceneObject->GetTransform().Scale(sx,sy,sz, false);
+	if(ra != 0)meshSceneObject->GetTransform().Rotate(rx,ry,rz,ra,false);
+	meshSceneObject->GetTransform().Translate(tx,ty,tz,false);
+
+	if(isStatic)SetAllObjectsStatic(meshSceneObject);
+
+	return meshSceneObject;
+}
+
+void Game::SetAllObjectsStatic(SceneObjectRef root)
+{
+	ProcessSceneObjects(root, [=](SceneObjectRef current)
+	{
+		current->SetStatic(true);
+	});
+}
+
+void Game::SetAllMeshesStandardShadowVolume(SceneObjectRef root)
+{
+	ProcessSceneObjects(root, [=](SceneObjectRef current)
+	{
+		SkinnedMesh3DRendererRef skinnedRenderer = current->GetSkinnedMesh3DRenderer();
+		if(skinnedRenderer.IsValid())
+		{
+			for(unsigned int i = 0; i < skinnedRenderer->GetSubRendererCount(); i++)
+			{
+				skinnedRenderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
+			}
+		}
+
+		Mesh3DRendererRef renderer = current->GetMesh3DRenderer();
+		if(renderer.IsValid())
+		{
+			for(unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
+			{
+				renderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
+			}
+		}
+	});
+}
 /*
  * Set up the player model and animations, use [importer] to load model files from disk.
  */
@@ -299,21 +516,22 @@ void Game::SetupPlayer(AssetImporter& importer)
 	{
 		case PlayerType::Koopa:
 			importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
-			playerObject = importer.LoadModelDirect("resources/models/koopa/koopamod.fbx", 1 );
+			playerObject = importer.LoadModelDirect("resources/models/koopa/koopamod.fbx");
 			ASSERT_RTRN(playerObject.IsValid(), "Could not load Koopa model!\n");
 			playerObject->SetActive(true);
 			playerMeshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
-			playerObject->GetTransform().Translate(0,-10,-2,false);
+			playerObject->GetTransform().SetIdentity();
+			playerObject->GetTransform().Translate(30,-10,-2,false);
 			playerObject->GetTransform().Scale(.05, .05, .05, true);
 		break;
 		case PlayerType::Warrior:
 			importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, true);
-			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx", 1 );
+			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx");
 			ASSERT_RTRN(playerObject.IsValid(), "Could not load Warrior model!\n");
 			playerObject->SetActive(true);
 			playerMeshRenderer = FindFirstSkinnedMeshRenderer(playerObject);
-			playerObject->GetTransform().Translate(0,-10,-2,false);
-			playerObject->GetTransform().Scale(5, 5, 5, true);
+			playerObject->GetTransform().Translate(50,-10,-10,false);
+			playerObject->GetTransform().Scale(4, 4, 4, true);
 		break;
 	}
 
@@ -387,7 +605,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 
 			ASSERT_RTRN(compatible, "Warrior animations are not compatible!");
 
-			// set all warrior meshes to use standard shadow volume
+			// set all meshes to use standard shadow volume
 			ProcessSceneObjects(playerObject, [=](SceneObjectRef current)
 			{
 				SkinnedMesh3DRendererRef renderer = current->GetSkinnedMesh3DRenderer();
@@ -424,58 +642,118 @@ void Game::SetupLights(AssetImporter& importer)
 	// get reference to the engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
-	// create point light scene object
-	pointLightObject = objectManager->CreateSceneObject();
-
-	// create self-illuminated cube mesh to represent point light
+	// create self-illuminated cube mesh to represent spinning point light
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
-	Mesh3DRef cubeMesh = GameUtil::CreateCubeMesh(meshAttributes);
+	Mesh3DRef pointLightCubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
 
-	// add the point light mesh to the point light scene object
-	pointLightObject->SetMesh3D(cubeMesh);
-
-	// create a renderer for the point light mesh
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	// create material for spinning point light mesh
 	ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("selflit", selfLitShaderSource);
 	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
+	selflitMaterial->SetColor(Color4(1,1,1,1), "SELFCOLOR");
+
+	// create spinning point light
+	spinningPointLightObject = objectManager->CreateSceneObject();
+	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	spinningPointLightObject->SetMesh3DFilter(filter);
+	filter->SetMesh3D(pointLightCubeMesh);
+	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
-
-	// add renderer for the point light mesh to the point light scene object
-	pointLightObject->SetMesh3DRenderer(renderer);
-
-	// Create Light object and set its properties
+	spinningPointLightObject->SetMesh3DRenderer(renderer);
 	LightRef light = objectManager->CreateLight();
-	light->SetDirection(1,-1,-1);
 	light->SetIntensity(1.7);
 	light->SetRange(25);
 	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Point);
-
-	// add Light object to the point light scene object
-	pointLightObject->SetLight(light);
-
-	// move point light scene object to its initial position in the scene
-	pointLightObject->GetTransform().Scale(.4,.4,.4, true);
-	pointLightObject->GetTransform().Translate(5, 0, 20, false);
+	spinningPointLightObject->SetLight(light);
+	spinningPointLightObject->GetTransform().Scale(.4,.4,.4, true);
+	spinningPointLightObject->GetTransform().Translate(5, 0, 20, false);
 
 	// create ambient light
-	sceneObject = objectManager->CreateSceneObject();
+	ambientLightObject = objectManager->CreateSceneObject();
 	light = objectManager->CreateLight();
 	light->SetIntensity(.30);
 	light->SetType(LightType::Ambient);
-	sceneObject->SetLight(light);
+	ambientLightObject->SetLight(light);
 
 	// create directional light
-	sceneObject = objectManager->CreateSceneObject();
+	directionalLightObject = objectManager->CreateSceneObject();
+	directionalLightObject->SetStatic(true);
 	light = objectManager->CreateLight();
 	light->SetDirection(-.8,-1.7,-2);
 	light->SetIntensity(.8);
 	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Directional);
-	sceneObject->SetLight(light);
+	directionalLightObject->SetLight(light);
+
+	// create mesh & material for castle lantern
+	Mesh3DRef lanternLightMesh = EngineUtility::CreateCubeMesh(meshAttributes);
+	Color4 lanternLightColor(1,.66,.231,1);
+	Color4 lanternLightMeshColor(1,.95,.5,1);
+	MaterialRef lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
+	lanterLightMeshMaterial->SetColor(lanternLightMeshColor, "SELFCOLOR");
+	lanterLightMeshMaterial->SetSelfLit(true);
+
+	// create castle right lantern
+	SceneObjectRef lanternObject = objectManager->CreateSceneObject();
+	lanternObject->SetStatic(true);
+	LightRef lanternLight = objectManager->CreateLight();
+	lanternLight->SetIntensity(1.8);
+	lanternLight->SetRange(25);
+	lanternLight->SetColor(lanternLightColor);
+	lanternLight->SetShadowsEnabled(true);
+	lanternLight->SetType(LightType::Point);
+	lanternObject->SetLight(lanternLight);
+	lanternObject->GetTransform().Scale(.2,.2,.2, true);
+	lanternObject->GetTransform().Translate(62.2, -5, 0, false);
+	filter = objectManager->CreateMesh3DFilter();
+	lanternObject->SetMesh3DFilter(filter);
+	filter->SetMesh3D(lanternLightMesh);
+	Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
+	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
+	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
+	otherPointLightObjects.push_back(lanternObject);
+
+	// create castle left lantern
+	lanternObject = objectManager->CreateSceneObject();
+	lanternObject->SetStatic(true);
+	lanternLight = objectManager->CreateLight();
+	lanternLight->SetIntensity(1.8);
+	lanternLight->SetRange(25);
+	lanternLight->SetColor(lanternLightColor);
+	lanternLight->SetShadowsEnabled(true);
+	lanternLight->SetType(LightType::Point);
+	lanternObject->SetLight(lanternLight);
+	lanternObject->GetTransform().Scale(.2,.2,.2, true);
+	lanternObject->GetTransform().Translate(62.4, -5, -8, false);
+	filter = objectManager->CreateMesh3DFilter();
+	lanternObject->SetMesh3DFilter(filter);
+	filter->SetMesh3D(lanternLightMesh);
+	lanterLightRenderer = objectManager->CreateMesh3DRenderer();
+	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
+	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
+	otherPointLightObjects.push_back(lanternObject);
+
+	// create castle side lantern
+	lanternObject = objectManager->CreateSceneObject();
+	lanternObject->SetStatic(true);
+	lanternLight = objectManager->CreateLight();
+	lanternLight->SetIntensity(1.5);
+	lanternLight->SetRange(20);
+	lanternLight->SetColor(lanternLightColor);
+	lanternLight->SetShadowsEnabled(true);
+	lanternLight->SetType(LightType::Point);
+	lanternObject->SetLight(lanternLight);
+	lanternObject->GetTransform().Scale(.2,.2,.2, true);
+	lanternObject->GetTransform().Translate(77.4, -5, -17.8, false);
+	filter = objectManager->CreateMesh3DFilter();
+	lanternObject->SetMesh3DFilter(filter);
+	filter->SetMesh3D(lanternLightMesh);
+	lanterLightRenderer = objectManager->CreateMesh3DRenderer();
+	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
+	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
+	otherPointLightObjects.push_back(lanternObject);
 }
 
 /*
@@ -506,7 +784,7 @@ void Game::Update()
 	Point3 lightRotatePoint(10,5,18);
 
 	// rotate the point light around [lightRotatePoint]
-	pointLightObject->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
+	spinningPointLightObject->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
 	//pointLightObject->SetActive(false);
 
 	// rotate the cube around its center and the y-axis
@@ -519,6 +797,23 @@ void Game::Update()
 	UpdatePlayerLookDirection();
 	UpdatePlayerFollowCamera();
 	ManagePlayerState();
+	HandleGeneralInput();
+
+	if(printFPS)
+	{
+		float elapsedPrintTime = Time::GetRealTimeSinceStartup() - lastFPSPrintTime;
+		if(elapsedPrintTime > 1)
+		{
+			printf("FPS: %f\r", Engine::Instance()->GetGraphicsEngine()->GetCurrentFPS());
+			fflush(stdout);
+			lastFPSPrintTime = Time::GetRealTimeSinceStartup();
+		}
+	}
+	else
+	{
+		printf("                                            \r");
+		fflush(stdout);
+	}
 }
 
 /*
@@ -840,6 +1135,63 @@ void Game::ManagePlayerState()
 }
 
 /*
+ * Handle non-player input
+ */
+void Game::HandleGeneralInput()
+{
+	// toggle ambient lights
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::A))
+	{
+		if(ambientLightObject.IsValid())
+		{
+			ambientLightObject->SetActive(!ambientLightObject->IsActive());
+		}
+	}
+
+	// toggle directional light
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::D))
+	{
+		if(directionalLightObject.IsValid())
+		{
+			directionalLightObject->SetActive(!directionalLightObject->IsActive());
+		}
+	}
+
+	// toggle point lights
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::P))
+	{
+		if(spinningPointLightObject.IsValid())
+		{
+			spinningPointLightObject->SetActive(!spinningPointLightObject->IsActive());
+		}
+
+		for(unsigned int i =0; i < otherPointLightObjects.size(); i++)
+		{
+			SceneObjectRef otherPointLightObject = otherPointLightObjects[i];
+			if(otherPointLightObject.IsValid())
+			{
+				otherPointLightObject->SetActive(!otherPointLightObject->IsActive());
+			}
+		}
+	}
+
+	// toggle skybox
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::S))
+	{
+		if(cameraObject.IsValid())
+		{
+			cameraObject->GetCamera()->SetSkyboxEnabled(!cameraObject->GetCamera()->IsSkyboxEnabled());
+		}
+	}
+
+	// toggle printing of FPS
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::F))
+	{
+		printFPS = !printFPS;
+	}
+}
+
+/*
  * Update the camera's position and direction that it is facing.
  */
 void Game::UpdatePlayerFollowCamera()
@@ -847,9 +1199,12 @@ void Game::UpdatePlayerFollowCamera()
 	Point3 cameraPos;
 	Point3 playerPos;
 
-	// point which the camera will be facing
-	Point3 playerPosCameraLookTarget;
-	// point to which the camera will move
+	// points that will determine the camera's final orientation. the camera
+	// will first rotate to look at [playerPosCameraLookTargetA], and from there
+	// will rotate to look at [playerPosCameraLookTargetB]
+	Point3 playerPosCameraLookTargetA;
+	Point3 playerPosCameraLookTargetB;
+	// position to which the camera will move
 	Point3 playerPosCameraMoveTarget;
 
 	// get the gamera's position in world space into [cameraPos]
@@ -858,20 +1213,26 @@ void Game::UpdatePlayerFollowCamera()
 	// get the player object's position in world space into [playerPos]
 	playerObject->GetTransform().TransformPoint(playerPos);
 
-	playerPosCameraLookTarget = playerPos;
+	playerPosCameraLookTargetA = playerPos;
 	playerPosCameraMoveTarget = playerPos;
 
-	// keep the y component of position at which the camera should look the same as the camera's current
-	// position so that its orientation stays level in the x-z plane
-	playerPosCameraLookTarget.y = cameraPos.y;
+	// set the values of the two points that will be used to form the camera's
+	// orientation rotations
+	playerPosCameraLookTargetA.y = cameraPos.y;
+	playerPosCameraLookTargetB = playerPosCameraLookTargetA;
+	playerPosCameraLookTargetB.y = playerPos.y + 10;
 
-	// the target position to which the camera should move is 10 world units above the player object's position
-	playerPosCameraMoveTarget.y = playerPos.y + 10;
+	// the target position to which the camera should move
+	playerPosCameraMoveTarget.y = playerPos.y + 13;
 
-	// get a vector from the camera's current position to the position at which it is looking,
-	// and store in [cameraToPlayerLook]
-	Vector3 cameraToPlayerLook;
-	Point3::Subtract(playerPosCameraLookTarget, cameraPos, cameraToPlayerLook);
+	// vector that represent the camera's direction when looking at [playerPosCameraLookTargetA]
+	Vector3 cameraToPlayerLookA;
+	// vector that represent the camera's direction when looking at [playerPosCameraLookTargetB]
+	Vector3 cameraToPlayerLookB;
+	// get a vector from the camera's current position to [cameraToPlayerLookA] and store in [cameraToPlayerLookA]
+	Point3::Subtract(playerPosCameraLookTargetA, cameraPos, cameraToPlayerLookA);
+	// get a vector from the camera's current position to [cameraToPlayerLookB] and store in [cameraToPlayerLookB]
+	Point3::Subtract(playerPosCameraLookTargetB, cameraPos, cameraToPlayerLookB);
 
 	// get a vector from the camera's current position to its target position,
 	// and store in [cameraToPlayerMove]
@@ -882,8 +1243,8 @@ void Game::UpdatePlayerFollowCamera()
 	cameraToPlayerMove.y=0;
 
 	// target distance camera should be from the player object. this means the real target position for the
-	// camera will be [desiredFollowDistance] units awya from [playerPosCameraMoveTarget]
-	float desiredFollowDistance = 30;
+	// camera will be [desiredFollowDistance] units away from [playerPosCameraMoveTarget]
+	float desiredFollowDistance = 25;
 
 	// create copy of [cameraToPlayerMove] and scale it a magnitude of [desiredFollowDistance]
 	Vector3 newCameraToPlayer = cameraToPlayerMove;
@@ -901,17 +1262,23 @@ void Game::UpdatePlayerFollowCamera()
 
 	// lerp the camera's current position towards its real target position
 	Point3 newCameraPos;
-	Point3::Lerp(cameraPos, realCameraTargetPos, newCameraPos, .4 * Time::GetDeltaTime());
+	Point3::Lerp(cameraPos, realCameraTargetPos, newCameraPos, 2 * Time::GetDeltaTime());
 
 	// get a vector that represents the lerp operation above
 	Vector3 cameraMove;
 	Point3::Subtract(newCameraPos, cameraPos, cameraMove);
 
 	// get quaternion that represents a rotation from the camera's original forward vector
-	// to [cameraToPlayerLook]
-	Quaternion cameraRotationA;
-	cameraRotationA = Quaternion::getRotation(baseCameraForward,cameraToPlayerLook);
-	cameraRotationA.normalize();
+	// to [cameraToPlayerLookA], then from [cameraToPlayerLookA] to [cameraToPlayerLookB]
+	// to form the final camera rotation [cameraRotation]
+	Quaternion cameraRotationXZ;
+	Quaternion cameraRotationY;
+	Quaternion cameraRotation;
+	cameraRotationXZ = Quaternion::getRotation(baseCameraForward,cameraToPlayerLookA);
+	cameraRotationY = Quaternion::getRotation(cameraToPlayerLookA,cameraToPlayerLookB);
+	cameraRotationXZ.normalize();
+	cameraRotationY.normalize();
+	cameraRotation = cameraRotationY * cameraRotationXZ;
 
 	Quaternion currentRotation;
 	Vector3 currentTranslation;
@@ -919,7 +1286,7 @@ void Game::UpdatePlayerFollowCamera()
 
 	// apply quaternion calculated above to make the camera look towards the player
 	cameraObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
-	cameraObject->GetTransform().SetLocalComponents(currentTranslation, cameraRotationA, currentScale);
+	cameraObject->GetTransform().SetLocalComponents(currentTranslation, cameraRotation, currentScale);
 
 	// move the camera's position along the lerp'd movement vector calculated earlier [cameraMove]
 	cameraObject->GetTransform().Translate(cameraMove, false);

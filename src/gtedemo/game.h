@@ -11,11 +11,14 @@
 
 //forward declarations
 class AssetImporter;
+class Vector3;
+class Quaternion;
 
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include <functional>
+#include <vector>
 
 class Game
 {
@@ -54,18 +57,29 @@ class Game
 
 	// SceneObject that contains the main camera for the scene
 	SceneObjectRef cameraObject;
-	// SceneObject that contains the single point light in the scene
-	SceneObjectRef pointLightObject;
+	// SceneObject that contains the spinning point light in the scene
+	SceneObjectRef spinningPointLightObject;
+	// container for other point lights in the scene
+	std::vector<SceneObjectRef> otherPointLightObjects;
 	// The SceneObject to which the player model hierarchy is attached
 	SceneObjectRef playerObject;
 	// The single cube in the scene
 	SceneObjectRef cubeSceneObject;
+	// scene object that holds the scene's directional light
+	SceneObjectRef directionalLightObject;
+	// scene object that holds the scene's ambient light
+	SceneObjectRef ambientLightObject;
 	//The SkinnedMesh3DRenderer that render the player's skinned mesh
 	SkinnedMesh3DRendererRef playerRenderer;
 	// player animations
 	AnimationRef playerAnimations[PlayerState::_Count];
 	// The AnimationPlayer responsible for managing the animations of the player character
 	AnimationPlayerRef animationPlayer;
+
+	// should we print out the graphics engine FPS?
+	bool printFPS;
+	// last time FPS was printed
+	float lastFPSPrintTime;
 
 	// movement variables
 	float playerWalkSpeed;
@@ -89,6 +103,10 @@ class Game
 
 	void SetupCamera();
 	void SetupScenery(AssetImporter& importer);
+	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz);
+	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz, bool isStatic);
+	void SetAllObjectsStatic(SceneObjectRef root);
+	void SetAllMeshesStandardShadowVolume(SceneObjectRef root);
 	void SetupPlayer(AssetImporter& importer);
 	void SetupLights(AssetImporter& importer);
 
@@ -101,6 +119,7 @@ class Game
 	void UpdatePlayerFollowCamera();
 	void ActivatePlayerState(PlayerState state);
 	void ManagePlayerState();
+	void HandleGeneralInput();
 
 	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
 
@@ -110,7 +129,7 @@ class Game
     ~Game();
 
     SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
-    Mesh3DRef FindFirstMesh(SceneObjectRef ref);
+    SceneObjectRef FindFirstMesh(SceneObjectRef ref);
     void Init();
     void Update();
 };

@@ -8,7 +8,6 @@ class GameUtil
 {
 	public:
 
-	static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes);
 };
 
 #endif
