@@ -102,7 +102,11 @@ class Game
 	Vector3 baseCameraForward;
 
 	void SetupCamera();
-	void SetupScenery(AssetImporter& importer);
+	void SetupScene(AssetImporter& importer);
+	void SetupSceneTerrain(AssetImporter& importer);
+	void SetupSceneStructures(AssetImporter& importer);
+	void SetupScenePlants(AssetImporter& importer);
+	void SetupSceneExtra(AssetImporter& importer);
 	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz);
 	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz, bool isStatic);
 	void SetAllObjectsStatic(SceneObjectRef root);
@@ -129,7 +133,7 @@ class Game
     ~Game();
 
     SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
-    SceneObjectRef FindFirstMesh(SceneObjectRef ref);
+    SceneObjectRef FindFirstSceneObjectWithMesh(SceneObjectRef ref);
     void Init();
     void Update();
 };

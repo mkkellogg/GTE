@@ -71,13 +71,15 @@ Game::Game()
 	// original camera forward is looking down the negative z-axis
 	baseCameraForward = Vector3(0,0,-1);
 
-	playerType = PlayerType::Koopa;
+	// initialize player state
+	playerType = PlayerType::Warrior;
 	playerState = PlayerState::Waiting;
 	for(unsigned int i = 0; i < MAX_PLAYER_STATES; i++)
 	{
 		stateActivationTime[i] = 0;
 	}
 
+	// FPS variables
 	printFPS = false;
 	lastFPSPrintTime = 0;
 }
@@ -91,8 +93,9 @@ Game::~Game()
 }
 
 /*
- * Recursively search the scene hierarchy starting at [ref] for an instance of SceneObject that
- * contains a SkinnedMesh3DRenderer component.
+ * Recursively search the scene hierarchy starting at [ref] for an
+ * instance of SceneObject that contains a SkinnedMesh3DRenderer component,
+ * but return just the SkinnedMesh3DRenderer instance.
  */
 SkinnedMesh3DRendererRef Game::FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
 {
@@ -111,10 +114,11 @@ SkinnedMesh3DRendererRef Game::FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
 }
 
 /*
- * Recursively search the scene hierarchy starting at [ref] for an instance of SceneObject that
- * contains a Mesh3D component.
+ * Recursively search the scene hierarchy starting at [ref] for an
+ * instance of SceneObject that contains a Mesh3D component, and return
+ * the containing SceneObject instance.
  */
-SceneObjectRef Game::FindFirstMesh(SceneObjectRef ref)
+SceneObjectRef Game::FindFirstSceneObjectWithMesh(SceneObjectRef ref)
 {
 	if(!ref.IsValid())return SceneObjectRef::Null();
 
@@ -123,7 +127,8 @@ SceneObjectRef Game::FindFirstMesh(SceneObjectRef ref)
 	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
 	{
 		SceneObjectRef childRef = ref->GetChildAt(i);
-		return FindFirstMesh(childRef);
+		SceneObjectRef subRef = FindFirstSceneObjectWithMesh(childRef);
+		if(subRef.IsValid())return subRef;
 	}
 
 	return SceneObjectRef::Null();
@@ -131,7 +136,7 @@ SceneObjectRef Game::FindFirstMesh(SceneObjectRef ref)
 
 /*
  * Recursively visit objects in the scene hierarchy with root at [ref] and for each
- * invoke [func] with [ref] as the only parameter.
+ * invoke [func] with the current SceneObject instance as the only parameter.
  */
 void Game::ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func)
 {
@@ -156,9 +161,11 @@ void Game::Init()
 	// instantiate an asset importer to load models
 	AssetImporter importer;
 
-	SetupScenery(importer);
+	// set up the scene
+	SetupScene(importer);
 	SetupLights(importer);
 
+	// setup & initialize player
 	SetupPlayer(importer);
 	InitializePlayerPosition();
 
@@ -188,25 +195,234 @@ void Game::SetupCamera()
 	Quaternion rot;
 	Matrix4x4 mat;
 
+	// decompose camera's transform into position, rotation and scale
 	playerObject->GetTransform().CopyMatrix(mat);
 	mat.Decompose(trans,rot,scale);
 	cameraObject->GetTransform().Translate(trans.x-20,trans.y+10,trans.z+15, true);
 
+	// create skybox texture
 	TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky_north.png",
-														 "resources/textures/skybox-night/nightsky_south.png",
-														 "resources/textures/skybox-night/nightsky_up.png",
-														 "resources/textures/skybox-night/nightsky_down.png",
-														 "resources/textures/skybox-night/nightsky_east.png",
-														 "resources/textures/skybox-night/nightsky_west.png");
-
+														 	 	"resources/textures/skybox-night/nightsky_south.png",
+														 	 	"resources/textures/skybox-night/nightsky_up.png",
+														 	 	"resources/textures/skybox-night/nightsky_down.png",
+														 	 	"resources/textures/skybox-night/nightsky_east.png",
+														 	 	"resources/textures/skybox-night/nightsky_west.png");
+	// activate skybox
 	camera->SetSkybox(skyboxTexture);
 	camera->SetSkyboxEnabled(true);
 }
 
 /*
- * Set up the scenery for the scene and use [importer] to load assets from disk.
+ * Set up the scenery for the scene and use [importer] to load assets from disk. This function
+ * uses sub-functions to do the grunt work of loading each required model, extracting relevant
+ * components that can be reused (meshes & materials) and positions each instance of each model
+ * in the scene.
  */
-void Game::SetupScenery(AssetImporter& importer)
+void Game::SetupScene(AssetImporter& importer)
+{
+	SetupSceneTerrain(importer);
+	SetupSceneStructures(importer);
+	SetupScenePlants(importer);
+	SetupSceneExtra(importer);
+}
+
+/*
+ * Set up the "land" elements in the scene.
+ */
+void Game::SetupSceneTerrain(AssetImporter& importer)
+{
+	// multi-use reference
+	SceneObjectRef modelSceneObject;
+
+	//========================================================
+	//
+	// Load island models
+	//
+	//========================================================
+
+	// load island model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+
+	// place island in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
+	modelSceneObject->GetTransform().Translate(0,-10,0,false);
+
+	// load island model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+
+	// place island in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
+	modelSceneObject->GetTransform().Translate(80,-10,-10,false);
+
+}
+
+/*
+ * Set up all the man-made structures, buildings, etc. in the scene.
+ */
+void Game::SetupSceneStructures(AssetImporter& importer)
+{
+	// multi-use reference
+	SceneObjectRef modelSceneObject;
+
+	//========================================================
+	//
+	// Load castle components
+	//
+	//========================================================
+
+	// load turrent tower
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+
+	// pplace turret tower in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.05,.05,.05, false);
+	modelSceneObject->GetTransform().Translate(10,-10,-10,false);
+
+	// load castle tower
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+
+	// extract mesh & material from castle tower model
+	SceneObjectRef tower2MeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
+	Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
+	Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
+	MaterialRef towerMaterial = towerRenderer->GetMaterial(0);
+
+	// place initial castle tower in scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.04,.03,.04, false);
+	modelSceneObject->GetTransform().Translate(65,-10,-15,false);
+
+	// re-use the castle tower mesh & material for multiple instances
+	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,-15, true);
+	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 65,-10,6, true);
+	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,6, true);
+
+	// load & place castle entrance arch-way left side
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Left_02.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
+	modelSceneObject->GetTransform().Rotate(0,1,0,90,false);
+	modelSceneObject->GetTransform().Translate(65,-10,-8.8,false);
+
+	// load and place castle entrance arch-way right side
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Right_02.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
+	modelSceneObject->GetTransform().Rotate(0,1,0, 90,false);
+	modelSceneObject->GetTransform().Translate(65,-10,0,false);
+
+	// load castle wall model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+
+	// extract mesh & material from castle wall model
+	SceneObjectRef wallBlockMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
+	Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
+	Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
+	MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
+
+	// place initial castle wall in scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.06,.05,.04, false);
+	modelSceneObject->GetTransform().Translate(70,-10,6.5,false);
+
+	// re-use the castle wall mesh & material for multiple instances
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10,6.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10,6.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 70,-10,-15.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10, -15.5, true);
+	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10, -15.5, true);
+	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
+	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, .25, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
+
+
+	//========================================================
+	//
+	// Load mushroom house model
+	//
+	//========================================================
+
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/mushroom/MushRoom_01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load mushroom house model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+
+	// place mushroom house in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.09,.09,.09, false);
+	modelSceneObject->GetTransform().Translate(-10,-10,20,false);
+
+}
+
+/*
+ * Add all the plants to the scene.
+ */
+void Game::SetupScenePlants(AssetImporter& importer)
+{
+	// multi-use reference
+	SceneObjectRef modelSceneObject;
+
+	//========================================================
+	//
+	// Load trees
+	//
+	//========================================================
+
+	// load tree model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toontree/toontree2/treeplain.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tree model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+
+	// extract tree mesh & material
+	SceneObjectRef treeMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
+	Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
+	Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
+	MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
+
+	// place initial tree in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.0015,.0015,.0015, false);
+	modelSceneObject->GetTransform().Rotate(.8,0,.2, -6, false);
+	modelSceneObject->GetTransform().Translate(55,-10.5, 11,false);
+
+	// reuse the tree mesh & material for multiple instances
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .10,.10,.10, 1,0,0, -85, 57, -10, 24, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .15,.15,.20, 1,0,0, -94, 61, -9, -15, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .20,.20,.30, 1,0,0, -93, 80, -9, -15, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .17,.17,.20, 1,0,0, -85, 85, -9.5, -13, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .22,.22,.38, 1,0,0, -90, 115, -9.5, 15, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .19,.19,.28, 1,0,0, -96, 105, -9.5, 8, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .18,.18,.20, 1,0,0, -87, 95, -10, 32, true);
+	SetAllMeshesStandardShadowVolume(modelSceneObject);
+}
+
+/*
+ * Add miscellaneous elements to the scene.
+ */
+void Game::SetupSceneExtra(AssetImporter& importer)
 {
 	// get reference to the engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -218,9 +434,7 @@ void Game::SetupScenery(AssetImporter& importer)
 	TextureAttributes texAttributes;
 	TextureRef texture;
 	Mesh3DRef cubeMesh;
-	Mesh3DRef firstMesh;
 	StandardAttributeSet meshAttributes;
-	SceneObjectRef childSceneObject;
 
 	//========================================================
 	//
@@ -242,12 +456,14 @@ void Game::SetupScenery(AssetImporter& importer)
 	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
 
-	// create the cube mesh and set its attributes
+	// set the cube mesh attributes
 	meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+
+	// create the cube mesh
 	cubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
 	cubeMesh->SetCastShadows(true);
 	cubeMesh->SetReceiveShadows(true);
@@ -266,56 +482,29 @@ void Game::SetupScenery(AssetImporter& importer)
 
 	//========================================================
 	//
-	// Load foliage
+	// Load fences
 	//
 	//========================================================
 
-	modelSceneObject = importer.LoadModelDirect("resources/models/toontree/toontree2/treeplain.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tree model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	SceneObjectRef treeMeshObject = FindFirstMesh(modelSceneObject);
-	Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
-	Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
-	MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.0015,.0015,.0015, false);
-	modelSceneObject->GetTransform().Rotate(.8,0,.2, -6, false);
-	modelSceneObject->GetTransform().Translate(55,-10.5, 11,false);
-
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .10,.10,.10, 1,0,0, -85, 57, -10, 24, true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .15,.15,.20, 1,0,0, -94, 61, -9, -15, true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .20,.20,.30, 1,0,0, -93, 80, -9, -15, true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .17,.17,.20, 1,0,0, -85, 85, -9.5, -13, true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .22,.22,.38, 1,0,0, -90, 115, -9.5, 15, true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .19,.19,.28, 1,0,0, -96, 105, -9.5, 8, true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .18,.18,.20, 1,0,0, -87, 95, -10, 32, true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-
-
-	//========================================================
-	//
-	// Load wooden objects
-	//
-	//========================================================
-
+	// load fence model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrier01.fbx");
 	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load barrier model!\n");
 	SetAllObjectsStatic(modelSceneObject);
-	SceneObjectRef fenceMeshObject = FindFirstMesh(modelSceneObject);
+
+	// extract fence mesh & material
+	SceneObjectRef fenceMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
 	Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
 	Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
 	MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
+
+	// place initial fence in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.6,.6,.6, false);
 	modelSceneObject->GetTransform().Translate(60,-10,22,false);
 
+	/** re-use the fence mesh & material for multiple instances  **/
+
+	// fence on right side of castle
 	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 47,-10,14.5, true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-70,true);
 	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 52,-10,20, true);
@@ -325,7 +514,7 @@ void Game::SetupScenery(AssetImporter& importer)
 	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 79.2,-10,19.3, true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,5,true);
 
-
+	// fence on left side of castle
 	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 51,-10,-16, true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-120,true);
 	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 55,-10,-25, true);
@@ -337,112 +526,53 @@ void Game::SetupScenery(AssetImporter& importer)
 	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 78,-10,-40, true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-175,true);
 
-	//========================================================
-	//
-	// Load island models
-	//
-	//========================================================
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
-	modelSceneObject->GetTransform().Translate(0,-10,0,false);
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
-	modelSceneObject->GetTransform().Translate(80,-10,-10,false);
-
 
 	//========================================================
 	//
-	// Load castle models
+	// Load barrels
 	//
 	//========================================================
 
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	// load barrel model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrel01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load barrel model!\n");
 	SetAllObjectsStatic(modelSceneObject);
+
+	// extract barrel mesh and material
+	SceneObjectRef barrelMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
+	Mesh3DRef barrelMesh = barrelMeshObject->GetMesh3D();
+	Mesh3DRendererRef barrelRenderer = barrelMeshObject->GetMesh3DRenderer();
+	MaterialRef barrelMaterial = barrelRenderer->GetMaterial(0);
+
+	// place initial barrel in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.05,.05,.05, false);
-	modelSceneObject->GetTransform().Translate(10,-10,-10,false);
+	modelSceneObject->GetTransform().Scale(.8,.8,.8, false);
+	modelSceneObject->GetTransform().Translate(78,-10,10.5, false);
 
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SceneObjectRef tower2MeshObject = FindFirstMesh(modelSceneObject);
-	Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
-	Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
-	MaterialRef towerMaterial = towerRenderer->GetMaterial(0);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.03,.04, false);
-	modelSceneObject->GetTransform().Translate(65,-10,-15,false);
-
-	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,-15, true);
-	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 65,-10,6, true);
-	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,6, true);
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Left_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
-	modelSceneObject->GetTransform().Rotate(0,1,0,90,false);
-	modelSceneObject->GetTransform().Translate(65,-10,-8.8,false);
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Right_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
-	modelSceneObject->GetTransform().Rotate(0,1,0, 90,false);
-	modelSceneObject->GetTransform().Translate(65,-10,0,false);
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SceneObjectRef wallBlockMeshObject = FindFirstMesh(modelSceneObject);
-	Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
-	MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.06,.05,.04, false);
-	modelSceneObject->GetTransform().Translate(70,-10,6.5,false);
-
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10,6.5, true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10,6.5, true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 70,-10,-15.5, true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10, -15.5, true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10, -15.5, true);
-	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
-	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, .25, true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
-
-	//========================================================
-	//
-	// Load mushroom house model
-	//
-	//========================================================
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/mushroom/MushRoom_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load mushroom house model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.09,.09,.09, false);
-	modelSceneObject->GetTransform().Translate(-10,-10,20,false);
-
+	// re-use the barrel mesh & material for multiple instances
+	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .8,.8,.8, 1,0,0, -90, 74,-10,10.5, true);
+	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-8.3,1.5, true);
+	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-8.3,-1.8, true);
+	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-5.3,-.15, true);
 }
 
+/*
+ * Redirects to the main AddMeshToScene(), passing in false for [isStatic].
+ *
+ */
 SceneObjectRef Game::AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz)
 {
 	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, false);
 }
 
+/*
+ * Given an instance of Mesh3D [mesh] and and instance of Material [material], create an instance of SceneObject that
+ * contains [mesh] and renders it using [material]. Scale the scene object's transform by [sx], [sy], [sz] in world
+ * space, then rotate by [ra] degrees around the world space axis [rx], [ry], [rz], and then translate in world space by
+ * [tx], [ty], tz]. If [isStatic] == true, then set the root SceneObject instance and all children to be static.
+ *
+ * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
+ */
 SceneObjectRef Game::AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz, bool isStatic)
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -464,6 +594,9 @@ SceneObjectRef Game::AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float 
 	return meshSceneObject;
 }
 
+/*
+ * Set the SceneObject [root] and all children to be static.
+ */
 void Game::SetAllObjectsStatic(SceneObjectRef root)
 {
 	ProcessSceneObjects(root, [=](SceneObjectRef current)
@@ -472,6 +605,10 @@ void Game::SetAllObjectsStatic(SceneObjectRef root)
 	});
 }
 
+/*
+ * Set any mesh encountered in the scene hierarchy beginning with [root]
+ * to use the standard shadow volume generation algorithm.
+ */
 void Game::SetAllMeshesStandardShadowVolume(SceneObjectRef root)
 {
 	ProcessSceneObjects(root, [=](SceneObjectRef current)
@@ -512,6 +649,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 	playerState = PlayerState::Waiting;
 	playerIsGrounded = true;
 
+	// load player models
 	switch(playerType)
 	{
 		case PlayerType::Koopa:
@@ -535,12 +673,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 		break;
 	}
 
-	//========================================================
-	//
-	// Load player animations
-	//
-	//========================================================
-
+	// load player animations
 	switch(playerType)
 	{
 		case PlayerType::Koopa:
@@ -566,6 +699,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
 	bool compatible = true;
 
+	// setup player animations
 	switch(playerType)
 	{
 		case PlayerType::Koopa:
