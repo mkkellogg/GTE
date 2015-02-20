@@ -379,8 +379,8 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	// render all self-lit objects in the scene once
 	ForwardRenderSceneForSelfLit(viewInverse, camera);
 
-	// if this camera has a skybox set up, then we want to render it
-	if(camera.HasActiveSkybox())
+	// if this camera has a skybox that is set up and enabled, then we want to render it
+	if(camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
 	{
 		RenderSkyboxForCamera(camera, viewInverse);
 	}
@@ -394,8 +394,8 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
  */
 void RenderManager::RenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse)
 {
-	// if this camera has a skybox set up, then we want to render it
-	if(camera.HasActiveSkybox())
+	// if this camera has a skybox set up and enabled, then we want to render it
+	if(camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
 	{
 		SceneObjectRef cameraObject = camera.GetSceneObject();
 		ASSERT_RTRN(cameraObject.IsValid(),"RenderManager::RenderSkyboxForCamera -> Camera is not attached to a scene object.");
@@ -753,7 +753,8 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			modelInverse.TransformVector(modelLocalLightDir);
 
 			// build special MVP transform for rendering shadow volumes
-			BuildShadowVolumeMVPTransform(light, subMesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, .99,.99);
+			float scaleFactor = subRenderer->GetUseBackSetShadowVolume() ? .99 : 1;
+			BuildShadowVolumeMVPTransform(light, subMesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
 
 			// activate the material, which will switch the GPU's active shader to
 			// the one associated with the material
@@ -790,23 +791,31 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 
 			ObjectPairKey cacheKey;
 			bool cacheShadowRendered = false;
+
+			// a shadow volume is cacheable if the light's scene object is static and the mesh's
+			// scene object is static
 			bool cacheable = sceneObject.IsStatic() && lightObject.IsValid() && lightObject->IsStatic();
 
 			if(cacheable)
 			{
+				// form cache key from sub-renderer's object ID and light's object ID
 				cacheKey.ObjectAID = subRenderer->GetObjectID();
 				cacheKey.ObjectBID = light.GetObjectID();
 				if(HasCachedShadowVolume(cacheKey))
 				{
 					Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
 
-					// render the shadow volume
-					if(cachedShadowVolume != NULL)subRenderer->RenderShadowVolume(cachedShadowVolume);
-
-					cacheShadowRendered = true;
+					// render the shadow volume if it is valid
+					if(cachedShadowVolume != NULL)
+					{
+						subRenderer->RenderShadowVolume(cachedShadowVolume);
+						cacheShadowRendered = true;
+					}
+					else Debug::PrintWarning("Cached shadow volume is NULL.");
 				}
 			}
 
+			// was the shadow volume already rendered from the cache?
 			if(!cacheShadowRendered)
 			{
 				// calculate shadow volume geometry
@@ -815,6 +824,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 
 				if(cacheable)
 				{
+					// form cache key from sub-renderer's object ID and light's object ID
 					cacheKey.ObjectAID = subRenderer->GetObjectID();
 					cacheKey.ObjectBID = light.GetObjectID();
 					CacheShadowVolume(cacheKey, subRenderer->GetShadowVolumePositions());
@@ -1019,7 +1029,7 @@ void RenderManager::DestroyCachedShadowVolumes()
 			Point3Array * shadowVolume = iter->second;
 			delete shadowVolume;
 	    }
-	 }
+	}
 	shadowVolumeCache.clear();
 }
 
