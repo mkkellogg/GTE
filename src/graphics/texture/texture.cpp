@@ -6,6 +6,8 @@
 
 #include "texture.h"
 #include "textureattr.h"
+#include "graphics/image/rawimage.h"
+#include "graphics/image/imageloader.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
 #include <string>
@@ -16,20 +18,33 @@ Texture::Texture(TextureAttributes attributes)
 	this->attributes = attributes;
 }
 
-Texture::Texture(TextureAttributes attributes, const std::string& sourcePath) : Texture(attributes)
+Texture::Texture(TextureAttributes attributes, RawImage* imageData) : Texture(attributes)
 {
-	this->sourcePaths.push_back(sourcePath);
+	this->imageData.push_back(imageData);
 }
 
-Texture::Texture(TextureAttributes attributes, const std::vector<std::string>& sourcePaths) : Texture(attributes)
+Texture::Texture(TextureAttributes attributes, std::vector<RawImage *>& imageData) : Texture(attributes)
 {
 	this->attributes = attributes;
-	this->sourcePaths = sourcePaths;
+	this->imageData = imageData;
 }
 
 Texture::~Texture()
 {
+	DestroyImageData();
+}
 
+void Texture::DestroyImageData()
+{
+	for(unsigned int i = 0; i < imageData.size(); i++)
+	{
+		RawImage * raw = imageData[i];
+		if(raw != NULL)
+		{
+			ImageLoader::DestroyRawImage(raw);
+		}
+	}
+	imageData.clear();
 }
 
 TextureAttributes Texture::GetAttributes()

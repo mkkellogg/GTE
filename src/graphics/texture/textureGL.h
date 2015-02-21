@@ -12,6 +12,7 @@
 
 //forward declarations
 class TextureGL;
+class RawImage;
 
 #include "texture.h"
 #include <GL/glew.h>
@@ -27,8 +28,8 @@ class TextureGL : public Texture
 	GLuint textureID;
 
 	TextureGL(TextureAttributes attributes, GLuint textureID);
-	TextureGL(TextureAttributes attributes, GLuint textureID, const std::string& sourcePath);
-	TextureGL(TextureAttributes attributes, GLuint textureID, const std::vector<std::string>& sourcePaths);
+	TextureGL(TextureAttributes attributes, GLuint textureID, RawImage* imageData);
+	TextureGL(TextureAttributes attributes, GLuint textureID, std::vector<RawImage *>& imageData);
 	~TextureGL();
 
 	public:

@@ -65,14 +65,12 @@ class GraphicsGL : public Graphics
     void DestroyShader(Shader * shader);
     VertexAttrBuffer * CreateVertexAttributeBuffer();
     void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
-    Texture * CreateTexture(const std::string& sourcePath,  TextureAttributes attributes);
-    Texture * CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes);
+    Texture * CreateTexture(const std::string& sourcePath, TextureAttributes attributes);
+    Texture * CreateTexture(RawImage * imageData, TextureAttributes attributes);
     Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 		    				    const std::string& bottom, const std::string& left, const std::string& right);
     Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-								RawImage * bottomData, RawImage * leftData, RawImage * rightData,
-								const std::string& front, const std::string& back, const std::string& top,
-								const std::string& bottom, const std::string& left, const std::string& right);
+								RawImage * bottomData, RawImage * leftData, RawImage * rightData);
     void DestroyTexture(Texture * texture);
     RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height);
     void DestroyRenderTarget(RenderTarget * target);

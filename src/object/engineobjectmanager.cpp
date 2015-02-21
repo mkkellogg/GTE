@@ -436,7 +436,7 @@ void EngineObjectManager::DeleteShader(Shader * shader)
 	graphics->DestroyShader(shader);
 }
 
-TextureRef EngineObjectManager::CreateTexture(const char * sourcePath, TextureAttributes attributes)
+TextureRef EngineObjectManager::CreateTexture(const std::string& sourcePath, TextureAttributes attributes)
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
@@ -449,10 +449,10 @@ TextureRef EngineObjectManager::CreateTexture(const char * sourcePath, TextureAt
 	});
 }
 
-TextureRef EngineObjectManager::CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes)
+TextureRef EngineObjectManager::CreateTexture(RawImage * imageData, TextureAttributes attributes)
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-	Texture * texture = graphics->CreateTexture(imageData, sourcePath, attributes);
+	Texture * texture = graphics->CreateTexture(imageData, attributes);
 	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
 
@@ -463,7 +463,7 @@ TextureRef EngineObjectManager::CreateTexture(const RawImage * imageData, const 
 }
 
 TextureRef EngineObjectManager::CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-		    				 const std::string& bottom, const std::string& left, const std::string& right)
+		    				 	 	 	 	 	  const std::string& bottom, const std::string& left, const std::string& right)
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateCubeTexture(front, back, top, bottom, left, right);
@@ -477,13 +477,10 @@ TextureRef EngineObjectManager::CreateCubeTexture(const std::string& front, cons
 }
 
 TextureRef EngineObjectManager::CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-							 RawImage * bottomData, RawImage * leftData, RawImage * rightData,
-							 const std::string& front, const std::string& back, const std::string& top,
-							 const std::string& bottom, const std::string& left, const std::string& right)
+							 	 	 	 	      RawImage * bottomData, RawImage * leftData, RawImage * rightData)
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-	Texture * texture = graphics->CreateCubeTexture(frontData, backData, topData, bottomData, leftData, rightData,
-													front, back, top, bottom, left, right);
+	Texture * texture = graphics->CreateCubeTexture(frontData, backData, topData, bottomData, leftData, rightData);
 	ASSERT(texture != NULL,"EngineObjectManager::CreateCubeTexture -> could create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
 
@@ -506,7 +503,7 @@ void EngineObjectManager::DeleteTexture(Texture * texture)
 	graphics->DestroyTexture(texture);
 }
 
-MaterialRef EngineObjectManager::CreateMaterial(const char *name, ShaderRef shader)
+MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, ShaderRef shader)
 {
 	Material * m = new Material(name);
 	ASSERT(m != NULL, "EngineObjectManager::CreateMaterial -> Unable to allocate material.", MaterialRef::Null());
@@ -526,7 +523,7 @@ MaterialRef EngineObjectManager::CreateMaterial(const char *name, ShaderRef shad
 	});
 }
 
-MaterialRef EngineObjectManager::CreateMaterial(const char *name, const ShaderSource& shaderSource)
+MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, const ShaderSource& shaderSource)
 {
 	ShaderRef shader= CreateShader(shaderSource);
 	if(!shader.IsValid())return MaterialRef::Null();
@@ -546,11 +543,6 @@ MaterialRef EngineObjectManager::CreateMaterial(const char *name, const ShaderSo
 	{
 		  DeleteMaterial(m);
 	});
-}
-
-MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, const ShaderSource& shaderSource)
-{
-	return CreateMaterial(name.c_str(), shaderSource);
 }
 
 void EngineObjectManager::DestroyMaterial(MaterialRef material)

@@ -111,17 +111,14 @@ class EngineObjectManager
 
     ShaderRef CreateShader(const ShaderSource& shaderSource);
     void DestroyShader(ShaderRef shader);
-    TextureRef CreateTexture(const char * sourcePath, TextureAttributes attributes);
-    TextureRef CreateTexture(const RawImage * imageData, const char * sourcePath, TextureAttributes attributes);
+    TextureRef CreateTexture(const std::string& sourcePath, TextureAttributes attributes);
+    TextureRef CreateTexture(RawImage * imageData,  TextureAttributes attributes);
     TextureRef CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
    		    						    const std::string& bottom, const std::string& left, const std::string& right);
     TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-   										RawImage * bottomData, RawImage * leftData, RawImage * rightData,
-   										const std::string& front, const std::string& back, const std::string& top,
-   										const std::string& bottom, const std::string& left, const std::string& right);
+   										RawImage * bottomData, RawImage * leftData, RawImage * rightData);
     void DestroyTexture(TextureRef texture);
-    MaterialRef CreateMaterial(const char *name, ShaderRef shader);
-    MaterialRef CreateMaterial(const char *name, const ShaderSource& shaderSource);
+    MaterialRef CreateMaterial(const std::string& name, ShaderRef shader);
     MaterialRef CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
 
     void DestroyMaterial(MaterialRef material);

@@ -13,6 +13,7 @@
 //forward declarations
 class Graphics;
 class TextureAttributes;
+class RawImage;
 
 #include "textureattr.h"
 #include "object/engineobject.h"
@@ -24,13 +25,15 @@ class Texture : public EngineObject
 
 	protected:
 
-	std::vector<std::string> sourcePaths;
+	std::vector<RawImage *> imageData;
 	TextureAttributes attributes;
 
 	Texture(TextureAttributes attributes);
-	Texture(TextureAttributes attributes, const std::string& sourcePath);
-	Texture(TextureAttributes attributes, const std::vector<std::string>& sourcePaths);
+	Texture(TextureAttributes attributes, RawImage* imageData);
+	Texture(TextureAttributes attributes, std::vector<RawImage *>& imageData);
 	virtual ~Texture();
+
+	void DestroyImageData();
 
 	public:
 

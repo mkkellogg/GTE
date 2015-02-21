@@ -98,13 +98,11 @@ class Graphics
     virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
     virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
     virtual Texture * CreateTexture(const std::string& sourcePath, TextureAttributes attributes) = 0;
-    virtual Texture * CreateTexture(const RawImage * imageData, const std::string& sourcePath, TextureAttributes attributes) = 0;
+    virtual Texture * CreateTexture(RawImage * imageData,  TextureAttributes attributes) = 0;
     virtual Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 		    						    const std::string& bottom, const std::string& left, const std::string& right) = 0;
     virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-										RawImage * bottomData, RawImage * leftData, RawImage * rightData,
-										const std::string& front, const std::string& back, const std::string& top,
-										const std::string& bottom, const std::string& left, const std::string& right) = 0;
+										RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
     virtual void DestroyTexture(Texture * texture) = 0;
     virtual RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height) = 0;
     virtual void DestroyRenderTarget(RenderTarget * target) = 0;
