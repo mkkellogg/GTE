@@ -25,6 +25,7 @@ class ShaderSource;
 #include "base/intmask.h"
 #include "render/rendertarget.h"
 #include "render/material.h"
+#include "global/global.h"
 
 enum class BlendingProperty
 {
@@ -99,12 +100,13 @@ class Graphics
     virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
     virtual Texture * CreateTexture(const std::string& sourcePath, TextureAttributes attributes) = 0;
     virtual Texture * CreateTexture(RawImage * imageData,  TextureAttributes attributes) = 0;
+    virtual Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes) = 0 ;
     virtual Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 		    						    const std::string& bottom, const std::string& left, const std::string& right) = 0;
     virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 										RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
     virtual void DestroyTexture(Texture * texture) = 0;
-    virtual RenderTarget * CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height) = 0;
+    virtual RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height) = 0;
     virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 
     virtual void ClearRenderBuffers(unsigned int bufferMask) = 0;
@@ -129,6 +131,9 @@ class Graphics
     virtual const GraphicsAttributes& GetAttributes() const;
 
     virtual void EnterRenderMode(RenderMode renderMode) = 0;
+
+    virtual bool ActivateRenderTarget(RenderTarget * target) = 0;
+    virtual bool RestoreDefaultRenderTarget() = 0;
 
     virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate) = 0;
 

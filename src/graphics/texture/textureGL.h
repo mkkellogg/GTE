@@ -28,8 +28,6 @@ class TextureGL : public Texture
 	GLuint textureID;
 
 	TextureGL(TextureAttributes attributes, GLuint textureID);
-	TextureGL(TextureAttributes attributes, GLuint textureID, RawImage* imageData);
-	TextureGL(TextureAttributes attributes, GLuint textureID, std::vector<RawImage *>& imageData);
 	~TextureGL();
 
 	public:

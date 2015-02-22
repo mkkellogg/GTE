@@ -20,10 +20,11 @@ class EngineObjectManager;
 class AnimationManager;
 class InputManager;
 class ErrorManager;
+class GraphicsAttributes;
 
 #include <string>
 #include "object/enginetypes.h"
-#include "graphics/graphics.h"
+
 
 class EngineCallbacks
 {

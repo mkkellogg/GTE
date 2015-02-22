@@ -18,17 +18,6 @@ Texture::Texture(TextureAttributes attributes)
 	this->attributes = attributes;
 }
 
-Texture::Texture(TextureAttributes attributes, RawImage* imageData) : Texture(attributes)
-{
-	this->imageData.push_back(imageData);
-}
-
-Texture::Texture(TextureAttributes attributes, std::vector<RawImage *>& imageData) : Texture(attributes)
-{
-	this->attributes = attributes;
-	this->imageData = imageData;
-}
-
 Texture::~Texture()
 {
 	DestroyImageData();
@@ -50,4 +39,9 @@ void Texture::DestroyImageData()
 TextureAttributes Texture::GetAttributes()
 {
 	return attributes;
+}
+
+void Texture::AddImageData(RawImage* imageData)
+{
+	this->imageData.push_back(imageData);
 }

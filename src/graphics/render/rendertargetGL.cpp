@@ -2,16 +2,17 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include "rendertargetGL.h"
+#include "object/engineobjectmanager.h"
 #include "base/intmask.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
+#include "graphics/graphics.h"
+#include "graphics/texture/texture.h"
+#include "graphics/texture/textureGL.h"
 
-RenderTargetGL::RenderTargetGL(IntMask bufferTypes, unsigned int width, unsigned int height) : RenderTarget(bufferTypes, width, height)
+RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth, unsigned int width, unsigned int height) : RenderTarget(hasColor, hasDepth, width, height)
 {
 	fboID = 0;
-	depthRenderBufferID = 0;
-	stencilRenderBufferID = 0;
-	colorAttachment0 = 0;
 }
 
 RenderTargetGL::~RenderTargetGL()
@@ -21,21 +22,37 @@ RenderTargetGL::~RenderTargetGL()
 
 void RenderTargetGL::Destroy()
 {
-	if(depthRenderBufferID >0)
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+	if(colorTexture.IsValid())
 	{
-		glDeleteRenderbuffersEXT(1, &depthRenderBufferID);
-		depthRenderBufferID = 0;
+		TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
+		if(texGL != NULL)
+		{
+			objectManager->DestroyTexture(colorTexture);
+		}
+		else
+		{
+			Debug::PrintError("RenderTargetGL::Destroy -> Unable to cast color texture to TextureGL.");
+		}
+	}
+
+	if(depthTexture.IsValid())
+	{
+		TextureGL * texGL = dynamic_cast<TextureGL*>(depthTexture.GetPtr());
+		if(texGL != NULL)
+		{
+			objectManager->DestroyTexture(depthTexture);
+		}
+		else
+		{
+			Debug::PrintError("RenderTargetGL::Destroy -> Unable to cast depth texture to TextureGL.");
+		}
 	}
 
 	if(fboID > 0)
 	{
 		glDeleteFramebuffersEXT(1, &fboID);
-	}
-
-	if(colorAttachment0 >0)
-	{
-		glDeleteTextures(1, &colorAttachment0);
-		colorAttachment0 = 0;
 	}
 }
 
@@ -43,63 +60,65 @@ bool RenderTargetGL::Init()
 {
 	Destroy();
 
-	glGenFramebuffersEXT(1, &fboID);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
+	glGenFramebuffers(1, &fboID);
+	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
 
 	ASSERT(fboID != 0, "RenderTargetGL::Init -> Unable to create frame buffer object.", false);
 
-	//Attach 2D texture to this FBO
-	glGenTextures(1, &colorAttachment0);
-	if(colorAttachment0 == 0)
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+	if(hasColorBuffer)
 	{
-		Debug::PrintError("RenderTargetGL::Init -> Unable to create color attachment.");
+		TextureAttributes attributes;
+		attributes.FilterMode = TextureFilter::Linear;
+		attributes.WrapMode = TextureWrap::Clamp;
+
+		TextureRef texture =  objectManager->CreateTexture(width, height, NULL, attributes);
+		ASSERT(texture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false);
+
+		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
+		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast color texture to TextureGL.", false);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
+	}
+
+	if(hasDepthBuffer)
+	{
+		TextureAttributes attributes;
+		attributes.FilterMode = TextureFilter::Point;
+		attributes.WrapMode = TextureWrap::Clamp;
+		attributes.IsDepthTexture = true;
+
+		TextureRef texture =  objectManager->CreateTexture(width, height, NULL, attributes);
+		ASSERT(texture.IsValid(), "RenderTargetGL::Init -> Unable to create depth texture.", false);
+
+		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
+		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.", false);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
+	}
+
+	/*glGenRenderbuffersEXT(1, &depthRenderBufferID);
+	if(depthRenderBufferID == 0)
+	{
+		Debug::PrintError("RenderTargetGL::Init -> Unable to create depth render buffer.");
 		Destroy();
 		return false;
 	}
 
-	glBindTexture(GL_TEXTURE_2D, colorAttachment0);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, colorAttachment0, 0);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthRenderBufferID);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width, height);
 
-	if(IntMaskUtil::IsBitSet(bufferTypes, (int)RenderBufferType::Depth))
-	{
-		glGenRenderbuffersEXT(1, &depthRenderBufferID);
-		if(depthRenderBufferID == 0)
-		{
-			Debug::PrintError("RenderTargetGL::Init -> Unable to create depth render buffer.");
-			Destroy();
-			return false;
-		}
+	//Attach depth buffer to FBO
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthRenderBufferID);*/
 
-		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthRenderBufferID);
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width, height);
-
-		//Attach depth buffer to FBO
-		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthRenderBufferID);
-	}
-
-	if(IntMaskUtil::IsBitSet(bufferTypes, (int)RenderBufferType::Stencil))
-	{
-		glGenRenderbuffersEXT(1, &stencilRenderBufferID);
-		if(depthRenderBufferID == 0)
-		{
-			Debug::PrintError("RenderTargetGL::Init -> Unable to create stencil render buffer.");
-			Destroy();
-			return false;
-		}
-
-		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, stencilRenderBufferID);
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_STENCIL_INDEX8_EXT, width, height);
-
-		//Attach depth buffer to FBO
-		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, stencilRenderBufferID);
-	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return true;
 }
+
+GLuint RenderTargetGL::GetFBOID()
+{
+	return fboID;
+}
+

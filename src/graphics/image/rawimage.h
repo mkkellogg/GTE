@@ -16,6 +16,8 @@
 
 class RawImage
 {
+	friend class ImageLoader;
+
 	protected:
 
 	unsigned int width;
@@ -25,16 +27,16 @@ class RawImage
 	unsigned int ImageSizeBytes();
 	void Destroy();
 
-	public:
-
 	RawImage(unsigned int width, unsigned int height);
 	~RawImage();
 
 	bool Init();
 	void SetDataTo(BYTE * data);
 	void SetByte(unsigned int index, BYTE byte);
-	BYTE * GetPixels();
 
+	public:
+
+	BYTE * GetPixels();
 	unsigned int GetWidth();
 	unsigned int GetHeight();
 };

@@ -3,18 +3,21 @@
 
 #include "base/intmask.h"
 #include "renderbuffer.h"
+#include "object/engineobject.h"
+#include "object/enginetypes.h"
 
-class RenderTarget
+class RenderTarget : EngineObject
 {
 	friend class Graphics;
 
     protected:
 
-	IntMask bufferTypes;
+	bool hasColorBuffer;
+	bool hasDepthBuffer;
 	unsigned int width;
 	unsigned int height;
 
-	RenderTarget(IntMask bufferTypes, unsigned int width, unsigned int height);
+	RenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
     virtual ~RenderTarget();
 
     public:

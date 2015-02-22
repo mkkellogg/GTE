@@ -15,11 +15,8 @@
 //forward declarations
 class EngineObjectManager;
 class SubMesh3D;
-class SceneObject;
-class SceneObjectComponent;
 
 #include "object/engineobject.h"
-#include "object/sceneobjectcomponent.h"
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"

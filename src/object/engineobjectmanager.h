@@ -64,12 +64,12 @@ class EngineObjectManager
 	void DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer);
 	void DeleteMaterial(Material * material);
 	void DeleteTexture(Texture * texture);
+	void DeleteRenderTarget(RenderTarget * target);
 	void DeleteShader(Shader * shader);
 	void DeleteSkeleton(Skeleton * target);
 	void DeleteAnimation(Animation * animation);
 	void DeleteAnimationInstance(AnimationInstance * animation);
 	void DeleteAnimationPlayer(AnimationPlayer * player);
-	void DeleteRenderTarget(RenderTarget * target);
 
 	bool InitBuiltinShaders();
 
@@ -113,17 +113,18 @@ class EngineObjectManager
     void DestroyShader(ShaderRef shader);
     TextureRef CreateTexture(const std::string& sourcePath, TextureAttributes attributes);
     TextureRef CreateTexture(RawImage * imageData,  TextureAttributes attributes);
+    TextureRef CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes);
     TextureRef CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
    		    						    const std::string& bottom, const std::string& left, const std::string& right);
     TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
    										RawImage * bottomData, RawImage * leftData, RawImage * rightData);
     void DestroyTexture(TextureRef texture);
+    RenderTargetRef CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
+    void DestroyRenderTarget(RenderTargetRef target);
+
     MaterialRef CreateMaterial(const std::string& name, ShaderRef shader);
     MaterialRef CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
-
     void DestroyMaterial(MaterialRef material);
-    RenderTargetRef CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height);
-    void DestroyRenderTarget(RenderTargetRef buffer);
 
     CameraRef CreateCamera();
     void DestroyCamera(CameraRef camera);

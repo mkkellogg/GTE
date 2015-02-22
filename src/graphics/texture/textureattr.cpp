@@ -13,6 +13,7 @@ TextureAttributes::TextureAttributes()
 	FilterMode = TextureFilter::Point;
 	MipMapLevel = 1;
 	IsCube = false;
+	IsDepthTexture = false;
 }
 
 TextureAttributes::~TextureAttributes()

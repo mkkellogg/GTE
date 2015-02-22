@@ -24,6 +24,7 @@ enum class TextureWrap
 enum class TextureFilter
 {
 	Point,
+	Linear,
 	BiLinear,
 	TriLinear,
 	Anisotropic
@@ -34,6 +35,7 @@ class TextureAttributes
 	public:
 
 	unsigned int MipMapLevel;
+	bool IsDepthTexture;
 	bool UseAlpha;
 	bool IsCube;
 	TextureFilter FilterMode;

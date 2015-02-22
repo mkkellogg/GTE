@@ -308,14 +308,12 @@ void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 	delete buffer;
 }
 
-Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes attributes)
+Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes)
 {
-	ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
-
 	glEnable(GL_TEXTURE_2D);
 	GLuint tex;
 	glGenTextures(1, &tex);
-	ASSERT(tex > 0, "GraphicsGL::CreateTexture -> unable to generate texture", NULL);
+	ASSERT(tex > 0, "GraphicsGL::CreateTexture -> Unable to generate texture", NULL);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 
@@ -331,8 +329,8 @@ Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes att
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
 
 	if(attributes.FilterMode == TextureFilter::Point)
@@ -340,9 +338,14 @@ Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes att
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
-	else if(attributes.FilterMode == TextureFilter::BiLinear)
+	else if(attributes.FilterMode == TextureFilter::Linear)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	else if(attributes.FilterMode == TextureFilter::BiLinear)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 	else if(attributes.FilterMode == TextureFilter::TriLinear)
@@ -351,26 +354,48 @@ Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes att
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
-	RawImage * raw = const_cast<RawImage *>(imageData);
-
-	if(openGLVersion >= 3)
+	if(attributes.IsDepthTexture)
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, attributes.MipMapLevel);
-		
-		//TODO: Figure out correct way to set texture data for OpenGL >= 3.0
-		//glTexStorage2D(GL_TEXTURE_2D, attributes.MipMapLevel, GL_RGBA8, raw->GetWidth(), raw->GetHeight());
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
-		//glTextureSubImage2D(tex, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
-		
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
-		if(attributes.FilterMode == TextureFilter::TriLinear)glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+
 	}
 	else
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, attributes.MipMapLevel);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, raw->GetWidth(), raw->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+		if(openGLVersion >= 3)
+		{
+			if(attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear)
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, attributes.MipMapLevel);
+			}
+
+			//TODO: Figure out correct way to set texture data for OpenGL >= 3.0
+			//glTexStorage2D(GL_TEXTURE_2D, attributes.MipMapLevel, GL_RGBA8, raw->GetWidth(), raw->GetHeight());
+			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+			//glTextureSubImage2D(tex, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
+
+			if(pixelData != NULL)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+			else
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+			if(attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear)glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else
+		{
+			if(attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear)
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, attributes.MipMapLevel);
+			}
+
+			if(pixelData != NULL)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+			else
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		}
 	}
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
@@ -378,7 +403,24 @@ Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes att
 	glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0 );
 	glPixelStorei( GL_UNPACK_SKIP_ROWS, 0 );
 
-	TextureGL * texture = new TextureGL(attributes, tex, imageData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	TextureGL * texture = new TextureGL(attributes, tex);
+	return texture;
+}
+
+Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes attributes)
+{
+	ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
+	Texture * texture =  CreateTexture(imageData->GetWidth(), imageData->GetHeight(), imageData->GetPixels(), attributes);
+	if(texture != NULL)
+	{
+		TextureGL * texGL = dynamic_cast<TextureGL*>(texture);
+		if(texGL != NULL)
+		{
+			texGL->AddImageData(imageData);
+		}
+	}
 	return texture;
 }
 
@@ -390,7 +432,6 @@ Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, TextureAttrib
 	TextureGL * tex = (TextureGL*)CreateTexture(raw, attributes);
 	if(tex == NULL)Debug::PrintError("GraphicsGL::CreateTexture -> Unable to create texture.");
 
-	ImageLoader::DestroyRawImage(raw);
 	return tex;
 }
 
@@ -430,15 +471,17 @@ Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backDa
 	attributes.IsCube = true;
 	attributes.MipMapLevel = 0;
 
-	std::vector<RawImage *> imageData;
-	imageData.push_back(frontData);
-	imageData.push_back(backData);
-	imageData.push_back(topData);
-	imageData.push_back(bottomData);
-	imageData.push_back(leftData);
-	imageData.push_back(rightData);
+	TextureGL * texture = new TextureGL(attributes, tex);
+	if(texture != NULL)
+	{
+		texture->AddImageData(frontData);
+		texture->AddImageData(backData);
+		texture->AddImageData(topData);
+		texture->AddImageData(bottomData);
+		texture->AddImageData(leftData);
+		texture->AddImageData(rightData);
+	}
 
-	TextureGL * texture = new TextureGL(attributes, tex, imageData);
 	return texture;
 }
 
@@ -486,10 +529,10 @@ void GraphicsGL::DestroyTexture(Texture * texture)
 	delete texGL;
 }
 
-RenderTarget * GraphicsGL::CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height)
+RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height)
 {
 	RenderTargetGL * buffer;
-	buffer = new RenderTargetGL(buffers, width, height);
+	buffer = new RenderTargetGL(hasColor, hasDepth, width, height);
 	ASSERT(buffer != NULL, "GraphicsGL::CreateRenderTarget -> unable to create render target", NULL);
 	return buffer;
 }
@@ -627,7 +670,10 @@ void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 		break;
 		case RenderMode::StandardWithShadowVolumeTest:
 
+			// enable color buffer rendering
+			SetColorBufferChannelState(true,true,true,true);
 			SetDepthBufferReadOnly(false);
+			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
 
 			// enable near & far clipping planes
 			glDisable(GL_DEPTH_CLAMP);
@@ -640,10 +686,6 @@ void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 			// prevent update to the stencil buffer
 			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
-			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
-
-			// enable color buffer rendering
-			SetColorBufferChannelState(true,true,true,true);
 			SetFaceCullingEnabled(true);
 
 			SetBlendingEnabled(false);
@@ -651,17 +693,16 @@ void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 		break;
 		case RenderMode::DepthOnly:
 
+			// disable color buffer rendering
+			SetColorBufferChannelState(false,false,false,false);
 			SetDepthBufferReadOnly(false);
+			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
 
 			// enable near & far clipping planes
 			glDisable(GL_DEPTH_CLAMP);
 
 			SetStencilTestEnabled(false);
 
-			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
-
-			// disable color buffer rendering
-			SetColorBufferChannelState(false,false,false,false);
 			SetFaceCullingEnabled(true);
 
 			SetBlendingEnabled(false);
@@ -670,17 +711,16 @@ void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 		default:
 		case RenderMode::Standard:
 
+			// enable color buffer rendering
+			SetColorBufferChannelState(true,true,true,true);
 			SetDepthBufferReadOnly(false);
+			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
 
 			// enable near & far clipping planes
 			glDisable(GL_DEPTH_CLAMP);
 
 			SetStencilTestEnabled(false);
 
-			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
-
-			// enable color buffer rendering
-			SetColorBufferChannelState(true,true,true,true);
 			SetFaceCullingEnabled(true);
 
 			SetBlendingEnabled(false);
@@ -735,6 +775,24 @@ void GraphicsGL::_glutReshapeFunc(int w, int h)
 {
 	//printf("glut reshape!\n");
 	glutPostRedisplay();
+}
+
+bool GraphicsGL::ActivateRenderTarget(RenderTarget * target)
+{
+	ASSERT(target != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is NULL.", false);
+	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target);
+
+	ASSERT(targetGL != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.", false);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, targetGL->GetFBOID());
+
+	return true;
+}
+
+bool GraphicsGL::RestoreDefaultRenderTarget()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	return true;
 }
 
 void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate)

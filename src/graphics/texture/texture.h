@@ -29,11 +29,10 @@ class Texture : public EngineObject
 	TextureAttributes attributes;
 
 	Texture(TextureAttributes attributes);
-	Texture(TextureAttributes attributes, RawImage* imageData);
-	Texture(TextureAttributes attributes, std::vector<RawImage *>& imageData);
 	virtual ~Texture();
 
 	void DestroyImageData();
+	void AddImageData(RawImage* imageData);
 
 	public:
 

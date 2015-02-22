@@ -440,7 +440,7 @@ TextureRef EngineObjectManager::CreateTexture(const std::string& sourcePath, Tex
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
-	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture -> couldn't create new Texture object.", TextureRef::Null());
+	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture -> could not create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
 
 	return TextureRef(texture, [=](Texture * texture)
@@ -453,7 +453,20 @@ TextureRef EngineObjectManager::CreateTexture(RawImage * imageData, TextureAttri
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateTexture(imageData, attributes);
-	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture -> could create new Texture object.", TextureRef::Null());
+	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture -> could not create new Texture object.", TextureRef::Null());
+	texture->SetObjectID(GetNextObjectID());
+
+	return TextureRef(texture, [=](Texture * texture)
+	{
+		  DeleteTexture(texture);
+	});
+}
+
+TextureRef EngineObjectManager::CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes)
+{
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	Texture * texture = graphics->CreateTexture(width, height, pixelData, attributes);
+	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture -> could not create new Texture object.", TextureRef::Null());
 	texture->SetObjectID(GetNextObjectID());
 
 	return TextureRef(texture, [=](Texture * texture)
@@ -501,6 +514,32 @@ void EngineObjectManager::DeleteTexture(Texture * texture)
 
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	graphics->DestroyTexture(texture);
+}
+
+RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height)
+{
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+
+	RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, width, height);
+	ASSERT(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null());
+
+	return RenderTargetRef(target, [=](RenderTarget * target)
+	{
+		  DeleteRenderTarget(target);
+	});
+}
+
+void EngineObjectManager::DestroyRenderTarget(RenderTargetRef buffer)
+{
+	buffer.ForceDelete();
+}
+
+void EngineObjectManager::DeleteRenderTarget(RenderTarget * target)
+{
+	ASSERT_RTRN(target != NULL,"EngineObjectManager::DeleteRenderBuffer -> target is NULL.");
+
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	graphics->DestroyRenderTarget(target);
 }
 
 MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, ShaderRef shader)
@@ -559,32 +598,6 @@ void EngineObjectManager::DeleteMaterial(Material * material)
 	DestroyShader(shader);
 
 	delete material;
-}
-
-RenderTargetRef EngineObjectManager::CreateRenderTarget(IntMask buffers, unsigned int width, unsigned int height)
-{
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-
-	RenderTarget*  target = graphics->CreateRenderTarget(buffers, width, height);
-	ASSERT(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null());
-
-	return RenderTargetRef(target, [=](RenderTarget * target)
-	{
-		  DeleteRenderTarget(target);
-	});
-}
-
-void EngineObjectManager::DestroyRenderTarget(RenderTargetRef buffer)
-{
-	buffer.ForceDelete();
-}
-
-void EngineObjectManager::DeleteRenderTarget(RenderTarget * target)
-{
-	ASSERT_RTRN(target != NULL,"EngineObjectManager::DeleteRenderBuffer -> target is NULL.");
-
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-	graphics->DestroyRenderTarget(target);
 }
 
 CameraRef EngineObjectManager::CreateCamera()

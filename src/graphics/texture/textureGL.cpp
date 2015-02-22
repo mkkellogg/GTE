@@ -17,16 +17,6 @@ TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID) : Texture(a
 	this->textureID = textureID;
 }
 
-TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID, RawImage* imageData) : Texture(attributes, imageData)
-{
-	this->textureID = textureID;
-}
-
-TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID,  std::vector<RawImage *>& imageData) : Texture(attributes, imageData)
-{
-	this->textureID = textureID;
-}
-
 TextureGL::~TextureGL()
 {
 

@@ -42,18 +42,3 @@ void ImportUtil::ConvertAssimpMatrix(const aiMatrix4x4& source, Matrix4x4& dest)
 	dest.SetTo(data);
 }
 
-RawImage * ImportUtil::GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height)
-{
-	RawImage * rawImage = new RawImage(width, height);
-	ASSERT(rawImage != NULL,"ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.",NULL);
-
-	bool initSuccess = rawImage->Init();
-	ASSERT(initSuccess,"ImportUtil::GetRawImageFromILData -> Could not init RawImage.", NULL);
-
-	for(unsigned int i=0; i < width * height * 4; i++)
-	{
-		rawImage->SetByte(i,(BYTE)data[i]);
-	}
-
-	return rawImage;
-}

@@ -13,11 +13,10 @@ class RenderTargetGL : public RenderTarget
     protected:
 
 	GLuint fboID;
-	GLuint depthRenderBufferID;
-	GLuint stencilRenderBufferID;
-	GLuint colorAttachment0;
+	TextureRef colorTexture;
+	TextureRef depthTexture;
 
-	RenderTargetGL(IntMask bufferTypes, unsigned int width, unsigned int height);
+	RenderTargetGL(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
     ~RenderTargetGL();
 
     void Destroy();
@@ -25,6 +24,7 @@ class RenderTargetGL : public RenderTarget
     public:
 
     bool Init();
+    GLuint GetFBOID();
 };
 
 #endif
