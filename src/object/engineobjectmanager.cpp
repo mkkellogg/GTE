@@ -523,6 +523,9 @@ RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasD
 	RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, width, height);
 	ASSERT(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null());
 
+	bool success = target->Init();
+	ASSERT(success == true, "EngineObjectManager::CreateRenderBuffer -> Could not initialize RenderTarget object.", RenderTargetRef::Null());
+
 	return RenderTargetRef(target, [=](RenderTarget * target)
 	{
 		  DeleteRenderTarget(target);

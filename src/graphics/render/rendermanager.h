@@ -104,6 +104,9 @@ class RenderManager
 	// material for rendering only to the depth buffer
 	MaterialRef depthOnlyMaterial;
 
+	// for offscreen rendering
+	RenderTargetRef offscreenRenderTarget;
+
 	// transform stack used for processing scene hierarchy
 	DataStack<Matrix4x4> sceneProcessingStack;
 

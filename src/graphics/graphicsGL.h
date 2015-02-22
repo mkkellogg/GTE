@@ -100,7 +100,7 @@ class GraphicsGL : public Graphics
     bool Init(const GraphicsAttributes& attributes);
     unsigned int GetOpenGLVersion();
 
-    bool ActivateRenderTarget(RenderTarget * target);
+    bool ActivateRenderTarget(RenderTargetRef target);
     bool RestoreDefaultRenderTarget();
 
     void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate);

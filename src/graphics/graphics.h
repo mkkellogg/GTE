@@ -132,7 +132,7 @@ class Graphics
 
     virtual void EnterRenderMode(RenderMode renderMode) = 0;
 
-    virtual bool ActivateRenderTarget(RenderTarget * target) = 0;
+    virtual bool ActivateRenderTarget(RenderTargetRef target) = 0;
     virtual bool RestoreDefaultRenderTarget() = 0;
 
     virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate) = 0;

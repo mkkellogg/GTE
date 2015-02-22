@@ -30,5 +30,7 @@ bool RenderTarget::HasBuffer(RenderBufferType bufferType) const
 			return false;
 		break;
 	}
+
+	return false;
 }
 

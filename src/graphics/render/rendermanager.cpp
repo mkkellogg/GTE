@@ -77,6 +77,10 @@ bool RenderManager::Init()
 	depthOnlyMaterial->SetSelfLit(true);
 	ASSERT(depthOnlyMaterial.IsValid(), "RenderManager::Init -> Unable to create depth only material.", false);
 
+	const GraphicsAttributes& graphicsAttributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
+	offscreenRenderTarget = objectManager->CreateRenderTarget(true, true, graphicsAttributes.WindowWidth,graphicsAttributes.WindowHeight);
+	ASSERT(offscreenRenderTarget.IsValid(), "RenderManager::Init -> Unable to create off-screen rendering surface.", false);
+
 	return true;
 }
 
@@ -342,7 +346,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 
 	// clear the list of objects that have been rendered at least once. this list is used to
 	// determine if blending should be turned on or off. if an object is being rendered for the
-	// first time, blending should be off; otherwise it should be on.
+	// first time, additive blending should be off; otherwise it should be on.
 	renderedObjects.clear();
 
 	// we have not yet rendered any ambient lights

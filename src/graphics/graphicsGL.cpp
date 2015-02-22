@@ -777,10 +777,10 @@ void GraphicsGL::_glutReshapeFunc(int w, int h)
 	glutPostRedisplay();
 }
 
-bool GraphicsGL::ActivateRenderTarget(RenderTarget * target)
+bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
 {
-	ASSERT(target != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is NULL.", false);
-	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target);
+	ASSERT(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> Render target is not valid.", false);
+	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target.GetPtr());
 
 	ASSERT(targetGL != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.", false);
 
