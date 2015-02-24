@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "material.h"
+#include "geometry/matrix4x4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/shader/shader.h"
@@ -493,10 +494,20 @@ void Material::SendSetUniformToShader(unsigned int index)
 				shader->SendUniformToShader(desc->ShaderVarID, desc->BasicFloatData[0]);
 				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Float));
 			}
+			else if(desc->Type == UniformType::Float2)
+			{
+				shader->SendUniformToShader2(desc->ShaderVarID,  desc->BasicFloatData[0], desc->BasicFloatData[1]);
+				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Float2));
+			}
 			else if(desc->Type == UniformType::Float4)
 			{
 				shader->SendUniformToShader4(desc->ShaderVarID,  desc->BasicFloatData[0], desc->BasicFloatData[1], desc->BasicFloatData[2], desc->BasicFloatData[3]);
 				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Float4));
+			}
+			else if(desc->Type == UniformType::Matrix4x4)
+			{
+				shader->SendUniformToShader(desc->ShaderVarID, &desc->MatrixData);
+				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Matrix4x4));
 			}
 		}
 	}
@@ -540,6 +551,26 @@ void Material::SetTexture(TextureRef texture, const std::string& varName)
  * Find a uniform with the name specified by [shaderVarName] and set its
  * value to [val]
  */
+void Material::SetMatrix4x4(const Matrix4x4& mat, const std::string& varName)
+{
+	ASSERT_RTRN(shader.IsValid(),"Material::SetMatrix4x4 -> shader is NULL");
+
+	int loc, foundIndex;
+	bool success = ValidateUniformName(varName, loc, foundIndex);
+	if(!success)return;
+
+	UniformDescriptor * desc = setUniforms[foundIndex];
+	desc->ShaderVarID = loc;
+	desc->Type = UniformType::Matrix4x4;
+	desc->MatrixData = mat;
+	desc->IsSet = true;
+}
+
+
+/*
+ * Find a uniform with the name specified by [shaderVarName] and set its
+ * value to [val]
+ */
 void Material::SetUniform1f(float val, const std::string& varName)
 {
 	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform1f -> shader is NULL");
@@ -552,6 +583,26 @@ void Material::SetUniform1f(float val, const std::string& varName)
 	desc->ShaderVarID = loc;
 	desc->Type = UniformType::Float;
 	desc->BasicFloatData[0] = val;
+	desc->IsSet = true;
+}
+
+/*
+ * Find a uniform with the name specified by [shaderVarName] and set its
+ * value to [val]
+ */
+void Material::SetUniform2f(float v1, float v2, const std::string& varName)
+{
+	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform2f -> shader is NULL");
+
+	int loc, foundIndex;
+	bool success = ValidateUniformName(varName, loc, foundIndex);
+	if(!success)return;
+
+	UniformDescriptor * desc = setUniforms[foundIndex];
+	desc->ShaderVarID = loc;
+	desc->Type = UniformType::Float2;
+	desc->BasicFloatData[0] = v1;
+	desc->BasicFloatData[1] = v2;
 	desc->IsSet = true;
 }
 
