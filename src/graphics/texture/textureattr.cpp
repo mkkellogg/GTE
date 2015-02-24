@@ -14,6 +14,7 @@ TextureAttributes::TextureAttributes()
 	MipMapLevel = 1;
 	IsCube = false;
 	IsDepthTexture = false;
+	Format = TextureFormat::RGBA8;
 }
 
 TextureAttributes::~TextureAttributes()

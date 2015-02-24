@@ -30,6 +30,13 @@ enum class TextureFilter
 	Anisotropic
 };
 
+enum class TextureFormat
+{
+	RGBA8,
+	RGBA128
+};
+
+
 class TextureAttributes
 {
 	public:
@@ -40,6 +47,7 @@ class TextureAttributes
 	bool IsCube;
 	TextureFilter FilterMode;
 	TextureWrap WrapMode;
+	TextureFormat Format;
 
 	TextureAttributes();
 	~TextureAttributes();
