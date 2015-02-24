@@ -44,6 +44,14 @@ class Game
 		_Count = 11
 	};
 
+	enum class SceneLighting
+	{
+		None = 0,
+		Ambient = 1,
+		Directional = 2,
+		Point = 3
+	};
+
 	static const unsigned int MAX_PLAYER_STATES = 32;
 
 	// time at which a state was most recently activated
@@ -78,8 +86,16 @@ class Game
 
 	// should we print out the graphics engine FPS?
 	bool printFPS;
-	// last time FPS was printed
-	float lastFPSPrintTime;
+	// last time FPS was retrieved from the graphics engine
+	float lastFPSRetrieveTime;
+	// last fps value retrieved from the graphics engine
+	float lastFPS;
+
+	// last time info was printed
+	float lastInfoPrintTime;
+
+	// lighting type that currently can be modified by the user
+	SceneLighting selectedLighting;
 
 	// movement variables
 	float playerWalkSpeed;
@@ -95,9 +111,13 @@ class Game
 	// booleans that are only true during the frame they become true
 	bool playerJumpApexReached;
 	bool playerLanded;
+	bool displayInfoChanged;
 
+	// player direction vectors
 	Vector3 playerMoveDirection;
 	Vector3 playerLookDirection;
+
+	// default direction vectors
 	Vector3 basePlayerForward;
 	Vector3 baseCameraForward;
 
@@ -124,6 +144,10 @@ class Game
 	void ActivatePlayerState(PlayerState state);
 	void ManagePlayerState();
 	void HandleGeneralInput();
+	void UpdateLight(SceneObjectRef sceneObject, bool toggleLight, float intensityChange);
+
+	void DisplayInfo();
+	void SignalDisplayInfoChanged();
 
 	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
 

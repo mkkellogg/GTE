@@ -81,7 +81,13 @@ Game::Game()
 
 	// FPS variables
 	printFPS = false;
-	lastFPSPrintTime = 0;
+	lastFPSRetrieveTime = 0;
+	lastFPS = 0;
+
+	lastInfoPrintTime = 0;
+	displayInfoChanged = false;
+
+	selectedLighting = SceneLighting::None;
 }
 
 /*
@@ -436,6 +442,7 @@ void Game::SetupSceneExtra(AssetImporter& importer)
 	Mesh3DRef cubeMesh;
 	StandardAttributeSet meshAttributes;
 
+
 	//========================================================
 	//
 	// Load textured scene cube
@@ -479,6 +486,7 @@ void Game::SetupSceneExtra(AssetImporter& importer)
 	// scale the cube and move to its position in the scene
 	cubeSceneObject->GetTransform().Scale(1.5, 1.5,1.5, false);
 	cubeSceneObject->GetTransform().Translate(2, -7, 10, false);
+
 
 	//========================================================
 	//
@@ -779,6 +787,7 @@ void Game::SetupLights(AssetImporter& importer)
 	// create self-illuminated cube mesh to represent spinning point light
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 	Mesh3DRef pointLightCubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
 
 	// create material for spinning point light mesh
@@ -933,21 +942,60 @@ void Game::Update()
 	ManagePlayerState();
 	HandleGeneralInput();
 
-	if(printFPS)
+	DisplayInfo();
+}
+
+/*
+ * Display info for the demo:
+ *
+ *   - The graphics engine frames-per-second
+ *   - Currently active scene lighting
+ */
+void Game::DisplayInfo()
+{
+	float elapsedPrintTime = Time::GetRealTimeSinceStartup() - lastInfoPrintTime;
+	if(elapsedPrintTime > 1 || displayInfoChanged)
 	{
-		float elapsedPrintTime = Time::GetRealTimeSinceStartup() - lastFPSPrintTime;
-		if(elapsedPrintTime > 1)
+		float elapsedFPSTime = Time::GetRealTimeSinceStartup() - lastFPSRetrieveTime;
+		if(elapsedFPSTime > 1)
 		{
-			printf("FPS: %f\r", Engine::Instance()->GetGraphicsEngine()->GetCurrentFPS());
-			fflush(stdout);
-			lastFPSPrintTime = Time::GetRealTimeSinceStartup();
+			lastFPS = Engine::Instance()->GetGraphicsEngine()->GetCurrentFPS();
+			lastFPSRetrieveTime = Time::GetRealTimeSinceStartup();
 		}
-	}
-	else
-	{
-		printf("                                            \r");
+
+		printf("FPS: %f ", lastFPS);
+
+		switch(selectedLighting)
+		{
+			case SceneLighting::Ambient:
+				printf(" |  Selected lighting: Ambient");
+			break;
+			case SceneLighting::Directional:
+				printf(" |  Selected lighting: Directional");
+			break;
+			case SceneLighting::Point:
+				printf(" |  Selected lighting: Point");
+			break;
+			default:
+				printf(" |  Selected lighting: None");
+			break;
+		}
+
+		printf("                             \r");
 		fflush(stdout);
+
+		lastInfoPrintTime = Time::GetRealTimeSinceStartup();
 	}
+
+	displayInfoChanged = false;
+}
+
+/*
+ * Signal that the info that is displayed to the user has been updated.
+ */
+void Game::SignalDisplayInfoChanged()
+{
+	displayInfoChanged = true;
 }
 
 /*
@@ -1273,40 +1321,75 @@ void Game::ManagePlayerState()
  */
 void Game::HandleGeneralInput()
 {
-	// toggle ambient lights
+	// toggle ssao
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::O))
+	{
+		Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+		const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
+		graphics->SetSSAOEnabled(!graphicsAttributes.SSAOEnabled);
+	}
+
+	// toggle ssao render mode
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::I))
+	{
+		Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+		const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
+		if(graphicsAttributes.SSAOMode == SSAORenderMode::Outline)graphics->SetSSAOMode(SSAORenderMode::Standard);
+		else graphics->SetSSAOMode(SSAORenderMode::Outline);
+	}
+
+	// select ambient lights
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::A))
 	{
-		if(ambientLightObject.IsValid())
-		{
-			ambientLightObject->SetActive(!ambientLightObject->IsActive());
-		}
+		SignalDisplayInfoChanged();
+		selectedLighting = SceneLighting::Ambient;
+
 	}
 
-	// toggle directional light
+	// select directional light
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::D))
 	{
-		if(directionalLightObject.IsValid())
-		{
-			directionalLightObject->SetActive(!directionalLightObject->IsActive());
-		}
+		SignalDisplayInfoChanged();
+		selectedLighting = SceneLighting::Directional;
+
 	}
 
-	// toggle point lights
+	// select point lights
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::P))
 	{
-		if(spinningPointLightObject.IsValid())
-		{
-			spinningPointLightObject->SetActive(!spinningPointLightObject->IsActive());
-		}
+		SignalDisplayInfoChanged();
+		selectedLighting = SceneLighting::Point;
 
-		for(unsigned int i =0; i < otherPointLightObjects.size(); i++)
-		{
-			SceneObjectRef otherPointLightObject = otherPointLightObjects[i];
-			if(otherPointLightObject.IsValid())
+	}
+
+	bool boostLightIntensity = Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::W);
+	bool reduceLightIntensity =  Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::E);
+	bool toggleLight = Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::Q);
+
+	float intensityBoost = 0;
+	if(boostLightIntensity)intensityBoost = .05;
+	else if(reduceLightIntensity)intensityBoost = -.05;
+
+	// toggle lights
+	switch(selectedLighting)
+	{
+		case SceneLighting::Ambient:
+			UpdateLight(ambientLightObject, toggleLight, intensityBoost);
+		break;
+		case SceneLighting::Directional:
+			UpdateLight(directionalLightObject, toggleLight, intensityBoost);
+		break;
+		case SceneLighting::Point:
+			UpdateLight(spinningPointLightObject, toggleLight, intensityBoost);
+
+			for(unsigned int i =0; i < otherPointLightObjects.size(); i++)
 			{
-				otherPointLightObject->SetActive(!otherPointLightObject->IsActive());
+				UpdateLight(otherPointLightObjects[i], toggleLight, intensityBoost);
 			}
-		}
+		break;
+		default:
+
+		break;
 	}
 
 	// toggle skybox
@@ -1317,11 +1400,26 @@ void Game::HandleGeneralInput()
 			cameraObject->GetCamera()->SetSkyboxEnabled(!cameraObject->GetCamera()->IsSkyboxEnabled());
 		}
 	}
+}
 
-	// toggle printing of FPS
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::F))
+/*
+ * Update the light that is attached to [sceneObject].
+ *
+ * [toggleLight] - Turn the light from on to off (or vice-versa).
+ * [intensityChange] - Amount by which light intensity should be adjusted.
+ */
+void Game::UpdateLight(SceneObjectRef sceneObject, bool toggleLight, float intensityChange)
+{
+	if(sceneObject.IsValid())
 	{
-		printFPS = !printFPS;
+		if(toggleLight)sceneObject->SetActive(!sceneObject->IsActive());
+
+		if(intensityChange != 0)
+		{
+			float intensity = sceneObject->GetLight()->GetIntensity();
+			if(intensity + intensityChange < 0 && intensityChange < 0)intensityChange = -intensity;
+			sceneObject->GetLight()->SetIntensity(intensity + intensityChange);
+		}
 	}
 }
 
@@ -1426,6 +1524,9 @@ void Game::UpdatePlayerFollowCamera()
 	cameraObject->GetTransform().Translate(cameraMove, false);
 }
 
+/*
+ * Set the player's current state.
+ */
 void Game::ActivatePlayerState(PlayerState state)
 {
 	playerState = state;

@@ -8,6 +8,7 @@
 #include <memory>
 #include "engine.h"
 #include "debug/gtedebug.h"
+#include "graphics/graphics.h"
 #include "gtedemo.h"
 #include "gtedemo/game.h"
 
