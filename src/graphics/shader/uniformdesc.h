@@ -12,9 +12,9 @@
 
 //forward declarations
 class Texture;
-class Matrix4x4;
 
 #include "object/enginetypes.h"
+#include "geometry/matrix4x4.h"
 
 enum class UniformType
 {
@@ -54,7 +54,7 @@ class UniformDescriptor
 	bool IsSet;
 
 	TextureRef SamplerData;
-	Matrix4x4 * MatrixData;
+	Matrix4x4 MatrixData;
 	float BasicFloatData[4];
 	float * ExtendedFloatData;
 };

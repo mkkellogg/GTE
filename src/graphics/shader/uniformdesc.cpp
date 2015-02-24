@@ -13,7 +13,6 @@ UniformDescriptor::UniformDescriptor()
 	Size = -1;
 	Type = UniformType::Float;
 	ExtendedFloatData = NULL;
-	MatrixData = NULL;
 	IsSet = false;
 	memset(BasicFloatData, 0, sizeof(float) * 4);
 }
