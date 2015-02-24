@@ -34,3 +34,13 @@ bool RenderTarget::HasBuffer(RenderBufferType bufferType) const
 	return false;
 }
 
+TextureRef RenderTarget::GetDepthTexture()
+{
+	return depthTexture;
+}
+
+TextureRef RenderTarget::GetColorTexture()
+{
+	return colorTexture;
+}
+

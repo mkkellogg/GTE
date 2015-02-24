@@ -16,6 +16,8 @@ class RenderTarget : EngineObject
 	bool hasDepthBuffer;
 	unsigned int width;
 	unsigned int height;
+	TextureRef colorTexture;
+	TextureRef depthTexture;
 
 	RenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
     virtual ~RenderTarget();
@@ -24,6 +26,8 @@ class RenderTarget : EngineObject
 
     virtual bool Init() = 0;
     bool HasBuffer(RenderBufferType bufferType) const;
+    TextureRef GetDepthTexture();
+    TextureRef GetColorTexture();
 };
 
 #endif

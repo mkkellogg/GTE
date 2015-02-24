@@ -13,8 +13,6 @@ class RenderTargetGL : public RenderTarget
     protected:
 
 	GLuint fboID;
-	TextureRef colorTexture;
-	TextureRef depthTexture;
 
 	RenderTargetGL(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
     ~RenderTargetGL();

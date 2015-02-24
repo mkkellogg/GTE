@@ -70,13 +70,13 @@ bool RenderTargetGL::Init()
 	if(hasColorBuffer)
 	{
 		TextureAttributes attributes;
-		attributes.FilterMode = TextureFilter::Linear;
+		attributes.FilterMode = TextureFilter::Point;
 		attributes.WrapMode = TextureWrap::Clamp;
 
-		TextureRef texture =  objectManager->CreateTexture(width, height, NULL, attributes);
-		ASSERT(texture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false);
+		colorTexture =  objectManager->CreateTexture(width, height, NULL, attributes);
+		ASSERT(colorTexture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false);
 
-		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
+		TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
 		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast color texture to TextureGL.", false);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
@@ -89,16 +89,17 @@ bool RenderTargetGL::Init()
 		attributes.WrapMode = TextureWrap::Clamp;
 		attributes.IsDepthTexture = true;
 
-		TextureRef texture =  objectManager->CreateTexture(width, height, NULL, attributes);
-		ASSERT(texture.IsValid(), "RenderTargetGL::Init -> Unable to create depth texture.", false);
+		depthTexture =  objectManager->CreateTexture(width, height, NULL, attributes);
+		ASSERT(depthTexture.IsValid(), "RenderTargetGL::Init -> Unable to create depth texture.", false);
 
-		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
+		TextureGL * texGL = dynamic_cast<TextureGL*>(depthTexture.GetPtr());
 		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.", false);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
 	}
 
-	/*glGenRenderbuffersEXT(1, &depthRenderBufferID);
+	/*GLuint depthRenderBufferID;
+	glGenRenderbuffers(1, &depthRenderBufferID);
 	if(depthRenderBufferID == 0)
 	{
 		Debug::PrintError("RenderTargetGL::Init -> Unable to create depth render buffer.");
@@ -106,11 +107,11 @@ bool RenderTargetGL::Init()
 		return false;
 	}
 
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthRenderBufferID);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width, height);
+	glBindRenderbufferEXT(GL_RENDERBUFFER, depthRenderBufferID);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 
 	//Attach depth buffer to FBO
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthRenderBufferID);*/
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferID);*/
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
