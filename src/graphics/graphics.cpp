@@ -102,4 +102,13 @@ const GraphicsAttributes& Graphics::GetAttributes() const
 	return attributes;
 }
 
+void Graphics::SetSSAOEnabled(bool enabled)
+{
+	attributes.SSAOEnabled = enabled;
+}
+
+void Graphics::SetSSAOMode(SSAORenderMode mode)
+{
+	attributes.SSAOMode = mode;
+}
 

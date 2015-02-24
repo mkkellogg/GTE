@@ -54,6 +54,12 @@ enum class RenderMode
 	None = 0
 };
 
+enum class SSAORenderMode
+{
+	Standard = 0,
+	Outline = 1
+};
+
 class GraphicsAttributes
 {
 	public:
@@ -61,6 +67,17 @@ class GraphicsAttributes
 	unsigned int WindowWidth;
 	unsigned int WindowHeight;
 	std::string WindowTitle;
+	bool SSAOEnabled;
+	SSAORenderMode SSAOMode;
+
+	GraphicsAttributes()
+	{
+		WindowWidth = 640;
+		WindowHeight = 480;
+		WindowTitle = std::string("GTE window");
+		SSAOEnabled = true;
+		SSAOMode = SSAORenderMode::Standard;
+	}
 };
 
 class Graphics
@@ -91,6 +108,8 @@ class Graphics
 
     RenderManager * GetRenderManager();
     float GetCurrentFPS();
+    void SetSSAOEnabled(bool enabled);
+    void SetSSAOMode(SSAORenderMode mode);
 
     virtual bool Init(const GraphicsAttributes& attributes);
 

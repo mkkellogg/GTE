@@ -32,6 +32,19 @@ class Point3Array;
 #include "graphics/light/light.h"
 #include "geometry/transform.h"
 
+enum class FowardBlendingMethod
+{
+	Additive = 0,
+	Subtractive = 1
+};
+
+enum class FowardBlendingFilter
+{
+	Never = 0,
+	Always = 1,
+	OnlyIfRendered=2
+};
+
 class RenderManager
 {
 	/*
@@ -104,6 +117,15 @@ class RenderManager
 	// material for rendering only to the depth buffer
 	MaterialRef depthOnlyMaterial;
 
+	// material for rendering depth values to color buffer
+	MaterialRef depthValueMaterial;
+
+	// material for rendering SSAO
+	MaterialRef ssaoMaterial;
+
+	// material for rendering SSAO-style outlines
+	MaterialRef ssaoOutlineMaterial;
+
 	// for offscreen rendering
 	RenderTargetRef offscreenRenderTarget;
 
@@ -127,6 +149,11 @@ class RenderManager
 	SceneObjectRef sceneAmbientLights[MAX_LIGHTS];
 	// list of cameras found in the scene during ProcessScene()
 	SceneObjectRef sceneCameras[MAX_CAMERAS];
+	// current blending method used in forward rendering
+	FowardBlendingMethod forwardBlending;
+
+	// texture for rendering depth info
+	TextureRef sceneDepthTexture;
 
 	// keep track of objects that have been rendered
 	// TODO: optimize usage of this hashing structure
@@ -136,15 +163,23 @@ class RenderManager
 
 	void ProcessScene();
 	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
+
 	void RenderSceneForCamera(unsigned int cameraIndex);
 	void ForwardRenderSceneForCamera(Camera& camera);
-	void RenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
-	void FillDepthBuffer(const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneForSelfLit(const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneForSelfLitMaterials(const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera,
-								 MaterialRef materialOverride, bool flagRendered);
+								 MaterialRef materialOverride, bool flagRendered, FowardBlendingFilter blendingFilter);
+	void ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
+	void ForwardRenderDepthBuffer(const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneSSAO(const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
+			  	  	  	  	  	  	  	                     FowardBlendingFilter blendingFilter);
+	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material,
+											   bool flagRendered, FowardBlendingFilter blendingFilter,  std::function<bool(SceneObjectRef)> filterFunction);
 	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Transform& viewTransformInverse, const Camera& camera);
+
+
 	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject);
 	bool HasSceneObjectBeenRendered(SceneObjectRef sceneObject);
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
@@ -154,6 +189,9 @@ class RenderManager
     bool HasCachedShadowVolume(ObjectPairKey& key);
     Point3Array * GetCachedShadowVolume(ObjectPairKey& key);
     void DestroyCachedShadowVolumes();
+
+    void SetForwardBlending(FowardBlendingMethod method);
+    FowardBlendingMethod GetForwardBlending();
 
     void ClearBuffersForCamera(const Camera& camera) const;
     void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
