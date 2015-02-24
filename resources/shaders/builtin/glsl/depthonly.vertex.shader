@@ -3,5 +3,5 @@ attribute vec4 POSITION;
  
 void main()
 {
-    gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION ;
+    gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION;
 }
