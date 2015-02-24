@@ -94,6 +94,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    glEnable(GL_POINT_SPRITE);
 
     SetBlendingEnabled(false);
 
@@ -170,7 +171,7 @@ void GraphicsGL::DestroyShader(Shader * shader)
     delete shader;
 }
 
-void GraphicsGL::ClearRenderBuffers(unsigned int bufferMask)
+void GraphicsGL::ClearRenderBuffers(IntMask bufferMask)
 {
 	GLbitfield glClearMask = 0;
 	if(IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Color))
@@ -357,9 +358,9 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 	if(attributes.IsDepthTexture)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-
 	}
 	else
 	{

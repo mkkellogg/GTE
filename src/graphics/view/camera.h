@@ -46,7 +46,7 @@ class Camera : public SceneObjectComponent
     const Transform& GetProjectionTransform() const ;
     void AddClearBuffer(RenderBufferType buffer);
     void RemoveClearBuffer(RenderBufferType buffer);
-    unsigned int GetClearBufferMask() const;
+    IntMask GetClearBufferMask() const;
     void UpdateDisplay();
 };
 

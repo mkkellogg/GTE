@@ -77,7 +77,7 @@ class GraphicsGL : public Graphics
     RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
     void DestroyRenderTarget(RenderTarget * target);
 
-    void ClearRenderBuffers(unsigned int bufferMask);
+    void ClearRenderBuffers(IntMask bufferMask);
 
     void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
 

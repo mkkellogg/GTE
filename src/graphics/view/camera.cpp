@@ -113,7 +113,7 @@ void Camera::RemoveClearBuffer(RenderBufferType buffer)
 	IntMaskUtil::ClearBitForMask(&clearBufferMask, (unsigned int)buffer);
 }
 
-unsigned int Camera::GetClearBufferMask() const
+IntMask Camera::GetClearBufferMask() const
 {
 	return clearBufferMask;
 }
