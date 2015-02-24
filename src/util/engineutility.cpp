@@ -79,6 +79,11 @@ Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes)
 
 Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes, bool doCCW)
 {
+	// force mesh to have at least positions and normals
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 	subMesh->Init(36);
