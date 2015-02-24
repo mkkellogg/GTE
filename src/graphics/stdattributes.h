@@ -6,11 +6,12 @@ enum class StandardAttributeMaskComponent
     Position=1,
     ShadowPosition=2,
     Normal=4,
-    Tangent=8,
-    VertexColor=16,
-    UVTexture0=32,
-    UVTexture1=64,
-    UVNormalMap=128
+    FaceNormal = 8,
+    Tangent=16,
+    VertexColor=32,
+    UVTexture0=64,
+    UVTexture1=128,
+    UVNormalMap=256
 };
 
 enum class StandardAttribute
@@ -18,13 +19,14 @@ enum class StandardAttribute
     Position=0,
     ShadowPosition=1,
     Normal=2,
-    Tangent=3,
-    VertexColor=4,
-    UVTexture0=5,
-    UVTexture1=6,
-    UVNormalMap=7,
-    _Last=8, // always keep as last entry
-    _None=9
+    FaceNormal=3,
+    Tangent=4,
+    VertexColor=5,
+    UVTexture0=6,
+    UVTexture1=7,
+    UVNormalMap=8,
+    _Last=9, // always keep as last entry
+    _None=10
 };
 
 #include "base/intmask.h"

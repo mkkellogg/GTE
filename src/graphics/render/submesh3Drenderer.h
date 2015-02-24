@@ -126,6 +126,7 @@ class SubMesh3DRenderer : public EngineObject
     void SetShadowVolumePositionData(const Point3Array * points);
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);
+    void SetFaceNormalData(Vector3Array * normals);
     void SetVertexColorData(Color4Array * colors);
     void SetUV1Data(UV2Array * uvs);
     void SetUV2Data(UV2Array * uvs);

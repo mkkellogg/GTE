@@ -110,6 +110,7 @@ void SubMesh3DRenderer::DestroyBuffers()
 {
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Position]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Normal]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::FaceNormal]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::VertexColor]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture0]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture1]);
@@ -484,6 +485,14 @@ void SubMesh3DRenderer::SetNormalData(Vector3Array * normals)
 }
 
 /*
+ * Set the vertex attribute buffer data for the mesh face normals.
+ */
+void SubMesh3DRenderer::SetFaceNormalData(Vector3Array * faceNormals)
+{
+	attributeBuffers[(int)StandardAttribute::FaceNormal]->SetData(faceNormals->GetDataPtr());
+}
+
+/*
  * Set the vertex attribute buffer data for the mesh vertex colors.
  */
 void SubMesh3DRenderer::SetVertexColorData(Color4Array * colors)
@@ -642,6 +651,7 @@ void SubMesh3DRenderer::CopyMeshData()
 
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetVertexNormals());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::FaceNormal))SetFaceNormalData(mesh->GetFaceNormals());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetVertexColorData(mesh->GetColors());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVsTexture0());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVsTexture1());

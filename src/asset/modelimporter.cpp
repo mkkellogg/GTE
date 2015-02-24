@@ -481,6 +481,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 	// add normals regardless of whether the mesh has them or not. if the mesh does not
 	// have them, they can be calculated
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
 
 	// if the Assimp mesh's material specifies vertex colors, add vertex colors
 	// to the StandardAttributeSet
