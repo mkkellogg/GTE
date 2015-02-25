@@ -67,7 +67,9 @@ void main()
 
     float ambientOcclusion = 0;
     
-    float filterRadius = FILTER_RADIUS;
+    vec2 filterRadius = FILTER_RADIUS;
+   // filterRadius.x = .005;
+   // filterRadius.y = 10;
 
     for (int i = 0; i < sample_count; ++i)
     {
@@ -88,11 +90,15 @@ void main()
         float a = 1.0 - smoothstep(DISTANCE_THRESHHOLD, DISTANCE_THRESHHOLD * 2, VPdistSP);
         // b = dot-Product
         float b = NdotS * 2;
-
-        ambientOcclusion += (a * b);
+        
+        if(a <0)a=0;
+        if(b <0)b = 0;
+		float aFactor = (a * b);
+		if(aFactor <0)aFactor = 0;
+        ambientOcclusion += aFactor;
     }
 
     float aoValue =  1.0 - (ambientOcclusion / sample_count);
-    gl_FragColor = vec4(0,0,0,aoValue/1);  
+    gl_FragColor = vec4(0,0,0,aoValue);  
 }
 
