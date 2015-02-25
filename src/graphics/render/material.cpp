@@ -499,6 +499,11 @@ void Material::SendSetUniformToShader(unsigned int index)
 				shader->SendUniformToShader2(desc->ShaderVarID,  desc->BasicFloatData[0], desc->BasicFloatData[1]);
 				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Float2));
 			}
+			else if(desc->Type == UniformType::Float3)
+			{
+				shader->SendUniformToShader3(desc->ShaderVarID,  desc->BasicFloatData[0], desc->BasicFloatData[1], desc->BasicFloatData[2]);
+				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Float3));
+			}
 			else if(desc->Type == UniformType::Float4)
 			{
 				shader->SendUniformToShader4(desc->ShaderVarID,  desc->BasicFloatData[0], desc->BasicFloatData[1], desc->BasicFloatData[2], desc->BasicFloatData[3]);
