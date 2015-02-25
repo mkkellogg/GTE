@@ -27,6 +27,7 @@ class Point3Array;
 #include <unordered_map>
 #include <memory>
 #include "object/engineobject.h"
+#include "object/objectpairkey.h"
 #include "util/datastack.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
@@ -65,48 +66,6 @@ class RenderManager
 		}
 	};
 
-	/*
-	 * This class is used as the key in the renderedObjects hashing structure
-	 */
-	class ObjectPairKey
-	{
-		public:
-
-		ObjectID ObjectAID;
-		ObjectID ObjectBID;
-
-		ObjectPairKey()
-		{
-			ObjectAID = 0;
-			ObjectBID = 0;
-		}
-
-		ObjectPairKey(ObjectID objectAID, ObjectID objectBID)
-		{
-			ObjectAID = objectAID;
-			ObjectBID = objectBID;
-		}
-
-		 // TODO: optimize this hashing function (implement correctly)
-		typedef struct
-		{
-			 int operator()(const ObjectPairKey& s) const
-			 {
-				  return ((int)s.ObjectAID << 1) +  ((int)s.ObjectBID << 2);
-			 }
-		}ObjectPairKeyHasher;
-
-		typedef struct
-		{
-		  bool operator() (const ObjectPairKey& a, const ObjectPairKey& b) const { return a==b; }
-		} ObjectPairKeyEq;
-
-		bool operator==(const ObjectPairKey& s) const
-		{
-			return s.ObjectAID == this->ObjectAID && s.ObjectBID == this->ObjectBID;
-		}
-	};
-
 	static const int MAX_LIGHTS = 16;
 	static const int MAX_CAMERAS = 8;
 	static const int MAX_SCENE_MESHES = 128;
@@ -126,7 +85,7 @@ class RenderManager
 	// material for rendering SSAO-style outlines
 	MaterialRef ssaoOutlineMaterial;
 
-	// for offscreen rendering
+	// for off-screen rendering
 	RenderTargetRef offscreenRenderTarget;
 
 	// transform stack used for processing scene hierarchy
@@ -152,9 +111,6 @@ class RenderManager
 	// current blending method used in forward rendering
 	FowardBlendingMethod forwardBlending;
 
-	// texture for rendering depth info
-	TextureRef sceneDepthTexture;
-
 	// keep track of objects that have been rendered
 	// TODO: optimize usage of this hashing structure
 	std::unordered_map<ObjectPairKey, bool, ObjectPairKey::ObjectPairKeyHasher,ObjectPairKey::ObjectPairKeyEq> renderedObjects;
@@ -168,7 +124,7 @@ class RenderManager
 	void ForwardRenderSceneForCamera(Camera& camera);
 	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneForSelfLitMaterials(const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneObjectMeshes(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera,
+	void ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera,
 								 MaterialRef materialOverride, bool flagRendered, FowardBlendingFilter blendingFilter);
 	void ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
 	void ForwardRenderDepthBuffer(const Transform& viewTransformInverse, const Camera& camera);

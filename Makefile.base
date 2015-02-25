@@ -38,7 +38,7 @@ LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
 IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
-ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shaderorganizer.o
+ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shaderorganizer.o obj/objectpairkey.o
 ASSETOBJ= obj/assetimporter.o obj/importutil.o obj/modelimporter.o obj/shadersourceloader.o obj/shadersourceloaderGL.o
 UTILOBJ= obj/datastack.o obj/engineutility.o obj/time.o
 FILESYSTEMOBJ= obj/filesystem.o obj/filesystemIX.o
@@ -153,6 +153,9 @@ obj/engineobject.o: $(ENGINEOBJECTSRC)/engineobject.cpp $(ENGINEOBJECTSRC)/engin
 	
 obj/engineobjectmanager.o: $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOBJECTSRC)/engineobjectmanager.h 
 	$(CC) $(CFLAGS) -o obj/engineobjectmanager.o -c $(ENGINEOBJECTSRC)/engineobjectmanager.cpp
+	
+obj/objectpairkey.o: $(ENGINEOBJECTSRC)/objectpairkey.cpp $(ENGINEOBJECTSRC)/objectpairkey.h 
+	$(CC) $(CFLAGS) -o obj/objectpairkey.o -c $(ENGINEOBJECTSRC)/objectpairkey.cpp
 	
 
 # ==================================
