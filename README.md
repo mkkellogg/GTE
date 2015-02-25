@@ -10,6 +10,7 @@
 		- Skeletal animation with animation blending and vertex skinning
 		- Dynamic shadows with shadow volumes
 		- Model loading capabilities through the inclusion of the Assimp library
+		- Screen-Space Ambient Occlusion (alpha stage).
 	
 	The engine is designed so that it can be extended to work with multiple graphics APIs (OpenGL, DirectX, etc...). Currently only OpenGL is implemented.
 
@@ -79,6 +80,8 @@
 
 	To run the demo, do not run the 'gtedemo' executable directly. Instead, execute the 'rungtedemo.sh' script that is in the root of the GTE installation, which will ensure the demo's working directory is correctly set up.
 	
+	Note: Screen-Space Ambient Occlusion is still in the alpha stage, so it won't look right in some places (such as terrain meshes).
+	
 	Demo Controls:
 	
 	Arrow keys: Move the knight around the environment. Physics are not incorporated into the engine so you will be able to walk through objects and off ledges.
@@ -91,14 +94,26 @@
 	
 	'B' Key: Play defend animation.
 	
-	'A' Key: Toggle ambient lighting.
-	
-	'D' Key: Toggle directional lighting.
-	
-	'P' Key: Toggle point lights in the scene.
-	
 	'S' Key: Toggle skybox rendering.
 	
-	'F' Key: Toggle printing of graphics FPS.
+	'O' Key: Toggle Screen-Space Ambient occlusion (SSAO).
+	
+	'I' Key: Toggle between standard SSAO, where SSAO is applied right after ambient lighting, to 'Outline SSAO', where SSAO is applied after all lighting, and produces an interesting outlining effect (and some undesirable side-effects).
+
+	Lighting functionality:
+	
+	'A' Key: Select ambient lighting.
+	
+	'D' Key: Select directional lighting.
+	
+	'P' Key: Select point lights in the scene.
+	
+	'Q' Key: Toggle currently selected light.
+	
+	'W' Key: Increase the intensity of currently selected light.
+	
+	'E' Key: Decrease intensity of currently selected light.
+	
+
 	
 
