@@ -541,20 +541,19 @@ void ShaderGL::SendUniformToShader(int varID, const Color4 * color)
 	glUniform4f(varID, color->r, color->g, color->b, color->a);
 }
 
-
 void ShaderGL::SendUniformToShader4v(int varID, const float * data)
 {
-
+	glUniform4fv(varID, 1, data);
 }
 
 void ShaderGL::SendUniformToShader3v(int varID, const float * data)
 {
-
+	glUniform3fv(varID, 1, data);
 }
 
 void ShaderGL::SendUniformToShader2v(int varID, const float * data)
 {
-
+	glUniform2fv(varID, 1, data);
 }
 
 void ShaderGL::SendUniformToShader4(int varID, float x, float y, float z, float w)
@@ -564,7 +563,7 @@ void ShaderGL::SendUniformToShader4(int varID, float x, float y, float z, float 
 
 void ShaderGL::SendUniformToShader3(int varID, float x, float y, float z)
 {
-
+	glUniform3f(varID, x, y, z);
 }
 
 void ShaderGL::SendUniformToShader2(int varID, float x, float y)
