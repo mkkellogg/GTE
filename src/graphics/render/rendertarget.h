@@ -1,10 +1,14 @@
 #ifndef _GTE_RENDER_TARGET_H_
 #define _GTE_RENDER_TARGET_H_
 
+// forward declarations
+class TextureAttributes;
+
 #include "base/intmask.h"
 #include "renderbuffer.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
+#include "graphics/texture/textureattr.h"
 
 class RenderTarget : EngineObject
 {
@@ -18,8 +22,9 @@ class RenderTarget : EngineObject
 	unsigned int height;
 	TextureRef colorTexture;
 	TextureRef depthTexture;
+	TextureAttributes colorTextureAttributes;
 
-	RenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
+	RenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
     virtual ~RenderTarget();
 
     public:

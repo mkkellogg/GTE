@@ -10,7 +10,8 @@
 #include "graphics/texture/texture.h"
 #include "graphics/texture/textureGL.h"
 
-RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth, unsigned int width, unsigned int height) : RenderTarget(hasColor, hasDepth, width, height)
+RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) :
+				RenderTarget(hasColor, hasDepth, colorTextureAttributes, width, height)
 {
 	fboID = 0;
 }
@@ -70,6 +71,7 @@ bool RenderTargetGL::Init()
 	if(hasColorBuffer)
 	{
 		TextureAttributes attributes;
+		attributes.Format = colorTextureAttributes.Format;
 		attributes.FilterMode = TextureFilter::Point;
 		attributes.WrapMode = TextureWrap::Clamp;
 

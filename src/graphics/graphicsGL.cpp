@@ -309,7 +309,7 @@ void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 	delete buffer;
 }
 
-Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes)
+Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes)
 {
 	glEnable(GL_TEXTURE_2D);
 	GLuint tex;
@@ -364,6 +364,9 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 	}
 	else
 	{
+		GLvoid *pixels = pixelData;
+		if(pixelData == NULL)pixels = (GLvoid*)0;
+
 		if(openGLVersion >= 3)
 		{
 			if(attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear)
@@ -377,10 +380,8 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
 			//glTextureSubImage2D(tex, 0, 0, 0, raw->GetWidth(), raw->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, raw->GetPixels());
 
-			if(pixelData != NULL)
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
-			else
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			if(attributes.Format == TextureFormat::RGBA8)glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			else if(attributes.Format == TextureFormat::R32)glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, pixels);
 
 			if(attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear)glGenerateMipmap(GL_TEXTURE_2D);
 		}
@@ -392,10 +393,8 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, attributes.MipMapLevel);
 			}
 
-			if(pixelData != NULL)
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
-			else
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			if(attributes.Format == TextureFormat::RGBA8)glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			else if(attributes.Format == TextureFormat::R32)glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, pixels);
 		}
 	}
 
@@ -410,7 +409,7 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 	return texture;
 }
 
-Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes attributes)
+Texture * GraphicsGL::CreateTexture(RawImage * imageData,  const TextureAttributes&  attributes)
 {
 	ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
 	Texture * texture =  CreateTexture(imageData->GetWidth(), imageData->GetHeight(), imageData->GetPixels(), attributes);
@@ -425,7 +424,7 @@ Texture * GraphicsGL::CreateTexture(RawImage * imageData,  TextureAttributes att
 	return texture;
 }
 
-Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, TextureAttributes attributes)
+Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes)
 {
 	RawImage * raw = ImageLoader::LoadImage(sourcePath);
 	ASSERT(raw != NULL, "GraphicsGL::CreateTexture -> unable to create raw image", NULL);
@@ -530,10 +529,10 @@ void GraphicsGL::DestroyTexture(Texture * texture)
 	delete texGL;
 }
 
-RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height)
+RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth,  const TextureAttributes& colorTextureAttributes,  unsigned int width, unsigned int height)
 {
 	RenderTargetGL * buffer;
-	buffer = new RenderTargetGL(hasColor, hasDepth, width, height);
+	buffer = new RenderTargetGL(hasColor, hasDepth, colorTextureAttributes, width, height);
 	ASSERT(buffer != NULL, "GraphicsGL::CreateRenderTarget -> unable to create render target", NULL);
 	return buffer;
 }

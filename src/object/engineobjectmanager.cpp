@@ -516,11 +516,11 @@ void EngineObjectManager::DeleteTexture(Texture * texture)
 	graphics->DestroyTexture(texture);
 }
 
-RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height)
+RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 
-	RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, width, height);
+	RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, colorTextureAttributes, width, height);
 	ASSERT(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null());
 
 	bool success = target->Init();

@@ -3,6 +3,7 @@ uniform mat4 MODELVIEWPROJECTION_MATRIX;
 
 attribute vec4 POSITION;
 attribute vec4 FACENORMAL;
+attribute vec4 NORMAL;
 
 varying vec3 vNormal;
  

@@ -3,12 +3,13 @@
 #include "base/intmask.h"
 #include "global/global.h"
 
-RenderTarget::RenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height)
+RenderTarget::RenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
 {
 	this->hasColorBuffer = hasColor;
 	this->hasDepthBuffer = hasDepth;
 	this->width = width;
 	this->height = height;
+	this->colorTextureAttributes = colorTextureAttributes;
 }
 
 RenderTarget::~RenderTarget()

@@ -33,7 +33,8 @@ enum class TextureFilter
 enum class TextureFormat
 {
 	RGBA8,
-	RGBA128
+	RGBA32,
+	R32
 };
 
 

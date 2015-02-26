@@ -119,7 +119,7 @@ class EngineObjectManager
     TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
    										RawImage * bottomData, RawImage * leftData, RawImage * rightData);
     void DestroyTexture(TextureRef texture);
-    RenderTargetRef CreateRenderTarget(bool hasColor, bool hasDepth, unsigned int width, unsigned int height);
+    RenderTargetRef CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
     void DestroyRenderTarget(RenderTargetRef target);
 
     MaterialRef CreateMaterial(const std::string& name, ShaderRef shader);

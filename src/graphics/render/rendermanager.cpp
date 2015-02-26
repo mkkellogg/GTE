@@ -94,7 +94,9 @@ bool RenderManager::Init()
 	ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.", false);
 
 	const GraphicsAttributes& graphicsAttributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
-	offscreenRenderTarget = objectManager->CreateRenderTarget(true, true, graphicsAttributes.WindowWidth,graphicsAttributes.WindowHeight);
+	TextureAttributes colorTextureAttributes;
+	colorTextureAttributes.Format = TextureFormat::R32;
+	offscreenRenderTarget = objectManager->CreateRenderTarget(true, true, colorTextureAttributes, graphicsAttributes.WindowWidth,graphicsAttributes.WindowHeight);
 	ASSERT(offscreenRenderTarget.IsValid(), "RenderManager::Init -> Unable to create off-screen rendering surface.", false);
 
 	TextureRef depthTexture = offscreenRenderTarget->GetDepthTexture();
