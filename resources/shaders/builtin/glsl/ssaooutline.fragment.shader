@@ -1,7 +1,5 @@
 #version 120
 
-precision highp float;
-
 uniform sampler2D DEPTH_TEXTURE;
 
 uniform mat4 INV_PROJECTION_MATRIX;
