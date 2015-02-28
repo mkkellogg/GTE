@@ -112,6 +112,11 @@ class Material : public EngineObject
 	// map a shader variable ID/location to its index in uniformsSetValues
 	std::map<int,int> uniformLocationsToVerificationIndex;
 
+	// current highest used sampler unit index
+	unsigned int currentSampletUnityIndex;
+	// map a texture uniform to its sampler unit
+	std::map<std::string, int> textureUniformSamplerUnitIndex;
+
 	// does this material require a light to be rendered?
 	bool selfLit;
 
@@ -130,6 +135,7 @@ class Material : public EngineObject
 	int TestForStandardAttribute(StandardAttribute attr) const;
 
 	int GetUniformIndex(const std::string& uniformName);
+	unsigned int GetSamplerUnitForName(const std::string& name);
 	void SetStandardUniformBinding( int varID, StandardUniform uniform);
 	int GetStandardUniformBinding(StandardUniform uniform) const;
 	int TestForStandardUniform(StandardUniform uniform) const;
@@ -137,6 +143,7 @@ class Material : public EngineObject
 
 	void SetAttributeSetValue(int varID, int size);
 	void SetUniformSetValue(int varID, int size);
+
 
     protected:
 

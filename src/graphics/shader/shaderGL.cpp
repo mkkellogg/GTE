@@ -502,7 +502,7 @@ void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
  * [varID] - shader var ID/location of the uniform for which the value is to be set.
  * [texture] - Holds sampler data to be sent
  */
-void ShaderGL::SendUniformToShader(unsigned int samplerUnitIndex, const TextureRef texture)
+void ShaderGL::SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture)
 {
 	ASSERT_RTRN(texture.IsValid(), "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> NULL texture passed");
 
@@ -511,8 +511,19 @@ void ShaderGL::SendUniformToShader(unsigned int samplerUnitIndex, const TextureR
 
 	ASSERT_RTRN(texGL != NULL, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> texture is not TextureGL !!");
 
-	glActiveTexture(GL_TEXTURE0 + samplerUnitIndex);
-	glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+	if(samplerUnitIndex==0)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+		SendUniformToShader(varID, 0);
+	}
+	else if(samplerUnitIndex==1)
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+		SendUniformToShader(varID, 1);
+	}
+	glActiveTexture(GL_TEXTURE0);
 }
 
 /*

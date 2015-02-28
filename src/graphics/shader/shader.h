@@ -52,7 +52,7 @@ class Shader : public EngineObject
     virtual int GetUniformVarID(const std::string& varName) const = 0;
     virtual void SendBufferToShader(int varID, VertexAttrBuffer * buffer) = 0;
 
-    virtual void SendUniformToShader(unsigned int samplerUnitIndex, const TextureRef texture) = 0;
+    virtual void SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture) = 0;
     virtual void SendUniformToShader(int varID, const Matrix4x4 * mat) = 0;
     virtual void SendUniformToShader(int varID, const Point3 * point) = 0;
     virtual void SendUniformToShader(int varID, const Vector3 * vector) = 0;

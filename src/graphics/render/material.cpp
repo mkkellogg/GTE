@@ -41,6 +41,8 @@ Material::Material(const std::string& materialName)
 	uniformsSetValues = NULL;
 
 	selfLit = false;
+
+	currentSampletUnityIndex = 0;
 }
 
 /*
@@ -290,6 +292,24 @@ int Material::GetUniformIndex(const std::string& uniformName)
 	return foundIndex;
 }
 
+unsigned int Material::GetSamplerUnitForName(const std::string& name)
+{
+	unsigned int index = 0;
+
+	if(textureUniformSamplerUnitIndex.find(name) == textureUniformSamplerUnitIndex.end())
+	{
+		textureUniformSamplerUnitIndex[name] = currentSampletUnityIndex;
+		index = currentSampletUnityIndex;
+		currentSampletUnityIndex++;
+	}
+	else
+	{
+		index = textureUniformSamplerUnitIndex[name];
+	}
+
+	return index;
+}
+
 /*
  * Map a standard uniform to a shader var ID/location
  */
@@ -481,12 +501,12 @@ void Material::SendSetUniformToShader(unsigned int index)
 		{
 			if(desc->Type == UniformType::Sampler2D)
 			{
-				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->SamplerData);
+				shader->SendUniformToShader(desc->ShaderVarID, desc->SamplerUnitIndex, desc->SamplerData);
 				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::Sampler2D));
 			}
 			if(desc->Type == UniformType::SamplerCube)
 			{
-				shader->SendUniformToShader(desc->SamplerUnitIndex, desc->SamplerData);
+				shader->SendUniformToShader(desc->ShaderVarID, desc->SamplerUnitIndex, desc->SamplerData);
 				SetUniformSetValue(desc->ShaderVarID, GetRequiredUniformSize(UniformType::SamplerCube));
 			}
 			else if(desc->Type == UniformType::Float)
@@ -549,6 +569,7 @@ void Material::SetTexture(TextureRef texture, const std::string& varName)
 	if(textureAttributes.IsCube)desc->Type = UniformType::SamplerCube;
 	else desc->Type = UniformType::Sampler2D;
 	desc->SamplerData = texture;
+	desc->SamplerUnitIndex = GetSamplerUnitForName(varName);
 	desc->IsSet = true;
 }
 
