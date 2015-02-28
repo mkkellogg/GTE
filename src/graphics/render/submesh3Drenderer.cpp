@@ -571,6 +571,8 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 	VertexAttrBufferBinding shadowVolumePositionBinding(attributeBuffers[(int)StandardAttribute::ShadowPosition], StandardAttribute::ShadowPosition, -1);
 	boundShadowVolumeAttributeBuffers.push_back(shadowVolumePositionBinding);
 
+	storedAttributes = meshAttributes;
+
 	return true;
 }
 
