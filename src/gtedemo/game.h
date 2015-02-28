@@ -13,6 +13,7 @@
 class AssetImporter;
 class Vector3;
 class Quaternion;
+class LavaField;
 
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
@@ -67,6 +68,8 @@ class Game
 	SceneObjectRef cameraObject;
 	// SceneObject that contains the spinning point light in the scene
 	SceneObjectRef spinningPointLightObject;
+	// scene lava
+	LavaField * lavaField;
 	// container for other point lights in the scene
 	std::vector<SceneObjectRef> otherPointLightObjects;
 	// The SceneObject to which the player model hierarchy is attached

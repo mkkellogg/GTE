@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
+
 #include <iostream>
 #include <memory>
 #include <functional>
 #include "game.h"
+#include "lavafield.h"
 #include "engine.h"
 #include "input/inputmanager.h"
 #include "gameutil.h"
@@ -88,6 +88,8 @@ Game::Game()
 	displayInfoChanged = false;
 
 	selectedLighting = SceneLighting::None;
+
+	lavaField = NULL;
 }
 
 /*
@@ -253,8 +255,8 @@ void Game::SetupSceneTerrain(AssetImporter& importer)
 
 	// place island in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
-	modelSceneObject->GetTransform().Translate(0,-10,0,false);
+	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
+	modelSceneObject->GetTransform().Translate(-20,-10,0,false);
 
 	// load island model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
@@ -265,6 +267,66 @@ void Game::SetupSceneTerrain(AssetImporter& importer)
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.07,.05,.07, false);
 	modelSceneObject->GetTransform().Translate(80,-10,-10,false);
+
+	//========================================================
+	//
+	// Load lava
+	//
+	//========================================================
+
+	lavaField = new LavaField(24);
+	lavaField->Init();
+	lavaField->SetDisplacementSpeed(.05);
+	lavaField->SetTextureASpeed(.015);
+	lavaField->SetTextureBSpeed(.035);
+	lavaField->SetDisplacementHeight(6);
+	lavaField->SetDisplacementTileSize(3);
+
+	SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
+	lavaFieldObject->GetTransform().Scale(100,1,95, false);
+	lavaFieldObject->GetTransform().Translate(-30,-17,0, false);
+
+
+	//========================================================
+	//
+	// Load stones
+	//
+	//========================================================
+
+	// load stone3
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/stone/Stone03.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load stone model!\n");
+	SetAllObjectsStatic(modelSceneObject);
+
+	// extract mesh & material from stone model
+	SceneObjectRef stone1MeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
+	Mesh3DRef stone1Mesh = stone1MeshObject->GetMesh3D();
+	Mesh3DRendererRef stone1Renderer = stone1MeshObject->GetMesh3DRenderer();
+	MaterialRef stone1Material = stone1Renderer->GetMaterial(0);
+
+	// place initial stone in scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.0045, .0045, .0045, false);
+	modelSceneObject->GetTransform().Rotate(0,1,0,25, false);
+	modelSceneObject->GetTransform().Rotate(0,0,1,15, false);
+	modelSceneObject->GetTransform().Translate(15,-15,-45,false);
+
+	// re-use the stone mesh & material for multiple instances
+	AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 1, 0,0, -90, -10,-15,-55, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 0, 1,0, -60, -51,-30,-55, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-15,false);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 1, 0,0, -90, -55,-15,-35, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-90, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 0, 1,0, -20, -85,-17, 8, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .55,.58, .55, 1, 0,0, -90, -80,-15, 30, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-40, true);
+	modelSceneObject->GetTransform().Rotate(1,0,0,-180, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 0, 1,0, -80, -75,-28, 43, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .45,.4, .45, 1, 0,0, -90, -30,-25, 45, true);
+	modelSceneObject->GetTransform().Rotate(0,0,1,-40, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .6,.5, .5, 0, 1,0, -80, -10,-28, 45, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.6, .6, 0, 1,0, -180, 20,-33, 5, true);
+	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .25,.6, .25, 0, 1,0, -180, 20,-25, -25, true);
 
 }
 
@@ -290,7 +352,7 @@ void Game::SetupSceneStructures(AssetImporter& importer)
 	// pplace turret tower in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.05,.05,.05, false);
-	modelSceneObject->GetTransform().Translate(10,-10,-10,false);
+	modelSceneObject->GetTransform().Translate(-20,-10,-10,false);
 
 	// load castle tower
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
@@ -372,7 +434,7 @@ void Game::SetupSceneStructures(AssetImporter& importer)
 	// place mushroom house in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.09,.09,.09, false);
-	modelSceneObject->GetTransform().Translate(-10,-10,20,false);
+	modelSceneObject->GetTransform().Translate(-27,-10,15,false);
 
 }
 
@@ -485,7 +547,7 @@ void Game::SetupSceneExtra(AssetImporter& importer)
 
 	// scale the cube and move to its position in the scene
 	cubeSceneObject->GetTransform().Scale(1.5, 1.5,1.5, false);
-	cubeSceneObject->GetTransform().Translate(2, -7, 10, false);
+	cubeSceneObject->GetTransform().Translate(-10, -7, 8, false);
 
 
 	//========================================================
@@ -811,7 +873,7 @@ void Game::SetupLights(AssetImporter& importer)
 	light->SetType(LightType::Point);
 	spinningPointLightObject->SetLight(light);
 	spinningPointLightObject->GetTransform().Scale(.4,.4,.4, true);
-	spinningPointLightObject->GetTransform().Translate(5, 0, 20, false);
+	spinningPointLightObject->GetTransform().Translate(-16, 2, 10, false);
 
 	// create ambient light
 	ambientLightObject = objectManager->CreateSceneObject();
@@ -924,7 +986,7 @@ void Game::InitializePlayerPosition()
  */
 void Game::Update()
 {
-	Point3 lightRotatePoint(10,5,18);
+	Point3 lightRotatePoint(-10,5,10);
 
 	// rotate the point light around [lightRotatePoint]
 	spinningPointLightObject->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
@@ -941,6 +1003,8 @@ void Game::Update()
 	UpdatePlayerFollowCamera();
 	ManagePlayerState();
 	HandleGeneralInput();
+
+	lavaField->Update();
 
 	DisplayInfo();
 }

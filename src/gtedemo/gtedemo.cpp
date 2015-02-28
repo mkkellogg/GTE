@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
 
 #include <memory>
 #include "engine.h"
