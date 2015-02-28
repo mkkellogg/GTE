@@ -430,6 +430,14 @@ void SubMesh3D::Update()
 }
 
 /*
+ * Only signal this mesh as updated, do not recalculate normals or faces. Useful
+ * when only moving vertex positions;
+ */
+void SubMesh3D::QuickUpdate()
+{
+	UpdateTimeStamp();
+}
+/*
  * Get the total number of vertices contained in this sub-mesh.
  */
 unsigned int SubMesh3D::GetTotalVertexCount() const

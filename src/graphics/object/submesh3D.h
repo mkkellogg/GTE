@@ -109,6 +109,7 @@ class SubMesh3D : public EngineObject
     const Vector3& GetSphereOfInfluenceZ() const;
     void SetNormalsSmoothingThreshold(unsigned int threshhold);
     void Update();
+    void QuickUpdate();
 
     bool Init(unsigned int totalVertexCount);
     unsigned int GetTotalVertexCount() const;
