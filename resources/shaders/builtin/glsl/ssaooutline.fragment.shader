@@ -80,7 +80,7 @@ void main()
         // a = distance function
         float a = 1.0 - smoothstep(DISTANCE_THRESHHOLD, DISTANCE_THRESHHOLD * 2, VPdistSP);
         // b = dot-Product
-        float b = NdotS * 2;
+        float b = NdotS * 1.5;
         
         if(a <0)a=0;
         if(b <0)b = 0;
