@@ -115,7 +115,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
 	}
 	else
 	{
-		std::string msg = std::string("AssetImporter -> Could not find file: ") + filePath;
+		std::string msg = std::string("ModelImporter -> Could not find file: ") + filePath;
 		Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::ModelFileNotFound, msg);
 		return NULL;
 	}
@@ -129,7 +129,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
 	// If the import failed, report it
 	if(!scene)
 	{
-		std::string msg = std::string("AssetImporter::LoadAIScene -> Could not import file: ") + std::string(importer->GetErrorString());
+		std::string msg = std::string("ModelImporter::LoadAIScene -> Could not import file: ") + std::string(importer->GetErrorString());
 		Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::ModelFileLoadFailed, msg);
 		return NULL;
 	}
@@ -184,9 +184,9 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	std::vector<MaterialImportDescriptor> materialImportDescriptors;
 
 	// verify that we have a valid scene
-	ASSERT(scene.mRootNode != NULL,"AssetImporter::ProcessModelScene -> Assimp scene root is NULL.", SceneObjectRef::Null());
+	ASSERT(scene.mRootNode != NULL,"ModelImporter::ProcessModelScene -> Assimp scene root is NULL.", SceneObjectRef::Null());
 	SceneObjectRef root = objectManager->CreateSceneObject();
-	ASSERT(root.IsValid(),"AssetImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
+	ASSERT(root.IsValid(),"ModelImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
 
 	// process all the Assimp materials in [scene] and create equivalent engine native materials.
 	// store those materials and their properties in MaterialImportDescriptor instances, which get
@@ -284,7 +284,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 	// create new scene object to hold the Mesh3D object and its renderer
 	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
-	ASSERT_RTRN(sceneObject.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create scene object.");
+	ASSERT_RTRN(sceneObject.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create scene object.");
 
 	// determine if [skeleton] is valid
 	bool hasSkeleton = skeleton.IsValid() && skeleton->GetBoneCount() ? true : false;
@@ -313,11 +313,11 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		// create a containing Mesh3D object that will hold all sub-meshes created for this node.
 		// for each Assimp mesh, one SubMesh3D will be created added to the Mesh3D instance.
 		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
-		ASSERT_RTRN(mesh3D.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
+		ASSERT_RTRN(mesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
 
 		// initialize the new Mesh3D instance
 		bool meshInitSuccess = mesh3D->Init();
-		ASSERT_RTRN(meshInitSuccess,"AssetImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
+		ASSERT_RTRN(meshInitSuccess,"ModelImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
 
 		// set shadow properties
 		mesh3D->SetCastShadows(castShadows);
@@ -327,7 +327,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		if(requiresSkinnedRenderer)
 		{
 			skinnedMeshRenderer = engineObjectManager->CreateSkinnedMesh3DRenderer();
-			ASSERT_RTRN(skinnedMeshRenderer.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.");
+			ASSERT_RTRN(skinnedMeshRenderer.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.");
 			rendererPtr = (Mesh3DRenderer*)skinnedMeshRenderer.GetPtr();
 
 			// set the vertex bone map for each sub renderer to "none" (-1)
@@ -341,7 +341,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		else
 		{
 			meshRenderer = engineObjectManager->CreateMesh3DRenderer();
-			ASSERT_RTRN(meshRenderer.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
+			ASSERT_RTRN(meshRenderer.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
 			rendererPtr = meshRenderer.GetPtr();
 		}
 
@@ -354,12 +354,12 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 			// get a pointer to the Assimp mesh
 			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
-			ASSERT_RTRN(mesh != NULL, "AssetImporter::RecursiveProcessModelScene -> Node mesh is NULL.");
+			ASSERT_RTRN(mesh != NULL, "ModelImporter::RecursiveProcessModelScene -> Node mesh is NULL.");
 
 			int materialIndex = mesh->mMaterialIndex;
 			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
 			MaterialRef material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
-			ASSERT_RTRN(material.IsValid(),"AssetImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
+			ASSERT_RTRN(material.IsValid(),"ModelImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
 
 			// add the material to the mesh renderer
 			rendererPtr->AddMaterial(material);
@@ -369,14 +369,14 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			bool invert = HasInvertedScale(mat);
 			// convert Assimp mesh to a Mesh3D object
 			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor, invert);
-			ASSERT_RTRN(subMesh3D.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
+			ASSERT_RTRN(subMesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
 
 			// add the mesh to the newly created scene object
 			mesh3D->SetSubMesh(subMesh3D, n);
 		}
 
 		Mesh3DFilterRef filter = engineObjectManager->CreateMesh3DFilter();
-		ASSERT_RTRN(filter.IsValid(),"AssetImporter::RecursiveProcessModelScene -> Unable to create mesh#D filter object.");
+		ASSERT_RTRN(filter.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Unable to create mesh#D filter object.");
 
 		filter->SetMesh3D(mesh3D);
 		sceneObject->SetMesh3DFilter(filter);
@@ -494,7 +494,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 
 	// create Mesh3D object with the constructed StandardAttributeSet
 	SubMesh3DRef mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
-	ASSERT(mesh3D.IsValid(),"AssetImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null());
+	ASSERT(mesh3D.IsValid(),"ModelImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null());
 
 	bool initSuccess = mesh3D->Init(vertexCount);
 
@@ -502,7 +502,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 	if(!initSuccess)
 	{
 		engineObjectManager->DestroySubMesh3D(mesh3D);
-		Debug::PrintError("AssetImporter::ConvertAssimpMesh -> Could not init mesh.");
+		Debug::PrintError("ModelImporter::ConvertAssimpMesh -> Could not init mesh.");
 		return SubMesh3DRef::Null();
 	}
 
@@ -586,7 +586,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	// TODO: Implement support for embedded textures
 	if (scene.HasTextures())
 	{
-		Debug::PrintError("AssetImporter::ProcessMaterials -> Support for meshes with embedded textures is not implemented");
+		Debug::PrintError("ModelImporter::ProcessMaterials -> Support for meshes with embedded textures is not implemented");
 		return false;
 	}
 
@@ -600,7 +600,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		aiString aiTexturePath;
 
 		aiMaterial * assimpMaterial = scene.mMaterials[m];
-		ASSERT(assimpMaterial != NULL, "AssetImporter::ProcessMaterials -> scene contains a NULL material.", false);
+		ASSERT(assimpMaterial != NULL, "ModelImporter::ProcessMaterials -> scene contains a NULL material.", false);
 
 		aiString mtName;
 		assimpMaterial->Get(AI_MATKEY_NAME,mtName);
@@ -620,7 +620,8 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		if(texFound == AI_SUCCESS)diffuseTexture = LoadAITexture(*assimpMaterial, aiTextureType_DIFFUSE, modelPath);
 		if(!diffuseTexture.IsValid())
 		{
-			std::string msg = "AssetImporter::ProcessMaterials -> Could not load diffuse texture.";
+			std::string msg = "ModelImporter::ProcessMaterials -> Could not load diffuse texture: ";
+			msg += aiTexturePath.C_Str();
 			Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::MaterialImportFailure, msg);
 			materialImportDescriptors.clear();
 			return false;
@@ -653,7 +654,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 				MaterialRef newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
 				if(!newMaterial.IsValid())
 				{
-					std::string msg = "AssetImporter::ProcessMaterials -> Could not create new Material object.";
+					std::string msg = "ModelImporter::ProcessMaterials -> Could not create new Material object.";
 					Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::MaterialImportFailure, msg);
 					materialImportDescriptors.clear();
 					return false;
