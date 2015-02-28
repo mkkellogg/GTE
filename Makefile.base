@@ -24,7 +24,7 @@ ERRORSRC= src/error
 ENGINEOBJ = obj/engine.o
 GLOBALOBJ = obj/constants.o
 BASEOBJ= obj/basevector4.o obj/basevector2.o obj/basevector2factory.o obj/basevector4factory.o obj/basevector2array.o obj/basevector4array.o obj/intmask.o obj/longmask.o
-GTEDEMOOBJ= obj/gtedemo.o obj/game.o obj/gameutil.o
+GTEDEMOOBJ= obj/gtedemo.o obj/game.o obj/gameutil.o obj/lavafield.o
 GTEMATHOBJ= obj/gtemath.o
 GEOMETRYOBJ= obj/matrix4x4.o obj/quaternion.o obj/point3.o obj/vector3.o obj/vector3factory.o obj/point3factory.o obj/vector3array.o obj/point3array.o obj/transform.o obj/sceneobjecttransform.o
 GRAPHICSOBJECTOBJ= obj/mesh3D.o obj/submesh3D.o obj/submesh3Dfaces.o obj/submesh3Dface.o obj/mesh3Dfilter.o
@@ -75,6 +75,9 @@ obj/game.o: $(GTEDEMOSRC)/game.cpp $(GTEDEMOSRC)/game.h
 
 obj/gameutil.o: $(GTEDEMOSRC)/gameutil.cpp $(GTEDEMOSRC)/gameutil.h 
 	$(CC) $(CFLAGS) -o obj/gameutil.o -c $(GTEDEMOSRC)/gameutil.cpp
+	
+obj/lavafield.o: $(GTEDEMOSRC)/lavafield.cpp $(GTEDEMOSRC)/lavafield.h 
+	$(CC) $(CFLAGS) -o obj/lavafield.o -c $(GTEDEMOSRC)/lavafield.cpp
 	
 
 # ==================================
