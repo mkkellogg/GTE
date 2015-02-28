@@ -72,6 +72,112 @@ void EngineUtility::PrintMatrix(const Matrix4x4& matrix)
 	}
 }
 
+Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height, unsigned int subDivisionsPerWidth, unsigned int subDivisionsPerHeight)
+{
+	if(width <= 0 || height <= 0)
+	{
+		Engine::Instance()->GetErrorManager()->SetError(EngineUtilityError::InvalidDimensions, "EngineUtility::CreateSquareMesh -> Width and height must be greater than 0.");
+		return Mesh3DRef::Null();
+	}
+
+	// force mesh to have at least positions and normals
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+
+	unsigned int subSquaresPerWidth = subDivisionsPerWidth;
+	unsigned int subSquaresPerHeight = subDivisionsPerHeight;
+	unsigned int totalSubSquares = subSquaresPerWidth * subSquaresPerHeight;
+	unsigned int totalVertices = totalSubSquares * 6;
+
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
+	subMesh->Init(totalVertices);
+
+	Mesh3DRef mesh = objectManager->CreateMesh3D(1);
+	mesh->Init();
+	mesh->SetSubMesh(subMesh, 0);
+
+	Point3Array * points = subMesh->GetPostions();
+	UV2Array *uvs = NULL;
+
+	float halfWidth = width / 2.0;
+	float halfHeight = height /2.0;
+
+	float initialWidth = -halfWidth;
+	float initialHeight = halfHeight;
+
+	float currentWidth = initialWidth;
+	float currentHeight = initialHeight;
+
+	float subSquareWidth = width / (float)subSquaresPerWidth;
+	float subSquareHeight = height / (float)subSquaresPerWidth;
+
+	float uvWidth = 1.0;
+	float uvHeight = 1.0;
+
+	float subSquareUVWidth = uvWidth / (float)subSquaresPerWidth;
+	float subSquareUVHeight = uvHeight / (float)subSquaresPerHeight;
+
+	unsigned int vertexIndex = 0;
+
+	for(unsigned int heightSquare = 0; heightSquare < subSquaresPerHeight; heightSquare++)
+	{
+		for(unsigned int widthSquare = 0; widthSquare < subSquaresPerWidth; widthSquare++)
+		{
+			points->GetPoint(vertexIndex)->Set(currentWidth, currentHeight, 0);
+			points->GetPoint(vertexIndex + 1)->Set(currentWidth + subSquareWidth, currentHeight, 0);
+			points->GetPoint(vertexIndex + 2)->Set(currentWidth, currentHeight - subSquareHeight, 0);
+
+			points->GetPoint(vertexIndex + 3)->Set(currentWidth + subSquareWidth, currentHeight, 0);
+			points->GetPoint(vertexIndex + 4)->Set(currentWidth + subSquareWidth, currentHeight - subSquareHeight, 0);
+			points->GetPoint(vertexIndex + 5)->Set(currentWidth, currentHeight - subSquareHeight, 0);
+
+			float uvX = currentWidth / width;
+			float uvY = height - (currentHeight / height);
+
+			if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0) || StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))
+			{
+				for(unsigned int i=0; i < 2; i++)
+				{
+					if(i == 0)
+					{
+						if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))
+							uvs = subMesh->GetUVsTexture0();
+						else continue;
+					}
+
+					if(i == 1)
+					{
+						if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))
+							uvs = subMesh->GetUVsTexture1();
+						else continue;
+					}
+
+					uvs->GetCoordinate(vertexIndex)->Set(uvX,uvY);
+					uvs->GetCoordinate(vertexIndex + 1)->Set(uvX + subSquareUVWidth, uvY);
+					uvs->GetCoordinate(vertexIndex + 2)->Set(uvX, uvY + subSquareUVHeight);
+
+					uvs->GetCoordinate(vertexIndex + 3)->Set(uvX + subSquareUVWidth, uvY);
+					uvs->GetCoordinate(vertexIndex + 4)->Set(uvX + subSquareUVWidth, uvY + subSquareUVHeight);
+					uvs->GetCoordinate(vertexIndex + 5)->Set(uvX, uvY + subSquareUVHeight);
+				}
+			}
+
+			currentWidth += subSquareWidth;
+			vertexIndex += 6;
+		}
+
+		currentWidth = initialWidth;
+		currentHeight -= subSquareHeight;
+	}
+
+	subMesh->SetNormalsSmoothingThreshold(85);
+	mesh->Update();
+
+	return mesh;
+}
+
 Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes)
 {
 	return CreateCubeMesh(meshAttributes, false);
