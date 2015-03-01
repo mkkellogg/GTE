@@ -319,10 +319,6 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		bool meshInitSuccess = mesh3D->Init();
 		ASSERT_RTRN(meshInitSuccess,"ModelImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
 
-		// set shadow properties
-		mesh3D->SetCastShadows(castShadows);
-		mesh3D->SetReceiveShadows(receiveShadows);
-
 		// if there are meshes with bones on this node, then we create a SkinnedMesh3DRenderer instead of a Mesh3DRenderer
 		if(requiresSkinnedRenderer)
 		{
@@ -378,6 +374,9 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		Mesh3DFilterRef filter = engineObjectManager->CreateMesh3DFilter();
 		ASSERT_RTRN(filter.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Unable to create mesh#D filter object.");
 
+		// set shadow properties
+		filter->SetCastShadows(castShadows);
+		filter->SetReceiveShadows(receiveShadows);
 		filter->SetMesh3D(mesh3D);
 		sceneObject->SetMesh3DFilter(filter);
 

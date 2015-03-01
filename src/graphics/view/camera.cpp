@@ -47,6 +47,10 @@ void Camera::SetSkybox(TextureRef cubeTexture)
 		// get reference to the engine's object manager
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
+		skyboxSceneObject = objectManager->CreateSceneObject();
+		ASSERT_RTRN(skyboxSceneObject.IsValid(), "Camera::SetSkybox -> Unable to create skybox scene object.");
+		skyboxSceneObject->SetActive(false);
+
 		ShaderSource skyboxShaderSource;
 		importer.LoadBuiltInShaderSource("skybox", skyboxShaderSource);
 		skyboxMaterial = objectManager->CreateMaterial(std::string("SkyBox"), skyboxShaderSource);
@@ -64,20 +68,13 @@ void Camera::SetSkybox(TextureRef cubeTexture)
 
 		skyboxMeshFilter = objectManager->CreateMesh3DFilter();
 		ASSERT_RTRN(skyboxMeshFilter.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh filter.");
-
 		skyboxMeshFilter->SetMesh3D(skyboxMesh);
+		skyboxSceneObject->SetMesh3DFilter(skyboxMeshFilter);
+
 		skyboxMeshRenderer = objectManager->CreateMesh3DRenderer();
 		ASSERT_RTRN(skyboxMeshRenderer.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh renderer.");
-
 		skyboxMeshRenderer->AddMaterial(skyboxMaterial);
-
-		skyboxSceneObject = objectManager->CreateSceneObject();
-		ASSERT_RTRN(skyboxSceneObject.IsValid(), "Camera::SetSkybox -> Unable to create skybox scene object.");
-
-		skyboxSceneObject->SetMesh3DFilter(skyboxMeshFilter);
 		skyboxSceneObject->SetMesh3DRenderer(skyboxMeshRenderer);
-
-		skyboxSceneObject->SetActive(false);
 
 		skyboxSetup = true;
 	}
@@ -131,7 +128,7 @@ void Camera::UpdateDisplay()
 
 	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
 
-	Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 150);
+	Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 200);
 	//Transform::BuildProjectionMatrixInfiniteFar(proj, 65, ratio, 3);
 	projection.SetTo(proj);
 }

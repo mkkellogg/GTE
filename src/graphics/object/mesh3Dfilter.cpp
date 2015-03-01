@@ -21,7 +21,8 @@
 
 Mesh3DFilter::Mesh3DFilter()
 {
-
+	castShadows = false;
+	receiveShadows = false;
 }
 
 Mesh3DFilter::~Mesh3DFilter()
@@ -43,3 +44,36 @@ Mesh3DRef Mesh3DFilter::GetMesh3D()
 {
 	return mesh;
 }
+
+/*
+ * Specify whether or not [mesh] should cast shadows.
+ */
+void Mesh3DFilter::SetCastShadows(bool castShadows)
+{
+	this->castShadows = castShadows;
+}
+
+/*
+ * Should [mesh] cast shadows?
+ */
+bool Mesh3DFilter::GetCastShadows()
+{
+	return castShadows;
+}
+
+/*
+ * Specify whether or not [mesh] should receive shadows.
+ */
+void Mesh3DFilter::SetReceiveShadows(bool receiveShadows)
+{
+	this->receiveShadows = receiveShadows;
+}
+
+/*
+ * Should [mesh] receive shadows?
+ */
+bool Mesh3DFilter::GetReceiveShadows()
+{
+	return receiveShadows;
+}
+

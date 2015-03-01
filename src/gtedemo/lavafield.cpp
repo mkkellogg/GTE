@@ -45,9 +45,6 @@ bool LavaField::InitMeshAndMaterial()
 	fieldMesh = EngineUtility::CreateRectangularMesh(meshAttributes, fieldWidth, fieldHeight, subDivisions-1, subDivisions-1);
 	ASSERT(fieldMesh.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create field mesh.", false);
 
-	fieldMesh->SetCastShadows(false);
-	fieldMesh->SetReceiveShadows(false);
-
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	AssetImporter importer;
 
@@ -163,6 +160,8 @@ bool LavaField::Init()
 	ASSERT(renderer.IsValid(), "LavaField::Init -> Could not create lava field renderer.", false);
 
 	meshFilter->SetMesh3D(fieldMesh);
+	meshFilter->SetCastShadows(false);
+	meshFilter->SetReceiveShadows(false);
 	lavaFieldObject->SetMesh3DFilter(meshFilter);
 
 	renderer->AddMaterial(lavaMaterial);

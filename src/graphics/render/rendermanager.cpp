@@ -22,6 +22,7 @@
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
+#include "graphics/object/mesh3Dfilter.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
@@ -263,10 +264,11 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 			}
 
 			Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
+			Mesh3DFilterRef meshFilter = child->GetMesh3DFilter();
 			SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
 
 			// check for standard mesh renderer
-			if(meshRenderer.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
+			if(child->GetMesh3D().IsValid() && meshRenderer.IsValid() && meshFilter.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
 			{
 				sceneMeshObjects[sceneMeshCount] = child;
 
@@ -288,7 +290,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 			}
 
 			// check for skinned mesh renderer
-			if(skinnedMeshRenderer.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
+			if(child->GetMesh3D().IsValid() && skinnedMeshRenderer.IsValid() && meshFilter.IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
 			{
 				sceneMeshObjects[sceneMeshCount] = child;
 
@@ -477,6 +479,7 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			// make sure the current scene object's meshes are valid for rendering
 			if(!ValidateSceneObjectForRendering(childRef))continue;
 			Mesh3DRef mesh = childRef->GetMesh3D();
+			Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
 			SceneObject * child = childRef.GetPtr();
 
 			// copy the full transform of the scene object, including those of all ancestors
@@ -488,7 +491,7 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			{
 				if(pass == ShadowVolumeRender) // shadow volume pass
 				{
-					if(mesh->GetCastShadows())
+					if(filter->GetCastShadows())
 					{
 						RenderShadowVolumesForSceneObject(*child, light, lightPosition, viewTransformInverse, camera);
 					}
@@ -496,7 +499,7 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 				else if(pass == StandardRender) // normal rendering pass
 				{
 					// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
-					if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && mesh->GetReceiveShadows())
+					if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && filter->GetReceiveShadows())
 					{
 						if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
 						{

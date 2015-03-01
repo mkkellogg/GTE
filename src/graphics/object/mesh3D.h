@@ -51,11 +51,6 @@ class Mesh3D : public EngineObject
 	// container for the submeshes
 	std::vector<SubMesh3DRef> subMeshes;
 
-	// should this mesh cast shadows?
-	bool castShadows;
-	// should this mesh receive shadows?
-	bool receiveShadows;
-
     Mesh3D(unsigned int subMeshCount);
     ~Mesh3D();
     void Destroy();
@@ -76,11 +71,6 @@ class Mesh3D : public EngineObject
     const Vector3& GetSphereOfInfluenceY() const;
     const Vector3& GetSphereOfInfluenceZ() const;
     LightCullType GetLightCullType() const;
-
-    void SetCastShadows(bool castShadows);
-    bool GetCastShadows();
-    void SetReceiveShadows(bool receiveShadows);
-    bool GetReceiveShadows();
 };
 
 #endif
