@@ -108,11 +108,15 @@
 	
 	'P' Key: Select point lights in the scene.
 	
+	'L' Key: Select lava lights.
+	
 	'Q' Key: Toggle currently selected light.
 	
 	'W' Key: Increase the intensity of currently selected light.
 	
 	'E' Key: Decrease intensity of currently selected light.
+	
+	'R' Key: Toggle shadow casting for light (will only work for meshes that cast shadows)
 	
 
 	
