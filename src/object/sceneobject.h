@@ -66,7 +66,7 @@ class SceneObject : public EngineObject
 
     void SetLayerMask(IntMask mask);
     void MergeLayerMask(IntMask mask);
-    IntMask GetLayerMask();
+    IntMask GetLayerMask() const;
 
     SceneObjectTransform& GetTransform();
     const Transform& GetAggregateTransform() const;

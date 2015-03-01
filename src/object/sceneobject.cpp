@@ -83,7 +83,7 @@ void SceneObject::MergeLayerMask(IntMask mask)
 	layerMask = IntMaskUtil::MergeMasks(layerMask, mask);
 }
 
-IntMask SceneObject::GetLayerMask()
+IntMask SceneObject::GetLayerMask() const
 {
 	return layerMask;
 }

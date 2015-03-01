@@ -483,9 +483,8 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			Transform full;
 			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
 
-			// make sure the current mesh should not be culled from [light]. this will be true
-			// if [light] is directional or ambient, or if ShouldCullFromLight() returns true.
-			if( light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient || !ShouldCullFromLight(light, lightPosition, full, *mesh))
+			// make sure the current mesh should not be culled from [light].
+			if(!ShouldCullFromLight(light, lightPosition, full, *child))
 			{
 				if(pass == ShadowVolumeRender) // shadow volume pass
 				{
@@ -716,18 +715,6 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 	Transform model;
 	Transform modelInverse;
 
-	// exclude objects that have layer masks that are not compatible
-	// with the culling mask of the light contained in [lightingDescriptor].
-	if(!lightingDescriptor.SelfLit)
-	{
-		IntMask layerMask = sceneObject.GetLayerMask();
-		IntMask cullingMask = lightingDescriptor.LightObject->GetCullingMask();
-		if(!IntMaskUtil::HaveAtLeastOneInCommon(layerMask, cullingMask))
-		{
-			return;
-		}
-	}
-
 	// check if [sceneObject] has a mesh & renderer
 	if(sceneObject.GetMesh3DRenderer().IsValid())
 	{
@@ -854,15 +841,6 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 	Transform modelView;
 	Transform model;
 	Transform modelInverse;
-
-	// exclude objects that have layer masks that are not compatible
-	// with the culling mask of the light contained in [lightingDescriptor].
-	IntMask layerMask = sceneObject.GetLayerMask();
-	IntMask cullingMask = light.GetCullingMask();
-	if(!IntMaskUtil::HaveAtLeastOneInCommon(layerMask, cullingMask))
-	{
-		return;
-	}
 
 	// check if [sceneObject] has a mesh & renderer
 	if(sceneObject.GetMesh3DRenderer().IsValid())
@@ -1207,22 +1185,44 @@ FowardBlendingMethod RenderManager::GetForwardBlending()
 /*
  * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].
  */
-bool RenderManager::ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform,  const Mesh3D& mesh) const
+bool RenderManager::ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform,  const SceneObject& sceneObject) const
 {
-	switch(mesh.GetLightCullType())
+	// exclude objects that have layer masks that are not compatible
+	// with the culling mask of the light contained in [lightingDescriptor].
+	IntMask layerMask = sceneObject.GetLayerMask();
+	IntMask cullingMask = light.GetCullingMask();
+	if(!IntMaskUtil::HaveAtLeastOneInCommon(layerMask, cullingMask))
 	{
-		case LightCullType::None:
-			return false;
-		break;
-		case LightCullType::SphereOfInfluence:
-			return ShouldCullBySphereOfInfluence(light, lightPosition, fullTransform, mesh);
-		break;
-		case LightCullType::Tiled:
-			return ShouldCullByTile(light, lightPosition, fullTransform, mesh);
-		break;
-		default:
-			return false;
-		break;
+		return true;
+	}
+
+	if(light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient )
+	{
+		return false;
+	}
+
+	SceneObject& sceneObj = const_cast<SceneObject&>(sceneObject);
+	Mesh3DRef meshRef = sceneObj.GetMesh3D();
+
+	if(meshRef.IsValid())
+	{
+		Mesh3D& mesh = meshRef.GetRef();
+
+		switch(mesh.GetLightCullType())
+		{
+			case LightCullType::None:
+				return false;
+			break;
+			case LightCullType::SphereOfInfluence:
+				return ShouldCullBySphereOfInfluence(light, lightPosition, fullTransform, mesh);
+			break;
+			case LightCullType::Tiled:
+				return ShouldCullByTile(light, lightPosition, fullTransform, mesh);
+			break;
+			default:
+				return false;
+			break;
+		}
 	}
 
 	return false;
