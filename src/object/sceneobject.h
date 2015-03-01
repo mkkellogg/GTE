@@ -16,6 +16,7 @@ class Light;
 #include "geometry/sceneobjecttransform.h"
 #include "engineobject.h"
 #include "enginetypes.h"
+#include "base/intmask.h"
 #include <vector>
 #include <memory>
 #include <string>
@@ -41,6 +42,7 @@ class SceneObject : public EngineObject
 	Transform processingTransform;
 	std::vector<SceneObjectRef > children;
 	SceneObjectRef parent;
+	IntMask layerMask;
 	CameraRef camera;
 	LightRef light;
 	Mesh3DRendererRef renderer3D;
@@ -61,6 +63,10 @@ class SceneObject : public EngineObject
     void SetStatic(bool isStatic);
     void SetName(const std::string& name);
     const std::string& GetName();
+
+    void SetLayerMask(IntMask mask);
+    void MergeLayerMask(IntMask mask);
+    IntMask GetLayerMask();
 
     SceneObjectTransform& GetTransform();
     const Transform& GetAggregateTransform() const;

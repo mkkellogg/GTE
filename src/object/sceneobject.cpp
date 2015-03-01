@@ -34,6 +34,8 @@ SceneObject::SceneObject() : EngineObject()
 	transform.SetSceneObject(this);
 
 	processingTransform.SetIdentity();
+
+	layerMask = IntMaskUtil::CreateIntMask();
 }
 
 SceneObject::~SceneObject()
@@ -69,6 +71,21 @@ void SceneObject::SetName(const std::string& name)
 const std::string& SceneObject::GetName()
 {
 	return name;
+}
+
+void SceneObject::SetLayerMask(IntMask mask)
+{
+	layerMask = mask;
+}
+
+void SceneObject::MergeLayerMask(IntMask mask)
+{
+	layerMask = IntMaskUtil::MergeMasks(layerMask, mask);
+}
+
+IntMask SceneObject::GetLayerMask()
+{
+	return layerMask;
 }
 
 SceneObjectTransform& SceneObject::GetTransform()
