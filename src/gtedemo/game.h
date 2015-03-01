@@ -18,6 +18,7 @@ class LavaField;
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
+#include "base/intmask.h"
 #include <functional>
 #include <vector>
 
@@ -50,8 +51,21 @@ class Game
 		None = 0,
 		Ambient = 1,
 		Directional = 2,
-		Point = 3
+		Point = 3,
+		Lava = 4
 	};
+
+	// layer name for lava pool wall
+	static const std::string LavaWallLayer;
+
+	// layer name for lava pool island
+	static const std::string LavaIslandLayer;
+
+	// layer mask for lava wall layer
+	IntMask lavaWallLayerMask;
+
+	// layer mask for lava island layer
+	IntMask lavaIslandLayerMask;
 
 	static const unsigned int MAX_PLAYER_STATES = 32;
 
@@ -70,6 +84,8 @@ class Game
 	SceneObjectRef spinningPointLightObject;
 	// scene lava
 	LavaField * lavaField;
+	// container lava lights
+	std::vector<SceneObjectRef> lavaLightObjects;
 	// container for other point lights in the scene
 	std::vector<SceneObjectRef> otherPointLightObjects;
 	// The SceneObject to which the player model hierarchy is attached
@@ -133,6 +149,8 @@ class Game
 	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz);
 	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz, bool isStatic);
 	void SetAllObjectsStatic(SceneObjectRef root);
+	void SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask);
+	void MergeAllObjectsLayerMask(SceneObjectRef root, IntMask mask);
 	void SetAllMeshesStandardShadowVolume(SceneObjectRef root);
 	void SetupPlayer(AssetImporter& importer);
 	void SetupLights(AssetImporter& importer);
@@ -147,20 +165,20 @@ class Game
 	void ActivatePlayerState(PlayerState state);
 	void ManagePlayerState();
 	void HandleGeneralInput();
-	void UpdateLight(SceneObjectRef sceneObject, bool toggleLight, float intensityChange);
+	void UpdateLight(SceneObjectRef sceneObject, bool toggleLight, float intensityChange, bool toggleCastShadows);
 
 	void DisplayInfo();
 	void SignalDisplayInfoChanged();
 
 	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
+	SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
+	SceneObjectRef FindFirstSceneObjectWithMesh(SceneObjectRef ref);
 
     public:
 
     Game();
     ~Game();
 
-    SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
-    SceneObjectRef FindFirstSceneObjectWithMesh(SceneObjectRef ref);
     void Init();
     void Update();
 };
