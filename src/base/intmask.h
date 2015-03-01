@@ -23,6 +23,9 @@ class IntMaskUtil
 	static bool IsBitSetForMask(IntMask target,IntMask mask);
 
 	static IntMask CreateIntMask();
+
+	static IntMask MergeMasks(IntMask a, IntMask b);
+	static bool HaveAtLeastOneInCommon(IntMask a, IntMask b);
 };
 
 #endif

@@ -100,3 +100,13 @@ IntMask IntMaskUtil::CreateIntMask()
 {
 	return 0;
 }
+
+IntMask IntMaskUtil::MergeMasks(IntMask a, IntMask b)
+{
+	return a | b;
+}
+
+bool IntMaskUtil::HaveAtLeastOneInCommon(IntMask a, IntMask b)
+{
+	return a & b;
+}
