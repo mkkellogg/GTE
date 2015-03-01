@@ -716,6 +716,18 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 	Transform model;
 	Transform modelInverse;
 
+	// exclude objects that have layer masks that are not compatible
+	// with the culling mask of the light contained in [lightingDescriptor].
+	if(!lightingDescriptor.SelfLit)
+	{
+		IntMask layerMask = sceneObject.GetLayerMask();
+		IntMask cullingMask = lightingDescriptor.LightObject->GetCullingMask();
+		if(!IntMaskUtil::HaveAtLeastOneInCommon(layerMask, cullingMask))
+		{
+			return;
+		}
+	}
+
 	// check if [sceneObject] has a mesh & renderer
 	if(sceneObject.GetMesh3DRenderer().IsValid())
 	{
@@ -842,6 +854,15 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 	Transform modelView;
 	Transform model;
 	Transform modelInverse;
+
+	// exclude objects that have layer masks that are not compatible
+	// with the culling mask of the light contained in [lightingDescriptor].
+	IntMask layerMask = sceneObject.GetLayerMask();
+	IntMask cullingMask = light.GetCullingMask();
+	if(!IntMaskUtil::HaveAtLeastOneInCommon(layerMask, cullingMask))
+	{
+		return;
+	}
 
 	// check if [sceneObject] has a mesh & renderer
 	if(sceneObject.GetMesh3DRenderer().IsValid())
