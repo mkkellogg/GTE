@@ -8,6 +8,7 @@ class Light;
 #include "graphics/color/color4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
+#include "base/intmask.h"
 #include <memory>
 
 enum class LightType
@@ -39,6 +40,7 @@ class Light : public SceneObjectComponent
 	float attenuation;
 	float range;
 	bool shadowsEnabled;
+	IntMask cullingMask;
 
 	protected:
 
@@ -73,6 +75,9 @@ class Light : public SceneObjectComponent
 
 	void SetShadowsEnabled(bool enabled);
 	bool GetShadowsEnabled() const;
+
+	void SetCullingMask(IntMask mask);
+	IntMask GetCullingMask() const;
 };
 
 #endif

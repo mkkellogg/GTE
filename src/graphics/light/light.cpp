@@ -24,7 +24,7 @@ Light::Light()
 
 Light::~Light()
 {
-
+	cullingMask = IntMaskUtil::CreateIntMask();
 }
 
 Color4 Light::GetColor() const
@@ -121,5 +121,15 @@ void Light::SetShadowsEnabled(bool enabled)
 bool Light::GetShadowsEnabled() const
 {
 	return shadowsEnabled;
+}
+
+void Light::SetCullingMask(IntMask mask)
+{
+	cullingMask = mask;
+}
+
+IntMask Light::GetCullingMask() const
+{
+	return cullingMask;
 }
 
