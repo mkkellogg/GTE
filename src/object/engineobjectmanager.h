@@ -30,6 +30,7 @@ class ShaderSource;
 #include "graphics/stdattributes.h"
 #include "object/sceneobject.h"
 #include "object/enginetypes.h"
+#include "object/layermanager.h"
 #include "graphics/texture/textureattr.h"
 #include "shaderorganizer.h"
 #include "base/longmask.h"
@@ -41,6 +42,7 @@ class EngineObjectManager
 
 	std::unordered_map<ObjectID, SceneObjectRef> sceneObjectDirectory;
 
+	LayerManager layerManager;
 	ShaderOrganizer loadedShaders;
 	std::vector<EngineObject *> engineObjects;
 	SceneObject sceneRoot;
@@ -75,9 +77,13 @@ class EngineObjectManager
 
     public :
 
+	static const std::string DefaultLayer;
+
 	bool Init();
 
     ShaderRef GetLoadedShader(LongMask properties);
+
+    LayerManager& GetLayerManager();
 
     SceneObjectRef FindSceneObjectInDirectory(unsigned long objectID);
     const SceneObjectRef GetSceneRoot() const;

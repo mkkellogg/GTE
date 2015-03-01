@@ -36,6 +36,8 @@
 #include "global/constants.h"
 #include <string>
 
+const std::string EngineObjectManager::DefaultLayer = "Default";
+
 EngineObjectManager::EngineObjectManager()
 {
 	currentEngineObjectID = 0L;
@@ -60,6 +62,7 @@ unsigned long EngineObjectManager::GetNextObjectID()
 
 bool EngineObjectManager::Init()
 {
+	layerManager.AddLayer(DefaultLayer);
 	return true;
 }
 
@@ -126,6 +129,11 @@ ShaderRef EngineObjectManager::GetLoadedShader(LongMask properties)
 	return loadedShaders.GetShader(properties);
 }
 
+LayerManager& EngineObjectManager::GetLayerManager()
+{
+	return layerManager;
+}
+
 SceneObjectRef EngineObjectManager::CreateSceneObject()
 {
 	SceneObject *sceneObject = new SceneObject();
@@ -137,6 +145,7 @@ SceneObjectRef EngineObjectManager::CreateSceneObject()
 		  DeleteSceneObject(sceneObject);
 	});
 
+	ref->SetLayerMask(layerManager.GetLayerMask(DefaultLayer));
 	AddSceneObjectToDirectory(ref->GetObjectID(), ref);
 
 	sceneRootRef->AddChild(ref);
@@ -630,7 +639,9 @@ LightRef EngineObjectManager::CreateLight()
 {
 	Light * light = new Light();
 	ASSERT(light != NULL, "EngineObjectManager::CreateLight -> Could not create new Light object.", LightRef::Null());
+
 	light->SetObjectID(GetNextObjectID());
+	light->SetCullingMask(layerManager.GetLayerMask(DefaultLayer));
 
 	return LightRef(light, [=](Light * light)
 	{
