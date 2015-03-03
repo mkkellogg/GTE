@@ -292,7 +292,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 			faceToLightDir.x = lightPosDir.x - vertexAvg.x;
 			faceToLightDir.y = lightPosDir.y - vertexAvg.y;
 			faceToLightDir.z = lightPosDir.z - vertexAvg.z;
-			faceToLightDir.Normalize();
+			faceToLightDir.QuickNormalize();
 		}
 
 		// calculate dot product between face normal and direction to light
@@ -399,7 +399,7 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 						adjFaceToLightDir.x = lightPosDir.x - vertexAvg.x;
 						adjFaceToLightDir.y = lightPosDir.y - vertexAvg.y;
 						adjFaceToLightDir.z = lightPosDir.z - vertexAvg.z;
-						adjFaceToLightDir.Normalize();
+						adjFaceToLightDir.QuickNormalize();
 					}
 
 					// calculate dot product between adjacent face normal and direction to light
