@@ -125,14 +125,14 @@ class RenderManager
 	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneForSelfLitMaterials(const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera,
-								 MaterialRef materialOverride, bool flagRendered, FowardBlendingFilter blendingFilter);
+								 MaterialRef materialOverride, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 	void ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
 	void ForwardRenderDepthBuffer(const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneSSAO(const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
-			  	  	  	  	  	  	  	                     FowardBlendingFilter blendingFilter);
-	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material,
-											   bool flagRendered, FowardBlendingFilter blendingFilter,  std::function<bool(SceneObjectRef)> filterFunction);
+											   bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
+											   bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,  std::function<bool(SceneObjectRef)> filterFunction);
 	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Transform& viewTransformInverse, const Camera& camera);
 
 

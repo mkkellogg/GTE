@@ -171,7 +171,7 @@ void Vector3::Normalize()
  * Convert this vector to a unity vector, but use the hacky cheat QuickMagnitude(),
  * which is not as accurate (or correct) as Magnitude()
  */
-void Vector3::QuickNormlize()
+void Vector3::QuickNormalize()
 {
     float magnitude = QuickMagnitude();
     if(magnitude != 0)

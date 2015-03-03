@@ -50,7 +50,7 @@ class Vector3 : public BaseVector4
 
     void Scale(float magnitude);
     void Normalize();
-    void QuickNormlize();
+    void QuickNormalize();
     float Magnitude() const ;
     float SquareMagnitude() const ;
     static float Magnitude(float x, float y, float z);

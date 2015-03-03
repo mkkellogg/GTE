@@ -57,15 +57,20 @@ class Game
 
 	// layer name for lava pool wall
 	static const std::string LavaWallLayer;
-
 	// layer name for lava pool island
 	static const std::string LavaIslandLayer;
-
+	// layer name for lava pool island objects
+	static const std::string LavaIslandObjectsLayer;
+	// layer name for player object
+	static const std::string PlayerObjectLayer;
 	// layer mask for lava wall layer
 	IntMask lavaWallLayerMask;
-
 	// layer mask for lava island layer
 	IntMask lavaIslandLayerMask;
+	// layer mask for lava island layer objects
+	IntMask lavaIslandObjectsLayerMask;
+	// layer mask for player object
+	IntMask playerObjectLayerMask;
 
 	static const unsigned int MAX_PLAYER_STATES = 32;
 
@@ -140,20 +145,24 @@ class Game
 	Vector3 basePlayerForward;
 	Vector3 baseCameraForward;
 
-	void SetupCamera();
+	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
+	SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
+	SceneObjectRef FindFirstSceneObjectWithMesh(SceneObjectRef ref);
+	void SetAllObjectsStatic(SceneObjectRef root);
+	void SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask);
+	void SetAllMeshesStandardShadowVolume(SceneObjectRef root);
+	void SetAllObjectsCastShadows(SceneObjectRef root, bool castShadows);
+
 	void SetupScene(AssetImporter& importer);
 	void SetupSceneTerrain(AssetImporter& importer);
 	void SetupSceneStructures(AssetImporter& importer);
 	void SetupScenePlants(AssetImporter& importer);
 	void SetupSceneExtra(AssetImporter& importer);
-	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz);
-	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz, bool isStatic);
-	void SetAllObjectsStatic(SceneObjectRef root);
-	void SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask);
-	void MergeAllObjectsLayerMask(SceneObjectRef root, IntMask mask);
-	void SetAllMeshesStandardShadowVolume(SceneObjectRef root);
-	void SetupPlayer(AssetImporter& importer);
+	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz,
+								  bool isStatic, bool castShadows, bool receiveShadows);
+	void SetupCamera();
 	void SetupLights(AssetImporter& importer);
+	void SetupPlayer(AssetImporter& importer);
 
 	void InitializePlayerPosition();
 	void UpdatePlayerHorizontalSpeedAndDirection();
@@ -169,10 +178,6 @@ class Game
 
 	void DisplayInfo();
 	void SignalDisplayInfoChanged();
-
-	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
-	SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
-	SceneObjectRef FindFirstSceneObjectWithMesh(SceneObjectRef ref);
 
     public:
 
