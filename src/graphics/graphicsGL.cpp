@@ -47,7 +47,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     char * argv = (char*)"";
     glutInit(&argc, &argv);
 
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
     glutInitWindowSize(this->attributes.WindowWidth, this->attributes.WindowHeight);
 
     if(!glutGet(GLUT_DISPLAY_MODE_POSSIBLE))
