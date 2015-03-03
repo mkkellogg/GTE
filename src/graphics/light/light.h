@@ -77,6 +77,7 @@ class Light : public SceneObjectComponent
 	bool GetShadowsEnabled() const;
 
 	void SetCullingMask(IntMask mask);
+	void MergeCullingMask(IntMask mask);
 	IntMask GetCullingMask() const;
 };
 
