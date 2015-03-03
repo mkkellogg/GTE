@@ -65,7 +65,6 @@ class SceneObject : public EngineObject
     const std::string& GetName();
 
     void SetLayerMask(IntMask mask);
-    void MergeLayerMask(IntMask mask);
     IntMask GetLayerMask() const;
 
     SceneObjectTransform& GetTransform();

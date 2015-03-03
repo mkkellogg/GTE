@@ -78,11 +78,6 @@ void SceneObject::SetLayerMask(IntMask mask)
 	layerMask = mask;
 }
 
-void SceneObject::MergeLayerMask(IntMask mask)
-{
-	layerMask = IntMaskUtil::MergeMasks(layerMask, mask);
-}
-
 IntMask SceneObject::GetLayerMask() const
 {
 	return layerMask;
