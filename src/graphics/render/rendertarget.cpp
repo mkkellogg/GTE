@@ -3,6 +3,9 @@
 #include "base/intmask.h"
 #include "global/global.h"
 
+/*
+ * Single constructor, set all member variables.
+ */
 RenderTarget::RenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
 {
 	this->hasColorBuffer = hasColor;
@@ -12,11 +15,17 @@ RenderTarget::RenderTarget(bool hasColor, bool hasDepth, const TextureAttributes
 	this->colorTextureAttributes = colorTextureAttributes;
 }
 
+/*
+ * Clean-up.
+ */
 RenderTarget::~RenderTarget()
 {
 
 }
 
+/*
+ * Return true if this render target supports [bufferType].
+ */
 bool RenderTarget::HasBuffer(RenderBufferType bufferType) const
 {
 	switch(bufferType)
@@ -35,11 +44,17 @@ bool RenderTarget::HasBuffer(RenderBufferType bufferType) const
 	return false;
 }
 
+/*
+ * Get a reference to the depth texture.
+ */
 TextureRef RenderTarget::GetDepthTexture()
 {
 	return depthTexture;
 }
 
+/*
+ * Get a reference to the color texture.
+ */
 TextureRef RenderTarget::GetColorTexture()
 {
 	return colorTexture;

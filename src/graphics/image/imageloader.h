@@ -17,6 +17,11 @@ class RawImage;
 #include <IL/il.h>
 #include <string>
 
+enum ImageLoaderError
+{
+	GeneralLoadError = 1
+};
+
 class ImageLoader
 {
 	static bool ilInitialized;

@@ -59,7 +59,7 @@ class Mesh3D : public EngineObject
 
 	public:
 
-    unsigned int GetSubMeshCount();
+    unsigned int GetSubMeshCount() const;
     void SetSubMesh(SubMesh3DRef mesh, unsigned int index);
     SubMesh3DRef GetSubMesh(unsigned int index);
     bool Init();

@@ -9,6 +9,7 @@
 #include "graphics/graphics.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/animation/animationmanager.h"
+#include "graphics/render/rendermanager.h"
 #include "input/inputmanager.h"
 #include "input/inputmanagerGL.h"
 #include "error/errormanager.h"
@@ -26,6 +27,7 @@ Engine::Engine()
 {
 	engineObjectManager = NULL;
 	graphicsEngine = NULL;
+	renderManager = NULL;
 	animationManager = NULL;
 	inputManager = NULL;
 	errorManager = NULL;
@@ -96,6 +98,12 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 
 	bool graphicsInitSuccess = graphicsEngine->Init(graphicsAttributes);
 	ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.", false);
+
+	renderManager = new RenderManager();
+	ASSERT(renderManager != NULL, "Engine::Init -> Unable to allocate render manager", false);
+
+	bool renderInitSuccess = renderManager->Init();
+	ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager", false);
 
 	// This portion of the initialization of the engine object manager must be called
 	// after the graphics engine is initialized
@@ -177,7 +185,7 @@ void Engine::Start()
  */
 void Engine::_Start()
 {
-	if(graphicsEngine != NULL)graphicsEngine->Run();
+	if(graphicsEngine != NULL)graphicsEngine->Start();
 	Quit();
 }
 
@@ -197,7 +205,7 @@ void Engine::ShutDown()
 /*
  * Has the Init() method been called successfully?
  */
-bool Engine::IsInitialized()
+bool Engine::IsInitialized() const
 {
 	return initialized;
 }
@@ -211,11 +219,19 @@ EngineObjectManager * Engine::GetEngineObjectManager()
 }
 
 /*
- * Access the GraphicsEngine component.
+ * Access the Graphics component.
  */
 Graphics * Engine::GetGraphicsEngine()
 {
 	return graphicsEngine;
+}
+
+/*
+ * Access the RenderManager component.
+ */
+RenderManager * Engine::GetRenderManager()
+{
+	return renderManager;
 }
 
 /*

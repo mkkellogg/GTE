@@ -37,7 +37,7 @@ class SceneObjectTransform : public Transform
     static void GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert);
     static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, bool includeSelf,  bool invert);
 
-    void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
+    void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
     void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
 
     void Translate(float x, float y, float z, bool local);

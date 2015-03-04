@@ -164,7 +164,7 @@ bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int length, in
 /*
  * Get the time this renderer was last updated with its target sub-mesh.
  */
-float SubMesh3DRenderer::GetTimeStamp()
+float SubMesh3DRenderer::GetTimeStamp() const
 {
 	return timeStamp;
 }
@@ -772,7 +772,7 @@ AttributeTransformer * SubMesh3DRenderer::GetAttributeTransformer()
 /*
  * Return the [doAttributeTransform] flag.
  */
-bool SubMesh3DRenderer::DoesAttributeTransform()
+bool SubMesh3DRenderer::DoesAttributeTransform() const
 {
 	return doAttributeTransform;
 }

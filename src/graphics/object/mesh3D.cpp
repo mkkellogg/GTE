@@ -48,7 +48,7 @@ void Mesh3D::Destroy()
 /*
  * Get the number of sub-meshes managed by this instance of Mesh3D.
  */
-unsigned int Mesh3D::GetSubMeshCount()
+unsigned int Mesh3D::GetSubMeshCount() const
 {
 	return subMeshCount;
 }

@@ -82,7 +82,7 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 		if (!success)
 		{
 			// Error occurred
-			Debug::PrintError("ImageLoader::LoadImage -> Couldn't convert image");
+			Engine::Instance()->GetErrorManager()->SetAndReportError(ImageLoaderError::GeneralLoadError, "ImageLoader::LoadImage -> Couldn't convert image");
 			ilDeleteImages(1, imageIds);
 			return NULL;
 		}
@@ -100,7 +100,7 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 			msg += std::string("Is DevIL configured to load extension: ") + extension + std::string(" ?");
 		}
 
-		Debug::PrintError(msg);
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ImageLoaderError::GeneralLoadError, msg);
 		ilDeleteImages(1, imageIds);
 		return NULL;
 	}

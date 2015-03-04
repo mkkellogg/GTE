@@ -449,7 +449,13 @@ TextureRef EngineObjectManager::CreateTexture(const std::string& sourcePath, Tex
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	Texture * texture = graphics->CreateTexture(sourcePath, attributes);
-	ASSERT(texture != NULL,"EngineObjectManager::CreateTexture -> could not create new Texture object.", TextureRef::Null());
+
+	if(texture == NULL)
+	{
+		Debug::PrintError("EngineObjectManager::CreateTexture -> could not create new Texture object.");
+		return TextureRef::Null();
+	}
+
 	texture->SetObjectID(GetNextObjectID());
 
 	return TextureRef(texture, [=](Texture * texture)

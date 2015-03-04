@@ -32,10 +32,8 @@ class SkinnedMesh3DRenderer : public Mesh3DRenderer
 	friend class EngineObjectManager;
 	friend class SubMesh3DRenderer;
 
-	protected:
-
 	// the skeleton for this skinned mesh renderer, describes the bone hierarchy
-	// and (inverse) bind pose transform of each bone. it also describes the scene
+	// and (inverse) bind pose transformation of each bone. it also describes the scene
 	// object to which each bone corresponds indirectly through the node structures
 	// it contains.
 	SkeletonRef skeleton;

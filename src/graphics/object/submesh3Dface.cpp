@@ -7,6 +7,9 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
+/*
+ * Constructor - initialize all member variables.
+ */
 SubMesh3DFace::SubMesh3DFace()
 {
 	FirstVertexIndex = -1;
@@ -15,6 +18,9 @@ SubMesh3DFace::SubMesh3DFace()
 	AdjacentFaceIndex3 = -1;
 }
 
+/*
+ * Clean up.
+ */
 SubMesh3DFace::~SubMesh3DFace()
 {
 

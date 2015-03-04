@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-enum class ErrorCode
+enum ErrorCode
 {
 	GENERAL_FATAL = 5,
 	GENERAL_SEVERE = 4,

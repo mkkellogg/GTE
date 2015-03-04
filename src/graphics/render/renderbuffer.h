@@ -21,10 +21,5 @@ enum class DepthBufferFunction
 
 };
 
-class RenderBuffer
-{
-
-};
-
 #endif
 

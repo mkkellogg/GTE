@@ -21,6 +21,7 @@ class AnimationManager;
 class InputManager;
 class ErrorManager;
 class GraphicsAttributes;
+class RenderManager;
 
 #include <string>
 #include "object/enginetypes.h"
@@ -49,6 +50,9 @@ class Engine
 
 	// Manages all graphics-related functionality
 	Graphics * graphicsEngine;
+
+	// Manages the rendering of the scene
+    RenderManager * renderManager;
 
 	// Manages active animations
 	AnimationManager * animationManager;
@@ -80,10 +84,11 @@ class Engine
     static bool Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
     static void Start();
 
-    bool IsInitialized();
+    bool IsInitialized() const;
 
     EngineObjectManager * GetEngineObjectManager();
     Graphics * GetGraphicsEngine();
+    RenderManager * GetRenderManager();
     AnimationManager * GetAnimationManager();
     InputManager * GetInputManager();
     ErrorManager * GetErrorManager();

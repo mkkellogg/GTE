@@ -1,3 +1,12 @@
+/*
+ * class:  AttributeTransformer
+ *
+ * Author: Mark Kellogg
+ *
+ * Base class for performing modifications to mesh attribute structures.
+ */
+
+
 #ifndef _GTE_ATTRIBUTE_TRANSFORMER_H
 #define _GTE_ATTRIBUTE_TRANSFORMER_H
 

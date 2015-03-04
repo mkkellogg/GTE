@@ -40,7 +40,7 @@ SceneObjectTransform::~SceneObjectTransform()
 /*
  * Decompose this transform's matrix into [translation], [rotation], and [scaling].
  */
-void SceneObjectTransform::GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale)
+void SceneObjectTransform::GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
 	matrix.Decompose(translation, rotation, scale);
 }

@@ -10,21 +10,33 @@
 #include "graphics/texture/texture.h"
 #include "graphics/texture/textureGL.h"
 
+/*
+ * Single constructor. For the most part acts as a pass-through to the base constructor, but
+ * also initializes member variables.
+ */
 RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) :
 				RenderTarget(hasColor, hasDepth, colorTextureAttributes, width, height)
 {
 	fboID = 0;
 }
 
+/*
+ * Clean-up.
+ */
 RenderTargetGL::~RenderTargetGL()
 {
 	Destroy();
 }
 
+/*
+ * Destroy the FBO associated with this render target and all attached textures and/or
+ * render buffers.
+ */
 void RenderTargetGL::Destroy()
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
+	// destroy the color texture attachment
 	if(colorTexture.IsValid())
 	{
 		TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
@@ -38,6 +50,7 @@ void RenderTargetGL::Destroy()
 		}
 	}
 
+	// destroy the depth texture attachment
 	if(depthTexture.IsValid())
 	{
 		TextureGL * texGL = dynamic_cast<TextureGL*>(depthTexture.GetPtr());
@@ -51,23 +64,30 @@ void RenderTargetGL::Destroy()
 		}
 	}
 
+	// destroy the FBO
 	if(fboID > 0)
 	{
 		glDeleteFramebuffersEXT(1, &fboID);
 	}
 }
 
+/*
+ * Perform all initialization for this render target. This render target will not
+ * be valid until this method successfully completes.
+ */
 bool RenderTargetGL::Init()
 {
+	// make sure to clean up existing frame-buffer objects (if they exist).
 	Destroy();
 
+	// generate an OpenGL FBO.
 	glGenFramebuffers(1, &fboID);
 	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
-
 	ASSERT(fboID != 0, "RenderTargetGL::Init -> Unable to create frame buffer object.", false);
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
+	// generate a color texture attachment
 	if(hasColorBuffer)
 	{
 		TextureAttributes attributes;
@@ -84,6 +104,7 @@ bool RenderTargetGL::Init()
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
 	}
 
+	// generate a depth texture attachment
 	if(hasDepthBuffer)
 	{
 		TextureAttributes attributes;
@@ -120,6 +141,9 @@ bool RenderTargetGL::Init()
 	return true;
 }
 
+/*
+ * Get the OpenGL FBO ID.
+ */
 GLuint RenderTargetGL::GetFBOID()
 {
 	return fboID;

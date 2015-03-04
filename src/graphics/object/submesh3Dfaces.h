@@ -4,7 +4,8 @@
 *
 * author: Mark Kellogg
 *
-* This class represents an array of sub mesh faces.
+* This class contains an array of sub mesh faces, specifically
+* instances of SubMesh3DFace.
 *
 ***********************************************/
 
@@ -22,7 +23,9 @@ class SubMesh3DFace;
 
 class SubMesh3DFaces
 {
+	// number of faces in [faces]
 	unsigned int faceCount;
+	// face data array
 	SubMesh3DFace * faces;
 
 	void Destroy();

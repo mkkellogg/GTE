@@ -51,7 +51,7 @@ class Mesh3DRenderer : public SceneObjectComponent
 
 	public:
 
-    unsigned int GetMaterialCount();
+    unsigned int GetMaterialCount() const;
     MaterialRef GetMaterial(unsigned int index);
     void SetMaterial(unsigned int index, MaterialRef material);
     void AddMaterial(MaterialRef material);
@@ -64,7 +64,7 @@ class Mesh3DRenderer : public SceneObjectComponent
     SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer);
     virtual SubMesh3DRef GetSubMesh(unsigned int index);
     SubMesh3DRendererRef GetSubRenderer(unsigned int index);
-    unsigned int GetSubRendererCount();
+    unsigned int GetSubRendererCount() const;
 };
 
 #endif

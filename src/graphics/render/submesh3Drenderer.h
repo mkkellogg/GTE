@@ -57,8 +57,6 @@ class SubMesh3DRenderer : public EngineObject
 	// needed for special access during rendering
 	friend class RenderManager;
 
-	protected:
-
 	// index of this sub-renderer in containing Mesh3DRenderer instance's list of sub-renderers
 	int targetSubMeshIndex;
 	// a reference to the last valid material used to for rendering
@@ -144,7 +142,7 @@ class SubMesh3DRenderer : public EngineObject
 
     public:
 
-    float GetTimeStamp();
+    float GetTimeStamp() const;
 
     void SetUseBadGeometryShadowFix(bool useFix);
 
@@ -153,7 +151,7 @@ class SubMesh3DRenderer : public EngineObject
 
     void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
     AttributeTransformer * GetAttributeTransformer();
-    bool DoesAttributeTransform();
+    bool DoesAttributeTransform() const;
 
     const Point3* GetFinalCenter();
 

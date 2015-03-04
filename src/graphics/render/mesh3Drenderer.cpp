@@ -66,7 +66,7 @@ void Mesh3DRenderer::DestroyRenderer(unsigned int index)
 /*
  * Get the number of materials attached to this instance.
  */
-unsigned int Mesh3DRenderer::GetMaterialCount()
+unsigned int Mesh3DRenderer::GetMaterialCount() const
 {
 	return materials.size();
 }
@@ -245,7 +245,7 @@ SubMesh3DRendererRef Mesh3DRenderer::GetSubRenderer(unsigned int index)
 /*
  * Get the number of sub-renderers managed by this renderer.
  */
-unsigned int Mesh3DRenderer::GetSubRendererCount()
+unsigned int Mesh3DRenderer::GetSubRendererCount() const
 {
 	return subRenderers.size();
 }

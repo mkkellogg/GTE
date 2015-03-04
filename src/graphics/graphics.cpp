@@ -19,94 +19,131 @@
 #include "debug/gtedebug.h"
 #include "util/time.h"
 
+/*
+ * Base constructor, initialize member variables.
+ */
+Graphics::Graphics()
+{
+    currentFPSSpanTime =0;
+	framesInFPSSpan =0;
+	currentFPS = 0.0;
+}
+
+/*
+ * Clean up.
+ */
 Graphics::~Graphics()
 {
 
 }
 
-Graphics::Graphics()
-{
-	renderManager = NULL;
-    fpsTime =0;
-	frames =0;
-	currentFPS = 0.0;
-}
-
+/*
+ * For now this method does nothing. It is meant to be overridden in a
+ * deriving class. It is not virtual because it will likely contain code
+ * as the Graphics class evolves.
+ */
 bool Graphics::Init(const GraphicsAttributes& attributes)
 {
-	renderManager = new RenderManager();
-	ASSERT(renderManager != NULL, "Graphics::Init -> Unable to allocate render manager", false);
-
-	bool renderInitSuccess = renderManager->Init();
-	if(!renderInitSuccess)return false;
-
 	return true;
 }
 
+/*
+ * For now this method does nothing. It is not virtual because it will likely contain code
+ * as the Graphics class evolves.
+ */
 void Graphics::PreProcessScene()
 {
 
 }
 
+/*
+ * Update is called once per frame.
+ */
 void Graphics::Update()
 {
 	UpdateFPS();
 }
 
-void Graphics::RenderScene()
-{
-
-}
-
+/*
+ * Update the FPS calculation.
+ */
 void Graphics::UpdateFPS()
 {
-	fpsTime += Time::GetDeltaTime();
-	frames++;
-	if(fpsTime >= 1)
+	currentFPSSpanTime += Time::GetDeltaTime();
+	framesInFPSSpan++;
+	if(currentFPSSpanTime >= 1)
 	{
-		currentFPS = (float)frames/fpsTime;
+		currentFPS = (float)framesInFPSSpan/currentFPSSpanTime;
 		//printf("fps: %f\n", currentFPS);
-		fpsTime = 0;
-		frames = 0;
+		currentFPSSpanTime = 0;
+		framesInFPSSpan = 0;
 	}
 }
 
-bool Graphics::Run()
+/*
+ * Called when the graphics engine starts up. Convenience method for
+ * deriving classes to receive a signal when the engine starts.
+ */
+bool Graphics::Start()
 {
 	return true;
 }
 
+/*
+ * In this base class, this is merely a pass-thru/middleman method that
+ * calls RenderAll() in the render manager. Deriving classes can override this
+ * method and perform any special functionality that may be necessary when rendering
+ * the scene, such as swapping buffers in a double buffering situation.
+ */
+void Graphics::RenderScene()
+{
+	Engine::Instance()->GetRenderManager()->RenderAll();
+}
+
+/*
+ * Set the material (and shader) that should be used for rendering.
+ */
 void Graphics::ActivateMaterial(MaterialRef material)
 {
 	activeMaterial = material;
 	material->ResetVerificationState();
 }
 
+/*
+ * Get the material that is currently being used for rendering.
+ */
 MaterialRef Graphics::GetActiveMaterial() const
 {
 	return activeMaterial;
 }
 
-RenderManager * Graphics::GetRenderManager()
-{
-	return renderManager;
-}
-
+/*
+ * Get the currently calculated FPS value.
+ */
 float Graphics::GetCurrentFPS()
 {
 	return currentFPS;
 }
 
+/*
+ * Get the currently active graphics properties.
+ */
 const GraphicsAttributes& Graphics::GetAttributes() const
 {
 	return attributes;
 }
 
+/*
+ * Turn on/off SSAO.
+ */
 void Graphics::SetSSAOEnabled(bool enabled)
 {
 	attributes.SSAOEnabled = enabled;
 }
 
+/*
+ * Set the type of SSAO being used.
+ */
 void Graphics::SetSSAOMode(SSAORenderMode mode)
 {
 	attributes.SSAOMode = mode;

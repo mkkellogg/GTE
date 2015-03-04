@@ -8,17 +8,27 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
+/*
+ * Base constructor - initializes all member variables.
+ */
 SubMesh3DFaces::SubMesh3DFaces()
 {
 	faceCount = 0;
 	faces = NULL;
 }
 
+/*
+ * Clean up.
+ */
 SubMesh3DFaces::~SubMesh3DFaces()
 {
 	Destroy();
 }
 
+/*
+ * Delete all instances of SubMesh3DFace in [faces] as well
+ * as the array itself.
+ */
 void SubMesh3DFaces::Destroy()
 {
 	if(faces != NULL)
@@ -28,11 +38,17 @@ void SubMesh3DFaces::Destroy()
 	}
 }
 
+/*
+ * Get the number of faces in [faces].
+ */
 unsigned int SubMesh3DFaces::GetFaceCount() const
 {
 	return faceCount;
 }
 
+/*
+ * Initialization, allocates [faces].
+ */
 bool SubMesh3DFaces::Init(unsigned int faceCount)
 {
 	Destroy();
@@ -45,12 +61,19 @@ bool SubMesh3DFaces::Init(unsigned int faceCount)
 	return true;
 }
 
+/*
+ * Get a pointer to the face at [index] in [faces].
+ */
 SubMesh3DFace * SubMesh3DFaces::GetFace(unsigned int index)
 {
 	ASSERT(index < faceCount, "SubMesh3DFaces::GetFace -> Index is out of range.", NULL);
 	return faces + index;
 }
 
+
+/*
+ * Get a const pointer to the face at [index] in [faces].
+ */
 const SubMesh3DFace * SubMesh3DFaces::GetFaceConst(unsigned int index) const
 {
 	ASSERT(index < faceCount, "SubMesh3DFaces::GetFaceConst -> Index is out of range.", NULL);

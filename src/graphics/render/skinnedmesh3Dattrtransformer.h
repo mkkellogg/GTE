@@ -38,7 +38,7 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 
 	// the renderer for which this transformer acts
 	SkinnedMesh3DRenderer* renderer;
-	// [skeleton] has an array of VertexBoneMap objects. [vertexBoneMapIndex] is the
+	// [renderer] has an array of VertexBoneMap objects. [vertexBoneMapIndex] is the
 	// index in that array that contains the VertexBoneMap for this instance of
 	// SkinnedMesh3DAttributeTransformer.
 	int vertexBoneMapIndex;

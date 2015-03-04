@@ -3,9 +3,10 @@
  *
  * author: Mark Kellogg
  *
- * The RenderManager is responsible for processing the scene graph
- * and rendering all objects with meshes and mesh renderers attached
- * to them.
+ * The RenderManager is responsible for rendering the scene. It processes
+ * the scene graph and builds data structures describing all meshes that
+ * need to be rendered as well as the lights and cameras for which they will
+ * be rendered.
  */
 
 #ifndef _GTE_RENDER_MANAGER_H
@@ -72,22 +73,16 @@ class RenderManager
 
 	// material for rendering shadow volumes
 	MaterialRef shadowVolumeMaterial;
-
 	// material for rendering only to the depth buffer
 	MaterialRef depthOnlyMaterial;
-
 	// material for rendering depth values to color buffer
 	MaterialRef depthValueMaterial;
-
 	// material for rendering SSAO
 	MaterialRef ssaoMaterial;
-
 	// material for rendering SSAO-style outlines
 	MaterialRef ssaoOutlineMaterial;
-
 	// for off-screen rendering
 	RenderTargetRef offscreenRenderTarget;
-
 	// transform stack used for processing scene hierarchy
 	DataStack<Matrix4x4> sceneProcessingStack;
 
@@ -114,7 +109,7 @@ class RenderManager
 	// keep track of objects that have been rendered
 	// TODO: optimize usage of this hashing structure
 	std::unordered_map<ObjectPairKey, bool, ObjectPairKey::ObjectPairKeyHasher,ObjectPairKey::ObjectPairKeyEq> renderedObjects;
-
+	// cache shadow volumes that don't need to be constantly rebuilt
 	std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher,ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
 	void ProcessScene();
@@ -136,18 +131,17 @@ class RenderManager
 	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Transform& viewTransformInverse, const Camera& camera);
 
 
-	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject);
-	bool HasSceneObjectBeenRendered(SceneObjectRef sceneObject);
+	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
-			 	 	 	 	 	 	   const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale);
-    void CacheShadowVolume(ObjectPairKey& key, const Point3Array * positions);
-    void ClearCachedShadowVolume(ObjectPairKey& key);
-    bool HasCachedShadowVolume(ObjectPairKey& key);
-    Point3Array * GetCachedShadowVolume(ObjectPairKey& key);
+			 	 	 	 	 	 	   const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale) const;
+    void CacheShadowVolume(const ObjectPairKey& key, const Point3Array * positions);
+    void ClearCachedShadowVolume(const ObjectPairKey& key);
+    bool HasCachedShadowVolume(const ObjectPairKey& key)  const;
+    const Point3Array * GetCachedShadowVolume(const ObjectPairKey& key);
     void DestroyCachedShadowVolumes();
 
     void SetForwardBlending(FowardBlendingMethod method);
-    FowardBlendingMethod GetForwardBlending();
+    FowardBlendingMethod GetForwardBlending() const;
 
     void ClearBuffersForCamera(const Camera& camera) const;
     void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
@@ -156,7 +150,7 @@ class RenderManager
     void ActivateMaterial(MaterialRef material);
     void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection);
     void SendModelViewProjectionToShader(const Transform& modelViewProjection);
-    void SendActiveMaterialUniformsToShader();
+    void SendActiveMaterialUniformsToShader() const;
 
     bool ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const SceneObject& sceneObject) const;
     bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;

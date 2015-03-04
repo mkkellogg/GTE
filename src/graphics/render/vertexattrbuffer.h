@@ -35,9 +35,9 @@ class VertexAttrBuffer
 
     virtual bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, float *srcData) = 0;
     virtual void SetData(const float * data) = 0;
-    int GetVertexCount();
-    int GetComponentCount();
-    int GetStride();
+    int GetVertexCount() const;
+    int GetComponentCount() const;
+    int GetStride() const;
     virtual unsigned int GetFullSize() const = 0;
 };
 

@@ -1,3 +1,24 @@
+
+ /*
+ * class: Graphics
+ *
+ * author: Mark Kellogg
+ *
+ * Base class that defines the core graphics functionality of the engine.
+ * All platform-specific graphics functionality should be put in a class
+ * that derives from Graphics.
+ *
+ * All graphics related objects (shaders, textures, render targets, etc.)
+ * are created via functions contained in this class. This is due to the fact
+ * that creating these kinds of objects will require platform specific code,
+ * that is why the relevant methods are virtual and must be implemented in a
+ * deriving class.
+ *
+ * Additionally this class contains methods for setting various state variables.
+ * Again this is something that is platform specific, so the methods are
+ * virtual.
+ */
+
 #ifndef _GTE_GRAPHICS_H_
 #define _GTE_GRAPHICS_H_
 
@@ -21,64 +42,12 @@ class RenderTarget;
 class ShaderSource;
 
 #include <string>
+#include "graphicsattr.h"
 #include "object/enginetypes.h"
 #include "base/intmask.h"
 #include "render/rendertarget.h"
 #include "render/material.h"
 #include "global/global.h"
-
-enum class BlendingProperty
-{
-	One,
-	SrcAlpha,
-	OneMinusSrcAlpha,
-	DstAlpha,
-	OneMinusDstAlpha,
-	Zero
-};
-
-enum class ColorChannel
-{
-	Red,
-	Green,
-	Blue,
-	Alpha
-};
-
-enum class RenderMode
-{
-	Standard = 1,
-	StandardWithShadowVolumeTest = 2,
-	ShadowVolumeRender = 3,
-	DepthOnly = 4,
-	None = 0
-};
-
-enum class SSAORenderMode
-{
-	Standard = 0,
-	Outline = 1
-};
-
-class GraphicsAttributes
-{
-	public:
-
-	unsigned int WindowWidth;
-	unsigned int WindowHeight;
-	std::string WindowTitle;
-	bool SSAOEnabled;
-	SSAORenderMode SSAOMode;
-
-	GraphicsAttributes()
-	{
-		WindowWidth = 640;
-		WindowHeight = 480;
-		WindowTitle = std::string("GTE window");
-		SSAOEnabled = true;
-		SSAOMode = SSAORenderMode::Standard;
-	}
-};
 
 class Graphics
 {
@@ -86,18 +55,23 @@ class Graphics
 
     protected:
 
+	// the material that is currently being used for rendering
 	MaterialRef activeMaterial;
-    RenderManager * renderManager;
+	// descriptor that describes the properties with which the graphics
+	// engine was initialized
     GraphicsAttributes attributes;
 
-    float fpsTime;
-    int frames;
+    // length of current span over which FPS is calculated
+    float currentFPSSpanTime;
+    // number of frames in rendered in current FPS calculation span
+    int framesInFPSSpan;
+    // last calculated FPS value
     float currentFPS;
 
     Graphics();
     virtual ~Graphics();
 
-    virtual bool Run();
+    virtual bool Start();
     virtual void Update();
     virtual void PreProcessScene();
     virtual void RenderScene();
@@ -106,7 +80,6 @@ class Graphics
 
     public :
 
-    RenderManager * GetRenderManager();
     float GetCurrentFPS();
     void SetSSAOEnabled(bool enabled);
     void SetSSAOMode(SSAORenderMode mode);

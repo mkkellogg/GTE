@@ -25,9 +25,17 @@ class SubMesh3DFace
 	SubMesh3DFace();
 	~SubMesh3DFace();
 
+	// index in the respective mesh's attribute arrays of the first
+	// vertex of this face
 	int FirstVertexIndex;
+	// index in the respective mesh's attribute arrays of the first
+	// vertex of this face's first adjacent face
 	int AdjacentFaceIndex1;
+	// index in the respective mesh's attribute arrays of the second
+	// vertex of this face's first adjacent face
 	int AdjacentFaceIndex2;
+	// index in the respective mesh's attribute arrays of the third
+	// vertex of this face's first adjacent face
 	int AdjacentFaceIndex3;
 };
 

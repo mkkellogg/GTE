@@ -27,7 +27,7 @@ class Mesh3DFilter : public SceneObjectComponent
 
 	Mesh3DRef mesh;
 
-	// should [meah] cast shadows?
+	// should [mesh] cast shadows?
 	bool castShadows;
 	// should this mesh receive shadows?
 	bool receiveShadows;
@@ -41,9 +41,9 @@ class Mesh3DFilter : public SceneObjectComponent
     Mesh3DRef GetMesh3D();
 
     void SetCastShadows(bool castShadows);
-   bool GetCastShadows();
+   bool GetCastShadows() const;
    void SetReceiveShadows(bool receiveShadows);
-   bool GetReceiveShadows();
+   bool GetReceiveShadows() const;
 };
 
 #endif

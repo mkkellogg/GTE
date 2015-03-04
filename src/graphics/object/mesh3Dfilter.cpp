@@ -19,17 +19,26 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
+/*
+ * Default constructor.
+ */
 Mesh3DFilter::Mesh3DFilter()
 {
 	castShadows = false;
 	receiveShadows = false;
 }
 
+/*
+ * Cleanup.
+ */
 Mesh3DFilter::~Mesh3DFilter()
 {
 
 }
 
+/*
+ * Set this mesh filter's target mesh.
+ */
 void Mesh3DFilter::SetMesh3D(Mesh3DRef mesh)
 {
 	this->mesh = mesh;
@@ -40,6 +49,9 @@ void Mesh3DFilter::SetMesh3D(Mesh3DRef mesh)
 	}
 }
 
+/*
+ * Get the target mesh for this mesh filter.
+ */
 Mesh3DRef Mesh3DFilter::GetMesh3D()
 {
 	return mesh;
@@ -56,7 +68,7 @@ void Mesh3DFilter::SetCastShadows(bool castShadows)
 /*
  * Should [mesh] cast shadows?
  */
-bool Mesh3DFilter::GetCastShadows()
+bool Mesh3DFilter::GetCastShadows() const
 {
 	return castShadows;
 }
@@ -72,7 +84,7 @@ void Mesh3DFilter::SetReceiveShadows(bool receiveShadows)
 /*
  * Should [mesh] receive shadows?
  */
-bool Mesh3DFilter::GetReceiveShadows()
+bool Mesh3DFilter::GetReceiveShadows() const
 {
 	return receiveShadows;
 }

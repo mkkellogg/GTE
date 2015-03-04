@@ -27,7 +27,7 @@ VertexAttrBuffer::~VertexAttrBuffer()
 /*
  * Get the number of vertices in this buffer.
  */
-int VertexAttrBuffer::GetVertexCount()
+int VertexAttrBuffer::GetVertexCount() const
 {
 	return vertexCount;
 }
@@ -36,7 +36,7 @@ int VertexAttrBuffer::GetVertexCount()
  * Get the number of components in this buffer's target attribute (e.g. vertex
  * position has 4 components: x,y,z,w).
  */
-int VertexAttrBuffer::GetComponentCount()
+int VertexAttrBuffer::GetComponentCount() const
 {
 	return componentCount;
 }
@@ -44,7 +44,7 @@ int VertexAttrBuffer::GetComponentCount()
 /*
  * Get the padding between vertices.
  */
-int VertexAttrBuffer::GetStride()
+int VertexAttrBuffer::GetStride() const
 {
 	return stride;
 }

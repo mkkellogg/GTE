@@ -948,7 +948,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 				cacheKey.ObjectAID = subRenderer->GetObjectID();
 				cacheKey.ObjectBID = light.GetObjectID();
 
-				Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
+				const Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
 
 				// render the shadow volume if it is valid
 				if(cachedShadowVolume != NULL)
@@ -985,7 +985,7 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
  * is a mesh and a mesh renderer present, and verifying that [sceneObject]
  * is active.
  */
-bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject)
+bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const
 {
 	if(!sceneObject.IsValid())
 	{
@@ -1044,7 +1044,7 @@ bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject)
  */
 void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos,
 												 const Vector3& modelLocalLightDir, const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform,
-												 float xScale, float yScale)
+												 float xScale, float yScale) const
 {
 	Transform modelView;
 	Transform model;
@@ -1100,7 +1100,7 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 /*
  * Store a copy of a shadow volume in [shadowVolumeCache], keyed by [key].
  */
-void RenderManager::CacheShadowVolume(ObjectPairKey& key, const Point3Array * shadowVolume)
+void RenderManager::CacheShadowVolume(const ObjectPairKey& key, const Point3Array * shadowVolume)
 {
 	ASSERT_RTRN(shadowVolume != NULL, "RenderManager::CacheShadowVolume -> Shadow volume is NULL.");
 
@@ -1123,7 +1123,7 @@ void RenderManager::CacheShadowVolume(ObjectPairKey& key, const Point3Array * sh
 /*
  * Remove the shadow volume cached for [key] (if it exists).
  */
-void RenderManager::ClearCachedShadowVolume(ObjectPairKey& key)
+void RenderManager::ClearCachedShadowVolume(const ObjectPairKey& key)
 {
 	if(HasCachedShadowVolume(key))
 	{
@@ -1139,7 +1139,7 @@ void RenderManager::ClearCachedShadowVolume(ObjectPairKey& key)
 /*
  * Is a shadow volume cached for [key].
  */
-bool RenderManager::HasCachedShadowVolume(ObjectPairKey& key)
+bool RenderManager::HasCachedShadowVolume(const ObjectPairKey& key)  const
 {
 	if(shadowVolumeCache.find(key) != shadowVolumeCache.end())
 	{
@@ -1152,11 +1152,12 @@ bool RenderManager::HasCachedShadowVolume(ObjectPairKey& key)
 /*
  * Get cached shadow volume for [key].
  */
-Point3Array * RenderManager::GetCachedShadowVolume(ObjectPairKey& key)
+const Point3Array * RenderManager::GetCachedShadowVolume(const ObjectPairKey& key)
 {
 	if(HasCachedShadowVolume(key))
 	{
-		return shadowVolumeCache[key];
+		const Point3Array * shadowVolume = shadowVolumeCache[key];
+		return shadowVolume;
 	}
 
 	return NULL;
@@ -1189,7 +1190,7 @@ void RenderManager::SetForwardBlending(FowardBlendingMethod method)
 /*
  * Get the blending method to be used in forward rendering.
  */
-FowardBlendingMethod RenderManager::GetForwardBlending()
+FowardBlendingMethod RenderManager::GetForwardBlending() const
 {
 	return forwardBlending;
 }
@@ -1330,7 +1331,7 @@ void RenderManager::SendModelViewProjectionToShader(const Transform& modelViewPr
 /*
  * Send any custom uniforms specified by the active material to the active shader
  */
-void RenderManager::SendActiveMaterialUniformsToShader()
+void RenderManager::SendActiveMaterialUniformsToShader()  const
 {
 	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
 	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendCustomUniformsToShader -> activeMaterial is not valid.");

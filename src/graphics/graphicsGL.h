@@ -1,3 +1,21 @@
+/*
+ * Class: GraphicsGL
+ *
+ * Author: Mark Kellogg
+ *
+ * This is the OpenGL implementation of the Graphics class.
+ *
+ * Most of the OpenGL-related functionality in the engine is
+ * contained within this class. Through its interface which is not OpenGL
+ * specific, all the core OpenGL state variables can be set, and OpenGL
+ * objects such as shaders, textures, and framebuffers can be created, activated,
+ * or destroyed.
+
+ * Additionally all of the GLUT, GLEW, and OpenGL initialization code is in
+ * this class, in the Init() method.
+ */
+
+
 #ifndef _GTE_GRAPHICS_GL_H_
 #define _GTE_GRAPHICS_GL_H_
 
@@ -23,42 +41,47 @@ class GraphicsGL : public Graphics
 {
     friend class Graphics;
     friend class Engine;
-    friend class SubMesh3DRendererGL;
 
+    // static GLUT callbacks
     static void _glutDisplayFunc();
     static void _glutIdleFunc();
     static void _glutReshapeFunc(int w, int h);
 
     protected:
 
+    // is OpenGL blending enabled?
     bool blendingEnabled;
-
+    // is OpenGL depth buffer enabled?
     bool depthBufferEnabled;
+    // is OpenGL depth buffer currently read only?
     bool depthBufferReadOnly;
-
+    // is the OpenGL color buffer enabled?
     bool colorBufferEnabled;
-
+    // is the OpenGL stencil buffer enabled?
     bool stencilBufferEnabled;
+    // is OpenGL stencil testing enabled?
     bool stencilTestEnabled;
-
+    // is face culling enabled in OpenGL?
     bool faceCullingEnabled;
-
+    // number of bits per channel in the OpenGL color buffer
     int redBits, greenBits, blueBits, alphaBits;
+    // bit depth of the OpenGL depth buffer
     int depthBufferBits;
+    // bit depth of the OpenGL stencil buffer
     int stencilBufferBits;
-
+    // is the graphics engine initialized?
     bool initialized;
 
     GraphicsGL();
     ~GraphicsGL();
 
+    // local version of OpenGL
     unsigned int openGLVersion;
 
     void PreProcessScene();
-    void RenderScene();
-    bool Run();
+    bool Start();
     void Update();
-
+    void RenderScene();
 
     public :
 
@@ -80,11 +103,9 @@ class GraphicsGL : public Graphics
     void ClearRenderBuffers(IntMask bufferMask);
 
     void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
-
     void SetDepthBufferEnabled(bool enabled);
     void SetDepthBufferReadOnly(bool readOnly);
     void SetDepthBufferFunction(DepthBufferFunction function);
-
     void SetStencilBufferEnabled(bool enabled);
     void SetStencilTestEnabled(bool enabled);
 
