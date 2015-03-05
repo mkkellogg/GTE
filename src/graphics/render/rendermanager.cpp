@@ -160,11 +160,8 @@ unsigned int RenderManager::RenderDepth(const DataStack<Matrix4x4>& transformSta
  * stores a list of all cameras, lights, and meshes in the scene. After that it renders the scene
  * from the perspective of each camera.
  */
-void RenderManager::RenderAll()
+void RenderManager::RenderScene()
 {
-	// find all the cameras, lights, and meshes in the scene
-	ProcessScene();
-
 	// render the scene from the perspective of each camera found in ProcessScene()
 	for(unsigned int i=0; i < cameraCount; i ++)
 	{
@@ -172,10 +169,15 @@ void RenderManager::RenderAll()
 	}
 }
 
+void RenderManager::ClearCaches()
+{
+	DestroyCachedShadowVolumes();
+}
+
 /*
  * Kick off the scene processing from the root of the scene.
  */
-void RenderManager::ProcessScene()
+void RenderManager::PreProcessScene()
 {
 	lightCount = 0;
 	ambientLightCount = 0;
@@ -188,7 +190,9 @@ void RenderManager::ProcessScene()
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::ProcessScene -> sceneRoot is NULL.");
 
 	// gather information about the cameras, lights, and renderable meshes in the scene
-	ProcessScene(sceneRoot.GetRef(), cameraModelView);
+	PreProcessScene(sceneRoot.GetRef(), cameraModelView);
+
+	BuildSceneShadowVolumes();
 }
 
 /*
@@ -211,7 +215,7 @@ void RenderManager::ProcessScene()
  * and calls the SubMesh3DRenderer::PreRender() Method. For skinned meshes, this method will (indirectly) perform the
  * vertex skinning transformation.
  */
-void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransform)
+void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTransform)
 {
 	Transform model;
 	Transform modelInverse;
@@ -325,7 +329,7 @@ void RenderManager::ProcessScene(SceneObject& parent, Transform& aggregateTransf
 			child->SetAggregateTransform(aggregateTransform);
 
 			// continue recursion through child object
-			ProcessScene(child.GetRef(), aggregateTransform);
+			PreProcessScene(child.GetRef(), aggregateTransform);
 
 			// restore previous view transform
 			PopTransformData(aggregateTransform, sceneProcessingStack);
@@ -936,45 +940,183 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			SceneObjectRef lightObject = castLight.GetSceneObject();
 
 			ObjectPairKey cacheKey;
-			bool cacheShadowRendered = false;
 
-			// a shadow volume is cacheable if the light's scene object is static and the mesh's
-			// scene object is static
-			bool cacheable = sceneObject.IsStatic() && lightObject.IsValid() && lightObject->IsStatic();
+			// form cache key from sub-renderer's object ID and light's object ID
+			cacheKey.ObjectAID = subRenderer->GetObjectID();
+			cacheKey.ObjectBID = light.GetObjectID();
 
-			if(cacheable)
+			const Point3Array * cachedShadowVolume = NULL;
+			cachedShadowVolume = GetCachedShadowVolume(cacheKey);
+
+			// render the shadow volume if it is valid
+			if(cachedShadowVolume != NULL)
 			{
-				// form cache key from sub-renderer's object ID and light's object ID
-				cacheKey.ObjectAID = subRenderer->GetObjectID();
-				cacheKey.ObjectBID = light.GetObjectID();
+				subRenderer->RenderShadowVolume(cachedShadowVolume);
+			}
+		}
+	}
+}
 
-				const Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
+/*
+ * Build shadow volumes for all relevant meshes for all shadow casting lights.
+ */
+void RenderManager::BuildSceneShadowVolumes()
+{
+	// loop through each light in [sceneLights]
+	for(unsigned int l = 0; l < lightCount; l++)
+	{
+		SceneObjectRef lightObject = sceneLights[l];
+		ASSERT_RTRN(lightObject.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light's scene object is not valid.");
 
-				// render the shadow volume if it is valid
-				if(cachedShadowVolume != NULL)
-				{
-					subRenderer->RenderShadowVolume(cachedShadowVolume);
-					cacheShadowRendered = true;
-				}
+		// verify the light is active
+		if(lightObject->IsActive())
+		{
+			LightRef lightRef = lightObject->GetLight();
+			ASSERT_RTRN(lightRef.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light is not valid.");
+
+			// verify that this light casts shadows
+			if(lightRef->GetShadowsEnabled())
+			{
+				Transform lightFullTransform;
+				lightFullTransform.SetTo(lightRef->GetSceneObject()->GetAggregateTransform());
+				BuildShadowVolumesForLight(lightRef.GetRef(), lightFullTransform);
+			}
+		}
+	}
+}
+
+/*
+ * Build shadow volumes for all relevant meshes for [light]. Use [lightFullTransform] as the
+ * local-to-world transformation for the light.
+ */
+void RenderManager::BuildShadowVolumesForLight(const Light& light, const Transform& lightFullTransform)
+{
+	Transform modelView;
+	Transform model;
+	Transform modelInverse;
+
+	Point3 lightPosition;
+	lightFullTransform.TransformPoint(lightPosition);
+
+	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
+	for(unsigned int s = 0; s < sceneMeshCount; s++)
+	{
+		SceneObjectRef childRef = sceneMeshObjects[s];
+
+		if(childRef->IsActive())
+		{
+			Mesh3DRef mesh = childRef->GetMesh3D();
+			Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
+			SceneObject * child = childRef.GetPtr();
+
+			// copy the full transform of the scene object, including those of all ancestors
+			Transform full;
+			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+
+			// make sure the current mesh should not be culled from [light].
+			if(!ShouldCullFromLight(light, lightPosition, full, *child))
+			{
+				BuildShadowVolumesForSceneObject(*child, light, lightPosition);
+			}
+		}
+	}
+}
+
+/*
+ * Build shadow volumes for the meshes attached to [sceneObject] for [light], using
+ * [lightPosition] as the light's world position.
+ */
+void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition)
+{
+	Mesh3DRenderer * renderer = NULL;
+	Transform modelViewProjection;
+	Transform modelView;
+	Transform model;
+	Transform modelInverse;
+
+	// check if [sceneObject] has a mesh & renderer
+	if(sceneObject.GetMesh3DRenderer().IsValid())
+	{
+		renderer = sceneObject.GetMesh3DRenderer().GetPtr();
+	}
+	else if(sceneObject.GetSkinnedMesh3DRenderer().IsValid())
+	{
+		renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
+	}
+
+	if(renderer != NULL)
+	{
+		Mesh3DRef mesh = renderer->GetTargetMesh();
+
+		ASSERT_RTRN(mesh.IsValid(),"RenderManager::BuildShadowVolumesForSceneObject -> renderer returned NULL mesh.");
+		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::BuildShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.");
+		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::BuildShadowVolumesForSceneObject -> renderer has no materials.");
+
+		// calculate model transform and inverse model transform
+		model.SetTo(sceneObject.GetAggregateTransform());
+		modelInverse.SetTo(model);
+		modelInverse.Invert();
+
+		// calculate the position and/or direction of [light]
+		// in the mesh's local space
+		Point3 modelLocalLightPos = lightPosition;
+		Vector3 modelLocalLightDir = light.GetDirection();
+		modelInverse.TransformPoint(modelLocalLightPos);
+		modelInverse.TransformVector(modelLocalLightDir);
+
+		// loop through each sub-renderer and render the shadow volume for its sub-mesh
+		for(unsigned int i=0; i < renderer->GetSubRendererCount(); i++)
+		{
+			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
+			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
+
+			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> NULL sub renderer encountered.");
+			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> NULL sub mesh encountered.");
+
+			Vector3 lightPosDir;
+			if(light.GetType() == LightType::Directional)
+			{
+				lightPosDir.x = modelLocalLightDir.x;
+				lightPosDir.y = modelLocalLightDir.y;
+				lightPosDir.z = modelLocalLightDir.z;
+			}
+			else
+			{
+				lightPosDir.x = modelLocalLightPos.x;
+				lightPosDir.y = modelLocalLightPos.y;
+				lightPosDir.z = modelLocalLightPos.z;
 			}
 
-			// was the shadow volume already rendered from the cache?
-			if(!cacheShadowRendered)
+			Light& castLight = const_cast<Light&>(light);
+			SceneObjectRef lightObject = castLight.GetSceneObject();
+
+			ObjectPairKey cacheKey;
+			bool cached = false;
+
+			// a shadow volume is dynamic if the light's scene object is not static or the mesh's
+			// scene object is not static
+			bool dynamic = !(sceneObject.IsStatic()) || !(lightObject->IsStatic());
+
+			// form cache key from sub-renderer's object ID and light's object ID
+			cacheKey.ObjectAID = subRenderer->GetObjectID();
+			cacheKey.ObjectBID = light.GetObjectID();
+
+			const Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
+
+			// check if this shadow volume is already cached
+			if(cachedShadowVolume != NULL)
+			{
+				cached = true;
+			}
+
+			if(!cached || dynamic) // always rebuild dynamic shadow volumes
 			{
 				// calculate shadow volume geometry
 				if(subRenderer->GetUseBackSetShadowVolume())subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, true);
 				else subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, false);
 
-				if(cacheable)
-				{
-					// form cache key from sub-renderer's object ID and light's object ID
-					cacheKey.ObjectAID = subRenderer->GetObjectID();
-					cacheKey.ObjectBID = light.GetObjectID();
-					CacheShadowVolume(cacheKey, subRenderer->GetShadowVolumePositions());
-				}
-
-				// render the shadow volume
-				subRenderer->RenderShadowVolume();
+				// cache shadow volume for later rendering
+				CacheShadowVolume(cacheKey, subRenderer->GetShadowVolumePositions());
 			}
 		}
 	}
@@ -1104,20 +1246,37 @@ void RenderManager::CacheShadowVolume(const ObjectPairKey& key, const Point3Arra
 {
 	ASSERT_RTRN(shadowVolume != NULL, "RenderManager::CacheShadowVolume -> Shadow volume is NULL.");
 
-	if(HasCachedShadowVolume(key))
+	bool needsInit = false;
+	Point3Array * target = NULL;
+
+	if(!HasCachedShadowVolume(key))
 	{
-		ClearCachedShadowVolume(key);
+		needsInit = true;
+	}
+	else
+	{
+		target = shadowVolumeCache[key];
+		if(target->GetReservedCount() != shadowVolume->GetReservedCount())
+		{
+			ClearCachedShadowVolume(key);
+			needsInit = true;
+		}
 	}
 
-	Point3Array * copy = new Point3Array();
-	ASSERT_RTRN(copy != NULL, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
+	if(needsInit)
+	{
+		target = new Point3Array();
+		ASSERT_RTRN(target != NULL, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
 
-	bool initSuccess = copy->Init(shadowVolume->GetReservedCount());
-	ASSERT_RTRN(initSuccess, "RenderManager::CacheShadowVolume -> Unable to initialize shadow volume copy.");
+		bool initSuccess = target->Init(shadowVolume->GetReservedCount());
+		ASSERT_RTRN(initSuccess, "RenderManager::CacheShadowVolume -> Unable to initialize shadow volume copy.");
 
-	copy->SetCount(shadowVolume->GetCount());
-	shadowVolume->CopyTo(copy);
-	shadowVolumeCache[key] = copy;
+		target->SetCount(shadowVolume->GetCount());
+		shadowVolumeCache[key] = target;
+	}
+
+	target->SetCount(shadowVolume->GetCount());
+	shadowVolume->CopyTo(target);
 }
 
 /*

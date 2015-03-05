@@ -34,6 +34,7 @@ class EngineCallbacks
     virtual void OnInit() = 0;
     virtual void OnQuit() = 0;
     virtual void OnUpdate() = 0;
+    virtual void OnPreRender() = 0;
     virtual ~EngineCallbacks();
 };
 

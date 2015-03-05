@@ -148,10 +148,12 @@ bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphic
 void Engine::Update()
 {
 	graphicsEngine->PreProcessScene();
-	if(callbacks!=NULL)callbacks->OnUpdate();
 	graphicsEngine->Update();
 	animationManager->Update();
 	inputManager->Update();
+	if(callbacks!=NULL)callbacks->OnUpdate();
+	renderManager->PreProcessScene();
+	if(callbacks!=NULL)callbacks->OnPreRender();
 	graphicsEngine->RenderScene();
 	Time::Update();
 }

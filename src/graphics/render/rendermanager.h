@@ -49,6 +49,7 @@ enum class FowardBlendingFilter
 
 class RenderManager
 {
+	friend class Engine;
 	/*
 	 * Data structure that is passed to RenderSceneObjectMeshes() that describes the kind of
 	 * lighting to be used (or not used) during rendering.
@@ -112,8 +113,8 @@ class RenderManager
 	// cache shadow volumes that don't need to be constantly rebuilt
 	std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher,ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
-	void ProcessScene();
-	void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
+	void PreProcessScene();
+	void PreProcessScene(SceneObject& parent, Transform& aggregateTransform);
 
 	void RenderSceneForCamera(unsigned int cameraIndex);
 	void ForwardRenderSceneForCamera(Camera& camera);
@@ -128,12 +129,14 @@ class RenderManager
 											   bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
 											   bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,  std::function<bool(SceneObjectRef)> filterFunction);
-	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Transform& viewTransformInverse, const Camera& camera);
-
-
 	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
 			 	 	 	 	 	 	   const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale) const;
+
+	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Transform& viewTransformInverse, const Camera& camera);
+	void BuildSceneShadowVolumes();
+	void BuildShadowVolumesForLight(const Light& light, const Transform& lightFullTransform);
+	void BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition);
     void CacheShadowVolume(const ObjectPairKey& key, const Point3Array * positions);
     void ClearCachedShadowVolume(const ObjectPairKey& key);
     bool HasCachedShadowVolume(const ObjectPairKey& key)  const;
@@ -162,8 +165,8 @@ class RenderManager
     ~RenderManager();
 
     bool Init();
-
-    void RenderAll();
+    void RenderScene();
+    void ClearCaches();
 };
 
 #endif
