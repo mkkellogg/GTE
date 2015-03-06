@@ -27,6 +27,7 @@ class Point3Array;
 #include <map>
 #include <unordered_map>
 #include <memory>
+#include <stack>
 #include "object/engineobject.h"
 #include "object/objectpairkey.h"
 #include "util/datastack.h"
@@ -113,6 +114,8 @@ class RenderManager
 	// cache shadow volumes that don't need to be constantly rebuilt
 	std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher,ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
+	std::stack<RenderTargetRef> renderTargetStack;
+
 	void PreProcessScene();
 	void PreProcessScene(SceneObject& parent, Transform& aggregateTransform);
 
@@ -147,9 +150,11 @@ class RenderManager
     FowardBlendingMethod GetForwardBlending() const;
 
     void ClearBuffersForCamera(const Camera& camera) const;
+
     void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
     void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
     unsigned int RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
+
     void ActivateMaterial(MaterialRef material);
     void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection);
     void SendModelViewProjectionToShader(const Transform& modelViewProjection);
@@ -167,6 +172,10 @@ class RenderManager
     bool Init();
     void RenderScene();
     void ClearCaches();
+
+    void PushRenderTarget(RenderTargetRef renderTarget);
+    RenderTargetRef PopRenderTarget();
+
 };
 
 #endif

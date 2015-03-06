@@ -127,6 +127,45 @@ void RenderManager::ClearBuffersForCamera(const Camera& camera) const
 }
 
 /*
+ * Push a new render target on to the render target stack and activate it.
+ */
+void RenderManager::PushRenderTarget(RenderTargetRef renderTarget)
+{
+	renderTargetStack.push(renderTarget);
+	// activate the new render target
+	Engine::Instance()->GetGraphicsEngine()->ActivateRenderTarget(renderTarget);
+}
+
+/*
+ * Pop the current render target off the stack and activate the one below it.
+ * If there is none below, activate the default render target.
+ */
+RenderTargetRef RenderManager::PopRenderTarget()
+{
+	RenderTargetRef old = RenderTargetRef::Null();
+	if(renderTargetStack.size() > 0)
+	{
+		old = renderTargetStack.top();
+		renderTargetStack.pop();
+	}
+
+	if(renderTargetStack.size() > 0)
+	{
+		RenderTargetRef top = renderTargetStack.top();
+		// activate the new render target
+		Engine::Instance()->GetGraphicsEngine()->ActivateRenderTarget(top);
+	}
+	else
+	{
+		// activate the default render target
+		Engine::Instance()->GetGraphicsEngine()->RestoreDefaultRenderTarget();
+	}
+
+	return old;
+
+}
+
+/*
  * Save a transform to the transform stack. This method is used to to save transformations
  * as the render manager progresses through the object tree that makes up the scene.
  */
@@ -152,7 +191,6 @@ void RenderManager::PopTransformData(Transform& transform, DataStack<Matrix4x4>&
 unsigned int RenderManager::RenderDepth(const DataStack<Matrix4x4>& transformStack) const
 {
 	return transformStack.GetEntryCount();
-
 }
 
 /*
@@ -611,7 +649,7 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 	GraphicsAttributes attributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
 
 	// activate the off-screen render target
-	Engine::Instance()->GetGraphicsEngine()->ActivateRenderTarget(offscreenRenderTarget);
+	PushRenderTarget(offscreenRenderTarget);
 
 	// clear the relevant buffers in the off-screen render target
 	IntMask clearMask = IntMaskUtil::CreateIntMask();
@@ -622,8 +660,8 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 	// render the depth values for the scene to the off-screen color texture
 	ForwardRenderSceneWithSelfLitLighting(viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never);
 
-	// restore default render target
-	Engine::Instance()->GetGraphicsEngine()->RestoreDefaultRenderTarget();
+	// restore previous render target
+	PopRenderTarget();
 
 	Matrix4x4 projectionInvMat;
 	camera.GetProjectionTransform().CopyMatrix(projectionInvMat);
@@ -1023,7 +1061,7 @@ void RenderManager::BuildShadowVolumesForLight(const Light& light, const Transfo
 }
 
 /*
- * Build shadow volumes for the meshes attached to [sceneObject] for [light], using
+ * Build (and cache) shadow volumes for the meshes attached to [sceneObject] for [light], using
  * [lightPosition] as the light's world position.
  */
 void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition)
