@@ -11,6 +11,8 @@
 #include "engine.h"
 #include "input/inputmanager.h"
 #include "gameutil.h"
+#include "scenes/lavascene.h"
+#include "scenes/castlescene.h"
 #include "asset/assetimporter.h"
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
@@ -50,9 +52,6 @@
 #include "filesys/filesystem.h"
 
 
-const std::string Game::LavaWallLayer = "LavaWall";
-const std::string Game::LavaIslandLayer = "LavaIsland";
-const std::string Game::LavaIslandObjectsLayer = "LavaIslandObjects";
 const std::string Game::PlayerObjectLayer = "Player";
 
 /*
@@ -81,7 +80,7 @@ Game::Game()
 	// initialize player state
 	playerType = PlayerType::Warrior;
 	playerState = PlayerState::Waiting;
-	for(unsigned int i = 0; i < MAX_PLAYER_STATES; i++)
+	for(unsigned int i = 0; i < MaxPlayerStates; i++)
 	{
 		stateActivationTime[i] = 0;
 	}
@@ -95,13 +94,11 @@ Game::Game()
 
 	selectedLighting = SceneLighting::None;
 
-	lavaField = NULL;
-
-	// initialize layer masks
-	lavaWallLayerMask = 0;
-	lavaIslandLayerMask = 0;
-	lavaIslandObjectsLayerMask = 0;
 	playerObjectLayerMask = 0;
+
+	currentScene = Scenes::LavaScene;
+
+	frameCount = 0;
 }
 
 /*
@@ -110,132 +107,6 @@ Game::Game()
 Game::~Game()
 {
 
-}
-
-/*
- * Recursively search the scene hierarchy starting at [ref] for an
- * instance of SceneObject that contains a SkinnedMesh3DRenderer component,
- * but return just the SkinnedMesh3DRenderer instance.
- */
-SkinnedMesh3DRendererRef Game::FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
-{
-	if(!ref.IsValid())return SkinnedMesh3DRendererRef::Null();
-
-	if(ref->GetSkinnedMesh3DRenderer().IsValid())return ref->GetSkinnedMesh3DRenderer();
-
-	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
-	{
-		SceneObjectRef childRef = ref->GetChildAt(i);
-		SkinnedMesh3DRendererRef subRef = FindFirstSkinnedMeshRenderer(childRef);
-		if(subRef.IsValid())return subRef;
-	}
-
-	return SkinnedMesh3DRendererRef::Null();
-}
-
-/*
- * Recursively search the scene hierarchy starting at [ref] for an
- * instance of SceneObject that contains a Mesh3D component, and return
- * the containing SceneObject instance.
- */
-SceneObjectRef Game::FindFirstSceneObjectWithMesh(SceneObjectRef ref)
-{
-	if(!ref.IsValid())return SceneObjectRef::Null();
-
-	if(ref->GetMesh3D().IsValid())return ref;
-
-	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
-	{
-		SceneObjectRef childRef = ref->GetChildAt(i);
-		SceneObjectRef subRef = FindFirstSceneObjectWithMesh(childRef);
-		if(subRef.IsValid())return subRef;
-	}
-
-	return SceneObjectRef::Null();
-}
-
-/*
- * Recursively visit objects in the scene hierarchy with root at [ref] and for each
- * invoke [func] with the current SceneObject instance as the only parameter.
- */
-void Game::ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func)
-{
-	if(!ref.IsValid())return;
-
-	// invoke [func]
-	func(ref);
-
-	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
-	{
-		SceneObjectRef childRef = ref->GetChildAt(i);
-		ProcessSceneObjects(childRef, func);
-	}
-}
-
-/*
- * Set the SceneObject [root] and all children to be static.
- */
-void Game::SetAllObjectsStatic(SceneObjectRef root)
-{
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
-	{
-		current->SetStatic(true);
-	});
-}
-
-/*
- * Set the SceneObject [root] and all children to have layer mask [mask].
- */
-void Game::SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask)
-{
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
-	{
-		current->SetLayerMask(mask);
-	});
-}
-
-/*
- * Set any mesh encountered in the scene hierarchy beginning with [root]
- * to use the standard shadow volume generation algorithm.
- */
-void Game::SetAllMeshesStandardShadowVolume(SceneObjectRef root)
-{
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
-	{
-		SkinnedMesh3DRendererRef skinnedRenderer = current->GetSkinnedMesh3DRenderer();
-		if(skinnedRenderer.IsValid())
-		{
-			for(unsigned int i = 0; i < skinnedRenderer->GetSubRendererCount(); i++)
-			{
-				skinnedRenderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
-			}
-		}
-
-		Mesh3DRendererRef renderer = current->GetMesh3DRenderer();
-		if(renderer.IsValid())
-		{
-			for(unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
-			{
-				renderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
-			}
-		}
-	});
-}
-
-/*
- * Set any mesh encountered in the scene hierarchy beginning with [root]
- * to set shadow casting to [castShadows].
- */
-void Game::SetAllObjectsCastShadows(SceneObjectRef root, bool castShadows)
-{
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
-	{
-		Mesh3DFilterRef filter = current->GetMesh3DFilter();
-		if(filter.IsValid())
-		{
-			filter->SetCastShadows(castShadows);
-		}
-	});
 }
 
 /*
@@ -248,39 +119,235 @@ void Game::Init()
 	AssetImporter importer;
 
 	LayerManager& layerManager = Engine::Instance()->GetEngineObjectManager()->GetLayerManager();
-	int lavaWallLayerIndex = layerManager.AddLayer(LavaWallLayer);
-	int lavaIslandLayerIndex = layerManager.AddLayer(LavaIslandLayer);
-	int lavaIslandObjectsLayerIndex = layerManager.AddLayer(LavaIslandObjectsLayer);
 	int playerObjectLayerIndex = layerManager.AddLayer(PlayerObjectLayer);
 
-	lavaWallLayerMask = layerManager.GetLayerMask(lavaWallLayerIndex);
-	lavaIslandLayerMask = layerManager.GetLayerMask(lavaIslandLayerIndex);
-	lavaIslandObjectsLayerMask = layerManager.GetLayerMask(lavaIslandObjectsLayerIndex);
 	playerObjectLayerMask = layerManager.GetLayerMask(playerObjectLayerIndex);
 
-	// set up the scene
-	SetupScene(importer);
-	SetupLights(importer);
+	SetupGlobalElements(importer);
 
 	// setup & initialize player
 	SetupPlayer(importer);
 	InitializePlayerPosition();
 
+	// set up the scene
+	SetupScenes(importer);
+
 	SetupCamera();
 }
 
 /*
- * Set up the scenery for the scene and use [importer] to load assets from disk. This function
- * uses sub-functions to do the grunt work of loading each required model, extracting relevant
- * components that can be reused (meshes & materials) and positions each instance of each model
- * in the scene.
+ * Set up the scenery for the scene and use [importer] to load assets from disk.
  */
-void Game::SetupScene(AssetImporter& importer)
+void Game::SetupScenes(AssetImporter& importer)
 {
-	SetupSceneTerrain(importer);
-	SetupSceneStructures(importer);
-	SetupScenePlants(importer);
-	SetupSceneExtra(importer);
+	scenes[(unsigned int)Scenes::LavaScene] = new LavaScene();
+	scenes[(unsigned int)Scenes::CastleScene] = new CastleScene();
+
+	SetupScene(importer, Scenes::LavaScene);
+	SetupScene(importer, Scenes::CastleScene);
+
+	SetupTransitionForScene(Scenes::LavaScene);
+	SetupTransitionForScene(Scenes::CastleScene);
+}
+
+/*
+ * Redirect to appropriate scene loading function base on [scene].
+ */
+void Game::SetupScene(AssetImporter& importer, Scenes scene)
+{
+	switch(scene)
+	{
+		case Scenes::LavaScene:
+			scenes[(unsigned int)Scenes::LavaScene]->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+		break;
+		case Scenes::CastleScene:
+			scenes[(unsigned int)Scenes::CastleScene]->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+		break;
+	}
+}
+
+/*
+ * Set up scene elements that are not specific not any particular scene.
+ */
+void Game::SetupGlobalElements(AssetImporter& importer)
+{
+	// get reference to the engine's object manager
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+	//========================================================
+	//
+	// Ambient light
+	//
+	//========================================================
+
+	// create ambient light
+	ambientLightObject = objectManager->CreateSceneObject();
+	LightRef light = objectManager->CreateLight();
+	light->SetIntensity(.30);
+	light->SetType(LightType::Ambient);
+	light->MergeCullingMask(playerObjectLayerMask);
+	ambientLightObject->SetLight(light);
+
+
+	//========================================================
+	//
+	// Directional light
+	//
+	//========================================================
+
+	directionalLightObject = objectManager->CreateSceneObject();
+	directionalLightObject->SetStatic(true);
+	light = objectManager->CreateLight();
+	light->SetDirection(-.8,-1.7,-2);
+	light->SetIntensity(.8);
+	light->MergeCullingMask(playerObjectLayerMask);
+	light->SetShadowsEnabled(true);
+	light->SetType(LightType::Directional);
+	directionalLightObject->SetLight(light);
+
+	importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
+
+	//========================================================
+	//
+	// start island
+	//
+	//========================================================
+
+	// load castle island model
+	SceneObjectRef modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	GameUtil::SetAllObjectsStatic(modelSceneObject);
+
+	// place island in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.03,.03,.03, false);
+	modelSceneObject->GetTransform().Translate(45,-10, 50, false);
+
+	//========================================================
+	//
+	// wood bridge
+	//
+	//========================================================
+
+	// load bridge
+	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1 , false, true);
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load bridge model!\n");
+	GameUtil::SetAllObjectsStatic(modelSceneObject);
+
+	// place bridge in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.1,.1,.1, false);
+	modelSceneObject->GetTransform().Translate(30,-11.5,35,false);
+	modelSceneObject->GetTransform().Rotate(0,1,0,55,true);
+
+}
+
+/*
+ * Activate all scene objects in [scene] and deactivate all others.
+ */
+void Game::SwitchToScene(Scenes scene)
+{
+	currentScene = scene;
+
+	for(unsigned int sceneIndex = 0; sceneIndex < SceneCount; sceneIndex++)
+	{
+		if(currentScene != (Scenes)sceneIndex)
+		{
+			scenes[sceneIndex]->GetSceneRoot()->SetActive(false);
+		}
+	}
+
+	scenes[(unsigned int)currentScene]->GetSceneRoot()->SetActive(true);
+}
+
+void Game::TransitionToScene(Scenes scene)
+{
+	if(scene == currentScene)return;
+	if(!sceneTransitioning)
+	{
+		sceneTransitionSrc = currentScene;
+		sceneTransitionDest = scene;
+		sceneTransitionStartTime = Time::GetRealTimeSinceStartup();
+		sceneTransitioning = true;
+	}
+}
+
+void Game::UpdateSceneTransition()
+{
+	if(sceneTransitioning)
+	{
+		float transitionTime = .25;
+		float elapsedTime = Time::GetRealTimeSinceStartup() - sceneTransitionStartTime;
+		float normalizedTime = elapsedTime / transitionTime;
+
+		Scene* srcSceneObj = scenes[(unsigned int)sceneTransitionSrc];
+		Scene* destSceneObj = scenes[(unsigned int)sceneTransitionDest];
+
+		SceneObjectRef srcRoot = srcSceneObj->GetSceneRoot();
+		SceneObjectRef destRoot = destSceneObj->GetSceneRoot();
+
+		destRoot->SetActive(true);
+		srcRoot->SetActive(false);
+
+		float srcScale = 1 - normalizedTime;
+		float destScale =  1 - srcScale;
+
+		unsigned int phases = 4;
+		float times[] = {0, .6, .8, 1};
+		float scales[] = {0, 1.2, .9, 1};
+
+		for(unsigned int i = 1; i < phases; i++)
+		{
+			if(normalizedTime < times[i])
+			{
+				float cElapsed = normalizedTime - times[i-1];
+				destScale =  ((cElapsed/(times[i]-times[i-1])) * (scales[i] - scales[i-1])) + scales[i-1];
+				break;
+			}
+		}
+
+		if(elapsedTime > transitionTime)destScale = 1;
+		if(currentScene == sceneTransitionDest)destScale = 1;
+
+		SceneTransition& srcTransition = sceneTransitions[(unsigned int)sceneTransitionSrc];
+		SceneTransition& destTransition = sceneTransitions[(unsigned int)sceneTransitionDest];
+
+		Transform srcTransform;
+		srcTransform.SetTo(srcTransition.OriginalTransform);
+		Vector3 srcScaleVec(srcScale,srcScale,srcScale);
+		srcTransform.Scale(srcScaleVec, true);
+		srcRoot->GetTransform().SetTo(srcTransform);
+
+		Transform destTransform;
+		destTransform.SetTo(destTransition.OriginalTransform);
+		Vector3 destScaleVec(destScale,destScale,destScale);
+		destTransform.Scale(destScaleVec, true);
+		destRoot->GetTransform().SetTo(destTransform);
+
+		if(elapsedTime > transitionTime)
+		{
+			SwitchToScene(sceneTransitionDest);
+			sceneTransitioning = false;
+		}
+	}
+}
+
+void Game::SetupTransitionForScene(Scenes scene)
+{
+	SceneTransition& sceneTransition = sceneTransitions[(unsigned int)scene];
+	Scene* sceneObj = scenes[(unsigned int)scene];
+	SceneObjectRef sceneRoot = sceneObj->GetSceneRoot();
+	sceneTransition.OriginalTransform.SetTo(sceneRoot->GetTransform());
+
+	switch(scene)
+	{
+		case Scenes::LavaScene:
+			sceneTransition.PreScaleTranslation = Vector3(30,10,0);
+		break;
+		case Scenes::CastleScene:
+			sceneTransition.PreScaleTranslation = Vector3(-80,10,10);
+		break;
+	}
 }
 
 /*
@@ -309,7 +376,7 @@ void Game::SetupCamera()
 	// decompose player's transform into position, rotation and scale
 	playerObject->GetTransform().CopyMatrix(mat);
 	mat.Decompose(trans,rot,scale);
-	cameraObject->GetTransform().Translate(trans.x-20,trans.y+10,trans.z+15, true);
+	cameraObject->GetTransform().Translate(trans.x+20,trans.y+10,trans.z+15, true);
 
 	// create skybox texture
 	TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky_north.png",
@@ -323,646 +390,6 @@ void Game::SetupCamera()
 	camera->SetSkyboxEnabled(true);
 }
 
-/*
- * Set up the "land" elements in the scene.
- */
-void Game::SetupSceneTerrain(AssetImporter& importer)
-{
-	// multi-use reference
-	SceneObjectRef modelSceneObject;
-
-	//========================================================
-	//
-	// Islands
-	//
-	//========================================================
-
-	// load lava island model
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SetAllObjectsLayerMask(modelSceneObject, lavaIslandLayerMask);
-
-	// place island in the scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
-	modelSceneObject->GetTransform().Translate(-30,-10,0,false);
-
-	// load castle island model
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-
-	// place island in the scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.07,.07,.07, false);
-	modelSceneObject->GetTransform().Translate(80,-10,-10,false);
-
-	//========================================================
-	//
-	// Lava
-	//
-	//========================================================
-
-	lavaField = new LavaField(24);
-	lavaField->Init();
-	lavaField->SetDisplacementSpeed(.05);
-	lavaField->SetTextureASpeed(.015);
-	lavaField->SetTextureBSpeed(.035);
-	lavaField->SetDisplacementHeight(6);
-	lavaField->SetDisplacementTileSize(3);
-
-	SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
-	lavaFieldObject->GetTransform().Scale(100,1,97, false);
-	lavaFieldObject->GetTransform().Translate(-40,-17,0, false);
-
-
-	//========================================================
-	//
-	// Lava wall
-	//
-	//========================================================
-
-	// load stone3
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/stone/Stone03.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load stone model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-
-	// extract mesh & material from stone model
-	SceneObjectRef stone1MeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef stone1Mesh = stone1MeshObject->GetMesh3D();
-	Mesh3DRendererRef stone1Renderer = stone1MeshObject->GetMesh3DRenderer();
-	MaterialRef stone1Material = stone1Renderer->GetMaterial(0);
-
-	// place initial stone in scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.0045, .0045, .0045, false);
-	modelSceneObject->GetTransform().Rotate(0,1,0,25, false);
-	modelSceneObject->GetTransform().Rotate(0,0,1,15, false);
-	modelSceneObject->GetTransform().Translate(5,-15,-45,false);
-
-	// re-use the stone mesh & material for multiple instances
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 1, 0,0, -90, -16,-15,-55, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 0, 1,0, -70, -54,-30,-52, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-15,false);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 1, 0,0, -90, -66,-15,-27, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-90, true);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 0, 1,0, -20, -95,-17, 8, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .55,.58, .55, 1, 0,0, -90, -90,-15, 30, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-40, true);
-	modelSceneObject->GetTransform().Rotate(1,0,0,-180, true);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.5, .5, 0, 1,0, -80, -85,-28, 43, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .45,.4, .45, 1, 0,0, -90, -40,-25, 45, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-40, true);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .6,.5, .5, 0, 1,0, -80, -20,-28, 45, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .5,.6, .6, 0, 1,0, -180, 10,-31.5, 5, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-	modelSceneObject = AddMeshToScene(stone1Mesh, stone1Material, .25,.6, .25, 0, 1,0, -180, 10,-25, -25, true,true,true);
-	SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
-
-}
-
-/*
- * Set up all the man-made structures, buildings, etc. in the scene.
- */
-void Game::SetupSceneStructures(AssetImporter& importer)
-{
-	// multi-use reference
-	SceneObjectRef modelSceneObject;
-
-	//========================================================
-	//
-	// Castle components
-	//
-	//========================================================
-
-	// load turrent tower
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SetAllObjectsLayerMask(modelSceneObject, lavaIslandObjectsLayerMask);
-
-	// place turret tower in the scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.05,.05,.05, false);
-	modelSceneObject->GetTransform().Translate(-30,-10,-10,false);
-
-	// load castle tower
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-
-	// extract mesh & material from castle tower model
-	SceneObjectRef tower2MeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
-	Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
-	MaterialRef towerMaterial = towerRenderer->GetMaterial(0);
-
-	// place initial castle tower in scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.03,.04, false);
-	modelSceneObject->GetTransform().Translate(65,-10,-15,false);
-
-	// re-use the castle tower mesh & material for multiple instances
-	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,-15, true,true,true);
-	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 65,-10,6, true,true,true);
-	AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,6, true,true,true);
-
-	// load & place castle entrance arch-way left side
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Left_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
-	modelSceneObject->GetTransform().Rotate(0,1,0,90,false);
-	modelSceneObject->GetTransform().Translate(65,-10,-8.8,false);
-
-	// load and place castle entrance arch-way right side
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Right_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
-	modelSceneObject->GetTransform().Rotate(0,1,0, 90,false);
-	modelSceneObject->GetTransform().Translate(65,-10,0,false);
-
-	// load castle wall model
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-
-	// extract mesh & material from castle wall model
-	SceneObjectRef wallBlockMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
-	MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
-
-	// place initial castle wall in scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.06,.05,.04, false);
-	modelSceneObject->GetTransform().Translate(70,-10,6.5,false);
-
-	// re-use the castle wall mesh & material for multiple instances
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10,6.5, true,true,true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10,6.5, true,true,true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 70,-10,-15.5, true,true,true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10, -15.5, true,true,true);
-	AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10, -15.5, true,true,true);
-	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
-	modelSceneObject = AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, .25, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
-
-
-	//========================================================
-	//
-	// Mushroom house
-	//
-	//========================================================
-
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/mushroom/MushRoom_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load mushroom house model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SetAllObjectsLayerMask(modelSceneObject, lavaIslandObjectsLayerMask);
-
-	// place mushroom house in the scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.09,.09,.09, false);
-	modelSceneObject->GetTransform().Translate(-37,-10,15,false);
-}
-
-/*
- * Add all the plants to the scene.
- */
-void Game::SetupScenePlants(AssetImporter& importer)
-{
-	// multi-use reference
-	SceneObjectRef modelSceneObject;
-
-	//========================================================
-	//
-	// Trees
-	//
-	//========================================================
-
-	// load tree model
-	modelSceneObject = importer.LoadModelDirect("resources/models/toontree/toontree2/treeplain.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tree model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-
-	// extract tree mesh & material
-	SceneObjectRef treeMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
-	Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
-	MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
-
-	// place initial tree in the scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.0015,.0015,.0015, false);
-	modelSceneObject->GetTransform().Rotate(.8,0,.2, -6, false);
-	modelSceneObject->GetTransform().Translate(55,-10.5, 11,false);
-
-	// reuse the tree mesh & material for multiple instances
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .10,.10,.10, 1,0,0, -85, 57, -10, 24, true,true,true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .15,.15,.20, 1,0,0, -94, 61, -9, -15, true,true,true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .20,.20,.30, 1,0,0, -93, 80, -9, -15, true,true,true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .17,.17,.20, 1,0,0, -85, 85, -9.5, -13, true,true,true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .22,.22,.38, 1,0,0, -90, 115, -9.5, 15, true,true,true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .19,.19,.28, 1,0,0, -96, 105, -9.5, 8, true,true,true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = AddMeshToScene(treeMesh, treeMaterial, .18,.18,.20, 1,0,0, -87, 95, -10, 32, true,true,true);
-	SetAllMeshesStandardShadowVolume(modelSceneObject);
-}
-
-/*
- * Add miscellaneous elements to the scene.
- */
-void Game::SetupSceneExtra(AssetImporter& importer)
-{
-	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-
-	// misc. reference variables
-	SceneObjectRef modelSceneObject;
-	Mesh3DRendererRef renderer;
-	SceneObjectRef sceneObject;
-	TextureAttributes texAttributes;
-	TextureRef texture;
-	Mesh3DRef cubeMesh;
-	StandardAttributeSet meshAttributes;
-
-	//========================================================
-	//
-	// Texture scene cube
-	//
-	//========================================================
-
-	// create instance of SceneObject to hold the cube mesh and its renderer
-	cubeSceneObject = objectManager->CreateSceneObject();
-	SetAllObjectsLayerMask(cubeSceneObject, lavaIslandObjectsLayerMask);
-
-	// load texture for the cube
-	texAttributes.FilterMode = TextureFilter::TriLinear;
-	texAttributes.MipMapLevel = 4;
-	texture = objectManager->CreateTexture("resources/textures/cartoonTex03.png", texAttributes);
-
-	// create the cube's material using the "basic" built-in shader
-	ShaderSource basicShaderSource;
-	importer.LoadBuiltInShaderSource("basic", basicShaderSource);
-	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
-	material->SetTexture(texture, "TEXTURE0");
-
-	// set the cube mesh attributes
-	meshAttributes = StandardAttributes::CreateAttributeSet();
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-
-	// create the cube mesh
-	cubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
-	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
-	cubeSceneObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(cubeMesh);
-	filter->SetCastShadows(true);
-	filter->SetReceiveShadows(true);
-
-	// create the cube mesh's renderer
-	renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(material);
-	cubeSceneObject->SetMesh3DRenderer(renderer);
-
-	// scale the cube and move to its position in the scene
-	cubeSceneObject->GetTransform().Scale(1.5, 1.5,1.5, false);
-	cubeSceneObject->GetTransform().Translate(-20, -7, 8, false);
-
-
-	//========================================================
-	//
-	// Fences
-	//
-	//========================================================
-
-	// load fence model
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrier01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load barrier model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-
-	// extract fence mesh & material
-	SceneObjectRef fenceMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
-	Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
-	MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
-
-	// place initial fence in the scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.6,.6,.6, false);
-	modelSceneObject->GetTransform().Translate(60,-10,22,false);
-
-	/** re-use the fence mesh & material for multiple instances  **/
-
-	// fence on right side of castle
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 47,-10,14.5, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-70,true);
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 52,-10,20, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-25,true);
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 69.5,-10,21, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,15,true);
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 79.2,-10,19.3, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,5,true);
-
-	// fence on left side of castle
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 51,-10,-16, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-120,true);
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 55,-10,-25, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-110,true);
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 59.9,-10,-33.3, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-135,true);
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 68.2,-10,-38, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-160,true);
-	modelSceneObject = AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 78,-10,-40, true,true,true);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-175,true);
-
-
-	//========================================================
-	//
-	// Barrels
-	//
-	//========================================================
-
-	// load barrel model
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrel01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load barrel model!\n");
-	SetAllObjectsStatic(modelSceneObject);
-
-	// extract barrel mesh and material
-	SceneObjectRef barrelMeshObject = FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef barrelMesh = barrelMeshObject->GetMesh3D();
-	Mesh3DRendererRef barrelRenderer = barrelMeshObject->GetMesh3DRenderer();
-	MaterialRef barrelMaterial = barrelRenderer->GetMaterial(0);
-
-	// place initial barrel in the scene
-	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.8,.8,.8, false);
-	modelSceneObject->GetTransform().Translate(78,-10,10.5, false);
-
-	// re-use the barrel mesh & material for multiple instances
-	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .8,.8,.8, 1,0,0, -90, 74,-10,10.5, true,true,true);
-	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-8.3,1.5, true,true,true);
-	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-8.3,-1.8, true,true,true);
-	modelSceneObject = AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-5.3,-.15, true,true,true);
-}
-
-/*
- * Set up the lights in the scene.
- */
-void Game::SetupLights(AssetImporter& importer)
-{
-	SceneObjectRef sceneObject;
-
-	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-
-	//========================================================
-	//
-	// Lava island spinning point light
-	//
-	//========================================================
-
-	// create self-illuminated cube mesh to represent spinning point light
-	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	Mesh3DRef pointLightCubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
-
-	// create material for spinning point light mesh
-	ShaderSource selfLitShaderSource;
-	importer.LoadBuiltInShaderSource("selflit", selfLitShaderSource);
-	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
-	selflitMaterial->SetColor(Color4(1,1,1,1), "SELFCOLOR");
-
-	// create spinning point light
-	spinningPointLightObject = objectManager->CreateSceneObject();
-	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
-	spinningPointLightObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(pointLightCubeMesh);
-	filter->SetCastShadows(false);
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(selflitMaterial);
-	spinningPointLightObject->SetMesh3DRenderer(renderer);
-	LightRef light = objectManager->CreateLight();
-	light->SetIntensity(1.7);
-	light->SetCullingMask(lavaIslandObjectsLayerMask);
-	light->MergeCullingMask(lavaIslandLayerMask);
-	light->MergeCullingMask(playerObjectLayerMask);
-	light->SetRange(25);
-	light->SetShadowsEnabled(true);
-	light->SetType(LightType::Point);
-	spinningPointLightObject->SetLight(light);
-	spinningPointLightObject->GetTransform().Scale(.4,.4,.4, true);
-	spinningPointLightObject->GetTransform().Translate(-26, 2, 10, false);
-
-	//========================================================
-	//
-	// Ambient light
-	//
-	//========================================================
-
-	// create ambient light
-	ambientLightObject = objectManager->CreateSceneObject();
-	light = objectManager->CreateLight();
-	light->SetIntensity(.30);
-	light->SetType(LightType::Ambient);
-	light->MergeCullingMask(playerObjectLayerMask);
-	light->MergeCullingMask(lavaIslandLayerMask);
-	light->MergeCullingMask(lavaIslandObjectsLayerMask);
-	light->MergeCullingMask(lavaWallLayerMask);
-	ambientLightObject->SetLight(light);
-
-
-	//========================================================
-	//
-	// Directional light
-	//
-	//========================================================
-
-	directionalLightObject = objectManager->CreateSceneObject();
-	directionalLightObject->SetStatic(true);
-	light = objectManager->CreateLight();
-	light->SetDirection(-.8,-1.7,-2);
-	light->SetIntensity(.8);
-	light->MergeCullingMask(playerObjectLayerMask);
-	light->MergeCullingMask(lavaIslandLayerMask);
-	light->MergeCullingMask(lavaIslandObjectsLayerMask);
-	light->MergeCullingMask(lavaWallLayerMask);
-	light->SetShadowsEnabled(true);
-	light->SetType(LightType::Directional);
-	directionalLightObject->SetLight(light);
-
-
-	//========================================================
-	//
-	// Castle lights
-	//
-	//========================================================
-
-	// create mesh & material for castle lantern
-	Mesh3DRef lanternLightMesh = EngineUtility::CreateCubeMesh(meshAttributes);
-	Color4 lanternLightColor(1,.66,.231,1);
-	Color4 lanternLightMeshColor(1,.95,.5,1);
-	MaterialRef lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
-	lanterLightMeshMaterial->SetColor(lanternLightMeshColor, "SELFCOLOR");
-	lanterLightMeshMaterial->SetSelfLit(true);
-
-	// create castle right lantern
-	SceneObjectRef lanternObject = objectManager->CreateSceneObject();
-	lanternObject->SetStatic(true);
-	LightRef lanternLight = objectManager->CreateLight();
-	lanternLight->SetIntensity(1.8);
-	lanternLight->SetRange(25);
-	lanternLight->SetColor(lanternLightColor);
-	lanternLight->MergeCullingMask(playerObjectLayerMask);
-	lanternLight->SetShadowsEnabled(true);
-	lanternLight->SetType(LightType::Point);
-	lanternObject->SetLight(lanternLight);
-	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(62.2, -5, 0, false);
-	filter = objectManager->CreateMesh3DFilter();
-	lanternObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(lanternLightMesh);
-	Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
-	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
-	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
-	otherPointLightObjects.push_back(lanternObject);
-
-	// create castle left lantern
-	lanternObject = objectManager->CreateSceneObject();
-	lanternObject->SetStatic(true);
-	lanternLight = objectManager->CreateLight();
-	lanternLight->SetIntensity(1.8);
-	lanternLight->SetRange(25);
-	lanternLight->SetColor(lanternLightColor);
-	lanternLight->MergeCullingMask(playerObjectLayerMask);
-	lanternLight->SetShadowsEnabled(true);
-	lanternLight->SetType(LightType::Point);
-	lanternObject->SetLight(lanternLight);
-	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(62.4, -5, -8, false);
-	filter = objectManager->CreateMesh3DFilter();
-	lanternObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(lanternLightMesh);
-	lanterLightRenderer = objectManager->CreateMesh3DRenderer();
-	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
-	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
-	otherPointLightObjects.push_back(lanternObject);
-
-	// create castle side lantern
-	lanternObject = objectManager->CreateSceneObject();
-	lanternObject->SetStatic(true);
-	lanternLight = objectManager->CreateLight();
-	lanternLight->SetIntensity(1.5);
-	lanternLight->SetRange(20);
-	lanternLight->SetColor(lanternLightColor);
-	lanternLight->MergeCullingMask(playerObjectLayerMask);
-	lanternLight->SetShadowsEnabled(true);
-	lanternLight->SetType(LightType::Point);
-	lanternObject->SetLight(lanternLight);
-	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(77.4, -5, -17.8, false);
-	filter = objectManager->CreateMesh3DFilter();
-	lanternObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(lanternLightMesh);
-	lanterLightRenderer = objectManager->CreateMesh3DRenderer();
-	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
-	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
-	otherPointLightObjects.push_back(lanternObject);
-
-	//========================================================
-	//
-	// Lava lights
-	//
-	//========================================================
-
-	// create lava pool wall light
-	SceneObjectRef lavaLightObject = objectManager->CreateSceneObject();
-	lavaLightObject->SetStatic(true);
-	LightRef lavaLight = objectManager->CreateLight();
-	lavaLight->SetIntensity(4.5);
-	lavaLight->SetCullingMask(lavaWallLayerMask);
-	lavaLight->SetRange(60);
-	lavaLight->SetColor(Color4(1,.5,0,1));
-	lavaLight->SetShadowsEnabled(false);
-	lavaLight->SetType(LightType::Point);
-	lavaLightObject->SetLight(lavaLight);
-	lavaLightObject->GetTransform().Translate(-25, -15, 3, false);
-	filter = objectManager->CreateMesh3DFilter();
-	lavaLightObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(lanternLightMesh);
-	Mesh3DRendererRef lavaLightRenderer = objectManager->CreateMesh3DRenderer();
-	lavaLightRenderer->AddMaterial(lanterLightMeshMaterial);
-	lavaLightObject->SetMesh3DRenderer(lavaLightRenderer);
-	lavaLightObjects.push_back(lavaLightObject);
-
-	// create lava island light
-	SceneObjectRef lavaDirectionalLightObject = objectManager->CreateSceneObject();
-	lavaDirectionalLightObject->SetStatic(true);
-	lavaLight = objectManager->CreateLight();
-	lavaLight->SetDirection(0,1,0);
-	lavaLight->SetIntensity(3);
-	lavaLight->SetCullingMask(lavaIslandLayerMask);
-	lavaLight->SetColor(Color4(1,.5,0,1));
-	lavaLight->SetShadowsEnabled(false);
-	lavaLight->SetType(LightType::Directional);
-	lavaDirectionalLightObject->SetLight(lavaLight);
-	lavaLightObjects.push_back(lavaDirectionalLightObject);
-}
-
-/*
- * Given an instance of Mesh3D [mesh] and and instance of Material [material], create an instance of SceneObject that
- * contains [mesh] and renders it using [material]. Scale the scene object's transform by [sx], [sy], [sz] in world
- * space, then rotate by [ra] degrees around the world space axis [rx], [ry], [rz], and then translate in world space by
- * [tx], [ty], tz]. If [isStatic] == true, then set the root SceneObject instance and all children to be static.
- *
- * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
- */
-SceneObjectRef Game::AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra,
-									float tx, float ty, float tz, bool isStatic, bool castShadows, bool receiveShadows)
-{
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();
-	meshSceneObject->SetActive(true);
-	Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
-	meshFilter->SetMesh3D(mesh);
-	meshFilter->SetCastShadows(castShadows);
-	meshFilter->SetReceiveShadows(receiveShadows);
-	meshSceneObject->SetMesh3DFilter(meshFilter);
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(material);
-	meshSceneObject->SetMesh3DRenderer(renderer);
-
-	meshSceneObject->GetTransform().Scale(sx,sy,sz, false);
-	if(ra != 0)meshSceneObject->GetTransform().Rotate(rx,ry,rz,ra,false);
-	meshSceneObject->GetTransform().Translate(tx,ty,tz,false);
-
-	if(isStatic)SetAllObjectsStatic(meshSceneObject);
-
-	return meshSceneObject;
-}
 
 /*
  * Set up the player model and animations, use [importer] to load model files from disk.
@@ -974,7 +401,6 @@ void Game::SetupPlayer(AssetImporter& importer)
 	playerType = PlayerType::Warrior;
 	playerState = PlayerState::Waiting;
 	playerIsGrounded = true;
-
 
 	//========================================================
 	//
@@ -996,11 +422,10 @@ void Game::SetupPlayer(AssetImporter& importer)
 			importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, true);
 			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx");
 			ASSERT_RTRN(playerObject.IsValid(), "Could not load Warrior model!\n");
-			playerObject->GetTransform().Translate(50,-10,-10,false);
+			playerObject->GetTransform().Translate(45,-10,55,false);
 			playerObject->GetTransform().Scale(4, 4, 4, true);
 		break;
 	}
-
 
 	//========================================================
 	//
@@ -1030,11 +455,10 @@ void Game::SetupPlayer(AssetImporter& importer)
 	}
 
 	playerObject->SetActive(true);
-	SetAllObjectsLayerMask(playerObject, playerObjectLayerMask);
-	playerRenderer = FindFirstSkinnedMeshRenderer(playerObject);
+	GameUtil::SetAllObjectsLayerMask(playerObject, playerObjectLayerMask);
+	playerRenderer = GameUtil::FindFirstSkinnedMeshRenderer(playerObject);
 	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
 	bool compatible = true;
-
 
 	//========================================================
 	//
@@ -1082,7 +506,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 			ASSERT_RTRN(compatible, "Warrior animations are not compatible!");
 
 			// set all meshes to use standard shadow volume
-			ProcessSceneObjects(playerObject, [=](SceneObjectRef current)
+			GameUtil::ProcessSceneObjects(playerObject, [=](SceneObjectRef current)
 			{
 				SkinnedMesh3DRendererRef renderer = current->GetSkinnedMesh3DRenderer();
 				if(renderer.IsValid())
@@ -1135,14 +559,10 @@ void Game::InitializePlayerPosition()
  */
 void Game::Update()
 {
-	Point3 lightRotatePoint(-20,5,10);
-
-	// rotate the point light around [lightRotatePoint]
-	spinningPointLightObject->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
-	//pointLightObject->SetActive(false);
-
-	// rotate the cube around its center and the y-axis
-	cubeSceneObject->GetTransform().Rotate(0,1,0,20 * Time::GetDeltaTime(), true);
+	if(!sceneTransitioning)
+	{
+		scenes[(unsigned int)currentScene]->Update();
+	}
 
 	UpdatePlayerHorizontalSpeedAndDirection();
 	UpdatePlayerVerticalSpeed();
@@ -1153,9 +573,22 @@ void Game::Update()
 	ManagePlayerState();
 	HandleGeneralInput();
 
-	if(lavaField->GetSceneObject()->IsActive())lavaField->Update();
-
+	UpdateSceneTransition();
 	DisplayInfo();
+
+	frameCount++;
+}
+
+/*
+ * OnPreRender() is called once per frame, after pre-processing is done on scene, and
+ * after the Update() call.
+ */
+void Game::OnPreRender()
+{
+	if(frameCount == 1)
+	{
+		SwitchToScene(Scenes::LavaScene);
+	}
 }
 
 /*
@@ -1589,6 +1022,13 @@ void Game::HandleGeneralInput()
 
 	}
 
+	LavaScene *lavaScene = ((LavaScene*)scenes[(unsigned int)Scenes::LavaScene]);
+	CastleScene *castleScene = ((CastleScene*)scenes[(unsigned int)Scenes::CastleScene]);
+	LavaField *lavaField = lavaScene->GetLavaField();
+	std::vector<SceneObjectRef>& lavaLightObjects = lavaScene->GetLavaLightObjects();
+	std::vector<SceneObjectRef>& castleLights = castleScene->GetPointLights();
+	SceneObjectRef lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
+
 	// toggle lava
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::K))
 	{
@@ -1604,6 +1044,7 @@ void Game::HandleGeneralInput()
 	float intensityBoost = 0;
 	if(boostLightIntensity)intensityBoost = .05;
 	else if(reduceLightIntensity)intensityBoost = -.05;
+
 
 	// update selected lights
 	switch(selectedLighting)
@@ -1621,11 +1062,10 @@ void Game::HandleGeneralInput()
 			UpdateLight(directionalLightObject, toggleLight, intensityBoost, toggleCastShadows);
 		break;
 		case SceneLighting::Point:
-			UpdateLight(spinningPointLightObject, toggleLight, intensityBoost, toggleCastShadows);
-
-			for(unsigned int i =0; i < otherPointLightObjects.size(); i++)
+			UpdateLight(lavaSpinningLight, toggleLight, intensityBoost, toggleCastShadows);
+			for(unsigned int i =0; i < castleLights.size(); i++)
 			{
-				UpdateLight(otherPointLightObjects[i], toggleLight, intensityBoost, toggleCastShadows);
+				UpdateLight(castleLights[i], toggleLight, intensityBoost, toggleCastShadows);
 			}
 		break;
 		default:
@@ -1640,6 +1080,20 @@ void Game::HandleGeneralInput()
 		{
 			cameraObject->GetCamera()->SetSkyboxEnabled(!cameraObject->GetCamera()->IsSkyboxEnabled());
 		}
+	}
+
+	// change to lava scene
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::One))
+	{
+		//SwitchToScene(Scene::LavaScene);
+		TransitionToScene(Scenes::LavaScene);
+	}
+
+	// change to castle scene
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::Two))
+	{
+		//SwitchToScene(Scene::CastleScene);
+		TransitionToScene(Scenes::CastleScene);
 	}
 }
 

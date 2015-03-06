@@ -14,10 +14,12 @@ class AssetImporter;
 class Vector3;
 class Quaternion;
 class LavaField;
+class Scene;
 
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
+#include "geometry/transform.h"
 #include "base/intmask.h"
 #include <functional>
 #include <vector>
@@ -55,48 +57,33 @@ class Game
 		Lava = 4
 	};
 
-	// layer name for lava pool wall
-	static const std::string LavaWallLayer;
-	// layer name for lava pool island
-	static const std::string LavaIslandLayer;
-	// layer name for lava pool island objects
-	static const std::string LavaIslandObjectsLayer;
+	enum class Scenes
+	{
+		LavaScene = 0,
+		CastleScene = 1
+	};
+
 	// layer name for player object
 	static const std::string PlayerObjectLayer;
-	// layer mask for lava wall layer
-	IntMask lavaWallLayerMask;
-	// layer mask for lava island layer
-	IntMask lavaIslandLayerMask;
-	// layer mask for lava island layer objects
-	IntMask lavaIslandObjectsLayerMask;
 	// layer mask for player object
 	IntMask playerObjectLayerMask;
 
-	static const unsigned int MAX_PLAYER_STATES = 32;
+	static const unsigned int MaxPlayerStates = 32;
 
 	// time at which a state was most recently activated
-	float stateActivationTime[MAX_PLAYER_STATES];
+	float stateActivationTime[MaxPlayerStates];
 
 	// player's current state
 	PlayerState playerState;
-
 	// specify which model to load for player object
 	PlayerType playerType;
 
+
 	// SceneObject that contains the main camera for the scene
 	SceneObjectRef cameraObject;
-	// SceneObject that contains the spinning point light in the scene
-	SceneObjectRef spinningPointLightObject;
-	// scene lava
-	LavaField * lavaField;
-	// container lava lights
-	std::vector<SceneObjectRef> lavaLightObjects;
-	// container for other point lights in the scene
-	std::vector<SceneObjectRef> otherPointLightObjects;
 	// The SceneObject to which the player model hierarchy is attached
 	SceneObjectRef playerObject;
-	// The single cube in the scene
-	SceneObjectRef cubeSceneObject;
+
 	// scene object that holds the scene's directional light
 	SceneObjectRef directionalLightObject;
 	// scene object that holds the scene's ambient light
@@ -108,18 +95,45 @@ class Game
 	// The AnimationPlayer responsible for managing the animations of the player character
 	AnimationPlayerRef animationPlayer;
 
+	// number of frames rendered;
+	unsigned int frameCount;
 	// should we print out the graphics engine FPS?
 	bool printFPS;
 	// last time FPS was retrieved from the graphics engine
 	float lastFPSRetrieveTime;
 	// last fps value retrieved from the graphics engine
 	float lastFPS;
-
 	// last time info was printed
 	float lastInfoPrintTime;
 
 	// lighting type that currently can be modified by the user
 	SceneLighting selectedLighting;
+
+
+	class SceneTransition
+	{
+		public:
+
+		Transform OriginalTransform;
+		Vector3 PreScaleTranslation;
+	};
+
+	// total number of scenes
+	static const int SceneCount = 2;
+	// scene transition descriptors
+	SceneTransition sceneTransitions[SceneCount];
+	// scenes
+	Scene* scenes[SceneCount];
+	// current scene index
+	Scenes currentScene;
+	// are we transitioning between scenes?
+	bool sceneTransitioning;
+	// when did the current scene transition start?
+	float sceneTransitionStartTime;
+	// scene we are transitioning from
+	Scenes sceneTransitionSrc;
+	// scene we are transitioning to
+	Scenes sceneTransitionDest;
 
 	// movement variables
 	float playerWalkSpeed;
@@ -145,23 +159,16 @@ class Game
 	Vector3 basePlayerForward;
 	Vector3 baseCameraForward;
 
-	void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
-	SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
-	SceneObjectRef FindFirstSceneObjectWithMesh(SceneObjectRef ref);
-	void SetAllObjectsStatic(SceneObjectRef root);
-	void SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask);
-	void SetAllMeshesStandardShadowVolume(SceneObjectRef root);
-	void SetAllObjectsCastShadows(SceneObjectRef root, bool castShadows);
+	void SetupScenes(AssetImporter& importer);
+	void SetupScene(AssetImporter& importer, Scenes scene);
+	void SetupGlobalElements(AssetImporter& importer);
 
-	void SetupScene(AssetImporter& importer);
-	void SetupSceneTerrain(AssetImporter& importer);
-	void SetupSceneStructures(AssetImporter& importer);
-	void SetupScenePlants(AssetImporter& importer);
-	void SetupSceneExtra(AssetImporter& importer);
-	SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz,
-								  bool isStatic, bool castShadows, bool receiveShadows);
+	void SwitchToScene(Scenes scene);
+	void TransitionToScene(Scenes scene);
+	void UpdateSceneTransition();
+	void SetupTransitionForScene(Scenes scene);
+
 	void SetupCamera();
-	void SetupLights(AssetImporter& importer);
 	void SetupPlayer(AssetImporter& importer);
 
 	void InitializePlayerPosition();
@@ -186,6 +193,7 @@ class Game
 
     void Init();
     void Update();
+    void OnPreRender();
 };
 
 #endif

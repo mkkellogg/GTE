@@ -36,6 +36,12 @@ class CustomEngineCallbacks: public EngineCallbacks
 		game->Update();
 	}
 
+	 void OnPreRender()
+	 {
+		 // pass the OnPreRender event to the main Game instance
+		 game->OnPreRender();
+	 }
+
 	void OnQuit(){}
 	virtual ~CustomEngineCallbacks(){}
 };
