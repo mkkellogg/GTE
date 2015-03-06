@@ -234,6 +234,18 @@ void SceneObject::AddChild(SceneObjectRef child)
 		child->parent->RemoveChild(child);
 	}
 
+	// by attaching a parent to [child], we are modifying its final transformation
+	// into the scene because the transform of its new parent will be concatenated with
+	// its own. we want the resulting full word-space transformation of the child
+	// to be the same as it was before attaching it to its new parent, so we adjust
+	// the local transform of [child] accordingly.
+	Transform parentInverse;
+	SceneObjectTransform::GetWorldTransform(parentInverse, this, true, true);
+	Transform newChildTransform;
+	newChildTransform.SetTo(parentInverse);
+	newChildTransform.TransformBy(child->GetTransform());
+	child->GetTransform().SetTo(newChildTransform);
+
 	child->parent = sceneObjectRef;
 	children.push_back(child);
 }
@@ -255,6 +267,15 @@ void SceneObject::RemoveChild(SceneObjectRef child)
 	if(foundIndex >=0)
 	{
 		children.erase(children.begin() + foundIndex);
+
+		// by removing the parent of[child], we are modifying its final transformation
+		// into the scene because the transform of its parent was concatenated with
+		// its own to form the final transformation. we want the resulting full word-space
+		// transformation of the child to be the same as it was before removing it from its
+		// parent, so we adjust the local transform of [child] accordingly.
+		Transform newChildTransform;
+		SceneObjectTransform::GetWorldTransform(newChildTransform, child, true, false);
+		child->GetTransform().SetTo(newChildTransform);
 		child->parent = SceneObjectRef::Null();
 	}
 }
