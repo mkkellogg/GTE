@@ -97,7 +97,7 @@ bool Graphics::Start()
  */
 void Graphics::RenderScene()
 {
-	Engine::Instance()->GetRenderManager()->RenderAll();
+	Engine::Instance()->GetRenderManager()->RenderScene();
 }
 
 /*
