@@ -25,8 +25,15 @@
 Camera::Camera()
 {
 	clearBufferMask = 0;
+
 	skyboxSetup = false;
 	skyboxEnabled = false;
+
+	ssaoMode = SSAORenderMode::Standard;
+	ssaoEnabled = false;
+
+	renderOrderIndex = 0;
+
 	UpdateDisplay();
 }
 
@@ -98,6 +105,36 @@ bool Camera::IsSkyboxEnabled() const
 SceneObjectRef Camera::GetSkyboxSceneObject()
 {
 	return skyboxSceneObject;
+}
+
+void Camera::SetSSAOEnabled(bool enabled)
+{
+	ssaoEnabled = enabled;
+}
+
+bool Camera::IsSSAOEnabled()
+{
+	return ssaoEnabled;
+}
+
+void Camera::SetSSAORenderMode(SSAORenderMode mode)
+{
+	ssaoMode = mode;
+}
+
+SSAORenderMode Camera::GetSSAORenderMode()
+{
+	return ssaoMode;
+}
+
+void Camera::SetRendeOrderIndex(unsigned int index)
+{
+	renderOrderIndex = index;
+}
+
+unsigned int Camera::GetRendeOrderIndex()
+{
+	return renderOrderIndex;
 }
 
 void Camera::AddClearBuffer(RenderBufferType buffer)

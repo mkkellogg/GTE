@@ -8,6 +8,7 @@ class Graphics;
 #include "geometry/transform.h"
 #include "object/sceneobjectcomponent.h"
 #include "graphics/render/rendertarget.h"
+#include "graphics/graphics.h"
 #include "object/enginetypes.h"
 
 
@@ -31,6 +32,11 @@ class Camera : public SceneObjectComponent
     Mesh3DFilterRef skyboxMeshFilter;
     Mesh3DRendererRef skyboxMeshRenderer;
 
+    SSAORenderMode ssaoMode;
+    bool ssaoEnabled;
+
+    unsigned int renderOrderIndex;
+
     protected:
 
     Camera();
@@ -43,6 +49,15 @@ class Camera : public SceneObjectComponent
     void SetSkyboxEnabled(bool enabled);
     bool IsSkyboxEnabled() const;
     SceneObjectRef GetSkyboxSceneObject();
+
+    void SetSSAOEnabled(bool enabled);
+    bool IsSSAOEnabled();
+    void SetSSAORenderMode(SSAORenderMode mode);
+    SSAORenderMode GetSSAORenderMode();
+
+    void SetRendeOrderIndex(unsigned int index);
+    unsigned int GetRendeOrderIndex();
+
     const Transform& GetProjectionTransform() const ;
     void AddClearBuffer(RenderBufferType buffer);
     void RemoveClearBuffer(RenderBufferType buffer);
