@@ -54,16 +54,12 @@ class GraphicsAttributes
 	unsigned int WindowWidth;
 	unsigned int WindowHeight;
 	std::string WindowTitle;
-	bool SSAOEnabled;
-	SSAORenderMode SSAOMode;
 
 	GraphicsAttributes()
 	{
 		WindowWidth = 640;
 		WindowHeight = 480;
 		WindowTitle = std::string("GTE window");
-		SSAOEnabled = true;
-		SSAOMode = SSAORenderMode::Standard;
 	}
 };
 

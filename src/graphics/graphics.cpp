@@ -133,19 +133,3 @@ const GraphicsAttributes& Graphics::GetAttributes() const
 	return attributes;
 }
 
-/*
- * Turn on/off SSAO.
- */
-void Graphics::SetSSAOEnabled(bool enabled)
-{
-	attributes.SSAOEnabled = enabled;
-}
-
-/*
- * Set the type of SSAO being used.
- */
-void Graphics::SetSSAOMode(SSAORenderMode mode)
-{
-	attributes.SSAOMode = mode;
-}
-

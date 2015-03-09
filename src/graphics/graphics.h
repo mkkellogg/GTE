@@ -81,8 +81,6 @@ class Graphics
     public :
 
     float GetCurrentFPS();
-    void SetSSAOEnabled(bool enabled);
-    void SetSSAOMode(SSAORenderMode mode);
 
     virtual bool Init(const GraphicsAttributes& attributes);
 
