@@ -10,6 +10,7 @@ class Graphics;
 #include "graphics/render/rendertarget.h"
 #include "graphics/graphics.h"
 #include "object/enginetypes.h"
+#include "base/intmask.h"
 
 
 class Camera : public SceneObjectComponent
@@ -31,11 +32,15 @@ class Camera : public SceneObjectComponent
     Mesh3DRef skyboxMesh;
     Mesh3DFilterRef skyboxMeshFilter;
     Mesh3DRendererRef skyboxMeshRenderer;
+    CameraRef sharedSkyboxCamera;
 
     SSAORenderMode ssaoMode;
     bool ssaoEnabled;
 
     unsigned int renderOrderIndex;
+    RenderTargetRef renderTarget;
+
+    IntMask cullingMask;
 
     protected:
 
@@ -44,7 +49,8 @@ class Camera : public SceneObjectComponent
 
     public:
 
-    void SetSkybox(TextureRef cubeTexture);
+    void SetupSkybox(TextureRef cubeTexture);
+    void ShareSkybox(CameraRef camera);
     bool IsSkyboxSetup() const;
     void SetSkyboxEnabled(bool enabled);
     bool IsSkyboxEnabled() const;
@@ -59,10 +65,20 @@ class Camera : public SceneObjectComponent
     unsigned int GetRendeOrderIndex();
 
     const Transform& GetProjectionTransform() const ;
+    void TransformProjectionTransformBy(const Transform& transform);
+    void PreTransformProjectionTransformBy(const Transform& transform);
+
     void AddClearBuffer(RenderBufferType buffer);
     void RemoveClearBuffer(RenderBufferType buffer);
     IntMask GetClearBufferMask() const;
+
+    void SetupOffscreenRenderTarget(int width, int height);
+    RenderTargetRef GetRenderTarget();
     void UpdateDisplay();
+
+    void SetCullingMask(IntMask mask);
+	void MergeCullingMask(IntMask mask);
+	IntMask GetCullingMask() const;
 };
 
 #endif

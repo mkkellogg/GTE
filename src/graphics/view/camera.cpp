@@ -42,7 +42,7 @@ Camera::~Camera()
 
 }
 
-void Camera::SetSkybox(TextureRef cubeTexture)
+void Camera::SetupSkybox(TextureRef cubeTexture)
 {
 	ASSERT_RTRN(cubeTexture.IsValid(), "Camera::SetSkybox -> cube texture is not valid.");
 
@@ -87,6 +87,12 @@ void Camera::SetSkybox(TextureRef cubeTexture)
 	}
 }
 
+void Camera::ShareSkybox(CameraRef camera)
+{
+	sharedSkyboxCamera = camera;
+	skyboxSetup = true;
+}
+
 bool Camera::IsSkyboxSetup() const
 {
 	return skyboxSetup;
@@ -104,6 +110,7 @@ bool Camera::IsSkyboxEnabled() const
 
 SceneObjectRef Camera::GetSkyboxSceneObject()
 {
+	if(sharedSkyboxCamera.IsValid())return sharedSkyboxCamera->GetSkyboxSceneObject();
 	return skyboxSceneObject;
 }
 
@@ -157,17 +164,74 @@ const Transform& Camera::GetProjectionTransform() const
 	return projection;
 }
 
+void Camera::TransformProjectionTransformBy(const Transform& transform)
+{
+	projection.TransformBy(transform);
+}
+
+void Camera::PreTransformProjectionTransformBy(const Transform& transform)
+{
+	projection.PreTransformBy(transform);
+}
+
+void Camera::SetupOffscreenRenderTarget(int width, int height)
+{
+	// get reference to the engine's object manager
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+	if(renderTarget.IsValid())
+	{
+		objectManager->DestroyRenderTarget(renderTarget);
+	}
+
+	TextureAttributes colorAttributes;
+	colorAttributes.FilterMode = TextureFilter::Linear;
+	colorAttributes.MipMapLevel = 8;
+	colorAttributes.WrapMode = TextureWrap::Clamp;
+	renderTarget = objectManager->CreateRenderTarget(true,true,colorAttributes,width, height);
+
+	UpdateDisplay();
+}
+
+RenderTargetRef Camera::GetRenderTarget()
+{
+	if(!renderTarget.IsValid())return Engine::Instance()->GetGraphicsEngine()->GetDefaultRenderTarget();
+	else return renderTarget;
+}
+
 void Camera::UpdateDisplay()
 {
 	Matrix4x4 proj;
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-	const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
 
-	float ratio = (float)graphicsAttributes.WindowWidth / (float)graphicsAttributes.WindowHeight;
+	float ratio = 1;
+
+	if(renderTarget.IsValid())
+	{
+		ratio = (float)renderTarget->GetWidth() / (float)renderTarget->GetHeight();
+	}
+	else
+	{
+		RenderTargetRef defaultRenderTarget = graphics->GetDefaultRenderTarget();
+		ratio = (float)defaultRenderTarget->GetWidth() / (float)defaultRenderTarget->GetHeight();
+	}
 
 	Transform::BuildProjectionMatrix(proj, 65, ratio, 5, 200);
-	//Transform::BuildProjectionMatrixInfiniteFar(proj, 65, ratio, 3);
 	projection.SetTo(proj);
 }
 
+void Camera::SetCullingMask(IntMask mask)
+{
+	cullingMask = mask;
+}
+
+void Camera::MergeCullingMask(IntMask mask)
+{
+	cullingMask = IntMaskUtil::MergeMasks(cullingMask, mask);
+}
+
+IntMask Camera::GetCullingMask() const
+{
+	return cullingMask;
+}
 
