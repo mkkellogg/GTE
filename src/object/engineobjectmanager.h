@@ -39,6 +39,7 @@ class ShaderSource;
 class EngineObjectManager
 {
 	friend class Engine;
+	friend class Graphics;
 
 	std::unordered_map<ObjectID, SceneObjectRef> sceneObjectDirectory;
 
@@ -74,6 +75,8 @@ class EngineObjectManager
 	void DeleteAnimationPlayer(AnimationPlayer * player);
 
 	bool InitBuiltinShaders();
+
+	RenderTargetRef WrapRenderTarget(RenderTarget * target);
 
     public :
 

@@ -145,6 +145,8 @@ SceneObjectRef EngineObjectManager::CreateSceneObject()
 		  DeleteSceneObject(sceneObject);
 	});
 
+	sceneObject->SetActive(true);
+
 	ref->SetLayerMask(layerManager.GetLayerMask(DefaultLayer));
 	AddSceneObjectToDirectory(ref->GetObjectID(), ref);
 
@@ -547,6 +549,16 @@ RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasD
 	});
 }
 
+RenderTargetRef EngineObjectManager::WrapRenderTarget(RenderTarget * target)
+{
+	ASSERT(target != NULL, "EngineObjectManager::WrapRenderTarget -> target is NULL.", RenderTargetRef::Null());
+
+	return RenderTargetRef(target, [=](RenderTarget * target)
+	{
+		  DeleteRenderTarget(target);
+	});
+}
+
 void EngineObjectManager::DestroyRenderTarget(RenderTargetRef buffer)
 {
 	buffer.ForceDelete();
@@ -623,6 +635,10 @@ CameraRef EngineObjectManager::CreateCamera()
 	Camera * camera = new Camera();
 	ASSERT(camera != NULL, "EngineObjectManager::CreateCamera -> Could not create new Camera object.", CameraRef::Null());
 	camera->SetObjectID(GetNextObjectID());
+
+	LayerManager& layerManager = GetLayerManager();
+	IntMask allMask = layerManager.CreateFullLayerMask();
+	camera->SetCullingMask(allMask);
 
 	return CameraRef(camera, [=](Camera * camera)
 	{
