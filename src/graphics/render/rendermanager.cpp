@@ -100,15 +100,17 @@ bool RenderManager::Init()
 	depthValueMaterial->SetSelfLit(true);
 	ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.", false);
 
-	// build general purpose off-screen render target
+	// build depth texture off-screen render target
 	const GraphicsAttributes& graphicsAttributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
 	TextureAttributes colorTextureAttributes;
 	colorTextureAttributes.Format = TextureFormat::R32;
-	offscreenRenderTarget = objectManager->CreateRenderTarget(true, true, colorTextureAttributes, graphicsAttributes.WindowWidth,graphicsAttributes.WindowHeight);
-	ASSERT(offscreenRenderTarget.IsValid(), "RenderManager::Init -> Unable to create off-screen rendering surface.", false);
+	colorTextureAttributes.FilterMode = TextureFilter::Point;
+	colorTextureAttributes.WrapMode = TextureWrap::Clamp;
+	depthRenderTarget = objectManager->CreateRenderTarget(true, true, colorTextureAttributes, graphicsAttributes.WindowWidth,graphicsAttributes.WindowHeight);
+	ASSERT(depthRenderTarget.IsValid(), "RenderManager::Init -> Unable to create off-screen rendering surface.", false);
 
-	TextureRef depthTexture = offscreenRenderTarget->GetDepthTexture();
-	TextureRef colorTexture = offscreenRenderTarget->GetColorTexture();
+	TextureRef depthTexture = depthRenderTarget->GetDepthTexture();
+	TextureRef colorTexture = depthRenderTarget->GetColorTexture();
 
 	ASSERT(colorTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen color buffer.", false);
 	ASSERT(depthTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen depth buffer.", false);
@@ -166,6 +168,14 @@ RenderTargetRef RenderManager::PopRenderTarget()
 }
 
 /*
+ * Clear [renderTargetStack].
+ */
+void RenderManager::ClearRenderTargetStack()
+{
+	renderTargetStack.empty();
+}
+
+/*
  * Save a transform to the transform stack. This method is used to to save transformations
  * as the render manager progresses through the object tree that makes up the scene.
  */
@@ -207,6 +217,9 @@ void RenderManager::RenderScene()
 	}
 }
 
+/*
+ * Clear any caches that are set up for the render manager.
+ */
 void RenderManager::ClearCaches()
 {
 	DestroyCachedShadowVolumes();
@@ -285,8 +298,17 @@ void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTra
 			if(camera.IsValid() && cameraCount < MAX_CAMERAS)
 			{
 				// add a scene camera from which to render the scene
-				sceneCameras[cameraCount] = child;
-				cameraCount++;
+				// always make sure to respect the render order index of the camera,
+				// the array is sort in ascending order
+				for(unsigned int i = 0; i <= cameraCount; i++)
+				{
+					if(i == cameraCount || sceneCameras[i]->GetCamera()->GetRendeOrderIndex() > camera->GetRendeOrderIndex())
+					{
+						sceneCameras[cameraCount] = child;
+						cameraCount++;
+						break;
+					}
+				}
 			}
 
 			LightRef light = child->GetLight();
@@ -390,8 +412,6 @@ void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
 	ASSERT_RTRN(cameraRef.IsValid(),"RenderManager::RenderSceneFromCamera -> Camera is not valid.");
 	Camera& camera = cameraRef.GetRef();
 
-	// clear the appropriate render buffers for this camera
-	ClearBuffersForCamera(camera);
 	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
@@ -410,8 +430,6 @@ void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
  */
 void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 {
-	const GraphicsAttributes& graphicsAttributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
-
 	SceneObjectRef cameraObject = camera.GetSceneObject();
 	ASSERT_RTRN(cameraObject.IsValid(),"RenderManager::ForwardRenderSceneForCamera -> Camera is not attached to a scene object.");
 
@@ -429,6 +447,13 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	// determine if blending should be turned on or off. if an object is being rendered for the
 	// first time, additive blending should be off; otherwise it should be on.
 	renderedObjects.clear();
+
+	// get the camera's render target as the active render target
+	ClearRenderTargetStack();
+	PushRenderTarget(camera.GetRenderTarget());
+
+	// clear the appropriate render buffers for this camera
+	ClearBuffersForCamera(camera);
 
 	// we have not yet rendered any ambient lights
 	bool renderedAmbient = false;
@@ -452,7 +477,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	ForwardRenderDepthBuffer(viewInverse, camera);
 
 	// perform the standard screen-space ambient occlusion pass
-	if(renderedAmbient && graphicsAttributes.SSAOEnabled && graphicsAttributes.SSAOMode == SSAORenderMode::Standard)ForwardRenderSceneSSAO(viewInverse, camera);
+	if(renderedAmbient && camera.IsSSAOEnabled() && camera.GetSSAORenderMode() == SSAORenderMode::Standard)ForwardRenderSceneSSAO(viewInverse, camera);
 
 	// loop through each regular light and render scene for that light
 	for(unsigned int l = 0; l < lightCount; l++)
@@ -468,7 +493,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	}
 
 	// perform the screen-space ambient occlusion pass as an outline effect
-	if(graphicsAttributes.SSAOEnabled && graphicsAttributes.SSAOMode == SSAORenderMode::Outline)ForwardRenderSceneSSAO(viewInverse, camera);
+	if(camera.IsSSAOEnabled() && camera.GetSSAORenderMode() == SSAORenderMode::Outline)ForwardRenderSceneSSAO(viewInverse, camera);
 
 	// render all self-lit objects in the scene once
 	ForwardRenderSceneForSelfLitMaterials(viewInverse, camera);
@@ -478,6 +503,8 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	{
 		ForwardRenderSkyboxForCamera(camera, viewInverse);
 	}
+
+	PopRenderTarget();
 }
 
 /*
@@ -538,7 +565,8 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
 
 			// make sure the current mesh should not be culled from [light].
-			if(!ShouldCullFromLight(light, lightPosition, full, *child))
+			if(!ShouldCullFromCamera(camera, *child) &&
+				!ShouldCullFromLight(light, lightPosition, full, *child))
 			{
 				if(pass == ShadowVolumeRender) // shadow volume pass
 				{
@@ -649,12 +677,12 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 	GraphicsAttributes attributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
 
 	// activate the off-screen render target
-	PushRenderTarget(offscreenRenderTarget);
+	PushRenderTarget(depthRenderTarget);
 
 	// clear the relevant buffers in the off-screen render target
 	IntMask clearMask = IntMaskUtil::CreateIntMask();
-	if(offscreenRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Color);
-	if(offscreenRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Depth);
+	if(depthRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Color);
+	if(depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Depth);
 	Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearMask);
 
 	// render the depth values for the scene to the off-screen color texture
@@ -668,13 +696,13 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 	projectionInvMat.Invert();
 
 	// retrieve the color texture (which contains depth values) from the off-screen render target
-	TextureRef depthTexture = offscreenRenderTarget->GetColorTexture();
+	TextureRef depthTexture = depthRenderTarget->GetColorTexture();
 
 	// set SSAO material values
 	ssaoOutlineMaterial->SetTexture(depthTexture, "DEPTH_TEXTURE");
 	ssaoOutlineMaterial->SetMatrix4x4(projectionInvMat, "INV_PROJECTION_MATRIX");
-	ssaoOutlineMaterial->SetUniform1f(1, "DISTANCE_THRESHHOLD");
-	ssaoOutlineMaterial->SetUniform2f(.006,.012, "FILTER_RADIUS");
+	ssaoOutlineMaterial->SetUniform1f(.5, "DISTANCE_THRESHHOLD");
+	ssaoOutlineMaterial->SetUniform2f(.3,.75, "FILTER_RADIUS");
 	ssaoOutlineMaterial->SetUniform1f(attributes.WindowWidth, "SCREEN_WIDTH");
 	ssaoOutlineMaterial->SetUniform1f(attributes.WindowHeight, "SCREEN_HEIGHT");
 
@@ -727,6 +755,11 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewT
 	for(unsigned int s = 0; s < sceneMeshCount; s++)
 	{
 		SceneObjectRef childRef = sceneMeshObjects[s];
+
+		if(ShouldCullFromCamera(camera, childRef.GetRef()))
+		{
+			continue;
+		}
 
 		// execute filter function (if one is specified)
 		if(filterFunction != nullptr)
@@ -1393,6 +1426,16 @@ FowardBlendingMethod RenderManager::GetForwardBlending() const
 }
 
 /*
+ * Should [camera] render the meshes on [sceneObject]? This is determined by comparing the
+ * layer mask of [sceneObject] with the culling mask of [camera].
+ */
+bool RenderManager::ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const
+{
+	// make sure camera's culling mask includes at least one of layers of [sceneObject]
+	return !(Engine::Instance()->GetEngineObjectManager()->GetLayerManager().AtLeastOneLayerInCommon(sceneObject.GetLayerMask(), camera.GetCullingMask()));
+}
+
+/*
  * Check if [mesh] should be rendered with [light], first based on the culling mask of the light and the layer to
  * which [sceneObject] belongs, and then based on the distance of the center of [mesh] from [lightPosition].
  */
@@ -1402,7 +1445,7 @@ bool RenderManager::ShouldCullFromLight(const Light& light, const Point3& lightP
 	// with the culling mask of the light contained in [lightingDescriptor].
 	IntMask layerMask = sceneObject.GetLayerMask();
 	IntMask cullingMask = light.GetCullingMask();
-	if(!IntMaskUtil::HaveAtLeastOneInCommon(layerMask, cullingMask))
+	if(!Engine::Instance()->GetEngineObjectManager()->GetLayerManager().AtLeastOneLayerInCommon(layerMask, cullingMask))
 	{
 		return true;
 	}

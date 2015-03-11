@@ -84,7 +84,7 @@ class RenderManager
 	// material for rendering SSAO-style outlines
 	MaterialRef ssaoOutlineMaterial;
 	// for off-screen rendering
-	RenderTargetRef offscreenRenderTarget;
+	RenderTargetRef depthRenderTarget;
 	// transform stack used for processing scene hierarchy
 	DataStack<Matrix4x4> sceneProcessingStack;
 
@@ -160,9 +160,14 @@ class RenderManager
     void SendModelViewProjectionToShader(const Transform& modelViewProjection);
     void SendActiveMaterialUniformsToShader() const;
 
+    bool ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const;
     bool ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const SceneObject& sceneObject) const;
     bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
     bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
+
+    void PushRenderTarget(RenderTargetRef renderTarget);
+    RenderTargetRef PopRenderTarget();
+    void ClearRenderTargetStack();
 
     public:
 
@@ -172,9 +177,6 @@ class RenderManager
     bool Init();
     void RenderScene();
     void ClearCaches();
-
-    void PushRenderTarget(RenderTargetRef renderTarget);
-    RenderTargetRef PopRenderTarget();
 
 };
 
