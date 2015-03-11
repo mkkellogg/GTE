@@ -52,6 +52,7 @@ class ShaderSource;
 class Graphics
 {
 	friend class Engine;
+	friend class EngineObjectManager;
 
     protected:
 
@@ -78,26 +79,30 @@ class Graphics
 
     void UpdateFPS();
 
+    virtual bool Init(const GraphicsAttributes& attributes);
+    virtual RenderTarget * CreateDefaultRenderTarget() = 0;
+    RenderTargetRef SetupDefaultRenderTarget();
+
     public :
 
-    float GetCurrentFPS();
-
-    virtual bool Init(const GraphicsAttributes& attributes);
-
     virtual Shader * CreateShader(const ShaderSource& shaderSource) = 0;
-    virtual void DestroyShader(Shader * shader) = 0;
-    virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
-    virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
-    virtual Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes& attributes) = 0;
-    virtual Texture * CreateTexture(RawImage * imageData,  const TextureAttributes& attributes) = 0;
-    virtual Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes& attributes) = 0 ;
-    virtual Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-		    						    const std::string& bottom, const std::string& left, const std::string& right) = 0;
-    virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-										RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
-    virtual void DestroyTexture(Texture * texture) = 0;
-    virtual RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) = 0;
-    virtual void DestroyRenderTarget(RenderTarget * target) = 0;
+   virtual void DestroyShader(Shader * shader) = 0;
+   virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
+   virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
+   virtual Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes& attributes) = 0;
+   virtual Texture * CreateTexture(RawImage * imageData,  const TextureAttributes& attributes) = 0;
+   virtual Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes& attributes) = 0 ;
+   virtual Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+									const std::string& bottom, const std::string& left, const std::string& right) = 0;
+   virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
+									RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
+   virtual void DestroyTexture(Texture * texture) = 0;
+   virtual RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) = 0;
+   virtual void DestroyRenderTarget(RenderTarget * target) = 0;
+
+    virtual RenderTargetRef GetDefaultRenderTarget() = 0;
+
+    float GetCurrentFPS();
 
     virtual void ClearRenderBuffers(unsigned int bufferMask) = 0;
 

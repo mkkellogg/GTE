@@ -31,6 +31,7 @@
 #include "view/camera.h"
 #include "base/intmask.h"
 #include "object/sceneobject.h"
+#include "object/engineobjectmanager.h"
 #include "geometry/transform.h"
 #include "global/global.h"
 #include "util/time.h"
@@ -164,11 +165,18 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glGetIntegerv(GL_STENCIL_BITS, &stencilBufferBits);
    // printf("stencil buffer bits: %d\n", stencilBufferBits);
 
+    defaultRenderTarget = Graphics::SetupDefaultRenderTarget();
+    ASSERT(defaultRenderTarget.IsValid(), "GraphicsGL::Init -> Unable to create default render target", false);
+
+    ActivateRenderTarget(defaultRenderTarget);
+
     initialized = true;
     return true;
 }
 
-
+/*
+ * Start the graphics engine. In the case of GLUT, this means call glutMainLoop().
+ */
 bool GraphicsGL::Start()
 {
 	Graphics::Start();
@@ -625,7 +633,7 @@ Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backDa
 
 	TextureAttributes attributes;
 	attributes.WrapMode = TextureWrap::Clamp;
-	attributes.FilterMode = TextureFilter::BiLinear;
+	attributes.FilterMode = TextureFilter::Linear;
 	attributes.IsCube = true;
 	attributes.MipMapLevel = 0;
 
@@ -722,6 +730,15 @@ RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth,  con
 	return buffer;
 }
 
+RenderTarget * GraphicsGL::CreateDefaultRenderTarget()
+{
+	 TextureAttributes colorAttributes;
+	 RenderTargetGL * defaultTarget = new RenderTargetGL(false,false,colorAttributes,this->attributes.WindowWidth, this->attributes.WindowHeight);
+	 ASSERT(defaultTarget != NULL, "GraphicsGL::CreateDefaultRenderTarget -> unable to create default render target", NULL);
+
+	 return defaultTarget;
+}
+
 /*
  * Destroy the render target specified by [target].
  */
@@ -734,6 +751,14 @@ void GraphicsGL::DestroyRenderTarget(RenderTarget * target)
 	{
 		delete targetGL;
 	}
+}
+
+/*
+ * Get the default render target for the graphics engine.
+ */
+RenderTargetRef GraphicsGL::GetDefaultRenderTarget()
+{
+	return defaultRenderTarget;
 }
 
 /*
@@ -953,11 +978,20 @@ unsigned int GraphicsGL::GetOpenGLVersion()
 bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
 {
 	ASSERT(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> Render target is not valid.", false);
-	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target.GetPtr());
 
+	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target.GetPtr());
 	ASSERT(targetGL != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.", false);
 
+	if(currentRenderTarget.IsValid())
+	{
+		// prevent activating the currently active target.
+		RenderTargetGL * currentTargetGL = dynamic_cast<RenderTargetGL *>(currentRenderTarget.GetPtr());
+		if(currentTargetGL->GetFBOID() == targetGL->GetFBOID())return true;
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, targetGL->GetFBOID());
+
+	currentRenderTarget = target;
 
 	return true;
 }
@@ -967,7 +1001,7 @@ bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
  */
 bool GraphicsGL::RestoreDefaultRenderTarget()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	ActivateRenderTarget(defaultRenderTarget);
 	return true;
 }
 

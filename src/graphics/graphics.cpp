@@ -38,6 +38,23 @@ Graphics::~Graphics()
 }
 
 /*
+ * Create default render target and wrap in a RenderTargetRef reference.
+ */
+RenderTargetRef Graphics::SetupDefaultRenderTarget()
+{
+
+    // get reference to the engine's object manager
+    EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+    RenderTarget * defaultTarget = CreateDefaultRenderTarget();
+    ASSERT(defaultTarget != NULL, "GraphicsGL::SetupDefaultRenderTarget -> default target is NULL", RenderTargetRef::Null());
+
+    RenderTargetRef defaultRenderTarget = objectManager->WrapRenderTarget(defaultTarget);
+    return defaultRenderTarget;
+
+}
+
+/*
  * For now this method does nothing. It is meant to be overridden in a
  * deriving class. It is not virtual because it will likely contain code
  * as the Graphics class evolves.

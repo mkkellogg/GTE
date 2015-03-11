@@ -72,6 +72,11 @@ class GraphicsGL : public Graphics
     // is the graphics engine initialized?
     bool initialized;
 
+    // RenderTarget objects that encapsulates the OpenGL default framebuffer
+    RenderTargetRef defaultRenderTarget;
+    // currently bound render target;
+    RenderTargetRef currentRenderTarget;
+
     GraphicsGL();
     ~GraphicsGL();
 
@@ -83,23 +88,26 @@ class GraphicsGL : public Graphics
     void Update();
     void RenderScene();
 
+    RenderTarget * CreateDefaultRenderTarget();
+
     public :
 
     Shader * CreateShader(const ShaderSource& shaderSource);
-    void DestroyShader(Shader * shader);
-    VertexAttrBuffer * CreateVertexAttributeBuffer();
-    void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
-    Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes);
-    Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes);
-    Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes);
-    Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-		    				    const std::string& bottom, const std::string& left, const std::string& right);
-    Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-								RawImage * bottomData, RawImage * leftData, RawImage * rightData);
-    void DestroyTexture(Texture * texture);
-    RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
-    void DestroyRenderTarget(RenderTarget * target);
+   void DestroyShader(Shader * shader);
+   VertexAttrBuffer * CreateVertexAttributeBuffer();
+   void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
+   Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes);
+   Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes);
+   Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes);
+   Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+							const std::string& bottom, const std::string& left, const std::string& right);
+   Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
+							RawImage * bottomData, RawImage * leftData, RawImage * rightData);
+   void DestroyTexture(Texture * texture);
+   RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+   void DestroyRenderTarget(RenderTarget * target);
 
+    RenderTargetRef GetDefaultRenderTarget();
     void ClearRenderBuffers(IntMask bufferMask);
 
     void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
