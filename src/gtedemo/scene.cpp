@@ -16,7 +16,7 @@ class LavaField;
 
 Scene::Scene()
 {
-
+	baseCameraForward = Vector3::Forward;
 }
 
 Scene::~Scene()

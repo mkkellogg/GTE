@@ -1,3 +1,12 @@
+/*
+ * Class: Scene
+ *
+ * Author: Mark Kellogg
+ *
+ * Part of the GTE engine demo, Scene is a base class
+ * for grouping scene objects and components.
+ */
+
 #ifndef _GTE_SCENE_H_
 #define _GTE_SCENE_H_
 
@@ -17,14 +26,19 @@ class LavaField;
 
 class Scene
 {
+	protected:
+
+	Vector3 baseCameraForward;
+
 	public:
 
 	Scene();
 	virtual ~Scene();
 
 	virtual SceneObjectRef GetSceneRoot() = 0;
+	virtual void OnActivate() = 0;
 	virtual void Update() = 0;
-	virtual void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directLightObject, SceneObjectRef playerObject) = 0;
+	virtual void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject) = 0;
 };
 
 #endif
