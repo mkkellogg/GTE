@@ -55,3 +55,31 @@ IntMask LayerManager::GetLayerMask(unsigned int layerIndex) const
 	}
 	return mask;
 }
+
+IntMask LayerManager::RemoveLayerFromMask(IntMask mask, unsigned int layerIndex)
+{
+	IntMaskUtil::ClearBit(&mask, layerIndex);
+	return mask;
+}
+
+IntMask LayerManager::MergeLayerMask(IntMask maskA, IntMask maskB)
+{
+	return IntMaskUtil::MergeMasks(maskA, maskB);
+}
+
+IntMask LayerManager::CreateFullLayerMask()
+{
+	IntMask mask = IntMaskUtil::CreateIntMask();
+	IntMaskUtil::SetAll(&mask);
+	return mask;
+}
+
+bool LayerManager::ContainsLayer(IntMask mask, unsigned int layerIndex)
+{
+	return IntMaskUtil::IsBitSetForMask(mask, layerIndex);
+}
+
+bool LayerManager::AtLeastOneLayerInCommon(IntMask a, IntMask b)
+{
+	return IntMaskUtil::HaveAtLeastOneInCommon(a,b);
+}
