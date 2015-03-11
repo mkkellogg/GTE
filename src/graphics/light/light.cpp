@@ -128,11 +128,6 @@ void Light::SetCullingMask(IntMask mask)
 	cullingMask = mask;
 }
 
-void Light::MergeCullingMask(IntMask mask)
-{
-	cullingMask = IntMaskUtil::MergeMasks(cullingMask, mask);
-}
-
 IntMask Light::GetCullingMask() const
 {
 	return cullingMask;
