@@ -28,8 +28,11 @@ class Transform
     public:
 
     Transform();
+    Transform(const Transform & source);
     Transform(const Transform *);
     virtual ~Transform();
+
+    Transform& operator= (const Transform & source);
 
     void CopyMatrix(Matrix4x4& dest) const;
     void SetTo(const Matrix4x4& matrix);

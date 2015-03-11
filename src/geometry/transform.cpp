@@ -36,11 +36,29 @@ Transform::Transform(const Transform * transform) : Transform()
 }
 
 /*
+ * Copy constructor
+ */
+Transform::Transform(const Transform& transform)
+{
+	transform.CopyMatrix(matrix);
+}
+
+/*
  * Clean up
  */
 Transform::~Transform()
 {
 
+}
+
+/*
+ * Overloaded assignment operator
+ */
+Transform& Transform::operator= (const Transform& source)
+{
+    if(this == &source)return *this;
+    SetTo(source);
+    return *this;
 }
 
 /*
