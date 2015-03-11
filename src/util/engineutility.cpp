@@ -133,8 +133,8 @@ Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttribut
 			points->GetPoint(vertexIndex + 4)->Set(currentWidth + subSquareWidth, currentHeight - subSquareHeight, 0);
 			points->GetPoint(vertexIndex + 5)->Set(currentWidth, currentHeight - subSquareHeight, 0);
 
-			float uvX = currentWidth / width;
-			float uvY = height - (currentHeight / height);
+			float uvX = (currentWidth + halfWidth) / width;
+			float uvY = ((currentHeight +halfHeight) / height);
 
 			if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0) || StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))
 			{
@@ -156,11 +156,11 @@ Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttribut
 
 					uvs->GetCoordinate(vertexIndex)->Set(uvX,uvY);
 					uvs->GetCoordinate(vertexIndex + 1)->Set(uvX + subSquareUVWidth, uvY);
-					uvs->GetCoordinate(vertexIndex + 2)->Set(uvX, uvY + subSquareUVHeight);
+					uvs->GetCoordinate(vertexIndex + 2)->Set(uvX, uvY - subSquareUVHeight);
 
 					uvs->GetCoordinate(vertexIndex + 3)->Set(uvX + subSquareUVWidth, uvY);
-					uvs->GetCoordinate(vertexIndex + 4)->Set(uvX + subSquareUVWidth, uvY + subSquareUVHeight);
-					uvs->GetCoordinate(vertexIndex + 5)->Set(uvX, uvY + subSquareUVHeight);
+					uvs->GetCoordinate(vertexIndex + 4)->Set(uvX + subSquareUVWidth, uvY - subSquareUVHeight);
+					uvs->GetCoordinate(vertexIndex + 5)->Set(uvX, uvY - subSquareUVHeight);
 				}
 			}
 
