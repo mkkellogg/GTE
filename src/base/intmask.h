@@ -7,11 +7,11 @@ class IntMaskUtil
 {
 	public:
 
-	static IntMask InvertBitsForIndexMask(IntMask index);
+	static IntMask InvertBitsForIndexMask(unsigned short index);
 	static IntMask InvertBits(IntMask index);
 
 	static IntMask MaskValueToIndex(IntMask maskValue);
-	static IntMask IndexToMaskValue(IntMask index);
+	static IntMask IndexToMaskValue(unsigned short index);
 
 	static void SetBit(IntMask * target, unsigned short index);
 	static void ClearBit(IntMask * target, unsigned short index);
@@ -26,6 +26,9 @@ class IntMaskUtil
 
 	static IntMask MergeMasks(IntMask a, IntMask b);
 	static bool HaveAtLeastOneInCommon(IntMask a, IntMask b);
+
+	static void ClearMask(IntMask * mask);
+	static void SetAll(IntMask * mask);
 };
 
 #endif

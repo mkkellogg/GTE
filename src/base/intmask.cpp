@@ -7,7 +7,7 @@
 #include "intmask.h"
 #include "debug/gtedebug.h"
 
-IntMask IntMaskUtil::InvertBitsForIndexMask(IntMask index)
+IntMask IntMaskUtil::InvertBitsForIndexMask(unsigned short index)
 {
 	IntMask maskValue = IndexToMaskValue(index);
 	return InvertBits(maskValue);
@@ -15,21 +15,7 @@ IntMask IntMaskUtil::InvertBitsForIndexMask(IntMask index)
 
 IntMask IntMaskUtil::InvertBits(IntMask a)
 {
-	IntMask result = 0;
-	IntMask mask = 0x80000000;
-
-	for(int i=0; i < 32; i++)
-	{
-		if(!(mask & a))
-		{
-			result |= 1;
-		}
-
-		result <<= 1;
-		mask >>= 1;
-	}
-
-	return result;
+	return ~a;
 }
 
 IntMask IntMaskUtil::MaskValueToIndex(IntMask maskValue)
@@ -38,7 +24,7 @@ IntMask IntMaskUtil::MaskValueToIndex(IntMask maskValue)
 
 	IntMask index=0x00000001;
 	int count = 0;
-	while(!(maskValue & index) && count < 64)
+	while(!(maskValue & index) && count < 32)
 	{
 		index <<= 1;
 		count++;
@@ -47,7 +33,7 @@ IntMask IntMaskUtil::MaskValueToIndex(IntMask maskValue)
 	return index;
 }
 
-IntMask IntMaskUtil::IndexToMaskValue(IntMask index)
+IntMask IntMaskUtil::IndexToMaskValue(unsigned short index)
 {
 	return 0x00000001 << index;
 }
@@ -108,5 +94,15 @@ IntMask IntMaskUtil::MergeMasks(IntMask a, IntMask b)
 
 bool IntMaskUtil::HaveAtLeastOneInCommon(IntMask a, IntMask b)
 {
-	return a & b;
+	return (a & b) != 0;
+}
+
+void IntMaskUtil::ClearMask(IntMask * mask)
+{
+	*mask = 0;
+}
+
+void IntMaskUtil::SetAll(IntMask * mask)
+{
+	*mask = (unsigned int)~0;
 }
