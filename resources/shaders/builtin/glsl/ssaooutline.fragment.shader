@@ -29,6 +29,7 @@ vec2 poisson16[] = vec2[](    // These are the Poisson Disk Samples
                                 vec2( -0.81409955,   0.91437590 ),
                                 vec2(  0.19984126,   0.78641367 ),
                                 vec2(  0.14383161,  -0.14100790 )
+                            
                                );
 
 vec4 calculatePosition(vec3 ndcCoords)
@@ -60,7 +61,9 @@ void main()
 
     float ambientOcclusion = 0;
     
-    vec2 filterRadius = FILTER_RADIUS;
+	vec2 filterRadius = FILTER_RADIUS;
+	float adjustFactor = 1.6 / (pow((depth + 1),8));
+	filterRadius *= adjustFactor;
 
     for (int i = 0; i < sample_count; ++i)
     {
@@ -80,7 +83,7 @@ void main()
         // a = distance function
         float a = 1.0 - smoothstep(DISTANCE_THRESHHOLD, DISTANCE_THRESHHOLD * 2, VPdistSP);
         // b = dot-Product
-        float b = NdotS * 1.5;
+        float b = NdotS * 1.45;
         
         if(a <0)a=0;
         if(b <0)b = 0;
@@ -90,6 +93,7 @@ void main()
     }
 
     float aoValue =  1.0 - (ambientOcclusion / sample_count);
-    gl_FragColor = vec4(0,0,0,aoValue);  
+   gl_FragColor = vec4(0,0,0,aoValue);  
+ //   gl_FragColor = vec4(aoValue,aoValue,aoValue,1);  
 }
 
