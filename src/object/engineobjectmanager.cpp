@@ -492,6 +492,29 @@ TextureRef EngineObjectManager::CreateTexture(unsigned int width, unsigned int h
 	});
 }
 
+TextureRef EngineObjectManager::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
+    		   	   	   	   	   	BYTE * backData, unsigned int backw, unsigned int backh,
+    		   	   	   	   	   	BYTE * topData, unsigned int tw, unsigned int th,
+    		   	   	   	   	   	BYTE * bottomData, unsigned int botw, unsigned int both,
+    		   	   	   	   	   	BYTE * leftData, unsigned int lw, unsigned int lh,
+    		   	   	   	   	   	BYTE * rightData, unsigned int rw, unsigned int rh)
+{
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	Texture * texture = graphics->CreateCubeTexture(frontData, fw,fh,
+													backData, backw, backh,
+													topData, tw, th,
+													bottomData, botw, both,
+													leftData, lw, lh,
+													rightData, rw, rh);
+	ASSERT(texture != NULL,"EngineObjectManager::CreateCubeTexture -> could not create new Texture object.", TextureRef::Null());
+	texture->SetObjectID(GetNextObjectID());
+
+	return TextureRef(texture, [=](Texture * texture)
+	{
+		  DeleteTexture(texture);
+	});
+}
+
 TextureRef EngineObjectManager::CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 		    				 	 	 	 	 	  const std::string& bottom, const std::string& left, const std::string& right)
 {
@@ -533,11 +556,12 @@ void EngineObjectManager::DeleteTexture(Texture * texture)
 	graphics->DestroyTexture(texture);
 }
 
-RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
+RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+														const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
 {
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 
-	RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, colorTextureAttributes, width, height);
+	RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
 	ASSERT(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null());
 
 	bool success = target->Init();

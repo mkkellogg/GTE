@@ -123,12 +123,20 @@ class EngineObjectManager
     TextureRef CreateTexture(const std::string& sourcePath, TextureAttributes attributes);
     TextureRef CreateTexture(RawImage * imageData,  TextureAttributes attributes);
     TextureRef CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes);
+    TextureRef CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
+    		   	   	   	   	   	BYTE * backData, unsigned int backw, unsigned int backh,
+    		   	   	   	   	   	BYTE * topData, unsigned int tw, unsigned int th,
+    		   	   	   	   	   	BYTE * bottomData, unsigned int botw, unsigned int both,
+    		   	   	   	   	   	BYTE * leftData, unsigned int lw, unsigned int lh,
+    		   	   	   	   	   	BYTE * rightData, unsigned int rw, unsigned int rh);
     TextureRef CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-   		    						    const std::string& bottom, const std::string& left, const std::string& right);
+   		    					 const std::string& bottom, const std::string& left, const std::string& right);
     TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-   										RawImage * bottomData, RawImage * leftData, RawImage * rightData);
+   								 RawImage * bottomData, RawImage * leftData, RawImage * rightData);
     void DestroyTexture(TextureRef texture);
-    RenderTargetRef CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+    RenderTargetRef CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+    							const TextureAttributes& colorTextureAttributes,
+    								   unsigned int width, unsigned int height);
     void DestroyRenderTarget(RenderTargetRef target);
 
     MaterialRef CreateMaterial(const std::string& name, ShaderRef shader);
