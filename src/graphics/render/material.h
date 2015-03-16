@@ -173,6 +173,8 @@ class Material : public EngineObject
     void SetColor(Color4 val, const std::string& varName);
     unsigned int GetSetUniformCount() const ;
 
+    void SendClipPlaneCountToShader(unsigned int count);
+    void SendClipPlaneToShader(unsigned int index, float eq1, float eq2, float eq3, float eq4);
     void SendModelMatrixToShader(const Matrix4x4 * mat);
     void SendModelViewMatrixToShader(const Matrix4x4 * mat);
     void SendProjectionMatrixToShader(const Matrix4x4 * mat);

@@ -685,6 +685,37 @@ unsigned int Material::GetSetUniformCount() const
 }
 
 /*
+ * Send the number of active clip planes to the material's shader.
+ */
+void Material::SendClipPlaneCountToShader(unsigned int count)
+{
+	ASSERT_RTRN(shader.IsValid(),"Material::SendClipPlaneToShader -> shader is NULL");
+
+	int varID = GetStandardUniformBinding(StandardUniform::ClipPlaneCount);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, (int)count);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
+	}
+}
+
+/*
+ * Send the clip plane specified collectively by [eq1], [eq2], [eq3], and [eq4]
+ * to this material's shader for clip number [index].
+ */
+void Material::SendClipPlaneToShader(unsigned int index, float eq1, float eq2, float eq3, float eq4)
+{
+	ASSERT_RTRN(shader.IsValid(),"Material::SendClipPlaneToShader -> shader is NULL");
+
+	int varID = GetStandardUniformBinding((StandardUniform)((unsigned int)StandardUniform::ClipPlane0 + index));
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader4(varID, eq1, eq2, eq3, eq4);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
+	}
+}
+
+/*
  * Send the 4x4 matrix data in [mat] to this material's shader via the
  * standard uniform ModelMatrix.
  */
