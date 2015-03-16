@@ -17,6 +17,7 @@ class Constants
     static const unsigned int MaxBonesPerVertex = 4;
     static const std::string BuiltinShaderPath;
     static const std::string BuiltinShaderPathOpenGL;
+    static const unsigned int MaxClipPlanes = 1;
 };
 
 #endif
