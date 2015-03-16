@@ -69,6 +69,12 @@ class GraphicsGL : public Graphics
     int depthBufferBits;
     // bit depth of the OpenGL stencil buffer
     int stencilBufferBits;
+    // which faces will be culled during rendering?
+    FaceCullingMode faceCullingMode;
+
+    // number of currently active clip planes
+    unsigned int activeClipPlanes;
+
     // is the graphics engine initialized?
     bool initialized;
 
@@ -99,16 +105,27 @@ class GraphicsGL : public Graphics
    Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes);
    Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes);
    Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes);
-   Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-							const std::string& bottom, const std::string& left, const std::string& right);
+   Texture * CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
+		   	   	   	   	   	   BYTE * backData, unsigned int backw, unsigned int backh,
+		   	   	   	   	   	   BYTE * topData, unsigned int tw, unsigned int th,
+		   	   	   	   	   	   BYTE * bottomData, unsigned int botw, unsigned int both,
+		   	   	   	   	   	   BYTE * leftData, unsigned int lw, unsigned int lh,
+		   	   	   	   	   	   BYTE * rightData, unsigned int rw, unsigned int rh);
    Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 							RawImage * bottomData, RawImage * leftData, RawImage * rightData);
+   Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+							const std::string& bottom, const std::string& left, const std::string& right);
    void DestroyTexture(Texture * texture);
-   RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+   RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+		   	   	   	   	   	   	     const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
    void DestroyRenderTarget(RenderTarget * target);
 
     RenderTargetRef GetDefaultRenderTarget();
     void ClearRenderBuffers(IntMask bufferMask);
+
+    void SetFaceCullingMode(FaceCullingMode mode);
+    FaceCullingMode GetFaceCullingMode();
+    void SetFaceCullingEnabled(bool enabled);
 
     void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
     void SetDepthBufferEnabled(bool enabled);
@@ -116,8 +133,6 @@ class GraphicsGL : public Graphics
     void SetDepthBufferFunction(DepthBufferFunction function);
     void SetStencilBufferEnabled(bool enabled);
     void SetStencilTestEnabled(bool enabled);
-
-    void SetFaceCullingEnabled(bool enabled);
 
     void SetBlendingEnabled(bool enabled);
     void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
@@ -130,7 +145,11 @@ class GraphicsGL : public Graphics
     unsigned int GetOpenGLVersion();
 
     bool ActivateRenderTarget(RenderTargetRef target);
+    bool ActivateCubeRenderTargetSide(CubeTextureSide side);
     bool RestoreDefaultRenderTarget();
+
+    bool AddClipPlane();
+    void DeactiveAllClipPlanes();
 
     void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate);
 };

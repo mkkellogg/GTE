@@ -51,7 +51,8 @@ GraphicsGL::GraphicsGL() : Graphics()
 	stencilTestEnabled = false;
 	stencilBufferEnabled = false;
 
-	faceCullingEnabled = false;
+	faceCullingMode = FaceCullingMode::Back;
+	faceCullingEnabled = true;
 
 	initialized = false;
 
@@ -61,6 +62,8 @@ GraphicsGL::GraphicsGL() : Graphics()
 	alphaBits = -1;
 	depthBufferBits = -1;
 	stencilBufferBits = -1;
+
+	activeClipPlanes = 0;
 }
 
 /*
@@ -130,10 +133,8 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glutReshapeFunc(&_glutReshapeFunc);
 
     // TODO: think of a better place for these initial calls
-    glClearColor(0,0,0,0);
+    glClearColor(1,0,0,1);
     glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
     glEnable(GL_POINT_SPRITE);
 
     // disable blending by default
@@ -149,6 +150,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     // enable face culling
     SetFaceCullingEnabled(true);
+    SetFaceCullingMode(FaceCullingMode::Back);
 
     // get depth information for the default color buffer
     glGetIntegerv(GL_RED_BITS, &redBits);
@@ -290,12 +292,48 @@ void GraphicsGL::ClearRenderBuffers(IntMask bufferMask)
 }
 
 /*
+ * Set the type of face that will be culled during rendering.
+ */
+void GraphicsGL::SetFaceCullingMode(FaceCullingMode mode)
+{
+	if(faceCullingMode != mode || !initialized)
+	{
+		if(mode == FaceCullingMode::Front)
+			glCullFace(GL_FRONT);
+		else
+			glCullFace(GL_BACK);
+		faceCullingMode = mode;
+	}
+}
+
+/*
+ * Get the current face culling mode.
+ */
+FaceCullingMode GraphicsGL::GetFaceCullingMode()
+{
+	return faceCullingMode;
+}
+
+/*
+ * Eanble/disable face culling.
+ */
+void GraphicsGL::SetFaceCullingEnabled(bool enabled)
+{
+	if(faceCullingEnabled != enabled || !initialized)
+	{
+		if(enabled)glEnable(GL_CULL_FACE);
+		else glDisable(GL_CULL_FACE);
+		faceCullingEnabled = enabled;
+	}
+}
+
+/*
  * Enable/disable the color channels for color buffer rendering.
  *
- * [r] - Enable disable the red channel.
- * [g] - Enable disable the green channel.
- * [b] - Enable disable the blue channel.
- * [a] - Enable disable the alpha channel.
+ * [r] - Enable/disable the red channel.
+ * [g] - Enable/disable the green channel.
+ * [b] - Enable/disable the blue channel.
+ * [a] - Enable/disable the alpha channel.
  *
  */
 void GraphicsGL::SetColorBufferChannelState(bool r, bool g, bool b, bool a)
@@ -387,18 +425,6 @@ void GraphicsGL::SetStencilTestEnabled(bool enabled)
 	}
 }
 
-/*
- * Enable/disable face culling.
- */
-void GraphicsGL::SetFaceCullingEnabled(bool enabled)
-{
-	if(faceCullingEnabled != enabled || !initialized)
-	{
-		if(enabled)glEnable(GL_CULL_FACE);
-		else glDisable(GL_CULL_FACE);
-		faceCullingEnabled = enabled;
-	}
-}
 
 /*
 void GraphicsGL::SetRenderBufferEnabled(RenderBufferType buffer, bool enabled) const
@@ -589,6 +615,77 @@ Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, const Texture
 /*
  * Create an OpenGL cube texture for cube mapping, and encapsulate in a Texture object.
  *
+ * [frontData] - Pixel data for the front of the cube.
+ * [fw], [fh] - Width and height (respectively) of the front image.
+ * [backData] - Pixel data for the back of the cube.
+ * [backw], [backh] - Width and height (respectively) of the back image.
+ * [topData] - Pixel data for the top of the cube.
+ * [tw], [th] - Width and height (respectively) of the top image.
+ * [bottomData] - Pixel data for the bottom of the cube.
+ * [botw], [both] - Width and height (respectively) of the bottom image.
+ * [leftData] - Pixel data for the left side of the cube.
+ * [lw], [lh] - Width and height (respectively) of the left image.
+ * [rightData] - Pixel data for the right side of the cube.
+ * [rw], [rh] - Width and height (respectively) of the right image.
+ */
+Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
+		   	   	   	   	   	   	   	    BYTE * backData, unsigned int backw, unsigned int backh,
+		   	   	   	   	   	   	   	    BYTE * topData, unsigned int tw, unsigned int th,
+		   	   	   	   	   	   	   	    BYTE * bottomData, unsigned int botw, unsigned int both,
+		   	   	   	   	   	   	   	    BYTE * leftData, unsigned int lw, unsigned int lh,
+		   	   	   	   	   	   	   	    BYTE * rightData, unsigned int rw, unsigned int rh)
+{
+	GLvoid * frontPixels = frontData != NULL ? frontData : (GLvoid*)0;
+	GLvoid * backPixels = backData != NULL ? backData : (GLvoid*)0;
+	GLvoid * topPixels = topData != NULL ? topData : (GLvoid*)0;
+	GLvoid * bottomPixels = bottomData != NULL ? bottomData : (GLvoid*)0;
+	GLvoid * leftPixels = leftData != NULL ? leftData : (GLvoid*)0;
+	GLvoid * rightPixels = rightData != NULL ? rightData : (GLvoid*)0;
+
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	GLuint tex;
+
+	// generate the OpenGL cube texture
+	glGenTextures(1, &tex);
+	ASSERT(tex > 0, "GraphicsGL::CreateCubeTexture -> unable to generate texture", NULL);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+	// assign the image data to each side of the cube texture
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, fw, fh, 0, GL_RGBA, GL_UNSIGNED_BYTE, frontPixels);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, backw, backh, 0, GL_RGBA, GL_UNSIGNED_BYTE, backPixels);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, tw, th, 0, GL_RGBA, GL_UNSIGNED_BYTE, topPixels);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, botw, both, 0, GL_RGBA, GL_UNSIGNED_BYTE, bottomPixels);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, lw, lh, 0, GL_RGBA, GL_UNSIGNED_BYTE, leftPixels);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, rw, rh, 0, GL_RGBA, GL_UNSIGNED_BYTE, rightPixels);
+
+	// set the relevant texture properties
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	TextureAttributes attributes;
+	attributes.WrapMode = TextureWrap::Clamp;
+	attributes.FilterMode = TextureFilter::Linear;
+	attributes.IsCube = true;
+	attributes.MipMapLevel = 0;
+
+	TextureGL * texture = new TextureGL(attributes, tex);
+	if(texture == NULL)
+	{
+		glDeleteTextures(1, &tex);
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateCubeTexture -> Unable to allocate TextureGL object.");
+	}
+
+	return texture;
+}
+
+/*
+ * Create an OpenGL cube texture for cube mapping, and encapsulate in a Texture object.
+ *
  * [frontData] - Image data for the front of the cube.
  * [backData] - Image data for the back of the cube.
  * [topData] - Image data for the top of the cube.
@@ -606,48 +703,23 @@ Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backDa
 	ASSERT(leftData != NULL, "GraphicsGL::CreateCubeTexture -> Left image is NULL.", NULL);
 	ASSERT(rightData != NULL, "GraphicsGL::CreateCubeTexture -> Right image is NULL.", NULL);
 
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	Texture * texture = CreateCubeTexture(frontData->GetPixels(), frontData->GetWidth(), frontData->GetHeight(),
+										  backData->GetPixels(), backData->GetWidth(), backData->GetHeight(),
+										  topData->GetPixels(), topData->GetWidth(), topData->GetHeight(),
+										  bottomData->GetPixels(), bottomData->GetWidth(), bottomData->GetHeight(),
+										  leftData->GetPixels(), leftData->GetWidth(), leftData->GetHeight(),
+										  rightData->GetPixels(), rightData->GetWidth(), rightData->GetHeight());
 
-	GLuint tex;
+	TextureGL * textureGL = dynamic_cast<TextureGL *>(texture);
+	ASSERT(textureGL != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL);
 
-	// generate the OpenGL cube texture
-	glGenTextures(1, &tex);
-	ASSERT(tex > 0, "GraphicsGL::CreateCubeTexture -> unable to generate texture", NULL);
-
-	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-
-	// assign the image data to each side of the cube texture
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, frontData->GetWidth(), frontData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, frontData->GetPixels());
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, backData->GetWidth(), backData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, backData->GetPixels());
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, topData->GetWidth(), topData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, topData->GetPixels());
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, bottomData->GetWidth(), bottomData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, bottomData->GetPixels());
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, leftData->GetWidth(), leftData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, leftData->GetPixels());
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, rightData->GetWidth(), rightData->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, rightData->GetPixels());
-
-	// set the relevant texture properties
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	TextureAttributes attributes;
-	attributes.WrapMode = TextureWrap::Clamp;
-	attributes.FilterMode = TextureFilter::Linear;
-	attributes.IsCube = true;
-	attributes.MipMapLevel = 0;
-
-	TextureGL * texture = new TextureGL(attributes, tex);
-	if(texture != NULL)
-	{
-		// store copies of the image data as part of the Texture object
-		texture->AddImageData(frontData);
-		texture->AddImageData(backData);
-		texture->AddImageData(topData);
-		texture->AddImageData(bottomData);
-		texture->AddImageData(leftData);
-		texture->AddImageData(rightData);
-	}
+	// store copies of the image data as part of the Texture object
+	textureGL->AddImageData(frontData);
+	textureGL->AddImageData(backData);
+	textureGL->AddImageData(topData);
+	textureGL->AddImageData(bottomData);
+	textureGL->AddImageData(leftData);
+	textureGL->AddImageData(rightData);
 
 	return texture;
 }
@@ -685,11 +757,7 @@ Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::str
 	std::vector<std::string> sourcePaths;
 
 	tex = (TextureGL*)CreateCubeTexture(rawFront, rawBack, rawTop, rawBottom, rawLeft, rawRight);
-	if(tex == NULL)
-	{
-		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.");
-		return NULL;
-	}
+	ASSERT(tex != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL);
 
 	return tex;
 }
@@ -722,10 +790,11 @@ void GraphicsGL::DestroyTexture(Texture * texture)
  * [width] - Width of both the color and depth render textures.
  * [height] - Width of both the color and depth render textures.
  */
-RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth,  const TextureAttributes& colorTextureAttributes,  unsigned int width, unsigned int height)
+RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+											  const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
 {
 	RenderTargetGL * buffer;
-	buffer = new RenderTargetGL(hasColor, hasDepth, colorTextureAttributes, width, height);
+	buffer = new RenderTargetGL(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
 	ASSERT(buffer != NULL, "GraphicsGL::CreateRenderTarget -> unable to create render target", NULL);
 	return buffer;
 }
@@ -733,7 +802,7 @@ RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth,  con
 RenderTarget * GraphicsGL::CreateDefaultRenderTarget()
 {
 	 TextureAttributes colorAttributes;
-	 RenderTargetGL * defaultTarget = new RenderTargetGL(false,false,colorAttributes,this->attributes.WindowWidth, this->attributes.WindowHeight);
+	 RenderTargetGL * defaultTarget = new RenderTargetGL(false,false, false, colorAttributes,this->attributes.WindowWidth, this->attributes.WindowHeight);
 	 ASSERT(defaultTarget != NULL, "GraphicsGL::CreateDefaultRenderTarget -> unable to create default render target", NULL);
 
 	 return defaultTarget;
@@ -997,12 +1066,78 @@ bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
 }
 
 /*
+ * For the current render target, if it is cubed, activate [side] as the target for rendering.
+ */
+bool GraphicsGL::ActivateCubeRenderTargetSide( CubeTextureSide side)
+{
+	if(currentRenderTarget.IsValid())
+	{
+		RenderTargetGL * currentTargetGL = dynamic_cast<RenderTargetGL *>(currentRenderTarget.GetPtr());
+		ASSERT(currentTargetGL != NULL, "RenderTargetGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.", false);
+
+		if(!currentTargetGL->GetColorTexture()->GetAttributes().IsCube)
+		{
+			std::string msg = "RenderTargetGL::ActivateCubeRenderTargetSide -> Render target is not cubed.";
+			Engine::Instance()->GetErrorManager()->SetAndReportError(GraphicsError::InvalidRenderTarget, msg);
+			return false;
+		}
+
+		TextureGL * texGL = dynamic_cast<TextureGL*>(currentTargetGL->GetColorTexture().GetPtr());
+		ASSERT(texGL != NULL, "RenderTargetGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.", false);
+
+		GLenum target;
+		switch(side)
+		{
+		case CubeTextureSide::Back:
+			target = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+			break;
+		case CubeTextureSide::Front:
+			target = GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+			break;
+		case CubeTextureSide::Top:
+			target = GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+			break;
+		case CubeTextureSide::Bottom:
+			target = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+			break;
+		case CubeTextureSide::Left:
+			target = GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+			break;
+		case CubeTextureSide::Right:
+			target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+			break;
+		}
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, texGL->GetTextureID(), 0);
+	}
+
+	return false;
+}
+
+/*
  * Make the default framebuffer the active render target.
  */
 bool GraphicsGL::RestoreDefaultRenderTarget()
 {
 	ActivateRenderTarget(defaultRenderTarget);
 	return true;
+}
+
+bool GraphicsGL::AddClipPlane()
+{
+	ASSERT(activeClipPlanes < Constants::MaxClipPlanes, "GraphicsGL::ActivateClipPlane -> Maximum clip planes exceeded.", false);
+	glEnable(GL_CLIP_PLANE0+activeClipPlanes);
+	activeClipPlanes++;
+	return true;
+}
+
+void GraphicsGL::DeactiveAllClipPlanes()
+{
+	for(unsigned int i = 0; i < activeClipPlanes; i++)
+	{
+		glDisable(GL_CLIP_PLANE0+i);
+	}
+	activeClipPlanes = 0;
 }
 
 /*

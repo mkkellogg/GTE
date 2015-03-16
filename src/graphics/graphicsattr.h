@@ -43,6 +43,12 @@ enum class SSAORenderMode
 	Outline = 1
 };
 
+enum class FaceCullingMode
+{
+	Back = 0,
+	Front = 1
+};
+
 /*
  * An instance of GraphicsAttributes is used to define the fundamental
  * attributes of the graphics system.
