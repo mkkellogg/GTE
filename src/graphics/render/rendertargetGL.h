@@ -26,7 +26,8 @@ class RenderTargetGL : public RenderTarget
 	// OpenGL Framebuffer Object ID.
 	GLuint fboID;
 
-	RenderTargetGL(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+	RenderTargetGL(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+				   const TextureAttributes& colorTextureAttributes,unsigned int width, unsigned int height);
     ~RenderTargetGL();
 
     void Destroy();

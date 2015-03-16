@@ -14,8 +14,9 @@
  * Single constructor. For the most part acts as a pass-through to the base constructor, but
  * also initializes member variables.
  */
-RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) :
-				RenderTarget(hasColor, hasDepth, colorTextureAttributes, width, height)
+RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth,bool enableStencilBuffer,
+							  const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) :
+							  RenderTarget(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height)
 {
 	fboID = 0;
 }
@@ -90,22 +91,42 @@ bool RenderTargetGL::Init()
 	// generate a color texture attachment
 	if(hasColorBuffer)
 	{
-		TextureAttributes attributes;
-		attributes.Format = colorTextureAttributes.Format;
-		attributes.FilterMode = TextureFilter::Point;
-		attributes.WrapMode = TextureWrap::Clamp;
+		TextureAttributes attributes = colorTextureAttributes;
 
-		colorTexture =  objectManager->CreateTexture(width, height, NULL, attributes);
+		if(attributes.IsCube)
+		{
+			colorTexture =  objectManager->CreateCubeTexture(NULL, width, height,
+														     NULL, width, height,
+															 NULL, width, height,
+															 NULL, width, height,
+															 NULL, width, height,
+															 NULL, width, height);
+		}
+		else
+		{
+			colorTexture =  objectManager->CreateTexture(width, height, NULL, attributes);
+		}
 		ASSERT(colorTexture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false);
 
 		TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
 		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast color texture to TextureGL.", false);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
+		if(attributes.IsCube)
+		{
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, texGL->GetTextureID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, texGL->GetTextureID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, texGL->GetTextureID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, texGL->GetTextureID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, texGL->GetTextureID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, texGL->GetTextureID(), 0);
+
+		}
+		else
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
 	}
 
 	// generate a depth texture attachment
-	if(hasDepthBuffer)
+	if(hasDepthBuffer && ! enableStencilBuffer)
 	{
 		TextureAttributes attributes;
 		attributes.FilterMode = TextureFilter::Point;
@@ -119,6 +140,24 @@ bool RenderTargetGL::Init()
 		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.", false);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
+	}
+	else if (hasDepthBuffer && enableStencilBuffer)
+	{
+		GLuint depthStencilRenderBufferID;
+		glGenRenderbuffers(1, &depthStencilRenderBufferID);
+		if(depthStencilRenderBufferID == 0)
+		{
+			Debug::PrintError("RenderTargetGL::Init -> Unable to create depth/stencil render buffer.");
+			Destroy();
+			return false;
+		}
+
+		glBindRenderbuffer(GL_RENDERBUFFER, depthStencilRenderBufferID);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+
+		//Attach stencil buffer to FBO
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilRenderBufferID);
+
 	}
 
 	/*GLuint depthRenderBufferID;
@@ -135,6 +174,12 @@ bool RenderTargetGL::Init()
 
 	//Attach depth buffer to FBO
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferID);*/
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, stencilRenderBufferID);
+
+
+
+	unsigned int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	ASSERT(status==GL_FRAMEBUFFER_COMPLETE, "RenderTargetGL::Init -> Framebuffer is incomplete!.", false);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

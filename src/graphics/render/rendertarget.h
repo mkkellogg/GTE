@@ -28,6 +28,8 @@ class RenderTarget : EngineObject
 	bool hasColorBuffer;
 	// does this render target support depth rendering?
 	bool hasDepthBuffer;
+	// enable stencil buffer for render (but not as a render target)
+	bool enableStencilBuffer;
 	// width of this render target
 	unsigned int width;
 	// height of this render target
@@ -39,7 +41,7 @@ class RenderTarget : EngineObject
 	// texture attributes of [colorTexture]
 	TextureAttributes colorTextureAttributes;
 
-	RenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+	RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
     virtual ~RenderTarget();
 
     public:
@@ -48,6 +50,8 @@ class RenderTarget : EngineObject
     bool HasBuffer(RenderBufferType bufferType) const;
     TextureRef GetDepthTexture();
     TextureRef GetColorTexture();
+    unsigned int GetWidth();
+    unsigned int GetHeight();
 };
 
 #endif

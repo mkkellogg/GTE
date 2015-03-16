@@ -6,14 +6,16 @@
 /*
  * Single constructor, set all member variables.
  */
-RenderTarget::RenderTarget(bool hasColor, bool hasDepth, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
+RenderTarget::RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
 {
 	this->hasColorBuffer = hasColor;
 	this->hasDepthBuffer = hasDepth;
+	this->enableStencilBuffer = enableStencilBuffer;
 	this->width = width;
 	this->height = height;
 	this->colorTextureAttributes = colorTextureAttributes;
 }
+
 
 /*
  * Clean-up.
@@ -58,5 +60,15 @@ TextureRef RenderTarget::GetDepthTexture()
 TextureRef RenderTarget::GetColorTexture()
 {
 	return colorTexture;
+}
+
+unsigned int RenderTarget::GetWidth()
+{
+	return width;
+}
+
+unsigned int RenderTarget::GetHeight()
+{
+	return height;
 }
 
