@@ -60,7 +60,8 @@ class Game
 	enum class Scenes
 	{
 		LavaScene = 0,
-		CastleScene = 1
+		CastleScene = 1,
+		PoolScene = 2
 	};
 
 	// layer name for player object
@@ -109,17 +110,15 @@ class Game
 	// lighting type that currently can be modified by the user
 	SceneLighting selectedLighting;
 
-
 	class SceneTransition
 	{
 		public:
 
 		Transform OriginalTransform;
-		Vector3 PreScaleTranslation;
 	};
 
 	// total number of scenes
-	static const int SceneCount = 2;
+	static const int SceneCount = 3;
 	// scene transition descriptors
 	SceneTransition sceneTransitions[SceneCount];
 	// scenes

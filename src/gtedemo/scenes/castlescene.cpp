@@ -23,6 +23,7 @@ class LavaField;
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/material.h"
+#include "graphics/render/rendermanager.h"
 #include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
@@ -47,27 +48,56 @@ class LavaField;
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
 
+/*
+ * Constructor - initialize member variables.
+ */
 CastleScene::CastleScene() : Scene()
 {
 
 }
 
+/*
+ * Clean up.
+ */
 CastleScene::~CastleScene()
 {
 
 }
 
+/*
+ * Get the SceneObject instance at the root of the scene.
+ */
 SceneObjectRef CastleScene::GetSceneRoot()
 {
 	return sceneRoot;
 }
 
+/*
+ * Called whenever this scene is activated.
+ */
+void CastleScene::OnActivate()
+{
+	//directionalLightObject->GetLight()->SetDirection(.8,-1.7,2);
+	//Engine::Instance()->GetRenderManager()->ClearCaches();
+}
+
+
+/*
+ * Update() is called once per frame from the Game() instance.
+ */
 void CastleScene::Update()
 {
 
 }
 
-void CastleScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directLightObject, SceneObjectRef playerObject)
+/*
+ * Set up all elements of the scene using [importer] to load any assets from disk.
+ *
+ * [ambientLightObject] - Global scene object that contains the global ambient light.
+ * [directLightObject] - Global scene object that contains the global directional light.
+ * [playerObject] - Scene object that contains the player mesh & renderer.
+ */
+void CastleScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject)
 {
 	importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
 
@@ -77,7 +107,7 @@ void CastleScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObje
 	sceneRoot = objectManager->CreateSceneObject();
 	ASSERT_RTRN(sceneRoot.IsValid(), "Could not create scene root for castle scene!\n");
 
-	sceneRoot->GetTransform().Translate(50,0,0, false);
+	sceneRoot->GetTransform().Translate(50,0,-15, false);
 
 	SetupTerrain(importer);
 	SetupStructures(importer);
@@ -85,9 +115,16 @@ void CastleScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObje
 	SetupExtra(importer);
 	SetupLights(importer,playerObject);
 
-	sceneRoot->GetTransform().Translate(-95, 0, 15, false);
+	sceneRoot->GetTransform().Rotate(0,1,0, 155, true);
+	sceneRoot->GetTransform().Translate(-44.3, 0, 52, false);
+
+
+	this->directionalLightObject = directionalLightObject;
 }
 
+/*
+* Set up the "land" elements in the scene.
+*/
 void CastleScene::SetupTerrain(AssetImporter& importer)
 {
 	// multi-use reference
@@ -111,6 +148,9 @@ void CastleScene::SetupTerrain(AssetImporter& importer)
 	modelSceneObject->GetTransform().Translate(80,-10,-10,false);
 }
 
+/*
+* Set up all the man-made structures, buildings, etc. in the scene.
+*/
 void CastleScene::SetupStructures(AssetImporter& importer)
 {
 	// multi-use reference
@@ -203,6 +243,9 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
 }
 
+/*
+* Add all the plants to the scene.
+*/
 void CastleScene::SetupPlants(AssetImporter& importer)
 {
 	// multi-use reference
@@ -257,6 +300,9 @@ void CastleScene::SetupPlants(AssetImporter& importer)
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
 }
 
+/*
+* Add miscellaneous elements to the scene.
+*/
 void CastleScene::SetupExtra(AssetImporter& importer)
 {
 	// misc. reference variables
@@ -340,10 +386,10 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 	// place initial barrel in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.8,.8,.8, false);
-	modelSceneObject->GetTransform().Translate(78,-10,10.5, false);
+	modelSceneObject->GetTransform().Translate(82,-10,10.5, false);
 
 	// re-use the barrel mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .8,.8,.8, 1,0,0, -90, 74,-10,10.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .8,.8,.8, 1,0,0, -90, 70,-10,10.5, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-8.3,1.5, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
@@ -353,6 +399,9 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 }
 
+/*
+* Set up the lights that belong to thsi scene.
+*/
 void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject)
 {
 	SceneObjectRef sceneObject;
@@ -392,7 +441,9 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	lanternLight->SetIntensity(1.8);
 	lanternLight->SetRange(25);
 	lanternLight->SetColor(lanternLightColor);
-	lanternLight->MergeCullingMask(playerObject->GetLayerMask());
+	IntMask mergedMask = lanternLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
+	lanternLight->SetCullingMask(mergedMask);
 	lanternLight->SetShadowsEnabled(true);
 	lanternLight->SetType(LightType::Point);
 	lanternObject->SetLight(lanternLight);
@@ -414,7 +465,9 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	lanternLight->SetIntensity(1.8);
 	lanternLight->SetRange(25);
 	lanternLight->SetColor(lanternLightColor);
-	lanternLight->MergeCullingMask(playerObject->GetLayerMask());
+	mergedMask = lanternLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
+	lanternLight->SetCullingMask(mergedMask);
 	lanternLight->SetShadowsEnabled(true);
 	lanternLight->SetType(LightType::Point);
 	lanternObject->SetLight(lanternLight);
@@ -436,12 +489,14 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	lanternLight->SetIntensity(1.5);
 	lanternLight->SetRange(20);
 	lanternLight->SetColor(lanternLightColor);
-	lanternLight->MergeCullingMask(playerObject->GetLayerMask());
+	mergedMask = lanternLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
+	lanternLight->SetCullingMask(mergedMask);
 	lanternLight->SetShadowsEnabled(true);
 	lanternLight->SetType(LightType::Point);
 	lanternObject->SetLight(lanternLight);
 	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(77.4, -5, -17.8, false);
+	lanternObject->GetTransform().Translate(77.4, -5, 8.7, false);
 	filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);

@@ -24,6 +24,7 @@ class LavaField;
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/material.h"
+#include "graphics/render/rendermanager.h"
 #include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
@@ -52,6 +53,9 @@ const std::string LavaScene::LavaWallLayer = "LavaWall";
 const std::string LavaScene::LavaIslandLayer = "LavaIsland";
 const std::string LavaScene::LavaIslandObjectsLayer = "LavaIslandObjects";
 
+/*
+ * Constructor - initialize member variables.
+ */
 LavaScene::LavaScene() : Scene()
 {
 	lavaField = NULL;
@@ -62,16 +66,34 @@ LavaScene::LavaScene() : Scene()
 	lavaIslandObjectsLayerMask = 0;
 }
 
+/*
+ * Clean up.
+ */
 LavaScene::~LavaScene()
 {
 
 }
 
+/*
+ * Get the SceneObject instance at the root of the scene.
+ */
 SceneObjectRef LavaScene::GetSceneRoot()
 {
 	return sceneRoot;
 }
 
+/*
+ * Called whenever this scene is activated.
+ */
+void LavaScene::OnActivate()
+{
+	//directionalLightObject->GetLight()->SetDirection(-.8,-1.7,-2);
+	//Engine::Instance()->GetRenderManager()->ClearCaches();
+}
+
+/*
+ * Update() is called once per frame from the Game() instance.
+ */
 void LavaScene::Update()
 {
 	Point3 lightRotatePoint(-20,5,10);
@@ -85,7 +107,14 @@ void LavaScene::Update()
 	if(lavaField->GetSceneObject()->IsActive())lavaField->Update();
 }
 
-void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directLightObject, SceneObjectRef playerObject)
+/*
+ * Set up all elements of the scene using [importer] to load any assets from disk.
+ *
+ * [ambientLightObject] - Global scene object that contains the global ambient light.
+ * [directLightObject] - Global scene object that contains the global directional light.
+ * [playerObject] - Scene object that contains the player mesh & renderer.
+ */
+void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject)
 {
 	importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
 
@@ -101,15 +130,21 @@ void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject
 	lavaIslandLayerMask = layerManager.GetLayerMask(lavaIslandLayerIndex);
 	lavaIslandObjectsLayerMask = layerManager.GetLayerMask(lavaIslandObjectsLayerIndex);
 
-	LightRef ambientLight = ambientLightObject->GetLight();
-	ambientLight->MergeCullingMask(lavaIslandLayerMask);
-	ambientLight->MergeCullingMask(lavaIslandObjectsLayerMask);
-	ambientLight->MergeCullingMask(lavaWallLayerMask);
+	IntMask mergedMask;
 
-	LightRef directionalLight = directLightObject->GetLight();
-	directionalLight->MergeCullingMask(lavaIslandLayerMask);
-	directionalLight->MergeCullingMask(lavaIslandObjectsLayerMask);
-	directionalLight->MergeCullingMask(lavaWallLayerMask);
+	LightRef ambientLight = ambientLightObject->GetLight();
+	mergedMask = ambientLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandLayerMask);
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandObjectsLayerMask);
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaWallLayerMask);
+	ambientLight->SetCullingMask(mergedMask);
+
+	LightRef directionalLight = directionalLightObject->GetLight();
+	mergedMask = directionalLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandLayerMask);
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandObjectsLayerMask);
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaWallLayerMask);
+	directionalLight->SetCullingMask(mergedMask);
 
 	sceneRoot = objectManager->CreateSceneObject();
 	ASSERT_RTRN(sceneRoot.IsValid(), "Could not create scene root for lava scene!\n");
@@ -121,8 +156,13 @@ void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject
 	SetupExtra(importer);
 	SetupLights(importer, playerObject);
 
+	this->directionalLightObject = directionalLightObject;
+
 }
 
+/*
+* Set up the "land" elements in the scene.
+*/
 void LavaScene::SetupTerrain(AssetImporter& importer)
 {
 	// multi-use reference
@@ -230,6 +270,9 @@ void LavaScene::SetupTerrain(AssetImporter& importer)
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
 }
 
+/*
+* Set up all the man-made structures, buildings, etc. in the scene.
+*/
 void LavaScene::SetupStructures(AssetImporter& importer)
 {
 	// multi-use reference
@@ -285,6 +328,9 @@ void LavaScene::SetupStructures(AssetImporter& importer)
 
 }
 
+/*
+* Add miscellaneous elements to the scene.
+*/
 void LavaScene::SetupExtra(AssetImporter& importer)
 {
 	// get reference to the engine's object manager
@@ -338,6 +384,9 @@ void LavaScene::SetupExtra(AssetImporter& importer)
 	cubeSceneObject->GetTransform().Translate(-20, -7, 8, false);
 }
 
+/*
+* Set up the lights that belong to thsi scene.
+*/
 void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject)
 {
 	// multi-use reference
@@ -377,9 +426,10 @@ void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	spinningPointLightObject->SetMesh3DRenderer(renderer);
 	LightRef light = objectManager->CreateLight();
 	light->SetIntensity(1.7);
-	light->SetCullingMask(lavaIslandObjectsLayerMask);
-	light->MergeCullingMask(lavaIslandLayerMask);
-	light->MergeCullingMask(playerObject->GetLayerMask());
+	IntMask mergedMask = lavaIslandObjectsLayerMask;
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandLayerMask);
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
+	light->SetCullingMask(mergedMask);
 	light->SetRange(25);
 	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Point);
@@ -398,7 +448,7 @@ void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	sceneRoot->AddChild(lavaLightObject);
 	lavaLightObject->SetStatic(true);
 	LightRef lavaLight = objectManager->CreateLight();
-	lavaLight->SetIntensity(4.5);
+	lavaLight->SetIntensity(6);
 	lavaLight->SetCullingMask(lavaWallLayerMask);
 	lavaLight->SetRange(60);
 	lavaLight->SetColor(Color4(1,.5,0,1));
@@ -423,16 +473,25 @@ void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	lavaLightObjects.push_back(lavaDirectionalLightObject);
 }
 
+/*
+ * Get the SceneObject instance that contains the scene's spinning point light.
+ */
 SceneObjectRef LavaScene::GetSpinningPointLightObject()
 {
 	return spinningPointLightObject;
 }
 
+/*
+ * Get all light objects that provide lava illumination.
+ */
 std::vector<SceneObjectRef>& LavaScene::GetLavaLightObjects()
 {
 	return lavaLightObjects;
 }
 
+/*
+ * Get a pointer to the LavaField instance for this scene.
+ */
 LavaField * LavaScene::GetLavaField()
 {
 	return lavaField;

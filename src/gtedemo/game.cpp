@@ -13,6 +13,7 @@
 #include "gameutil.h"
 #include "scenes/lavascene.h"
 #include "scenes/castlescene.h"
+#include "scenes/poolscene.h"
 #include "asset/assetimporter.h"
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
@@ -26,6 +27,7 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/material.h"
+#include "graphics/render/rendermanager.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
@@ -72,10 +74,10 @@ Game::Game()
 	playerJumpApexReached = false;
 	playerLanded = false;
 
-	// original player forward is looking down the positive z-axis
-	basePlayerForward = Vector3(0,0,1);
-	// original camera forward is looking down the negative z-axis
-	baseCameraForward = Vector3(0,0,-1);
+	basePlayerForward = Vector3::Forward;
+	basePlayerForward.Invert();
+
+	baseCameraForward = Vector3::Forward;
 
 	// initialize player state
 	playerType = PlayerType::Warrior;
@@ -99,6 +101,8 @@ Game::Game()
 	currentScene = Scenes::LavaScene;
 
 	frameCount = 0;
+
+	sceneTransitioning = false;
 }
 
 /*
@@ -118,36 +122,45 @@ void Game::Init()
 	// instantiate an asset importer to load models
 	AssetImporter importer;
 
+	// set up player layer mask
 	LayerManager& layerManager = Engine::Instance()->GetEngineObjectManager()->GetLayerManager();
 	int playerObjectLayerIndex = layerManager.AddLayer(PlayerObjectLayer);
-
 	playerObjectLayerMask = layerManager.GetLayerMask(playerObjectLayerIndex);
 
+	// set up global scene elements
 	SetupGlobalElements(importer);
 
 	// setup & initialize player
 	SetupPlayer(importer);
 	InitializePlayerPosition();
 
-	// set up the scene
-	SetupScenes(importer);
-
 	SetupCamera();
+
+	// set up the individual scenes
+	SetupScenes(importer);
 }
 
 /*
- * Set up the scenery for the scene and use [importer] to load assets from disk.
+ * Set up the individual scenes that showcase the various features of the
+ * engine, and initialize the transitions between them.
  */
 void Game::SetupScenes(AssetImporter& importer)
 {
 	scenes[(unsigned int)Scenes::LavaScene] = new LavaScene();
 	scenes[(unsigned int)Scenes::CastleScene] = new CastleScene();
 
+	PoolScene * poolScene = new PoolScene();
+	poolScene->SetMainCamera(cameraObject->GetCamera());
+	scenes[(unsigned int)Scenes::PoolScene] = poolScene;
+
 	SetupScene(importer, Scenes::LavaScene);
 	SetupScene(importer, Scenes::CastleScene);
+	SetupScene(importer, Scenes::PoolScene);
 
 	SetupTransitionForScene(Scenes::LavaScene);
 	SetupTransitionForScene(Scenes::CastleScene);
+	SetupTransitionForScene(Scenes::PoolScene);
+
 }
 
 /*
@@ -162,6 +175,9 @@ void Game::SetupScene(AssetImporter& importer, Scenes scene)
 		break;
 		case Scenes::CastleScene:
 			scenes[(unsigned int)Scenes::CastleScene]->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+		break;
+		case Scenes::PoolScene:
+			scenes[(unsigned int)Scenes::PoolScene]->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 	}
 }
@@ -180,12 +196,15 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 	//
 	//========================================================
 
+	IntMask mergedMask;
+
 	// create ambient light
 	ambientLightObject = objectManager->CreateSceneObject();
 	LightRef light = objectManager->CreateLight();
 	light->SetIntensity(.30);
 	light->SetType(LightType::Ambient);
-	light->MergeCullingMask(playerObjectLayerMask);
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(light->GetCullingMask(), playerObjectLayerMask);
+	light->SetCullingMask(mergedMask);
 	ambientLightObject->SetLight(light);
 
 
@@ -200,7 +219,8 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 	light = objectManager->CreateLight();
 	light->SetDirection(-.8,-1.7,-2);
 	light->SetIntensity(.8);
-	light->MergeCullingMask(playerObjectLayerMask);
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(light->GetCullingMask(), playerObjectLayerMask);
+	light->SetCullingMask(mergedMask);
 	light->SetShadowsEnabled(true);
 	light->SetType(LightType::Directional);
 	directionalLightObject->SetLight(light);
@@ -258,72 +278,94 @@ void Game::SwitchToScene(Scenes scene)
 	}
 
 	scenes[(unsigned int)currentScene]->GetSceneRoot()->SetActive(true);
+
+	//Engine::Instance()->GetRenderManager()->ClearCaches();
 }
 
+/*
+ * Activate a transition from the current scene to [scene]. The transition
+ * will take place over several frames.
+ */
 void Game::TransitionToScene(Scenes scene)
 {
+	// don't start a transition into the current scene
 	if(scene == currentScene)return;
+
+	// initialize transition only if one is not in progress
 	if(!sceneTransitioning)
 	{
 		sceneTransitionSrc = currentScene;
 		sceneTransitionDest = scene;
 		sceneTransitionStartTime = Time::GetRealTimeSinceStartup();
 		sceneTransitioning = true;
+		currentScene = scene;
+		scenes[(unsigned int)scene]->OnActivate();
+		SignalDisplayInfoChanged();
 	}
 }
 
+/*
+ * This method is called once per frame and is responsible for advancing
+ * the progress of a scene transition.
+ */
 void Game::UpdateSceneTransition()
 {
 	if(sceneTransitioning)
 	{
+		// total time transition should last
 		float transitionTime = .25;
+		// full elapsed time
 		float elapsedTime = Time::GetRealTimeSinceStartup() - sceneTransitionStartTime;
-		float normalizedTime = elapsedTime / transitionTime;
+		// elapsed time scaled to the range 0..1
+		float normalizedElapsedTime = elapsedTime / transitionTime;
 
+		// from scene ...
 		Scene* srcSceneObj = scenes[(unsigned int)sceneTransitionSrc];
+		// ... to scene
 		Scene* destSceneObj = scenes[(unsigned int)sceneTransitionDest];
 
+		// source scene root
 		SceneObjectRef srcRoot = srcSceneObj->GetSceneRoot();
+		// destination scene root
 		SceneObjectRef destRoot = destSceneObj->GetSceneRoot();
 
+		// activate destination scene
 		destRoot->SetActive(true);
+		// deactivate source scene
 		srcRoot->SetActive(false);
 
-		float srcScale = 1 - normalizedTime;
-		float destScale =  1 - srcScale;
+		float destScale = 1;
 
+		// the transition has 4 phases, each representing a scale value
 		unsigned int phases = 4;
 		float times[] = {0, .6, .8, 1};
 		float scales[] = {0, 1.2, .9, 1};
 
+		// find where the elapsed time currently lies relative to the phase
+		// boundaries, and interpolate the scale between the current phase
+		// and the next phase based on elapsed time
 		for(unsigned int i = 1; i < phases; i++)
 		{
-			if(normalizedTime < times[i])
+			if(normalizedElapsedTime < times[i])
 			{
-				float cElapsed = normalizedTime - times[i-1];
+				float cElapsed = normalizedElapsedTime - times[i-1];
 				destScale =  ((cElapsed/(times[i]-times[i-1])) * (scales[i] - scales[i-1])) + scales[i-1];
 				break;
 			}
 		}
 
 		if(elapsedTime > transitionTime)destScale = 1;
-		if(currentScene == sceneTransitionDest)destScale = 1;
 
-		SceneTransition& srcTransition = sceneTransitions[(unsigned int)sceneTransitionSrc];
 		SceneTransition& destTransition = sceneTransitions[(unsigned int)sceneTransitionDest];
 
-		Transform srcTransform;
-		srcTransform.SetTo(srcTransition.OriginalTransform);
-		Vector3 srcScaleVec(srcScale,srcScale,srcScale);
-		srcTransform.Scale(srcScaleVec, true);
-		srcRoot->GetTransform().SetTo(srcTransform);
-
+		// apply calculated/interpolated scale
 		Transform destTransform;
 		destTransform.SetTo(destTransition.OriginalTransform);
 		Vector3 destScaleVec(destScale,destScale,destScale);
 		destTransform.Scale(destScaleVec, true);
 		destRoot->GetTransform().SetTo(destTransform);
 
+		// is the transition complete?
 		if(elapsedTime > transitionTime)
 		{
 			SwitchToScene(sceneTransitionDest);
@@ -332,22 +374,17 @@ void Game::UpdateSceneTransition()
 	}
 }
 
+/*
+ * Initialize transition data for [scene].
+ */
 void Game::SetupTransitionForScene(Scenes scene)
 {
 	SceneTransition& sceneTransition = sceneTransitions[(unsigned int)scene];
 	Scene* sceneObj = scenes[(unsigned int)scene];
+
+	// for now we are only saving the original transform of the scene root
 	SceneObjectRef sceneRoot = sceneObj->GetSceneRoot();
 	sceneTransition.OriginalTransform.SetTo(sceneRoot->GetTransform());
-
-	switch(scene)
-	{
-		case Scenes::LavaScene:
-			sceneTransition.PreScaleTranslation = Vector3(30,10,0);
-		break;
-		case Scenes::CastleScene:
-			sceneTransition.PreScaleTranslation = Vector3(-80,10,10);
-		break;
-	}
 }
 
 /*
@@ -361,11 +398,14 @@ void Game::SetupCamera()
 	// create camera
 	cameraObject = objectManager->CreateSceneObject();
 	CameraRef camera = objectManager->CreateCamera();
+	camera->SetRendeOrderIndex(5);
 	cameraObject->SetCamera(camera);
 
 	// specify which kinds of render buffers to use for this camera
 	camera->AddClearBuffer(RenderBufferType::Color);
 	camera->AddClearBuffer(RenderBufferType::Depth);
+
+	camera->SetSSAOEnabled(true);
 
 	// move camera object to its initial position
 	Vector3 trans;
@@ -383,10 +423,10 @@ void Game::SetupCamera()
 														 	 	"resources/textures/skybox-night/nightsky_south.png",
 														 	 	"resources/textures/skybox-night/nightsky_up.png",
 														 	 	"resources/textures/skybox-night/nightsky_down.png",
-														 	 	"resources/textures/skybox-night/nightsky_east.png",
-														 	 	"resources/textures/skybox-night/nightsky_west.png");
+														 	 	"resources/textures/skybox-night/nightsky_west.png",
+														 	 	"resources/textures/skybox-night/nightsky_east.png");
 	// activate skybox
-	camera->SetSkybox(skyboxTexture);
+	camera->SetupSkybox(skyboxTexture);
 	camera->SetSkyboxEnabled(true);
 }
 
@@ -415,7 +455,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 			playerObject = importer.LoadModelDirect("resources/models/koopa/koopamod.fbx");
 			ASSERT_RTRN(playerObject.IsValid(), "Could not load Koopa model!\n");
 			playerObject->GetTransform().SetIdentity();
-			playerObject->GetTransform().Translate(50,-10,-2,false);
+			playerObject->GetTransform().Translate(45,-10,55,false);
 			playerObject->GetTransform().Scale(.05, .05, .05, true);
 		break;
 		case PlayerType::Warrior:
@@ -559,11 +599,6 @@ void Game::InitializePlayerPosition()
  */
 void Game::Update()
 {
-	if(!sceneTransitioning)
-	{
-		scenes[(unsigned int)currentScene]->Update();
-	}
-
 	UpdatePlayerHorizontalSpeedAndDirection();
 	UpdatePlayerVerticalSpeed();
 	ApplyPlayerMovement();
@@ -573,7 +608,12 @@ void Game::Update()
 	ManagePlayerState();
 	HandleGeneralInput();
 
+	if(!sceneTransitioning)
+	{
+		scenes[(unsigned int)currentScene]->Update();
+	}
 	UpdateSceneTransition();
+
 	DisplayInfo();
 
 	frameCount++;
@@ -627,6 +667,19 @@ void Game::DisplayInfo()
 			break;
 			default:
 				printf(" |  Selected lighting: None");
+			break;
+		}
+
+		switch(currentScene)
+		{
+			case Scenes::LavaScene:
+				printf(" |  Current scene: Lava ");
+			break;
+			case Scenes::CastleScene:
+				printf(" |  Current scene: Castle");
+			break;
+			case Scenes::PoolScene:
+				printf(" |  Current scene: Reflecting Pool");
 			break;
 		}
 
@@ -976,18 +1029,16 @@ void Game::HandleGeneralInput()
 	// toggle ssao
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::O))
 	{
-		Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-		const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
-		graphics->SetSSAOEnabled(!graphicsAttributes.SSAOEnabled);
+		CameraRef mainCamera = cameraObject->GetCamera();
+		mainCamera->SetSSAOEnabled(!mainCamera->IsSSAOEnabled());
 	}
 
 	// toggle ssao render mode
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::I))
 	{
-		Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
-		const GraphicsAttributes& graphicsAttributes = graphics->GetAttributes();
-		if(graphicsAttributes.SSAOMode == SSAORenderMode::Outline)graphics->SetSSAOMode(SSAORenderMode::Standard);
-		else graphics->SetSSAOMode(SSAORenderMode::Outline);
+		CameraRef mainCamera = cameraObject->GetCamera();
+		if(mainCamera->GetSSAORenderMode() == SSAORenderMode::Outline)mainCamera->SetSSAORenderMode(SSAORenderMode::Standard);
+		else mainCamera->SetSSAORenderMode(SSAORenderMode::Outline);
 	}
 
 	// select ambient lights
@@ -1022,12 +1073,10 @@ void Game::HandleGeneralInput()
 
 	}
 
+	// get scene object pointers
 	LavaScene *lavaScene = ((LavaScene*)scenes[(unsigned int)Scenes::LavaScene]);
 	CastleScene *castleScene = ((CastleScene*)scenes[(unsigned int)Scenes::CastleScene]);
 	LavaField *lavaField = lavaScene->GetLavaField();
-	std::vector<SceneObjectRef>& lavaLightObjects = lavaScene->GetLavaLightObjects();
-	std::vector<SceneObjectRef>& castleLights = castleScene->GetPointLights();
-	SceneObjectRef lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
 
 	// toggle lava
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::K))
@@ -1036,6 +1085,7 @@ void Game::HandleGeneralInput()
 		lavaFieldObject->SetActive(!lavaFieldObject->IsActive());
 	}
 
+	// determine light actions based on key input
 	bool toggleCastShadows = Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::R);
 	bool boostLightIntensity = Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::W);
 	bool reduceLightIntensity =  Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::E);
@@ -1045,6 +1095,10 @@ void Game::HandleGeneralInput()
 	if(boostLightIntensity)intensityBoost = .05;
 	else if(reduceLightIntensity)intensityBoost = -.05;
 
+	// get references to various lights across multiple scenes
+	std::vector<SceneObjectRef>& lavaLightObjects = lavaScene->GetLavaLightObjects();
+	std::vector<SceneObjectRef>& castleLights = castleScene->GetPointLights();
+	SceneObjectRef lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
 
 	// update selected lights
 	switch(selectedLighting)
@@ -1085,15 +1139,19 @@ void Game::HandleGeneralInput()
 	// change to lava scene
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::One))
 	{
-		//SwitchToScene(Scene::LavaScene);
 		TransitionToScene(Scenes::LavaScene);
 	}
 
 	// change to castle scene
 	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::Two))
 	{
-		//SwitchToScene(Scene::CastleScene);
 		TransitionToScene(Scenes::CastleScene);
+	}
+
+	// change to pool scene
+	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::Three))
+	{
+		TransitionToScene(Scenes::PoolScene);
 	}
 }
 

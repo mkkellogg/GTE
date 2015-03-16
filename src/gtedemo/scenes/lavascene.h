@@ -18,6 +18,7 @@ class LavaField;
 
 class LavaScene : public Scene
 {
+	// the SceneObject instance at the root of the scene
 	SceneObjectRef sceneRoot;
 
 	// layer name for lava pool wall
@@ -41,6 +42,8 @@ class LavaScene : public Scene
 	std::vector<SceneObjectRef> lavaLightObjects;
 	// The single cube in the scene
 	SceneObjectRef cubeSceneObject;
+	// global directional light
+	SceneObjectRef directionalLightObject;
 
 	public:
 
@@ -48,8 +51,9 @@ class LavaScene : public Scene
 	~LavaScene();
 
 	SceneObjectRef GetSceneRoot();
+	void OnActivate();
 	void Update();
-	void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directLightObject, SceneObjectRef playerObject);
+	void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject);
 
 	void SetupTerrain(AssetImporter& importer);
 	void SetupStructures(AssetImporter& importer);

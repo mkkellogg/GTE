@@ -1,3 +1,12 @@
+/*
+ * Class: Scene
+ *
+ * Author: Mark Kellogg
+ *
+ * Part of the GTE engine demo, GameUtil is a utility class
+ * for performing common useful functions.
+ */
+
 #ifndef _GTE_GAMEUTIL_H_
 #define _GTE_GAMEUTIL_H_
 

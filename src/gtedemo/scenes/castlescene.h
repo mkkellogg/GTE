@@ -18,8 +18,12 @@ class LavaField;
 
 class CastleScene : public Scene
 {
+	// the SceneObject instance at the root of the scene
 	SceneObjectRef sceneRoot;
+	// point lights in this scene
 	std::vector<SceneObjectRef> pointLights;
+	// global directional light
+	SceneObjectRef directionalLightObject;
 
 	public:
 
@@ -27,8 +31,9 @@ class CastleScene : public Scene
 	~CastleScene();
 
 	SceneObjectRef GetSceneRoot();
+	void OnActivate();
 	void Update();
-	void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directLightObject, SceneObjectRef playerObject);
+	void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject);
 
 	void SetupTerrain(AssetImporter& importer);
 	void SetupStructures(AssetImporter& importer);
