@@ -33,6 +33,8 @@ class PoolScene : public Scene
 	// main camera
 	CameraRef mainCamera;
 
+	void SetMaterialCameraPosition();
+
 	public:
 
 	PoolScene();

@@ -89,14 +89,78 @@ void PoolScene::Update()
 {
 	if(waterCamera.IsValid() && waterCamera->GetSceneObject().IsValid())
 	{
-		Point3 reflectCamPos;
-		Point3 poolCenter(-5,0,15);
+		waterCamera->SetReverseCulling(true);
+		sceneRoot->RemoveChild(waterCamera->GetSceneObject());
 
-		Vector3 trans, scale;
-		Quaternion rot;
+		Transform cameraTrans;
+		SceneObjectTransform::GetWorldTransform(cameraTrans , mainCamera->GetSceneObject(), true ,false);
 
-		waterCamera->GetSceneObject()->GetTransform().SetTo(mainCamera->GetSceneObject()->GetAggregateTransform());
-		//waterCamera->GetSceneObject()->GetTransform().Scale(1,-1,1,true);
+		waterCamera->GetSceneObject()->GetTransform().SetTo(cameraTrans);
+
+		sceneRoot->AddChild(waterCamera->GetSceneObject());
+
+		Mesh3DRef waterMesh = waterObject->GetMesh3D();
+
+		UV2Array * uvs =  waterMesh->GetSubMesh(0)->GetUVsTexture0();
+		Point3Array * positions = waterMesh->GetSubMesh(0)->GetPostions();
+
+		Transform model;
+		SceneObjectTransform::GetWorldTransform(model , waterObject, true ,false);
+		Transform viewInverse = cameraTrans;
+		viewInverse.Invert();
+
+		Transform project;
+		Transform modelView = model;
+		modelView.PreTransformBy(viewInverse);
+		project = modelView;
+		project.PreTransformBy(mainCamera->GetProjectionTransform());
+
+		Matrix4x4 mat;
+		project.CopyMatrix(mat);
+
+		for(unsigned int i =0; i < 6;i++)
+		{
+			float * dataP = positions->GetPoint(i)->GetDataPtr();
+			float data[4];
+
+			data[0] = dataP[0];
+			data[1] = dataP[1];
+			data[2] = dataP[2];
+			data[3] = dataP[3];
+
+			mat.Transform(data);
+
+			float w = data[3];
+			data[0] /= w;
+			data[1] /= w;
+
+			UV2 * uv = uvs->GetCoordinate(i);
+			uv->u = (data[0] + 1.0) / 2.0;
+			uv->v = (data[1] + 1.0) / 2.0;
+		}
+
+		waterMesh->GetSubMesh(0)->QuickUpdate();
+
+		Vector3 xAxis(1,0,0);
+		cameraTrans.TransformVector(xAxis);
+
+		Point3 waterObjCenter;
+		model.TransformPoint(waterObjCenter);
+
+		Transform modelInverse = model;
+		modelInverse.Invert();
+
+		Transform pre;
+
+		pre.PreTransformBy(modelInverse);
+		pre.Scale(1,-1,1, false);
+		pre.PreTransformBy(model);
+
+		waterCamera->SetUniformWorldSceneObjectTransform(pre);
+
+		Transform skyboxTrans;
+		skyboxTrans.Scale(1,-1,1,false);
+		waterCamera->SetSkyboxTextureTransform(skyboxTrans);
 	}
 }
 
@@ -310,6 +374,9 @@ void PoolScene::SetupExtra(AssetImporter& importer)
 	// get reference to the engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
+	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
+	const GraphicsAttributes& graphicsAttr = graphics->GetAttributes();
+
 	waterObject = objectManager->CreateSceneObject();
 
 	unsigned reflectiveLayerIndex = objectManager->GetLayerManager().AddLayer("Reflective");
@@ -322,9 +389,11 @@ void PoolScene::SetupExtra(AssetImporter& importer)
 	waterCamera->AddClearBuffer(RenderBufferType::Color);
 	waterCamera->AddClearBuffer(RenderBufferType::Depth);
 	waterCamera->SetRendeOrderIndex(0);
-	waterCamera->SetupOffscreenRenderTarget(1280,800);
+	waterCamera->SetupOffscreenRenderTarget(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight,false);
 	waterCamera->ShareSkybox(mainCamera);
 	waterCamera->SetSkyboxEnabled(true);
+//	waterCamera->SetFOV(90);
+	waterCamera->SetRenderTargetWidthHeightRatio(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight);
 
 	IntMask cameraMask = waterCamera->GetCullingMask();
 	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
@@ -343,11 +412,12 @@ void PoolScene::SetupExtra(AssetImporter& importer)
 
 	// create material water surface
 	ShaderSource waterShaderSource;
-	importer.LoadBuiltInShaderSource("water", waterShaderSource);
+	importer.LoadBuiltInShaderSource("waterplanar", waterShaderSource);
 	waterMaterial = objectManager->CreateMaterial("WaterMaterial", waterShaderSource);
 	waterMaterial->SetColor(Color4(1,1,1,1), "WATERCOLOR");
 	waterMaterial->SetSelfLit(true);
 	waterMaterial->SetTexture(waterCamera->GetRenderTarget()->GetColorTexture(), "REFLECTED_TEXTURE");
+	//waterMaterial->SetTexture(mainCamera->GetSkyboxTexture(), "REFLECTED_TEXTURE");
 
 	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
 	waterObject->SetMesh3DFilter(filter);
@@ -358,15 +428,26 @@ void PoolScene::SetupExtra(AssetImporter& importer)
 	waterMeshRenderer->AddMaterial(waterMaterial);
 	waterObject->SetMesh3DRenderer(waterMeshRenderer);
 
-	waterObject->GetTransform().Rotate(1,0,0,-90, true);
-	waterObject->GetTransform().Scale(20,1,20,false);
-	waterObject->GetTransform().Translate(-5,-7,20,false);
-	waterObject->GetTransform().Rotate(0,0,1,-90, true);
+	Transform rot90;
+	rot90.Rotate(1,0,0,-90, true);
+
+	for(unsigned int i =0; i < 6;i++)
+	{
+		Point3 * p = waterMesh->GetSubMesh(0)->GetPostions()->GetPoint(i);
+		rot90.TransformPoint(*p);
+	}
+	waterMesh->Update();
+
+	waterObject->GetTransform().Scale(18,18,18,false);
+	waterObject->GetTransform().Translate(-6.05,-7,20.6,false);
 	sceneRoot->AddChild(waterObject);
 
-	waterCameraObject->GetTransform().Translate(-5,-7,20,false);
+	waterCameraObject->GetTransform().Translate(-6.0,-12,20.6,false);
+	//waterCameraObject->GetTransform().Rotate(1,0,0,-90,true);
 	sceneRoot->AddChild(waterCameraObject);
+	//waterCameraObject->SetActive(false);
 
+	waterCamera->AddClipPlane(Vector3(0,-1,0), -7);
 }
 
 /*
@@ -431,4 +512,19 @@ void PoolScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 std::vector<SceneObjectRef>& PoolScene::GetPointLights()
 {
 	return pointLights;
+}
+
+void PoolScene::SetMaterialCameraPosition()
+{
+	Point3 origin;
+	mainCamera->GetSceneObject()->GetTransform().TransformPoint(origin);
+	waterMaterial->SetUniform4f(origin.x,origin.y,origin.z,1, "CAMERA_POSITION");
+
+	//Transform viewInverse;
+	//viewInverse.SetTo(mainCamera->GetSceneObject()->GetTransform());
+	//viewInverse.Invert();
+	//Matrix4x4 viMat;
+	//viewInverse.CopyMatrix(viMat);
+	//waterMaterial->SetMatrix4x4(viMat, "VIEW_MATRIX");
+
 }
