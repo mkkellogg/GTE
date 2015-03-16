@@ -70,6 +70,8 @@ class Engine
 	// flag that indicates the engine has been initialized
 	bool initialized;
 
+	bool firstFrameEntered;
+
 	Engine();
     ~Engine();
 

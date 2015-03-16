@@ -34,6 +34,7 @@ Engine::Engine()
 	callbacks = NULL;
 
 	initialized = false;
+	firstFrameEntered = false;
 }
 
 /*
@@ -125,8 +126,6 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 
 	initialized = true;
 
-	if(callbacks!=NULL)callbacks->OnInit();
-
 	return true;
 }
 
@@ -147,11 +146,17 @@ bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphic
  */
 void Engine::Update()
 {
-	graphicsEngine->PreProcessScene();
+	if(!firstFrameEntered)
+	{
+		if(callbacks!=NULL)callbacks->OnInit();
+		Time::Update();
+		firstFrameEntered = true;
+	}
 	graphicsEngine->Update();
 	animationManager->Update();
 	inputManager->Update();
 	if(callbacks!=NULL)callbacks->OnUpdate();
+	graphicsEngine->PreProcessScene();
 	renderManager->PreProcessScene();
 	if(callbacks!=NULL)callbacks->OnPreRender();
 	graphicsEngine->RenderScene();
