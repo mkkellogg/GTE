@@ -17,7 +17,9 @@ enum class StandardUniformMaskComponent
     Texture0=2048,
     Texture1=4096,
     NormalMap=8192,
-    DoShadowVolumeRender=16384
+    DoShadowVolumeRender=16384,
+    ClipPlaneCount=32768,
+    ClipPlane0=65536
 };
 
 enum class StandardUniform
@@ -37,8 +39,10 @@ enum class StandardUniform
 	Texture1=12,
 	NormalMap=13,
 	DoShadowVolumeRender=14,
-    _Last=15, // always keep as last entry (before _None)
-    _None=16
+	ClipPlaneCount=15,
+	ClipPlane0=16,
+    _Last=17, // always keep as last entry (before _None)
+    _None=18
 };
 
 #include "base/intmask.h"
