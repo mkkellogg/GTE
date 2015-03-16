@@ -61,9 +61,12 @@ class RenderManager
 
 		const Light* LightObject;
 		const Point3* LightPosition;
+		const Vector3* LightDirection;
 		bool SelfLit;
 
-		LightingDescriptor(const Light* lightObject, const Point3* lightPosition, bool selfLit) : LightObject(lightObject), LightPosition(lightPosition)
+		LightingDescriptor(const Light* lightObject, const Point3* lightPosition, const Vector3 * lightDirection, bool selfLit) : LightObject(lightObject),
+																								  LightPosition(lightPosition),
+																								  LightDirection(lightDirection)
 		{
 			this->SelfLit = selfLit;
 		}
@@ -118,28 +121,33 @@ class RenderManager
 
 	void PreProcessScene();
 	void PreProcessScene(SceneObject& parent, Transform& aggregateTransform);
+	void PreRenderScene();
 
 	void RenderSceneForCamera(unsigned int cameraIndex);
 	void ForwardRenderSceneForCamera(Camera& camera);
-	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneForSelfLitMaterials(const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse, const Camera& camera,
-								 MaterialRef materialOverride, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+	void ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& camera, const Transform& viewInverse);
+	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& modelPreTransform,
+									const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
+							      const Transform& viewTransformInverse, const Camera& camera,MaterialRef materialOverride, bool flagRendered,
+							      bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 	void ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
-	void ForwardRenderDepthBuffer(const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneSSAO(const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
-											   bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
-	void ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
-											   bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,  std::function<bool(SceneObjectRef)> filterFunction);
+	void ForwardRenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera,
+											   MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+	void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform,const Transform& viewTransformInverse, const Camera& camera,
+											   MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+											   std::function<bool(SceneObjectRef)> filterFunction);
 	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 	void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
 			 	 	 	 	 	 	   const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale) const;
-
-	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Transform& viewTransformInverse, const Camera& camera);
+	void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,  const Vector3& lightDirection,
+										  const Transform& modelPreTransform,const Transform& viewTransformInverse, const Camera& camera);
 	void BuildSceneShadowVolumes();
 	void BuildShadowVolumesForLight(const Light& light, const Transform& lightFullTransform);
-	void BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition);
+	void BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection);
     void CacheShadowVolume(const ObjectPairKey& key, const Point3Array * positions);
     void ClearCachedShadowVolume(const ObjectPairKey& key);
     bool HasCachedShadowVolume(const ObjectPairKey& key)  const;
@@ -158,6 +166,7 @@ class RenderManager
     void ActivateMaterial(MaterialRef material);
     void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection);
     void SendModelViewProjectionToShader(const Transform& modelViewProjection);
+    void SendClipPlanesToShader(const Camera& camera);
     void SendActiveMaterialUniformsToShader() const;
 
     bool ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const;

@@ -26,6 +26,8 @@
 #include "graphics/object/submesh3D.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
+#include "graphics/texture/texture.h"
+#include "graphics/texture/textureattr.h"
 #include "filesys/filesystem.h"
 #include "asset/assetimporter.h"
 #include "util/datastack.h"
@@ -60,11 +62,7 @@ RenderManager::~RenderManager()
  */
 bool RenderManager::Init()
 {
-	if(!sceneProcessingStack.Init())
-	{
-		Debug::PrintError("RenderManager::Init -> unable to initialize view transform stack.");
-		return false;
-	}
+	ASSERT(sceneProcessingStack.Init(), "RenderManager::Init -> unable to initialize view transform stack.", false);
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
@@ -101,12 +99,13 @@ bool RenderManager::Init()
 	ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.", false);
 
 	// build depth texture off-screen render target
-	const GraphicsAttributes& graphicsAttributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	RenderTargetRef defaultRenderTarget = graphics->GetDefaultRenderTarget();
 	TextureAttributes colorTextureAttributes;
 	colorTextureAttributes.Format = TextureFormat::R32;
 	colorTextureAttributes.FilterMode = TextureFilter::Point;
 	colorTextureAttributes.WrapMode = TextureWrap::Clamp;
-	depthRenderTarget = objectManager->CreateRenderTarget(true, true, colorTextureAttributes, graphicsAttributes.WindowWidth,graphicsAttributes.WindowHeight);
+	depthRenderTarget = objectManager->CreateRenderTarget(true, true, false, colorTextureAttributes, defaultRenderTarget->GetWidth(),defaultRenderTarget->GetHeight());
 	ASSERT(depthRenderTarget.IsValid(), "RenderManager::Init -> Unable to create off-screen rendering surface.", false);
 
 	TextureRef depthTexture = depthRenderTarget->GetDepthTexture();
@@ -242,7 +241,9 @@ void RenderManager::PreProcessScene()
 
 	// gather information about the cameras, lights, and renderable meshes in the scene
 	PreProcessScene(sceneRoot.GetRef(), cameraModelView);
-
+	// perform any pre-transformations and calculations (e.g. vertex skinning)
+	PreRenderScene();
+	// calculate shadow volumes
 	BuildSceneShadowVolumes();
 }
 
@@ -304,7 +305,11 @@ void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTra
 				{
 					if(i == cameraCount || sceneCameras[i]->GetCamera()->GetRendeOrderIndex() > camera->GetRendeOrderIndex())
 					{
-						sceneCameras[cameraCount] = child;
+						for(unsigned int ii=cameraCount; ii > i; ii--)
+							sceneCameras[ii] = sceneCameras[ii-1];
+
+						sceneCameras[i] = child;
+
 						cameraCount++;
 						break;
 					}
@@ -344,21 +349,6 @@ void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTra
 				if(meshRenderer.IsValid())
 				{
 					sceneMeshObjects[sceneMeshCount] = child;
-
-					model.SetTo(aggregateTransform);
-					modelInverse.SetTo(model);
-					modelInverse.Invert();
-
-					// for each sub-renderer, call the PreRender() method
-					for(unsigned int r = 0; r< meshRenderer->GetSubRendererCount(); r++)
-					{
-						SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
-						if(subRenderer.IsValid())
-						{
-							subRenderer->PreRender(model.matrix, modelInverse.matrix);
-						}
-					}
-
 					sceneMeshCount++;
 				}
 
@@ -366,21 +356,6 @@ void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTra
 				if(skinnedMeshRenderer.IsValid())
 				{
 					sceneMeshObjects[sceneMeshCount] = child;
-
-					model.SetTo(aggregateTransform);
-					modelInverse.SetTo(model);
-					modelInverse.Invert();
-
-					// for each sub-renderer, call the PreRender() method
-					for(unsigned int r = 0; r< skinnedMeshRenderer->GetSubRendererCount(); r++)
-					{
-						SubMesh3DRendererRef subRenderer = skinnedMeshRenderer->GetSubRenderer(r);
-						if(subRenderer.IsValid())
-						{
-							subRenderer->PreRender(model.matrix, modelInverse.matrix);
-						}
-					}
-
 					sceneMeshCount++;
 				}
 			}
@@ -393,6 +368,60 @@ void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTra
 
 			// restore previous view transform
 			PopTransformData(aggregateTransform, sceneProcessingStack);
+		}
+	}
+}
+
+/*
+ * Iterate through all (active) mesh renderers in the scene all call their
+ * respective PreRender() methods. This is typically where vertex skinning will
+ * happen.
+ */
+void RenderManager::PreRenderScene()
+{
+	Transform model;
+	Transform modelInverse;
+
+	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
+	for(unsigned int s = 0; s < sceneMeshCount; s++)
+	{
+		SceneObjectRef childRef = sceneMeshObjects[s];
+
+		Mesh3DRef mesh = childRef->GetMesh3D();
+		Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
+
+		model.SetTo(childRef->GetAggregateTransform());
+		modelInverse.SetTo(model);
+		modelInverse.Invert();
+
+		Mesh3DRendererRef meshRenderer = childRef->GetMesh3DRenderer();
+		Mesh3DFilterRef meshFilter = childRef->GetMesh3DFilter();
+		SkinnedMesh3DRendererRef skinnedMeshRenderer = childRef->GetSkinnedMesh3DRenderer();
+
+		if(meshRenderer.IsValid())
+		{
+			// for each sub-renderer, call the PreRender() method
+			for(unsigned int r = 0; r< meshRenderer->GetSubRendererCount(); r++)
+			{
+				SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
+				if(subRenderer.IsValid())
+				{
+					subRenderer->PreRender(model.matrix, modelInverse.matrix);
+				}
+			}
+		}
+
+		if(skinnedMeshRenderer.IsValid())
+		{
+			// for each sub-renderer, call the PreRender() method
+			for(unsigned int r = 0; r< skinnedMeshRenderer->GetSubRendererCount(); r++)
+			{
+				SubMesh3DRendererRef subRenderer = skinnedMeshRenderer->GetSubRenderer(r);
+				if(subRenderer.IsValid())
+				{
+					subRenderer->PreRender(model.matrix, modelInverse.matrix);
+				}
+			}
 		}
 	}
 }
@@ -420,18 +449,19 @@ void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
 }
 
 /*
- * Render all the meshes in the scene using forward rendering. The camera's inverted transform is used
- * as the view transform. The reason the inverse is used is because on the GPU side of things the view
- * transform is used to move the world relative to the camera, rather than move the camera in the world.
- *
- * Since this method uses a forward-rendering approach, each mesh is rendered once for each light and the output from
- * each pass is combined with the others using additive blending. This method calls ForwardRenderSceneForLight(),
- * which then calls ForwardRenderSceneObject(). The additive blending occurs in the ForwardRenderSceneObject() method.
+ * This method will activate the render target belonging to [camera] (which may just be the default render target),
+ * and then pass control to ForwardRenderSceneForCameraAndCurrentRenderTarget.
  */
 void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 {
 	SceneObjectRef cameraObject = camera.GetSceneObject();
 	ASSERT_RTRN(cameraObject.IsValid(),"RenderManager::ForwardRenderSceneForCamera -> Camera is not attached to a scene object.");
+
+	// clear stack of activated render targets
+	ClearRenderTargetStack();
+
+	// activate camera's render target
+	PushRenderTarget(camera.GetRenderTarget());
 
 	// render the scene using the view transform of the current camera
 	const Transform& cameraTransform = camera.GetSceneObject()->GetAggregateTransform();
@@ -443,17 +473,83 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	viewInverse.SetTo(cameraTransform);
 	viewInverse.Invert();
 
+	// if the render target is a cube, render 6 times, twice for each axis
+	if(camera.GetRenderTarget()->GetColorTexture().IsValid() &&
+	   camera.GetRenderTarget()->GetColorTexture()->GetAttributes().IsCube)
+	{
+		Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
+
+		// front
+		graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Front);
+		viewInverse.SetTo(cameraTransform);
+		viewInverse.Rotate(0,1,0, 0, true);
+		viewInverse.Invert();
+		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+		// back
+		graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Back);
+		viewInverse.SetTo(cameraTransform);
+		viewInverse.Rotate(0,1,0, 180, true);
+		viewInverse.Invert();
+		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+		// top
+		graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Top);
+		viewInverse.SetTo(cameraTransform);
+		viewInverse.Rotate(1,0,0, 90, true);
+		viewInverse.Invert();
+		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+		// bottom
+		graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Bottom);
+		viewInverse.SetTo(cameraTransform);
+		viewInverse.Rotate(1,0,0, -90,true);
+		viewInverse.Invert();
+		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+		// left
+		graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Left);
+		viewInverse.SetTo(cameraTransform);
+		viewInverse.Rotate(0,1,0, 90, true);
+		viewInverse.Invert();
+		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+		// right
+		graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Right);
+		viewInverse.SetTo(cameraTransform);
+		viewInverse.Rotate(0,1,0, -90, true);
+		viewInverse.Invert();
+		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+	}
+	else
+	{
+		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+	}
+
+	PopRenderTarget();
+}
+
+/*
+ * Render all the meshes in the scene using forward rendering. The camera's inverted transform is used
+ * as the view transform. The reason the inverse is used is because on the GPU side of things the view
+ * transform is used to move the world relative to the camera, rather than move the camera in the world.
+ *
+ * Since this method uses a forward-rendering approach, each mesh is rendered once for each light and the output from
+ * each pass is combined with the others using additive blending. This method calls ForwardRenderSceneForLight(),
+ * which then calls ForwardRenderSceneObject(). The additive blending occurs in the ForwardRenderSceneObject() method.
+ *
+ * This method will render to whatever render target is currently active.
+ */
+void RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& camera, const Transform& viewInverse)
+{
 	// clear the list of objects that have been rendered at least once. this list is used to
-	// determine if blending should be turned on or off. if an object is being rendered for the
+	// determine if additive blending should be turned on or off. if an object is being rendered for the
 	// first time, additive blending should be off; otherwise it should be on.
 	renderedObjects.clear();
 
-	// get the camera's render target as the active render target
-	ClearRenderTargetStack();
-	PushRenderTarget(camera.GetRenderTarget());
-
 	// clear the appropriate render buffers for this camera
 	ClearBuffersForCamera(camera);
+
+	// modelPreTransform is pre-multiplied with the transform of each rendered scene object & light
+	Transform modelPreTransform = camera.GetUniformWorldSceneObjectTransform();
+
+	if(camera.GetReverseCulling())Engine::Instance()->GetGraphicsEngine()->SetFaceCullingMode(FaceCullingMode::Front);
+	else Engine::Instance()->GetGraphicsEngine()->SetFaceCullingMode(FaceCullingMode::Back);
 
 	// we have not yet rendered any ambient lights
 	bool renderedAmbient = false;
@@ -468,16 +564,19 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.");
 
 		// render all objects in the scene that have non self-lit materials
-		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera);
+		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewInverse, camera);
 		renderedAmbient = true;
 	}
 
 	// if no ambient lights were rendered, then we need to fill the depth buffer with the scene to allow
 	// for proper shadow volume rendering and depth-buffer culling
-	ForwardRenderDepthBuffer(viewInverse, camera);
+	ForwardRenderDepthBuffer(modelPreTransform, viewInverse, camera);
 
 	// perform the standard screen-space ambient occlusion pass
-	if(renderedAmbient && camera.IsSSAOEnabled() && camera.GetSSAORenderMode() == SSAORenderMode::Standard)ForwardRenderSceneSSAO(viewInverse, camera);
+	if(renderedAmbient && camera.IsSSAOEnabled() && camera.GetSSAORenderMode() == SSAORenderMode::Standard)
+	{
+		ForwardRenderSceneSSAO(modelPreTransform, viewInverse, camera);
+	}
 
 	// loop through each regular light and render scene for that light
 	for(unsigned int l = 0; l < lightCount; l++)
@@ -489,22 +588,25 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Light is not valid.");
 
 		// render all objects in the scene that have non self-lit materials
-		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), viewInverse, camera);
+		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewInverse, camera);
 	}
 
 	// perform the screen-space ambient occlusion pass as an outline effect
-	if(camera.IsSSAOEnabled() && camera.GetSSAORenderMode() == SSAORenderMode::Outline)ForwardRenderSceneSSAO(viewInverse, camera);
+	if(camera.IsSSAOEnabled() && camera.GetSSAORenderMode() == SSAORenderMode::Outline)
+	{
+		ForwardRenderSceneSSAO(modelPreTransform, viewInverse, camera);
+	}
 
 	// render all self-lit objects in the scene once
-	ForwardRenderSceneForSelfLitMaterials(viewInverse, camera);
+	ForwardRenderSceneForSelfLitMaterials(modelPreTransform, viewInverse, camera);
+
+	Engine::Instance()->GetGraphicsEngine()->SetFaceCullingMode(FaceCullingMode::Back);
 
 	// if this camera has a skybox that is set up and enabled, then we want to render it
 	if(camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
 	{
 		ForwardRenderSkyboxForCamera(camera, viewInverse);
 	}
-
-	PopRenderTarget();
 }
 
 /*
@@ -517,16 +619,25 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
  * Pass 2: Perform actual rendering of all meshes in the scene for [light]. If [light] is not ambient, this pass will
  *         exclude screen pixels that are hidden from [light] based on the stencil buffer contents from pass 0. Is [light]
  *         is ambient, then this pass will perform a standard render of all meshes in the scene.
+ *
+ * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object & light
  */
 
-void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& modelPreTransform,
+											   const Transform& viewTransformInverse, const Camera& camera)
 {
 	Transform modelView;
 	Transform model;
 	Transform modelInverse;
 
+	Transform lightTransform = lightFullTransform;
+	lightTransform.PreTransformBy(modelPreTransform);
+
 	Point3 lightPosition;
-	lightFullTransform.TransformPoint(lightPosition);
+	lightTransform.TransformPoint(lightPosition);
+
+	Vector3 lightDirection = light.GetDirection();
+	lightTransform.TransformVector(lightDirection);
 
 	RenderMode currentRenderMode = RenderMode::None;
 
@@ -572,7 +683,7 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 				{
 					if(filter->GetCastShadows())
 					{
-						RenderShadowVolumesForSceneObject(*child, light, lightPosition, viewTransformInverse, camera);
+						RenderShadowVolumesForSceneObject(*child, light, lightPosition, lightDirection, modelPreTransform, viewTransformInverse, camera);
 					}
 				}
 				else if(pass == StandardRender) // normal rendering pass
@@ -593,8 +704,8 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 					}
 
 					// set up lighting descriptor for non self-lit lighting
-					LightingDescriptor lightingDescriptor(&light, &lightPosition, false);
-					ForwardRenderSceneObject(*child, lightingDescriptor, viewTransformInverse, camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
+					LightingDescriptor lightingDescriptor(&light, &lightPosition, &lightDirection, false);
+					ForwardRenderSceneObject(*child, lightingDescriptor, modelPreTransform, viewTransformInverse, camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
 				}
 			}
 		}
@@ -604,10 +715,12 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 /*
  * Forward-Render all the meshes found in ProcessScene() that have self-lit materials from the perspective
  * of [camera] using [viewTransformInverse] as the camera's position and orientation.
+ *
+ * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object.
  */
-void RenderManager::ForwardRenderSceneForSelfLitMaterials(const Transform& viewTransformInverse , const Camera& camera)
+void RenderManager::ForwardRenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransformInverse , const Camera& camera)
 {
-	ForwardRenderSceneWithSelfLitLighting(viewTransformInverse, camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
+	ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransformInverse, camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
 }
 
 /*
@@ -632,28 +745,27 @@ void RenderManager::ForwardRenderSkyboxForCamera(Camera& camera, const Transform
 		Point3 cameraOrigin;
 		cameraObject->GetAggregateTransform().TransformPoint(cameraOrigin);
 
-		// get world space location of the skybox
-		Point3 skyboxOrigin;
-		skyboxObject->GetAggregateTransform().TransformPoint(skyboxOrigin);
-
-		// calculate the distance between the camera and the center of the skybox
-		Vector3 trans;
-		Point3::Subtract(cameraOrigin, skyboxOrigin, trans);
-
 		// update the skybox's position to be equal to to the camera's position, but leave
 		// the skybox's orientation as default. if we matched the skybox's orientation to
 		// the camera's orientation, we'd always see the exact same area of the skybox, no
 		// matter where the camera was facing.
 		Transform base;
-		base.SetTo(skyboxObject->GetAggregateTransform());
-		base.Translate(trans, false);
+		Vector3 trans(cameraOrigin.x, cameraOrigin.y, cameraOrigin.z);
+		base.Translate(trans, true);
 		skyboxObject->SetAggregateTransform(base);
-		skyboxObject->GetTransform().Translate(trans, false);
 
 		// render the skybox
 		skyboxObject->SetActive(true);
-		LightingDescriptor lightingDescriptor(NULL, NULL, true);
-		ForwardRenderSceneObject(skyboxObject.GetRef(), lightingDescriptor, viewTransformInverse, camera, MaterialRef::Null(), true, true, FowardBlendingFilter::Never);
+		MaterialRef skyboxMaterial = camera.GetSkyboxMaterial();
+
+		// set up skybox texture transformation
+		Matrix4x4 textureTrans;
+		camera.GetSkyboxTransform().CopyMatrix(textureTrans);
+		skyboxMaterial->SetMatrix4x4(textureTrans, "TEXTURETRANSFORM_MATRIX");
+
+		LightingDescriptor lightingDescriptor(NULL, NULL, NULL, true);
+		ForwardRenderSceneObject(skyboxObject.GetRef(), lightingDescriptor, Transform(), viewTransformInverse, camera,
+								 MaterialRef::Null(), true, true, FowardBlendingFilter::Never);
 		skyboxObject->SetActive(false);
 	}
 }
@@ -661,17 +773,21 @@ void RenderManager::ForwardRenderSkyboxForCamera(Camera& camera, const Transform
 /*
  * Render the scene to only the depth-buffer. Render from the perspective
  * of [camera] using [viewTransformInverse] as the camera's position and orientation.
+ *
+ * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object.
  */
-void RenderManager::ForwardRenderDepthBuffer(const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::ForwardRenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera)
 {
-	ForwardRenderSceneWithSelfLitLighting(viewTransformInverse, camera, depthOnlyMaterial, false, false, FowardBlendingFilter::Never);
+	ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransformInverse, camera, depthOnlyMaterial, false, false, FowardBlendingFilter::Never);
 }
 
 /*
  * Render the screen-space ambient occlusion for the scene. Render from the perspective
  * of [camera] using [viewTransformInverse] as the camera's position and orientation.
+ *
+ * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object.
  */
-void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::ForwardRenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera)
 {
 	Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
 	GraphicsAttributes attributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
@@ -686,7 +802,7 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 	Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearMask);
 
 	// render the depth values for the scene to the off-screen color texture
-	ForwardRenderSceneWithSelfLitLighting(viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never);
+	ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never);
 
 	// restore previous render target
 	PopRenderTarget();
@@ -703,8 +819,8 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 	ssaoOutlineMaterial->SetMatrix4x4(projectionInvMat, "INV_PROJECTION_MATRIX");
 	ssaoOutlineMaterial->SetUniform1f(.5, "DISTANCE_THRESHHOLD");
 	ssaoOutlineMaterial->SetUniform2f(.3,.75, "FILTER_RADIUS");
-	ssaoOutlineMaterial->SetUniform1f(attributes.WindowWidth, "SCREEN_WIDTH");
-	ssaoOutlineMaterial->SetUniform1f(attributes.WindowHeight, "SCREEN_HEIGHT");
+	ssaoOutlineMaterial->SetUniform1f(depthRenderTarget->GetWidth(), "SCREEN_WIDTH");
+	ssaoOutlineMaterial->SetUniform1f(depthRenderTarget->GetHeight(), "SCREEN_HEIGHT");
 
 	FowardBlendingMethod currentFoward = GetForwardBlending();
 
@@ -712,7 +828,7 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 	// scene that are occluded.
 	SetForwardBlending(FowardBlendingMethod::Subtractive);
 	// rendering scene with SSAO material and filter out non-static objects
-	ForwardRenderSceneWithSelfLitLighting(viewTransformInverse, camera, ssaoOutlineMaterial, false, true, FowardBlendingFilter::Always, [=](SceneObjectRef sceneObject)
+	ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransformInverse, camera, ssaoOutlineMaterial, false, true, FowardBlendingFilter::Always, [=](SceneObjectRef sceneObject)
 	{
 		return !sceneObject->IsStatic();
 	});
@@ -723,11 +839,14 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& viewTransformInverse
 /*
  * Same as main ForwardRenderSceneWithSelfLitLighting() method, except it passes nullptr
  * as the value for [filterFunction].
+ *
+ * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object & light.
  */
-void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
+void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransformInverse,
+														  const Camera& camera, MaterialRef material, bool flagRendered,
 														  bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 {
-	ForwardRenderSceneWithSelfLitLighting(viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter, nullptr);
+	ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter, nullptr);
 }
 
 /*
@@ -735,8 +854,9 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewT
  * override material (if it is valid, needs to be self-lit), otherwise all meshes will be rendered
  * with their own materials (if they are self-lit).
  *
- * [camera] - The Camera object for which rendering is taking place.
+ * [modelPreTransform] - This transform is pre-multiplied with the transform of each rendered scene object.
  * [viewTransformInverse] - The view transform for rendering. (it should be the inverse of the camera's local-to-world-space transformation).
+ * [camera] - The Camera object for which rendering is taking place.
  * [material] - If this is valid, it will be used to render all meshes.
  * [flagRendered] - If true, each mesh will be flagged as rendered after it is rendered, which affects how blending
  *                  works for that mesh on future rendering passes.
@@ -746,8 +866,9 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewT
  *
  * Render from the perspective of [camera] using [viewTransformInverse] as the camera's position and orientation.
  */
-void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewTransformInverse, const Camera& camera, MaterialRef material, bool flagRendered,
-		   	   	   	   	   	   	   	   	   	   	   	      bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,  std::function<bool(SceneObjectRef)> filterFunction)
+void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera,
+														  MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+														  std::function<bool(SceneObjectRef)> filterFunction)
 {
 	Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
 
@@ -756,6 +877,7 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewT
 	{
 		SceneObjectRef childRef = sceneMeshObjects[s];
 
+		// check if [childRef] should be rendered for [camera]
 		if(ShouldCullFromCamera(camera, childRef.GetRef()))
 		{
 			continue;
@@ -775,8 +897,8 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewT
 		Transform full;
 		SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
 
-		LightingDescriptor lightingDescriptor(NULL, NULL, true);
-		ForwardRenderSceneObject(*child, lightingDescriptor, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter);
+		LightingDescriptor lightingDescriptor(NULL, NULL, NULL, true);
+		ForwardRenderSceneObject(*child, lightingDescriptor, modelPreTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter);
 	}
 }
 /*
@@ -784,6 +906,7 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewT
  *
  * [lightingDescriptor] - Describes the lighting to be used for rendering (if there is any).
  * [camera] - The Camera object for which rendering is taking place.
+ * [modelPreTransform] - This transform is pre-multiplied with the transform of each rendered scene object.
  * [viewTransformInverse] - The view transform for rendering. (it should be the inverse of the camera's local-to-world-space transformation).
  * [materialOverride] - If this is valid, it will be used to render all meshes.
  * [flagRendered] - If true, each mesh will be flagged as rendered after it is rendered, which affects how blending
@@ -791,14 +914,16 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& viewT
  * [renderMoreThanOnce] - If true, meshes can be rendered more than once (meaning in the additive passes).
  * [blendingFilter] - Determines how forward-rendering blending will be applied.
  */
-void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& viewTransformInverse,
-											 const Camera& camera, MaterialRef materialOverride, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
+void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
+											 const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride, bool flagRendered,
+											 bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 {
 	Mesh3DRenderer * renderer = NULL;
 	Transform modelViewProjection;
 	Transform modelView;
 	Transform model;
 	Transform modelInverse;
+
 
 	// check if [sceneObject] has a mesh & renderer
 	if(sceneObject.GetMesh3DRenderer().IsValid())
@@ -822,6 +947,7 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 		bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
 
 		model.SetTo(sceneObject.GetAggregateTransform());
+		model.PreTransformBy(modelPreTransform);
 
 		// concatenate model transform with inverted view transform, and then with
 		// the camera's projection transform.
@@ -864,16 +990,20 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 				// activate the material, which will switch the GPU's active shader to
 				// the one associated with the material
 				ActivateMaterial(currentMaterial);
+
 				// send uniforms set for the new material to its shader
 				SendActiveMaterialUniformsToShader();
 
 				// send light data to the active shader (if not self-lit)
 				if(!lightingDescriptor.SelfLit)
 				{
-					currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, NULL);
+					currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, lightingDescriptor.LightDirection);
 				}
 				// pass concatenated modelViewTransform and projection transforms to shader
 				SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform(), modelViewProjection);
+
+				// set up clip planes for [camera]
+				SendClipPlanesToShader(camera);
 
 				// if this sub mesh has already been rendered by this camera, then we want to use
 				// additive blending to combine it with the output from other lights. Otherwise
@@ -923,10 +1053,11 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
  *
  * [lightPosition] - The world space position of [light].
  * [camera] - The Camera object for which rendering is taking place.
+ * [modelPreTransform] - This transform is pre-multiplied with the transform of each rendered shadow volume.
  * [viewTransformInverse] - The view transform for rendering. (it should be the inverse of the camera's local-to-world-space transformation).
  */
-void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition,
-													  const Transform& viewTransformInverse, const Camera& camera)
+void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
+													  const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera)
 {
 	Mesh3DRenderer * renderer = NULL;
 	Transform modelViewProjection;
@@ -954,13 +1085,14 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 
 		// calculate model transform and inverse model transform
 		model.SetTo(sceneObject.GetAggregateTransform());
+		model.PreTransformBy(modelPreTransform);
 		modelInverse.SetTo(model);
 		modelInverse.Invert();
 
 		// calculate the position and/or direction of [light]
 		// in the mesh's local space
 		Point3 modelLocalLightPos = lightPosition;
-		Vector3 modelLocalLightDir = light.GetDirection();
+		Vector3 modelLocalLightDir = lightDirection;
 		modelInverse.TransformPoint(modelLocalLightPos);
 		modelInverse.TransformVector(modelLocalLightDir);
 
@@ -989,20 +1121,8 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			SendActiveMaterialUniformsToShader();
 			// pass special shadow volume model-view-matrix to shader
 			SendModelViewProjectionToShader(modelViewProjection);
-
-			Vector3 lightPosDir;
-			if(light.GetType() == LightType::Directional)
-			{
-				lightPosDir.x = modelLocalLightDir.x;
-				lightPosDir.y = modelLocalLightDir.y;
-				lightPosDir.z = modelLocalLightDir.z;
-			}
-			else
-			{
-				lightPosDir.x = modelLocalLightPos.x;
-				lightPosDir.y = modelLocalLightPos.y;
-				lightPosDir.z = modelLocalLightPos.z;
-			}
+			// set up clip planes for [camera]
+			SendClipPlanesToShader(camera);
 
 			// send shadow volume uniforms to shader
 			shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
@@ -1069,6 +1189,9 @@ void RenderManager::BuildShadowVolumesForLight(const Light& light, const Transfo
 	Point3 lightPosition;
 	lightFullTransform.TransformPoint(lightPosition);
 
+	Vector3 lightDirection = light.GetDirection();
+	lightFullTransform.TransformVector(lightDirection);
+
 	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
 	for(unsigned int s = 0; s < sceneMeshCount; s++)
 	{
@@ -1087,7 +1210,7 @@ void RenderManager::BuildShadowVolumesForLight(const Light& light, const Transfo
 			// make sure the current mesh should not be culled from [light].
 			if(!ShouldCullFromLight(light, lightPosition, full, *child))
 			{
-				BuildShadowVolumesForSceneObject(*child, light, lightPosition);
+				BuildShadowVolumesForSceneObject(*child, light, lightPosition, lightDirection);
 			}
 		}
 	}
@@ -1097,7 +1220,7 @@ void RenderManager::BuildShadowVolumesForLight(const Light& light, const Transfo
  * Build (and cache) shadow volumes for the meshes attached to [sceneObject] for [light], using
  * [lightPosition] as the light's world position.
  */
-void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition)
+void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection)
 {
 	Mesh3DRenderer * renderer = NULL;
 	Transform modelViewProjection;
@@ -1131,7 +1254,7 @@ void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, c
 		// calculate the position and/or direction of [light]
 		// in the mesh's local space
 		Point3 modelLocalLightPos = lightPosition;
-		Vector3 modelLocalLightDir = light.GetDirection();
+		Vector3 modelLocalLightDir = lightDirection;
 		modelInverse.TransformPoint(modelLocalLightPos);
 		modelInverse.TransformVector(modelLocalLightDir);
 
@@ -1261,12 +1384,9 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 {
 	Transform modelView;
 	Transform model;
-	Transform modelInverse;
 
 	// copy the mesh's local-to-world transform into [model]
 	model.SetTo(modelTransform);
-	modelInverse.SetTo(model);
-	modelInverse.Invert();
 
 	Transform shadowVolumeViewTransform;
 	Vector3 lightToMesh;
@@ -1278,8 +1398,7 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
 	{
 		// if light is directional, the mesh-to-light vector will
 		// simply be the inverse of the light's direction
-		lightToMesh = light.GetDirection();
-		modelInverse.TransformVector(lightToMesh);
+		lightToMesh = modelLocalLightDir;
 	}
 	else
 	{
@@ -1566,6 +1685,39 @@ void RenderManager::SendModelViewProjectionToShader(const Transform& modelViewPr
 	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendModelViewProjectionToShader -> material contains NULL shader.");
 
 	activeMaterial->SendMVPMatrixToShader(&modelViewProjection.matrix);
+}
+
+/*
+ * Send all active clips planes for [camera] to the active shader.
+ */
+void RenderManager::SendClipPlanesToShader(const Camera& camera)
+{
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
+	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendClipPlaneToShader -> activeMaterial is NULL.");
+
+	ShaderRef shader = activeMaterial->GetShader();
+	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendClipPlaneToShader -> material contains NULL shader.");
+
+	if(camera.GetClipPlaneCount() > 0)
+	{
+		Engine::Instance()->GetGraphicsEngine()->DeactiveAllClipPlanes();
+		Engine::Instance()->GetGraphicsEngine()->AddClipPlane();
+
+		const ClipPlane* clipPlane0 = const_cast<Camera&>(camera).GetClipPlane(0);
+
+		if(clipPlane0 != NULL)
+		{
+			activeMaterial->SendClipPlaneToShader(0, clipPlane0->Normal.x, clipPlane0->Normal.y, clipPlane0->Normal.z, clipPlane0->Offset);
+		}
+
+		activeMaterial->SendClipPlaneCountToShader(1);
+	}
+	else
+	{
+		Engine::Instance()->GetGraphicsEngine()->DeactiveAllClipPlanes();
+		activeMaterial->SendClipPlaneToShader(0, 0,0,0,0);
+		activeMaterial->SendClipPlaneCountToShader(0);
+	}
 }
 
 /*
