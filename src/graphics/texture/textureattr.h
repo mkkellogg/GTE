@@ -1,4 +1,5 @@
 /*
+ * class: TextureAttributes
  *
  * author: Mark Kellogg
  *
@@ -10,9 +11,17 @@
 #ifndef _GTE_TEXTUREATTR_H_
 #define _GTE_TEXTUREATTR_H_
 
-//forward declarations
-
 #include "global/global.h"
+
+enum class CubeTextureSide
+{
+	Front = 0,
+	Back = 1,
+	Top = 2,
+	Bottom = 3,
+	Left = 4,
+	Right = 5
+};
 
 enum class TextureWrap
 {
