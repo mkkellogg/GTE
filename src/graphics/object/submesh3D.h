@@ -78,16 +78,20 @@ class SubMesh3D : public EngineObject
     // last time this mesh was modified
     float timeStamp;
 
-    void Destroy();
-
-	protected :
+    // maps vertices to other equal vertices
+    std::vector<unsigned int>** vertexCrossMap;
 
     SubMesh3D();
     SubMesh3D(StandardAttributeSet attributes);
     virtual ~SubMesh3D();
 
+    void Destroy();
+    void DestroyVertexCrossMap();
+    bool BuildVertexCrossMap();
+
     void CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const;
     void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
+    int FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, unsigned int vbIndex) const;
     void BuildFaces();
 
     void CalcSphereOfInfluence();

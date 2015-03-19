@@ -53,6 +53,8 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 	subIndex = -1;
 	invertNormals = false;
 
+	vertexCrossMap = NULL;
+
 	UpdateTimeStamp();
 }
 
@@ -123,40 +125,36 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 
 	int faceVertexIndex = face->FirstVertexIndex;
 
-	// get pointers to the three vertices that make up the face
-	const Point3 * faceVertexA = positions.GetPointConst(faceVertexIndex);
-	const Point3 * faceVertexB = positions.GetPointConst(faceVertexIndex + 1);
-	const Point3 * faceVertexC = positions.GetPointConst(faceVertexIndex + 2);
+	int aResult = FindCommonFace(faceIndex, (unsigned int)faceVertexIndex, (unsigned int)faceVertexIndex +1);
+	int bResult = FindCommonFace(faceIndex, (unsigned int)faceVertexIndex+1, (unsigned int)faceVertexIndex +2);
+	int cResult = FindCommonFace(faceIndex, (unsigned int)faceVertexIndex+2, (unsigned int)faceVertexIndex);
 
-	int edgesSet = 0;
+	if(aResult >= 0)edgeA = aResult;
+	if(bResult >= 0)edgeB = bResult;
+	if(cResult >= 0)edgeC = cResult;
+}
 
-	// loop through each face and compare its edges to the edges of the face specified by [faceIndex].
-	for(unsigned int f = 0; f < faces.GetFaceCount(); f++)
+/*
+ * Find the face to which vertices at [vaIndex] and [vbIndex] in [positions] both belong, excluding
+ * the face specified by [excludeFace].
+ */
+int SubMesh3D::FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, unsigned int vbIndex) const
+{
+	std::vector<unsigned int>* indicentVerticesA = vertexCrossMap[vaIndex];
+	std::vector<unsigned int>* indicentVerticesB = vertexCrossMap[vbIndex];
+
+	for(unsigned int a =0; a < indicentVerticesA->size(); a++)
 	{
-		if(faceIndex != f)
+		unsigned int aFace = indicentVerticesA->operator [](a) / 3;
+		for(unsigned int b =0; b < indicentVerticesB->size(); b++)
 		{
-			const SubMesh3DFace * compareFace = faces.GetFaceConst(f);
-			int compareVertexIndex = compareFace->FirstVertexIndex;
+			unsigned int bFace = indicentVerticesB->operator [](b) / 3;
 
-			if(compareVertexIndex < 0)continue;
-
-			const Point3 * compareVertexA = positions.GetPointConst(compareVertexIndex);
-			const Point3 * compareVertexB = positions.GetPointConst(compareVertexIndex+1);
-			const Point3 * compareVertexC = positions.GetPointConst(compareVertexIndex+2);
-
-			if(Point3::AreStrictlyEqual(compareVertexB,faceVertexA) && Point3::AreStrictlyEqual(compareVertexA,faceVertexB)){edgeA = f;edgesSet++;}
-			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexA) && Point3::AreStrictlyEqual(compareVertexB,faceVertexB)){edgeA = f;edgesSet++;}
-			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexA) && Point3::AreStrictlyEqual(compareVertexC, faceVertexB)){edgeA = f;edgesSet++;}
-
-			if(Point3::AreStrictlyEqual(compareVertexB, faceVertexB) && Point3::AreStrictlyEqual(compareVertexA, faceVertexC)){edgeB = f;edgesSet++;}
-			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexB) && Point3::AreStrictlyEqual(compareVertexB, faceVertexC)){edgeB = f;edgesSet++;}
-			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexB) && Point3::AreStrictlyEqual(compareVertexC, faceVertexC)){edgeB = f;edgesSet++;}
-
-			if(Point3::AreStrictlyEqual(compareVertexB, faceVertexC) && Point3::AreStrictlyEqual(compareVertexA, faceVertexA)){edgeC = f;edgesSet++;}
-			else if(Point3::AreStrictlyEqual(compareVertexC, faceVertexC) && Point3::AreStrictlyEqual(compareVertexB, faceVertexA)){edgeC = f;edgesSet++;}
-			else if(Point3::AreStrictlyEqual(compareVertexA, faceVertexC) && Point3::AreStrictlyEqual(compareVertexC, faceVertexA)){edgeC = f;edgesSet++;}
+			if(aFace == bFace && aFace != excludeFace)return aFace;
 		}
 	}
+
+	return -1;
 }
 
 /*
@@ -248,38 +246,8 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		faceNormals.GetVector(v+2)->Set(normal.x,normal.y,normal.z);
 	}
 
-	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
-	// vertices, so this structure is used to store all the normals for those vertices, so they can later
-	// be used to calculate average (smoothed) normals
-	std::unordered_map<Point3, std::shared_ptr<std::vector<Vector3*>>, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
-
 	// This vector is used to store the calculated average normal for all equal vertices
 	std::vector<Vector3> averageNormals;
-
-	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
-	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
-	for(unsigned int v = 0; v < totalVertexCount; v++)
-	{
-		Point3 * point = positions.GetPoint(v);
-		Point3 targetPoint = *point;
-
-		// create a normal list for a vertex if one does not exist
-		if(normalGroups.find(targetPoint) == normalGroups.end())
-		{
-			std::vector<Vector3*> * newVector = new std::vector<Vector3*>();
-			ASSERT_RTRN(newVector != NULL, "SubMesh3D::CalculateNormals -> Could not allocate new normal std::vector.");
-
-			// we use a shared_ptr so that the dynamically allocated vector that contains pointers to all normals in
-			// a normal group will automatically be deallocated when the containing map goes out of scope
-			normalGroups[targetPoint] = std::shared_ptr<std::vector<Vector3*>>(newVector);
-		}
-
-		std::shared_ptr<std::vector<Vector3*>> list = normalGroups[targetPoint];
-		Vector3 * normal = vertexNormals.GetVector(v);
-
-		// add the normal at index [v] to the normal group linked to [targetPoint]
-		list->push_back(normal);
-	}
 
 	// loop through each vertex and lookup the associated list of
 	// normals associated with that vertex, and then calculate the
@@ -296,16 +264,15 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 		Point3 targetPoint = *point;
 
 		// retrieve the list of normals for [targetPoint]
-		std::shared_ptr<std::vector<Vector3*>> listPtr = normalGroups[targetPoint];
-
+		std::vector<unsigned int>* listPtr = vertexCrossMap[v];
 		ASSERT_RTRN(listPtr != NULL, "SubMesh3D::CalculateNormals -> NULL pointer to normal group list");
-		std::vector<Vector3*> list = *listPtr;
 
 		Vector3 avg(0,0,0);
 		float divisor = 0;
-		for(unsigned int i=0; i < list.size(); i++)
+		for(unsigned int i=0; i < listPtr->size(); i++)
 		{
-			Vector3 * currentPtr = list[i];
+			unsigned int vIndex = listPtr->operator[](i);
+			Vector3 * currentPtr = vertexNormals.GetVector(vIndex);
 			Vector3 current = *currentPtr;
 			current.Normalize();
 
@@ -365,7 +332,53 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
  */
 void SubMesh3D::Destroy()
 {
+	DestroyVertexCrossMap();
+}
 
+/*
+ * Deallocate and destroy [vertexCrossMap].
+ */
+void SubMesh3D::DestroyVertexCrossMap()
+{
+	if(vertexCrossMap != NULL)
+	{
+		delete vertexCrossMap;
+		vertexCrossMap = NULL;
+	}
+}
+
+/*
+ * Construct [vertexCrossMap].
+ */
+bool SubMesh3D::BuildVertexCrossMap()
+{
+	DestroyVertexCrossMap();
+
+	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
+	// vertices, so this structure is used to store all the normals for those vertices, so they can later
+	// be used to calculate average (smoothed) normals
+	std::unordered_map<Point3, std::vector<unsigned int>*, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
+
+	vertexCrossMap = new std::vector<unsigned int>*[totalVertexCount];
+	ASSERT(vertexCrossMap != NULL, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.", false);
+
+	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
+	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
+	for(unsigned int v = 0; v < totalVertexCount; v++)
+	{
+		Point3 * point = positions.GetPoint(v);
+		Point3 targetPoint = *point;
+
+		std::vector<unsigned int>*& list = normalGroups[targetPoint];
+
+		if(list == NULL)list = new std::vector<unsigned int>();
+
+		// add the normal at index [v] to the normal group linked to [targetPoint]
+		list->push_back(v);
+		vertexCrossMap[v] = list;
+	}
+
+	return true;
 }
 
 /*
@@ -417,6 +430,7 @@ const Vector3& SubMesh3D::GetSphereOfInfluenceZ() const
  */
 void SubMesh3D::Update()
 {
+	if(!BuildVertexCrossMap())return;
 	CalcSphereOfInfluence();
 	CalculateNormals(normalsSmoothingThreshold);
 	BuildFaces();
@@ -431,7 +445,7 @@ void SubMesh3D::Update()
 
 /*
  * Only signal this mesh as updated, do not recalculate normals or faces. Useful
- * when only moving vertex positions;
+ * when only changing vertex positions;
  */
 void SubMesh3D::QuickUpdate()
 {
