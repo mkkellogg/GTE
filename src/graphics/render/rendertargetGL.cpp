@@ -95,6 +95,7 @@ bool RenderTargetGL::Init()
 
 		if(attributes.IsCube)
 		{
+			// create a cube texture for this render target
 			colorTexture =  objectManager->CreateCubeTexture(NULL, width, height,
 														     NULL, width, height,
 															 NULL, width, height,
@@ -104,6 +105,7 @@ bool RenderTargetGL::Init()
 		}
 		else
 		{
+			// create a 2D texture for this render target
 			colorTexture =  objectManager->CreateTexture(width, height, NULL, attributes);
 		}
 		ASSERT(colorTexture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false);
@@ -143,6 +145,11 @@ bool RenderTargetGL::Init()
 	}
 	else if (hasDepthBuffer && enableStencilBuffer)
 	{
+		/***
+		 * In OpengL, if we want depth AND stencil abilities then they must both be render buffers and
+		 * they must be shared.
+		 ***/
+
 		GLuint depthStencilRenderBufferID;
 		glGenRenderbuffers(1, &depthStencilRenderBufferID);
 		if(depthStencilRenderBufferID == 0)
@@ -174,9 +181,6 @@ bool RenderTargetGL::Init()
 
 	//Attach depth buffer to FBO
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferID);*/
-	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, stencilRenderBufferID);
-
-
 
 	unsigned int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	ASSERT(status==GL_FRAMEBUFFER_COMPLETE, "RenderTargetGL::Init -> Framebuffer is incomplete!.", false);

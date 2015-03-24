@@ -20,7 +20,7 @@ class TextureAttributes;
 #include "object/enginetypes.h"
 #include "graphics/texture/textureattr.h"
 
-class RenderTarget : EngineObject
+class RenderTarget : public EngineObject
 {
     protected:
 
