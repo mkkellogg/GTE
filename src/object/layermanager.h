@@ -27,6 +27,7 @@ class LayerManager
 	IntMask RemoveLayerFromMask(IntMask mask, unsigned int layerIndex);
 	IntMask MergeLayerMask(IntMask maskA, IntMask maskB);
 	IntMask CreateFullLayerMask();
+	IntMask CreateEmptyLayerMask();
 	bool ContainsLayer(IntMask mask, unsigned int layerIndex);
 	bool AtLeastOneLayerInCommon(IntMask a, IntMask b);
 };

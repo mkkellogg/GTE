@@ -74,6 +74,11 @@ IntMask LayerManager::CreateFullLayerMask()
 	return mask;
 }
 
+IntMask LayerManager::CreateEmptyLayerMask()
+{
+	return IntMaskUtil::CreateIntMask();
+}
+
 bool LayerManager::ContainsLayer(IntMask mask, unsigned int layerIndex)
 {
 	return IntMaskUtil::IsBitSetForMask(mask, layerIndex);
