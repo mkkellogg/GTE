@@ -45,3 +45,9 @@ void Texture::AddImageData(RawImage* imageData)
 {
 	this->imageData.push_back(imageData);
 }
+
+RawImage * Texture::GetImageData(unsigned int index)
+{
+	ASSERT(index < imageData.size(), "Texture::GetImageData -> Index is out of range.", NULL);
+	return imageData[index];
+}

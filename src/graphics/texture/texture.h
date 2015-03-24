@@ -37,6 +37,7 @@ class Texture : public EngineObject
 	public:
 
 	TextureAttributes GetAttributes();
+	RawImage * GetImageData(unsigned int index);
 };
 
 #endif
