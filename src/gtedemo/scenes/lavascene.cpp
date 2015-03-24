@@ -192,7 +192,7 @@ void LavaScene::SetupTerrain(AssetImporter& importer)
 	//
 	//========================================================
 
-	lavaField = new LavaField(24);
+	lavaField = new LavaField(30);
 	lavaField->Init();
 	lavaField->SetDisplacementSpeed(.05);
 	lavaField->SetTextureASpeed(.015);
