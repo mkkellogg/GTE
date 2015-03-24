@@ -510,12 +510,9 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	ShaderSource waterShaderSource;
 	importer.LoadBuiltInShaderSource("waterplanar", waterShaderSource);
 	waterMaterial = objectManager->CreateMaterial("WaterMaterial", waterShaderSource);
-	waterMaterial->SetColor(Color4(0.45, 0.55, 0.66, 1), "WATERCOLOR");
 	waterMaterial->SetSelfLit(true);
 	waterMaterial->SetTexture(waterReflectionCamera->GetRenderTarget()->GetColorTexture(), "REFLECTED_TEXTURE");
 	waterMaterial->SetTexture(mainCamera->GetCopyRenderTarget()->GetColorTexture(), "SCREEN_BUFFER_TEXTURE");
-	waterMaterial->SetUniform1f(graphicsAttr.WindowWidth, "SCREEN_WIDTH");
-	waterMaterial->SetUniform1f(graphicsAttr.WindowHeight, "SCREEN_HEIGHT");
 
 	// create a renderer for the water mesh
 	Mesh3DRendererRef waterMeshRenderer = objectManager->CreateMesh3DRenderer();
