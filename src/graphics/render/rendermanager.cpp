@@ -32,6 +32,7 @@
 #include "asset/assetimporter.h"
 #include "util/datastack.h"
 #include "util/time.h"
+#include "util/engineutility.h"
 #include "global/global.h"
 #include "global/constants.h"
 #include "debug/gtedebug.h"
@@ -102,7 +103,7 @@ bool RenderManager::Init()
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 	RenderTargetRef defaultRenderTarget = graphics->GetDefaultRenderTarget();
 	TextureAttributes colorTextureAttributes;
-	colorTextureAttributes.Format = TextureFormat::R32;
+	colorTextureAttributes.Format = TextureFormat::R32F;
 	colorTextureAttributes.FilterMode = TextureFilter::Point;
 	colorTextureAttributes.WrapMode = TextureWrap::Clamp;
 	depthRenderTarget = objectManager->CreateRenderTarget(true, true, false, colorTextureAttributes, defaultRenderTarget->GetWidth(),defaultRenderTarget->GetHeight());
@@ -113,6 +114,47 @@ bool RenderManager::Init()
 
 	ASSERT(colorTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen color buffer.", false);
 	ASSERT(depthTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen depth buffer.", false);
+
+	// create full screen quad mesh
+	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
+	fullScreenQuad = EngineUtility::CreateRectangularMesh(meshAttributes, 1,1,1,1, true, true);
+	ASSERT(fullScreenQuad.IsValid(), "RenderManager::Init -> Unable to create full screen quad.", false);
+
+	// transform full-screen quad to: X: [0..1], Y: [0..1]
+	for(unsigned int i =0; i < fullScreenQuad->GetSubMesh(0)->GetPostions()->GetCount();i++)
+	{
+		Point3 * p = fullScreenQuad->GetSubMesh(0)->GetPostions()->GetPoint(i);
+		p->x += 0.5;
+		p->y += 0.5;
+	}
+	fullScreenQuad->Update();
+
+	// create camera for rendering to [fullScreenQuad]
+	fullScreenQuadCam = objectManager->CreateCamera();
+	ASSERT(fullScreenQuadCam.IsValid(), "RenderManager::Init -> Unable to camera for full screen quad.", false);
+	fullScreenQuadCam->SetProjectionMode(ProjectionMode::Orthographic);
+
+	fullScreenQuadObject = objectManager->CreateSceneObject();
+	ASSERT(fullScreenQuadObject.IsValid(), "RenderManager::Init -> Unable to scene object for full screen quad.", false);
+
+	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to mesh filter for full screen quad.", false);
+
+	filter->SetCastShadows(false);
+	filter->SetReceiveShadows(false);
+	filter->SetMesh3D(fullScreenQuad);
+	fullScreenQuadObject->SetMesh3DFilter(filter);
+
+	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to renderer for full screen quad.", false);
+	fullScreenQuadObject->SetMesh3DRenderer(renderer);
+
+	fullScreenQuadObject->SetActive(false);
 
 	return true;
 }
@@ -222,6 +264,50 @@ void RenderManager::RenderScene()
 void RenderManager::ClearCaches()
 {
 	DestroyCachedShadowVolumes();
+}
+
+void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, bool clearBuffers)
+{
+	Transform model;
+	Transform modelView;
+	Transform projection;
+	Transform modelViewProjection;
+
+	ASSERT_RTRN(renderTarget.IsValid(), "RenderManager::RenderFullScreenQuad -> Invalid render target.");
+	ASSERT_RTRN(material.IsValid(), "RenderManager::RenderFullScreenQuad -> Invalid material.");
+
+	// activate the material, which will switch the GPU's active shader to
+	// the one associated with the material
+	ActivateMaterial(material);
+
+	// send uniforms set for the material to its shader
+	SendActiveMaterialUniformsToShader();
+
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	RenderTargetRef currentTarget = graphics->GetCurrrentRenderTarget();
+	graphics->ActivateRenderTarget(renderTarget);
+
+	if(clearBuffers)
+	{
+		IntMask clearMask = IntMaskUtil::CreateIntMask();
+		IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Color);
+		IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Depth);
+		graphics->ClearRenderBuffers(clearMask);
+	}
+
+	fullScreenQuadObject->SetActive(true);
+	Mesh3DRendererRef renderer = fullScreenQuadObject->GetMesh3DRenderer();
+	if(renderer->GetMaterialCount() > 0)renderer->SetMaterial(0, material);
+	else renderer->AddMaterial(material);
+
+	for(unsigned int i = 0; i < fullScreenQuad->GetSubMeshCount(); i++)
+	{
+		renderer->GetSubRenderer(i)->Render();
+	}
+	fullScreenQuadObject->SetActive(false);
+
+
+	graphics->ActivateRenderTarget(currentTarget);
 }
 
 /*
@@ -473,12 +559,12 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	viewInverse.SetTo(cameraTransform);
 	viewInverse.Invert();
 
+	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
+
 	// if the render target is a cube, render 6 times, twice for each axis
 	if(camera.GetRenderTarget()->GetColorTexture().IsValid() &&
 	   camera.GetRenderTarget()->GetColorTexture()->GetAttributes().IsCube)
 	{
-		Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
-
 		// front
 		graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Front);
 		viewInverse.SetTo(cameraTransform);
@@ -519,6 +605,13 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	else
 	{
 		ForwardRenderSceneForCameraAndCurrentRenderTarget(camera, viewInverse);
+	}
+
+	RenderTargetRef copyTarget = camera.GetCopyRenderTarget();
+	if(copyTarget.IsValid())
+	{
+		RenderTargetRef source = camera.GetRenderTarget();
+		graphics->CopyBetweenRenderTargets(source, copyTarget);
 	}
 
 	PopRenderTarget();
@@ -1102,6 +1195,9 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
+			// if mesh doesn't have face data, it can't have a shadow volume
+			if(!subMesh->HasFaces())continue;
+
 			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> NULL sub renderer encountered.");
 			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> NULL sub mesh encountered.");
 
@@ -1263,6 +1359,9 @@ void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, c
 		{
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
+
+			// if mesh doesn't have face data, it can't have a shadow volume
+			if(!subMesh->HasFaces())continue;
 
 			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> NULL sub renderer encountered.");
 			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> NULL sub mesh encountered.");

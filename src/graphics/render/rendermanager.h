@@ -76,6 +76,12 @@ class RenderManager
 	static const int MAX_CAMERAS = 8;
 	static const int MAX_SCENE_MESHES = 128;
 
+	// mesh for doing full screen effects
+	Mesh3DRef fullScreenQuad;
+	// Ortho camera for rendering to [fullScreenQuad]
+	CameraRef fullScreenQuadCam;
+	// scene object for full screen quad mesh
+	SceneObjectRef fullScreenQuadObject;
 	// material for rendering shadow volumes
 	MaterialRef shadowVolumeMaterial;
 	// material for rendering only to the depth buffer
@@ -186,6 +192,8 @@ class RenderManager
     bool Init();
     void RenderScene();
     void ClearCaches();
+
+    void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, bool clearBuffers);
 
 };
 
