@@ -72,7 +72,9 @@ void EngineUtility::PrintMatrix(const Matrix4x4& matrix)
 	}
 }
 
-Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height, unsigned int subDivisionsPerWidth, unsigned int subDivisionsPerHeight)
+Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height,
+											   unsigned int subDivisionsPerWidth, unsigned int subDivisionsPerHeight,
+											   bool calculateNormals, bool buildFaces)
 {
 	if(width <= 0 || height <= 0)
 	{
@@ -81,8 +83,11 @@ Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttribut
 	}
 
 	// force mesh to have at least positions and normals
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
+	if(calculateNormals)
+	{
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
+	}
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 
 	unsigned int subSquaresPerWidth = subDivisionsPerWidth;
@@ -96,7 +101,6 @@ Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttribut
 
 	Mesh3DRef mesh = objectManager->CreateMesh3D(1);
 	mesh->Init();
-	mesh->SetSubMesh(subMesh, 0);
 
 	Point3Array * points = subMesh->GetPostions();
 	UV2Array *uvs = NULL;
@@ -173,7 +177,9 @@ Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttribut
 	}
 
 	subMesh->SetNormalsSmoothingThreshold(85);
-	mesh->Update();
+	subMesh->SetBuildFaces(buildFaces);
+	subMesh->SetCalculateNormals(calculateNormals);
+	mesh->SetSubMesh(subMesh, 0);
 
 	return mesh;
 }

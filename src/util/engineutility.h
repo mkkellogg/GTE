@@ -35,7 +35,9 @@ class EngineUtility
 	static std::string TrimRight(const std::string& str);
 	static std::string Trim(const std::string& str);
 	static void PrintMatrix(const Matrix4x4& matrix);
-	static Mesh3DRef CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height, unsigned int subDivisionsWidth, unsigned int subDivisionsHeight);
+	static Mesh3DRef CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height,
+										   unsigned int subDivisionsWidth, unsigned int subDivisionsHeight,
+										   bool calculateNormals, bool buildFaces);
 	static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes, bool doCCW);
 	static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes);
 };
