@@ -529,6 +529,24 @@ void ShaderGL::SendUniformToShader(int varID, unsigned int samplerUnitIndex, con
 			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
 		SendUniformToShader(varID, 1);
 	}
+	else if(samplerUnitIndex==2)
+	{
+		glActiveTexture(GL_TEXTURE2);
+		if(texGL->GetAttributes().IsCube)
+			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
+		else
+			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+		SendUniformToShader(varID, 2);
+	}
+	else if(samplerUnitIndex==3)
+	{
+		glActiveTexture(GL_TEXTURE3);
+		if(texGL->GetAttributes().IsCube)
+			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
+		else
+			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+		SendUniformToShader(varID, 3);
+	}
 	glActiveTexture(GL_TEXTURE0);
 }
 
