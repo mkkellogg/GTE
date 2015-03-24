@@ -96,6 +96,11 @@ class GraphicsGL : public Graphics
 
     RenderTarget * CreateDefaultRenderTarget();
 
+    GLenum GetGLCubeTarget(CubeTextureSide side);
+    GLenum GetGLTextureFormat(TextureFormat format);
+    GLenum GetGLPixelFormat(TextureFormat format);
+    GLenum GetGLPixelType(TextureFormat format);
+
     public :
 
     Shader * CreateShader(const ShaderSource& shaderSource);
@@ -145,8 +150,14 @@ class GraphicsGL : public Graphics
     unsigned int GetOpenGLVersion();
 
     bool ActivateRenderTarget(RenderTargetRef target);
+    RenderTargetRef GetCurrrentRenderTarget();
     bool ActivateCubeRenderTargetSide(CubeTextureSide side);
     bool RestoreDefaultRenderTarget();
+    void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest);
+
+    void SetTextureData(TextureRef texture, BYTE * data);
+    void SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side);
+    void RebuildMipMaps(TextureRef texture);
 
     bool AddClipPlane();
     void DeactiveAllClipPlanes();

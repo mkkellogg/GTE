@@ -111,7 +111,6 @@ class Graphics
    virtual RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
 		   	   	   	   	   	   	   	   	     const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) = 0;
    virtual void DestroyRenderTarget(RenderTarget * target) = 0;
-
     virtual RenderTargetRef GetDefaultRenderTarget() = 0;
 
     float GetCurrentFPS();
@@ -143,8 +142,14 @@ class Graphics
     virtual void EnterRenderMode(RenderMode renderMode) = 0;
 
     virtual bool ActivateRenderTarget(RenderTargetRef target) = 0;
+    virtual RenderTargetRef GetCurrrentRenderTarget() = 0;
     virtual bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
     virtual bool RestoreDefaultRenderTarget() = 0;
+    virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest) = 0;
+
+    virtual void SetTextureData(TextureRef texture, BYTE * data) = 0;
+    virtual void SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side) = 0;
+    virtual void RebuildMipMaps(TextureRef texture) = 0;
 
     virtual bool AddClipPlane() = 0;
     virtual void DeactiveAllClipPlanes() = 0;

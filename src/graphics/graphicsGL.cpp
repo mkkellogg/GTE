@@ -133,7 +133,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glutReshapeFunc(&_glutReshapeFunc);
 
     // TODO: think of a better place for these initial calls
-    glClearColor(1,0,0,1);
+    glClearColor(0,0,0,1);
     glFrontFace(GL_CW);
     glEnable(GL_POINT_SPRITE);
 
@@ -545,12 +545,11 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, attributes.MipMapLevel);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, attributes.MipMapLevel);
 		}
 
 		// set the texture format, dimensions and data
-		if(attributes.Format == TextureFormat::RGBA8)glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-		else if(attributes.Format == TextureFormat::R32)glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, pixels);
-
+		glTexImage2D(GL_TEXTURE_2D, 0, GetGLTextureFormat(attributes.Format), width, height, 0, GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), pixels);
 		if(openGLVersion >= 3 && (attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear))glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
@@ -562,6 +561,34 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	TextureGL * texture = new TextureGL(attributes, tex);
+	if(texture == NULL)
+	{
+		glDeleteTextures(1, &tex);
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateTexture -> Unable to allocate TextureGL object.");
+		return NULL;
+	}
+
+	bool rawImageAllocationComplete = false;
+	RawImage  * imageData = new RawImage(width, height);
+	if(imageData != NULL)
+	{
+		if(imageData->Init())
+		{
+			if(pixelData != NULL)imageData->SetDataTo(pixelData);
+			texture->AddImageData(imageData);
+			rawImageAllocationComplete = true;
+		}
+	}
+
+	if(!rawImageAllocationComplete)
+	{
+		if(imageData !=  NULL)delete imageData;
+
+		glDeleteTextures(1, &tex);
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateTexture -> Unable to allocate raw image data.");
+		return NULL;
+	}
+
 	return texture;
 }
 
@@ -576,14 +603,6 @@ Texture * GraphicsGL::CreateTexture(RawImage * imageData,  const TextureAttribut
 	ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
 
 	Texture * texture =  CreateTexture(imageData->GetWidth(), imageData->GetHeight(), imageData->GetPixels(), attributes);
-	if(texture != NULL)
-	{
-		TextureGL * texGL = dynamic_cast<TextureGL*>(texture);
-		if(texGL != NULL)
-		{
-			texGL->AddImageData(imageData);
-		}
-	}
 	return texture;
 }
 
@@ -680,6 +699,47 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateCubeTexture -> Unable to allocate TextureGL object.");
 	}
 
+	std::vector<RawImage *> imageDatas;
+	BYTE * datas[] = {frontData, backData, topData, bottomData, leftData, rightData};
+	unsigned int widths[] = {fw, backw, tw, botw, lw, rw};
+	unsigned int heights[] = {fh, backh, th, both, lh, rh};
+
+	for(unsigned int i = 0; i < 6; i++)
+	{
+		RawImage  * imageData = new RawImage(widths[i], heights[i]);
+		if(imageData != NULL)
+		{
+			if(imageData->Init())
+			{
+				if(datas[i] != NULL)imageData->SetDataTo(datas[i]);
+				imageDatas.push_back(imageData);
+			}
+			else
+			{
+				delete imageData;
+				break;
+			}
+		}
+		else break;
+	}
+
+	if(imageDatas.size() == 6)
+	{
+		for(unsigned int i = 0; i < 6; i++)
+		{
+			texture->AddImageData(imageDatas[i]);
+		}
+	}
+	else
+	{
+		for(unsigned int i = 0; i < imageDatas.size(); i++)
+		{
+			if(imageDatas[i] != NULL)delete imageDatas[i];
+		}
+		glDeleteTextures(1, &tex);
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateCubeTexture -> Unable to allocate RawImage data.");
+	}
+
 	return texture;
 }
 
@@ -712,14 +772,6 @@ Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backDa
 
 	TextureGL * textureGL = dynamic_cast<TextureGL *>(texture);
 	ASSERT(textureGL != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL);
-
-	// store copies of the image data as part of the Texture object
-	textureGL->AddImageData(frontData);
-	textureGL->AddImageData(backData);
-	textureGL->AddImageData(topData);
-	textureGL->AddImageData(bottomData);
-	textureGL->AddImageData(leftData);
-	textureGL->AddImageData(rightData);
 
 	return texture;
 }
@@ -892,8 +944,6 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 {
 	ASSERT_RTRN(material.IsValid(),"GraphicsGL::ActivateMaterial -> material is NULL");
 
-	// TODO: Change this to a proper comparison, and not just
-	// a comparison of object IDs
 	if(!this->activeMaterial.IsValid() || !(this->activeMaterial->GetObjectID() == material->GetObjectID()))
 	{
 		GLuint oldActiveProgramID = (GLuint)0xFFFFFFF0;
@@ -1042,6 +1092,115 @@ unsigned int GraphicsGL::GetOpenGLVersion()
 }
 
 /*
+ * Get the OpenGL constant for texture cube side that corresponds
+ * to [side].
+ */
+GLenum GraphicsGL::GetGLCubeTarget(CubeTextureSide side)
+{
+	GLenum target;
+	switch(side)
+	{
+	case CubeTextureSide::Back:
+		target = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+		break;
+	case CubeTextureSide::Front:
+		target = GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+		break;
+	case CubeTextureSide::Top:
+		target = GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+		break;
+	case CubeTextureSide::Bottom:
+		target = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+		break;
+	case CubeTextureSide::Left:
+		target = GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+		break;
+	case CubeTextureSide::Right:
+		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+		break;
+	}
+
+	return target;
+}
+
+/*
+ * Get the OpenGL texture format that corresponds to [format].
+ */
+GLenum GraphicsGL::GetGLTextureFormat(TextureFormat format)
+{
+	switch(format)
+	{
+	case TextureFormat::R32F:
+		return GL_R32F;
+		break;
+	case TextureFormat::RGBA8:
+		return GL_RGBA8;
+		break;
+	case TextureFormat::RGBA16F:
+		return GL_RGBA16F;
+		break;
+	case TextureFormat::RGBA32F:
+		return GL_RGBA32F;
+		break;
+
+	}
+
+	return GL_RGBA8;
+}
+
+
+/*
+ * Get the OpenGL pixel format that corresponds to [format].
+ */
+GLenum GraphicsGL::GetGLPixelFormat(TextureFormat format)
+{
+	switch(format)
+	{
+	case TextureFormat::R32F:
+		return GL_RED;
+		break;
+	case TextureFormat::RGBA8:
+		return GL_RGBA;
+		break;
+	case TextureFormat::RGBA16F:
+		return GL_RGBA;
+		break;
+	case TextureFormat::RGBA32F:
+		return GL_RGBA;
+		break;
+
+	}
+
+	return GL_RGBA;
+}
+
+
+/*
+ * Get the OpenGL pixel type that corresponds to [format].
+ */
+GLenum GraphicsGL::GetGLPixelType(TextureFormat format)
+{
+	switch(format)
+	{
+	case TextureFormat::R32F:
+		return GL_FLOAT;
+		break;
+	case TextureFormat::RGBA8:
+		return GL_UNSIGNED_BYTE;
+		break;
+	case TextureFormat::RGBA16F:
+		return GL_FLOAT;
+		break;
+	case TextureFormat::RGBA32F:
+		return GL_FLOAT;
+		break;
+
+	}
+
+	return GL_UNSIGNED_BYTE;
+}
+
+/*
  * Make [target] the target for all standard rendering operations.
  */
 bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
@@ -1058,11 +1217,21 @@ bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
 		if(currentTargetGL->GetFBOID() == targetGL->GetFBOID())return true;
 	}
 
+	glViewport(0,0,target->GetWidth(), target->GetHeight());
+
 	glBindFramebuffer(GL_FRAMEBUFFER, targetGL->GetFBOID());
 
 	currentRenderTarget = target;
 
 	return true;
+}
+
+/*
+ * Get the currently active render target.
+ */
+RenderTargetRef GraphicsGL::GetCurrrentRenderTarget()
+{
+	return currentRenderTarget;
 }
 
 /*
@@ -1073,40 +1242,25 @@ bool GraphicsGL::ActivateCubeRenderTargetSide( CubeTextureSide side)
 	if(currentRenderTarget.IsValid())
 	{
 		RenderTargetGL * currentTargetGL = dynamic_cast<RenderTargetGL *>(currentRenderTarget.GetPtr());
-		ASSERT(currentTargetGL != NULL, "RenderTargetGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.", false);
+		ASSERT(currentTargetGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.", false);
 
 		if(!currentTargetGL->GetColorTexture()->GetAttributes().IsCube)
 		{
-			std::string msg = "RenderTargetGL::ActivateCubeRenderTargetSide -> Render target is not cubed.";
+			std::string msg = "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not cubed.";
 			Engine::Instance()->GetErrorManager()->SetAndReportError(GraphicsError::InvalidRenderTarget, msg);
 			return false;
 		}
 
 		TextureGL * texGL = dynamic_cast<TextureGL*>(currentTargetGL->GetColorTexture().GetPtr());
-		ASSERT(texGL != NULL, "RenderTargetGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.", false);
+		ASSERT(texGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.", false);
 
-		GLenum target;
-		switch(side)
-		{
-		case CubeTextureSide::Back:
-			target = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
-			break;
-		case CubeTextureSide::Front:
-			target = GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
-			break;
-		case CubeTextureSide::Top:
-			target = GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
-			break;
-		case CubeTextureSide::Bottom:
-			target = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
-			break;
-		case CubeTextureSide::Left:
-			target = GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
-			break;
-		case CubeTextureSide::Right:
-			target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-			break;
-		}
+		GLenum target = GetGLCubeTarget(side);
+
+		unsigned int sideIndex = (unsigned int)side;
+		RawImage * imageData = texGL->GetImageData(sideIndex);
+		ASSERT(imageData, "GraphicsGL::ActivateCubeRenderTargetSide -> Unable to get image data for specified side.", false);
+
+		glViewport(0,0,imageData->GetWidth(), imageData->GetHeight());
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, texGL->GetTextureID(), 0);
 	}
@@ -1123,6 +1277,102 @@ bool GraphicsGL::RestoreDefaultRenderTarget()
 	return true;
 }
 
+/*
+ * Copy the contents of one render target to another.
+ */
+void GraphicsGL::CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest)
+{
+	GLuint currentFB = 0;
+	if(currentRenderTarget.IsValid())
+	{
+		RenderTargetGL * currentGL = dynamic_cast<RenderTargetGL*>(currentRenderTarget.GetPtr());
+		if(currentGL != NULL)
+		{
+			currentFB = currentGL->GetFBOID();
+		}
+	}
+
+	ASSERT_RTRN(src.IsValid(), "GraphicsGL::CopyBetweenRenderTargets -> Source is not valid");
+	ASSERT_RTRN(dest.IsValid(), "GraphicsGL::CopyBetweenRenderTargets -> Destination is not valid");
+
+	RenderTargetGL * srcGL = dynamic_cast<RenderTargetGL*>(src.GetPtr());
+	ASSERT_RTRN(srcGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Source is not a valid OpenGL render target.");
+
+	RenderTargetGL * destGL = dynamic_cast<RenderTargetGL*>(dest.GetPtr());
+	ASSERT_RTRN(destGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Destination is not a valid OpenGL render target.");
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, srcGL->GetFBOID());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destGL->GetFBOID());
+
+	glBlitFramebuffer(0, 0, src->GetWidth(), src->GetHeight(),
+	                  0, 0, dest->GetWidth(), dest->GetHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, currentFB);
+}
+
+/*
+ * Set the contents of [texture] be that of [data].
+ */
+void GraphicsGL::SetTextureData(TextureRef texture, BYTE * data)
+{
+	SetTextureData(texture, data, CubeTextureSide::Front);
+}
+
+/*
+ * Set the contents of [texture] be that of [data]. If it is a cube texture, update
+ * the side specified by [side].
+ */
+void GraphicsGL::SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side)
+{
+	ASSERT_RTRN(texture.IsValid(), "GraphicsGL::SetTextureData -> Texture is not valid.");
+
+	TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
+	ASSERT_RTRN(texGL != NULL, "GraphicsGL::SetTextureData -> Texture is not a valid OpenGL texture.");
+
+	const TextureAttributes attributes = texture->GetAttributes();
+	if(attributes.IsCube)
+	{
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
+		RawImage * imageData = texture->GetImageData((unsigned int)side);
+		glTexImage2D(GetGLCubeTarget(side), 0, GetGLTextureFormat(attributes.Format), imageData->GetWidth(), imageData->GetHeight(), 0,
+							 GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), data);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
+	else
+	{
+		glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+		RawImage * imageData = texture->GetImageData(0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GetGLTextureFormat(attributes.Format), imageData->GetWidth(), imageData->GetHeight(), 0,
+					 GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), data);
+		if(openGLVersion >= 3 && (attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear))glGenerateMipmap(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+}
+
+/*
+ * Force a rebuild of the mip-maps for [texture].
+ */
+void GraphicsGL::RebuildMipMaps(TextureRef texture)
+{
+	TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
+	ASSERT_RTRN(texGL != NULL, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");
+
+	const TextureAttributes attributes = texture->GetAttributes();
+	if(openGLVersion >= 3 && (attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear))
+	{
+		if(!attributes.IsCube)
+		{
+			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+	}
+}
+
+/*
+ * Enable one more clip plane than is currently enabled.
+ */
 bool GraphicsGL::AddClipPlane()
 {
 	ASSERT(activeClipPlanes < Constants::MaxClipPlanes, "GraphicsGL::ActivateClipPlane -> Maximum clip planes exceeded.", false);
@@ -1131,6 +1381,9 @@ bool GraphicsGL::AddClipPlane()
 	return true;
 }
 
+/*
+ * Disable all OpenGL clip planes.
+ */
 void GraphicsGL::DeactiveAllClipPlanes()
 {
 	for(unsigned int i = 0; i < activeClipPlanes; i++)
