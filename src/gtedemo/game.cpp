@@ -399,6 +399,7 @@ void Game::SetupCamera()
 	cameraObject = objectManager->CreateSceneObject();
 	CameraRef camera = objectManager->CreateCamera();
 	camera->SetRendeOrderIndex(5);
+	camera->SetupCopyRenderTarget();
 	cameraObject->SetCamera(camera);
 
 	// specify which kinds of render buffers to use for this camera
@@ -1076,6 +1077,7 @@ void Game::HandleGeneralInput()
 	// get scene object pointers
 	LavaScene *lavaScene = ((LavaScene*)scenes[(unsigned int)Scenes::LavaScene]);
 	CastleScene *castleScene = ((CastleScene*)scenes[(unsigned int)Scenes::CastleScene]);
+	PoolScene *poolScene = ((PoolScene*)scenes[(unsigned int)Scenes::PoolScene]);
 	LavaField *lavaField = lavaScene->GetLavaField();
 
 	// toggle lava
@@ -1099,6 +1101,7 @@ void Game::HandleGeneralInput()
 	std::vector<SceneObjectRef>& lavaLightObjects = lavaScene->GetLavaLightObjects();
 	std::vector<SceneObjectRef>& castleLights = castleScene->GetPointLights();
 	SceneObjectRef lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
+	std::vector<SceneObjectRef>& reflectingPoolLights = poolScene->GetPointLights();
 
 	// update selected lights
 	switch(selectedLighting)
@@ -1120,6 +1123,10 @@ void Game::HandleGeneralInput()
 			for(unsigned int i =0; i < castleLights.size(); i++)
 			{
 				UpdateLight(castleLights[i], toggleLight, intensityBoost, toggleCastShadows);
+			}
+			for(unsigned int i =0; i < reflectingPoolLights.size(); i++)
+			{
+				UpdateLight(reflectingPoolLights[i], toggleLight, intensityBoost, toggleCastShadows);
 			}
 		break;
 		default:

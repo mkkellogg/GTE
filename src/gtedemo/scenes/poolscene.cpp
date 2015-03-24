@@ -53,7 +53,9 @@ class LavaField;
  */
 PoolScene::PoolScene() : Scene()
 {
-
+	currentHeightMapIndex = 0;
+	lastWaterDropTime = Time::GetRealTimeSinceStartup() ;
+	lastWaterSimAdvanceTime = Time::GetRealTimeSinceStartup() ;
 }
 
 /*
@@ -79,90 +81,136 @@ void PoolScene::OnActivate()
 {
 	//directionalLightObject->GetLight()->SetDirection(.8,-1.7,2);
 	//Engine::Instance()->GetRenderManager()->ClearCaches();
+
+	UpdateCameras();
 }
 
+/*
+ * Update the positions of [waterReflectionCamera] and [waterSurfaceCamera].
+ */
+void PoolScene::UpdateCameras()
+{
+	Transform mainCameraTrans;
+	SceneObjectTransform::GetWorldTransform(mainCameraTrans , mainCamera->GetSceneObject(), true ,false);
 
+	// set the water reflection camera's position & orientation to that of [mainCamera]
+	sceneRoot->RemoveChild(waterReflectionCamera->GetSceneObject());
+	waterReflectionCamera->GetSceneObject()->GetTransform().SetTo(mainCameraTrans);
+	sceneRoot->AddChild(waterReflectionCamera->GetSceneObject());
+
+	// set the water surface camera's position & orientation to that of [mainCamera]
+	sceneRoot->RemoveChild(waterSurfaceCamera->GetSceneObject());
+	waterSurfaceCamera->GetSceneObject()->GetTransform().SetTo(mainCameraTrans);
+	sceneRoot->AddChild(waterSurfaceCamera->GetSceneObject());
+
+}
+
+unsigned int dropCount = 0;
 /*
  * Update() is called once per frame from the Game() instance.
  */
 void PoolScene::Update()
 {
-	if(waterCamera.IsValid() && waterCamera->GetSceneObject().IsValid())
+	if(waterReflectionCamera.IsValid() && waterReflectionCamera->GetSceneObject().IsValid())
 	{
-		waterCamera->SetReverseCulling(true);
-		sceneRoot->RemoveChild(waterCamera->GetSceneObject());
+		Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
 
-		Transform cameraTrans;
-		SceneObjectTransform::GetWorldTransform(cameraTrans , mainCamera->GetSceneObject(), true ,false);
+		// we want front faces culled since we will reflecting the scene using a negative scale
+		waterReflectionCamera->SetReverseCulling(true);
 
-		waterCamera->GetSceneObject()->GetTransform().SetTo(cameraTrans);
+		UpdateCameras();
 
-		sceneRoot->AddChild(waterCamera->GetSceneObject());
+		Transform mainCameraTrans;
+		SceneObjectTransform::GetWorldTransform(mainCameraTrans , mainCamera->GetSceneObject(), true ,false);
 
-		Mesh3DRef waterMesh = waterObject->GetMesh3D();
 
-		UV2Array * uvs =  waterMesh->GetSubMesh(0)->GetUVsTexture0();
-		Point3Array * positions = waterMesh->GetSubMesh(0)->GetPostions();
+		Transform waterSurfaceTransform;
 
-		Transform model;
-		SceneObjectTransform::GetWorldTransform(model , waterObject, true ,false);
-		Transform viewInverse = cameraTrans;
-		viewInverse.Invert();
+		// get full world-space transformation for water's surface
+		SceneObjectTransform::GetWorldTransform(waterSurfaceTransform, waterSurfaceSceneObject, true ,false);
+		Transform waterSurfaceInverseTransform = waterSurfaceTransform;
+		waterSurfaceInverseTransform.Invert();
 
-		Transform project;
-		Transform modelView = model;
-		modelView.PreTransformBy(viewInverse);
-		project = modelView;
-		project.PreTransformBy(mainCamera->GetProjectionTransform());
+		// build the transform that will reflect the scene about the water's surface,
+		// which is the XZ plane in the object's local space.
+		Transform reflectionTransform;
+		reflectionTransform.PreTransformBy(waterSurfaceInverseTransform);
+		reflectionTransform.Scale(1,-1,1, false);
+		reflectionTransform.PreTransformBy(waterSurfaceTransform);
 
-		Matrix4x4 mat;
-		project.CopyMatrix(mat);
+		// tell [waterReflectionCamera] about the reflection transform
+		waterReflectionCamera->SetUniformWorldSceneObjectTransform(reflectionTransform);
 
-		for(unsigned int i =0; i < 6;i++)
-		{
-			float * dataP = positions->GetPoint(i)->GetDataPtr();
-			float data[4];
-
-			data[0] = dataP[0];
-			data[1] = dataP[1];
-			data[2] = dataP[2];
-			data[3] = dataP[3];
-
-			mat.Transform(data);
-
-			float w = data[3];
-			data[0] /= w;
-			data[1] /= w;
-
-			UV2 * uv = uvs->GetCoordinate(i);
-			uv->u = (data[0] + 1.0) / 2.0;
-			uv->v = (data[1] + 1.0) / 2.0;
-		}
-
-		waterMesh->GetSubMesh(0)->QuickUpdate();
-
-		Vector3 xAxis(1,0,0);
-		cameraTrans.TransformVector(xAxis);
-
-		Point3 waterObjCenter;
-		model.TransformPoint(waterObjCenter);
-
-		Transform modelInverse = model;
-		modelInverse.Invert();
-
-		Transform pre;
-
-		pre.PreTransformBy(modelInverse);
-		pre.Scale(1,-1,1, false);
-		pre.PreTransformBy(model);
-
-		waterCamera->SetUniformWorldSceneObjectTransform(pre);
-
+		// need to reflect skybox texture coordinates
 		Transform skyboxTrans;
 		skyboxTrans.Scale(1,-1,1,false);
-		waterCamera->SetSkyboxTextureTransform(skyboxTrans);
+		waterReflectionCamera->SetSkyboxTextureTransform(skyboxTrans);
+
+
+
+		float frameTime  = 1.0/60.0;
+		float simAdvanceTimeDiff = Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
+		if(simAdvanceTimeDiff > frameTime)
+		{
+
+		RenderManager * renderManager = Engine::Instance()->GetRenderManager();
+		unsigned int renderHeightMap = 0;
+
+		if(Time::GetRealTimeSinceStartup() - lastWaterDropTime > 1)
+		{
+			float dropRadius = 4.0f / (float)WHMR * (float)rand() / (float)RAND_MAX;
+			float x = 2.0f * (float)rand() / (float)RAND_MAX - 1.0f;
+			float y = 1.0f - 2.0f * (float)rand() / (float)RAND_MAX;
+
+
+			 waterDropMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
+			 waterDropMaterial->SetUniform1f(dropRadius, "DROP_RADIUS");
+			 waterDropMaterial->SetUniform2f(x * 0.5f + 0.5f, 0.5f - y * 0.5f, "DROP_POSITION");
+			 renderHeightMap = (currentHeightMapIndex + 1) % 2;
+			 renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterDropMaterial, false);
+			 graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
+
+			// printf("drops: %d\n", dropCount);
+
+		    ++currentHeightMapIndex %= 2;
+			lastWaterDropTime = Time::GetRealTimeSinceStartup();
+			dropCount++;
+		}
+
+		waterHeightsMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
+		renderHeightMap = (currentHeightMapIndex + 1) % 2;
+		renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterHeightsMaterial, false);
+		graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
+		++currentHeightMapIndex %= 2;
+
+
+		waterNormalsMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
+		renderManager->RenderFullScreenQuad(waterNormals, waterNormalsMaterial, false);
+		graphics->RebuildMipMaps(waterNormals->GetColorTexture());
+
+		Point3 cameraPos;
+		mainCameraTrans.TransformPoint(cameraPos);
+		waterMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
+  	//waterMaterial->SetUniform4f(cameraPos.x, cameraPos.y, cameraPos.z, 1, "CAMERA_POSITION");
+		if(pointLights[0]->IsActive())
+		{
+			waterMaterial->SetUniform1f(.3, "REFLECTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.7, "REFRACTED_COLOR_FACTOR");
+		}
+		else
+		{
+			waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
+		}
+
+		while(Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime > frameTime)
+		{
+			lastWaterSimAdvanceTime += frameTime;
+		}
+		}
 	}
 }
+
 
 /*
  * Set up all elements of the scene using [importer] to load any assets from disk.
@@ -184,13 +232,11 @@ void PoolScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject
 	SetupTerrain(importer);
 	SetupStructures(importer);
 	//SetupPlants(importer);
-	SetupExtra(importer);
+	SetupWaterSurface(importer);
 	SetupLights(importer,playerObject);
 
-	//sceneRoot->GetTransform().Rotate(0,1,0, 155, true);
-	//sceneRoot->GetTransform().Translate(-44.3, 0, 52, false);
-
 	this->directionalLightObject = directionalLightObject;
+	this->playerObject = playerObject;
 }
 
 /*
@@ -239,11 +285,11 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 
 	//========================================================
 	//
-	// Castle components
+	// Pool components
 	//
 	//========================================================
 
-	// load castle tower
+	// load castle tower for pool corners
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
 	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
 	sceneRoot->AddChild(modelSceneObject);
@@ -268,7 +314,7 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.015, 1,0,0, -90, -16.5,-10,31.5, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 
-	// load castle wall model
+	// load castle wall model for pool walls
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
 	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
 	sceneRoot->AddChild(modelSceneObject);
@@ -307,6 +353,31 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.06,.025, 1,0,0, -90, 4.9, -10,25, true,true,true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90, true);
 	sceneRoot->AddChild(modelSceneObject);
+
+
+
+	// load castle wall model for pool walls
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
+	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	sceneRoot->AddChild(modelSceneObject);
+	GameUtil::SetAllObjectsStatic(modelSceneObject);
+
+	wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	wallBlockMesh = wallBlockMeshObject->GetMesh3D();
+	wallBlockMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(35);
+	wallBlockMesh->Update();
+
+	// place initial castle wall in scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Rotate(1,0,0,-90, true);
+	modelSceneObject->GetTransform().Scale(.15,.025,.175, false);
+	modelSceneObject->GetTransform().Translate(-5.5,-10.5,33,false);
+
+
+
+//	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .15,.22,.025, 1,0,0, -90, -7,-13.5, 20.5, false,true,true);
+//	sceneRoot->AddChild(modelSceneObject);
+
 }
 
 /*
@@ -367,9 +438,9 @@ void PoolScene::SetupPlants(AssetImporter& importer)
 }
 
 /*
-* Add miscellaneous elements to the scene.
+* Add water surface to the scene.
 */
-void PoolScene::SetupExtra(AssetImporter& importer)
+void PoolScene::SetupWaterSurface(AssetImporter& importer)
 {
 	// get reference to the engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -377,77 +448,170 @@ void PoolScene::SetupExtra(AssetImporter& importer)
 	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
 	const GraphicsAttributes& graphicsAttr = graphics->GetAttributes();
 
-	waterObject = objectManager->CreateSceneObject();
+	// create scene object for the water's surface
+	waterSurfaceSceneObject = objectManager->CreateSceneObject();
 
+	// set the water surface's layer
 	unsigned reflectiveLayerIndex = objectManager->GetLayerManager().AddLayer("Reflective");
 	IntMask reflectiveMask = objectManager->GetLayerManager().GetLayerMask(reflectiveLayerIndex);
-	waterObject->SetLayerMask(reflectiveMask);
+	waterSurfaceSceneObject->SetLayerMask(reflectiveMask);
 
 	// set up camera that will render water reflection
-	waterCamera = objectManager->CreateCamera();
-	waterCamera->SetSSAOEnabled(false);
-	waterCamera->AddClearBuffer(RenderBufferType::Color);
-	waterCamera->AddClearBuffer(RenderBufferType::Depth);
-	waterCamera->SetRendeOrderIndex(0);
-	waterCamera->SetupOffscreenRenderTarget(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight,false);
-	waterCamera->ShareSkybox(mainCamera);
-	waterCamera->SetSkyboxEnabled(true);
-//	waterCamera->SetFOV(90);
-	waterCamera->SetRenderTargetWidthHeightRatio(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight);
+	waterReflectionCamera = objectManager->CreateCamera();
+	waterReflectionCamera->SetSSAOEnabled(false);
+	waterReflectionCamera->AddClearBuffer(RenderBufferType::Color);
+	waterReflectionCamera->AddClearBuffer(RenderBufferType::Depth);
+	// ensure [waterReflectionCamera] renders before [mainCamera]
+	waterReflectionCamera->SetRendeOrderIndex(0);
+	waterReflectionCamera->SetupOffscreenRenderTarget(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight,false);
+	waterReflectionCamera->ShareSkybox(mainCamera);
+	waterReflectionCamera->SetSkyboxEnabled(true);
+	waterReflectionCamera->SetWidthHeightRatio(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight);
 
-	IntMask cameraMask = waterCamera->GetCullingMask();
+	// prevent [waterReflectionCamera] from rendering the water surface's mesh
+	IntMask cameraMask = waterReflectionCamera->GetCullingMask();
 	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
-	waterCamera->SetCullingMask(cameraMask);
+	waterReflectionCamera->SetCullingMask(cameraMask);
 
-	SceneObjectRef waterCameraObject = objectManager->CreateSceneObject();
-	waterCameraObject->SetCamera(waterCamera);
+	// set up camera that will render water reflection
+	waterSurfaceCamera = objectManager->CreateCamera();
+	waterSurfaceCamera->SetSSAOEnabled(false);
+	// ensure [waterSurfaceCamera] renders after [mainCamera]
+	waterSurfaceCamera->SetRendeOrderIndex(10);
 
+	// restrict [waterSurfaceCamera] to rendering only the water's surface
+	cameraMask = objectManager->GetLayerManager().GetLayerMask(reflectiveLayerIndex);
+	waterSurfaceCamera->SetCullingMask(cameraMask);
+
+	// prevent [main camera] from rendering the water surface's mesh
+	cameraMask = mainCamera->GetCullingMask();
+	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
+	mainCamera->SetCullingMask(cameraMask);
+
+	SceneObjectRef waterReflectionCameraObject = objectManager->CreateSceneObject();
+	waterReflectionCameraObject->SetCamera(waterReflectionCamera);
+	sceneRoot->AddChild(waterReflectionCameraObject);
+	waterReflectionCamera->AddClipPlane(Vector3(0,-1,0), -7);
+
+	SceneObjectRef waterSurfaceCameraObject = objectManager->CreateSceneObject();
+	waterSurfaceCameraObject->SetCamera(waterSurfaceCamera);
+	sceneRoot->AddChild(waterSurfaceCameraObject);
+
+	// create mesh for water's surface
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
+	//StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	//StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
-	Mesh3DRef waterMesh = EngineUtility::CreateRectangularMesh(meshAttributes, 1,1,1,1);
+	Mesh3DRef waterMesh = EngineUtility::CreateRectangularMesh(meshAttributes, 2,2,WMR,WMR, false, false);
 
-	// create material water surface
+	// create material for water surface
 	ShaderSource waterShaderSource;
 	importer.LoadBuiltInShaderSource("waterplanar", waterShaderSource);
 	waterMaterial = objectManager->CreateMaterial("WaterMaterial", waterShaderSource);
-	waterMaterial->SetColor(Color4(1,1,1,1), "WATERCOLOR");
+	waterMaterial->SetColor(Color4(0.45, 0.55, 0.66, 1), "WATERCOLOR");
 	waterMaterial->SetSelfLit(true);
-	waterMaterial->SetTexture(waterCamera->GetRenderTarget()->GetColorTexture(), "REFLECTED_TEXTURE");
-	//waterMaterial->SetTexture(mainCamera->GetSkyboxTexture(), "REFLECTED_TEXTURE");
+	waterMaterial->SetTexture(waterReflectionCamera->GetRenderTarget()->GetColorTexture(), "REFLECTED_TEXTURE");
+	waterMaterial->SetTexture(mainCamera->GetCopyRenderTarget()->GetColorTexture(), "SCREEN_BUFFER_TEXTURE");
+	waterMaterial->SetUniform1f(graphicsAttr.WindowWidth, "SCREEN_WIDTH");
+	waterMaterial->SetUniform1f(graphicsAttr.WindowHeight, "SCREEN_HEIGHT");
 
-	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
-	waterObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(waterMesh);
-	filter->SetCastShadows(false);
-	filter->SetReceiveShadows(false);
+	// create a renderer for the water mesh
 	Mesh3DRendererRef waterMeshRenderer = objectManager->CreateMesh3DRenderer();
 	waterMeshRenderer->AddMaterial(waterMaterial);
-	waterObject->SetMesh3DRenderer(waterMeshRenderer);
+	waterSurfaceSceneObject->SetMesh3DRenderer(waterMeshRenderer);
 
+	// apply rotation of 90 degrees around positive x-axis to water mesh
 	Transform rot90;
 	rot90.Rotate(1,0,0,-90, true);
-
-	for(unsigned int i =0; i < 6;i++)
+	for(unsigned int i =0; i <  waterMesh->GetSubMesh(0)->GetPostions()->GetCount();i++)
 	{
 		Point3 * p = waterMesh->GetSubMesh(0)->GetPostions()->GetPoint(i);
 		rot90.TransformPoint(*p);
+		p->y = 0;
 	}
-	waterMesh->Update();
 
-	waterObject->GetTransform().Scale(18,18,18,false);
-	waterObject->GetTransform().Translate(-6.05,-7,20.6,false);
-	sceneRoot->AddChild(waterObject);
+	// add water mesh to its scene object
+	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	waterSurfaceSceneObject->SetMesh3DFilter(filter);
+	filter->SetMesh3D(waterMesh);
+	filter->SetCastShadows(false);
+	filter->SetReceiveShadows(false);
 
-	waterCameraObject->GetTransform().Translate(-6.0,-12,20.6,false);
-	//waterCameraObject->GetTransform().Rotate(1,0,0,-90,true);
-	sceneRoot->AddChild(waterCameraObject);
-	//waterCameraObject->SetActive(false);
+	// set the size & position of the water's surface
+	waterSurfaceSceneObject->GetTransform().Scale(9.75,1,9.75,false);
+	waterSurfaceSceneObject->GetTransform().Translate(-6.05,-7,20.6,false);
+	sceneRoot->AddChild(waterSurfaceSceneObject);
 
-	waterCamera->AddClipPlane(Vector3(0,-1,0), -7);
+
+	TextureAttributes colorAttributes;
+	colorAttributes.FilterMode = TextureFilter::TriLinear;
+	colorAttributes.MipMapLevel = 8;
+	colorAttributes.WrapMode = TextureWrap::Clamp;
+	colorAttributes.Format = TextureFormat::RGBA32F;
+
+	waterHeights[0] = objectManager->CreateRenderTarget(true,false,false,colorAttributes,WHMR,WHMR);
+	waterHeights[1] = objectManager->CreateRenderTarget(true,false,false,colorAttributes,WHMR,WHMR);
+	waterNormals = objectManager->CreateRenderTarget(true,false,false,colorAttributes,WNMR,WNMR);
+
+	unsigned int mapSize = WHMR * WHMR * 4;
+	float * heightData = new float[mapSize];
+
+	for(unsigned int i = 0; i < mapSize; i += 4)
+	{
+		heightData[i] = 0;
+		heightData[i+1] = 0;
+		heightData[i+2] = 0;
+		heightData[i+3] = 0;
+	}
+
+	mapSize = WNMR * WNMR * 4;
+	float * normalData = new float[mapSize];
+
+	for(unsigned int i = 0; i < mapSize; i += 4)
+	{
+		normalData[i] = 0;
+		normalData[i+1] = 0;
+		normalData[i+2] = 1;
+		normalData[i+3] = 1;
+	}
+
+	graphics->SetTextureData(waterHeights[0]->GetColorTexture(), (BYTE *)heightData);
+	graphics->SetTextureData(waterHeights[1]->GetColorTexture(), (BYTE *)heightData);
+	graphics->SetTextureData(waterNormals->GetColorTexture(), (BYTE *)normalData);
+
+	delete heightData;
+	delete normalData;
+
+	// create material for adding water drops to height maps
+	ShaderSource waterDropShaderSource;
+	importer.LoadBuiltInShaderSource("waterdrop", waterDropShaderSource);
+	waterDropMaterial = objectManager->CreateMaterial("WaterDropMaterial", waterDropShaderSource);
+	waterDropMaterial->SetSelfLit(true);
+	waterDropMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
+
+	// create material for updating height maps
+	ShaderSource waterHeightsShaderSource;
+	importer.LoadBuiltInShaderSource("waterheights", waterHeightsShaderSource);
+	waterHeightsMaterial = objectManager->CreateMaterial("WaterHeightsMaterial", waterHeightsShaderSource);
+	waterHeightsMaterial->SetSelfLit(true);
+	waterHeightsMaterial->SetUniform1f(1.0 / (float)WHMR, "ODWHMR");
+	waterHeightsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
+
+	// create material for updating water normal map
+	ShaderSource waterNormalsShaderSource;
+	importer.LoadBuiltInShaderSource("waternormals", waterNormalsShaderSource);
+	waterNormalsMaterial = objectManager->CreateMaterial("WaterNormalsMaterial", waterNormalsShaderSource);
+	waterNormalsMaterial->SetSelfLit(true);
+	waterNormalsMaterial->SetUniform1f(1.0 / (float)WNMR, "ODWNMR");
+	waterNormalsMaterial->SetUniform1f(2.0 / (float)WNMR * 2.0, "WMSDWNMRM2");
+	waterNormalsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
+
+	waterMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
+	waterMaterial->SetTexture(waterNormals->GetColorTexture(), "WATER_NORMAL_MAP");
+	waterMaterial->SetUniform1f(.2, "REFLECTED_COLOR_FACTOR");
+	waterMaterial->SetUniform1f(.8, "REFRACTED_COLOR_FACTOR");
 }
 
 /*
@@ -484,7 +648,7 @@ void PoolScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	poolLightMeshMaterial->SetColor(poolLightMeshColor, "SELFCOLOR");
 	poolLightMeshMaterial->SetSelfLit(true);
 
-	// create castle right lantern
+	// create pool light
 	SceneObjectRef poolLightObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(poolLightObject);
 	poolLightObject->SetStatic(true);
@@ -492,39 +656,29 @@ void PoolScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	poolLight->SetIntensity(1.8);
 	poolLight->SetRange(25);
 	poolLight->SetColor(poolLightColor);
-	IntMask mergedMask = poolLight->GetCullingMask();
-	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
-	poolLight->SetCullingMask(mergedMask);
 	poolLight->SetShadowsEnabled(true);
 	poolLight->SetType(LightType::Point);
 	poolLightObject->SetLight(poolLight);
 	poolLightObject->GetTransform().Scale(.2,.2,.2, true);
 	poolLightObject->GetTransform().Translate(0, 0, 20, false);
+
+	// set up culling mask for pool light
+	IntMask mergedMask = poolLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
+	poolLight->SetCullingMask(mergedMask);
+
+	// add mesh for pool light to scene
 	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
 	poolLightObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(poolLightMesh);
 	Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(poolLightMeshMaterial);
 	poolLightObject->SetMesh3DRenderer(lanterLightRenderer);
+
 	pointLights.push_back(poolLightObject);
 }
 
 std::vector<SceneObjectRef>& PoolScene::GetPointLights()
 {
 	return pointLights;
-}
-
-void PoolScene::SetMaterialCameraPosition()
-{
-	Point3 origin;
-	mainCamera->GetSceneObject()->GetTransform().TransformPoint(origin);
-	waterMaterial->SetUniform4f(origin.x,origin.y,origin.z,1, "CAMERA_POSITION");
-
-	//Transform viewInverse;
-	//viewInverse.SetTo(mainCamera->GetSceneObject()->GetTransform());
-	//viewInverse.Invert();
-	//Matrix4x4 viMat;
-	//viewInverse.CopyMatrix(viMat);
-	//waterMaterial->SetMatrix4x4(viMat, "VIEW_MATRIX");
-
 }

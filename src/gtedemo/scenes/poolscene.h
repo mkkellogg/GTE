@@ -24,16 +24,44 @@ class PoolScene : public Scene
 	std::vector<SceneObjectRef> pointLights;
 	// global directional light
 	SceneObjectRef directionalLightObject;
-	// water surface object
-	SceneObjectRef waterObject;
-	// camera for rending water
-	CameraRef waterCamera;
-	// material for rendering water
-	MaterialRef waterMaterial;
+	// player object
+	SceneObjectRef playerObject;
+	// position of player in previous frame
+	Point3 lastPlayerPos;
 	// main camera
 	CameraRef mainCamera;
 
-	void SetMaterialCameraPosition();
+	// water surface object
+	SceneObjectRef waterSurfaceSceneObject;
+	// camera for rendering water reflection
+	CameraRef waterReflectionCamera;
+	// camera for rendering water's surface
+	CameraRef waterSurfaceCamera;
+	// material for rendering water
+	MaterialRef waterMaterial;
+	// height maps for water surface
+	RenderTargetRef waterHeights[2];
+	// normal maps for water surface
+	RenderTargetRef waterNormals;
+	// material for rendering the height maps
+	MaterialRef waterHeightsMaterial;
+	// material for rendering the normal map
+	MaterialRef waterNormalsMaterial;
+	// material for adding a new water drop
+	MaterialRef waterDropMaterial;
+
+	// last time drop was added to pool
+	float lastWaterDropTime;
+	// last time water simulation advanced
+	float lastWaterSimAdvanceTime;
+	// current height map index
+	unsigned int currentHeightMapIndex;
+
+	const unsigned int WMR = 128; // water mesh resolution
+	const unsigned int WHMR = 128; // water height map resolution
+	const unsigned int WNMR = 256; // water normal map resolution
+
+	void UpdateCameras();
 
 	public:
 
@@ -49,7 +77,7 @@ class PoolScene : public Scene
 	void SetupTerrain(AssetImporter& importer);
 	void SetupStructures(AssetImporter& importer);
 	void SetupPlants(AssetImporter& importer);
-	void SetupExtra(AssetImporter& importer);
+	void SetupWaterSurface(AssetImporter& importer);
 	void SetupLights(AssetImporter& importer, SceneObjectRef playerObject);
 
 	std::vector<SceneObjectRef>& GetPointLights();
