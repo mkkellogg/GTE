@@ -80,6 +80,10 @@ class SubMesh3D : public EngineObject
 
     // maps vertices to other equal vertices
     std::vector<unsigned int>** vertexCrossMap;
+    // should face-related data be calculated?
+    bool buildFaces;
+    // should normals be calculated?
+    bool calculateNormals;
 
     SubMesh3D();
     SubMesh3D(StandardAttributeSet attributes);
@@ -104,6 +108,10 @@ class SubMesh3D : public EngineObject
     void UpdateTimeStamp();
 
 	public:
+
+    void SetCalculateNormals(bool calculate);
+    void SetBuildFaces(bool build);
+    bool HasFaces() const;
 
     SubMesh3DFaces& GetFaces();
 

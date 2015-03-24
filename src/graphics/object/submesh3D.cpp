@@ -55,6 +55,9 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 
 	vertexCrossMap = NULL;
 
+	buildFaces = true;
+	calculateNormals = true;
+
 	UpdateTimeStamp();
 }
 
@@ -342,6 +345,17 @@ void SubMesh3D::DestroyVertexCrossMap()
 {
 	if(vertexCrossMap != NULL)
 	{
+		std::unordered_map<long, bool> deleted;
+		for(unsigned int i = 0; i < totalVertexCount; i ++)
+		{
+			std::vector<unsigned int>* list =  vertexCrossMap[i];
+			if(list != NULL && !deleted[(long)list])
+			{
+				delete list;
+				deleted[(long)list] = true;
+			}
+		}
+
 		delete vertexCrossMap;
 		vertexCrossMap = NULL;
 	}
@@ -379,6 +393,30 @@ bool SubMesh3D::BuildVertexCrossMap()
 	}
 
 	return true;
+}
+
+/*
+ * Tell this mesh whether or not to calculate its own normals.
+ */
+void SubMesh3D::SetCalculateNormals(bool calculate)
+{
+	calculateNormals = calculate;
+}
+
+/*
+ * Tell this mesh whether or not to build face data.
+ */
+void SubMesh3D::SetBuildFaces(bool build)
+{
+	buildFaces = build;
+}
+
+/*
+ * Does this mesh have face data?
+ */
+bool SubMesh3D::HasFaces() const
+{
+	return buildFaces;
 }
 
 /*
@@ -430,10 +468,13 @@ const Vector3& SubMesh3D::GetSphereOfInfluenceZ() const
  */
 void SubMesh3D::Update()
 {
-	if(!BuildVertexCrossMap())return;
+	if(calculateNormals || buildFaces)
+	{
+		if(!BuildVertexCrossMap())return;
+	}
 	CalcSphereOfInfluence();
-	CalculateNormals(normalsSmoothingThreshold);
-	BuildFaces();
+	if(calculateNormals)CalculateNormals(normalsSmoothingThreshold);
+	if(buildFaces)BuildFaces();
 
 	if(containerMesh != NULL)
 	{
