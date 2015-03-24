@@ -433,7 +433,7 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	lanterLightMeshMaterial->SetColor(lanternLightMeshColor, "SELFCOLOR");
 	lanterLightMeshMaterial->SetSelfLit(true);
 
-	// create castle right lantern
+	// create castle center lantern
 	SceneObjectRef lanternObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(lanternObject);
 	lanternObject->SetStatic(true);
@@ -448,35 +448,11 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	lanternLight->SetType(LightType::Point);
 	lanternObject->SetLight(lanternLight);
 	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(62.2, -5, 0, false);
+	lanternObject->GetTransform().Translate(77.2, -4, -5, false);
 	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);
 	Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
-	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
-	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
-	pointLights.push_back(lanternObject);
-
-	// create castle left lantern
-	lanternObject = objectManager->CreateSceneObject();
-	sceneRoot->AddChild(lanternObject);
-	lanternObject->SetStatic(true);
-	lanternLight = objectManager->CreateLight();
-	lanternLight->SetIntensity(1.8);
-	lanternLight->SetRange(25);
-	lanternLight->SetColor(lanternLightColor);
-	mergedMask = lanternLight->GetCullingMask();
-	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
-	lanternLight->SetCullingMask(mergedMask);
-	lanternLight->SetShadowsEnabled(true);
-	lanternLight->SetType(LightType::Point);
-	lanternObject->SetLight(lanternLight);
-	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(62.4, -5, -8, false);
-	filter = objectManager->CreateMesh3DFilter();
-	lanternObject->SetMesh3DFilter(filter);
-	filter->SetMesh3D(lanternLightMesh);
-	lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
 	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
 	pointLights.push_back(lanternObject);
