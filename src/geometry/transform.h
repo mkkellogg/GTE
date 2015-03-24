@@ -59,8 +59,9 @@ class Transform
     virtual void TransformVector4f(float * vector) const;
 
     static Transform * CreateIdentityTransform();
-    static void BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP);
-    static void BuildProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP);
+    static void BuildOrthographicProjectionMatrix(Matrix4x4& matrix, float top, float bottom, float left, float right, float near, float far);
+    static void BuildPerspectiveProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP);
+    static void BuildPerspectiveProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP);
     static void BuildLookAtMatrix(Matrix4x4& matrix, float posX, float posY, float posZ, float lookAtX, float lookAtY, float lookAtZ);
 };
 

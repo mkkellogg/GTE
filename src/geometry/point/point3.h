@@ -62,18 +62,18 @@ class Point3 : public BaseVector4
     {
     	 int operator()(const Point3& p) const
     	 {
-			 return (int)GTEMath::Round(p.x) + (((int)GTEMath::Round(p.y)) << 1) + (((int)GTEMath::Round(p.z)) << 2);
+			 return (int)p.x + (6 << (int)p.y) + (12 << (int)p.z);
     	 }
 
     	 int operator()(const Point3& p)
 		 {
-    		 return (int)GTEMath::Round(p.x) + (((int)GTEMath::Round(p.y)) << 1) + (((int)GTEMath::Round(p.z)) << 2);
+    		 return (int)p.x + (6 << (int)p.y) + (12 << (int)p.z);
 		 }
     }Point3Hasher;
 
     typedef struct
     {
-      bool operator() (const Point3& a, const Point3& b) const { return a==b; }
+      bool operator() (const Point3& a, const Point3& b) const { return a.x == b.x && a.y == b.y && a.z == b.z; }
     } Point3Eq;
 };
 

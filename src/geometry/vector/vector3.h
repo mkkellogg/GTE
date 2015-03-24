@@ -25,6 +25,7 @@ class Vector3 : public BaseVector4
 	static const Vector3 UnitY;
 	static const Vector3 UnitZ;
 	static const Vector3 Up;
+	static const Vector3 Forward;
 
     float &x;
     float &y;

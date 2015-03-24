@@ -247,15 +247,62 @@ void Transform::Rotate(float x, float y, float z, float a, bool local)
 }
 
 /*
- * Utility function to create a projection matrix. An existing Matrix4x4 object is passed in via [matrix],
+ * Utility function to create an orthographic projection matrix. An existing Matrix4x4 object is passed in via [matrix],
+ * and its data is set to contain the projection matrix.
+ *
+ * [top] 	- 	Distance from the eye of the top clip plane
+ * [bottom] 	-	Distance from the eye of the bottom clip plane
+ * [left]  -  Distance from the eye of the left clip plane
+ * [right]   -   Distance from the eye of the right clip plane
+ * [near]  -   Distance from the eye to the near clip plane
+ * [far]   -   Distance from the eye to the far clip plane
+ */
+void Transform::BuildOrthographicProjectionMatrix(Matrix4x4& matrix, float top, float bottom, float left, float right, float near, float far)
+{
+    matrix.SetIdentity();
+
+    float data[16];
+    memset(data,0,16 * sizeof(float));
+
+    float r_width  = 1.0f / (right - left);
+    float r_height = 1.0f / (top - bottom);
+    float r_depth  = 1.0f / (far - near);
+    float x =  2.0f * (r_width);
+    float y =  2.0f * (r_height);
+    float z = -2.0f * (r_depth);
+    float tx = -(right + left) * r_width;
+    float ty = -(top + bottom) * r_height;
+    float tz = -(far + near) * r_depth;
+    data[0] = x;
+    data[5] = y;
+    data[10] = z;
+    data[12] = tx;
+    data[13] = ty;
+    data[14] = tz;
+    data[15] = 1.0f;
+    data[1] = 0.0f;
+    data[2] = 0.0f;
+    data[3] = 0.0f;
+    data[4] = 0.0f;
+    data[6] = 0.0f;
+    data[7] = 0.0f;
+    data[8] = 0.0f;
+    data[9] = 0.0f;
+    data[11] = 0.0f;
+
+    matrix.SetTo(data);
+}
+
+/*
+ * Utility function to create a perspective projection matrix. An existing Matrix4x4 object is passed in via [matrix],
  * and its data is set to contain the projection matrix.
  *
  * [fov] 	- 	Angle (in degrees) of the field of view.
- * [ratio] 	-	Ration of the viewport's width to height
+ * [ratio] 	-	Ratio of the viewport's width to height
  * [nearP]  -   Distance from the eye to the near clip plane
  * [farP]   -   Distance from the eye to the far clip plane
  */
-void Transform::BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP)
+void Transform::BuildPerspectiveProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP)
 {
 	// convert fov to radians
     float f = 1.0f / tan (fov * Constants::TwoPIOver360 *.5);
@@ -274,7 +321,15 @@ void Transform::BuildProjectionMatrix(Matrix4x4& matrix, float fov, float ratio,
     matrix.SetTo(data);
 }
 
-void Transform::BuildProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP)
+/*
+ * Utility function to create a perspective projection matrix with an infinite far plane.
+ * An existing Matrix4x4 object is passed in via [matrix], and its data is set to contain the projection matrix.
+ *
+ * [fov] 	- 	Angle (in degrees) of the field of view.
+ * [ratio] 	-	Ratio of the viewport's width to height
+ * [nearP]  -   Distance from the eye to the near clip plane
+ */
+void Transform::BuildPerspectiveProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP)
 {
 	// convert fov to radians
     float f = 1.0f / tan (fov * Constants::TwoPIOver360 *.5);
