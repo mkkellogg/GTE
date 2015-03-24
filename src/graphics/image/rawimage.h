@@ -27,14 +27,14 @@ class RawImage
 	unsigned int ImageSizeBytes();
 	void Destroy();
 
+	public:
+
 	RawImage(unsigned int width, unsigned int height);
 	~RawImage();
 
 	bool Init();
 	void SetDataTo(BYTE * data);
 	void SetByte(unsigned int index, BYTE byte);
-
-	public:
 
 	BYTE * GetPixels();
 	unsigned int GetWidth();
