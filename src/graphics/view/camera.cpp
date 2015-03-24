@@ -25,6 +25,9 @@
 
 Camera::Camera()
 {
+	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	const GraphicsAttributes& graphicsAttr = graphics->GetAttributes();
+
 	clearBufferMask = 0;
 
 	skyboxSetup = false;
@@ -36,11 +39,13 @@ Camera::Camera()
 	renderOrderIndex = 0;
 
 	fov = 65;
-	renderTargetwidthHeightRatio = 1;
+	widthHeightRatio = (float)graphicsAttr.WindowWidth / (float)graphicsAttr.WindowHeight;
 
 	clipPlaneCount = 0;
 
 	reverseCulling = false;
+
+	projectionMode = ProjectionMode::Perspective;
 
 	UpdateDisplay();
 }
@@ -205,7 +210,7 @@ void Camera::SetupOffscreenRenderTarget(int width, int height, bool cube)
 	// get reference to the engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
-	if(renderTarget.IsValid())
+	if(renderTarget.IsValid() && renderTarget->GetObjectID() != Engine::Instance()->GetGraphicsEngine()->GetDefaultRenderTarget()->GetObjectID())
 	{
 		objectManager->DestroyRenderTarget(renderTarget);
 	}
@@ -226,23 +231,61 @@ RenderTargetRef Camera::GetRenderTarget()
 	else return renderTarget;
 }
 
+void Camera::SetWidthHeightRatio(float width, float height)
+{
+	this->widthHeightRatio = width/height;
+	UpdateDisplay();
+}
+
+void Camera::SetupCopyRenderTarget()
+{
+	// get reference to the engine's object manager
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+	if(copyTarget.IsValid())
+	{
+		objectManager->DestroyRenderTarget(copyTarget);
+	}
+
+	TextureAttributes colorAttributes;
+	colorAttributes.FilterMode = TextureFilter::Linear;
+	colorAttributes.MipMapLevel = 4;
+	colorAttributes.WrapMode = TextureWrap::Clamp;
+
+	RenderTargetRef renderTarget = GetRenderTarget();
+	copyTarget = objectManager->CreateRenderTarget(true,false,false,colorAttributes,renderTarget->GetWidth(), renderTarget->GetHeight());
+}
+
+RenderTargetRef Camera::GetCopyRenderTarget()
+{
+	return copyTarget;
+}
+
 void Camera::UpdateDisplay()
 {
 	Matrix4x4 proj;
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
 
-	float ratio =1;
-	if(renderTarget.IsValid())
+	float ratio = widthHeightRatio;
+
+	if(projectionMode == ProjectionMode::Perspective)
 	{
-		ratio = renderTargetwidthHeightRatio;
+		Transform::BuildPerspectiveProjectionMatrix(proj, fov, ratio, 5, 200);
 	}
 	else
 	{
-		RenderTargetRef defaultRenderTarget = graphics->GetDefaultRenderTarget();
-		ratio = (float)defaultRenderTarget->GetWidth() / (float)defaultRenderTarget->GetHeight();
+		RenderTargetRef renderTarget = GetRenderTarget();
+		float height = renderTarget->GetHeight();
+		float width =  renderTarget->GetWidth();
+		float halfWidth = width/2.0;
+		float halfHeight = height/2.0;
+		float left = -halfWidth;
+		float right = left + width;
+		float top = halfHeight;
+		float bottom = halfHeight - height;
+		float near = 5;
+		float far = 200;
+		Transform::BuildOrthographicProjectionMatrix(proj,top,bottom,left,right,near,far);
 	}
-
-	Transform::BuildProjectionMatrix(proj, fov, ratio, 5, 200);
 	projection.SetTo(proj);
 }
 
@@ -264,12 +307,6 @@ IntMask Camera::GetCullingMask() const
 void Camera::SetFOV(float fov)
 {
 	this->fov = fov;
-	UpdateDisplay();
-}
-
-void Camera::SetRenderTargetWidthHeightRatio(float width, float height)
-{
-	this->renderTargetwidthHeightRatio = width/height;
 	UpdateDisplay();
 }
 
@@ -321,5 +358,11 @@ void Camera::SetUniformWorldSceneObjectTransform(const Transform& transform)
 const Transform& Camera::GetUniformWorldSceneObjectTransform()
 {
 	return uniformWorldSceneObjectTransform;
+}
+
+void Camera::SetProjectionMode(ProjectionMode mode)
+{
+	projectionMode = mode;
+	UpdateDisplay();
 }
 

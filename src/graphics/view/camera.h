@@ -22,6 +22,12 @@ class ClipPlane
 	float Offset;
 };
 
+enum class ProjectionMode
+{
+	Perspective = 0,
+	Orthographic =1
+};
+
 class Camera : public SceneObjectComponent
 {
 	// Since this ultimately derives from EngineObject, we make this class
@@ -48,18 +54,23 @@ class Camera : public SceneObjectComponent
     bool ssaoEnabled;
 
     unsigned int renderOrderIndex;
+
     RenderTargetRef renderTarget;
+
+    RenderTargetRef copyTarget;
 
     IntMask cullingMask;
 
     float fov;
-    float renderTargetwidthHeightRatio;
+    float widthHeightRatio;
 
     unsigned int clipPlaneCount;
     ClipPlane clipPlanes[Constants::MaxClipPlanes];
 
     Transform uniformWorldSceneObjectTransform;
     bool reverseCulling;
+
+    ProjectionMode projectionMode;
 
     Camera();
     ~Camera();
@@ -94,6 +105,11 @@ class Camera : public SceneObjectComponent
     void SetupOffscreenRenderTarget(int width, int height);
     void SetupOffscreenRenderTarget(int width, int height, bool cube);
     RenderTargetRef GetRenderTarget();
+	void SetWidthHeightRatio(float width, float height);
+
+	void SetupCopyRenderTarget();
+	RenderTargetRef GetCopyRenderTarget();
+
     void UpdateDisplay();
 
     void SetCullingMask(IntMask mask);
@@ -101,7 +117,6 @@ class Camera : public SceneObjectComponent
 	IntMask GetCullingMask() const;
 
 	void SetFOV(float fov);
-	void SetRenderTargetWidthHeightRatio(float width, float height);
 
 	void SetSkyboxTextureTransform(Transform& trans);
 	const Transform& GetSkyboxTransform();
@@ -115,6 +130,8 @@ class Camera : public SceneObjectComponent
 
 	void SetUniformWorldSceneObjectTransform(const Transform& transform);
 	const Transform& GetUniformWorldSceneObjectTransform();
+
+	void SetProjectionMode(ProjectionMode mode);
 };
 
 #endif
