@@ -12,7 +12,7 @@
 #define _GTE_VERTEX_ATTR_BUFFER_GL_H_
 
 #include <GL/glew.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 
 #include "vertexattrbuffer.h"
 

@@ -1,8 +1,6 @@
 #ifndef _GTE_DEBUG_H_
 #define _GTE_DEBUG_H_
 
-#include <GL/glew.h>
-#include <GL/glut.h>
 #include <string>
 
 enum class DebugLevel

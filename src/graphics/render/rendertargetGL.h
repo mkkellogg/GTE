@@ -15,7 +15,7 @@
 class TextureAttributes;
 
 #include <GL/glew.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include "rendertarget.h"
 #include "base/intmask.h"
 

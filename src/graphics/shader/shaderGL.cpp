@@ -5,7 +5,7 @@
 #include <memory.h>
 #include <math.h>
 #include <GL/glew.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
  
 #include "object/enginetypes.h"
 #include "shader.h"

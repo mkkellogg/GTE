@@ -23,7 +23,7 @@
 #define _GTE_SHADER_GL_H_
 
 #include <GL/glew.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 
 //forward declarations
 class ShaderSource;

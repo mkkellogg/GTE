@@ -4,7 +4,7 @@
 #include <memory.h>
 #include <math.h>
 #include <GL/glew.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <string>
  
 #include "engine.h"
@@ -93,11 +93,13 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glutInit(&argc, &argv);
 
 #ifdef __APPLE__
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE | GLUT_3_2_CORE_PROFILE);
     glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
     glutInitContextProfile(GLUT_CORE_PROFILE);
 #else
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
+    //glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
+   // glutInitContextProfile(GLUT_CORE_PROFILE);
 #endif
 
     glutInitWindowSize(this->attributes.WindowWidth, this->attributes.WindowHeight);
