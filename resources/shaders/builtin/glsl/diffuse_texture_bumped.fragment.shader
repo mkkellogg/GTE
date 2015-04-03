@@ -1,10 +1,7 @@
- 
-varying vec2 vUVTexture0;
+#version 130
 
-vec4 outputF;
 uniform sampler2D TEXTURE0;
 uniform sampler2D TEXTURE1;
-
 uniform vec4 LIGHT_POSITION;
 uniform vec4 LIGHT_DIRECTION;
 uniform vec4 LIGHT_COLOR;
@@ -13,10 +10,14 @@ uniform float LIGHT_ATTENUATION;
 uniform int LIGHT_TYPE;
 
 vec4 texColor;
+vec4 outputF;
 
-varying vec3 vNormal;
-varying vec4 vPosition;
-varying vec3 vLightDir;
+in vec2 vUVTexture0;
+in vec3 vNormal;
+in vec4 vPosition;
+in vec3 vLightDir;
+
+out vec4 out_color;
 
 void main()
 {
@@ -45,5 +46,5 @@ void main()
 	}
 	
     outputF = texColor * DiffuseTerm * LIGHT_COLOR;
-    gl_FragColor = outputF;
+    out_color = outputF;
 }

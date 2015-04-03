@@ -75,12 +75,6 @@ bool RenderManager::Init()
 	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);
 	ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.", false);
 
-	// construct SSAO material
-	assetImporter.LoadBuiltInShaderSource("ssao", shaderSource);
-	ssaoMaterial = objectManager->CreateMaterial("SSAO", shaderSource);
-	ssaoMaterial->SetSelfLit(true);
-	ASSERT(ssaoMaterial.IsValid(), "RenderManager::Init -> Unable to create SSAO material.", false);
-
 	// construct SSAO outline material
 	assetImporter.LoadBuiltInShaderSource("ssaooutline", shaderSource);
 	ssaoOutlineMaterial = objectManager->CreateMaterial("SSAOOutline", shaderSource);

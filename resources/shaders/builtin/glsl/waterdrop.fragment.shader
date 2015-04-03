@@ -1,4 +1,4 @@
-#version 120
+#version 130
 
 precision highp float;
 
@@ -6,9 +6,10 @@ uniform sampler2D WATER_HEIGHT_MAP;
 uniform float DROP_RADIUS;
 uniform vec2 DROP_POSITION;
 
-varying vec2 vUVTexture0;
+in vec2 vUVTexture0;
 
-invariant gl_FragColor;
+out vec4 out_color;
+invariant out_color;
 
 void main()
 {
@@ -16,5 +17,5 @@ void main()
 
     float d = distance(vUVTexture0.st, DROP_POSITION);
 
-    gl_FragColor = vec4(vh.r, vh.g - 4.5f * max(DROP_RADIUS - d, 0.0), 0.0, 0.0);
+    out_color = vec4(vh.r, vh.g - 4.5f * max(DROP_RADIUS - d, 0.0), 0.0, 0.0);
 }

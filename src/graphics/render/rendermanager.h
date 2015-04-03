@@ -88,8 +88,6 @@ class RenderManager
 	MaterialRef depthOnlyMaterial;
 	// material for rendering depth values to color buffer
 	MaterialRef depthValueMaterial;
-	// material for rendering SSAO
-	MaterialRef ssaoMaterial;
 	// material for rendering SSAO-style outlines
 	MaterialRef ssaoOutlineMaterial;
 	// for off-screen rendering

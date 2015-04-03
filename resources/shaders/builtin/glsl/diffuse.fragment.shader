@@ -1,7 +1,4 @@
- 
-varying vec4 vColor;
-
-vec4 outputF;
+#version 130
 
 uniform vec4 LIGHT_POSITION;
 uniform vec4 LIGHT_DIRECTION;
@@ -9,8 +6,13 @@ uniform vec4 LIGHT_COLOR;
 uniform float LIGHT_INTENSITY;
 uniform int LIGHT_TYPE;
 
-varying vec3 vNormal;
-varying vec4 vPosition;
+vec4 outputF;
+
+in vec4 vColor;
+in vec3 vNormal;
+in vec4 vPosition;
+
+out vec4 out_color;
 
 void main()
 {	
@@ -35,5 +37,5 @@ void main()
 	}    
 	
     outputF = vColor * DiffuseTerm;
-    gl_FragColor = outputF;
+    out_color = outputF;
 }

@@ -64,6 +64,9 @@ GraphicsGL::GraphicsGL() : Graphics()
 	stencilBufferBits = -1;
 
 	activeClipPlanes = 0;
+
+	openGLMinorVersion = 0;
+	openGLVersion = 0;
 }
 
 /*
@@ -88,10 +91,16 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     // initialize GLUT
     glutInit(&argc, &argv);
+
+#ifdef __APPLE__
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE | GLUT_3_2_CORE_PROFILE);
+#else
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
+#endif
+
     glutInitWindowSize(this->attributes.WindowWidth, this->attributes.WindowHeight);
 
-    ASSERT(glutGet(GLUT_DISPLAY_MODE_POSSIBLE), "GraphicsGL::Init -> Unable to create rendering window of the specified widht and height.", false);
+    ASSERT(glutGet(GLUT_DISPLAY_MODE_POSSIBLE), "GraphicsGL::Init -> Unable to create rendering window of the specified width and height.", false);
 
     (void)glutCreateWindow(this->attributes.WindowTitle.c_str());
 
@@ -100,25 +109,34 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glewInit();
 
     // get OpenGL version
-    if (glewIsSupported("GL_VERSION_3_0"))
+    if (glewIsSupported("GL_VERSION_3_2"))
+    {
+    	Debug::PrintMessage("Using OpenGL 3.2");
+    	openGLVersion =3;
+    	openGLMinorVersion = 2;
+    }
+    else if (glewIsSupported("GL_VERSION_3_0"))
     {
     	Debug::PrintMessage("Using OpenGL 3.0");
-    	openGLVersion =3;
+    	openGLVersion = 3;
+    	openGLMinorVersion = 0;
     }
     else if (glewIsSupported("GL_VERSION_2_0"))
     {
     	Debug::PrintMessage("Using OpenGL 2.0");
     	openGLVersion = 2;
+    	openGLMinorVersion = 0;
     }
     else
     {
     	openGLVersion = 1;
+    	openGLMinorVersion = 0;
     }
 
     // require OpenGL 2.0 or greater
-    if(openGLVersion <= 1)
+    if(!(openGLVersion >= 3 && openGLMinorVersion >= 2))
     {
-    	 Debug::PrintError("Requires OpenGL 2.0 or greater.");
+    	 Debug::PrintError("Requires OpenGL 3.2 or greater.");
     	 return false;
     }
 
@@ -561,6 +579,8 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	TextureGL * texture = new TextureGL(attributes, tex);
+
+	// check allocation of TextureGL object
 	if(texture == NULL)
 	{
 		glDeleteTextures(1, &tex);
@@ -568,6 +588,7 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 		return NULL;
 	}
 
+	// assign a RawImage object to the texture
 	bool rawImageAllocationComplete = false;
 	RawImage  * imageData = new RawImage(width, height);
 	if(imageData != NULL)
@@ -580,6 +601,7 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 		}
 	}
 
+	// check allocation of RawImage object
 	if(!rawImageAllocationComplete)
 	{
 		if(imageData !=  NULL)delete imageData;
@@ -693,6 +715,8 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 	attributes.MipMapLevel = 0;
 
 	TextureGL * texture = new TextureGL(attributes, tex);
+
+	// check allocation of TextureGL object
 	if(texture == NULL)
 	{
 		glDeleteTextures(1, &tex);
@@ -704,6 +728,7 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 	unsigned int widths[] = {fw, backw, tw, botw, lw, rw};
 	unsigned int heights[] = {fh, backh, th, both, lh, rh};
 
+	// allocate RawImage object for each side of cube
 	for(unsigned int i = 0; i < 6; i++)
 	{
 		RawImage  * imageData = new RawImage(widths[i], heights[i]);
@@ -723,12 +748,16 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 		else break;
 	}
 
+	// check allocation of RawImage objects
 	if(imageDatas.size() == 6)
 	{
+		// assign RawImage object for each side of cube
 		for(unsigned int i = 0; i < 6; i++)
 		{
 			texture->AddImageData(imageDatas[i]);
 		}
+
+		return texture;
 	}
 	else
 	{
@@ -738,9 +767,9 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 		}
 		glDeleteTextures(1, &tex);
 		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateCubeTexture -> Unable to allocate RawImage data.");
-	}
 
-	return texture;
+		return NULL;
+	}
 }
 
 /*

@@ -88,6 +88,7 @@ class GraphicsGL : public Graphics
 
     // local version of OpenGL
     unsigned int openGLVersion;
+    unsigned int openGLMinorVersion;
 
     void PreProcessScene();
     bool Start();

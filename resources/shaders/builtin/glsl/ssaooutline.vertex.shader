@@ -3,13 +3,13 @@
 uniform mat4 MODEL_MATRIX;
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
-attribute vec4 POSITION;
-attribute vec4 FACENORMAL;
-attribute vec4 NORMAL;
 uniform int CLIP_PLANE_COUNT;
 uniform vec4 CLIP_PLANE0;
+in vec4 POSITION;
+in vec4 FACENORMAL;
+in vec4 NORMAL;
 
-varying vec3 vNormal;
+out vec3 vNormal;
  
 void main()
 {

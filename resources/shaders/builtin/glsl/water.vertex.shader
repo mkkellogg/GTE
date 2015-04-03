@@ -1,4 +1,4 @@
-#version 150
+#version 120
 
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 uniform mat4 MODEL_MATRIX;

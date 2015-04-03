@@ -1,15 +1,13 @@
-#version 120
+#version 130
 
 uniform sampler2D DEPTH_TEXTURE;
-
 uniform mat4 INV_PROJECTION_MATRIX;
 uniform float DISTANCE_THRESHHOLD;
 uniform vec2 FILTER_RADIUS;
-
 uniform float SCREEN_WIDTH;
 uniform float SCREEN_HEIGHT;
 
-varying vec3 vNormal;
+in vec3 vNormal;
 
 const int sample_count = 16;
 vec2 poisson16[] = vec2[](    // These are the Poisson Disk Samples
@@ -31,6 +29,8 @@ vec2 poisson16[] = vec2[](    // These are the Poisson Disk Samples
                                 vec2(  0.14383161,  -0.14100790 )
                             
                                );
+
+out vec4 out_color;
 
 vec4 calculatePosition(vec3 ndcCoords)
 {
@@ -93,7 +93,7 @@ void main()
     }
 
     float aoValue =  1.0 - (ambientOcclusion / sample_count);
-   gl_FragColor = vec4(0,0,0,aoValue);  
- //   gl_FragColor = vec4(aoValue,aoValue,aoValue,1);  
+    out_color = vec4(0,0,0,aoValue);  
+    // out_color = vec4(aoValue,aoValue,aoValue,1);  
 }
 

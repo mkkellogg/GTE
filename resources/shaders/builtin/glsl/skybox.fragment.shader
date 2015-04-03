@@ -1,7 +1,12 @@
-varying vec4 TexCoord0;
+#version 130
+
 uniform samplerCube SKYBOX_TEXTURE;
+
+in vec4 TexCoord0;
+
+out vec4 out_color;
 
 void main()
 {
-    gl_FragColor = textureCube(SKYBOX_TEXTURE, TexCoord0.xyz);
+    out_color = textureCube(SKYBOX_TEXTURE, TexCoord0.xyz);
 }

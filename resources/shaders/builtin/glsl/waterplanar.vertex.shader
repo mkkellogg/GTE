@@ -1,18 +1,17 @@
-#version 150
+#version 130
 
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 uniform mat4 MODEL_MATRIX;
 uniform mat4 MODELVIEW_MATRIX;
+in vec4 POSITION;
+in vec4 NORMAL;
 
 uniform sampler2D WATER_HEIGHT_MAP;
 
-attribute vec4 POSITION;
-attribute vec4 NORMAL;
-
-varying vec4 position;
-varying vec4 oPos;
-varying vec4 modLocalPos;
-varying vec4 normal;
+out vec4 position;
+out vec4 oPos;
+out vec4 modLocalPos;
+out vec4 normal;
  
 void main()
 {

@@ -1,13 +1,14 @@
-#version 120
+#version 130
 
 precision highp float;
 
 uniform sampler2D WATER_HEIGHT_MAP;
 uniform float ODWNMR, WMSDWNMRM2;
 
-varying vec2 vUVTexture0;
+in vec2 vUVTexture0;
 
-invariant gl_FragColor;
+out vec4 out_color;
+invariant out_color;
 
 void main()
 {
@@ -48,5 +49,5 @@ void main()
 
     vec3 Normal = normalize(vec3(y[2] - y[0], WMSDWNMRM2, y[1] - y[3]));
 
-    gl_FragColor = vec4(Normal, 1.0);
+    out_color = vec4(Normal, 1.0);
 }

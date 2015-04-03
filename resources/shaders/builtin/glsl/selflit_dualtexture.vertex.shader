@@ -2,20 +2,19 @@
 
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 uniform mat4 MODEL_MATRIX;
-attribute vec4 POSITION;
-attribute vec2 UVTEXTURE0;
-attribute vec2 UVTEXTURE1;
 uniform int CLIP_PLANE_COUNT;
 uniform vec4 CLIP_PLANE0;
+in vec4 POSITION;
+in vec2 UVTEXTURE0;
+in vec2 UVTEXTURE1;
 
 uniform vec2 UVTEXTURE0_OFFSET;
 uniform vec2 UVTEXTURE1_OFFSET;
 
-varying vec2 uv0;
-varying vec2 uv0Offset;
-
-varying vec2 uv1;
-varying vec2 uv1Offset;
+out vec2 uv0;
+out vec2 uv0Offset;
+out vec2 uv1;
+out vec2 uv1Offset;
  
 void main()
 {

@@ -1,3 +1,5 @@
+#version 130
+
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 uniform mat4 MODEL_MATRIX;
@@ -14,10 +16,12 @@ uniform float SCREEN_HEIGHT;
 uniform float REFLECTED_COLOR_FACTOR;
 uniform float REFRACTED_COLOR_FACTOR;
 
-varying vec4 position;
-varying vec4 oPos;
-varying vec4 modLocalPos;
-varying vec4 normal;
+in vec4 position;
+in vec4 oPos;
+in vec4 modLocalPos;
+in vec4 normal;
+
+out vec4 out_color;
         
 void main()
 {	
@@ -80,8 +84,8 @@ void main()
     //vec2 texCoords = vec2(oPos.x * 0.5 + 0.5, 0.5 - oPos.z * 0.5);
 vec2 texCoords = vec2(oPos.x * 0.5 + 0.5, 0.5 - oPos.z * 0.5);
 vec3 LocalNormal = normalize(texture2D(WATER_NORMAL_MAP, texCoords.st).rgb);
-vec3 Direction = normalize(position - CAMERA_POSITION);
-vec3 Normal = MODEL_MATRIX * vec4(LocalNormal, 0);
+vec3 Direction = normalize(position.xyz - CAMERA_POSITION.xyz);
+vec3 Normal = vec3(MODEL_MATRIX * vec4(LocalNormal, 0));
 float h = texture2D(WATER_HEIGHT_MAP, texCoords.st).g;
 
  vec4 reflectOffset = vec4(LocalNormal.x, 0 , LocalNormal.z, 0) * .45 * (h / .002);
@@ -116,7 +120,7 @@ vec4 currentColor = texture2D(SCREEN_BUFFER_TEXTURE, vec2(refractedXCoord, refra
 float depthFactor = (1.0 - gl_FragCoord.z);
 reflectedColor = vec4(reflectedColor.rgb,1);
 currentColor = vec4(currentColor.rgb,1);
- gl_FragColor = ((currentColor * REFRACTED_COLOR_FACTOR) + (reflectedColor * REFLECTED_COLOR_FACTOR));
+ out_color = ((currentColor * REFRACTED_COLOR_FACTOR) + (reflectedColor * REFLECTED_COLOR_FACTOR));
   
   
 }

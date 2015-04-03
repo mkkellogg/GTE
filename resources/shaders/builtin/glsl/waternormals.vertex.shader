@@ -1,10 +1,10 @@
-#version 120
+#version 130
 
 precision highp float;
 
-attribute vec4 POSITION;
+in vec4 POSITION;
 
-varying vec2 vUVTexture0;
+out vec2 vUVTexture0;
 
 invariant gl_Position;
 invariant vUVTexture0;

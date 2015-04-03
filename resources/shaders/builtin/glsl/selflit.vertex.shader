@@ -2,9 +2,9 @@
 
 uniform mat4 MODEL_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
-attribute vec4 POSITION;
 uniform int CLIP_PLANE_COUNT;
 uniform vec4 CLIP_PLANE0;
+in vec4 POSITION;
 
 void main()
 {

@@ -1,6 +1,10 @@
+#version 130
+
+out vec4 out_color;
+
 void main()
 {	
-   	gl_FragColor.r = gl_FragCoord.z;
+   	out_color.r = gl_FragCoord.z;
 }
 
 

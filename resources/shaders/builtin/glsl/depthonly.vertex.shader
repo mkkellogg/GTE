@@ -1,8 +1,9 @@
 #version 130
 
+in vec4 POSITION;
+
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 uniform mat4 MODEL_MATRIX;
-attribute vec4 POSITION;
 uniform int CLIP_PLANE_COUNT;
 uniform vec4 CLIP_PLANE0;
  

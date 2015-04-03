@@ -1,4 +1,4 @@
-#version 120
+#version 130
 
 precision highp float;
 
@@ -6,9 +6,10 @@ uniform sampler2D WATER_HEIGHT_MAP;
 uniform float ODWHMR;
 uniform float TIME_FACTOR;
 
-varying vec2 vUVTexture0;
+in vec2 vUVTexture0;
 
-invariant gl_FragColor;
+out vec4 out_color;
+invariant out_color;
 
 float getForce(vec2 coords, vec2 sourceForce)
 {
@@ -44,8 +45,7 @@ void main()
     
     vec4 result = vec4(vh, 0, 0.0);
 
-
-    gl_FragColor = result;
+    out_color = result;
 }
 
 

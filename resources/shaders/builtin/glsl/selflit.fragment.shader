@@ -1,6 +1,10 @@
+#version 130
+
 uniform vec4 SELFCOLOR;
+
+out vec4 out_color;
 
 void main()
 {	
-    gl_FragColor = SELFCOLOR;
+    out_color = SELFCOLOR;
 }

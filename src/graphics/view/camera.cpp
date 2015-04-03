@@ -62,6 +62,7 @@ void Camera::SetupSkybox(TextureRef cubeTexture)
 	if(!skyboxSetup)
 	{
 		skyboxTexture = cubeTexture;
+
 		// instantiate an asset importer to load shaders
 		AssetImporter importer;
 
