@@ -101,6 +101,6 @@ void main()
 	
 	ref = vec3(MODEL_MATRIX * vec4(ref, 0));
 		
-    vec4 reflectedColor = textureCube(REFLECTED_TEXTURE, ref);
+    vec4 reflectedColor = texture(REFLECTED_TEXTURE, ref);
     gl_FragColor = reflectedColor * WATERCOLOR;
 }

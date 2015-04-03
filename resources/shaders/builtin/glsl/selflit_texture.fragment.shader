@@ -11,6 +11,6 @@ out vec4 out_color;
 
 void main()
 {	
-	vec4 textureColor = texture2D(TEXTUREA, uv0.st + uv0Offset); 
+	vec4 textureColor = texture(TEXTUREA, uv0.st + uv0Offset); 
     out_color = textureColor * SELFCOLOR;
 }

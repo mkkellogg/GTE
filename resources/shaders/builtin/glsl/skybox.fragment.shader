@@ -8,5 +8,5 @@ out vec4 out_color;
 
 void main()
 {
-    out_color = textureCube(SKYBOX_TEXTURE, TexCoord0.xyz);
+    out_color = texture(SKYBOX_TEXTURE, TexCoord0.xyz);
 }

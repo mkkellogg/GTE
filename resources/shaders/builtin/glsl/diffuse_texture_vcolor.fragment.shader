@@ -21,7 +21,7 @@ out vec4 out_color;
 
 void main()
 {
-	texColor = texture2D(TEXTURE0, vUVTexture0);
+	texColor = texture(TEXTURE0, vUVTexture0);
 	float DiffuseTerm = 0.0;
 	
 	if(LIGHT_TYPE == 4)

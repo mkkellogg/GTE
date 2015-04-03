@@ -19,7 +19,7 @@ void main()
 	position = MODEL_MATRIX * POSITION ;
 	oPos = POSITION; 
 	modLocalPos = POSITION;
-   // modLocalPos.y += texture2D(WATER_HEIGHT_MAP, texCoords.st).g * 20;
+   // modLocalPos.y += texture(WATER_HEIGHT_MAP, texCoords.st).g * 20;
 	normal = MODEL_MATRIX * NORMAL ;
     gl_Position = MODELVIEWPROJECTION_MATRIX * modLocalPos ;
 }

@@ -13,7 +13,7 @@ invariant out_color;
 
 float getForce(vec2 coords, vec2 sourceForce)
 {
-	float force = texture2D(WATER_HEIGHT_MAP, coords.st).g - sourceForce.g;
+	float force = texture(WATER_HEIGHT_MAP, coords.st).g - sourceForce.g;
 	return force;
 }
 

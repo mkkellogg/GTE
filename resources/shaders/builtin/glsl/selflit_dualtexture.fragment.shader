@@ -13,7 +13,7 @@ out vec4 out_color;
 
 void main()
 {	
-	vec4 textureColorA = texture2D(TEXTUREA, uv0.st + uv0Offset); 
-	vec4 textureColorB = texture2D(TEXTUREB, uv1.st + uv1Offset); 
+	vec4 textureColorA = texture(TEXTUREA, uv0.st + uv0Offset); 
+	vec4 textureColorB = texture(TEXTUREB, uv1.st + uv1Offset); 
     out_color = textureColorA * textureColorA * SELFCOLOR;
 }

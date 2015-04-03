@@ -52,7 +52,7 @@ void main()
 	float yOverScreenHeight = (gl_FragCoord.y) / screenHeight;
 
 	vec2 texCoords = vec2(xOverScreenWidth, yOverScreenHeight);
-	float depth = texture2D(DEPTH_TEXTURE, texCoords).r;
+	float depth = texture(DEPTH_TEXTURE, texCoords).r;
     vec3 ndcCoords = vec3(texCoords.x * 2.0 - 1.0, texCoords.y * 2.0 - 1.0, depth * 2.0 -1.0);
 	
 	vec3 viewPos = calculatePosition(ndcCoords).xyz;
@@ -69,7 +69,7 @@ void main()
     {
         // sample at an offset specified by the current Poisson-Disk sample and scale it by a radius (has to be in Texture-Space)
         vec2 sampleTexCoord = texCoords + (poisson16[i] * (filterRadius));
-        float sampleDepth = texture2D(DEPTH_TEXTURE, sampleTexCoord).r;
+        float sampleDepth = texture(DEPTH_TEXTURE, sampleTexCoord).r;
         vec3  sampleNdcCoords = vec3(sampleTexCoord.x * 2.0 - 1.0, sampleTexCoord.y * 2.0 - 1.0, sampleDepth  * 2.0 -1.0);
        
         vec3 samplePos = calculatePosition(sampleNdcCoords).xyz;

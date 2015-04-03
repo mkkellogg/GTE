@@ -13,7 +13,7 @@ invariant out_color;
 
 void main()
 {
-    vec2 vh = texture2D(WATER_HEIGHT_MAP, vUVTexture0.st).rg;
+    vec2 vh = texture(WATER_HEIGHT_MAP, vUVTexture0.st).rg;
 
     float d = distance(vUVTexture0.st, DROP_POSITION);
 

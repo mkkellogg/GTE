@@ -93,7 +93,9 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     glutInit(&argc, &argv);
 
 #ifdef __APPLE__
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE | GLUT_3_2_CORE_PROFILE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
+    glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
+    glutInitContextProfile(GLUT_CORE_PROFILE);
 #else
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
 #endif
