@@ -10,7 +10,9 @@
 		- Skeletal animation with animation blending and vertex skinning
 		- Dynamic shadows with shadow volumes
 		- Model loading capabilities through the inclusion of the Assimp library
-		- Screen-Space Ambient Occlusion (alpha stage).
+		- Screen-Space Ambient Occlusion (alpha stage)
+		- Multisample Anti-aliasing (MSAA)
+		- Render-to-texture
 	
 	The engine is designed so that it can be extended to work with multiple graphics APIs (OpenGL, DirectX, etc...). Currently only OpenGL is implemented.
 
@@ -20,7 +22,7 @@
 	
 		- Assimp (Asset import library)
 		- DevIL image loading library
-		- GLUT (OpenGL Utility Toolkit)
+		- FreeGLUT (OpenGL Utility Toolkit)
 		- GLEW (OpenGL Extension Wrangler library)
 	
 	Your Assimp installation needs to include the ability to load FBX files in order to run the demo included in the project.
@@ -43,7 +45,7 @@
 	DeVIL, GLUT, and GLEW are available through standard package management channels, although the package names differ from the official names:
 
 	- DevIL: libdevil-dev
-	- GLUT: freeglut3-dev
+	- FreeGLUT: freeglut3-dev
 	- GLEW: libglew-dev
 
 	On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location.
@@ -54,7 +56,7 @@
 	
 	- Assimp: assimp
 	- DevIL: devil
-	- GLUT: freeglut
+	- FreeGLUT: freeglut
 	- GLEW: glew
 	
 	You will also need to make sure to have 'gcc' and 'g++' installed on your machine.
@@ -83,6 +85,12 @@
 	Note: Screen-Space Ambient Occlusion is still in the alpha stage, so it won't look right in some places (such as terrain meshes).
 	
 	Demo Controls:
+	
+	There are three scenes in the demo and they can be accessed via the numeric keys:
+	
+	- Lava scene - '1' Key
+	- Castle Scene - '2' Key
+	- Reflecting pool scene - '3' Key
 	
 	Arrow keys: Move the knight around the environment. Physics are not incorporated into the engine so you will be able to walk through objects and off ledges.
 	
