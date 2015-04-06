@@ -167,21 +167,6 @@ bool RenderTargetGL::Init()
 
 	}
 
-	/*GLuint depthRenderBufferID;
-	glGenRenderbuffers(1, &depthRenderBufferID);
-	if(depthRenderBufferID == 0)
-	{
-		Debug::PrintError("RenderTargetGL::Init -> Unable to create depth render buffer.");
-		Destroy();
-		return false;
-	}
-
-	glBindRenderbufferEXT(GL_RENDERBUFFER, depthRenderBufferID);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-
-	//Attach depth buffer to FBO
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferID);*/
-
 	unsigned int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	ASSERT(status==GL_FRAMEBUFFER_COMPLETE, "RenderTargetGL::Init -> Framebuffer is incomplete!.", false);
 

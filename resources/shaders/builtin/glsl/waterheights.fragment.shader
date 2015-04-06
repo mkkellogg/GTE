@@ -3,7 +3,7 @@
 precision highp float;
 
 uniform sampler2D WATER_HEIGHT_MAP;
-uniform float ODWHMR;
+uniform float PIXEL_DISTANCE;
 uniform float TIME_FACTOR;
 
 in vec2 vUVTexture0;
@@ -24,16 +24,16 @@ void main()
 
     float force = 0.0;
 
-    force += 0.707107 * getForce(vUVTexture0.st - vec2(ODWHMR, ODWHMR), vh);
-    force += getForce(vUVTexture0.st - vec2(0.0, ODWHMR), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(0.0, ODWHMR)).g - vh.g;
-    force += 0.707107 * getForce( vUVTexture0.st + vec2(ODWHMR, -ODWHMR), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(ODWHMR, -ODWHMR)).g - vh.g);
+    force += 0.707107 * getForce(vUVTexture0.st - vec2(PIXEL_DISTANCE, PIXEL_DISTANCE), vh);
+    force += getForce(vUVTexture0.st - vec2(0.0, PIXEL_DISTANCE), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(0.0, PIXEL_DISTANCE)).g - vh.g;
+    force += 0.707107 * getForce( vUVTexture0.st + vec2(PIXEL_DISTANCE, -PIXEL_DISTANCE), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(PIXEL_DISTANCE, -PIXEL_DISTANCE)).g - vh.g);
 
-    force += getForce(vUVTexture0.st - vec2(ODWHMR, 0.0), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(ODWHMR, 0.0)).g - vh.g;
-    force += getForce(vUVTexture0.st + vec2(ODWHMR, 0.0), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(ODWHMR, 0.0)).g - vh.g;
+    force += getForce(vUVTexture0.st - vec2(PIXEL_DISTANCE, 0.0), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(PIXEL_DISTANCE, 0.0)).g - vh.g;
+    force += getForce(vUVTexture0.st + vec2(PIXEL_DISTANCE, 0.0), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(PIXEL_DISTANCE, 0.0)).g - vh.g;
 
-    force += 0.707107 * getForce(vUVTexture0.st + vec2(-ODWHMR, ODWHMR), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(-ODWHMR, ODWHMR)).g - vh.g);
-    force += getForce(vUVTexture0.st + vec2(0.0, ODWHMR), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(0.0, ODWHMR)).g - vh.g;
-    force += 0.707107 * getForce(vUVTexture0.st + vec2(ODWHMR, ODWHMR), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(ODWHMR, ODWHMR)).g - vh.g);
+    force += 0.707107 * getForce(vUVTexture0.st + vec2(-PIXEL_DISTANCE, PIXEL_DISTANCE), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(-PIXEL_DISTANCE, PIXEL_DISTANCE)).g - vh.g);
+    force += getForce(vUVTexture0.st + vec2(0.0, PIXEL_DISTANCE), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(0.0, PIXEL_DISTANCE)).g - vh.g;
+    force += 0.707107 * getForce(vUVTexture0.st + vec2(PIXEL_DISTANCE, PIXEL_DISTANCE), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(PIXEL_DISTANCE, PIXEL_DISTANCE)).g - vh.g);
 
     force *= .065;
 

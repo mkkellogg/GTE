@@ -182,6 +182,8 @@ class RenderManager
     RenderTargetRef PopRenderTarget();
     void ClearRenderTargetStack();
 
+    bool InitFullScreenQuad();
+
     public:
 
 	RenderManager();

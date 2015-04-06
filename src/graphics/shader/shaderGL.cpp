@@ -345,13 +345,9 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 			{
 				case GL_SAMPLER_CUBE:
 					desc->Type = UniformType::SamplerCube;
-					desc->SamplerUnitIndex = samplerUnitIndex;
-					samplerUnitIndex++;
 				break;
 				case GL_SAMPLER_2D:
 					desc->Type = UniformType::Sampler2D;
-					desc->SamplerUnitIndex = samplerUnitIndex;
-					samplerUnitIndex++;
 				break;
 				case GL_FLOAT_MAT4:
 					desc->Type = UniformType::Matrix4x4;
@@ -371,6 +367,12 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 				case GL_INT:
 					desc->Type = UniformType::Int;
 				break;
+			}
+
+			if(desc->Type == UniformType::SamplerCube || desc->Type == UniformType::Sampler2D)
+			{
+				desc->SamplerUnitIndex = samplerUnitIndex;
+				samplerUnitIndex++;
 			}
 
 			strcpy(desc->Name, name);
@@ -497,7 +499,7 @@ void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
 }
 
 /*
- * Set the value for a uniform texture.
+ * Set the value for a sampler uniform.
  *
  * [varID] - shader var ID/location of the uniform for which the value is to be set.
  * [texture] - Holds sampler data to be sent
@@ -511,42 +513,23 @@ void ShaderGL::SendUniformToShader(int varID, unsigned int samplerUnitIndex, con
 
 	ASSERT_RTRN(texGL != NULL, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> texture is not TextureGL !!");
 
-	if(samplerUnitIndex==0)
+	GLenum textureUnit;
+
+	if(samplerUnitIndex==0)textureUnit = GL_TEXTURE0;
+	else if(samplerUnitIndex==1)textureUnit = GL_TEXTURE1;
+	else if(samplerUnitIndex==2)textureUnit = GL_TEXTURE2;
+	else if(samplerUnitIndex==3)textureUnit = GL_TEXTURE3;
+
+	if(samplerUnitIndex >=0 && samplerUnitIndex <=3)
 	{
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(textureUnit);
 		if(texGL->GetAttributes().IsCube)
 			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
 		else
 			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
-		SendUniformToShader(varID, 0);
+		SendUniformToShader(varID, (int)samplerUnitIndex);
 	}
-	else if(samplerUnitIndex==1)
-	{
-		glActiveTexture(GL_TEXTURE1);
-		if(texGL->GetAttributes().IsCube)
-			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
-		else
-			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
-		SendUniformToShader(varID, 1);
-	}
-	else if(samplerUnitIndex==2)
-	{
-		glActiveTexture(GL_TEXTURE2);
-		if(texGL->GetAttributes().IsCube)
-			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
-		else
-			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
-		SendUniformToShader(varID, 2);
-	}
-	else if(samplerUnitIndex==3)
-	{
-		glActiveTexture(GL_TEXTURE3);
-		if(texGL->GetAttributes().IsCube)
-			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
-		else
-			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
-		SendUniformToShader(varID, 3);
-	}
+
 	glActiveTexture(GL_TEXTURE0);
 }
 
@@ -554,63 +537,129 @@ void ShaderGL::SendUniformToShader(int varID, unsigned int samplerUnitIndex, con
  * Set the value for a uniform 4x4 matrix.
  *
  * [varID] - ID/location of the shader uniform for which the value is to be set.
- * [mat] - Holds 4x4 matrix data to be sent
+ * [mat] - Holds 4x4 matrix data to be sent.
  */
 void ShaderGL::SendUniformToShader(int varID, const Matrix4x4 * mat)
 {
 	glUniformMatrix4fv(varID,1, GL_FALSE, mat->GetDataPtr());
 }
 
+/*
+ * Set the value for a position uniform (corresponds 3-component vector).
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [point] - Holds position data to be sent.
+ */
 void ShaderGL::SendUniformToShader(int varID, const Point3 * point)
 {
 	glUniform4f(varID, point->x, point->y, point->z, 1);
 }
 
+/*
+ * Set the value for a vector uniform (corresponds 3-component vector).
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [vector] - Holds vector data to be sent.
+ */
 void ShaderGL::SendUniformToShader(int varID, const Vector3 * vector)
 {
 	glUniform4f(varID, vector->x, vector->y, vector->z, 0);
 }
 
+/*
+ * Set the value for a color uniform (corresponds 4-component vector).
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [color] - Holds color data to be sent.
+ */
 void ShaderGL::SendUniformToShader(int varID, const Color4 * color)
 {
 	glUniform4f(varID, color->r, color->g, color->b, color->a);
 }
 
+/*
+ * Set the value for a 4-component vector uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Holds vector data to be sent.
+ */
 void ShaderGL::SendUniformToShader4v(int varID, const float * data)
 {
 	glUniform4fv(varID, 1, data);
 }
 
+/*
+ * Set the value for a 3-component vector uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Holds vector data to be sent.
+ */
 void ShaderGL::SendUniformToShader3v(int varID, const float * data)
 {
 	glUniform3fv(varID, 1, data);
 }
 
+/*
+ * Set the value for a 2-component vector uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Holds vector data to be sent.
+ */
 void ShaderGL::SendUniformToShader2v(int varID, const float * data)
 {
 	glUniform2fv(varID, 1, data);
 }
 
+/*
+ * Set the value for a 4-component vector uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Holds vector data to be sent.
+ */
 void ShaderGL::SendUniformToShader4(int varID, float x, float y, float z, float w)
 {
 	glUniform4f(varID, x, y, z, w);
 }
 
+/*
+ * Set the value for a 3-component vector uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Holds vector data to be sent.
+ */
 void ShaderGL::SendUniformToShader3(int varID, float x, float y, float z)
 {
 	glUniform3f(varID, x, y, z);
 }
 
+/*
+ * Set the value for a 2-component vector uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Holds vector data to be sent.
+ */
 void ShaderGL::SendUniformToShader2(int varID, float x, float y)
 {
 	glUniform2f(varID, x, y);
 }
 
+/*
+ * Set the value for a single float uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Uniform data to be sent.
+ */
 void ShaderGL::SendUniformToShader(int varID, float  data)
 {
 	glUniform1f(varID,data);
 }
 
+/*
+ * Set the value for a single integer uniform.
+ *
+ * [varID] - ID/location of the shader uniform for which the value is to be set.
+ * [data] - Uniform data to be sent.
+ */
 void ShaderGL::SendUniformToShader(int varID, int  data)
 {
 	glUniform1i(varID, data);

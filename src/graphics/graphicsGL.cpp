@@ -94,12 +94,14 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
 #ifdef __APPLE__
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
-    glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
+   // glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
+    glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
     glutInitContextProfile(GLUT_CORE_PROFILE);
 #else
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
-    //glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
-   // glutInitContextProfile(GLUT_CORE_PROFILE);
+   // glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
+    glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
+    glutInitContextProfile(GLUT_CORE_PROFILE);
 #endif
 
     glutInitWindowSize(this->attributes.WindowWidth, this->attributes.WindowHeight);
@@ -137,7 +139,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     	openGLMinorVersion = 0;
     }
 
-    // require OpenGL 2.0 or greater
+    // require OpenGL 3.2 or greater
     if(!(openGLVersion >= 3 && openGLMinorVersion >= 2))
     {
     	 Debug::PrintError("Requires OpenGL 3.2 or greater.");

@@ -105,7 +105,82 @@ void PoolScene::UpdateCameras()
 
 }
 
-unsigned int dropCount = 0;
+/*
+ * Advance the ripple simulation by one frame (if enough time has elapsed).
+ */
+void PoolScene::UpdateRippleSimulation()
+{
+	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
+
+	// calculate the time difference between ripple simulation frames
+	float frameTime  = 1.0/60.0;
+	float simAdvanceTimeDiff = Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
+
+	// make sure the ripple simulation runs at a max of 60 iterations per second
+	if(simAdvanceTimeDiff > frameTime)
+	{
+		RenderManager * renderManager = Engine::Instance()->GetRenderManager();
+		unsigned int renderHeightMap = 0;
+
+		// add water drop if enough time has passed since the last drop
+		if(Time::GetRealTimeSinceStartup() - lastWaterDropTime > 1)
+		{
+			// calculate drop position and drop size
+			float dropRadius = 4.0f / (float)waterHeightMapResolution * (float)rand() / (float)RAND_MAX;
+			float x = 2.0f * (float)rand() / (float)RAND_MAX - 1.0f;
+			float y = 1.0f - 2.0f * (float)rand() / (float)RAND_MAX;
+
+			// set variable values in [waterDropMaterial]
+			waterDropMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
+			waterDropMaterial->SetUniform1f(dropRadius, "DROP_RADIUS");
+			waterDropMaterial->SetUniform2f(x * 0.5f + 0.5f, 0.5f - y * 0.5f, "DROP_POSITION");
+			renderHeightMap = (currentHeightMapIndex + 1) % 2;
+
+			// render water drop to water height map
+			renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterDropMaterial, false);
+			graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
+
+			++currentHeightMapIndex %= 2;
+			lastWaterDropTime = Time::GetRealTimeSinceStartup();
+		}
+
+		// update water height map
+		waterHeightsMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
+		renderHeightMap = (currentHeightMapIndex + 1) % 2;
+		renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterHeightsMaterial, false);
+		graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
+		++currentHeightMapIndex %= 2;
+
+		// update water normal map
+		waterNormalsMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
+		renderManager->RenderFullScreenQuad(waterNormals, waterNormalsMaterial, false);
+		graphics->RebuildMipMaps(waterNormals->GetColorTexture());
+
+		Transform mainCameraTransform;
+		SceneObjectTransform::GetWorldTransform(mainCameraTransform , mainCamera->GetSceneObject(), true ,false);
+
+		Point3 cameraPos;
+		mainCameraTransform.TransformPoint(cameraPos);
+		waterMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
+		//waterMaterial->SetUniform4f(cameraPos.x, cameraPos.y, cameraPos.z, 1, "CAMERA_POSITION");
+
+		if(pointLights[0]->IsActive())
+		{
+			waterMaterial->SetUniform1f(.3, "REFLECTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.7, "REFRACTED_COLOR_FACTOR");
+		}
+		else
+		{
+			waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
+		}
+
+		while(Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime > frameTime)
+		{
+			lastWaterSimAdvanceTime += frameTime;
+		}
+	}
+}
 /*
  * Update() is called once per frame from the Game() instance.
  */
@@ -113,20 +188,14 @@ void PoolScene::Update()
 {
 	if(waterReflectionCamera.IsValid() && waterReflectionCamera->GetSceneObject().IsValid())
 	{
-		Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
-
 		// we want front faces culled since we will reflecting the scene using a negative scale
 		waterReflectionCamera->SetReverseCulling(true);
 
+		// Update the positions of [waterReflectionCamera] and [waterSurfaceCamera] to match [mainCamera].
 		UpdateCameras();
 
-		Transform mainCameraTrans;
-		SceneObjectTransform::GetWorldTransform(mainCameraTrans , mainCamera->GetSceneObject(), true ,false);
-
-
-		Transform waterSurfaceTransform;
-
 		// get full world-space transformation for water's surface
+		Transform waterSurfaceTransform;
 		SceneObjectTransform::GetWorldTransform(waterSurfaceTransform, waterSurfaceSceneObject, true ,false);
 		Transform waterSurfaceInverseTransform = waterSurfaceTransform;
 		waterSurfaceInverseTransform.Invert();
@@ -146,68 +215,8 @@ void PoolScene::Update()
 		skyboxTrans.Scale(1,-1,1,false);
 		waterReflectionCamera->SetSkyboxTextureTransform(skyboxTrans);
 
-
-
-		float frameTime  = 1.0/60.0;
-		float simAdvanceTimeDiff = Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
-		if(simAdvanceTimeDiff > frameTime)
-		{
-
-		RenderManager * renderManager = Engine::Instance()->GetRenderManager();
-		unsigned int renderHeightMap = 0;
-
-		if(Time::GetRealTimeSinceStartup() - lastWaterDropTime > 1)
-		{
-			float dropRadius = 4.0f / (float)WHMR * (float)rand() / (float)RAND_MAX;
-			float x = 2.0f * (float)rand() / (float)RAND_MAX - 1.0f;
-			float y = 1.0f - 2.0f * (float)rand() / (float)RAND_MAX;
-
-
-			 waterDropMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
-			 waterDropMaterial->SetUniform1f(dropRadius, "DROP_RADIUS");
-			 waterDropMaterial->SetUniform2f(x * 0.5f + 0.5f, 0.5f - y * 0.5f, "DROP_POSITION");
-			 renderHeightMap = (currentHeightMapIndex + 1) % 2;
-			 renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterDropMaterial, false);
-			 graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
-
-			// printf("drops: %d\n", dropCount);
-
-		    ++currentHeightMapIndex %= 2;
-			lastWaterDropTime = Time::GetRealTimeSinceStartup();
-			dropCount++;
-		}
-
-		waterHeightsMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
-		renderHeightMap = (currentHeightMapIndex + 1) % 2;
-		renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterHeightsMaterial, false);
-		graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
-		++currentHeightMapIndex %= 2;
-
-
-		waterNormalsMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
-		renderManager->RenderFullScreenQuad(waterNormals, waterNormalsMaterial, false);
-		graphics->RebuildMipMaps(waterNormals->GetColorTexture());
-
-		Point3 cameraPos;
-		mainCameraTrans.TransformPoint(cameraPos);
-		waterMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
-  	//waterMaterial->SetUniform4f(cameraPos.x, cameraPos.y, cameraPos.z, 1, "CAMERA_POSITION");
-		if(pointLights[0]->IsActive())
-		{
-			waterMaterial->SetUniform1f(.3, "REFLECTED_COLOR_FACTOR");
-			waterMaterial->SetUniform1f(.7, "REFRACTED_COLOR_FACTOR");
-		}
-		else
-		{
-			waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
-			waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
-		}
-
-		while(Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime > frameTime)
-		{
-			lastWaterSimAdvanceTime += frameTime;
-		}
-		}
+		// advance ripples
+		UpdateRippleSimulation();
 	}
 }
 
@@ -448,15 +457,22 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
 	const GraphicsAttributes& graphicsAttr = graphics->GetAttributes();
 
-	// create scene object for the water's surface
-	waterSurfaceSceneObject = objectManager->CreateSceneObject();
-
-	// set the water surface's layer
+	// create layer for water's surface
 	unsigned reflectiveLayerIndex = objectManager->GetLayerManager().AddLayer("Reflective");
 	IntMask reflectiveMask = objectManager->GetLayerManager().GetLayerMask(reflectiveLayerIndex);
-	waterSurfaceSceneObject->SetLayerMask(reflectiveMask);
 
-	// set up camera that will render water reflection
+	// prevent [main camera] from rendering the water surface's mesh
+	IntMask cameraMask = mainCamera->GetCullingMask();
+	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
+	mainCamera->SetCullingMask(cameraMask);
+
+
+	//========================================================
+	//
+	// Set up camera that will render water reflection
+	//
+	//========================================================
+
 	waterReflectionCamera = objectManager->CreateCamera();
 	waterReflectionCamera->SetSSAOEnabled(false);
 	waterReflectionCamera->AddClearBuffer(RenderBufferType::Color);
@@ -469,7 +485,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	waterReflectionCamera->SetWidthHeightRatio(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight);
 
 	// prevent [waterReflectionCamera] from rendering the water surface's mesh
-	IntMask cameraMask = waterReflectionCamera->GetCullingMask();
+	cameraMask = waterReflectionCamera->GetCullingMask();
 	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
 	waterReflectionCamera->SetCullingMask(cameraMask);
 
@@ -483,11 +499,6 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	cameraMask = objectManager->GetLayerManager().GetLayerMask(reflectiveLayerIndex);
 	waterSurfaceCamera->SetCullingMask(cameraMask);
 
-	// prevent [main camera] from rendering the water surface's mesh
-	cameraMask = mainCamera->GetCullingMask();
-	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
-	mainCamera->SetCullingMask(cameraMask);
-
 	SceneObjectRef waterReflectionCameraObject = objectManager->CreateSceneObject();
 	waterReflectionCameraObject->SetCamera(waterReflectionCamera);
 	sceneRoot->AddChild(waterReflectionCameraObject);
@@ -497,14 +508,24 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	waterSurfaceCameraObject->SetCamera(waterSurfaceCamera);
 	sceneRoot->AddChild(waterSurfaceCameraObject);
 
+
+	//========================================================
+	//
+	// Create scene object for the water's surface
+	//
+	//========================================================
+
+	waterSurfaceSceneObject = objectManager->CreateSceneObject();
+
+	// set the water surface's layer
+	waterSurfaceSceneObject->SetLayerMask(reflectiveMask);
+
 	// create mesh for water's surface
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	//StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	//StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
-	Mesh3DRef waterMesh = EngineUtility::CreateRectangularMesh(meshAttributes, 2,2,WMR,WMR, false, false);
+	Mesh3DRef waterMesh = EngineUtility::CreateRectangularMesh(meshAttributes, 2,2,waterMeshResolution,waterMeshResolution, false, false);
 
 	// create material for water surface
 	ShaderSource waterShaderSource;
@@ -542,19 +563,30 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	sceneRoot->AddChild(waterSurfaceSceneObject);
 
 
-	TextureAttributes colorAttributes;
-	colorAttributes.FilterMode = TextureFilter::TriLinear;
-	colorAttributes.MipMapLevel = 8;
-	colorAttributes.WrapMode = TextureWrap::Clamp;
-	colorAttributes.Format = TextureFormat::RGBA32F;
+	//========================================================
+	//
+	// Create materials and render targets for processing ripple effects
+	//
+	//========================================================
 
-	waterHeights[0] = objectManager->CreateRenderTarget(true,false,false,colorAttributes,WHMR,WHMR);
-	waterHeights[1] = objectManager->CreateRenderTarget(true,false,false,colorAttributes,WHMR,WHMR);
-	waterNormals = objectManager->CreateRenderTarget(true,false,false,colorAttributes,WNMR,WNMR);
+	TextureAttributes renderTargetColorAttributes;
+	renderTargetColorAttributes.FilterMode = TextureFilter::TriLinear;
+	renderTargetColorAttributes.MipMapLevel = 8;
+	renderTargetColorAttributes.WrapMode = TextureWrap::Clamp;
+	renderTargetColorAttributes.Format = TextureFormat::RGBA32F;
 
-	unsigned int mapSize = WHMR * WHMR * 4;
+	waterHeights[0] = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterHeightMapResolution,waterHeightMapResolution);
+	waterHeights[1] = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterHeightMapResolution,waterHeightMapResolution);
+	waterNormals = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterNomralMapResolution,waterNomralMapResolution);
+
+	ASSERT_RTRN(waterHeights[0].IsValid() && waterHeights[1].IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water height map.");
+	ASSERT_RTRN(waterNormals.IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water normals map.");
+
+	unsigned int mapSize = waterHeightMapResolution * waterHeightMapResolution * 4;
 	float * heightData = new float[mapSize];
+	ASSERT_RTRN(heightData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water height map.");
 
+	// create water height map initialization data
 	for(unsigned int i = 0; i < mapSize; i += 4)
 	{
 		heightData[i] = 0;
@@ -563,9 +595,11 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 		heightData[i+3] = 0;
 	}
 
-	mapSize = WNMR * WNMR * 4;
+	mapSize = waterNomralMapResolution * waterNomralMapResolution * 4;
 	float * normalData = new float[mapSize];
+	ASSERT_RTRN(normalData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water normal map.");
 
+	// create water normal map initialization data
 	for(unsigned int i = 0; i < mapSize; i += 4)
 	{
 		normalData[i] = 0;
@@ -574,8 +608,11 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 		normalData[i+3] = 1;
 	}
 
+	// initialize water height maps
 	graphics->SetTextureData(waterHeights[0]->GetColorTexture(), (BYTE *)heightData);
 	graphics->SetTextureData(waterHeights[1]->GetColorTexture(), (BYTE *)heightData);
+
+	// initialize water normal maps
 	graphics->SetTextureData(waterNormals->GetColorTexture(), (BYTE *)normalData);
 
 	delete heightData;
@@ -593,7 +630,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	importer.LoadBuiltInShaderSource("waterheights", waterHeightsShaderSource);
 	waterHeightsMaterial = objectManager->CreateMaterial("WaterHeightsMaterial", waterHeightsShaderSource);
 	waterHeightsMaterial->SetSelfLit(true);
-	waterHeightsMaterial->SetUniform1f(1.0 / (float)WHMR, "ODWHMR");
+	waterHeightsMaterial->SetUniform1f(1.0 / (float)waterHeightMapResolution, "PIXEL_DISTANCE");
 	waterHeightsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 	// create material for updating water normal map
@@ -601,8 +638,8 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	importer.LoadBuiltInShaderSource("waternormals", waterNormalsShaderSource);
 	waterNormalsMaterial = objectManager->CreateMaterial("WaterNormalsMaterial", waterNormalsShaderSource);
 	waterNormalsMaterial->SetSelfLit(true);
-	waterNormalsMaterial->SetUniform1f(1.0 / (float)WNMR, "ODWNMR");
-	waterNormalsMaterial->SetUniform1f(2.0 / (float)WNMR * 2.0, "WMSDWNMRM2");
+	waterNormalsMaterial->SetUniform1f(1.0 / (float)waterNomralMapResolution, "PIXEL_DISTANCE");
+	waterNormalsMaterial->SetUniform1f(2.0 / (float)waterNomralMapResolution * 2.0, "PIXEL_DISTANCEX2");
 	waterNormalsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 	waterMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");

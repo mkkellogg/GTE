@@ -109,6 +109,18 @@ bool RenderManager::Init()
 	ASSERT(colorTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen color buffer.", false);
 	ASSERT(depthTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen depth buffer.", false);
 
+	if(!InitFullScreenQuad())return false;
+
+	return true;
+}
+
+/*
+ * Initialize the components needed to render a full screen quad.
+ */
+bool RenderManager::InitFullScreenQuad()
+{
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
 	// create full screen quad mesh
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
@@ -260,6 +272,18 @@ void RenderManager::ClearCaches()
 	DestroyCachedShadowVolumes();
 }
 
+/*
+ * Render a quad-mesh that covers the entire screen and whose normal is orthogonal to the camera's
+ * direction vector. The vertices of the quad will be passed to the shader it the range:
+ *
+ *   X: [0 .. 1] From left to right
+ *   Y: [0 .. 1] From bottom to top
+ *
+ * [renderTarget] - The render target to which the quad should be rendered.
+ * [material] - The material (and shader) to be used for rendering.
+ * [clearBuffers] - Should the buffers belonging to [renderTarget] be cleared before rendering?
+ *
+ */
 void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, bool clearBuffers)
 {
 	Transform model;
@@ -278,9 +302,14 @@ void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialR
 	SendActiveMaterialUniformsToShader();
 
 	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+
+	// save the currently active render target
 	RenderTargetRef currentTarget = graphics->GetCurrrentRenderTarget();
+
+	// set [renderTarget] as the current render target
 	graphics->ActivateRenderTarget(renderTarget);
 
+	// clear buffers (if necessary)
 	if(clearBuffers)
 	{
 		IntMask clearMask = IntMaskUtil::CreateIntMask();
@@ -290,17 +319,20 @@ void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialR
 	}
 
 	fullScreenQuadObject->SetActive(true);
+
+	// set [material] to be the material for the full screen quad mesh
 	Mesh3DRendererRef renderer = fullScreenQuadObject->GetMesh3DRenderer();
 	if(renderer->GetMaterialCount() > 0)renderer->SetMaterial(0, material);
 	else renderer->AddMaterial(material);
 
+	// render the full screen quad mesh
 	for(unsigned int i = 0; i < fullScreenQuad->GetSubMeshCount(); i++)
 	{
 		renderer->GetSubRenderer(i)->Render();
 	}
 	fullScreenQuadObject->SetActive(false);
 
-
+	// activate the old render target
 	graphics->ActivateRenderTarget(currentTarget);
 }
 

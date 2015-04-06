@@ -138,13 +138,16 @@ void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& 
 }
 
 /*
- * Find the face to which vertices at [vaIndex] and [vbIndex] in [positions] both belong, excluding
+ * Find the face to which vertices at [vaIndex] and [vbIndex] in member [positions] both belong, excluding
  * the face specified by [excludeFace].
  */
 int SubMesh3D::FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, unsigned int vbIndex) const
 {
 	std::vector<unsigned int>* indicentVerticesA = vertexCrossMap[vaIndex];
 	std::vector<unsigned int>* indicentVerticesB = vertexCrossMap[vbIndex];
+
+	ASSERT(indicentVerticesA != NULL, "SubMesh3D::FindCommonFace -> indicentVerticesA is NULL.", -1);
+	ASSERT(indicentVerticesB != NULL, "SubMesh3D::FindCommonFace -> indicentVerticesB is NULL.", -1);
 
 	for(unsigned int a =0; a < indicentVerticesA->size(); a++)
 	{
@@ -161,7 +164,8 @@ int SubMesh3D::FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, un
 }
 
 /*
- * Populate the [faces] data structure, and find  the adjacent faces for each face.
+ * Populate the [faces] data structure with each face in this mesh, and find
+ * the adjacent faces for each face.
  */
 void SubMesh3D::BuildFaces()
 {
@@ -362,32 +366,34 @@ void SubMesh3D::DestroyVertexCrossMap()
 }
 
 /*
- * Construct [vertexCrossMap].
+ * Construct [vertexCrossMap]. The vertex cross map is used to group all vertices that are equal.
+ * For a given combination of x,y,z, a corresponding list exists in [vertexCrossMap] with all the indices
+ * of vertices in [positions] which have a matching value for x,y, and z.
  */
 bool SubMesh3D::BuildVertexCrossMap()
 {
+	// destroy existing cross map (if there is one).
 	DestroyVertexCrossMap();
 
-	// This map is used to store normals for all equal vertices. Many triangles in a mesh can potentially have equal
-	// vertices, so this structure is used to store all the normals for those vertices, so they can later
-	// be used to calculate average (smoothed) normals
-	std::unordered_map<Point3, std::vector<unsigned int>*, Point3::Point3Hasher,Point3::Point3Eq> normalGroups;
+	// This map is used to link all equal vertices. Many triangles in a mesh can potentially have equal
+	// vertices, so this structure is used to store indices in [positions] for those vertices.
+	std::unordered_map<Point3, std::vector<unsigned int>*, Point3::Point3Hasher,Point3::Point3Eq> vertexGroups;
 
 	vertexCrossMap = new std::vector<unsigned int>*[totalVertexCount];
 	ASSERT(vertexCrossMap != NULL, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.", false);
 
-	// loop through each vertex in the mesh and store the normal for each in [normalGroups].
-	// the normals for vertices that are equal (even if they are in different triangles) will be in the same list.
+	// loop through each vertex in the mesh and add the index in [position] for that vertex to the
+	// appropriate vertex group.
 	for(unsigned int v = 0; v < totalVertexCount; v++)
 	{
 		Point3 * point = positions.GetPoint(v);
 		Point3 targetPoint = *point;
 
-		std::vector<unsigned int>*& list = normalGroups[targetPoint];
+		std::vector<unsigned int>*& list = vertexGroups[targetPoint];
 
 		if(list == NULL)list = new std::vector<unsigned int>();
 
-		// add the normal at index [v] to the normal group linked to [targetPoint]
+		// add the normal at index [v] to the vertex group linked to [targetPoint]
 		list->push_back(v);
 		vertexCrossMap[v] = list;
 	}
@@ -472,7 +478,9 @@ void SubMesh3D::Update()
 	{
 		if(!BuildVertexCrossMap())return;
 	}
+
 	CalcSphereOfInfluence();
+
 	if(calculateNormals)CalculateNormals(normalsSmoothingThreshold);
 	if(buildFaces)BuildFaces();
 

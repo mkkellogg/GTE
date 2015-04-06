@@ -57,11 +57,15 @@ class PoolScene : public Scene
 	// current height map index
 	unsigned int currentHeightMapIndex;
 
-	const unsigned int WMR = 128; // water mesh resolution
-	const unsigned int WHMR = 128; // water height map resolution
-	const unsigned int WNMR = 256; // water normal map resolution
+	// water mesh resolution
+	const unsigned int waterMeshResolution = 128;
+	// water height map resolution
+	const unsigned int waterHeightMapResolution = 128;
+	// water normal map resolution
+	const unsigned int waterNomralMapResolution = 256;
 
 	void UpdateCameras();
+	void UpdateRippleSimulation();
 
 	public:
 
