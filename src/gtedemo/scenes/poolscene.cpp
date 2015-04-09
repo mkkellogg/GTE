@@ -87,6 +87,7 @@ void PoolScene::OnActivate()
 
 /*
  * Update the positions of [waterReflectionCamera] and [waterSurfaceCamera].
+ * Additionally set reflection parameters for [waterReflectionCamera].
  */
 void PoolScene::UpdateCameras()
 {
@@ -103,6 +104,28 @@ void PoolScene::UpdateCameras()
 	waterSurfaceCamera->GetSceneObject()->GetTransform().SetTo(mainCameraTrans);
 	sceneRoot->AddChild(waterSurfaceCamera->GetSceneObject());
 
+	waterReflectionCamera->SetReverseCulling(true);
+
+	// get full world-space transformation for water's surface
+	Transform waterSurfaceTransform;
+	SceneObjectTransform::GetWorldTransform(waterSurfaceTransform, waterSurfaceSceneObject, true ,false);
+	Transform waterSurfaceInverseTransform = waterSurfaceTransform;
+	waterSurfaceInverseTransform.Invert();
+
+	// build the transform that will reflect the scene about the water's surface,
+	// which is the XZ plane in the object's local space.
+	Transform reflectionTransform;
+	reflectionTransform.PreTransformBy(waterSurfaceInverseTransform);
+	reflectionTransform.Scale(1,-1,1, false);
+	reflectionTransform.PreTransformBy(waterSurfaceTransform);
+
+	// tell [waterReflectionCamera] about the reflection transform
+	waterReflectionCamera->SetUniformWorldSceneObjectTransform(reflectionTransform);
+
+	// need to reflect skybox texture coordinates
+	Transform skyboxTrans;
+	skyboxTrans.Scale(1,-1,1,false);
+	waterReflectionCamera->SetSkyboxTextureTransform(skyboxTrans);
 }
 
 /*
@@ -123,7 +146,7 @@ void PoolScene::UpdateRippleSimulation()
 		unsigned int renderHeightMap = 0;
 
 		// add water drop if enough time has passed since the last drop
-		if(Time::GetRealTimeSinceStartup() - lastWaterDropTime > 1)
+		if(Time::GetRealTimeSinceStartup() - lastWaterDropTime > .6)
 		{
 			// calculate drop position and drop size
 			float dropRadius = 4.0f / (float)waterHeightMapResolution * (float)rand() / (float)RAND_MAX;
@@ -188,38 +211,14 @@ void PoolScene::Update()
 {
 	if(waterReflectionCamera.IsValid() && waterReflectionCamera->GetSceneObject().IsValid())
 	{
-		// we want front faces culled since we will reflecting the scene using a negative scale
-		waterReflectionCamera->SetReverseCulling(true);
-
 		// Update the positions of [waterReflectionCamera] and [waterSurfaceCamera] to match [mainCamera].
+		// Additionally set reflection parameters for [waterReflectionCamera].
 		UpdateCameras();
-
-		// get full world-space transformation for water's surface
-		Transform waterSurfaceTransform;
-		SceneObjectTransform::GetWorldTransform(waterSurfaceTransform, waterSurfaceSceneObject, true ,false);
-		Transform waterSurfaceInverseTransform = waterSurfaceTransform;
-		waterSurfaceInverseTransform.Invert();
-
-		// build the transform that will reflect the scene about the water's surface,
-		// which is the XZ plane in the object's local space.
-		Transform reflectionTransform;
-		reflectionTransform.PreTransformBy(waterSurfaceInverseTransform);
-		reflectionTransform.Scale(1,-1,1, false);
-		reflectionTransform.PreTransformBy(waterSurfaceTransform);
-
-		// tell [waterReflectionCamera] about the reflection transform
-		waterReflectionCamera->SetUniformWorldSceneObjectTransform(reflectionTransform);
-
-		// need to reflect skybox texture coordinates
-		Transform skyboxTrans;
-		skyboxTrans.Scale(1,-1,1,false);
-		waterReflectionCamera->SetSkyboxTextureTransform(skyboxTrans);
 
 		// advance ripples
 		UpdateRippleSimulation();
 	}
 }
-
 
 /*
  * Set up all elements of the scene using [importer] to load any assets from disk.
@@ -364,7 +363,6 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 
 
-
 	// load castle wall model for pool walls
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
 	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
@@ -381,12 +379,6 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 	modelSceneObject->GetTransform().Rotate(1,0,0,-90, true);
 	modelSceneObject->GetTransform().Scale(.15,.025,.175, false);
 	modelSceneObject->GetTransform().Translate(-5.5,-10.5,33,false);
-
-
-
-//	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .15,.22,.025, 1,0,0, -90, -7,-13.5, 20.5, false,true,true);
-//	sceneRoot->AddChild(modelSceneObject);
-
 }
 
 /*
@@ -478,7 +470,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	waterReflectionCamera->AddClearBuffer(RenderBufferType::Color);
 	waterReflectionCamera->AddClearBuffer(RenderBufferType::Depth);
 	// ensure [waterReflectionCamera] renders before [mainCamera]
-	waterReflectionCamera->SetRendeOrderIndex(0);
+	waterReflectionCamera->SetRenderOrderIndex(0);
 	waterReflectionCamera->SetupOffscreenRenderTarget(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight,false);
 	waterReflectionCamera->ShareSkybox(mainCamera);
 	waterReflectionCamera->SetSkyboxEnabled(true);
@@ -493,7 +485,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	waterSurfaceCamera = objectManager->CreateCamera();
 	waterSurfaceCamera->SetSSAOEnabled(false);
 	// ensure [waterSurfaceCamera] renders after [mainCamera]
-	waterSurfaceCamera->SetRendeOrderIndex(10);
+	waterSurfaceCamera->SetRenderOrderIndex(10);
 
 	// restrict [waterSurfaceCamera] to rendering only the water's surface
 	cameraMask = objectManager->GetLayerManager().GetLayerMask(reflectiveLayerIndex);
@@ -642,10 +634,11 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	waterNormalsMaterial->SetUniform1f(2.0 / (float)waterNomralMapResolution * 2.0, "PIXEL_DISTANCEX2");
 	waterNormalsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
+	// set appropriate sampler uniforms for water surface shader
 	waterMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 	waterMaterial->SetTexture(waterNormals->GetColorTexture(), "WATER_NORMAL_MAP");
-	waterMaterial->SetUniform1f(.2, "REFLECTED_COLOR_FACTOR");
-	waterMaterial->SetUniform1f(.8, "REFRACTED_COLOR_FACTOR");
+	waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
+	waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
 }
 
 /*
@@ -712,6 +705,9 @@ void PoolScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	pointLights.push_back(poolLightObject);
 }
 
+/*
+ * Return the point lights used in this scene.
+ */
 std::vector<SceneObjectRef>& PoolScene::GetPointLights()
 {
 	return pointLights;

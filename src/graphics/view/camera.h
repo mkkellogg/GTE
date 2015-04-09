@@ -91,7 +91,7 @@ class Camera : public SceneObjectComponent
     void SetSSAORenderMode(SSAORenderMode mode);
     SSAORenderMode GetSSAORenderMode();
 
-    void SetRendeOrderIndex(unsigned int index);
+    void SetRenderOrderIndex(unsigned int index);
     unsigned int GetRendeOrderIndex();
 
     const Transform& GetProjectionTransform() const ;

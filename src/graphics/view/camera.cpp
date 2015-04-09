@@ -161,7 +161,7 @@ SSAORenderMode Camera::GetSSAORenderMode()
 	return ssaoMode;
 }
 
-void Camera::SetRendeOrderIndex(unsigned int index)
+void Camera::SetRenderOrderIndex(unsigned int index)
 {
 	renderOrderIndex = index;
 }

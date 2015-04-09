@@ -16,9 +16,6 @@
 #include "scenes/poolscene.h"
 #include "asset/assetimporter.h"
 #include "graphics/graphics.h"
-#include "graphics/stdattributes.h"
-#include "graphics/object/submesh3D.h"
-#include "graphics/object/mesh3Dfilter.h"
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationmanager.h"
 #include "graphics/animation/animationinstance.h"
@@ -27,12 +24,8 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/material.h"
-#include "graphics/render/rendermanager.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
-#include "graphics/texture/textureattr.h"
-#include "graphics/texture/texture.h"
-#include "graphics/shader/shadersource.h"
 #include "base/basevector4.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/quaternion.h"
@@ -52,7 +45,6 @@
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
-
 
 const std::string Game::PlayerObjectLayer = "Player";
 
@@ -76,7 +68,6 @@ Game::Game()
 
 	basePlayerForward = Vector3::Forward;
 	basePlayerForward.Invert();
-
 	baseCameraForward = Vector3::Forward;
 
 	// initialize player state
@@ -86,6 +77,7 @@ Game::Game()
 	{
 		stateActivationTime[i] = 0;
 	}
+	playerObjectLayerMask = 0;
 
 	// FPS variables
 	printFPS = false;
@@ -95,8 +87,6 @@ Game::Game()
 	displayInfoChanged = false;
 
 	selectedLighting = SceneLighting::None;
-
-	playerObjectLayerMask = 0;
 
 	currentScene = Scenes::LavaScene;
 
@@ -160,7 +150,6 @@ void Game::SetupScenes(AssetImporter& importer)
 	SetupTransitionForScene(Scenes::LavaScene);
 	SetupTransitionForScene(Scenes::CastleScene);
 	SetupTransitionForScene(Scenes::PoolScene);
-
 }
 
 /*
@@ -259,7 +248,6 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 	modelSceneObject->GetTransform().Scale(.1,.1,.1, false);
 	modelSceneObject->GetTransform().Translate(30,-11.5,35,false);
 	modelSceneObject->GetTransform().Rotate(0,1,0,55,true);
-
 }
 
 /*
@@ -398,7 +386,7 @@ void Game::SetupCamera()
 	// create camera
 	cameraObject = objectManager->CreateSceneObject();
 	CameraRef camera = objectManager->CreateCamera();
-	camera->SetRendeOrderIndex(5);
+	camera->SetRenderOrderIndex(5);
 	camera->SetupCopyRenderTarget();
 	cameraObject->SetCamera(camera);
 
