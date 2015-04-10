@@ -18,6 +18,8 @@
 
 2. Building GTE
 
+	Required OpenGL version: 3.2
+	
 	A number of pre-requisite libraries must be installed prior to building GTE. These libraries are:
 	
 		- Assimp (Asset import library)
