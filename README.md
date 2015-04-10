@@ -22,7 +22,7 @@
 	
 		- Assimp (Asset import library)
 		- DevIL image loading library
-		- FreeGLUT (OpenGL Utility Toolkit)
+		- GLFW 3
 		- GLEW (OpenGL Extension Wrangler library)
 	
 	Your Assimp installation needs to include the ability to load FBX files in order to run the demo included in the project.
@@ -36,16 +36,47 @@
 	- Make sure CMake is installed.
 	- Make sure you have the cmake-gui package installed
 	- Use cmake-gui to configure the CMake build for Assimp
+	- To clone the Git repo, run:
+		
+		git clone https://github.com/assimp/assimp.git
+	
 	- In a terminal window, navigate to the root of your Assimp repo and run:
 	
 		cmake -G "Unix Makefiles"
 	
 	- Now run make, followed by make install
 	
-	DeVIL, GLUT, and GLEW are available through standard package management channels, although the package names differ from the official names:
+	GLFW 3 is not yet (at the time of this writing) available via standard package management channels, so you will have to build it. 
+
+	First install GLFW's dependencies, including OpenGL/Mesa:
+
+		sudo apt-get install cmake xorg-dev libglu1-mesa-dev 
+	
+	You must have sudo privileges. (On Red Hat, you'll need to install cmake28 instead.)
+
+	You should now have:
+	
+		/usr/include/GL /usr/lib/x86_64-linux-gnu/libGL.so 
+	
+	To acquire the source visit:
+	
+		http://www.glfw.org/download.html
+	
+	Unzip the GLFW source archive and change your working directory to the glfw-x.x.x directory. Install GLFW:
+	
+		cd glfw-x.x.x
+		rehash 
+		cmake -G "Unix Makefiles"
+		make
+		sudo make install
+	
+	You should now have:
+	
+		/usr/local/include/GLFW /usr/local/lib/libglfw3.a
+
+	DeVIL and GLEW are available through standard package management channels, although the package names differ from the official names:
 
 	- DevIL: libdevil-dev
-	- FreeGLUT: freeglut3-dev
 	- GLEW: libglew-dev
 
 	On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location.
@@ -56,10 +87,10 @@
 	
 	- Assimp: assimp
 	- DevIL: devil
-	- FreeGLUT: freeglut
+	- GLFW: run 'brew install glfw3' to get the correct full package name
 	- GLEW: glew
 	
-	You will also need to make sure to have 'gcc' and 'g++' installed on your machine.
+	You will also need to make sure to have XCode command line tools installed.
 	
 	2.4 Compiling GTE
 	
