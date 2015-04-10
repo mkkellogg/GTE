@@ -110,8 +110,8 @@ void LavaField::DisplaceField()
 		float percentageY = (float)y / fieldHeight;
 
 		// calculate pixel position in displacement map images
-		unsigned int pixelX = percentageX * diplacementImageDimensionSize;
-		unsigned int pixelY = percentageY * diplacementImageDimensionSize;
+		int pixelX = percentageX * diplacementImageDimensionSize;
+		int pixelY = percentageY * diplacementImageDimensionSize;
 
 		// enforce wrapping if pixel position is outside image boundaries
 		if(pixelX >= diplacementImageDimensionSize)pixelX = pixelX % diplacementImageDimensionSize;

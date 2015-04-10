@@ -520,7 +520,7 @@ void ShaderGL::SendUniformToShader(int varID, unsigned int samplerUnitIndex, con
 	else if(samplerUnitIndex==2)textureUnit = GL_TEXTURE2;
 	else if(samplerUnitIndex==3)textureUnit = GL_TEXTURE3;
 
-	if(samplerUnitIndex >=0 && samplerUnitIndex <=3)
+	if(samplerUnitIndex <=3)
 	{
 		glActiveTexture(textureUnit);
 		if(texGL->GetAttributes().IsCube)

@@ -49,7 +49,7 @@ IntMask LayerManager::GetLayerMask(const std::string& name) const
 IntMask LayerManager::GetLayerMask(unsigned int layerIndex) const
 {
 	IntMask mask = IntMaskUtil::CreateIntMask();
-	if(layerIndex >= 0)
+	if(layerIndex < 31)
 	{
 		IntMaskUtil::SetBit(&mask, layerIndex);
 	}
