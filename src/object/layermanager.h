@@ -4,6 +4,7 @@
 //forward declarations
 class EngineObjectManager;
 
+#include <string>
 #include <map>
 #include "base/intmask.h"
 
