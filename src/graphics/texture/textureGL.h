@@ -14,9 +14,8 @@
 class TextureGL;
 class RawImage;
 
+#include "graphics/gl_include.h"
 #include "texture.h"
-#include <GL/glew.h>
-#include <GL/freeglut.h>
 #include <string>
 
 class TextureGL : public Texture

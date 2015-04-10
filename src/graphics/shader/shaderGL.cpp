@@ -4,9 +4,8 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/freeglut.h>
- 
+
+#include "graphics/gl_include.h"
 #include "object/enginetypes.h"
 #include "shader.h"
 #include "shaderGL.h"
@@ -496,6 +495,7 @@ void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
 	{
 		glVertexAttribPointer(varID, componentCount, GL_FLOAT, GL_FALSE, stride, data);
 	}
+glEnableVertexAttribArray(0);
 }
 
 /*

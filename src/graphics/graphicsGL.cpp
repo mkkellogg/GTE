@@ -3,10 +3,9 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/freeglut.h>
 #include <string>
- 
+
+#include "graphics/gl_include.h"
 #include "engine.h"
 #include "graphicsGL.h"
 #include "graphics/screendesc.h"
@@ -67,6 +66,8 @@ GraphicsGL::GraphicsGL() : Graphics()
 
 	openGLMinorVersion = 0;
 	openGLVersion = 0;
+
+	window = NULL;
 }
 
 /*
@@ -84,31 +85,38 @@ GraphicsGL::~GraphicsGL()
  */
 bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 {
-	this->attributes = attributes;
+    this->attributes = attributes;
 
-    int argc = 0;
-    char * argv = (char*)"";
+    /* Initialize the library */
+    if (!glfwInit())
+    {
+	Debug::PrintError("Unable to initialize GLFW.");
+	return false;
+    } 
 
-    // initialize GLUT
-    glutInit(&argc, &argv);
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-#ifdef __APPLE__
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
-   // glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
-    glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
-    glutInitContextProfile(GLUT_CORE_PROFILE);
-#else
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
-   // glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
-    glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
-    glutInitContextProfile(GLUT_CORE_PROFILE);
-#endif
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(attributes.WindowWidth, attributes.WindowHeight, attributes.WindowTitle.c_str(), NULL, NULL);
 
-    glutInitWindowSize(this->attributes.WindowWidth, this->attributes.WindowHeight);
+    //GLFWvidmode vm;
+    //glfwGetDesktopMode(&amp;vm);
+    //window = glfwOpenWindow(attributes.WindowWidth, attributes.WindowHeight,vm.RedBits, vm.GreenBits, vm.BlueBits, 0, 0, 0, GLFW_WINDOW)
 
-    ASSERT(glutGet(GLUT_DISPLAY_MODE_POSSIBLE), "GraphicsGL::Init -> Unable to create rendering window of the specified width and height.", false);
+    if (window == NULL)
+    {
+	Debug::PrintError("Unable to create GLFW window.");
+        glfwTerminate();
+        return false;
+    }
 
-    (void)glutCreateWindow(this->attributes.WindowTitle.c_str());
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+
 
     // initialize GLEW
     glewExperimental = GL_TRUE; 
@@ -146,15 +154,9 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     	 return false;
     }
 
-	// call base Init() method
-	bool parentInit = Graphics::Init(this->attributes);
-	if(!parentInit)return false;
-
-	//TODO: Right now, GLUT callbacks drive the engine loop. This is not ideal,
-	// so eventually we need to move the loop driver somewhere else
-    glutDisplayFunc(&_glutDisplayFunc);
-    glutIdleFunc(&_glutIdleFunc);
-    glutReshapeFunc(&_glutReshapeFunc);
+    // call base Init() method
+    bool parentInit = Graphics::Init(this->attributes);
+    if(!parentInit)return false;
 
     // TODO: think of a better place for these initial calls
     glClearColor(0,0,0,1);
@@ -196,6 +198,10 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     ActivateRenderTarget(defaultRenderTarget);
 
+    GLuint vertex_array;
+    glGenVertexArrays(1, &vertex_array);
+    glBindVertexArray(vertex_array);
+
     initialized = true;
     return true;
 }
@@ -205,9 +211,26 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
  */
 bool GraphicsGL::Start()
 {
-	Graphics::Start();
-	glutMainLoop();
-	return true;
+    Graphics::Start();
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
+	Engine::Instance()->Update();
+
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return true;
+}
+
+/*
+* Get the GLFWwindow the is used by GLFW.
+*/
+GLFWwindow* GraphicsGL::GetGLFWWindow()
+{
+    return window;
 }
 
 /*
@@ -231,37 +254,12 @@ void GraphicsGL::Update()
  */
 void GraphicsGL::RenderScene()
 {
-	Graphics::RenderScene();
-	glutSwapBuffers();
+    Graphics::RenderScene();
+	
+    /* Swap front and back buffers */
+    glfwSwapBuffers(window);
 }
 
-/*
- * Static GLUT display callback. For now this is what drives the engine loop.
- * This is certainly not ideal and will be modified sometime in the future.
- */
-void GraphicsGL::_glutDisplayFunc()
-{
-	Engine::Instance()->Update();
-}
-
-/*
- * Static GLUT idle callback.
- */
-void GraphicsGL::_glutIdleFunc()
-{
-	 glutPostRedisplay();
-}
-
-/*
- * Static GLUT reshape callback.
- *
- * TODO: This will need to make sure all necessary pieces of the engine
- * get informed about screen size changing.
- */
-void GraphicsGL::_glutReshapeFunc(int w, int h)
-{
-	glutPostRedisplay();
-}
 
 /*
  * Create a new shader from [shaderSource].

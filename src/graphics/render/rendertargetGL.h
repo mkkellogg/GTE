@@ -14,8 +14,7 @@
 // forward declarations
 class TextureAttributes;
 
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+#include "graphics/gl_include.h"
 #include "rendertarget.h"
 #include "base/intmask.h"
 

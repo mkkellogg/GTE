@@ -1,4 +1,4 @@
-#version 130
+#version 150
 
 precision highp float;
 
@@ -9,7 +9,9 @@ uniform vec2 DROP_POSITION;
 in vec2 vUVTexture0;
 
 out vec4 out_color;
+
 invariant out_color;
+invariant vUVTexture0;
 
 void main()
 {

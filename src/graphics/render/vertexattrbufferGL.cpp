@@ -4,9 +4,8 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/freeglut.h>
 
+#include "graphics/gl_include.h"
 #include "vertexattrbufferGL.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
@@ -82,8 +81,9 @@ bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, b
 		if(gpuBufferID > 0)
 		{
 			if(srcData != NULL)SetData(srcData);
+			this->dataOnGPU = true;
 		}
-		else this->dataOnGPU = true;
+		else this->dataOnGPU = false;
 	}
 
 	return true;

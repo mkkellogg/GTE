@@ -22,8 +22,7 @@
 #ifndef _GTE_SHADER_GL_H_
 #define _GTE_SHADER_GL_H_
 
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+#include "graphics/gl_include.h"
 
 //forward declarations
 class ShaderSource;

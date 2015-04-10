@@ -1,4 +1,4 @@
-#version 130
+#version 150
 
 precision highp float;
 
@@ -9,7 +9,9 @@ uniform float PIXEL_DISTANCEX2;
 in vec2 vUVTexture0;
 
 out vec4 out_color;
+
 invariant out_color;
+invariant vUVTexture0;
 
 void main()
 {   

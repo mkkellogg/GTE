@@ -13,12 +13,11 @@ class InputManagerGL : public InputManager
 
 	protected:
 
-	InputManagerGL();
+   InputManagerGL();
     ~InputManagerGL();
-    DigitalInput MapSpecialInputToDigitalInput(int key);
-    int MapSpecialInputToKeyIndex(int key);
-    int MapModifierToKeyIndex(int modifier);
-    void DetectModifiers();
+   DigitalInput MapSpecialInputToDigitalInput(int key);
+   int MapSpecialInputToKeyIndex(int key);
+   int MapModifierToKeyIndex(int modifier);
     unsigned int GetKeyIndexForNonCharacterKey(NonCharacterKey key);
     unsigned int GetKeyIndexFromCharacter(unsigned char key);
 
@@ -26,10 +25,8 @@ class InputManagerGL : public InputManager
 
     bool Init();
     void Update();
-    void KeyboardFunction(unsigned char key, int x, int y);
-    void KeyboardFunctionUp(unsigned char key, int x, int y);
-    void SpecialInputUp(int key, int x, int y);
-    void SpecialInput(int key, int x, int y);
+    void KeyboardFunction(int key, int scanCode, int mods);
+    void KeyboardFunctionUp(int key, int scanCode, int mods);
 };
 
 #endif

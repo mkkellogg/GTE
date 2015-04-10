@@ -1,6 +1,5 @@
 #include <math.h>
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+#include "graphics/gl_include.h"
 #include "rendertargetGL.h"
 #include "object/engineobjectmanager.h"
 #include "base/intmask.h"

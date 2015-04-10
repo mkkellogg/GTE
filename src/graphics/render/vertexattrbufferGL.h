@@ -11,9 +11,7 @@
 #ifndef _GTE_VERTEX_ATTR_BUFFER_GL_H_
 #define _GTE_VERTEX_ATTR_BUFFER_GL_H_
 
-#include <GL/glew.h>
-#include <GL/freeglut.h>
-
+#include "graphics/gl_include.h"
 #include "vertexattrbuffer.h"
 
 class VertexAttrBufferGL : public VertexAttrBuffer

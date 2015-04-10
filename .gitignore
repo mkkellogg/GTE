@@ -6,3 +6,4 @@ ldlibs.sh
 .settings/
 resources/models/
 resources/textures/
+.DS_Store

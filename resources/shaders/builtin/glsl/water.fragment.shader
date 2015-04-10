@@ -1,3 +1,5 @@
+#version 150
+
 uniform vec4 WATERCOLOR;
 uniform samplerCube REFLECTED_TEXTURE;
 uniform vec4 CAMERA_POSITION;

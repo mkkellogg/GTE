@@ -1,4 +1,4 @@
-#version 130
+#version 150
 
 uniform sampler2D TEXTURE0;
 uniform vec4 LIGHT_POSITION;

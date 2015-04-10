@@ -1,4 +1,4 @@
-#version 130
+#version 150
 
 uniform sampler2D DEPTH_TEXTURE;
 uniform mat4 INV_PROJECTION_MATRIX;

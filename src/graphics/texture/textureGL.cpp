@@ -5,12 +5,12 @@
 #include <math.h>
 #include <string>
 
+#include "graphics/gl_include.h"
 #include "textureGL.h"
 #include "textureattr.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+
 
 TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID) : Texture(attributes)
 {

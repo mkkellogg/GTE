@@ -50,7 +50,7 @@ OPENGLOBJ= obj/graphicsGL.o obj/shaderGL.o obj/vertexattrbufferGL.o obj/textureG
 OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEDEMOOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)
 
 all: obj bin gtemain engine graphics animation debug geometry gtemath base global engineobjects asset util image filesystem inputmanager error
-	$(CC) -o bin/gtedemo $(OBJECTFILES) $(LIBS) 
+	$(CC) $(LIBS) $(OBJECTFILES) -o bin/gtedemo  
 	rm -rf bin/resources
 	cp -r resources bin/
 

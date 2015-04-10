@@ -1,4 +1,4 @@
-#version 130
+#version 150
 
 precision highp float;
 
@@ -9,7 +9,9 @@ uniform float TIME_FACTOR;
 in vec2 vUVTexture0;
 
 out vec4 out_color;
+
 invariant out_color;
+invariant vUVTexture0;
 
 float getForce(vec2 coords, vec2 sourceForce)
 {
@@ -19,7 +21,7 @@ float getForce(vec2 coords, vec2 sourceForce)
 
 void main()
 {
-	vec4 full = texture2D(WATER_HEIGHT_MAP, vUVTexture0.st);
+	vec4 full = texture(WATER_HEIGHT_MAP, vUVTexture0.st);
     vec2 vh = full.rg;
 
     float force = 0.0;

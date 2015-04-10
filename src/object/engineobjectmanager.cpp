@@ -292,7 +292,10 @@ SubMesh3DRendererRef  EngineObjectManager::CreateSubMesh3DRenderer()
 
 SubMesh3DRendererRef EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
 {
-	SubMesh3DRenderer * renderer = new SubMesh3DRenderer(attrTransformer);
+	// TODO: for now we force vertex attribute buffers to be on GPU
+        // in the constructor for SubMesh3DRenderer, need to think
+	// of a better way to do this.
+	SubMesh3DRenderer * renderer = new SubMesh3DRenderer(true, attrTransformer);
 
 	ASSERT(renderer != NULL,"EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not create new SubMesh3DRenderer object.", SubMesh3DRendererRef::Null());
 	renderer->SetObjectID(GetNextObjectID());

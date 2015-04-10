@@ -31,8 +31,7 @@ class AttributeTransformer;
 class RenderTarget;
 class RawImage;
 
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+#include "graphics/gl_include.h"
 #include "graphics.h"
 #include "base/intmask.h"
 #include <string>
@@ -42,10 +41,7 @@ class GraphicsGL : public Graphics
     friend class Graphics;
     friend class Engine;
 
-    // static GLUT callbacks
-    static void _glutDisplayFunc();
-    static void _glutIdleFunc();
-    static void _glutReshapeFunc(int w, int h);
+    GLFWwindow* window;
 
     protected:
 
@@ -103,6 +99,8 @@ class GraphicsGL : public Graphics
     GLenum GetGLPixelType(TextureFormat format);
 
     public :
+
+    GLFWwindow* GetGLFWWindow();
 
     Shader * CreateShader(const ShaderSource& shaderSource);
    void DestroyShader(Shader * shader);
