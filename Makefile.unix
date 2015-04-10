@@ -7,7 +7,7 @@
 # 		version of the library that has this ability and the corresponding include files. 
 #
 # - DevIL image loading library
-# - GLUT (OpenGL Utility Toolkit)
+# - GLFW 3.0
 # - GLEW (OpenGL Extension Wrangler library)
 
 #ASSIMP_LIB=~/assimp/lib
@@ -15,7 +15,7 @@
 #this needs to be changed to your own OpenGL lib path (or removed)
 OPENGL_LIB=/usr/lib/nvidia-331-updates/
 
-LIBS= -L$(OPENGL_LIB) -lassimp -lm -lGL -lglut -lGLU -lGLEW -lassimp -lIL 
+LIBS= -L$(OPENGL_LIB) -lassimp -lm -lGL -lglfw3 -lGLU -lGLEW -lassimp -lIL -lXrandr -lXi -lX11 -lXxf86vm -lpthread  -lXcursor -lXinerama
 CFLAGS=-Isrc -std=c++11 -Wall
 CC=g++
 
