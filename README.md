@@ -16,10 +16,12 @@
 	
 	The engine is designed so that it can be extended to work with multiple graphics APIs (OpenGL, DirectX, etc...). Currently only OpenGL is implemented.
 
+	Minimum OpenGL version: 3.2
+	
+	Supported operating systems: Apple OS X, Linux, Unix
+
 2. Building GTE
 
-	Required OpenGL version: 3.2
-	
 	A number of pre-requisite libraries must be installed prior to building GTE. These libraries are:
 	
 		- Assimp (Asset import library)
@@ -56,10 +58,6 @@
 	
 	You must have sudo privileges. (On Red Hat, you'll need to install cmake28 instead.)
 
-	You should now have:
-	
-		/usr/include/GL /usr/lib/x86_64-linux-gnu/libGL.so 
-	
 	To acquire the source visit:
 	
 		http://www.glfw.org/download.html
@@ -85,7 +83,7 @@
 
 	2.3 OSX Notes
 	
-	On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Brew package management utility, and the version of Assimp available through Brew seems to support FBX models. The one caveat is that Brew package names vary slightly from the official names mentioned above. The actual names of the packages you need to install are as follows:
+	On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Homebrew package management utility, and the version of Assimp available through Homebrew seems to support FBX models. The actual names of the Homebrew packages you need to install are as follows:
 	
 	- Assimp: assimp
 	- DevIL: devil
