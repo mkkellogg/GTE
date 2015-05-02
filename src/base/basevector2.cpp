@@ -14,7 +14,7 @@ void BaseVector2::Init(float *target, bool permAttach)
 
 	if(target == NULL && permAttach == true)
 	{
-		Debug::PrintWarning("BaseVector4::Init -> permAttach is true, but target is NULL!");
+		Debug::PrintWarning("BaseVector4::Init -> 'permAttach' is true, but 'target' is null!");
 		permAttach = false;
 	}
 

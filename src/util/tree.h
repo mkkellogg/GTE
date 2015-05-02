@@ -48,7 +48,7 @@ template <class T> class Tree
 		TreeNode* AddChild(T data)
 		{
 			TreeNode * newNode = new TreeNode(data);
-			ASSERT(newNode != NULL,"Tree::AddChild -> Could not allocate new node", NULL);
+			ASSERT(newNode != NULL,"Tree::AddChild -> Could not allocate new node");
 			newNode->parent = this;
 			children.push_back(newNode);
 			return newNode;
@@ -99,7 +99,7 @@ template <class T> class Tree
     	if(!root)
     	{
 			TreeNode * newNode = new TreeNode(data);
-			ASSERT(newNode != NULL,"Tree::AddChild -> Could not allocate new node", NULL);
+			ASSERT(newNode != NULL,"Tree::AddChild -> Could not allocate new node");
 
 			root = newNode;
     	}

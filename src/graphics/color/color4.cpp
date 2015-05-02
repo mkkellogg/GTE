@@ -60,30 +60,10 @@ void Color4::Set(float r, float g, float b, float a)
 void Color4::AttachTo(float * data)
 {
 	BaseVector4::AttachTo(data);
-	UpdateComponentPointers();
 }
 
 
 void Color4::Detach()
 {
 	BaseVector4::Detach();
-	UpdateComponentPointers();
 }
-
-/*
- * TODO: This does NOT currently work...fix!
- */
-void Color4::UpdateComponentPointers()
-{
-    float ** rPtr;
-    rPtr = (float **)&r;
-    *rPtr = data;
-    rPtr = (float **)&g;
-    *rPtr = data+1;
-    rPtr = (float **)&b;
-    *rPtr = data+2;
-    rPtr = (float **)&a;
-    *rPtr = data+2;
-}
-
-

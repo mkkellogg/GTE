@@ -34,14 +34,14 @@ unsigned int RawImage::ImageSizeBytes()
 bool RawImage::Init()
 {
 	imageBytes = new BYTE[ImageSizeBytes()];
-	ASSERT(imageBytes != NULL, "RawImage::Init -> Unable to allocate image bytes.", false);
+	ASSERT(imageBytes != NULL, "RawImage::Init -> Unable to allocate image bytes.");
 
 	return true;
 }
 
 void RawImage::SetDataTo(BYTE * data)
 {
-	ASSERT_RTRN(data != NULL, "RawImage::SetDataTo -> data is NULL");
+	NONFATAL_ASSERT(data != NULL, "RawImage::SetDataTo -> 'data' is null.", true);
 
 	if(imageBytes != NULL)
 	{

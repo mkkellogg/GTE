@@ -46,8 +46,8 @@ AnimationManager::~AnimationManager()
  */
 bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation) const
 {
-	ASSERT(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false);
-	ASSERT(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false);
+	NONFATAL_ASSERT_RTRN(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false, true);
+	NONFATAL_ASSERT_RTRN(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false, true);
 
 	unsigned int skeletonNodeCount = skeleton->GetNodeCount();
 	unsigned int channelCount = animation->GetChannelCount();
@@ -95,8 +95,8 @@ bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation
  */
 bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const
 {
-	ASSERT(meshRenderer.IsValid(), "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false);
-	ASSERT(meshRenderer->GetSkeleton().IsValid(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false);
+	NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false, true);
+	NONFATAL_ASSERT_RTRN(meshRenderer->GetSkeleton().IsValid(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false, true);
 
 	return IsCompatible(meshRenderer->GetSkeleton(), animation);
 }
@@ -123,15 +123,15 @@ void AnimationManager::Update()
  */
 AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkeletonRef target)
 {
-	ASSERT(target.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerRef::Null());
+	NONFATAL_ASSERT_RTRN(target.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerRef::Null(), true);
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	ASSERT(objectManager != NULL, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is NULL.", AnimationPlayerRef::Null());
+	ASSERT(objectManager != NULL, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is NULL.");
 
 	if(activePlayers.find(target->GetObjectID()) == activePlayers.end())
 	{
 		AnimationPlayerRef player = objectManager->CreateAnimationPlayer(target);
-		ASSERT(player.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Unable to create player.", AnimationPlayerRef::Null());
+		NONFATAL_ASSERT_RTRN(player.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Unable to create player.", AnimationPlayerRef::Null(), false);
 
 		// put the newly created AnimationPlayer in the list of active players.s
 		activePlayers[target->GetObjectID()] = player;
@@ -147,7 +147,7 @@ AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkeletonRef
  */
 AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRef renderer)
 {
-	ASSERT(renderer.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Mesh renderer is not valid.", AnimationPlayerRef::Null());
+	NONFATAL_ASSERT_RTRN(renderer.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Mesh renderer is not valid.", AnimationPlayerRef::Null(), true);
 	return RetrieveOrCreateAnimationPlayer(renderer->GetSkeleton());
 }
 

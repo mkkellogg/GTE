@@ -7,8 +7,6 @@ class Color4 : public BaseVector4
 {
 	protected:
 
-	void UpdateComponentPointers();
-
     public:
 
     float &r;

@@ -83,7 +83,7 @@ bool RenderTargetGL::Init()
 	// generate an OpenGL FBO.
 	glGenFramebuffers(1, &fboID);
 	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
-	ASSERT(fboID != 0, "RenderTargetGL::Init -> Unable to create frame buffer object.", false);
+	ASSERT(fboID != 0, "RenderTargetGL::Init -> Unable to create frame buffer object.");
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
@@ -107,10 +107,10 @@ bool RenderTargetGL::Init()
 			// create a 2D texture for this render target
 			colorTexture =  objectManager->CreateTexture(width, height, NULL, attributes);
 		}
-		ASSERT(colorTexture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false);
+		NONFATAL_ASSERT_RTRN(colorTexture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false, true);
 
 		TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
-		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast color texture to TextureGL.", false);
+		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast color texture to TextureGL.");
 
 		if(attributes.IsCube)
 		{
@@ -135,10 +135,10 @@ bool RenderTargetGL::Init()
 		attributes.IsDepthTexture = true;
 
 		depthTexture =  objectManager->CreateTexture(width, height, NULL, attributes);
-		ASSERT(depthTexture.IsValid(), "RenderTargetGL::Init -> Unable to create depth texture.", false);
+		NONFATAL_ASSERT_RTRN(depthTexture.IsValid(), "RenderTargetGL::Init -> Unable to create depth texture.", false, true);
 
 		TextureGL * texGL = dynamic_cast<TextureGL*>(depthTexture.GetPtr());
-		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.", false);
+		ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.");
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
 	}
@@ -167,7 +167,7 @@ bool RenderTargetGL::Init()
 	}
 
 	unsigned int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	ASSERT(status==GL_FRAMEBUFFER_COMPLETE, "RenderTargetGL::Init -> Framebuffer is incomplete!.", false);
+	NONFATAL_ASSERT_RTRN(status==GL_FRAMEBUFFER_COMPLETE, "RenderTargetGL::Init -> Framebuffer is incomplete!.", false, true);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

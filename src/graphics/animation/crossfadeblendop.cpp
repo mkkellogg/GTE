@@ -33,7 +33,7 @@ CrossFadeBlendOp::~CrossFadeBlendOp()
 void CrossFadeBlendOp::Update(std::vector<float>& weights)
 {
 	if(complete)return;
-	ASSERT_RTRN(weights.size() >= initialWeights.size(), "CrossFadeBlendOp::Update -> Weight count is less than initial weight count.");
+	NONFATAL_ASSERT(weights.size() >= initialWeights.size(), "CrossFadeBlendOp::Update -> Weight count is less than initial weight count.", true);
 
 	BlendOp::Update(weights);
 	float normalizedProgress = progress / duration;

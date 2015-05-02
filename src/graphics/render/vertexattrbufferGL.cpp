@@ -65,7 +65,7 @@ bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, b
 	int fullDataSize =  CalcFullSize();
 
 	data = new float[CalcFloatCount()];
-	ASSERT(data != NULL, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.", false);
+	ASSERT(data != NULL, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.");
 
 	// zero out the buffer
 	if(srcData == NULL)

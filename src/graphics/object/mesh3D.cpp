@@ -168,7 +168,7 @@ void Mesh3D::Update()
  */
 void Mesh3D::SetSubMesh(SubMesh3DRef mesh, unsigned int index)
 {
-	ASSERT_RTRN(mesh.IsValid(),"Mesh3D::SetSubMesh -> mesh is NULL.");
+	NONFATAL_ASSERT(mesh.IsValid(),"Mesh3D::SetSubMesh -> 'mesh' is null.", true);
 
 	if(index < subMeshCount)
 	{

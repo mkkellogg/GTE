@@ -35,10 +35,10 @@ InputManagerGL::~InputManagerGL()
 
 bool InputManagerGL::Init()
 {
-    Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+    Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
     GraphicsGL * graphicsGL = dynamic_cast<GraphicsGL*>(graphics);
 
-    ASSERT(graphicsGL != NULL, "InputManagerGL::Init -> Unable to cast to GraphicsGL.", false);
+    ASSERT(graphicsGL != NULL, "InputManagerGL::Init -> Unable to cast to GraphicsGL.");
 	
     GLFWwindow* window = graphicsGL->GetGLFWWindow();
     glfwSetKeyCallback(window, _keyboardFunc);

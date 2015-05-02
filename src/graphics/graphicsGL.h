@@ -3,7 +3,7 @@
  *
  * Author: Mark Kellogg
  *
- * This is the OpenGL implementation of the Graphics class.
+ * This is the OpenGL graphics system, it is an implementation of the Graphics class.
  *
  * Most of the OpenGL-related functionality in the engine is
  * contained within this class. Through its interface which is not OpenGL
@@ -11,7 +11,7 @@
  * objects such as shaders, textures, and framebuffers can be created, activated,
  * or destroyed.
 
- * Additionally all of the GLUT, GLEW, and OpenGL initialization code is in
+ * Additionally all of the GLFW, GLEW, and OpenGL initialization code is in
  * this class, in the Init() method.
  */
 
@@ -35,6 +35,8 @@ class RawImage;
 #include "graphics.h"
 #include "base/intmask.h"
 #include <string>
+
+#define GL_GLEXT_PROTOTYPES
 
 class GraphicsGL : public Graphics
 {
@@ -71,7 +73,7 @@ class GraphicsGL : public Graphics
     // number of currently active clip planes
     unsigned int activeClipPlanes;
 
-    // is the graphics engine initialized?
+    // is the graphics system initialized?
     bool initialized;
 
     // RenderTarget objects that encapsulates the OpenGL default framebuffer
@@ -88,6 +90,7 @@ class GraphicsGL : public Graphics
 
     void PreProcessScene();
     bool Start();
+    void End();
     void Update();
     void RenderScene();
 

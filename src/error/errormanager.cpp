@@ -24,6 +24,17 @@ void ErrorManager::SetError(int code, const char * message)
 	SetError(code, std::string(message));
 }
 
+void ErrorManager::AddError(int code, const std::string& message)
+{
+	errorCode = code;
+	errorMessage = message;
+}
+
+void ErrorManager::AddError(int code, const char * message)
+{
+	AddError(code, std::string(message));
+}
+
 void ErrorManager::SetAndReportError(int code, const std::string& message)
 {
 	SetError(code, message);
@@ -35,15 +46,15 @@ void ErrorManager::SetAndReportError(int code, const char * message)
 	SetAndReportError(code, std::string(message));
 }
 
-void ErrorManager::SetAndReportWarning(int code, const std::string& message)
+void ErrorManager::AddAndReportError(int code, const std::string& message)
 {
-	SetError(code, message);
-	Debug::PrintAtLevel(message, DebugLevel::Warning);
+	AddError(code, message);
+	Debug::PrintAtLevel(message, DebugLevel::Error);
 }
 
-void ErrorManager::SetAndReportWarning(int code, const char * message)
+void ErrorManager::AddAndReportError(int code, const char * message)
 {
-	SetAndReportWarning(code, std::string(message));
+	AddAndReportError(code, std::string(message));
 }
 
 void ErrorManager::Reset()

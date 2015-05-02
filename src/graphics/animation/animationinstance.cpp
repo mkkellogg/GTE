@@ -80,8 +80,8 @@ bool AnimationInstance::Init()
 {
 	Destroy();
 
-	ASSERT(Target.IsValid(), "AnimationInstance::Init -> Animation target is invalid.", false);
-	ASSERT(SourceAnimation.IsValid(), "AnimationInstance::Init -> Animation is invalid.", false);
+	NONFATAL_ASSERT_RTRN(Target.IsValid(), "AnimationInstance::Init -> Animation target is invalid.", false, true);
+	NONFATAL_ASSERT_RTRN(SourceAnimation.IsValid(), "AnimationInstance::Init -> Animation is invalid.", false, true);
 
 	unsigned int nodeCount = Target->GetNodeCount();
 	unsigned int channelCount = SourceAnimation->GetChannelCount();
@@ -89,7 +89,7 @@ bool AnimationInstance::Init()
 	if(nodeCount <= 0)return true;
 
 	FrameStates = new FrameState[nodeCount];
-	ASSERT(FrameStates != NULL, "AnimationInstance::Init -> Unable to allocate FrameState array.", false);
+	ASSERT(FrameStates != NULL, "AnimationInstance::Init -> Unable to allocate FrameState array.");
 
 	NodeToChannelMap = new int[nodeCount];
 	if(NodeToChannelMap == NULL)
@@ -169,8 +169,8 @@ AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int st
 
 int AnimationInstance::GetChannelMappingForTargetNode(unsigned int nodeIndex)
 {
-	ASSERT(Target.IsValid(), "AnimationInstance::GetChannelMappingForTargetNode -> target skeleton is not valid.", -1);
-	ASSERT(nodeIndex < Target->GetNodeCount(), "AnimationInstance::GetChannelMappingForTargetNode -> nodeIndex is out of range.", -1);
+	NONFATAL_ASSERT_RTRN(Target.IsValid(), "AnimationInstance::GetChannelMappingForTargetNode -> target skeleton is not valid.", -1, true);
+	NONFATAL_ASSERT_RTRN(nodeIndex < Target->GetNodeCount(), "AnimationInstance::GetChannelMappingForTargetNode -> nodeIndex is out of range.", -1, true);
 
 	return NodeToChannelMap[nodeIndex];
 }

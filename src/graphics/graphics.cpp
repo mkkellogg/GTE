@@ -47,7 +47,7 @@ RenderTargetRef Graphics::SetupDefaultRenderTarget()
     EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
     RenderTarget * defaultTarget = CreateDefaultRenderTarget();
-    ASSERT(defaultTarget != NULL, "GraphicsGL::SetupDefaultRenderTarget -> default target is NULL", RenderTargetRef::Null());
+    ASSERT(defaultTarget != NULL, "GraphicsGL::SetupDefaultRenderTarget -> Default target is null.");
 
     RenderTargetRef defaultRenderTarget = objectManager->WrapRenderTarget(defaultTarget);
     return defaultRenderTarget;
@@ -98,12 +98,21 @@ void Graphics::UpdateFPS()
 }
 
 /*
- * Called when the graphics engine starts up. Convenience method for
+ * Called when the graphics interface starts up. Convenience method for
  * deriving classes to receive a signal when the engine starts.
  */
 bool Graphics::Start()
 {
 	return true;
+}
+
+/*
+ * Called when the graphics interface shuts down. Convenience method for
+ * deriving classes to receive a signal when the engine shuts down.
+ */
+void Graphics::End()
+{
+
 }
 
 /*

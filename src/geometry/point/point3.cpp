@@ -94,7 +94,7 @@ void Point3::Lerp(const Point3& p1, const Point3& p2, Point3& result, float t)
  */
 void Point3::AttachTo(float * data)
 {
-	ASSERT_RTRN(data != NULL, "Point3::AttachTo -> NULL data passed.");
+	NONFATAL_ASSERT(data != NULL, "Point3::AttachTo -> 'data' is null.", true);
 	BaseVector4::AttachTo(data);
 	UpdateComponentPointers();
 }
@@ -182,7 +182,7 @@ bool Point3::AreEqual(const Point3& a, const Point3& b)
  */
 bool Point3::AreEqual(const Point3* a, const Point3* b)
 {
-	ASSERT(a != NULL && b != NULL, "Point3::AreEqual -> NULL point passed.", false);
+	NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Point3::AreEqual -> Null point passed.", false, true);
 
 	float epsilon = .0005;
 	return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
@@ -193,7 +193,7 @@ bool Point3::AreEqual(const Point3* a, const Point3* b)
  */
 bool Point3::AreStrictlyEqual(const Point3* a, const Point3* b)
 {
-	ASSERT(a != NULL && b != NULL, "Point3::AreStrictlyEqual -> NULL point passed.", false);
+	NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Point3::AreStrictlyEqual -> Null point passed.", false, true);
 
 	return a->x == b->x && a->y == b->y && a->z == b->z;
 }

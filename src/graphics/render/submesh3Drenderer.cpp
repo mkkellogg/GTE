@@ -90,7 +90,7 @@ void SubMesh3DRenderer::SetTargetSubMeshIndex(unsigned int index)
  */
 void SubMesh3DRenderer::SetContainerRenderer(Mesh3DRenderer * renderer)
 {
-	ASSERT_RTRN(renderer != NULL, "SubMesh3DRenderer::SetContainerRenderer -> renderer is NULL");
+	NONFATAL_ASSERT(renderer != NULL, "SubMesh3DRenderer::SetContainerRenderer -> 'renderer' is null.", true);
 	this->containerRenderer = renderer;
 }
 
@@ -124,7 +124,7 @@ void SubMesh3DRenderer::DestroyBuffer(VertexAttrBuffer ** buffer)
 {
 	if((*buffer) != NULL)
 	{
-		Engine::Instance()->GetGraphicsEngine()->DestroyVertexAttributeBuffer(*buffer);
+		Engine::Instance()->GetGraphicsSystem()->DestroyVertexAttributeBuffer(*buffer);
 	}
 	*buffer = NULL;
 }
@@ -134,14 +134,14 @@ void SubMesh3DRenderer::DestroyBuffer(VertexAttrBuffer ** buffer)
  */
 bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount, int stride)
 {
-	ASSERT(buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false);
+	NONFATAL_ASSERT_RTRN(buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false, true);
 
 	// if the buffer has already been created, destroy it first.
 	DestroyBuffer(buffer);
 
 	// create the vertex attribute buffer
-	*buffer = Engine::Instance()->GetGraphicsEngine()->CreateVertexAttributeBuffer();
-	ASSERT(*buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Graphics::CreateVertexAttrBuffer() returned NULL.", false);
+	*buffer = Engine::Instance()->GetGraphicsSystem()->CreateVertexAttributeBuffer();
+	ASSERT(*buffer != NULL,"SubMesh3DRenderer::InitBuffer -> Graphics::CreateVertexAttrBuffer() returned null.");
 	// initialize the vertex attribute buffer
 	(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, NULL);
 
@@ -205,7 +205,7 @@ void SubMesh3DRenderer::SetUseBadGeometryShadowFix(bool useFix)
 void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional, bool backFacesFrontCap)
 {
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT_RTRN(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> mesh is invalid.");
+	ASSERT(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> Mesh is invalid.");
 
 	if(mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
 
@@ -213,14 +213,14 @@ void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional
 	// from that transformation to build the shadow volume. otherwise we want to use the original positions
 	// from the target sub-mesh.
 	Point3Array * positions = mesh->GetPostions();
-	ASSERT_RTRN(positions, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL positions array.");
+	ASSERT(positions, "SubMesh3DRenderer::BuildShadowVolume -> Mesh contains null positions array.");
 	Point3Array& positionsSource = doPositionTransform == true ? transformedPositions : *positions;
 	float * positionsSrcPtr = const_cast<float*>(positionsSource.GetDataPtr());
 
 	// if this sub-renderer is utilizing an attribute transformer, we want to use the normals that result
 	// from that transformation to build the shadow volume.
 	Vector3Array * normals = mesh->GetFaceNormals();
-	ASSERT_RTRN(normals, "SubMesh3DRenderer::BuildShadowVolume -> mesh contains NULL face normals array.");
+	ASSERT(normals, "SubMesh3DRenderer::BuildShadowVolume -> MEsh contains null face normals array.");
 	Vector3Array& normalsSource = doNormalTransform == true ? transformedFaceNormals : *normals;
 
 	// dot product result threshold distinguishing front and back facing polygons.
@@ -524,10 +524,10 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 {
 	// if vertex attribute buffers are already created, destroy them
 	DestroyBuffers();
-	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::UpdateMeshAttributeBuffers -> containerRenderer is NULL.",false);
+	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Container renderer is null.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not find matching sub mesh for sub renderer.",false);
+	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 	StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
@@ -584,7 +584,7 @@ bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 {
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UpdateAttributeTransformerData -> Could not find matching sub mesh for sub renderer.",false);
+	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UpdateAttributeTransformerData -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
@@ -644,10 +644,10 @@ bool SubMesh3DRenderer::UpdateAttributeTransformerData()
  */
 void SubMesh3DRenderer::CopyMeshData()
 {
-	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRenderer::CopyMeshData -> containerRenderer is NULL.");
+	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::CopyMeshData -> Container renderer is null.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRenderer::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
+	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
@@ -679,10 +679,10 @@ void SubMesh3DRenderer::UpdateTimeStamp()
  */
 void SubMesh3DRenderer::UpdateFromMesh()
 {
-	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRenderer::UpdateFromMesh -> containerRenderer is NULL.");
+	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::UpdateFromMesh -> Container renderer is null.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRenderer::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
+	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
 	bool updateSuccess = true;
 
@@ -696,8 +696,7 @@ void SubMesh3DRenderer::UpdateFromMesh()
 	// update this sub-renderer's attribute transformer so that its storage space for transformed vertex attributes
 	// is large enough for the target sub-mesh
 	updateSuccess = updateSuccess && UpdateAttributeTransformerData();
-
-	ASSERT_RTRN(updateSuccess == true, "SubMesh3DRenderer::UpdateFromMesh -> Error occurred while updating mesh structure and data.");
+	ASSERT(updateSuccess == true, "SubMesh3DRenderer::UpdateFromMesh -> Error occurred while updating mesh structure and data.");
 
 	// copy over the data from the target sub-mesh
 	CopyMeshData();
@@ -717,10 +716,10 @@ bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialRef material)
 
 	lastUsedMaterial = material;
 
-	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::UseMaterial -> containerRenderer is NULL.", false);
+	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::UseMaterial -> Container renderer is null.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.", false);
+	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet materialAttributes = material->GetStandardAttributes();
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
@@ -786,10 +785,10 @@ bool SubMesh3DRenderer::DoesAttributeTransform() const
  */
 void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& modelInverse)
 {
-	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRenderer::PreRender -> containerRenderer is NULL.");
+	ASSERT(containerRenderer != NULL,"SubMesh3DRenderer::PreRender -> Container renderer is null.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRenderer::PreRender -> Could not find matching sub mesh for sub renderer.");
+	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::PreRender -> Could not find matching sub mesh for sub renderer.");
 
 	if(doAttributeTransform)
 	{
@@ -802,9 +801,9 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 			Vector3Array * vertexNormals = mesh->GetVertexNormals();
 			Vector3Array * faceNormals = mesh->GetFaceNormals();
 
-			ASSERT_RTRN(positions != NULL && vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL positions or normals.");
-			ASSERT_RTRN(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL vertex normals.");
-			ASSERT_RTRN(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL face normals.");
+			ASSERT(positions != NULL && vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null positions or normals.");
+			ASSERT(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null vertex normals.");
+			ASSERT(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null face normals.");
 
 			// invoke the attribute transformer
 			attributeTransformer->TransformPositionsAndNormals(*positions, transformedPositions, *vertexNormals, transformedVertexNormals, *faceNormals, transformedFaceNormals, mesh->GetCenter(), transformedCenter);
@@ -820,7 +819,7 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 			if(doPositionTransform)
 			{
 				Point3Array * positions = mesh->GetPostions();
-				ASSERT_RTRN(positions != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL positions.");
+				ASSERT(positions != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null positions.");
 
 				// invoke the attribute transformer
 				attributeTransformer->TransformPositions(*positions, transformedPositions,  mesh->GetCenter(), transformedCenter);
@@ -834,8 +833,8 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 				Vector3Array * vertexNormals = mesh->GetVertexNormals();
 				Vector3Array * faceNormals = mesh->GetFaceNormals();
 
-				ASSERT_RTRN(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL vertex normals.");
-				ASSERT_RTRN(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> mesh contains NULL face normals.");
+				ASSERT(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null vertex normals.");
+				ASSERT(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null face normals.");
 
 				// invoke the attribute transformer
 				attributeTransformer->TransformNormals(*vertexNormals, transformedVertexNormals, *faceNormals, transformedFaceNormals);
@@ -855,7 +854,7 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 const Point3* SubMesh3DRenderer::GetFinalCenter()
 {
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::Render -> Could not find matching sub mesh for sub renderer.", NULL);
+	ASSERT(mesh.IsValid(),"SubMesh3DRenderer::Render -> Could not find matching sub mesh for sub renderer.");
 
 	StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
@@ -878,17 +877,17 @@ const Point3* SubMesh3DRenderer::GetFinalCenter()
  */
 void SubMesh3DRenderer::Render()
 {
-	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> containerRenderer is NULL.");
+	ASSERT(containerRenderer != NULL,"SubMesh3DRendererGL::Render -> Container renderer is null.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
+	ASSERT(mesh.IsValid(),"SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
 	if(mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
 
-	MaterialRef currentMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
-	ASSERT_RTRN(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
+	MaterialRef currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+	ASSERT(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
 
-	Engine::Instance()->GetGraphicsEngine()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);
+	Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);
 }
 
 /*
@@ -896,10 +895,10 @@ void SubMesh3DRenderer::Render()
  */
 void SubMesh3DRenderer::RenderShadowVolume()
 {
-	ASSERT_RTRN(containerRenderer != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> containerRenderer is NULL.");
+	ASSERT(containerRenderer != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> Container renderer is null.");
 
 	SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
-	ASSERT_RTRN(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
+	ASSERT(mesh.IsValid(),"SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
 
 	RenderShadowVolume(&shadowVolumePositions);
 }
@@ -909,7 +908,7 @@ void SubMesh3DRenderer::RenderShadowVolume()
  */
 void SubMesh3DRenderer::RenderShadowVolume(const Point3Array * shadowVolumePositions)
 {
-	ASSERT_RTRN(shadowVolumePositions != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> shadowVolumePositions is NULL.");
+	ASSERT(shadowVolumePositions != NULL,"SubMesh3DRendererGL::RenderShadowVolume -> 'shadowVolumePositions' is null.");
 
 	if(shadowVolumePositions->GetCount() > 0)
 	{
@@ -917,7 +916,7 @@ void SubMesh3DRenderer::RenderShadowVolume(const Point3Array * shadowVolumePosit
 		SetShadowVolumePositionData(shadowVolumePositions);
 
 		// render shadow volume
-		Engine::Instance()->GetGraphicsEngine()->RenderTriangles(boundShadowVolumeAttributeBuffers, shadowVolumePositions->GetCount(), false);
+		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundShadowVolumeAttributeBuffers, shadowVolumePositions->GetCount(), false);
 	}
 }
 

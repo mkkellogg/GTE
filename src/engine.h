@@ -49,8 +49,8 @@ class Engine
 	// Manages all objects that derive from EngineObject
 	EngineObjectManager * engineObjectManager;
 
-	// Manages all graphics-related functionality
-	Graphics * graphicsEngine;
+	// Interface for all lower-level graphics-related functionality
+	Graphics * graphicsSystem;
 
 	// Manages the rendering of the scene
     RenderManager * renderManager;
@@ -90,7 +90,7 @@ class Engine
     bool IsInitialized() const;
 
     EngineObjectManager * GetEngineObjectManager();
-    Graphics * GetGraphicsEngine();
+    Graphics * GetGraphicsSystem();
     RenderManager * GetRenderManager();
     AnimationManager * GetAnimationManager();
     InputManager * GetInputManager();

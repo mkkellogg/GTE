@@ -31,7 +31,7 @@
  */
 AnimationPlayer::AnimationPlayer(SkeletonRef target)
 {
-	ASSERT_RTRN(target.IsValid(),"AnimationPlayer::AnimationPlayer -> Invalid target.");
+	NONFATAL_ASSERT(target.IsValid(),"AnimationPlayer::AnimationPlayer -> Invalid target.", true);
 	this->target = target;
 	animationCount = 0;
 	playingAnimationsCount = 0;
@@ -50,7 +50,7 @@ AnimationPlayer::~AnimationPlayer()
  */
 void AnimationPlayer::QueueBlendOperation(BlendOp * op)
 {
-	ASSERT_RTRN(op,"AnimationPlayer::QueueBlendOperation -> op is NULL.");
+	NONFATAL_ASSERT(op,"AnimationPlayer::QueueBlendOperation -> 'op' is null.", true);
 	activeBlendOperations.push(op);
 }
 
@@ -98,7 +98,7 @@ void AnimationPlayer::UpdateBlendingOperations()
 		BlendOp * op = activeBlendOperations.front();
 		if(op == NULL)
 		{
-			Debug::PrintWarning("AnimationPlayer::UpdateBlending -> NULL operation found in queue.");
+			Debug::PrintWarning("AnimationPlayer::UpdateBlending -> Null operation found in queue.");
 			activeBlendOperations.pop();
 			return;
 		}
@@ -317,7 +317,7 @@ void AnimationPlayer::ApplyActiveAnimations()
 void AnimationPlayer::CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
 	KeyFrameSet * frameSet = instance->SourceAnimation->GetKeyFrameSet(channel);
-	ASSERT_RTRN(frameSet != NULL, "AnimationPlayer::CalculateInterpolatedValues -> frameSet is NULL.");
+	NONFATAL_ASSERT(frameSet != NULL, "AnimationPlayer::CalculateInterpolatedValues -> 'frameSet' is null.", false);
 
 	// make sure it's an active KeyFrameSet
 	if(frameSet != NULL && frameSet->Used)
@@ -389,10 +389,10 @@ void AnimationPlayer::UpdateAnimationInstanceProgress(AnimationInstanceRef insta
  */
 void AnimationPlayer::CalculateInterpolatedTranslation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const
 {
-	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedTranslation -> Animation is invalid.");
+	NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedTranslation -> 'instance' is invalid.", true);
 
 	unsigned int frameCount = keyFrameSet.TranslationKeyFrames.size();
-	ASSERT_RTRN(frameCount > 0, "AnimationPlayer::CalculateInterpolatedTranslation -> Key frame count is zero.");
+	NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedTranslation -> Key frame count is zero.", true);
 
 	unsigned int previousIndex, nextIndex;
 	float interFrameProgress;
@@ -422,10 +422,10 @@ void AnimationPlayer::CalculateInterpolatedTranslation(AnimationInstanceRef inst
  */
 void AnimationPlayer::CalculateInterpolatedScale(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const
 {
-	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedScale -> Animation is invalid.");
+	NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedScale -> 'instance' is invalid.", true);
 
 	unsigned int frameCount = keyFrameSet.ScaleKeyFrames.size();
-	ASSERT_RTRN(frameCount > 0, "AnimationPlayer::CalculateInterpolatedScale -> Key frame count is zero.");
+	NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedScale -> Key frame count is zero.", true);
 
 	unsigned int previousIndex, nextIndex;
 	float interFrameProgress;
@@ -455,10 +455,10 @@ void AnimationPlayer::CalculateInterpolatedScale(AnimationInstanceRef instance, 
  */
 void AnimationPlayer::CalculateInterpolatedRotation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const
 {
-	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedRotation -> Animation is invalid.");
+	NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedRotation -> 'instance' is invalid.", true);
 
 	unsigned int frameCount = keyFrameSet.RotationKeyFrames.size();
-	ASSERT_RTRN(frameCount > 0, "AnimationPlayer::CalculateInterpolatedRotation -> Key frame count is zero.");
+	NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedRotation -> Key frame count is zero.", true);
 
 	unsigned int previousIndex, nextIndex;
 	float interFrameProgress;
@@ -490,7 +490,7 @@ void AnimationPlayer::CalculateInterpolatedRotation(AnimationInstanceRef instanc
  */
 bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, unsigned int& previousIndex, unsigned int& nextIndex, float& interFrameProgress, TransformationCompnent component) const
 {
-	ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolation -> Animation is invalid.", false);
+	NONFATAL_ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CalculateInterpolation -> 'instance' is invalid.", false, true);
 
 	unsigned int frameCount = 0;
 	float progress = instance->Progress;
@@ -608,12 +608,12 @@ float AnimationPlayer::GetKeyFrameTime(TransformationCompnent transformationComp
 void AnimationPlayer::AddAnimation(AnimationRef animation)
 {
 	AnimationManager * animationManager = Engine::Instance()->GetAnimationManager();
-	ASSERT_RTRN(animationManager != NULL,"AnimationPlayer::CreateAnimationInstance -> Animation manager is NULL.");
+	ASSERT(animationManager != NULL,"AnimationPlayer::CreateAnimationInstance -> Animation manager is null.");
 
-	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::CreateAnimationInstance -> Animation is invalid.");
+	NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::CreateAnimationInstance -> 'animation' is invalid.", true);
 
 	// verify compatibility with [target]
-	ASSERT_RTRN(animationManager->IsCompatible(target,animation), "AnimationPlayer::CreateAnimationInstance -> Skeleton is not compatible with animation.");
+	NONFATAL_ASSERT(animationManager->IsCompatible(target,animation), "AnimationPlayer::CreateAnimationInstance -> Skeleton is not compatible with animation.", true);
 
 	AnimationInstanceRef instance;
 
@@ -621,12 +621,13 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
 	if(animationIndexMap.find(animation->GetObjectID()) == animationIndexMap.end())
 	{
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-		AnimationInstanceRef instance = objectManager->CreateAnimationInstance(target, animation);
+		ASSERT(objectManager != NULL,"AnimationPlayer::CreateAnimationInstance -> Engine object manager is null.");
 
-		ASSERT_RTRN(instance.IsValid(), " AnimationPlayer::CreateAnimationInstance -> Unable to create animation instance.");
+		AnimationInstanceRef instance = objectManager->CreateAnimationInstance(target, animation);
+		NONFATAL_ASSERT(instance.IsValid(), " AnimationPlayer::CreateAnimationInstance -> Unable to create animation instance.", false);
 
 		bool initSuccess = instance->Init();
-		ASSERT_RTRN(initSuccess,"AnimationPlayer::CreateAnimationInstance -> Unable to initialize animation instance.");
+		NONFATAL_ASSERT(initSuccess,"AnimationPlayer::CreateAnimationInstance -> Unable to initialize animation instance.", false);
 
 		registeredAnimations.push_back(instance);
 		animationWeights.push_back(0);
@@ -642,7 +643,7 @@ void AnimationPlayer::AddAnimation(AnimationRef animation)
  */
 void AnimationPlayer::SetSpeed(AnimationRef animation, float speedFactor)
 {
-	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::SetSpeed -> Animation is invalid.");
+	NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::SetSpeed -> 'animation' is invalid.", true);
 	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
@@ -652,10 +653,10 @@ void AnimationPlayer::SetSpeed(AnimationRef animation, float speedFactor)
 
 void AnimationPlayer::SetSpeed(unsigned int animationIndex, float speedFactor)
 {
-	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::SetSpeed -> invalid animation index.");
+	NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::SetSpeed -> 'animationIndex' is invalid.", true);
 
 	AnimationInstanceRef instance = registeredAnimations[animationIndex];
-	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::SetSpeed -> Target animation is invalid.");
+	NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::SetSpeed -> Target animation is invalid.", true);
 
 	instance->SpeedFactor = speedFactor;
 }
@@ -665,7 +666,8 @@ void AnimationPlayer::SetSpeed(unsigned int animationIndex, float speedFactor)
  */
 void AnimationPlayer::Play(AnimationRef animation)
 {
-	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Play -> Animation is invalid.");
+	NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::Play -> 'animation' is invalid.", true);
+
 	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
@@ -678,7 +680,8 @@ void AnimationPlayer::Play(AnimationRef animation)
  */
 void AnimationPlayer::Play(unsigned int animationIndex)
 {
-	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Play -> invalid animation index.");
+	NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Play -> 'animationIndex' is invalid.", true);
+
 
 	float tempLeftOver = 1;
 	for(unsigned int i = 0; i < registeredAnimations.size(); i++)
@@ -707,11 +710,11 @@ void AnimationPlayer::Play(unsigned int animationIndex)
  */
 void AnimationPlayer::Stop(AnimationRef animation)
 {
-	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Stop -> Animation is invalid.");
+	NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::Stop -> 'animation' is invalid.", true);
 	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
-		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index found in index map.");
+		NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index found in index map.", true);
 
 		Stop(targetIndex);
 	}
@@ -720,12 +723,12 @@ void AnimationPlayer::Stop(AnimationRef animation)
 /*
  * Stop playback of registered animation at [animationIndex].
  */
-void AnimationPlayer::Stop(unsigned int  animationIndex)
+void AnimationPlayer::Stop(unsigned int animationIndex)
 {
-	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index.");
+	NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Stop -> 'animationIndex' is invalid.", true);
 
 	AnimationInstanceRef instance = registeredAnimations[animationIndex];
-	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Stop -> Target animation is invalid.");
+	NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::Stop -> Target animation is invalid.", true);
 
 	if(instance->Playing)playingAnimationsCount--;
 	instance->Stop();
@@ -738,11 +741,11 @@ void AnimationPlayer::Stop(unsigned int  animationIndex)
  */
 void AnimationPlayer::Pause(AnimationRef animation)
 {
-	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Pause -> Animation is invalid.");
+	NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::Pause -> 'animation' is invalid.", true);
 	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
-		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index found in index map.");
+		NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index found in index map.", true);
 
 		Pause(targetIndex);
 	}
@@ -751,12 +754,12 @@ void AnimationPlayer::Pause(AnimationRef animation)
 /*
  * Pause playback of registered animation at [animationIndex].
  */
-void AnimationPlayer::Pause(unsigned int  animationIndex)
+void AnimationPlayer::Pause(unsigned int animationIndex)
 {
-	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index.");
+	NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Pause -> 'animationIndex' is invalid.", true);
 
 	AnimationInstanceRef instance = registeredAnimations[animationIndex];
-	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Pause -> Target animation is invalid.");
+	NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::Pause -> Target animation is invalid.", true);
 
 	instance->Pause();
 }
@@ -766,14 +769,14 @@ void AnimationPlayer::Pause(unsigned int  animationIndex)
  */
 void AnimationPlayer::Resume(AnimationRef animation)
 {
-	ASSERT_RTRN(animation.IsValid(), "AnimationPlayer::Resume -> Animation is invalid.");
+	NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::Resume -> 'animation' is invalid.", true);
 	if(animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
-		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::Resume -> invalid animation index found in index map.");
+		NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::Resume -> invalid animation index found in index map.", true);
 
 		AnimationInstanceRef instance = registeredAnimations[targetIndex];
-		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Resume -> Target animation is invalid.");
+		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::Resume -> Target animation is invalid.", true);
 
 		instance->Play();
 	}
@@ -782,12 +785,12 @@ void AnimationPlayer::Resume(AnimationRef animation)
 /*
  * Resume playback of registered animation at [animationIndex].
  */
-void AnimationPlayer::Resume(unsigned int  animationIndex)
+void AnimationPlayer::Resume(unsigned int animationIndex)
 {
-	ASSERT_RTRN(animationIndex < animationCount, "AnimationPlayer::Resume -> invalid animation index.");
+	NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Resume -> 'animationIndex' is invalid.", true);
 
 	AnimationInstanceRef instance = registeredAnimations[animationIndex];
-	ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::Resume -> Target animation is invalid.");
+	NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::Resume -> Target animation is invalid.", true);
 
 	instance->Play();
 }
@@ -813,16 +816,16 @@ void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued
 	if(animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[target->GetObjectID()];
-		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::CrossFade -> invalid animation index found in index map.");
+		NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::CrossFade -> invalid animation index found in index map.", true);
 
 		AnimationInstanceRef instance = registeredAnimations[targetIndex];
-		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CrossFade -> Target animation is invalid.");
+		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CrossFade -> Target animation is invalid.", true);
 
 		// if a crossfade operation is currently active with the same target, then do nothing
 		if(crossFadeTargets[targetIndex] == 1)return;
 
 		CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
-		ASSERT_RTRN(blendOp, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
+		ASSERT(blendOp, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
 
 		bool initSuccess = blendOp->Init(animationWeights);
 		if(!initSuccess)
@@ -902,10 +905,10 @@ void AnimationPlayer::SetPlaybackMode(AnimationRef target, PlaybackMode playback
 	if(animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
 	{
 		unsigned int targetIndex = animationIndexMap[target->GetObjectID()];
-		ASSERT_RTRN(targetIndex < animationCount, "AnimationPlayer::SetPlaybackMode -> invalid animation index found in index map.");
+		NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::SetPlaybackMode -> invalid animation index found in index map.", true);
 
 		AnimationInstanceRef instance = registeredAnimations[targetIndex];
-		ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::SetPlaybackMode -> Target animation is invalid.");
+		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::SetPlaybackMode -> Target animation is invalid.", true);
 
 		instance->PlayBackMode = playbackMode;
 	}

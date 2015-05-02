@@ -26,7 +26,7 @@ Engine * Engine::theInstance = NULL;
 Engine::Engine()
 {
 	engineObjectManager = NULL;
-	graphicsEngine = NULL;
+	graphicsSystem = NULL;
 	renderManager = NULL;
 	animationManager = NULL;
 	inputManager = NULL;
@@ -45,7 +45,7 @@ Engine::~Engine()
 	SAFE_DELETE(errorManager);
 	SAFE_DELETE(inputManager);
 	SAFE_DELETE(animationManager);
-	SAFE_DELETE(graphicsEngine);
+	SAFE_DELETE(graphicsSystem);
 	SAFE_DELETE(engineObjectManager);
 }
 
@@ -84,43 +84,43 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 	// The error manager must be initialized before any other engine component so that errors
 	// during initialization of those components can be reported
 	errorManager = new ErrorManager();
-	ASSERT(errorManager != NULL, "Engine::Init -> Unable to create error manager.", false);
+	ASSERT(errorManager != NULL, "Engine::Init -> Unable to create error manager.");
 
 	engineObjectManager = new EngineObjectManager();
-	ASSERT(engineObjectManager != NULL, "Engine::Init -> Unable to create engine object manager.", false);
+	ASSERT(engineObjectManager != NULL, "Engine::Init -> Unable to create engine object manager.");
 
 	bool engineObjectManagerInitSuccess = engineObjectManager->Init();
-	ASSERT(engineObjectManagerInitSuccess == true, "Engine::Init -> Unable to initialize engine object manager.", false);
+	ASSERT(engineObjectManagerInitSuccess == true, "Engine::Init -> Unable to initialize engine object manager.");
 
 	// TODO: add switch to detect correct type for platform
 	// for now, only support OpenGL
-	graphicsEngine = new GraphicsGL();
-	ASSERT(graphicsEngine != NULL, "Engine::Init -> Unable to allocate graphics enigne.", false);
+	graphicsSystem = new GraphicsGL();
+	ASSERT(graphicsSystem != NULL, "Engine::Init -> Unable to allocate graphics engine.");
 
-	bool graphicsInitSuccess = graphicsEngine->Init(graphicsAttributes);
-	ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.", false);
+	bool graphicsInitSuccess = graphicsSystem->Init(graphicsAttributes);
+	ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.");
 
 	renderManager = new RenderManager();
-	ASSERT(renderManager != NULL, "Engine::Init -> Unable to allocate render manager", false);
+	ASSERT(renderManager != NULL, "Engine::Init -> Unable to allocate render manager");
 
 	bool renderInitSuccess = renderManager->Init();
-	ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager", false);
+	ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager");
 
 	// This portion of the initialization of the engine object manager must be called
 	// after the graphics engine is initialized
 	bool initShadersSuccess = engineObjectManager->InitBuiltinShaders();
-	ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initiliaze built-in shaders", false);
+	ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initiliaze built-in shaders");
 
 	animationManager = new AnimationManager();
-	ASSERT(animationManager != NULL, "Engine::Init -> Unable to create animation manager.", false);
+	ASSERT(animationManager != NULL, "Engine::Init -> Unable to create animation manager.");
 
 	// TODO: add switch to detect correct type for platform
 	// for now, only support OpenGL
 	inputManager = new InputManagerGL();
-	ASSERT(inputManager != NULL, "Engine::Init -> Unable to create input manager.", false);
+	ASSERT(inputManager != NULL, "Engine::Init -> Unable to create input manager.");
 
 	bool inputInitSuccess = inputManager->Init();
-	ASSERT(inputInitSuccess, "Engine::Init -> Unable to initialize input manager.", false);
+	ASSERT(inputInitSuccess, "Engine::Init -> Unable to initialize input manager.");
 
 	this->callbacks = callbacks;
 
@@ -136,7 +136,7 @@ bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphi
 bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes)
 {
 	Engine * engine = Engine::Instance();
-	ASSERT(engine != NULL, "Engine::Init -> Unable retrieve Engine instance.", false);
+	ASSERT(engine != NULL, "Engine::Init -> Unable retrieve Engine instance.");
 
 	return engine->_Init(callbacks, graphicsAtrributes);
 }
@@ -152,14 +152,14 @@ void Engine::Update()
 		Time::Update();
 		firstFrameEntered = true;
 	}
-	graphicsEngine->Update();
+	graphicsSystem->Update();
 	animationManager->Update();
 	inputManager->Update();
 	if(callbacks!=NULL)callbacks->OnUpdate();
-	graphicsEngine->PreProcessScene();
+	graphicsSystem->PreProcessScene();
 	renderManager->PreProcessScene();
 	if(callbacks!=NULL)callbacks->OnPreRender();
-	graphicsEngine->RenderScene();
+	graphicsSystem->RenderScene();
 	Time::Update();
 }
 
@@ -179,9 +179,9 @@ void Engine::Quit()
 void Engine::Start()
 {
 	Engine * engine = Engine::Instance();
-	ASSERT_RTRN(engine != NULL, "Engine::Start retrieve Engine instance.");
+	ASSERT(engine != NULL, "Engine::Start retrieve Engine instance.");
 
-	ASSERT_RTRN(engine->IsInitialized(), "Engine::Start -> Engine instance is not initialized.");
+	NONFATAL_ASSERT(engine->IsInitialized(), "Engine::Start -> Engine instance is not initialized.", true);
 
 	engine->_Start();
 
@@ -192,7 +192,7 @@ void Engine::Start()
  */
 void Engine::_Start()
 {
-	if(graphicsEngine != NULL)graphicsEngine->Start();
+	if(graphicsSystem != NULL)graphicsSystem->Start();
 	Quit();
 }
 
@@ -203,7 +203,7 @@ void Engine::_Start()
 void Engine::ShutDown()
 {
 	Engine * engine = Engine::Instance();
-	ASSERT_RTRN(engine != NULL, "Engine::ShutDown -> Unable retrieve Engine instance.");
+	ASSERT(engine != NULL, "Engine::ShutDown -> Unable retrieve Engine instance.");
 
 	SAFE_DELETE(theInstance);
 	theInstance = NULL;
@@ -226,11 +226,11 @@ EngineObjectManager * Engine::GetEngineObjectManager()
 }
 
 /*
- * Access the Graphics component.
+ * Access the the interface to the lower-level graphics system.
  */
-Graphics * Engine::GetGraphicsEngine()
+Graphics * Engine::GetGraphicsSystem()
 {
-	return graphicsEngine;
+	return graphicsSystem;
 }
 
 /*

@@ -25,7 +25,7 @@
 
 Camera::Camera()
 {
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 	const GraphicsAttributes& graphicsAttr = graphics->GetAttributes();
 
 	clearBufferMask = 0;
@@ -57,7 +57,7 @@ Camera::~Camera()
 
 void Camera::SetupSkybox(TextureRef cubeTexture)
 {
-	ASSERT_RTRN(cubeTexture.IsValid(), "Camera::SetSkybox -> cube texture is not valid.");
+	NONFATAL_ASSERT(cubeTexture.IsValid(), "Camera::SetSkybox -> 'cubeTexture' is not valid.", true);
 
 	if(!skyboxSetup)
 	{
@@ -70,13 +70,13 @@ void Camera::SetupSkybox(TextureRef cubeTexture)
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 		skyboxSceneObject = objectManager->CreateSceneObject();
-		ASSERT_RTRN(skyboxSceneObject.IsValid(), "Camera::SetSkybox -> Unable to create skybox scene object.");
+		ASSERT(skyboxSceneObject.IsValid(), "Camera::SetSkybox -> Unable to create skybox scene object.");
 		skyboxSceneObject->SetActive(false);
 
 		ShaderSource skyboxShaderSource;
 		importer.LoadBuiltInShaderSource("skybox", skyboxShaderSource);
 		skyboxMaterial = objectManager->CreateMaterial(std::string("SkyBox"), skyboxShaderSource);
-		ASSERT_RTRN(skyboxMaterial.IsValid(), "Camera::SetSkybox -> Unable to create skybox material.");
+		NONFATAL_ASSERT(skyboxMaterial.IsValid(), "Camera::SetSkybox -> Unable to create skybox material.", true);
 
 		skyboxMaterial->SetSelfLit(true);
 		skyboxMaterial->SetTexture(skyboxTexture, "SKYBOX_TEXTURE");
@@ -86,15 +86,15 @@ void Camera::SetupSkybox(TextureRef cubeTexture)
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 		skyboxMesh = EngineUtility::CreateCubeMesh(meshAttributes, true);
-		ASSERT_RTRN(skyboxMesh.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh.");
+		ASSERT(skyboxMesh.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh.");
 
 		skyboxMeshFilter = objectManager->CreateMesh3DFilter();
-		ASSERT_RTRN(skyboxMeshFilter.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh filter.");
+		ASSERT(skyboxMeshFilter.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh filter.");
 		skyboxMeshFilter->SetMesh3D(skyboxMesh);
 		skyboxSceneObject->SetMesh3DFilter(skyboxMeshFilter);
 
 		skyboxMeshRenderer = objectManager->CreateMesh3DRenderer();
-		ASSERT_RTRN(skyboxMeshRenderer.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh renderer.");
+		ASSERT(skyboxMeshRenderer.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh renderer.");
 		skyboxMeshRenderer->AddMaterial(skyboxMaterial);
 		skyboxSceneObject->SetMesh3DRenderer(skyboxMeshRenderer);
 
@@ -211,7 +211,7 @@ void Camera::SetupOffscreenRenderTarget(int width, int height, bool cube)
 	// get reference to the engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
-	if(renderTarget.IsValid() && renderTarget->GetObjectID() != Engine::Instance()->GetGraphicsEngine()->GetDefaultRenderTarget()->GetObjectID())
+	if(renderTarget.IsValid() && renderTarget->GetObjectID() != Engine::Instance()->GetGraphicsSystem()->GetDefaultRenderTarget()->GetObjectID())
 	{
 		objectManager->DestroyRenderTarget(renderTarget);
 	}
@@ -228,7 +228,7 @@ void Camera::SetupOffscreenRenderTarget(int width, int height, bool cube)
 
 RenderTargetRef Camera::GetRenderTarget()
 {
-	if(!renderTarget.IsValid())return Engine::Instance()->GetGraphicsEngine()->GetDefaultRenderTarget();
+	if(!renderTarget.IsValid())return Engine::Instance()->GetGraphicsSystem()->GetDefaultRenderTarget();
 	else return renderTarget;
 }
 
@@ -323,7 +323,7 @@ const Transform& Camera::GetSkyboxTransform()
 
 bool Camera::AddClipPlane(const Vector3& normal, float offset)
 {
-	ASSERT(clipPlaneCount < Constants::MaxClipPlanes, "Camera::AddClipPlane -> Maximum clip planes exceeded.", false);
+	NONFATAL_ASSERT_RTRN(clipPlaneCount < Constants::MaxClipPlanes, "Camera::AddClipPlane -> Maximum clip planes exceeded.", false, true);
 	clipPlanes[clipPlaneCount].Normal = normal;
 	clipPlanes[clipPlaneCount].Offset = offset;
 	clipPlaneCount++;
@@ -332,7 +332,7 @@ bool Camera::AddClipPlane(const Vector3& normal, float offset)
 
 const ClipPlane* Camera::GetClipPlane(unsigned int index)
 {
-	ASSERT(index < clipPlaneCount, "Camera::GetClipPlane -> index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(index < clipPlaneCount, "Camera::GetClipPlane -> 'index' is out of range.", NULL, true);
 	return clipPlanes + index;
 }
 

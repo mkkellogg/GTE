@@ -63,7 +63,7 @@ RenderManager::~RenderManager()
  */
 bool RenderManager::Init()
 {
-	ASSERT(sceneProcessingStack.Init(), "RenderManager::Init -> unable to initialize view transform stack.", false);
+	ASSERT(sceneProcessingStack.Init(), "RenderManager::Init -> unable to initialize view transform stack.");
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
@@ -73,41 +73,41 @@ bool RenderManager::Init()
 	// construct shadow volume material
 	assetImporter.LoadBuiltInShaderSource("shadowvolume", shaderSource);
 	shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);
-	ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.", false);
+	ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.");
 
 	// construct SSAO outline material
 	assetImporter.LoadBuiltInShaderSource("ssaooutline", shaderSource);
 	ssaoOutlineMaterial = objectManager->CreateMaterial("SSAOOutline", shaderSource);
 	ssaoOutlineMaterial->SetSelfLit(true);
-	ASSERT(ssaoOutlineMaterial.IsValid(), "RenderManager::Init -> Unable to create SSAO outline material.", false);
+	ASSERT(ssaoOutlineMaterial.IsValid(), "RenderManager::Init -> Unable to create SSAO outline material.");
 
 	// construct depth-only material
 	assetImporter.LoadBuiltInShaderSource("depthonly", shaderSource);
 	depthOnlyMaterial = objectManager->CreateMaterial("DepthOnlyMaterial", shaderSource);
 	depthOnlyMaterial->SetSelfLit(true);
-	ASSERT(depthOnlyMaterial.IsValid(), "RenderManager::Init -> Unable to create depth only material.", false);
+	ASSERT(depthOnlyMaterial.IsValid(), "RenderManager::Init -> Unable to create depth only material.");
 
 	// construct depth-value material
 	assetImporter.LoadBuiltInShaderSource("depthvalue", shaderSource);
 	depthValueMaterial = objectManager->CreateMaterial("DepthValueMaterial", shaderSource);
 	depthValueMaterial->SetSelfLit(true);
-	ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.", false);
+	ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.");
 
 	// build depth texture off-screen render target
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 	RenderTargetRef defaultRenderTarget = graphics->GetDefaultRenderTarget();
 	TextureAttributes colorTextureAttributes;
 	colorTextureAttributes.Format = TextureFormat::R32F;
 	colorTextureAttributes.FilterMode = TextureFilter::Point;
 	colorTextureAttributes.WrapMode = TextureWrap::Clamp;
 	depthRenderTarget = objectManager->CreateRenderTarget(true, true, false, colorTextureAttributes, defaultRenderTarget->GetWidth(),defaultRenderTarget->GetHeight());
-	ASSERT(depthRenderTarget.IsValid(), "RenderManager::Init -> Unable to create off-screen rendering surface.", false);
+	ASSERT(depthRenderTarget.IsValid(), "RenderManager::Init -> Unable to create off-screen rendering surface.");
 
 	TextureRef depthTexture = depthRenderTarget->GetDepthTexture();
 	TextureRef colorTexture = depthRenderTarget->GetColorTexture();
 
-	ASSERT(colorTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen color buffer.", false);
-	ASSERT(depthTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen depth buffer.", false);
+	ASSERT(colorTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen color buffer.");
+	ASSERT(depthTexture.IsValid(), "RenderManager::Init -> Unable to create off-screen depth buffer.");
 
 	if(!InitFullScreenQuad())return false;
 
@@ -129,7 +129,7 @@ bool RenderManager::InitFullScreenQuad()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
 	fullScreenQuad = EngineUtility::CreateRectangularMesh(meshAttributes, 1,1,1,1, true, true);
-	ASSERT(fullScreenQuad.IsValid(), "RenderManager::Init -> Unable to create full screen quad.", false);
+	ASSERT(fullScreenQuad.IsValid(), "RenderManager::Init -> Unable to create full screen quad.");
 
 	// transform full-screen quad to: X: [0..1], Y: [0..1]
 	for(unsigned int i =0; i < fullScreenQuad->GetSubMesh(0)->GetPostions()->GetCount();i++)
@@ -142,14 +142,14 @@ bool RenderManager::InitFullScreenQuad()
 
 	// create camera for rendering to [fullScreenQuad]
 	fullScreenQuadCam = objectManager->CreateCamera();
-	ASSERT(fullScreenQuadCam.IsValid(), "RenderManager::Init -> Unable to camera for full screen quad.", false);
+	ASSERT(fullScreenQuadCam.IsValid(), "RenderManager::Init -> Unable to camera for full screen quad.");
 	fullScreenQuadCam->SetProjectionMode(ProjectionMode::Orthographic);
 
 	fullScreenQuadObject = objectManager->CreateSceneObject();
-	ASSERT(fullScreenQuadObject.IsValid(), "RenderManager::Init -> Unable to scene object for full screen quad.", false);
+	ASSERT(fullScreenQuadObject.IsValid(), "RenderManager::Init -> Unable to scene object for full screen quad.");
 
 	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
-	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to mesh filter for full screen quad.", false);
+	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to mesh filter for full screen quad.");
 
 	filter->SetCastShadows(false);
 	filter->SetReceiveShadows(false);
@@ -157,7 +157,7 @@ bool RenderManager::InitFullScreenQuad()
 	fullScreenQuadObject->SetMesh3DFilter(filter);
 
 	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
-	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to renderer for full screen quad.", false);
+	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to renderer for full screen quad.");
 	fullScreenQuadObject->SetMesh3DRenderer(renderer);
 
 	fullScreenQuadObject->SetActive(false);
@@ -172,7 +172,7 @@ bool RenderManager::InitFullScreenQuad()
 void RenderManager::ClearBuffersForCamera(const Camera& camera) const
 {
 	unsigned int clearBufferMask = camera.GetClearBufferMask();
-	Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
+	Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearBufferMask);
 }
 
 /*
@@ -182,7 +182,7 @@ void RenderManager::PushRenderTarget(RenderTargetRef renderTarget)
 {
 	renderTargetStack.push(renderTarget);
 	// activate the new render target
-	Engine::Instance()->GetGraphicsEngine()->ActivateRenderTarget(renderTarget);
+	Engine::Instance()->GetGraphicsSystem()->ActivateRenderTarget(renderTarget);
 }
 
 /*
@@ -202,12 +202,12 @@ RenderTargetRef RenderManager::PopRenderTarget()
 	{
 		RenderTargetRef top = renderTargetStack.top();
 		// activate the new render target
-		Engine::Instance()->GetGraphicsEngine()->ActivateRenderTarget(top);
+		Engine::Instance()->GetGraphicsSystem()->ActivateRenderTarget(top);
 	}
 	else
 	{
 		// activate the default render target
-		Engine::Instance()->GetGraphicsEngine()->RestoreDefaultRenderTarget();
+		Engine::Instance()->GetGraphicsSystem()->RestoreDefaultRenderTarget();
 	}
 
 	return old;
@@ -236,7 +236,7 @@ void RenderManager::PushTransformData(const Transform& transform, DataStack<Matr
  */
 void RenderManager::PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack)
 {
-	ASSERT_RTRN(transformStack.GetEntryCount() > 0,"RenderManager::PopTransformData -> transformStack is empty!");
+	NONFATAL_ASSERT(transformStack.GetEntryCount() > 0,"RenderManager::PopTransformData -> 'transformStack' is empty!", true);
 
 	Matrix4x4 * mat = transformStack.Pop();
 	transform.SetTo(*mat);
@@ -291,8 +291,8 @@ void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialR
 	Transform projection;
 	Transform modelViewProjection;
 
-	ASSERT_RTRN(renderTarget.IsValid(), "RenderManager::RenderFullScreenQuad -> Invalid render target.");
-	ASSERT_RTRN(material.IsValid(), "RenderManager::RenderFullScreenQuad -> Invalid material.");
+	NONFATAL_ASSERT(renderTarget.IsValid(), "RenderManager::RenderFullScreenQuad -> Invalid render target.", true);
+	NONFATAL_ASSERT(material.IsValid(), "RenderManager::RenderFullScreenQuad -> Invalid material.", true);
 
 	// activate the material, which will switch the GPU's active shader to
 	// the one associated with the material
@@ -301,7 +301,7 @@ void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialR
 	// send uniforms set for the material to its shader
 	SendActiveMaterialUniformsToShader();
 
-	Graphics * graphics = Engine::Instance()->GetGraphicsEngine();
+	Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 
 	// save the currently active render target
 	RenderTargetRef currentTarget = graphics->GetCurrrentRenderTarget();
@@ -349,7 +349,7 @@ void RenderManager::PreProcessScene()
 	Transform cameraModelView;
 
 	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
-	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::ProcessScene -> sceneRoot is NULL.");
+	ASSERT(sceneRoot.IsValid(),"RenderManager::ProcessScene -> sceneRoot is NULL.");
 
 	// gather information about the cameras, lights, and renderable meshes in the scene
 	PreProcessScene(sceneRoot.GetRef(), cameraModelView);
@@ -544,17 +544,17 @@ void RenderManager::PreRenderScene()
  */
 void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
 {
-	ASSERT_RTRN(cameraIndex < cameraCount,"RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds");
+	NONFATAL_ASSERT(cameraIndex < cameraCount,"RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds", true);
 
 	SceneObjectRef objectRef= sceneCameras[cameraIndex];
-	ASSERT_RTRN(objectRef.IsValid(),"RenderManager::RenderSceneFromCamera -> Camera's scene object is not valid.");
+	NONFATAL_ASSERT(objectRef.IsValid(),"RenderManager::RenderSceneFromCamera -> Camera's scene object is not valid.", true);
 
 	CameraRef cameraRef = objectRef->GetCamera();
-	ASSERT_RTRN(cameraRef.IsValid(),"RenderManager::RenderSceneFromCamera -> Camera is not valid.");
+	NONFATAL_ASSERT(cameraRef.IsValid(),"RenderManager::RenderSceneFromCamera -> Camera is not valid.", true);
 	Camera& camera = cameraRef.GetRef();
 
 	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
-	ASSERT_RTRN(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
+	ASSERT(sceneRoot.IsValid(),"RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
 
 	// currently we use forward rendering
 	ForwardRenderSceneForCamera(camera);
@@ -567,7 +567,7 @@ void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
 void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 {
 	SceneObjectRef cameraObject = camera.GetSceneObject();
-	ASSERT_RTRN(cameraObject.IsValid(),"RenderManager::ForwardRenderSceneForCamera -> Camera is not attached to a scene object.");
+	NONFATAL_ASSERT(cameraObject.IsValid(),"RenderManager::ForwardRenderSceneForCamera -> Camera is not attached to a scene object.", true);
 
 	// clear stack of activated render targets
 	ClearRenderTargetStack();
@@ -585,7 +585,7 @@ void RenderManager::ForwardRenderSceneForCamera(Camera& camera)
 	viewInverse.SetTo(cameraTransform);
 	viewInverse.Invert();
 
-	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
+	Graphics* graphics = Engine::Instance()->GetGraphicsSystem();
 
 	// if the render target is a cube, render 6 times, twice for each axis
 	if(camera.GetRenderTarget()->GetColorTexture().IsValid() &&
@@ -667,8 +667,8 @@ void RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& ca
 	// modelPreTransform is pre-multiplied with the transform of each rendered scene object & light
 	Transform modelPreTransform = camera.GetUniformWorldSceneObjectTransform();
 
-	if(camera.GetReverseCulling())Engine::Instance()->GetGraphicsEngine()->SetFaceCullingMode(FaceCullingMode::Front);
-	else Engine::Instance()->GetGraphicsEngine()->SetFaceCullingMode(FaceCullingMode::Back);
+	if(camera.GetReverseCulling())Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Front);
+	else Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Back);
 
 	// we have not yet rendered any ambient lights
 	bool renderedAmbient = false;
@@ -677,10 +677,10 @@ void RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& ca
 	for(unsigned int l = 0; l < ambientLightCount; l++)
 	{
 		SceneObjectRef lightObject = sceneAmbientLights[l];
-		ASSERT_RTRN(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light's scene object is not valid.");
+		NONFATAL_ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light's scene object is not valid.", true);
 
 		LightRef lightRef = lightObject->GetLight();
-		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.");
+		NONFATAL_ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.", true);
 
 		// render all objects in the scene that have non self-lit materials
 		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewInverse, camera);
@@ -701,10 +701,10 @@ void RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& ca
 	for(unsigned int l = 0; l < lightCount; l++)
 	{
 		SceneObjectRef lightObject = sceneLights[l];
-		ASSERT_RTRN(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Light's scene object is not valid.");
+		NONFATAL_ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Light's scene object is not valid.", true);
 
 		LightRef lightRef = lightObject->GetLight();
-		ASSERT_RTRN(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Light is not valid.");
+		NONFATAL_ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Light is not valid.", true);
 
 		// render all objects in the scene that have non self-lit materials
 		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewInverse, camera);
@@ -719,7 +719,7 @@ void RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& ca
 	// render all self-lit objects in the scene once
 	ForwardRenderSceneForSelfLitMaterials(modelPreTransform, viewInverse, camera);
 
-	Engine::Instance()->GetGraphicsEngine()->SetFaceCullingMode(FaceCullingMode::Back);
+	Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Back);
 
 	// if this camera has a skybox that is set up and enabled, then we want to render it
 	if(camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
@@ -775,7 +775,7 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 			if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
 			{
 				currentRenderMode = RenderMode::ShadowVolumeRender;
-				Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::ShadowVolumeRender);
+				Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::ShadowVolumeRender);
 			}
 			else
 				continue;
@@ -813,13 +813,13 @@ void RenderManager::ForwardRenderSceneForLight(const Light& light, const Transfo
 						if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
 						{
 							currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
-							Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
+							Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
 						}
 					}
 					else if(currentRenderMode != RenderMode::Standard)
 					{
 						currentRenderMode = RenderMode::Standard;
-						Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
+						Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 					}
 
 					// set up lighting descriptor for non self-lit lighting
@@ -848,17 +848,17 @@ void RenderManager::ForwardRenderSceneForSelfLitMaterials(const Transform& model
  */
 void RenderManager::ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse)
 {
-	Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
+	Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
 	// ensure the camera has a valid skybox
 	if(camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
 	{
 		SceneObjectRef cameraObject = camera.GetSceneObject();
-		ASSERT_RTRN(cameraObject.IsValid(),"RenderManager::RenderSkyboxForCamera -> Camera is not attached to a scene object.");
+		NONFATAL_ASSERT(cameraObject.IsValid(),"RenderManager::RenderSkyboxForCamera -> Camera is not attached to a scene object.", true);
 
 		// retrieve the scene objects for the camera and for the camera's skybox
 		SceneObjectRef skyboxObject = camera.GetSkyboxSceneObject();
-		ASSERT_RTRN(skyboxObject.IsValid(),"RenderManager::RenderSkyboxForCamera -> Camera has invalid skybox scene object.");
+		NONFATAL_ASSERT(skyboxObject.IsValid(),"RenderManager::RenderSkyboxForCamera -> Camera has invalid skybox scene object.", true);
 
 		/// get the world space location of the camera
 		Point3 cameraOrigin;
@@ -908,8 +908,8 @@ void RenderManager::ForwardRenderDepthBuffer(const Transform& modelPreTransform,
  */
 void RenderManager::ForwardRenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera)
 {
-	Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
-	GraphicsAttributes attributes = Engine::Instance()->GetGraphicsEngine()->GetAttributes();
+	Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
+	GraphicsAttributes attributes = Engine::Instance()->GetGraphicsSystem()->GetAttributes();
 
 	// activate the off-screen render target
 	PushRenderTarget(depthRenderTarget);
@@ -918,7 +918,7 @@ void RenderManager::ForwardRenderSceneSSAO(const Transform& modelPreTransform, c
 	IntMask clearMask = IntMaskUtil::CreateIntMask();
 	if(depthRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Color);
 	if(depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Depth);
-	Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearMask);
+	Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearMask);
 
 	// render the depth values for the scene to the off-screen color texture
 	ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never);
@@ -989,7 +989,7 @@ void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& model
 														  MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
 														  std::function<bool(SceneObjectRef)> filterFunction)
 {
-	Engine::Instance()->GetGraphicsEngine()->EnterRenderMode(RenderMode::Standard);
+	Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
 	// loop through each mesh-containing SceneObject in [sceneMeshObjects]
 	for(unsigned int s = 0; s < sceneMeshCount; s++)
@@ -1058,9 +1058,9 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 	{
 		Mesh3DRef mesh = renderer->GetTargetMesh();
 
-		ASSERT_RTRN(mesh.IsValid(),"RenderManager::RenderSceneObjectMeshes -> renderer returned NULL mesh.");
-		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderSceneObjectMeshes -> Sub mesh count does not match sub renderer count!.");
-		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderSceneObjectMeshes -> renderer has no materials.");
+		NONFATAL_ASSERT(mesh.IsValid(),"RenderManager::RenderSceneObjectMeshes -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderSceneObjectMeshes -> Sub mesh count does not match sub renderer count!.", true);
+		NONFATAL_ASSERT(renderer->GetMaterialCount() > 0,"RenderManager::RenderSceneObjectMeshes -> Renderer has no materials.", true);
 
 		unsigned int materialIndex = 0;
 		bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
@@ -1089,9 +1089,9 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
-			ASSERT_RTRN(currentMaterial.IsValid(),"RenderManager::RenderSceneObjectMeshes -> NULL material encountered.")
-			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshes -> NULL sub renderer encountered.");
-			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshes -> NULL sub mesh encountered.");
+			NONFATAL_ASSERT(currentMaterial.IsValid(),"RenderManager::RenderSceneObjectMeshes -> Null material encountered.", true)
+			NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null sub renderer encountered.", true);
+			NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null sub mesh encountered.", true);
 
 			// determine if this mesh has been rendered before
 			ObjectPairKey key(sceneObject.GetObjectID(), subMesh->GetObjectID());
@@ -1131,18 +1131,18 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 				{
 					if(GetForwardBlending() == FowardBlendingMethod::Subtractive)
 					{
-						Engine::Instance()->GetGraphicsEngine()->SetBlendingEnabled(true);
-						Engine::Instance()->GetGraphicsEngine()->SetBlendingFunction(BlendingProperty::Zero,BlendingProperty::SrcAlpha);
+						Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
+						Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(BlendingProperty::Zero,BlendingProperty::SrcAlpha);
 					}
 					else
 					{
-						Engine::Instance()->GetGraphicsEngine()->SetBlendingEnabled(true);
-						Engine::Instance()->GetGraphicsEngine()->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
+						Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
+						Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(BlendingProperty::One,BlendingProperty::One);
 					}
 				}
 				else
 				{
-					Engine::Instance()->GetGraphicsEngine()->SetBlendingEnabled(false);
+					Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(false);
 				}
 
 				// render the current mesh
@@ -1198,9 +1198,9 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 	{
 		Mesh3DRef mesh = renderer->GetTargetMesh();
 
-		ASSERT_RTRN(mesh.IsValid(),"RenderManager::RenderShadowVolumesForSceneObject -> renderer returned NULL mesh.");
-		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.");
-		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::RenderShadowVolumesForSceneObject -> renderer has no materials.");
+		NONFATAL_ASSERT(mesh.IsValid(),"RenderManager::RenderShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
+		NONFATAL_ASSERT(renderer->GetMaterialCount() > 0,"RenderManager::RenderShadowVolumesForSceneObject -> Renderer has no materials.", true);
 
 		// calculate model transform and inverse model transform
 		model.SetTo(sceneObject.GetAggregateTransform());
@@ -1224,8 +1224,8 @@ void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, 
 			// if mesh doesn't have face data, it can't have a shadow volume
 			if(!subMesh->HasFaces())continue;
 
-			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> NULL sub renderer encountered.");
-			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> NULL sub mesh encountered.");
+			NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub renderer encountered.", true);
+			NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
 
 			// build special MVP transform for rendering shadow volumes
 			float scaleFactor = subRenderer->GetUseBackSetShadowVolume() ? .99 : 1;
@@ -1279,13 +1279,13 @@ void RenderManager::BuildSceneShadowVolumes()
 	for(unsigned int l = 0; l < lightCount; l++)
 	{
 		SceneObjectRef lightObject = sceneLights[l];
-		ASSERT_RTRN(lightObject.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light's scene object is not valid.");
+		NONFATAL_ASSERT(lightObject.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light's scene object is not valid.", true);
 
 		// verify the light is active
 		if(lightObject->IsActive())
 		{
 			LightRef lightRef = lightObject->GetLight();
-			ASSERT_RTRN(lightRef.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light is not valid.");
+			NONFATAL_ASSERT(lightRef.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light is not valid.", true);
 
 			// verify that this light casts shadows
 			if(lightRef->GetShadowsEnabled())
@@ -1364,9 +1364,9 @@ void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, c
 	{
 		Mesh3DRef mesh = renderer->GetTargetMesh();
 
-		ASSERT_RTRN(mesh.IsValid(),"RenderManager::BuildShadowVolumesForSceneObject -> renderer returned NULL mesh.");
-		ASSERT_RTRN(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::BuildShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.");
-		ASSERT_RTRN(renderer->GetMaterialCount() > 0,"RenderManager::BuildShadowVolumesForSceneObject -> renderer has no materials.");
+		NONFATAL_ASSERT(mesh.IsValid(),"RenderManager::BuildShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::BuildShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
+		NONFATAL_ASSERT(renderer->GetMaterialCount() > 0,"RenderManager::BuildShadowVolumesForSceneObject -> Renderer has no materials.", true);
 
 		// calculate model transform and inverse model transform
 		model.SetTo(sceneObject.GetAggregateTransform());
@@ -1389,8 +1389,8 @@ void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, c
 			// if mesh doesn't have face data, it can't have a shadow volume
 			if(!subMesh->HasFaces())continue;
 
-			ASSERT_RTRN(subRenderer.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> NULL sub renderer encountered.");
-			ASSERT_RTRN(subMesh.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> NULL sub mesh encountered.");
+			NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> Null sub renderer encountered.", true);
+			NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
 
 			Vector3 lightPosDir;
 			if(light.GetType() == LightType::Directional)
@@ -1559,7 +1559,7 @@ void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Poin
  */
 void RenderManager::CacheShadowVolume(const ObjectPairKey& key, const Point3Array * shadowVolume)
 {
-	ASSERT_RTRN(shadowVolume != NULL, "RenderManager::CacheShadowVolume -> Shadow volume is NULL.");
+	NONFATAL_ASSERT(shadowVolume != NULL, "RenderManager::CacheShadowVolume -> Shadow volume is null.", true);
 
 	bool needsInit = false;
 	Point3Array * target = NULL;
@@ -1581,10 +1581,10 @@ void RenderManager::CacheShadowVolume(const ObjectPairKey& key, const Point3Arra
 	if(needsInit)
 	{
 		target = new Point3Array();
-		ASSERT_RTRN(target != NULL, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
+		ASSERT(target != NULL, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
 
 		bool initSuccess = target->Init(shadowVolume->GetReservedCount());
-		ASSERT_RTRN(initSuccess, "RenderManager::CacheShadowVolume -> Unable to initialize shadow volume copy.");
+		ASSERT(initSuccess, "RenderManager::CacheShadowVolume -> Unable to initialize shadow volume copy.");
 
 		target->SetCount(shadowVolume->GetCount());
 		shadowVolumeCache[key] = target;
@@ -1785,11 +1785,11 @@ bool RenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosi
  */
 void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection,  const Transform& modelViewProjection)
 {
-	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
-	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendTransformUniformsToShader -> activeMaterial is NULL.");
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+	ASSERT(activeMaterial.IsValid(),"RenderManager::SendTransformUniformsToShader -> Active material is null.");
 
 	ShaderRef shader = activeMaterial->GetShader();
-	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendTransformUniformsToShader -> material contains NULL shader.");
+	ASSERT(shader.IsValid(),"RenderManager::SendTransformUniformsToShader -> Active material contains null shader.");
 
 	activeMaterial->SendModelMatrixToShader(&model.matrix);
 	activeMaterial->SendModelViewMatrixToShader(&modelView.matrix);
@@ -1803,11 +1803,11 @@ void RenderManager::SendTransformUniformsToShader(const Transform& model, const 
  */
 void RenderManager::SendModelViewProjectionToShader(const Transform& modelViewProjection)
 {
-	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
-	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendModelViewProjectionToShader -> activeMaterial is NULL.");
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+	ASSERT(activeMaterial.IsValid(),"RenderManager::SendModelViewProjectionToShader -> Active material is null.");
 
 	ShaderRef shader = activeMaterial->GetShader();
-	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendModelViewProjectionToShader -> material contains NULL shader.");
+	ASSERT(shader.IsValid(),"RenderManager::SendModelViewProjectionToShader -> Active material contains null shader.");
 
 	activeMaterial->SendMVPMatrixToShader(&modelViewProjection.matrix);
 }
@@ -1817,16 +1817,16 @@ void RenderManager::SendModelViewProjectionToShader(const Transform& modelViewPr
  */
 void RenderManager::SendClipPlanesToShader(const Camera& camera)
 {
-	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
-	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendClipPlaneToShader -> activeMaterial is NULL.");
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+	ASSERT(activeMaterial.IsValid(),"RenderManager::SendClipPlaneToShader -> Active material is null.");
 
 	ShaderRef shader = activeMaterial->GetShader();
-	ASSERT_RTRN(shader.IsValid(),"RenderManager::SendClipPlaneToShader -> material contains NULL shader.");
+	ASSERT(shader.IsValid(),"RenderManager::SendClipPlaneToShader -> Active material contains null shader.");
 
 	if(camera.GetClipPlaneCount() > 0)
 	{
-		Engine::Instance()->GetGraphicsEngine()->DeactiveAllClipPlanes();
-		Engine::Instance()->GetGraphicsEngine()->AddClipPlane();
+		Engine::Instance()->GetGraphicsSystem()->DeactiveAllClipPlanes();
+		Engine::Instance()->GetGraphicsSystem()->AddClipPlane();
 
 		const ClipPlane* clipPlane0 = const_cast<Camera&>(camera).GetClipPlane(0);
 
@@ -1839,7 +1839,7 @@ void RenderManager::SendClipPlanesToShader(const Camera& camera)
 	}
 	else
 	{
-		Engine::Instance()->GetGraphicsEngine()->DeactiveAllClipPlanes();
+		Engine::Instance()->GetGraphicsSystem()->DeactiveAllClipPlanes();
 		activeMaterial->SendClipPlaneToShader(0, 0,0,0,0);
 		activeMaterial->SendClipPlaneCountToShader(0);
 	}
@@ -1850,8 +1850,8 @@ void RenderManager::SendClipPlanesToShader(const Camera& camera)
  */
 void RenderManager::SendActiveMaterialUniformsToShader()  const
 {
-	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsEngine()->GetActiveMaterial();
-	ASSERT_RTRN(activeMaterial.IsValid(),"RenderManager::SendCustomUniformsToShader -> activeMaterial is not valid.");
+	MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+	ASSERT(activeMaterial.IsValid(),"RenderManager::SendCustomUniformsToShader -> Active material is not valid.");
 	activeMaterial->SendAllSetUniformsToShader();
 }
 
@@ -1863,6 +1863,6 @@ void RenderManager::ActivateMaterial(MaterialRef material)
 {
 	// We MUST notify the graphics system about the change in active material because other
 	// components (like Mesh3DRenderer) need to know about the active material
-	Engine::Instance()->GetGraphicsEngine()->ActivateMaterial(material);
+	Engine::Instance()->GetGraphicsSystem()->ActivateMaterial(material);
 }
 

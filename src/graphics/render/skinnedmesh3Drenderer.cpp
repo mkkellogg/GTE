@@ -97,7 +97,7 @@ void SkinnedMesh3DRenderer::InitializeForMesh()
 					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Normal);
 
 					SkinnedMesh3DAttributeTransformer *attributeTransformer = new SkinnedMesh3DAttributeTransformer(attributes);
-					ASSERT_RTRN(attributeTransformer != NULL,"SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
+					ASSERT(attributeTransformer != NULL,"SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
 
 					subRenderer->SetAttributeTransformer(attributeTransformer);
 				}
@@ -134,7 +134,7 @@ void SkinnedMesh3DRenderer::AddVertexBoneMap(VertexBoneMap * map)
  */
 VertexBoneMap * SkinnedMesh3DRenderer::GetVertexBoneMap(unsigned int index)
 {
-	ASSERT(index < vertexBoneMaps.size(), "Mesh3D::GetVertexBoneMap -> Index out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(index < vertexBoneMaps.size(), "Mesh3D::GetVertexBoneMap -> 'index' is out of range.", NULL, true);
 
 	return vertexBoneMaps[index];
 }

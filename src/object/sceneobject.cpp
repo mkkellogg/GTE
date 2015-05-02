@@ -111,10 +111,10 @@ void SceneObject::NotifyNewMesh3D()
 bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 {
 	if(this->renderer3D == renderer)return true;
-	ASSERT(renderer.IsValid(),"SceneObject::SetMeshRenderer3D -> attempted to add NULL renderer.", false);
+	NONFATAL_ASSERT_RTRN(renderer.IsValid(),"SceneObject::SetMeshRenderer3D -> 'renderer' is invalid.", false, true);
 
 	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-	ASSERT(thisRef.IsValid(),"SceneObject::SetMeshRenderer3D -> Could not find matching reference for scene object", false);
+	ASSERT(thisRef.IsValid(),"SceneObject::SetMeshRenderer3D -> Could not find matching reference for scene object");
 
 	renderer->sceneObject = thisRef;
 	this->renderer3D = renderer;
@@ -127,10 +127,10 @@ bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
 {
 	if(this->skinnedRenderer3D == renderer)return true;
-	ASSERT(renderer.IsValid(),"SceneObject::SkinnedMesh3DRendererRef -> attempted to add NULL renderer.", false);
+	NONFATAL_ASSERT_RTRN(renderer.IsValid(),"SceneObject::SkinnedMesh3DRendererRef -> 'renderer' is invalid.", false, true);
 
 	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-	ASSERT(thisRef.IsValid(),"SceneObject::SkinnedMesh3DRendererRef -> Could not find matching reference for scene object", false);
+	ASSERT(thisRef.IsValid(),"SceneObject::SkinnedMesh3DRendererRef -> Could not find matching reference for scene object.");
 
 	renderer->sceneObject = thisRef;
 	this->skinnedRenderer3D = renderer;
@@ -142,10 +142,10 @@ bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
 
 bool SceneObject::SetMesh3DFilter(Mesh3DFilterRef filter)
 {
-	ASSERT(filter.IsValid(),"SceneObject::SetMesh3DFilter -> attempted to add NULL filter.", false);
+	NONFATAL_ASSERT_RTRN(filter.IsValid(),"SceneObject::SetMesh3DFilter -> 'filter' is invalid.", false, true);
 
 	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-	ASSERT(thisRef.IsValid(),"SceneObject::SetMesh3DFilter -> Could not find matching reference for scene object", false);
+	ASSERT(thisRef.IsValid(),"SceneObject::SetMesh3DFilter -> Could not find matching reference for scene object.");
 
 	filter->sceneObject = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	this->mesh3DFilter = filter;
@@ -157,10 +157,10 @@ bool SceneObject::SetMesh3DFilter(Mesh3DFilterRef filter)
 
 bool SceneObject::SetCamera(CameraRef camera)
 {
-	ASSERT(camera.IsValid(),"SceneObject::SetCamera -> attempted to add NULL camera.", false);
+	NONFATAL_ASSERT_RTRN(camera.IsValid(),"SceneObject::SetCamera -> 'camera' is invalid.", false, true);
 
 	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-	ASSERT(thisRef.IsValid(),"SceneObject::SetCamera -> Could not find matching reference for scene object", false);
+	ASSERT(thisRef.IsValid(),"SceneObject::SetCamera -> Could not find matching reference for scene object.");
 
 	camera->sceneObject = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 	this->camera = camera;
@@ -170,10 +170,10 @@ bool SceneObject::SetCamera(CameraRef camera)
 
 bool SceneObject::SetLight(LightRef light)
 {
-	ASSERT(light.IsValid(),"SceneObject::SetLight -> attempted to add NULL light.", false);
+	NONFATAL_ASSERT_RTRN(light.IsValid(),"SceneObject::SetLight -> 'light' is invalid.", false, true);
 
 	SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-	ASSERT(thisRef.IsValid(),"SceneObject::SetLight -> Could not find matching reference for scene object", false);
+	ASSERT(thisRef.IsValid(),"SceneObject::SetLight -> Could not find matching reference for scene object.");
 
 	light->sceneObject = thisRef;
 	this->light = light;
@@ -214,7 +214,7 @@ LightRef SceneObject::GetLight()
 
 void SceneObject::AddChild(SceneObjectRef child)
 {
-	ASSERT_RTRN(child.IsValid(),"SceneObject::AddChild -> child is NULL.");
+	NONFATAL_ASSERT(child.IsValid(),"SceneObject::AddChild -> 'child' is invalid.", true);
 
 	// check for adding self as child (that's bad)
 	if(child.GetPtr() == this)
@@ -226,7 +226,7 @@ void SceneObject::AddChild(SceneObjectRef child)
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	SceneObjectRef sceneObjectRef = objectManager->FindSceneObjectInDirectory(this->GetObjectID());
-	ASSERT_RTRN(sceneObjectRef.IsValid(),"SceneObject::AddChild -> sceneObjectRef is NULL.");
+	ASSERT(sceneObjectRef.IsValid(),"SceneObject::AddChild -> Could not find matching reference for 'child' scene object.");
 
 	//TODO: add check for duplicate children
 	if(child->parent.IsValid())
@@ -252,7 +252,7 @@ void SceneObject::AddChild(SceneObjectRef child)
 
 void SceneObject::RemoveChild(SceneObjectRef child)
 {
-	ASSERT_RTRN(child.IsValid(),"SceneObject::RemoveChild -> child is NULL.");
+	NONFATAL_ASSERT(child.IsValid(),"SceneObject::RemoveChild -> 'child' is invalid.", true);
 
 	int foundIndex = -1;
 	for(unsigned int i =0; i < children.size(); i++)

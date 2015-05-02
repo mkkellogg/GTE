@@ -7,6 +7,7 @@
 #include "color4factory.h"
 #include "color4.h"
 #include "base/basevector4.h"
+#include "global/global.h"
 
 Color4Factory * Color4Factory::instance;
 
@@ -28,10 +29,10 @@ BaseVector4 * Color4Factory::CreatePermAttached(float * target)
 BaseVector4 ** Color4Factory::CreateArray(int count)
 {
 	BaseVector4** pptr = (BaseVector4**)new Color4*[count];
-	if(pptr != NULL)
-	{
-		memset(pptr, (int)NULL, sizeof(Color4*) * count);
-	}
+	ASSERT(pptr != NULL, "Color4Factory::CreateArray -> Unable to allocate array");
+
+	memset(pptr, (int)NULL, sizeof(Color4*) * count);
+
 	return pptr;
 }
 

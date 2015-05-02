@@ -114,13 +114,8 @@ unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
  */
 bool Material::Init(ShaderRef shader)
 {
-	ASSERT(shader.IsValid()," Material::Init(Shader *) -> tried to Init with NULL shader.", false);
-
-	if(!shader->IsLoaded())
-	{
-		Debug::PrintError(" Material::Init(Shader *) -> tried to Init with unloaded shader.");
-		return false;
-	}
+	NONFATAL_ASSERT_RTRN(shader.IsValid()," Material::Init -> tried to initialize with invalid shader.", false, true);
+	NONFATAL_ASSERT_RTRN(shader->IsLoaded()," Material::Init -> tried to initialize with unloaded shader.", false, true);
 
 	this->shader = shader;
 
@@ -145,16 +140,16 @@ bool Material::Init(ShaderRef shader)
  */
 bool Material::SetupSetVerifiers()
 {
-	ASSERT(shader.IsValid(),"Material::SetupSetVerifiers -> shader is NULL", false);
+	NONFATAL_ASSERT_RTRN(shader.IsValid(),"Material::SetupSetVerifiers -> Shader is invalid.", false, true);
 
 	unsigned int attributeCount = shader->GetAttributeCount();
 	unsigned int uniformCount = shader->GetUniformCount();
 
 	attributesSetValues = new int[attributeCount];
-	ASSERT(attributesSetValues != NULL,"Material::SetupSetVerifiers -> could not allocate attributesSetValues", false);
+	ASSERT(attributesSetValues != NULL,"Material::SetupSetVerifiers -> Could not allocate attributesSetValues.");
 
 	uniformsSetValues = new int[uniformCount];
-	ASSERT(uniformsSetValues != NULL,"Material::SetupSetVerifiers -> could not allocate uniformsSetValues", false);
+	ASSERT(uniformsSetValues != NULL,"Material::SetupSetVerifiers -> Could not allocate uniformsSetValues.");
 
 	// initialize all the values in [attributesSetValues] and [uniformsSetValues] to 0
 	ResetVerificationState();
@@ -182,7 +177,7 @@ bool Material::SetupSetVerifiers()
  */
 bool Material::SetupSetUniforms()
 {
-	ASSERT(shader.IsValid(),"Material::SetupSetUniforms -> shader is NULL", false);
+	NONFATAL_ASSERT_RTRN(shader.IsValid(),"Material::SetupSetUniforms -> Shader is invalid.", false, true);
 
 	DestroySetUniforms();
 
@@ -278,7 +273,7 @@ int Material::TestForStandardAttribute(StandardAttribute attr) const
  */
 int Material::GetUniformIndex(const std::string& uniformName)
 {
-	ASSERT(shader.IsValid(),"Material::GetUniformIndex -> is NULL",-1);
+	NONFATAL_ASSERT_RTRN(shader.IsValid(),"Material::GetUniformIndex -> Shader is invalid.",-1, true);
 
 	int foundIndex = -1;
 	for(unsigned int i=0; i< setUniforms.size(); i++)
@@ -444,7 +439,7 @@ StandardAttributeSet Material::GetStandardAttributes() const
  */
 void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer)
 {
-	ASSERT_RTRN(buffer != NULL, "Material::SendStandardAttributeBufferToShader -> buffer is NULL.");
+	NONFATAL_ASSERT(buffer != NULL, "Material::SendStandardAttributeBufferToShader -> 'buffer' is null.", true);
 
 	int varID = GetStandardAttributeBinding(attr);
 	if(varID >= 0)
@@ -463,8 +458,8 @@ void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, Verte
  */
 void Material::SendAttributeBufferToShader(int varID, VertexAttrBuffer *buffer)
 {
-	ASSERT_RTRN(buffer != NULL, "Material::SendAttributeBufferToShader -> buffer is NULL.");
-	ASSERT_RTRN(varID >= 0, "Material::SendAttributeBufferToShader -> varID cannot be less than 0.");
+	NONFATAL_ASSERT(buffer != NULL, "Material::SendAttributeBufferToShader -> 'buffer' is null.", true);
+	NONFATAL_ASSERT(varID >= 0, "Material::SendAttributeBufferToShader -> 'varID' cannot be less than 0.", true);
 
 	if(varID >= 0)
 	{
@@ -490,12 +485,12 @@ StandardUniformSet Material::GetStandardUniforms() const
  */
 void Material::SendSetUniformToShader(unsigned int index)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendSetUniformToShader -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendSetUniformToShader -> 'shader' is null.", true);
 
 	if(index < setUniforms.size())
 	{
 		UniformDescriptor * desc = setUniforms[index];
-		ASSERT_RTRN(desc != NULL, "Material::SendSetUniformToShader -> uniform descriptor is NULL");
+		NONFATAL_ASSERT(desc != NULL, "Material::SendSetUniformToShader -> Uniform descriptor is null.", true);
 
 		if(desc->IsSet)
 		{
@@ -555,8 +550,8 @@ void Material::SendAllSetUniformsToShader()
  */
 void Material::SetTexture(TextureRef texture, const std::string& varName)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SetTexture -> shader is NULL");
-	ASSERT_RTRN(texture.IsValid(),"Material::SetTexture -> texture is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SetTexture -> Shader is null.", true);
+	NONFATAL_ASSERT(texture.IsValid(),"Material::SetTexture -> 'texture' is null.", true);
 
 	int loc, foundIndex;
 	bool success = ValidateUniformName(varName, loc, foundIndex);
@@ -579,7 +574,7 @@ void Material::SetTexture(TextureRef texture, const std::string& varName)
  */
 void Material::SetMatrix4x4(const Matrix4x4& mat, const std::string& varName)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SetMatrix4x4 -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SetMatrix4x4 -> Shader is null.", true);
 
 	int loc, foundIndex;
 	bool success = ValidateUniformName(varName, loc, foundIndex);
@@ -599,7 +594,7 @@ void Material::SetMatrix4x4(const Matrix4x4& mat, const std::string& varName)
  */
 void Material::SetUniform1f(float val, const std::string& varName)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform1f -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SetUniform1f -> 'shader' is null.", true);
 
 	int loc, foundIndex;
 	bool success = ValidateUniformName(varName, loc, foundIndex);
@@ -618,7 +613,7 @@ void Material::SetUniform1f(float val, const std::string& varName)
  */
 void Material::SetUniform2f(float v1, float v2, const std::string& varName)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform2f -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SetUniform2f -> 'shader' is null.", true);
 
 	int loc, foundIndex;
 	bool success = ValidateUniformName(varName, loc, foundIndex);
@@ -638,7 +633,7 @@ void Material::SetUniform2f(float v1, float v2, const std::string& varName)
  */
 void Material::SetUniform4f(float v1, float v2, float v3, float v4, const std::string& varName)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SetUniform4f -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SetUniform4f -> 'shader' is null.", true);
 
 	int loc, foundIndex;
 	bool success = ValidateUniformName(varName, loc, foundIndex);
@@ -659,7 +654,7 @@ void Material::SetUniform4f(float v1, float v2, float v3, float v4, const std::s
 */
 void Material::SetColor(Color4 val, const std::string& varName)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SetColor -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SetColor -> 'shader' is null.", true);
 
 	int loc, foundIndex;
 	bool success = ValidateUniformName(varName, loc, foundIndex);
@@ -689,7 +684,7 @@ unsigned int Material::GetSetUniformCount() const
  */
 void Material::SendClipPlaneCountToShader(unsigned int count)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendClipPlaneToShader -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
 	int varID = GetStandardUniformBinding(StandardUniform::ClipPlaneCount);
 	if(varID >=0 )
@@ -705,7 +700,7 @@ void Material::SendClipPlaneCountToShader(unsigned int count)
  */
 void Material::SendClipPlaneToShader(unsigned int index, float eq1, float eq2, float eq3, float eq4)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendClipPlaneToShader -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
 	int varID = GetStandardUniformBinding((StandardUniform)((unsigned int)StandardUniform::ClipPlane0 + index));
 	if(varID >=0 )
@@ -721,7 +716,7 @@ void Material::SendClipPlaneToShader(unsigned int index, float eq1, float eq2, f
  */
 void Material::SendModelMatrixToShader(const Matrix4x4 * mat)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendModelMatrixToShader -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendModelMatrixToShader -> 'shader' is null.", true);
 
 	int varID = GetStandardUniformBinding(StandardUniform::ModelMatrix);
 	if(varID >=0 )
@@ -737,7 +732,7 @@ void Material::SendModelMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendModelViewMatrixToShader -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendModelViewMatrixToShader -> 'shader' is null.", true);
 
 	int varID = GetStandardUniformBinding(StandardUniform::ModelViewMatrix);
 	if(varID >=0 )
@@ -753,7 +748,7 @@ void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendProjectionMatrixToShader -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendProjectionMatrixToShader -> 'shader' is null.", true);
 
 	int varID = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
 	if(varID >= 0)
@@ -769,7 +764,7 @@ void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendMVPMatrixToShader -> shader is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendMVPMatrixToShader -> 'shader' is null.", true);
 
 	int varID = GetStandardUniformBinding(StandardUniform::ModelViewProjectionMatrix);
 	if(varID >=0 )
@@ -785,9 +780,9 @@ void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
  */
 void Material::SendLightToShader(const Light * light, const Point3 * position,  const Vector3 * altDirection)
 {
-	ASSERT_RTRN(shader.IsValid(),"Material::SendLightToShader -> shader is NULL");
-	ASSERT_RTRN(light != NULL,"Material::SendLightToShader -> light is NULL");
-	ASSERT_RTRN(position != NULL,"Material::SendLightToShader -> position is NULL");
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendLightToShader -> 'shader' is null.", true);
+	NONFATAL_ASSERT(light != NULL,"Material::SendLightToShader -> 'light' is null.", true);
+	NONFATAL_ASSERT(position != NULL,"Material::SendLightToShader -> 'position' is null.", true);
 
 	int varID = GetStandardUniformBinding(StandardUniform::LightType);
 	if(varID >=0 )
@@ -839,7 +834,7 @@ void Material::SendLightToShader(const Light * light, const Point3 * position,  
  */
 bool Material::VerifySetVars(int vertexCount)
 {
-	ASSERT(shader.IsValid(), "Material::VerifySetVars -> shader is NULL", false);
+	NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::VerifySetVars -> 'shader' is null.", false, true);
 	if(allSetUniformsandAttributesVerified == true)return true;
 
 	for(unsigned int i =0; i< shader->GetAttributeCount(); i++)

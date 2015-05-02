@@ -33,10 +33,10 @@ bool LavaField::InitMeshAndMaterial()
 {
 	// load first displacement image
 	displacementA = ImageLoader::LoadImage("resources/textures/lava/displacementA.png");
-	ASSERT(displacementA != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture A.", false);
+	ASSERT(displacementA != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture A.");
 	// load second displacement image
 	displacementB = ImageLoader::LoadImage("resources/textures/lava/displacementB.png");
-	ASSERT(displacementB != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture B.", false);
+	ASSERT(displacementB != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture B.");
 
 	// make lava field 1x1 in model space
 	fieldWidth = 1;
@@ -48,7 +48,7 @@ bool LavaField::InitMeshAndMaterial()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
 	fieldMesh = EngineUtility::CreateRectangularMesh(meshAttributes, fieldWidth, fieldHeight, subDivisions-1, subDivisions-1, false, false);
-	ASSERT(fieldMesh.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava field mesh.", false);
+	ASSERT(fieldMesh.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava field mesh.");
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	AssetImporter importer;
@@ -59,17 +59,17 @@ bool LavaField::InitMeshAndMaterial()
 
 	// create the first texture
 	lavaTextureA = objectManager->CreateTexture("resources/textures/lava/lavatex.jpg", texAttributes);
-	ASSERT(lavaTextureA.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava texture A.", false);
+	ASSERT(lavaTextureA.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava texture A.");
 	// create the second texture
 	lavaTextureB = objectManager->CreateTexture("resources/textures/lava/lavatex2.jpg", texAttributes);
-	ASSERT(lavaTextureB.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava texture B.", false);
+	ASSERT(lavaTextureB.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava texture B.");
 
 	// load the lava shader and use it to create the material for rendering
 	// the lava field mesh
 	ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("lava", selfLitShaderSource);
 	lavaMaterial = objectManager->CreateMaterial("SelfLitTexture", selfLitShaderSource);
-	ASSERT(lavaMaterial.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava material.", false);
+	ASSERT(lavaMaterial.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava material.");
 
 	// assign the textures to the material
 	lavaMaterial->SetTexture(lavaTextureA, "TEXTUREA");
@@ -114,8 +114,8 @@ void LavaField::DisplaceField()
 		int pixelY = percentageY * diplacementImageDimensionSize;
 
 		// enforce wrapping if pixel position is outside image boundaries
-		if(pixelX >= diplacementImageDimensionSize)pixelX = pixelX % diplacementImageDimensionSize;
-		if(pixelY >= diplacementImageDimensionSize)pixelY = pixelY % diplacementImageDimensionSize;
+		if(pixelX > 0 && (unsigned int)pixelX >= diplacementImageDimensionSize)pixelX = pixelX % diplacementImageDimensionSize;
+		if(pixelY > 0 && (unsigned int)pixelY >= diplacementImageDimensionSize)pixelY = pixelY % diplacementImageDimensionSize;
 		if(pixelX < 0)pixelX = diplacementImageDimensionSize - (pixelX % diplacementImageDimensionSize);
 		if(pixelY < 0)pixelY = diplacementImageDimensionSize - (pixelY % diplacementImageDimensionSize);
 
@@ -181,24 +181,24 @@ bool LavaField::Init()
 {
 	// initialize mesh, materials, textures, and displacement data
 	bool baseInitSuccess = InitMeshAndMaterial();
-	ASSERT(baseInitSuccess == true, "LavaField::Init -> Could not initialize lava material or lava field mesh.", false);
+	ASSERT(baseInitSuccess == true, "LavaField::Init -> Could not initialize lava material or lava field mesh.");
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	// create SceneObject
 	lavaFieldObject = objectManager->CreateSceneObject();
-	ASSERT(lavaFieldObject.IsValid(), "LavaField::Init -> Could not create lava field scene object.", false);
+	ASSERT(lavaFieldObject.IsValid(), "LavaField::Init -> Could not create lava field scene object.");
 
 	// set up mesh filter
 	Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
-	ASSERT(meshFilter.IsValid(), "LavaField::Init -> Could not create lava field mesh filter.", false);
+	ASSERT(meshFilter.IsValid(), "LavaField::Init -> Could not create lava field mesh filter.");
 	meshFilter->SetMesh3D(fieldMesh);
 	meshFilter->SetCastShadows(false);
 	meshFilter->SetReceiveShadows(false);
 
 	// set up renderer
 	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
-	ASSERT(renderer.IsValid(), "LavaField::Init -> Could not create lava field renderer.", false);
+	ASSERT(renderer.IsValid(), "LavaField::Init -> Could not create lava field renderer.");
 	renderer->AddMaterial(lavaMaterial);
 
 	lavaFieldObject->SetMesh3DFilter(meshFilter);

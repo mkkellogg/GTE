@@ -136,13 +136,6 @@ void Game::Init()
  */
 void Game::SetupScenes(AssetImporter& importer)
 {
-	scenes[(unsigned int)Scenes::LavaScene] = new LavaScene();
-	scenes[(unsigned int)Scenes::CastleScene] = new CastleScene();
-
-	PoolScene * poolScene = new PoolScene();
-	poolScene->SetMainCamera(cameraObject->GetCamera());
-	scenes[(unsigned int)Scenes::PoolScene] = poolScene;
-
 	SetupScene(importer, Scenes::LavaScene);
 	SetupScene(importer, Scenes::CastleScene);
 	SetupScene(importer, Scenes::PoolScene);
@@ -157,16 +150,27 @@ void Game::SetupScenes(AssetImporter& importer)
  */
 void Game::SetupScene(AssetImporter& importer, Scenes scene)
 {
+	LavaScene * lavaScene = NULL;
+	CastleScene * castleScene = NULL;
+	PoolScene * poolScene = NULL;
+
 	switch(scene)
 	{
 		case Scenes::LavaScene:
-			scenes[(unsigned int)Scenes::LavaScene]->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+			lavaScene = new LavaScene();
+			scenes[(unsigned int)Scenes::LavaScene] = lavaScene;
+			lavaScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 		case Scenes::CastleScene:
-			scenes[(unsigned int)Scenes::CastleScene]->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+			castleScene = new CastleScene();
+			scenes[(unsigned int)Scenes::CastleScene] = castleScene;
+			castleScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 		case Scenes::PoolScene:
-			scenes[(unsigned int)Scenes::PoolScene]->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+			poolScene = new PoolScene();
+			poolScene->SetMainCamera(cameraObject->GetCamera());
+			scenes[(unsigned int)Scenes::PoolScene] = poolScene;
+			poolScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 	}
 }
@@ -224,7 +228,7 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 
 	// load castle island model
 	SceneObjectRef modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// place island in the scene
@@ -240,7 +244,7 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 
 	// load bridge
 	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load bridge model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load bridge model!\n");
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// place bridge in the scene
@@ -442,7 +446,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 		case PlayerType::Koopa:
 			importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
 			playerObject = importer.LoadModelDirect("resources/models/koopa/koopamod.fbx");
-			ASSERT_RTRN(playerObject.IsValid(), "Could not load Koopa model!\n");
+			ASSERT(playerObject.IsValid(), "Could not load Koopa model!\n");
 			playerObject->GetTransform().SetIdentity();
 			playerObject->GetTransform().Translate(45,-10,55,false);
 			playerObject->GetTransform().Scale(.05, .05, .05, true);
@@ -450,7 +454,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 		case PlayerType::Warrior:
 			importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, true);
 			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx");
-			ASSERT_RTRN(playerObject.IsValid(), "Could not load Warrior model!\n");
+			ASSERT(playerObject.IsValid(), "Could not load Warrior model!\n");
 			playerObject->GetTransform().Translate(45,-10,55,false);
 			playerObject->GetTransform().Scale(4, 4, 4, true);
 		break;
@@ -506,7 +510,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpEnd]);
 			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpFall]);
 
-			ASSERT_RTRN(compatible, "Koopa animations are not compatible!");
+			ASSERT(compatible, "Koopa animations are not compatible!");
 
 			// create an animation player and some animations to it for the player object.
 			playerAnimations[PlayerState::JumpFall]->ClipEnds(playerAnimations[PlayerState::JumpFall]->GetDuration() - .05, playerAnimations[PlayerState::JumpFall]->GetDuration());
@@ -532,7 +536,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Attack3]);
 			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Defend1]);
 
-			ASSERT_RTRN(compatible, "Warrior animations are not compatible!");
+			ASSERT(compatible, "Warrior animations are not compatible!");
 
 			// set all meshes to use standard shadow volume
 			GameUtil::ProcessSceneObjects(playerObject, [=](SceneObjectRef current)
@@ -634,7 +638,7 @@ void Game::DisplayInfo()
 		float elapsedFPSTime = Time::GetRealTimeSinceStartup() - lastFPSRetrieveTime;
 		if(elapsedFPSTime > 1)
 		{
-			lastFPS = Engine::Instance()->GetGraphicsEngine()->GetCurrentFPS();
+			lastFPS = Engine::Instance()->GetGraphicsSystem()->GetCurrentFPS();
 			lastFPSRetrieveTime = Time::GetRealTimeSinceStartup();
 		}
 

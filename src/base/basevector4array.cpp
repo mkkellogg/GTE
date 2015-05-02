@@ -36,20 +36,10 @@ bool BaseVector4Array::Init(unsigned int reservedCount)
 	this->count = reservedCount;
 
 	data = new float[reservedCount * 4];
-	if(data == NULL)
-	{
-		Debug::PrintError("Could not allocate data memory for BaseVector4Array");
-		return false;
-	}
+	ASSERT(data != NULL, "Could not allocate data memory for BaseVector4Array");
 
 	objects = baseFactory->CreateArray(reservedCount);
-
-	if(objects == NULL)
-	{
-		Debug::PrintError("Could not allocate objects memory for BaseVector4Array");
-		Destroy();
-		return false;
-	}
+	ASSERT(objects != NULL, "Could not allocate objects memory for BaseVector4Array");
 
 	float *dataPtr = data;
 
@@ -57,13 +47,7 @@ bool BaseVector4Array::Init(unsigned int reservedCount)
 	while(index < reservedCount)
 	{
 		BaseVector4 * currentObject = (BaseVector4*)baseFactory->CreatePermAttached(dataPtr);
-
-		if(currentObject == NULL)
-		{
-			Debug::PrintError("Could not allocate BaseVector4 for BaseVector4Array");
-			Destroy();
-			return false;
-		}
+		ASSERT(currentObject != NULL, "Could not allocate BaseVector4 for BaseVector4Array");
 
 		objects[index] = currentObject;
 		currentObject->Set(0,0,0,0);
@@ -77,7 +61,7 @@ bool BaseVector4Array::Init(unsigned int reservedCount)
 
 BaseVector4 * BaseVector4Array::GetBaseVector(unsigned int index)
 {
-	ASSERT(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", NULL, true);
 
 	return objects[index];
 }
@@ -104,7 +88,7 @@ unsigned int BaseVector4Array::GetCount() const
 
 bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
 {
-	ASSERT(dest != NULL," BaseVector4Array::CopyTo -> Destination is NULL.",false);
+	NONFATAL_ASSERT_RTRN(dest != NULL," BaseVector4Array::CopyTo -> 'dest' is null.",false, true);
 
 	if(dest->GetCount() != count)
 	{

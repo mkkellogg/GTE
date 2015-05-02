@@ -147,7 +147,7 @@ void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject
 	directionalLight->SetCullingMask(mergedMask);
 
 	sceneRoot = objectManager->CreateSceneObject();
-	ASSERT_RTRN(sceneRoot.IsValid(), "Could not create scene root for lava scene!\n");
+	ASSERT(sceneRoot.IsValid(), "Could not create scene root for lava scene!\n");
 
 	sceneRoot->GetTransform().Translate(-20,0,0, false);
 
@@ -176,7 +176,7 @@ void LavaScene::SetupTerrain(AssetImporter& importer)
 
 	// load lava island model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaIslandLayerMask);
@@ -214,7 +214,7 @@ void LavaScene::SetupTerrain(AssetImporter& importer)
 
 	// load stone3
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/stone/Stone03.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load stone model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load stone model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
@@ -285,7 +285,7 @@ void LavaScene::SetupStructures(AssetImporter& importer)
 	//========================================================
 
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/mushroom/MushRoom_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load mushroom house model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load mushroom house model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaIslandObjectsLayerMask);
@@ -297,7 +297,7 @@ void LavaScene::SetupStructures(AssetImporter& importer)
 
 	// load turrent tower
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load tower model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaIslandObjectsLayerMask);
@@ -315,7 +315,7 @@ void LavaScene::SetupStructures(AssetImporter& importer)
 
 	// load bridge
 	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load bridge model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load bridge model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 

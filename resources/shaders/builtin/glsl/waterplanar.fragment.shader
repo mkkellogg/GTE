@@ -15,7 +15,6 @@ uniform float REFRACTED_COLOR_FACTOR;
 
 in vec4 position;
 in vec4 oPos;
-in vec4 modLocalPos;
 
 out vec4 out_color;
         

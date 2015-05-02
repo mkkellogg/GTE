@@ -18,7 +18,7 @@ bool ImageLoader::Initialize()
 {
 	if(!ImageLoader::ilInitialized)
 	{
-		ASSERT(ilGetInteger(IL_VERSION_NUM) >= IL_VERSION, "AssetImporter::ProcessMaterials -> wrong DevIL version", false);
+		ASSERT(ilGetInteger(IL_VERSION_NUM) >= IL_VERSION, "AssetImporter::ProcessMaterials -> wrong DevIL version");
 
 		ilInit(); /// Initialization of DevIL
 		ilEnable(IL_ORIGIN_SET);
@@ -32,7 +32,7 @@ bool ImageLoader::Initialize()
 RawImage * ImageLoader::LoadPNG(const std::string& fullPath)
 {
 	bool initializeSuccess = Initialize();
-	ASSERT(initializeSuccess, "ImageLoader::LoadPNG -> Error occurred while initializing image loader.", NULL);
+	ASSERT(initializeSuccess, "ImageLoader::LoadPNG -> Error occurred while initializing image loader.");
 
 	std::vector<unsigned char> image; // raw pixels
 	unsigned width, height;
@@ -50,7 +50,7 @@ RawImage * ImageLoader::LoadPNG(const std::string& fullPath)
 	RawImage * raw = new RawImage(width,height);
 	bool initSuccess = raw->Init();
 
-	ASSERT(initSuccess, "ImageLoader::LoadPNG -> could not init raw image", NULL);
+	NONFATAL_ASSERT_RTRN(initSuccess, "ImageLoader::LoadPNG -> Could not initialize raw image.", NULL, false);
 
 	for(unsigned int i=0; i < width * height * 4; i++)
 	{
@@ -63,7 +63,7 @@ RawImage * ImageLoader::LoadPNG(const std::string& fullPath)
 RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 {
 	bool initializeSuccess = Initialize();
-	ASSERT(initializeSuccess, "ImageLoader::LoadImage -> Error occurred while initializing image loader.", NULL);
+	NONFATAL_ASSERT_RTRN(initializeSuccess, "ImageLoader::LoadImage -> Error occurred while initializing image loader.", NULL, false);
 
 	std::string extension = GetFileExtension(fullPath);
 
@@ -112,10 +112,10 @@ RawImage * ImageLoader::LoadImage(const std::string& fullPath)
 
 RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height)
 {
-	ASSERT(data != NULL,"ImportUtil::GetRawImageFromILData -> data is NULL.",NULL);
+	NONFATAL_ASSERT_RTRN(data != NULL,"ImportUtil::GetRawImageFromILData -> 'data' is null.",NULL, true);
 
 	RawImage * rawImage = new RawImage(width, height);
-	ASSERT(rawImage != NULL,"ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.",NULL);
+	ASSERT(rawImage != NULL,"ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.");
 
 	bool initSuccess = rawImage->Init();
 	if(!initSuccess)
@@ -135,7 +135,7 @@ RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, unsigned int width
 
 void ImageLoader::DestroyRawImage(RawImage * image)
 {
-	ASSERT_RTRN(image != NULL,"ImageLoader::DestroyRawImage -> image is NULL.");
+	NONFATAL_ASSERT(image != NULL,"ImageLoader::DestroyRawImage -> 'image' is null.", true);
 	delete image;
 }
 

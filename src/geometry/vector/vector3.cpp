@@ -97,7 +97,7 @@ bool Vector3::operator==(const Vector3 & source)
  */
 bool Vector3::AreStrictlyEqual(const Vector3* a, const Vector3* b)
 {
-	ASSERT(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> NULL vector passed.", false);
+	NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> Null vector passed.", false, true);
 
 	return a->x == b->x && a->y == b->y && a->z == b->z;
 }
@@ -294,7 +294,7 @@ float Vector3::Dot(const Vector3& a,const Vector3& b)
  */
 void Vector3::AttachTo(float * data)
 {
-	ASSERT_RTRN(data != NULL, "Vector3::AttachTo -> NULL data passed.");
+	NONFATAL_ASSERT(data != NULL, "Vector3::AttachTo -> 'data' is null.", true);
 	BaseVector4::AttachTo(data);
 	UpdateComponentPointers();
 }

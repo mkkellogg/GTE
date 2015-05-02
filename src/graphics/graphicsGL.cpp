@@ -79,7 +79,7 @@ GraphicsGL::~GraphicsGL()
 }
 
 /*
- * Initialize the graphics engine. The custom properties to be used
+ * Initialize the graphics system. The custom properties to be used
  * during initialization such as screen dimensions are passed in
  * via [attributes].
  */
@@ -194,7 +194,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
    // printf("stencil buffer bits: %d\n", stencilBufferBits);
 
     defaultRenderTarget = Graphics::SetupDefaultRenderTarget();
-    ASSERT(defaultRenderTarget.IsValid(), "GraphicsGL::Init -> Unable to create default render target", false);
+    ASSERT(defaultRenderTarget.IsValid(), "GraphicsGL::Init -> Unable to create default render target.");
 
     ActivateRenderTarget(defaultRenderTarget);
 
@@ -207,7 +207,7 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 }
 
 /*
- * Start the graphics engine. In the case of GLUT, this means call glutMainLoop().
+ * Start the graphics system.
  */
 bool GraphicsGL::Start()
 {
@@ -215,14 +215,25 @@ bool GraphicsGL::Start()
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-	Engine::Instance()->Update();
+    	Engine::Instance()->Update();
 
         /* Poll for and process events */
         glfwPollEvents();
     }
 
-    glfwTerminate();
+    End();
     return true;
+}
+
+
+/*
+ * Shut down the graphics system
+ */
+void GraphicsGL::End()
+{
+	Graphics::End();
+
+	 glfwTerminate();
 }
 
 /*
@@ -267,7 +278,7 @@ void GraphicsGL::RenderScene()
 Shader * GraphicsGL::CreateShader(const ShaderSource& shaderSource)
 {
     Shader * shader = new ShaderGL(shaderSource);
-    ASSERT(shader != NULL, "GraphicsGL::CreateShader -> Unable to allocate new shader.", NULL);
+    ASSERT(shader != NULL, "GraphicsGL::CreateShader -> Unable to allocate new shader.");
 
     // load, compile, and link the shader into a complete OpenGL shader program
     bool loadSuccess = shader->Load();
@@ -286,7 +297,7 @@ Shader * GraphicsGL::CreateShader(const ShaderSource& shaderSource)
  */
 void GraphicsGL::DestroyShader(Shader * shader)
 {
-	ASSERT_RTRN(shader != NULL, "GraphicsGL::DestroyShader -> shader is NULL");
+	NONFATAL_ASSERT(shader != NULL, "GraphicsGL::DestroyShader -> 'shader' is null.", true);
     delete shader;
 }
 
@@ -484,7 +495,7 @@ VertexAttrBuffer * GraphicsGL::CreateVertexAttributeBuffer()
  */
 void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 {
-	ASSERT_RTRN(buffer != NULL, "GraphicsGL::DestroyVertexAttributeBuffer -> buffer is NULL");
+	NONFATAL_ASSERT(buffer != NULL, "GraphicsGL::DestroyVertexAttributeBuffer -> 'buffer' is null", true);
 	delete buffer;
 }
 
@@ -504,7 +515,7 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 
 	// generate the OpenGL texture
 	glGenTextures(1, &tex);
-	ASSERT(tex > 0, "GraphicsGL::CreateTexture -> Unable to generate texture", NULL);
+	ASSERT(tex > 0, "GraphicsGL::CreateTexture -> Unable to generate texture");
 
 	// make the new texture active
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -626,7 +637,7 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
  */
 Texture * GraphicsGL::CreateTexture(RawImage * imageData,  const TextureAttributes&  attributes)
 {
-	ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> imageData is NULL", NULL);
+	NONFATAL_ASSERT_RTRN(imageData != NULL, "GraphicsGL::CreateTexture -> 'imageData' is null", NULL, true);
 
 	Texture * texture =  CreateTexture(imageData->GetWidth(), imageData->GetHeight(), imageData->GetPixels(), attributes);
 	return texture;
@@ -693,7 +704,7 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 
 	// generate the OpenGL cube texture
 	glGenTextures(1, &tex);
-	ASSERT(tex > 0, "GraphicsGL::CreateCubeTexture -> unable to generate texture", NULL);
+	ASSERT(tex > 0, "GraphicsGL::CreateCubeTexture -> unable to generate texture");
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 
@@ -789,12 +800,12 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backData,  RawImage * topData,
 										RawImage * bottomData,  RawImage * leftData,  RawImage * rightData)
 {
-	ASSERT(frontData != NULL, "GraphicsGL::CreateCubeTexture -> Front image is NULL.", NULL);
-	ASSERT(backData != NULL, "GraphicsGL::CreateCubeTexture -> Back image is NULL.", NULL);
-	ASSERT(topData != NULL, "GraphicsGL::CreateCubeTexture -> Top image is NULL.", NULL);
-	ASSERT(bottomData != NULL, "GraphicsGL::CreateCubeTexture -> Bottom image is NULL.", NULL);
-	ASSERT(leftData != NULL, "GraphicsGL::CreateCubeTexture -> Left image is NULL.", NULL);
-	ASSERT(rightData != NULL, "GraphicsGL::CreateCubeTexture -> Right image is NULL.", NULL);
+	NONFATAL_ASSERT_RTRN(frontData != NULL, "GraphicsGL::CreateCubeTexture -> Front image is null.", NULL, true);
+	NONFATAL_ASSERT_RTRN(backData != NULL, "GraphicsGL::CreateCubeTexture -> Back image is null.", NULL, true);
+	NONFATAL_ASSERT_RTRN(topData != NULL, "GraphicsGL::CreateCubeTexture -> Top image is null.", NULL, true);
+	NONFATAL_ASSERT_RTRN(bottomData != NULL, "GraphicsGL::CreateCubeTexture -> Bottom image is null.", NULL, true);
+	NONFATAL_ASSERT_RTRN(leftData != NULL, "GraphicsGL::CreateCubeTexture -> Left image is null.", NULL, true);
+	NONFATAL_ASSERT_RTRN(rightData != NULL, "GraphicsGL::CreateCubeTexture -> Right image is null.", NULL, true);
 
 	Texture * texture = CreateCubeTexture(frontData->GetPixels(), frontData->GetWidth(), frontData->GetHeight(),
 										  backData->GetPixels(), backData->GetWidth(), backData->GetHeight(),
@@ -804,7 +815,7 @@ Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backDa
 										  rightData->GetPixels(), rightData->GetWidth(), rightData->GetHeight());
 
 	TextureGL * textureGL = dynamic_cast<TextureGL *>(texture);
-	ASSERT(textureGL != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL);
+	ASSERT(textureGL != NULL, "GraphicsGL::CreateCubeTexture -> Unable to cast to TextureGL.");
 
 	return texture;
 }
@@ -842,7 +853,7 @@ Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::str
 	std::vector<std::string> sourcePaths;
 
 	tex = (TextureGL*)CreateCubeTexture(rawFront, rawBack, rawTop, rawBottom, rawLeft, rawRight);
-	ASSERT(tex != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL);
+	NONFATAL_ASSERT_RTRN(tex != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL, true);
 
 	return tex;
 }
@@ -852,10 +863,10 @@ Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::str
  */
 void GraphicsGL::DestroyTexture(Texture * texture)
 {
-	ASSERT_RTRN(texture != NULL, "GraphicsGL::DestroyTexture -> texture is NULL");
+	NONFATAL_ASSERT(texture != NULL, "GraphicsGL::DestroyTexture -> 'texture' is null", true);
 
 	TextureGL * texGL = dynamic_cast<TextureGL*>(texture);
-	ASSERT_RTRN(texGL != NULL, "GraphicsGL::DestroyTexture -> texture is not OpenGL compatible");
+	ASSERT(texGL != NULL, "GraphicsGL::DestroyTexture -> 'texture' is not OpenGL compatible.");
 
 	GLuint textureID = texGL->GetTextureID();
 	if(glIsTexture(textureID))
@@ -880,7 +891,7 @@ RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth, bool
 {
 	RenderTargetGL * buffer;
 	buffer = new RenderTargetGL(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
-	ASSERT(buffer != NULL, "GraphicsGL::CreateRenderTarget -> unable to create render target", NULL);
+	ASSERT(buffer != NULL, "GraphicsGL::CreateRenderTarget -> Unable to allocate render target.");
 	return buffer;
 }
 
@@ -888,7 +899,7 @@ RenderTarget * GraphicsGL::CreateDefaultRenderTarget()
 {
 	 TextureAttributes colorAttributes;
 	 RenderTargetGL * defaultTarget = new RenderTargetGL(false,false, false, colorAttributes,this->attributes.WindowWidth, this->attributes.WindowHeight);
-	 ASSERT(defaultTarget != NULL, "GraphicsGL::CreateDefaultRenderTarget -> unable to create default render target", NULL);
+	 ASSERT(defaultTarget != NULL, "GraphicsGL::CreateDefaultRenderTarget -> Unable to allocate default render target");
 
 	 return defaultTarget;
 }
@@ -898,7 +909,7 @@ RenderTarget * GraphicsGL::CreateDefaultRenderTarget()
  */
 void GraphicsGL::DestroyRenderTarget(RenderTarget * target)
 {
-	ASSERT_RTRN(target != NULL, "GraphicsGL::DestroyRenderTarget -> target is NULL");
+	NONFATAL_ASSERT(target != NULL, "GraphicsGL::DestroyRenderTarget -> 'target' is null", true);
 
 	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL*>(target);
 	if(targetGL != NULL)
@@ -908,7 +919,7 @@ void GraphicsGL::DestroyRenderTarget(RenderTarget * target)
 }
 
 /*
- * Get the default render target for the graphics engine.
+ * Get the default render target for the graphics system.
  */
 RenderTargetRef GraphicsGL::GetDefaultRenderTarget()
 {
@@ -975,7 +986,7 @@ GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property)
  */
 void GraphicsGL::ActivateMaterial(MaterialRef material)
 {
-	ASSERT_RTRN(material.IsValid(),"GraphicsGL::ActivateMaterial -> material is NULL");
+	NONFATAL_ASSERT(material.IsValid(),"GraphicsGL::ActivateMaterial -> 'material' is invalid", true);
 
 	if(!this->activeMaterial.IsValid() || !(this->activeMaterial->GetObjectID() == material->GetObjectID()))
 	{
@@ -998,10 +1009,10 @@ void GraphicsGL::ActivateMaterial(MaterialRef material)
 		Graphics::ActivateMaterial(material);
 
 		ShaderRef shader = material->GetShader();
-		ASSERT_RTRN(shader.IsValid(),"GraphicsGL::ActivateMaterial -> shader is NULL");
+		NONFATAL_ASSERT(shader.IsValid(),"GraphicsGL::ActivateMaterial -> 'shader' is null.", true);
 
 		ShaderGL * shaderGL = dynamic_cast<ShaderGL *>(shader.GetPtr());
-		ASSERT_RTRN(shaderGL != NULL,"GraphicsGL::ActivateMaterial -> material's shader is not ShaderGL !!");
+		ASSERT(shaderGL != NULL,"GraphicsGL::ActivateMaterial -> Material's shader is not ShaderGL !!");
 
 		// only active the new shader if it is different from the currently active one
 		if(oldActiveProgramID != shaderGL->GetProgramID())
@@ -1039,7 +1050,7 @@ void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 
 			clearBufferMask = 0;
 			IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
-			Engine::Instance()->GetGraphicsEngine()->ClearRenderBuffers(clearBufferMask);
+			Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearBufferMask);
 			SetStencilBufferEnabled(true);
 			SetStencilTestEnabled(true);
 
@@ -1238,10 +1249,10 @@ GLenum GraphicsGL::GetGLPixelType(TextureFormat format)
  */
 bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
 {
-	ASSERT(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> Render target is not valid.", false);
+	NONFATAL_ASSERT_RTRN(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> 'target' is not valid.", false, true);
 
 	RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target.GetPtr());
-	ASSERT(targetGL != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.", false);
+	ASSERT(targetGL != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.");
 
 	if(currentRenderTarget.IsValid())
 	{
@@ -1275,7 +1286,7 @@ bool GraphicsGL::ActivateCubeRenderTargetSide( CubeTextureSide side)
 	if(currentRenderTarget.IsValid())
 	{
 		RenderTargetGL * currentTargetGL = dynamic_cast<RenderTargetGL *>(currentRenderTarget.GetPtr());
-		ASSERT(currentTargetGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.", false);
+		ASSERT(currentTargetGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.");
 
 		if(!currentTargetGL->GetColorTexture()->GetAttributes().IsCube)
 		{
@@ -1285,13 +1296,13 @@ bool GraphicsGL::ActivateCubeRenderTargetSide( CubeTextureSide side)
 		}
 
 		TextureGL * texGL = dynamic_cast<TextureGL*>(currentTargetGL->GetColorTexture().GetPtr());
-		ASSERT(texGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.", false);
+		ASSERT(texGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.");
 
 		GLenum target = GetGLCubeTarget(side);
 
 		unsigned int sideIndex = (unsigned int)side;
 		RawImage * imageData = texGL->GetImageData(sideIndex);
-		ASSERT(imageData, "GraphicsGL::ActivateCubeRenderTargetSide -> Unable to get image data for specified side.", false);
+		ASSERT(imageData, "GraphicsGL::ActivateCubeRenderTargetSide -> Unable to get image data for specified side.");
 
 		glViewport(0,0,imageData->GetWidth(), imageData->GetHeight());
 
@@ -1325,14 +1336,14 @@ void GraphicsGL::CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef d
 		}
 	}
 
-	ASSERT_RTRN(src.IsValid(), "GraphicsGL::CopyBetweenRenderTargets -> Source is not valid");
-	ASSERT_RTRN(dest.IsValid(), "GraphicsGL::CopyBetweenRenderTargets -> Destination is not valid");
+	NONFATAL_ASSERT(src.IsValid(), "GraphicsGL::CopyBetweenRenderTargets -> Source is not valid", true);
+	NONFATAL_ASSERT(dest.IsValid(), "GraphicsGL::CopyBetweenRenderTargets -> Destination is not valid", true);
 
 	RenderTargetGL * srcGL = dynamic_cast<RenderTargetGL*>(src.GetPtr());
-	ASSERT_RTRN(srcGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Source is not a valid OpenGL render target.");
+	ASSERT(srcGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Source is not a valid OpenGL render target.");
 
 	RenderTargetGL * destGL = dynamic_cast<RenderTargetGL*>(dest.GetPtr());
-	ASSERT_RTRN(destGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Destination is not a valid OpenGL render target.");
+	ASSERT(destGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Destination is not a valid OpenGL render target.");
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, srcGL->GetFBOID());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destGL->GetFBOID());
@@ -1357,10 +1368,10 @@ void GraphicsGL::SetTextureData(TextureRef texture, BYTE * data)
  */
 void GraphicsGL::SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side)
 {
-	ASSERT_RTRN(texture.IsValid(), "GraphicsGL::SetTextureData -> Texture is not valid.");
+	NONFATAL_ASSERT(texture.IsValid(), "GraphicsGL::SetTextureData -> 'texture' is not valid.", true);
 
 	TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
-	ASSERT_RTRN(texGL != NULL, "GraphicsGL::SetTextureData -> Texture is not a valid OpenGL texture.");
+	ASSERT(texGL != NULL, "GraphicsGL::SetTextureData -> Texture is not a valid OpenGL texture.");
 
 	const TextureAttributes attributes = texture->GetAttributes();
 	if(attributes.IsCube)
@@ -1389,7 +1400,7 @@ void GraphicsGL::SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide
 void GraphicsGL::RebuildMipMaps(TextureRef texture)
 {
 	TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
-	ASSERT_RTRN(texGL != NULL, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");
+	ASSERT(texGL != NULL, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");
 
 	const TextureAttributes attributes = texture->GetAttributes();
 	if(openGLVersion >= 3 && (attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear))
@@ -1408,7 +1419,7 @@ void GraphicsGL::RebuildMipMaps(TextureRef texture)
  */
 bool GraphicsGL::AddClipPlane()
 {
-	ASSERT(activeClipPlanes < Constants::MaxClipPlanes, "GraphicsGL::ActivateClipPlane -> Maximum clip planes exceeded.", false);
+	NONFATAL_ASSERT_RTRN(activeClipPlanes < Constants::MaxClipPlanes, "GraphicsGL::ActivateClipPlane -> Maximum clip planes exceeded.", false, true);
 	glEnable(GL_CLIP_PLANE0+activeClipPlanes);
 	activeClipPlanes++;
 	return true;

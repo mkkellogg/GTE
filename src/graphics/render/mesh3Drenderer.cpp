@@ -76,7 +76,7 @@ unsigned int Mesh3DRenderer::GetMaterialCount() const
  */
 MaterialRef Mesh3DRenderer::GetMaterial(unsigned int index)
 {
-	ASSERT(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> Index is out of range.", MaterialRef::Null());
+	NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", MaterialRef::Null(), true);
 
 	return materials[index];
 }
@@ -86,8 +86,8 @@ MaterialRef Mesh3DRenderer::GetMaterial(unsigned int index)
  */
 void Mesh3DRenderer::SetMaterial(unsigned int index, MaterialRef material)
 {
-	ASSERT_RTRN(material.IsValid(), "Mesh3DRenderer::SetMaterial -> material is NULL.");
-	ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::SetMaterial -> Index is out of range.");
+	NONFATAL_ASSERT(material.IsValid(), "Mesh3DRenderer::SetMaterial -> 'material' is null.", true);
+	NONFATAL_ASSERT(index < GetMaterialCount(), "Mesh3DRenderer::SetMaterial -> 'index' is out of range.", true);
 
 	materials[index] = material;
 }
@@ -97,7 +97,7 @@ void Mesh3DRenderer::SetMaterial(unsigned int index, MaterialRef material)
  */
 void Mesh3DRenderer::AddMaterial(MaterialRef material)
 {
-	ASSERT_RTRN(material.IsValid(), "Mesh3DRenderer::AddMaterial -> material is NULL.");
+	NONFATAL_ASSERT(material.IsValid(), "Mesh3DRenderer::AddMaterial -> 'material' is null.", true);
 	materials.push_back(material);
 }
 
@@ -111,10 +111,10 @@ void Mesh3DRenderer::AddMaterial(MaterialRef material)
  */
 void Mesh3DRenderer::InitializeForMesh()
 {
-	ASSERT_RTRN(sceneObject.IsValid(),"Mesh3DRenderer::UpdateFromMesh -> sceneObject is NULL.");
+	NONFATAL_ASSERT(sceneObject.IsValid(),"Mesh3DRenderer::UpdateFromMesh -> 'sceneObject' is null.", true);
 
 	Mesh3DRef mesh = GetTargetMesh();
-	ASSERT_RTRN(mesh.IsValid(),"Mesh3DRenderer::UpdateFromMesh -> mesh is NULL.");
+	NONFATAL_ASSERT(mesh.IsValid(),"Mesh3DRenderer::UpdateFromMesh -> mesh is NULL.", true);
 
 	InitializeForMesh(mesh);
 }
@@ -144,7 +144,7 @@ void Mesh3DRenderer::InitializeForMesh(Mesh3DRef mesh)
 		for(unsigned int i = subRenderers.size(); i < subMeshCount; i++)
 		{
 			SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
-			ASSERT_RTRN(renderer.IsValid(),"Mesh3DRenderer::UpdateFromMesh(Mesh3DRef) -> could not create new SubMesh3DRenderer.");
+			NONFATAL_ASSERT(renderer.IsValid(),"Mesh3DRenderer::UpdateFromMesh(Mesh3DRef) -> Could not create new SubMesh3DRenderer.", false);
 
 			renderer->SetTargetSubMeshIndex(i);
 			renderer->SetContainerRenderer(this);
@@ -166,7 +166,7 @@ void Mesh3DRenderer::InitializeForMesh(Mesh3DRef mesh)
  */
 void Mesh3DRenderer::UpdateFromSubMesh(unsigned int index)
 {
-	ASSERT_RTRN(index <  subRenderers.size(), "Mesh3DRenderer::UpdateFromSubMesh -> Index is out of range.");
+	NONFATAL_ASSERT(index <  subRenderers.size(), "Mesh3DRenderer::UpdateFromSubMesh -> 'index' is out of range.", true);
 
 	SubMesh3DRendererRef renderer = subRenderers[index];
 	renderer->UpdateFromMesh();
@@ -178,7 +178,7 @@ void Mesh3DRenderer::UpdateFromSubMesh(unsigned int index)
  */
 Mesh3DRef Mesh3DRenderer::GetTargetMesh()
 {
-	ASSERT(sceneObject.IsValid(),"Mesh3DRenderer::GetTargetMesh -> sceneObject is NULL.", Mesh3DRef::Null());
+	NONFATAL_ASSERT_RTRN(sceneObject.IsValid(),"Mesh3DRenderer::GetTargetMesh -> 'sceneObject' is null.", Mesh3DRef::Null(), true);
 
 	Mesh3DRef mesh = sceneObject->GetMesh3D();
 
@@ -191,8 +191,8 @@ Mesh3DRef Mesh3DRenderer::GetTargetMesh()
  */
 SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer)
 {
-	ASSERT(subRenderer.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> subRenderer is NULL.", SubMesh3DRef::Null());
-	ASSERT(sceneObject.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> sceneObject is NULL.", SubMesh3DRef::Null());
+	NONFATAL_ASSERT_RTRN(subRenderer.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> 'subRenderer' is null.", SubMesh3DRef::Null(), true);
+	NONFATAL_ASSERT_RTRN(sceneObject.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> 'sceneObject' is null.", SubMesh3DRef::Null(), true);
 
 	// this loop finds the index in [subRenderers] to which [subRenderer] belongs
 	for(unsigned int i=0; i < subRenderers.size(); i++)
@@ -200,10 +200,10 @@ SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRef subRe
 		if(subRenderers[i] == subRenderer)
 		{
 			Mesh3DRef mesh = GetTargetMesh();
-			ASSERT(mesh.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> mesh is NULL.", SubMesh3DRef::Null());
+			NONFATAL_ASSERT_RTRN(mesh.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> 'mesh' is null.", SubMesh3DRef::Null(), false);
 
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-			ASSERT(subMesh.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> subMesh is NULL.", SubMesh3DRef::Null());
+			NONFATAL_ASSERT_RTRN(subMesh.IsValid(),"Mesh3DRenderer::GetSubMeshForSubRenderer -> 'subMesh' is null.", SubMesh3DRef::Null(), false);
 
 			return subMesh;
 		}
@@ -217,15 +217,15 @@ SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRef subRe
  */
 SubMesh3DRef Mesh3DRenderer::GetSubMesh(unsigned int index)
 {
-	ASSERT(sceneObject.IsValid(),"Mesh3DRenderer::GetSubMesh -> sceneObject is NULL.", SubMesh3DRef::Null());
+	NONFATAL_ASSERT_RTRN(sceneObject.IsValid(),"Mesh3DRenderer::GetSubMesh -> 'sceneObject' is null.", SubMesh3DRef::Null(), true);
 
 	Mesh3DRef mesh = GetTargetMesh();
-	ASSERT(mesh.IsValid(),"Mesh3DRenderer::GetSubMesh -> mesh is NULL.", SubMesh3DRef::Null());
+	NONFATAL_ASSERT_RTRN(mesh.IsValid(),"Mesh3DRenderer::GetSubMesh -> 'mesh' is null.", SubMesh3DRef::Null(), true);
 
 	SubMesh3DRef subMesh = mesh->GetSubMesh(index);
-	ASSERT(subMesh.IsValid(),"Mesh3DRenderer::GetSubMesh -> subMesh is NULL.", SubMesh3DRef::Null());
+	NONFATAL_ASSERT_RTRN(subMesh.IsValid(),"Mesh3DRenderer::GetSubMesh -> 'subMesh' is null.", SubMesh3DRef::Null(), true);
 
-	return subMesh;
+ 	return subMesh;
 }
 
 /*
@@ -235,7 +235,7 @@ SubMesh3DRendererRef Mesh3DRenderer::GetSubRenderer(unsigned int index)
 {
 	if(index >= subRenderers.size())
 	{
-		Debug::PrintError("Mesh3DRenderer::GetSubRenderer -> Index is out of range.");
+		Debug::PrintError("Mesh3DRenderer::GetSubRenderer -> 'index' is out of range.");
 		return SubMesh3DRendererRef::Null();
 	}
 

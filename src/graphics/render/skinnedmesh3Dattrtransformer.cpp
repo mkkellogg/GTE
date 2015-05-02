@@ -94,7 +94,7 @@ bool SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray()
 		SkeletonRef skeleton = renderer->GetSkeleton();
 		boneCount = skeleton->GetBoneCount();
 		boneTransformed = new unsigned char[boneCount];
-		ASSERT(boneTransformed != NULL, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray -> Unable to allocate flags array.", false);
+		ASSERT(boneTransformed != NULL, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray -> Unable to allocate flags array.");
 		return true;
 	}
 
@@ -146,11 +146,11 @@ void SkinnedMesh3DAttributeTransformer::DestroyCache(CacheType target)
  */
 bool SkinnedMesh3DAttributeTransformer::CreateCache(CacheType target)
 {
-	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> renderer is NULL.", false);
+	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> Renderer is null.");
 
 	// retrieve this instance's vertex bone map
 	VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::CreateCache -> No valid vertex bone map found for sub mesh.", false);
+	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::CreateCache -> No valid vertex bone map found for sub mesh.");
 
 	unsigned int count = vertexBoneMap->GetUniqueVertexCount();
 
@@ -168,21 +168,21 @@ bool SkinnedMesh3DAttributeTransformer::CreateCache(CacheType target)
 	else if(target == CacheType::VertexNormal)
 	{
 		bool initSuccess = transformedVertexNormals.Init(count);
-		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed vertex normal array.", false);
+		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed vertex normal array.");
 
 		return true;
 	}
 	else if(target == CacheType::FaceNormal)
 	{
 		bool initSuccess = transformedFaceNormals.Init(count);
-		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed face normal array.", false);
+		ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed face normal array.");
 
 		return true;
 	}
 	else if(target == CacheType::Transform)
 	{
 		savedTransforms = new Matrix4x4[count];
-		ASSERT(savedTransforms != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not saved transform array.", false);
+		ASSERT(savedTransforms != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not saved transform array.");
 
 		return true;
 	}
@@ -203,11 +203,11 @@ void SkinnedMesh3DAttributeTransformer::ClearCacheFlags()
  */
 void SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags(unsigned char value)
 {
-	ASSERT_RTRN(renderer != NULL, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> renderer is NULL.");
+	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> Renderer is NULL.");
 
 	// retrieve this instance's vertex bone map
 	VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-	ASSERT_RTRN(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> No valid vertex bone map found for sub mesh.");
+	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> No valid vertex bone map found for sub mesh.");
 
 	unsigned int count = vertexBoneMap->GetUniqueVertexCount();
 
@@ -227,16 +227,16 @@ void SkinnedMesh3DAttributeTransformer:: DestroyIdenticalNormalsFlags()
  */
 bool SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags()
 {
-	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags -> renderer is NULL.", false);
+	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags -> 'renderer' is null.");
 
 	// retrieve this instance's vertex bone map
 	VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags -> No valid vertex bone map found for sub mesh.", false);
+	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags -> No valid vertex bone map found for sub mesh.");
 
 	unsigned int count = vertexBoneMap->GetUniqueVertexCount();
 
 	identicalNormalFlags = new unsigned char[count];
-	ASSERT(identicalNormalFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags -> Unable to allocate identicalNormals flags array.", false);
+	ASSERT(identicalNormalFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags -> Unable to allocate identicalNormals flags array.");
 
 	return true;
 }
@@ -246,11 +246,11 @@ bool SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsFlags()
  */
 void SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags()
 {
-	ASSERT_RTRN(renderer != NULL, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags -> renderer is NULL.");
+	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags -> 'renderer' is null.");
 
 	// retrieve this instance's vertex bone map
 	VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-	ASSERT_RTRN(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags -> No valid vertex bone map found for sub mesh.");
+	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags -> No valid vertex bone map found for sub mesh.");
 
 	unsigned int count = vertexBoneMap->GetUniqueVertexCount();
 
@@ -276,21 +276,21 @@ void SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags()
  */
 bool SkinnedMesh3DAttributeTransformer::FindIdenticalNormals(Vector3Array& fullNormalList)
 {
-	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> renderer is NULL.", false);
+	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> renderer is NULL.");
 
 	// retrieve this instance's vertex bone map
 	VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> No valid vertex bone map found for sub mesh.", false);
+	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> No valid vertex bone map found for sub mesh.");
 
 	unsigned int uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 	ASSERT(fullNormalList.GetCount() == vertexBoneMap->GetVertexCount(),
-				"SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> fullNormalList vertex count does not match vertex bone map.", false);
+				"SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> fullNormalList vertex count does not match vertex bone map.");
 
 	Vector3Array seenNormalValues;
 	std::vector<bool> seenNormals;
 
 	bool initSeenNormals = seenNormalValues.Init(uniqueVertexCount);
-	ASSERT(initSeenNormals != false,"SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> Unable to init seenNormalValues.", false);
+	ASSERT(initSeenNormals != false,"SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> Unable to init seenNormalValues.");
 
 	for(unsigned int i =0; i < uniqueVertexCount; i++)
 	{
@@ -335,32 +335,32 @@ bool SkinnedMesh3DAttributeTransformer::FindIdenticalNormals(Vector3Array& fullN
  */
 bool SkinnedMesh3DAttributeTransformer::CreateCaches()
 {
-	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> renderer is NULL.", false);
+	ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> 'renderer' is null.");
 
 	// retrieve this instance's vertex bone map
 	VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::CreateCaches -> No valid vertex bone map found for sub mesh.", false);
+	ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::CreateCaches -> No valid vertex bone map found for sub mesh.");
 
 	unsigned int uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 
 	cacheFlags = new unsigned char[uniqueVertexCount];
-	ASSERT(cacheFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to allocate cacheFlags flags array.", false);
+	ASSERT(cacheFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to allocate cacheFlags flags array.");
 
 	DestroyCache(CacheType::Position);
 	bool createSuccess = CreateCache(CacheType::Position);
-	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create position transform flags array.", false);
+	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create position transform flags array.");
 
 	DestroyCache(CacheType::VertexNormal);
 	createSuccess = CreateCache(CacheType::VertexNormal);
-	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create vertex normal transform flags array.", false);
+	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create vertex normal transform flags array.");
 
 	DestroyCache(CacheType::FaceNormal);
 	createSuccess = CreateCache(CacheType::FaceNormal);
-	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create face normal transform flags array.", false);
+	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create face normal transform flags array.");
 
 	DestroyCache(CacheType::Transform);
 	createSuccess = CreateCache(CacheType::Transform);
-	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create saved transforms array.", false);
+	ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create saved transforms array.");
 
 	return true;
 }
@@ -433,14 +433,14 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 
 		// retrieve this instance's vertex bone map
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT_RTRN(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> No valid vertex bone map found for sub mesh.");
 
 		// get the number of unique vertices in the vertex bone map
 		unsigned int uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 		// get total number of vertices (including multiple instances of a unique vertex)
 		unsigned int fullVertexCount = vertexBoneMap->GetVertexCount();
 
-		ASSERT_RTRN(positionsOut.GetCount() == fullVertexCount &&
+		ASSERT(positionsOut.GetCount() == fullVertexCount &&
 				    vertexNormalsOut.GetCount() == fullVertexCount &&
 				    faceNormalsOut.GetCount() == fullVertexCount,
 				    "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Mismatched vertex counts.")
@@ -451,11 +451,11 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		{
 			DestroyCaches();
 			bool createSuccess = CreateCaches();
-			ASSERT_RTRN(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Unable to create caches.");
+			ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Unable to create caches.");
 
 			DestroyIdenticalNormalsFlags();
 			createSuccess = CreateIdenticalNormalsFlags();
-			ASSERT_RTRN(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Unable to create identical normal caches.");
+			ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> Unable to create identical normal caches.");
 
 			FindIdenticalNormals(vertexNormalsOut);
 
@@ -463,7 +463,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals(const Point
 		}
 
 		SkeletonRef skeleton = renderer->GetSkeleton();
-		ASSERT_RTRN(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> renderer's skeleton is not valid.");
+		ASSERT(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> renderer's skeleton is not valid.");
 
 		if(boneCount < 0 || (unsigned int)boneCount != skeleton->GetBoneCount())
 		{
@@ -607,20 +607,20 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 		Matrix4x4 full;
 
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT_RTRN(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::TransformPositions -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != NULL,"SkinnedMesh3DAttributeTransformer::TransformPositions -> No valid vertex bone map found for sub mesh.");
 
 		unsigned int uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 		if(currentCacheSize < 0 || uniqueVertexCount != (unsigned int)currentCacheSize)
 		{
 			DestroyCaches();
 			bool createSuccess = CreateCaches();
-			ASSERT_RTRN(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformPositions -> Unable to create caches.");
+			ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformPositions -> Unable to create caches.");
 
 			currentCacheSize = uniqueVertexCount;
 		}
 
 		SkeletonRef skeleton = renderer->GetSkeleton();
-		ASSERT_RTRN(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformPositions -> renderer's skeleton is not valid.");
+		ASSERT(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformPositions -> renderer's skeleton is not valid.");
 
 		if(boneCount < 0 || (unsigned int)boneCount != skeleton->GetBoneCount())
 		{
@@ -637,7 +637,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 			if(cacheFlags[desc->UniqueVertexIndex] == 1)
 			{
 				Point3 * p = transformedPositions.GetPoint(desc->UniqueVertexIndex);
-				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedPositions contains NULL point.");
+				ASSERT(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> transformedPositions contains NULL point.");
 				positionsOut.GetPoint(i)->SetTo(*p);
 			}
 			else
@@ -646,7 +646,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 				for(unsigned int b = 0; b < desc->BoneCount; b++)
 				{
 					SkeletonRef skeleton = renderer->GetSkeleton();
-					ASSERT_RTRN(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> renderer's skeleton is not valid.");
+					ASSERT(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformPositionsAndNormals -> renderer's skeleton is not valid.");
 
 					Bone * bone = skeleton->GetBone(desc->BoneIndex[b]);
 
@@ -673,7 +673,7 @@ void SkinnedMesh3DAttributeTransformer::TransformPositions(const Point3Array& po
 				}
 
 				Point3 * p = positionsOut.GetPoint(i);
-				ASSERT_RTRN(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositions -> positionsOut contains NULL point.");
+				ASSERT(p!=NULL,"SkinnedMesh3DAttributeTransformer::TransformPositions -> positionsOut contains NULL point.");
 				full.Transform(*p);
 
 				transformedPositions.GetPoint(desc->UniqueVertexIndex)->SetTo(*p);

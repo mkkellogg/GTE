@@ -8,8 +8,6 @@ class UV2 : public BaseVector2
 {
 	protected:
 
-	void UpdateComponentPointers();
-
     public:
 
     float &u;

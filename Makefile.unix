@@ -12,6 +12,7 @@
 
 #ASSIMP_LIB=~/assimp/lib
 #ASSIMP_INC=~/assimp/include
+
 #this needs to be changed to your own OpenGL lib path (or removed)
 OPENGL_LIB=/usr/lib/nvidia-331-updates/
 

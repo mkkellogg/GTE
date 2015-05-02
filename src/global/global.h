@@ -5,8 +5,6 @@
 #include "engine.h"
 #include "debug/gtedebug.h"
 
-#define GL_GLEXT_PROTOTYPES
-
 #define SAFE_DELETE(ptr)                   \
 {                                          \
   if((ptr) != NULL){                       \
@@ -27,10 +25,19 @@
   }										   \
 }
 
-#define GET_ASSERT_MACRO(_1,_2,_3,_4, NAME,...) NAME
-#define ASSERT(...) GET_ASSERT_MACRO(__VA_ARGS__, ASSERT4, ASSERT3, ASSERT2)(__VA_ARGS__)
+#define ASSERT(exp, msg)    				\
+{										   	\
+	if(!(exp))					     		\
+	{										\
+		Debug::PrintError((msg));			\
+		exit(-1);							\
+	}									   	\
+}
 
-#define ASSERT4(exp, msg, returnExp, errCode)    															\
+#define GET_NONFATAL_ASSERT_RTRN_MACRO(_1,_2,_3,_4,_5, NAME,...) NAME
+#define NONFATAL_ASSERT_RTRN(...) GET_NONFATAL_ASSERT_RTRN_MACRO(__VA_ARGS__, NONFATAL_ASSERT_RTRN5, NONFATAL_ASSERT_RTRN4, NONFATAL_ASSERT_RTRN3, NONFATAL_ASSERT_RTRN2)(__VA_ARGS__)
+
+#define NONFATAL_ASSERT_RTRN5(exp, msg, errCode, returnExp, reset)    										\
 {										   																	\
 	if(!(exp))					     			 															\
 	{																										\
@@ -39,7 +46,7 @@
 	}									   		 															\
 }
 
-#define ASSERT3(exp, msg, returnExp)             															\
+#define NONFATAL_ASSERT_RTRN4(exp, msg, returnExp, reset)             										\
 {										   		 															\
 	if(!(exp))					     			 															\
 	{																										\
@@ -48,25 +55,23 @@
 	}									   																	\
 }
 
-#define GET_ASSERT_RTRN_MACRO(_1,_2,_3, NAME,...) NAME
-#define ASSERT_RTRN(...) GET_ASSERT_RTRN_MACRO(__VA_ARGS__, ASSERT_RTRN3, ASSERT_RTRN2)(__VA_ARGS__)
+#define GET_NONFATAL_ASSERT_MACRO(_1,_2,_3,_4, NAME,...) NAME
+#define NONFATAL_ASSERT(...) GET_NONFATAL_ASSERT_MACRO(__VA_ARGS__, NONFATAL_ASSERT4, NONFATAL_ASSERT3, NONFATAL_ASSERT2)(__VA_ARGS__)
 
-#define ASSERT_RTRN3(exp, msg, errCode)        	 										\
+#define NONFATAL_ASSERT4(exp, msg, errCode, reset)        	 							\
 {										   		 										\
 	if(!(exp))					     			 										\
 	{																					\
 		Engine::Instance()->GetErrorManager()->SetAndReportError((errCode), (msg));    	\
-		Debug::PrintError((msg));  		   		 										\
 		return;			       			 												\
 	}									   		 				    					\
 }
 
-#define ASSERT_RTRN2(exp, msg)        	         														\
+#define NONFATAL_ASSERT3(exp, msg, reset)        	         											\
 {										   																\
 	if(!(exp))					     			 														\
 	{									   		 														\
 		Engine::Instance()->GetErrorManager()->SetAndReportError((int)ErrorCode::GENERAL_FATAL, (msg)); \
-		Debug::PrintError((msg));  		   		 														\
 		return;			       		 			 														\
 	}									   		 														\
 }

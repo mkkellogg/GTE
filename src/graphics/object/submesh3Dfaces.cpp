@@ -56,7 +56,7 @@ bool SubMesh3DFaces::Init(unsigned int faceCount)
 	this->faceCount = faceCount;
 	faces = new SubMesh3DFace[faceCount];
 
-	ASSERT(faces != NULL, "SubMesh3DFaces::Init -> Could not allocate faces array.", false);
+	ASSERT(faces != NULL, "SubMesh3DFaces::Init -> Could not allocate faces array.");
 
 	return true;
 }
@@ -66,7 +66,7 @@ bool SubMesh3DFaces::Init(unsigned int faceCount)
  */
 SubMesh3DFace * SubMesh3DFaces::GetFace(unsigned int index)
 {
-	ASSERT(index < faceCount, "SubMesh3DFaces::GetFace -> Index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFace -> 'index' is out of range.", NULL, true);
 	return faces + index;
 }
 
@@ -76,6 +76,6 @@ SubMesh3DFace * SubMesh3DFaces::GetFace(unsigned int index)
  */
 const SubMesh3DFace * SubMesh3DFaces::GetFaceConst(unsigned int index) const
 {
-	ASSERT(index < faceCount, "SubMesh3DFaces::GetFaceConst -> Index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFaceConst -> 'index' is out of range.", NULL, true);
 	return (const SubMesh3DFace *)(faces + index);
 }

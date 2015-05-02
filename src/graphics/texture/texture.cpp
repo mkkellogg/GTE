@@ -48,6 +48,6 @@ void Texture::AddImageData(RawImage* imageData)
 
 RawImage * Texture::GetImageData(unsigned int index)
 {
-	ASSERT(index < imageData.size(), "Texture::GetImageData -> Index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(index < imageData.size(), "Texture::GetImageData -> 'index' is out of range.", NULL, true);
 	return imageData[index];
 }

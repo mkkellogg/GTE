@@ -35,20 +35,10 @@ bool BaseVector2Array::Init(int count)
 	this->count = count;
 
 	data = new float[count * 2];
-	if(data == NULL)
-	{
-		Debug::PrintError("Could not allocate data memory for BaseVector2Array");
-		return false;
-	}
+	ASSERT(data != NULL, "Could not allocate data memory for BaseVector2Array");
 
 	objects = baseFactory->CreateArray(count);
-
-	if(objects == NULL)
-	{
-		Debug::PrintError("Could not allocate objects memory for BaseVector2Array");
-		Destroy();
-		return false;
-	}
+	ASSERT(objects != NULL, "Could not allocate objects memory for BaseVector2Array");
 
 	float *dataPtr = data;
 
@@ -57,12 +47,7 @@ bool BaseVector2Array::Init(int count)
 	{
 		BaseVector2 * currentObject = (BaseVector2*)baseFactory->CreatePermAttached(dataPtr);
 
-		if(currentObject == NULL)
-		{
-			Debug::PrintError("Could not allocate BaseVector2 for BaseVector2Array");
-			Destroy();
-			return false;
-		}
+		ASSERT(currentObject != NULL, "Could not allocate BaseVector2 for BaseVector2Array");
 
 		objects[index] = currentObject;
 		currentObject->Set(0,0);

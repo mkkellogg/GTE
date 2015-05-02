@@ -7,6 +7,7 @@
 #include "uv2factory.h"
 #include "uv2.h"
 #include "base/basevector2.h"
+#include "global/global.h"
 
 UV2Factory * UV2Factory::instance;
 
@@ -28,10 +29,10 @@ UV2  * UV2Factory::CreatePermAttached(float * target)
 BaseVector2** UV2Factory::CreateArray(int count)
 {
 	BaseVector2** pptr = (BaseVector2**)new UV2*[count];
-	if(*pptr != NULL)
-	{
-		memset(pptr, (int)NULL, sizeof(UV2*) * count);
-	}
+	ASSERT(pptr != NULL, "UV2Factory::CreateArray -> Could not allocate array.");
+
+	memset(pptr, (int)NULL, sizeof(UV2*) * count);
+
 	return pptr;
 }
 

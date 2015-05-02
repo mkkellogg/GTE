@@ -133,7 +133,7 @@ void PoolScene::UpdateCameras()
  */
 void PoolScene::UpdateRippleSimulation()
 {
-	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
+	Graphics* graphics = Engine::Instance()->GetGraphicsSystem();
 
 	// calculate the time difference between ripple simulation frames
 	float frameTime  = 1.0/60.0;
@@ -235,7 +235,7 @@ void PoolScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	sceneRoot = objectManager->CreateSceneObject();
-	ASSERT_RTRN(sceneRoot.IsValid(), "Could not create scene root for pool scene!\n");
+	ASSERT(sceneRoot.IsValid(), "Could not create scene root for pool scene!\n");
 
 	SetupTerrain(importer);
 	SetupStructures(importer);
@@ -271,7 +271,7 @@ void PoolScene::SetupTerrain(AssetImporter& importer)
 
 	// load castle island model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -299,7 +299,7 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 
 	// load castle tower for pool corners
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load tower model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -324,7 +324,7 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 
 	// load castle wall model for pool walls
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load wall model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -365,7 +365,7 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 
 	// load castle wall model for pool walls
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load wall model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -397,7 +397,7 @@ void PoolScene::SetupPlants(AssetImporter& importer)
 
 	// load tree model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toontree/toontree2/treeplain.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tree model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load tree model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
@@ -446,7 +446,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	// get reference to the engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
-	Graphics* graphics = Engine::Instance()->GetGraphicsEngine();
+	Graphics* graphics = Engine::Instance()->GetGraphicsSystem();
 	const GraphicsAttributes& graphicsAttr = graphics->GetAttributes();
 
 	// create layer for water's surface
@@ -571,12 +571,12 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	waterHeights[1] = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterHeightMapResolution,waterHeightMapResolution);
 	waterNormals = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterNomralMapResolution,waterNomralMapResolution);
 
-	ASSERT_RTRN(waterHeights[0].IsValid() && waterHeights[1].IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water height map.");
-	ASSERT_RTRN(waterNormals.IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water normals map.");
+	ASSERT(waterHeights[0].IsValid() && waterHeights[1].IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water height map.");
+	ASSERT(waterNormals.IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water normals map.");
 
 	unsigned int mapSize = waterHeightMapResolution * waterHeightMapResolution * 4;
 	float * heightData = new float[mapSize];
-	ASSERT_RTRN(heightData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water height map.");
+	ASSERT(heightData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water height map.");
 
 	// create water height map initialization data
 	for(unsigned int i = 0; i < mapSize; i += 4)
@@ -589,7 +589,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 
 	mapSize = waterNomralMapResolution * waterNomralMapResolution * 4;
 	float * normalData = new float[mapSize];
-	ASSERT_RTRN(normalData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water normal map.");
+	ASSERT(normalData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water normal map.");
 
 	// create water normal map initialization data
 	for(unsigned int i = 0; i < mapSize; i += 4)
@@ -637,6 +637,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	// set appropriate sampler uniforms for water surface shader
 	waterMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 	waterMaterial->SetTexture(waterNormals->GetColorTexture(), "WATER_NORMAL_MAP");
+	//waterMaterial->SetUniform1f(1.0 / (float)waterNomralMapResolution, "PIXEL_DISTANCE");
 	waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
 	waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
 }

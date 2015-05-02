@@ -32,7 +32,7 @@ BaseVector4** BaseVector4Factory::CreateArray(int count)
 
 void BaseVector4Factory::DestroyArray(BaseVector4 ** array, unsigned int size)
 {
-	ASSERT_RTRN(array != NULL, "BaseVector4Factory::DestroyArray -> array is NULL.");
+	NONFATAL_ASSERT(array != NULL, "BaseVector4Factory::DestroyArray -> 'array' is null.", true);
 
 	for(unsigned int i=0; i < size; i++)
 	{

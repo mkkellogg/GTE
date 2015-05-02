@@ -110,7 +110,7 @@ class ModelImporter
 	ModelImporter();
 	~ModelImporter();
 
-	bool InitImporter();
+	void InitImporter();
 	const aiScene * LoadAIScene(const std::string& filePath, bool preserveFBXPivots);
 
 	void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,

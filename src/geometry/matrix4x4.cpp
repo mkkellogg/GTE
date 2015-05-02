@@ -106,7 +106,7 @@ void Matrix4x4::SetTo(const Matrix4x4& src)
  */
 void Matrix4x4::SetTo(const float * sourceData)
 {
-	ASSERT_RTRN(sourceData != NULL,"Matrix4x4::SetTo -> srcData is NULL");
+	NONFATAL_ASSERT(sourceData != NULL,"Matrix4x4::SetTo -> 'srcData' is null", true);
 	memcpy(data, sourceData, sizeof(float) * DATA_SIZE);
 }
 
@@ -127,7 +127,7 @@ void Matrix4x4::BuildFromComponents(const Vector3& translation, const Quaternion
 
 void Matrix4x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
-	ASSERT_RTRN(IsAffine(), "Matrix4x4::Decompose -> matrix is not affine");
+	NONFATAL_ASSERT(IsAffine(), "Matrix4x4::Decompose -> Matrix is not affine.", true);
 
 	Matrix4x4 rotMatrix;
 
@@ -284,7 +284,7 @@ void Matrix4x4::Transform(Point3& point) const
  */
 void Matrix4x4::Transform(float * vector4f) const
 {
-	ASSERT_RTRN(vector4f != NULL, "Matrix4x4::Transform(float *) -> vector4f is NULL");
+	NONFATAL_ASSERT(vector4f != NULL, "Matrix4x4::Transform(float *) -> 'vector4f' is null.", true);
 
 	float temp[DIM_SIZE];
 	MultiplyMV(this->data, vector4f, temp);
@@ -344,9 +344,9 @@ void Matrix4x4::Multiply(const Matrix4x4& lhs, const Matrix4x4& rhs, Matrix4x4& 
  */
 void Matrix4x4::MultiplyMV(const float * lhsMat, const float * rhsVec, float * out)
 {
-	ASSERT_RTRN(lhsMat != NULL, "Matrix4x4::MultiplyMV -> lhsMat is NULL");
-	ASSERT_RTRN(rhsVec != NULL, "Matrix4x4::MultiplyMV -> rhsVec is NULL");
-	ASSERT_RTRN(out != NULL, "Matrix4x4::MultiplyMV -> out is NULL");
+	NONFATAL_ASSERT(lhsMat != NULL, "Matrix4x4::MultiplyMV -> 'lhsMat' is null.", true);
+	NONFATAL_ASSERT(rhsVec != NULL, "Matrix4x4::MultiplyMV -> 'rhsVec' is null.", true);
+	NONFATAL_ASSERT(out != NULL, "Matrix4x4::MultiplyMV -> 'out' is null.", true);
 
     Mx4transform(rhsVec[0], rhsVec[1], rhsVec[2], rhsVec[3], lhsMat, out);
 }
@@ -357,8 +357,8 @@ void Matrix4x4::MultiplyMV(const float * lhsMat, const float * rhsVec, float * o
  */
 void Matrix4x4::Mx4transform(float x, float y, float z, float w, const float* matrix, float* pDest) 
 {
-	ASSERT_RTRN(matrix != NULL, "Matrix4x4::Mx4transform -> lhsMat is NULL");
-	ASSERT_RTRN(pDest != NULL, "Matrix4x4::Mx4transform -> pDest is NULL");
+	NONFATAL_ASSERT(matrix != NULL, "Matrix4x4::Mx4transform -> 'lhsMat' is null.", true);
+	NONFATAL_ASSERT(pDest != NULL, "Matrix4x4::Mx4transform -> 'pDest' is null.", true);
 
     pDest[0] = matrix[0 + DIM_SIZE * 0] * x + matrix[0 + DIM_SIZE * 1] * y + matrix[0 + DIM_SIZE * 2] * z + matrix[0 + DIM_SIZE * 3] * w;
     pDest[1] = matrix[1 + DIM_SIZE * 0] * x + matrix[1 + DIM_SIZE * 1] * y + matrix[1 + DIM_SIZE * 2] * z + matrix[1 + DIM_SIZE * 3] * w;
@@ -419,8 +419,8 @@ void Matrix4x4::Transpose()
  */
 void Matrix4x4::Transpose(const float* source, float *dest)
 {
-	ASSERT_RTRN(source != NULL, "Matrix4x4::Transpose -> source is NULL");
-	ASSERT_RTRN(dest != NULL, "Matrix4x4::Transpose -> dest is NULL");
+	NONFATAL_ASSERT(source != NULL, "Matrix4x4::Transpose -> 'source' is null.", true);
+	NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Transpose -> 'dest' is null.", true);
 
     for (int i = 0; i < DIM_SIZE; i++) 
     {
@@ -471,8 +471,8 @@ bool Matrix4x4::Invert(const float * source, float * dest)
 	// result in a non-affine matrix
 	bool isAffine = Matrix4x4::IsAffine(source);
 
-	ASSERT(source != NULL, "Matrix4x4::Invert -> source is NULL", false);
-	ASSERT(dest != NULL, "Matrix4x4::Invert -> dest is NULL", false);
+	NONFATAL_ASSERT_RTRN(source != NULL, "Matrix4x4::Invert -> 'source' is null.", false, true);
+	NONFATAL_ASSERT_RTRN(dest != NULL, "Matrix4x4::Invert -> 'dest' is null.", false, true);
 
     // array of transpose source matrix
     float src[DATA_SIZE];
@@ -590,7 +590,7 @@ void Matrix4x4::SetIdentity()
  */
 void Matrix4x4::SetIdentity(float * target)
 {
-	ASSERT_RTRN(target != NULL, "Matrix4x4::SetIdentity -> target is NULL");
+	NONFATAL_ASSERT(target != NULL, "Matrix4x4::SetIdentity -> 'target' is null.", true);
 
     for (int i=0 ; i< DATA_SIZE; i++) 
     {
@@ -673,8 +673,8 @@ void Matrix4x4::Scale(Matrix4x4& out, float x, float y, float z) const
  */
 void Matrix4x4::Scale(const float * source, float * dest,  float x, float y, float z)
 {
-	ASSERT_RTRN(source != NULL, "Matrix4x4::Scale -> source is NULL");
-	ASSERT_RTRN(dest != NULL, "Matrix4x4::Scale -> dest is NULL");
+	NONFATAL_ASSERT(source != NULL, "Matrix4x4::Scale -> 'source' is null.", true);
+	NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Scale -> 'dest' is null.", true);
 
     for (int i = 0; i < DIM_SIZE ; i++)
     {
@@ -765,7 +765,7 @@ void Matrix4x4::Translate(const Matrix4x4& source, Matrix4x4& out,float x, float
  */
 void Matrix4x4::Translate(const float * source, float * dest, float x, float y, float z)
 {
-	ASSERT_RTRN(source != NULL, "Matrix4x4::Translate -> source is NULL");
+	NONFATAL_ASSERT(source != NULL, "Matrix4x4::Translate -> 'source' is null.", true);
 
     if(source != dest)
     {
@@ -884,7 +884,7 @@ void Matrix4x4::SetRotate(Matrix4x4& m, float x, float y, float z, float a)
  */
 void Matrix4x4::SetRotate(float * rm, float x, float y, float z, float a)
 {
-	ASSERT_RTRN(rm != NULL, "Matrix4x4::SetRotate -> rm is NULL");
+	NONFATAL_ASSERT(rm != NULL, "Matrix4x4::SetRotate -> 'rm' is null.", true);
 
     rm[3] = 0;
     rm[7] = 0;
@@ -954,7 +954,7 @@ void Matrix4x4::SetRotate(float * rm, float x, float y, float z, float a)
  */
 void Matrix4x4::SetRotateEuler(float * rm, float x, float y, float z)
 {
-	ASSERT_RTRN(rm != NULL, "Matrix4x4::SetRotateEuler -> rm is NULL");
+	NONFATAL_ASSERT(rm != NULL, "Matrix4x4::SetRotateEuler -> 'rm' is null.", true);
 
     x *= Constants::DegreesToRads;
     y *= Constants::DegreesToRads;

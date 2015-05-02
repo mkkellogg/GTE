@@ -70,7 +70,7 @@ void SceneObjectTransform::GetInheritedTransform(Transform& transform, bool inve
  */
 void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, bool includeSelf, bool invert)
 {
-	ASSERT_RTRN(sceneObject.IsValid(), "SceneObjectTransform::GetWorldTransform() -> sceneObject is not valid.");
+	NONFATAL_ASSERT(sceneObject.IsValid(), "SceneObjectTransform::GetWorldTransform() -> 'sceneObject' is not valid.", true);
 	GetWorldTransform(transform, sceneObject.GetPtr(), includeSelf, invert);
 }
 
@@ -81,7 +81,7 @@ void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObjectRe
  */
 void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert )
 {
-	ASSERT_RTRN(sceneObject != NULL, "SceneObjectTransform::GetWorldTransform() -> sceneObject is NULL.");
+	NONFATAL_ASSERT(sceneObject != NULL, "SceneObjectTransform::GetWorldTransform() -> 'sceneObject' is null.", true);
 
 	Transform full;
 	if(includeSelf)full.SetTo(sceneObject->GetTransform());
@@ -328,7 +328,7 @@ void SceneObjectTransform::TransformPoint(Point3& point) const
  */
 void SceneObjectTransform::TransformVector4f(float * vector) const
 {
-	ASSERT_RTRN(vector != NULL, "SceneObjectTransform::TransformVector4f -> NULL vector passed.");
+	NONFATAL_ASSERT(vector != NULL, "SceneObjectTransform::TransformVector4f -> 'vector' is null.", true);
 
 	Transform full;
 	GetInheritedTransform(full, false);

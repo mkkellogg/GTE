@@ -145,13 +145,13 @@ bool ShaderGL::Load()
     {
     	shaderSourceLoaded = shaderSource.Load();
     }
-    ASSERT(shaderSourceLoaded == true, "ShaderGL::Load -> Unable to load shader source.", false);
+    ASSERT(shaderSourceLoaded == true, "ShaderGL::Load -> Unable to load shader source.");
 
     // Create the OpenGL objects that will hold each shader
     vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
     fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-    ASSERT(vertexShaderID != 0, "Unable to create GL vertex shader.", false);
+    ASSERT(vertexShaderID != 0, "Unable to create GL vertex shader.");
 
     if(fragmentShaderID == 0)
     {
@@ -314,7 +314,7 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 	{
 		// allocate array for UniformDescriptor objects
 		uniforms = new UniformDescriptor*[totalUniforms];
-		ASSERT(uniforms != NULL, "Unable to allocate shader uniform descriptors.", false);
+		ASSERT(uniforms != NULL, "Unable to allocate shader uniform descriptors.");
 
 		// initialize UniformDescriptor array
 		memset(uniforms, 0, sizeof(UniformDescriptor*)*totalUniforms);
@@ -386,7 +386,7 @@ bool ShaderGL::StoreUniformAndAttributeInfo()
 	{
 		// allocate array for AttributeDescriptor objects
 		attributes = new AttributeDescriptor*[totalAttributes];
-		ASSERT(attributes != NULL, "Unable to allocate shader attribute descriptors.", false);
+		ASSERT(attributes != NULL, "Unable to allocate shader attribute descriptors.");
 
 		// initialize AttributeDescriptor array
 		memset(attributes, 0, sizeof(AttributeDescriptor*)*totalAttributes);
@@ -476,8 +476,7 @@ void ShaderGL::SendBufferToShader(int varID, VertexAttrBuffer * buffer)
 	if(varID < 0)return;
 
 	VertexAttrBufferGL * bufferGL =  dynamic_cast<VertexAttrBufferGL *>(buffer);
-
-	ASSERT_RTRN(bufferGL != NULL, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
+	ASSERT(bufferGL != NULL, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
 
 	const float * data = bufferGL->GetDataPtr();
 	int componentCount = bufferGL->GetComponentCount();
@@ -506,12 +505,12 @@ glEnableVertexAttribArray(0);
  */
 void ShaderGL::SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture)
 {
-	ASSERT_RTRN(texture.IsValid(), "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> NULL texture passed");
+	ASSERT(texture.IsValid(), "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> 'texture' is null.");
 
 	Texture* texturePtr = ((TextureRef)texture).GetPtr();
 	TextureGL * texGL = dynamic_cast<TextureGL *>(texturePtr);
 
-	ASSERT_RTRN(texGL != NULL, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> texture is not TextureGL !!");
+	ASSERT(texGL != NULL, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> texture is not TextureGL !!");
 
 	GLenum textureUnit;
 

@@ -31,7 +31,7 @@ Transform::Transform()
  */
 Transform::Transform(const Transform * transform) : Transform()
 {
-	ASSERT_RTRN(transform != NULL, "Transform::copy constructor -> NULL transform passed.");
+	NONFATAL_ASSERT(transform != NULL, "Transform::copy constructor -> 'transform' is null.", true);
 	transform->CopyMatrix(matrix);
 }
 
@@ -90,7 +90,7 @@ void Transform::SetTo(const Transform& transform)
  */
 void Transform::SetTo(const float * matrixData)
 {
-	ASSERT_RTRN(matrixData != NULL, "Transform::SetTo -> NULL matrix data passed.");
+	NONFATAL_ASSERT(matrixData != NULL, "Transform::SetTo -> 'matrixData' is null.", true);
 	matrix.SetTo(matrixData);
 }
 
@@ -435,6 +435,6 @@ void Transform::TransformPoint(Point3& point) const
  */
 void Transform::TransformVector4f(float * vector) const
 {
-	ASSERT_RTRN(vector != NULL, "Transform::TransformVector4f -> NULL vector passed.");
+	NONFATAL_ASSERT(vector != NULL, "Transform::TransformVector4f -> 'vector' is null.", true);
 	matrix.Transform(vector);
 }

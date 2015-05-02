@@ -29,10 +29,12 @@ class ErrorManager
 
     void SetError(int code, const std::string& message);
     void SetError(int code, const char * message);
+    void AddError(int code, const std::string& message);
+    void AddError(int code, const char * message);
     void SetAndReportError(int code, const std::string& message);
     void SetAndReportError(int code, const char * message);
-    void SetAndReportWarning(int code, const std::string& message);
-    void SetAndReportWarning(int code, const char * message);
+    void AddAndReportError(int code, const std::string& message);
+    void AddAndReportError(int code, const char * message);
     void Reset();
     int GetErrorCode() const;
     const std::string& GetErrorMessage() const;

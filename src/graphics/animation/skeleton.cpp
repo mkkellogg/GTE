@@ -83,7 +83,7 @@ bool Skeleton::Init()
 	Destroy();
 
 	bones = new Bone[boneCount];
-	ASSERT(bones != NULL,"Skeleton::Init -> Could not allocate bone array.", false);
+	ASSERT(bones != NULL,"Skeleton::Init -> Could not allocate bone array.");
 
 	return true;
 }
@@ -107,7 +107,7 @@ Tree<SkeletonNode*>::TreeNode *  Skeleton::CreateRoot(SkeletonNode * node)
  */
 Tree<SkeletonNode*>::TreeNode *  Skeleton::AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode * node)
 {
-	ASSERT(parent != NULL,"Skeleton::AddChild -> parent is NULL.", NULL);
+	NONFATAL_ASSERT_RTRN(parent != NULL,"Skeleton::AddChild -> 'parent' is null.", NULL, true);
 	Tree<SkeletonNode*>::TreeNode * childNode = parent->AddChild(node);
 
 	return childNode;
@@ -141,7 +141,7 @@ int Skeleton::GetBoneMapping(std::string& name)
  */
 Bone* Skeleton::GetBone(unsigned int boneIndex)
 {
-	ASSERT(boneIndex < boneCount, "Skeleton::GetBone -> Index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(boneIndex < boneCount, "Skeleton::GetBone -> 'boneIndex' is out of range.", NULL, true);
 
 	return bones + boneIndex;
 }
@@ -196,7 +196,7 @@ void Skeleton::AddNodeToList(SkeletonNode * node)
  */
 void Skeleton::OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode)
 {
-	ASSERT_RTRN(skeleton.IsValid(),"Skeleton::OverrideBonesFrom -> skeleton is not valid.");
+	NONFATAL_ASSERT(skeleton.IsValid(),"Skeleton::OverrideBonesFrom -> 'skeleton' is not valid.", true);
 	OverrideBonesFrom(skeleton.GetPtr(), takeOffset, takeNode);
 }
 
@@ -228,7 +228,7 @@ Skeleton * Skeleton::FullClone()
 {
 	// allocate new Skeleton object
 	Skeleton * newSkeleton = new Skeleton(boneCount);
-	ASSERT(newSkeleton != NULL,"Skeleton::FullClone -> could not allocate skeleton.",NULL);
+	ASSERT(newSkeleton != NULL,"Skeleton::FullClone -> could not allocate skeleton.");
 
 	// initialize new skeleton
 	bool initSuccess = newSkeleton->Init();

@@ -93,7 +93,7 @@ void SubMesh3D::SetSubIndex(int index)
  */
 void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const
 {
-	ASSERT_RTRN(faceIndex < totalVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> faceIndex is out range.");
+	NONFATAL_ASSERT(faceIndex < totalVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> 'faceIndex' is out range.", true);
 
 	Vector3 a,b,c;
 
@@ -102,9 +102,9 @@ void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result) con
 	const Point3 *pb = positions.GetPointConst(faceIndex+1);
 	const Point3 *pc = positions.GetPointConst(faceIndex+2);
 
-	ASSERT_RTRN(pa != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
-	ASSERT_RTRN(pb != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
-	ASSERT_RTRN(pc != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.");
+	NONFATAL_ASSERT(pa != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
+	NONFATAL_ASSERT(pb != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
+	NONFATAL_ASSERT(pc != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
 
 	// form 2 vectors based on triangle's vertices
 	Point3::Subtract(*pb, *pa, b);
@@ -123,7 +123,7 @@ void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result) con
  */
 void SubMesh3D:: FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const
 {
-	ASSERT_RTRN(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> faceIndex is out range.");
+	NONFATAL_ASSERT(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> 'faceIndex' is out range.", true);
 	const SubMesh3DFace * face = faces.GetFaceConst(faceIndex);
 
 	int faceVertexIndex = face->FirstVertexIndex;
@@ -146,8 +146,8 @@ int SubMesh3D::FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, un
 	std::vector<unsigned int>* indicentVerticesA = vertexCrossMap[vaIndex];
 	std::vector<unsigned int>* indicentVerticesB = vertexCrossMap[vbIndex];
 
-	ASSERT(indicentVerticesA != NULL, "SubMesh3D::FindCommonFace -> indicentVerticesA is NULL.", -1);
-	ASSERT(indicentVerticesB != NULL, "SubMesh3D::FindCommonFace -> indicentVerticesB is NULL.", -1);
+	NONFATAL_ASSERT_RTRN(indicentVerticesA != NULL, "SubMesh3D::FindCommonFace -> 'indicentVerticesA' is null.", -1, true);
+	NONFATAL_ASSERT_RTRN(indicentVerticesB != NULL, "SubMesh3D::FindCommonFace -> 'indicentVerticesB' is null.", -1, true);
 
 	for(unsigned int a =0; a < indicentVerticesA->size(); a++)
 	{
@@ -272,7 +272,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 
 		// retrieve the list of normals for [targetPoint]
 		std::vector<unsigned int>* listPtr = vertexCrossMap[v];
-		ASSERT_RTRN(listPtr != NULL, "SubMesh3D::CalculateNormals -> NULL pointer to normal group list");
+		NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to normal group list", true);
 
 		Vector3 avg(0,0,0);
 		float divisor = 0;
@@ -380,7 +380,7 @@ bool SubMesh3D::BuildVertexCrossMap()
 	std::unordered_map<Point3, std::vector<unsigned int>*, Point3::Point3Hasher,Point3::Point3Eq> vertexGroups;
 
 	vertexCrossMap = new std::vector<unsigned int>*[totalVertexCount];
-	ASSERT(vertexCrossMap != NULL, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.", false);
+	ASSERT(vertexCrossMap != NULL, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.");
 
 	// loop through each vertex in the mesh and add the index in [position] for that vertex to the
 	// appropriate vertex group.

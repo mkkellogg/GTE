@@ -55,25 +55,12 @@ BaseVector2& UV2::operator= (const BaseVector2& source)
 void UV2::AttachTo(float * data)
 {
 	BaseVector2::AttachTo(data);
-	UpdateComponentPointers();
 }
 
 void UV2::Detach()
 {
 	BaseVector2::Detach();
-	UpdateComponentPointers();
 }
 
-/*
- * TODO: This does NOT currently work...fix!
- */
-void UV2::UpdateComponentPointers()
-{
-    float ** rPtr;
-    rPtr = (float **)&u;
-    *rPtr = data;
-    rPtr = (float **)&v;
-    *rPtr = data+1;
-}
 
 

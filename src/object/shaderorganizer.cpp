@@ -31,13 +31,8 @@ ShaderOrganizer::~ShaderOrganizer()
 
 void ShaderOrganizer::AddShader(LongMask properties, ShaderRef shader)
 {
-	ASSERT_RTRN(shader.IsValid(),"ShaderManager::AddShader -> shader is NULL.");
-
-	if(!shader->IsLoaded())
-	{
-		Debug::PrintError("ShaderManager::AddShader -> Tried to add unloaded shader.");
-		return;
-	}
+	NONFATAL_ASSERT(shader.IsValid(),"ShaderManager::AddShader -> 'shader' is null.", true);
+	NONFATAL_ASSERT(shader->IsLoaded(),"ShaderManager::AddShader -> 'shader' is not loaded.", true);
 
 	loadedShaders[properties] = shader;
 }

@@ -48,7 +48,7 @@ AnimationRef AssetImporter::LoadAnimation(const std::string& filePath, bool addL
 
 void AssetImporter::LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource)
 {
-	ASSERT_RTRN(shaderSourceLoader != NULL, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is NULL.");
+	ASSERT(shaderSourceLoader != NULL, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is NULL.");
 	shaderSourceLoader->LoadShaderSouce(name, shaderSource);
 }
 

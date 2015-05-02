@@ -7,6 +7,7 @@
 #include "point3factory.h"
 #include "point3.h"
 #include "base/basevector4.h"
+#include "global/global.h"
 
 Point3Factory * Point3Factory::instance;
 
@@ -28,10 +29,10 @@ BaseVector4 * Point3Factory::CreatePermAttached(float * target)
 BaseVector4** Point3Factory::CreateArray(int count)
 {
 	BaseVector4** pptr = (BaseVector4**)new Point3*[count];
-	if(pptr != NULL)
-	{
-		memset(pptr, (int)NULL, sizeof(Point3*) * count);
-	}
+	ASSERT(pptr != NULL, "Point3Factory::CreateArray -> Could not allocate new array.");
+
+	memset(pptr, (int)NULL, sizeof(Point3*) * count);
+
 	return pptr;
 }
 

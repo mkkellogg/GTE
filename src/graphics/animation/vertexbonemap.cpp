@@ -51,7 +51,7 @@ bool VertexBoneMap::Init()
 	Destroy();
 
 	mappingDescriptors = new VertexMappingDescriptor[vertexCount];
-	ASSERT(mappingDescriptors != NULL, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.", false);
+	ASSERT(mappingDescriptors != NULL, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.");
 
 	return true;
 }
@@ -91,7 +91,7 @@ unsigned int VertexBoneMap::GetUniqueVertexCount()
  */
 void VertexBoneMap::BindTo(SkeletonRef skeleton)
 {
-	ASSERT_RTRN(skeleton.IsValid(), "VertexBoneMap::BindTo -> skeleton is not valid.");
+	NONFATAL_ASSERT(skeleton.IsValid(), "VertexBoneMap::BindTo -> 'skeleton' is not valid.", true);
 
 	for(unsigned int v = 0; v < vertexCount; v++)
 	{
@@ -111,7 +111,7 @@ VertexBoneMap * VertexBoneMap::FullClone()
 {
 	// allocate new VertexBoneMap objects
 	VertexBoneMap * clone = new VertexBoneMap(vertexCount, uniqueVertexCount);
-	ASSERT(clone != NULL, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.", NULL);
+	ASSERT(clone != NULL, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.");
 
 	// initialize the new map
 	bool initSuccess = clone->Init();

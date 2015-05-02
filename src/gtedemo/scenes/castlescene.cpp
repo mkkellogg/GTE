@@ -105,7 +105,7 @@ void CastleScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObje
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 	sceneRoot = objectManager->CreateSceneObject();
-	ASSERT_RTRN(sceneRoot.IsValid(), "Could not create scene root for castle scene!\n");
+	ASSERT(sceneRoot.IsValid(), "Could not create scene root for castle scene!\n");
 
 	sceneRoot->GetTransform().Translate(50,0,-15, false);
 
@@ -138,7 +138,7 @@ void CastleScene::SetupTerrain(AssetImporter& importer)
 
 	// load castle island model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load island model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -164,7 +164,7 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 
 	// load castle tower
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tower model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load tower model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -189,7 +189,7 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 
 	// load & place castle entrance arch-way left side
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Left_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load wall model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	modelSceneObject->SetActive(true);
@@ -199,7 +199,7 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 
 	// load and place castle entrance arch-way right side
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Right_02.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load wall model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	modelSceneObject->SetActive(true);
@@ -209,7 +209,7 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 
 	// load castle wall model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load wall model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load wall model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -259,7 +259,7 @@ void CastleScene::SetupPlants(AssetImporter& importer)
 
 	// load tree model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toontree/toontree2/treeplain.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load tree model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load tree model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
@@ -316,7 +316,7 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 
 	// load fence model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrier01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load barrier model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load barrier model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -373,7 +373,7 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 
 	// load barrel model
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrel01.fbx");
-	ASSERT_RTRN(modelSceneObject.IsValid(), "Could not load barrel model!\n");
+	ASSERT(modelSceneObject.IsValid(), "Could not load barrel model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 

@@ -82,15 +82,14 @@ ModelImporter::~ModelImporter()
 /**
  * Initialize the Assimp importer object (if it has not already been done so).
  */
-bool ModelImporter::InitImporter()
+void ModelImporter::InitImporter()
 {
 	if(importer == NULL)
 	{
 		importer = new Assimp::Importer();
 	}
 
-	if(importer == NULL)return false;
-	return true;
+	ASSERT(importer != NULL, "ModelImporter::InitImporter -> importer is NULL.");
 }
 
 /**
@@ -104,8 +103,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
 	const aiScene* scene = NULL;
 
 	// Create an instance of the Assimp Importer class
-	bool initSuccess = InitImporter();
-	ASSERT(initSuccess == true," ModelImporter::LoadAIScene -> Could not initialize Assimp importer." , NULL);
+	InitImporter();
 
 	// Check if model file exists
 	std::ifstream fin(filePath.c_str());
@@ -116,7 +114,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
 	else
 	{
 		std::string msg = std::string("ModelImporter -> Could not find file: ") + filePath;
-		Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::ModelFileNotFound, msg);
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::ModelFileNotFound, msg);
 		return NULL;
 	}
 
@@ -130,7 +128,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
 	if(!scene)
 	{
 		std::string msg = std::string("ModelImporter::LoadAIScene -> Could not import file: ") + std::string(importer->GetErrorString());
-		Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::ModelFileLoadFailed, msg);
+		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::ModelFileLoadFailed, msg);
 		return NULL;
 	}
 
@@ -184,9 +182,9 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	std::vector<MaterialImportDescriptor> materialImportDescriptors;
 
 	// verify that we have a valid scene
-	ASSERT(scene.mRootNode != NULL,"ModelImporter::ProcessModelScene -> Assimp scene root is NULL.", SceneObjectRef::Null());
+	NONFATAL_ASSERT_RTRN(scene.mRootNode != NULL,"ModelImporter::ProcessModelScene -> Assimp scene root is NULL.", SceneObjectRef::Null(), true);
 	SceneObjectRef root = objectManager->CreateSceneObject();
-	ASSERT(root.IsValid(),"ModelImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null());
+	NONFATAL_ASSERT_RTRN(root.IsValid(),"ModelImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null(), true);
 
 	// process all the Assimp materials in [scene] and create equivalent engine native materials.
 	// store those materials and their properties in MaterialImportDescriptor instances, which get
@@ -284,7 +282,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 	// create new scene object to hold the Mesh3D object and its renderer
 	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
-	ASSERT_RTRN(sceneObject.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create scene object.");
+	NONFATAL_ASSERT(sceneObject.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create scene object.", false);
 
 	// determine if [skeleton] is valid
 	bool hasSkeleton = skeleton.IsValid() && skeleton->GetBoneCount() ? true : false;
@@ -313,17 +311,17 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		// create a containing Mesh3D object that will hold all sub-meshes created for this node.
 		// for each Assimp mesh, one SubMesh3D will be created added to the Mesh3D instance.
 		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
-		ASSERT_RTRN(mesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.");
+		NONFATAL_ASSERT(mesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.", false);
 
 		// initialize the new Mesh3D instance
 		bool meshInitSuccess = mesh3D->Init();
-		ASSERT_RTRN(meshInitSuccess,"ModelImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.");
+		NONFATAL_ASSERT(meshInitSuccess,"ModelImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.", false);
 
 		// if there are meshes with bones on this node, then we create a SkinnedMesh3DRenderer instead of a Mesh3DRenderer
 		if(requiresSkinnedRenderer)
 		{
 			skinnedMeshRenderer = engineObjectManager->CreateSkinnedMesh3DRenderer();
-			ASSERT_RTRN(skinnedMeshRenderer.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.");
+			NONFATAL_ASSERT(skinnedMeshRenderer.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create SkinnedMesh3DRenderer object.", false);
 			rendererPtr = (Mesh3DRenderer*)skinnedMeshRenderer.GetPtr();
 
 			// set the vertex bone map for each sub renderer to "none" (-1)
@@ -337,7 +335,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		else
 		{
 			meshRenderer = engineObjectManager->CreateMesh3DRenderer();
-			ASSERT_RTRN(meshRenderer.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.");
+			NONFATAL_ASSERT(meshRenderer.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3DRenderer object.", false);
 			rendererPtr = meshRenderer.GetPtr();
 		}
 
@@ -350,12 +348,12 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 			// get a pointer to the Assimp mesh
 			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
-			ASSERT_RTRN(mesh != NULL, "ModelImporter::RecursiveProcessModelScene -> Node mesh is NULL.");
+			NONFATAL_ASSERT(mesh != NULL, "ModelImporter::RecursiveProcessModelScene -> Assimp node mesh is NULL.", true);
 
 			int materialIndex = mesh->mMaterialIndex;
 			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
 			MaterialRef material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
-			ASSERT_RTRN(material.IsValid(),"ModelImporter::RecursiveProcessModelScene -> NULL Material object encountered.");
+			NONFATAL_ASSERT(material.IsValid(),"ModelImporter::RecursiveProcessModelScene -> NULL Material object encountered.", true);
 
 			// add the material to the mesh renderer
 			rendererPtr->AddMaterial(material);
@@ -365,14 +363,14 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			bool invert = HasInvertedScale(mat);
 			// convert Assimp mesh to a Mesh3D object
 			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor, invert);
-			ASSERT_RTRN(subMesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.");
+			NONFATAL_ASSERT(subMesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.", false);
 
 			// add the mesh to the newly created scene object
 			mesh3D->SetSubMesh(subMesh3D, n);
 		}
 
 		Mesh3DFilterRef filter = engineObjectManager->CreateMesh3DFilter();
-		ASSERT_RTRN(filter.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Unable to create mesh#D filter object.");
+		NONFATAL_ASSERT(filter.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Unable to create mesh#D filter object.", false);
 
 		// set shadow properties
 		filter->SetCastShadows(castShadows);
@@ -454,7 +452,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
  */
 SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const
 {
-	ASSERT(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DRef::Null());
+	NONFATAL_ASSERT_RTRN(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DRef::Null(), true);
 
 	unsigned int vertexCount = 0;
 	aiMesh & mesh = *scene.mMeshes[meshIndex];
@@ -493,7 +491,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 
 	// create Mesh3D object with the constructed StandardAttributeSet
 	SubMesh3DRef mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
-	ASSERT(mesh3D.IsValid(),"ModelImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null());
+	NONFATAL_ASSERT_RTRN(mesh3D.IsValid(),"ModelImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null(), false);
 
 	bool initSuccess = mesh3D->Init(vertexCount);
 
@@ -599,7 +597,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		aiString aiTexturePath;
 
 		aiMaterial * assimpMaterial = scene.mMaterials[m];
-		ASSERT(assimpMaterial != NULL, "ModelImporter::ProcessMaterials -> scene contains a NULL material.", false);
+		NONFATAL_ASSERT_RTRN(assimpMaterial != NULL, "ModelImporter::ProcessMaterials -> Scene contains a NULL material.", false, true);
 
 		aiString mtName;
 		assimpMaterial->Get(AI_MATKEY_NAME,mtName);
@@ -621,7 +619,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		{
 			std::string msg = "ModelImporter::ProcessMaterials -> Could not load diffuse texture: ";
 			msg += aiTexturePath.C_Str();
-			Engine::Instance()->GetErrorManager()->SetAndReportWarning(ModelImporterErrorCodes::MaterialImportFailure, msg);
+			Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::MaterialImportFailure, msg);
 			materialImportDescriptors.clear();
 			return false;
 		}
@@ -716,7 +714,7 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
 	// retrieve the first texture descriptor (at index 0) matching [textureType] from the Assimp material
 	texFound = assimpMaterial.GetTexture(textureType, 0, &aiTexturePath);
 
-	ASSERT(texFound == AI_SUCCESS, "ModelImporter::LoadAITexture -> Assimp material does not have desired texture type.", TextureRef::Null(), ModelImporterErrorCodes::AssimpTextureNotFound);
+	NONFATAL_ASSERT_RTRN(texFound == AI_SUCCESS, "ModelImporter::LoadAITexture -> Assimp material does not have desired texture type.", TextureRef::Null(), ModelImporterErrorCodes::AssimpTextureNotFound);
 
 	// build the full path to the texture image as specified by the Assimp material
 	std::string texPath = fileSystem->FixupPath(std::string(aiTexturePath.data));
@@ -920,7 +918,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	SkeletonRef target = objectManager->CreateSkeleton(boneCount);
-	ASSERT(target.IsValid(),"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",SkeletonRef::Null());
+	NONFATAL_ASSERT_RTRN(target.IsValid(),"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",SkeletonRef::Null(), false);
 
 	bool skeletonInitSuccess = target->Init();
 	if(!skeletonInitSuccess)
@@ -998,7 +996,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 
 void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex) const
 {
-	ASSERT_RTRN(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.");
+	NONFATAL_ASSERT(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.", true);
 
 	for(unsigned int b = 0; b < mesh.mNumBones; b++)
 	{
@@ -1032,7 +1030,7 @@ void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const ai
 
 void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const
 {
-	ASSERT_RTRN(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.");
+	NONFATAL_ASSERT(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.", true);
 
 	for(unsigned int b = 0; b < mesh.mNumBones; b++)
 	{
@@ -1144,7 +1142,7 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopPadding) const
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	ASSERT(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null());
+	NONFATAL_ASSERT_RTRN(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null(), true);
 
 	float ticksPerSecond = (float)animation.mTicksPerSecond;
 
@@ -1156,11 +1154,11 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 
 	if(addLoopPadding) durationTicks += loopPadding;
 
-	ASSERT(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> tickers per second is 0.", AnimationRef::Null());
+	NONFATAL_ASSERT_RTRN(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> Ticks per second is 0.", AnimationRef::Null(), true);
 	//float duration = durationTicks / ticksPerSecond;
 
 	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond);
-	ASSERT(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null());
+	NONFATAL_ASSERT_RTRN(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null(), false);
 
 	bool initSuccess = animationRef->Init(animation.mNumChannels);
 	if(!initSuccess)
@@ -1240,17 +1238,16 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
  */
 AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding, bool preserveFBXPivots)
 {
-	bool initSuccess = InitImporter();
-	ASSERT(initSuccess, "ModelImporter::LoadAnimation -> Unable to initialize importer.", AnimationRef::Null());
+	InitImporter();
 
 	const aiScene * scene = LoadAIScene(filePath, preserveFBXPivots);
-	ASSERT(scene != NULL, "ModelImporter::LoadAnimation -> Unable to load scene.", AnimationRef::Null());
+	NONFATAL_ASSERT_RTRN(scene != NULL, "ModelImporter::LoadAnimation -> Unable to load scene.", AnimationRef::Null(), false);
 
-	ASSERT(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationRef::Null());
+	NONFATAL_ASSERT_RTRN(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationRef::Null(), true);
 
 	// only load the first animation
 	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), addLoopPadding);
-	ASSERT(animation.IsValid(),"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null());
+	NONFATAL_ASSERT_RTRN(animation.IsValid(),"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null(), false);
 
 	return animation;
 }

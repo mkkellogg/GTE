@@ -79,15 +79,10 @@ bool Animation::Init(unsigned int channelCount)
 	this->channelCount = channelCount;
 
 	keyFrames = new KeyFrameSet[channelCount];
-	ASSERT(keyFrames != NULL,"Animation::Init -> Could not allocate key frame set array", false);
+	ASSERT(keyFrames != NULL,"Animation::Init -> Could not allocate key frame set array.");
 
 	channelNames = new std::string[channelCount];
-	if(channelNames == NULL)
-	{
-		Destroy();
-		Debug::PrintError("Animation::Init -> Could not allocate channel name set array");
-		return false;
-	}
+	ASSERT(channelNames != NULL,"Animation::Init -> Could not allocate channel name set array.");
 
 	return true;
 }
@@ -118,19 +113,19 @@ unsigned int Animation::GetChannelCount()
  */
 KeyFrameSet * Animation::GetKeyFrameSet(unsigned int nodeIndex)
 {
-	ASSERT(nodeIndex < channelCount,"Animation::GetKeyFrameSet -> Node index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(nodeIndex < channelCount,"Animation::GetKeyFrameSet -> Node index is out of range.", NULL, true);
 	return keyFrames + nodeIndex;
 }
 
 const std::string * Animation::GetChannelName(unsigned int index)
 {
-	ASSERT(index < channelCount, "Animation::GetChannelName -> index is out of range.", NULL);
+	NONFATAL_ASSERT_RTRN(index < channelCount, "Animation::GetChannelName -> 'index' is out of range.", NULL, true);
 	return channelNames + index;
 }
 
 void Animation::SetChannelName(unsigned int index, const std::string& name)
 {
-	ASSERT_RTRN(index < channelCount, "Animation::SetChannelName -> index is out of range.");
+	NONFATAL_ASSERT(index < channelCount, "Animation::SetChannelName -> 'index' is out of range.", true);
 	channelNames[index] = name;
 }
 
