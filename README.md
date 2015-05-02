@@ -90,7 +90,9 @@
 	- GLFW: run 'brew install glfw3' to get the correct full package name
 	- GLEW: glew
 	
-	You will also need to make sure to have XCode command line tools installed.
+	You will also need to make sure to have XCode command line tools installed. Version 6.2 seems to work well, while versions 6.3 and above (at the time of this writing) exhibit STL - related compile errors. Even after installing XCode command line tools you may need to install gcc with brew:
+
+		brew install gcc
 	
 	2.4 Compiling GTE
 	
