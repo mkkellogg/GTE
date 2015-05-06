@@ -9,15 +9,27 @@ template <typename T> class DataStack
 	unsigned int elementsPerEntry;
 	unsigned int entries;
 	T * data;
-
 	T * stackPointer;
 
 	void Destroy()
 	{
-		SAFE_DELETE(data);
+		if(data != NULL)
+		{
+			delete[] data;
+			data = NULL;
+		}
 	}
 
 	public:
+
+	DataStack()
+	{
+		this->maxEntryCount = 256;
+		this->elementsPerEntry = 1;
+		entries = 0;
+		data = NULL;
+		stackPointer = NULL;
+	}
 
 	DataStack(int maxEntryCount, int elementsPerEntry)
 	{
