@@ -7,19 +7,20 @@ enum class StandardUniformMaskComponent
     ModelViewMatrix=2,
     ModelViewProjectionMatrix=4,
     ProjectionMatrix=8,
-    LightPosition=16,
-    LightDirection=32,
-    LightColor=64,
-    LightIntensity=128,
-    LightAttenuation=256,
-    LightType=512,
-    EmissiveColor=1024,
-    Texture0=2048,
-    Texture1=4096,
-    NormalMap=8192,
-    DoShadowVolumeRender=16384,
-    ClipPlaneCount=32768,
-    ClipPlane0=65536
+    EyePosition=16,
+    LightPosition=32,
+    LightDirection=64,
+    LightColor=128,
+    LightIntensity=256,
+    LightAttenuation=512,
+    LightType=1024,
+    EmissiveColor=2048,
+    Texture0=4096,
+    Texture1=8192,
+    NormalMap=16384,
+    DoShadowVolumeRender=32768,
+    ClipPlaneCount=65536,
+    ClipPlane0=131072
 };
 
 enum class StandardUniform
@@ -28,21 +29,22 @@ enum class StandardUniform
 	ModelViewMatrix=1,
 	ModelViewProjectionMatrix=2,
 	ProjectionMatrix=3,
-	LightPosition=4,
-	LightDirection=5,
-	LightColor=6,
-	LightIntensity=7,
-	LightAttenuation=8,
-	LightType=9,
-	EmissiveColor=10,
-	Texture0=11,
-	Texture1=12,
-	NormalMap=13,
-	DoShadowVolumeRender=14,
-	ClipPlaneCount=15,
-	ClipPlane0=16,
-    _Last=17, // always keep as last entry (before _None)
-    _None=18
+	EyePosition=4,
+	LightPosition=5,
+	LightDirection=6,
+	LightColor=7,
+	LightIntensity=8,
+	LightAttenuation=9,
+	LightType=10,
+	EmissiveColor=11,
+	Texture0=12,
+	Texture1=13,
+	NormalMap=14,
+	DoShadowVolumeRender=15,
+	ClipPlaneCount=16,
+	ClipPlane0=17,
+    _Last=18, // always keep as last entry (before _None)
+    _None=19
 };
 
 #include "base/intmask.h"

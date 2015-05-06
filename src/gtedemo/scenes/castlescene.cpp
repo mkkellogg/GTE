@@ -235,9 +235,9 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10, -15.5, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true,true,true);
-	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
+	//modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true,true,true);
+	//sceneRoot->AddChild(modelSceneObject);
+	//modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
 	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, .25, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
@@ -397,6 +397,65 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-5.3,-.15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
+
+
+
+
+	// get reference to the engine's object manager
+	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+	//========================================================
+	//
+	// Texture scene cube
+	//
+	//========================================================
+
+	// create instance of SceneObject to hold the cube mesh and its renderer
+	SceneObjectRef cubeSceneObject = objectManager->CreateSceneObject();
+	cubeSceneObject->SetStatic(true);
+	sceneRoot->AddChild(cubeSceneObject);
+
+	// load texture for the cube
+	TextureAttributes texAttributes;
+	texAttributes.FilterMode = TextureFilter::TriLinear;
+	texAttributes.MipMapLevel = 4;
+	TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
+	TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
+
+
+	// create the cube's material using the "basic" built-in shader
+	ShaderSource basicShaderSource;
+	importer.LoadBuiltInShaderSource("basic", basicShaderSource);
+	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
+	material->SetTexture(texture, "TEXTURE0");
+	material->SetTexture(normalmap, "NORMALMAP");
+	material->SetUniform1f(3.4, "USCALE");
+	material->SetUniform1f(3.4, "VSCALE");
+
+	// set the cube mesh attributes
+	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Tangent);
+
+	// create the cube mesh
+	Mesh3DRef cubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
+	Mesh3DFilterRef cubeMeshfilter = objectManager->CreateMesh3DFilter();
+	cubeSceneObject->SetMesh3DFilter(cubeMeshfilter);
+	cubeMeshfilter->SetMesh3D(cubeMesh);
+	cubeMeshfilter->SetCastShadows(false);
+	cubeMeshfilter->SetReceiveShadows(true);
+
+	// create the cube mesh's renderer
+	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	renderer->AddMaterial(material);
+	cubeSceneObject->SetMesh3DRenderer(renderer);
+
+	// scale the cube and move to its position in the scene
+	cubeSceneObject->GetTransform().Scale(10, 1.5, 10, false);
+	cubeSceneObject->GetTransform().Translate(78, -11.4, -4, false);
 }
 
 /*
@@ -448,7 +507,7 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	lanternLight->SetType(LightType::Point);
 	lanternObject->SetLight(lanternLight);
 	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(77.2, -4, -5, false);
+	lanternObject->GetTransform().Translate(75.2, -6, -5, false);
 	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);

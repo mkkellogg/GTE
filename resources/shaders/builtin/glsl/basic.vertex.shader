@@ -17,22 +17,19 @@ uniform int LIGHT_TYPE;
 uniform int CLIP_PLANE_COUNT;
 uniform vec4 CLIP_PLANE0;
 
+uniform float USCALE;
+uniform float VSCALE;
+
 out vec3 vColor;
 out vec2 vUVTexture0;
 out vec3 vNormal;
 out vec3 vTangent;
 out vec4 vPosition;
-out vec3 vLightDir;
  
 void main()
 {
-	if(LIGHT_TYPE == 1)
-	{
-		vLightDir = normalize(LIGHT_DIRECTION.xyz);
-	}
-	
    	vColor = COLOR;
-   	vUVTexture0 = UVTEXTURE0;
+   	vUVTexture0 = vec2(UVTEXTURE0.s * USCALE, UVTEXTURE0.t * VSCALE);
    	vNormal = vec3(MODEL_MATRIX * NORMAL);
    	vTangent = vec3(MODEL_MATRIX * TANGENT);
    	vPosition = MODEL_MATRIX * POSITION;

@@ -351,8 +351,8 @@ void LavaScene::SetupExtra(AssetImporter& importer)
 	TextureAttributes texAttributes;
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/corroded/color.png", texAttributes);
-	TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/corroded/normal.png", texAttributes);
+	TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
+	TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
 
 
 	// create the cube's material using the "basic" built-in shader
@@ -361,6 +361,8 @@ void LavaScene::SetupExtra(AssetImporter& importer)
 	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
 	material->SetTexture(normalmap, "NORMALMAP");
+	material->SetUniform1f(1.0, "USCALE");
+	material->SetUniform1f(1.0, "VSCALE");
 
 	// set the cube mesh attributes
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();

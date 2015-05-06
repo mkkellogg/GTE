@@ -129,19 +129,19 @@ class RenderManager
 
 	void RenderSceneForCamera(unsigned int cameraIndex);
 	void ForwardRenderSceneForCamera(Camera& camera);
-	void ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& camera, const Transform& viewInverse);
+	void ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& camera, const Transform& viewTransform, const Transform& viewInverse);
 	void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& modelPreTransform,
-									const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
+								    const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 	void ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
-							      const Transform& viewTransformInverse, const Camera& camera,MaterialRef materialOverride, bool flagRendered,
-							      bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
-	void ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransformInverse);
-	void ForwardRenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
-	void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera,
+								  const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,MaterialRef materialOverride,
+								  bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+	void ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransform, const Transform& viewTransformInverse);
+	void ForwardRenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
+	void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
 											   MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
-	void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform,const Transform& viewTransformInverse, const Camera& camera,
+	void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform,const Transform& viewTransformInverse, const Camera& camera,
 											   MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
 											   std::function<bool(SceneObjectRef)> filterFunction);
 	bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
@@ -170,7 +170,7 @@ class RenderManager
     void ActivateMaterial(MaterialRef material);
     void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection);
     void SendModelViewProjectionToShader(const Transform& modelViewProjection);
-    void SendClipPlanesToShader(const Camera& camera);
+    void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);
     void SendActiveMaterialUniformsToShader() const;
 
     bool ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const;

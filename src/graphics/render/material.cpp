@@ -828,6 +828,18 @@ void Material::SendLightToShader(const Light * light, const Point3 * position,  
 	}
 }
 
+void Material::SendEyePositionToShader(const Point3 * position)
+{
+	NONFATAL_ASSERT(shader.IsValid(),"Material::SendViewPositionToShader -> 'shader' is null.", true);
+
+	int varID = GetStandardUniformBinding(StandardUniform::EyePosition);
+	if(varID >=0 )
+	{
+		shader->SendUniformToShader(varID, position);
+		SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
+	}
+}
+
 /*
  * Verify that all uniforms and attributes exposed by this material's shader have values
  * set for them and that those values are of the correct size.
