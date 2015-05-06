@@ -20,7 +20,11 @@
 	
 	Supported operating systems: Apple OS X, Linux, Unix
 
+	
+
 2. Building GTE
+
+	2.1 Build overview
 
 	A number of pre-requisite libraries must be installed prior to building GTE. These libraries are:
 	
@@ -30,6 +34,7 @@
 		- GLEW (OpenGL Extension Wrangler library)
 	
 	Your Assimp installation needs to include the ability to load FBX files in order to run the demo included in the project.
+
 
 	2.2 Linux notes
 	
@@ -80,6 +85,7 @@
 	- GLEW: libglew-dev
 
 	On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location.
+	
 
 	2.3 OSX Notes
 	
@@ -90,7 +96,10 @@
 	- GLFW: run 'brew install glfw3' to get the correct full package name
 	- GLEW: glew
 	
-	You will also need to make sure to have XCode command line tools installed.
+	You will also need to make sure to have XCode command line tools installed. Version 6.2 seems to work well, while versions 6.3 and above (at the time of this writing) exhibit STL - related compile errors. Even after installing XCode command line tools you may need to install gcc with brew:
+
+		brew install gcc
+	
 	
 	2.4 Compiling GTE
 	
@@ -106,6 +115,7 @@
 		Makefile.unix - Unix & Linux systems
 		
 	Assuming the build succeeded, the 'gtedemo' executable will be produced in the 'bin' subdirectory of the GTE installation. 
+
 
 3. Running the demo
 
