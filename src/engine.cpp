@@ -42,11 +42,12 @@ Engine::Engine()
  */
 Engine::~Engine()
 {
-	SAFE_DELETE(errorManager);
 	SAFE_DELETE(inputManager);
 	SAFE_DELETE(animationManager);
-	SAFE_DELETE(graphicsSystem);
 	SAFE_DELETE(engineObjectManager);
+	SAFE_DELETE(renderManager);
+	SAFE_DELETE(graphicsSystem);
+	SAFE_DELETE(errorManager);
 }
 
 EngineCallbacks::~EngineCallbacks()
