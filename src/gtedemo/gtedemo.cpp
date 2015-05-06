@@ -42,7 +42,10 @@ class CustomEngineCallbacks: public EngineCallbacks
 		 game->OnPreRender();
 	 }
 
-	void OnQuit(){}
+	void OnQuit()
+	{
+		game->OnQuit();
+	}
 	virtual ~CustomEngineCallbacks(){}
 };
 
