@@ -41,7 +41,8 @@
 {										   																	\
 	if(!(exp))					     			 															\
 	{																										\
-		Engine::Instance()->GetErrorManager()->SetAndReportError((errCode), (msg));    						\
+		Engine::Instance()->GetErrorManager()->SetError((errCode), (msg));    								\
+		Debug::PrintAtLevel((msg), DebugLevel::Error);														\
 		return (returnExp);			       		 															\
 	}									   		 															\
 }
@@ -50,7 +51,8 @@
 {										   		 															\
 	if(!(exp))					     			 															\
 	{																										\
-		Engine::Instance()->GetErrorManager()->SetAndReportError((int)ErrorCode::GENERAL_FATAL, (msg));  	\
+		Engine::Instance()->GetErrorManager()->SetError((int)ErrorCode::GENERAL_NONFATAL, (msg));  			\
+		Debug::PrintAtLevel((msg), DebugLevel::Error);														\
 		return (returnExp);			       																	\
 	}									   																	\
 }
@@ -62,7 +64,8 @@
 {										   		 										\
 	if(!(exp))					     			 										\
 	{																					\
-		Engine::Instance()->GetErrorManager()->SetAndReportError((errCode), (msg));    	\
+		Engine::Instance()->GetErrorManager()->SetError((errCode), (msg));    			\
+		Debug::PrintAtLevel((msg), DebugLevel::Error);									\
 		return;			       			 												\
 	}									   		 				    					\
 }
@@ -71,7 +74,8 @@
 {										   																\
 	if(!(exp))					     			 														\
 	{									   		 														\
-		Engine::Instance()->GetErrorManager()->SetAndReportError((int)ErrorCode::GENERAL_FATAL, (msg)); \
+		Engine::Instance()->GetErrorManager()->SetError((int)ErrorCode::GENERAL_NONFATAL, (msg)); 		\
+		Debug::PrintAtLevel((msg), DebugLevel::Error);													\
 		return;			       		 			 														\
 	}									   		 														\
 }
