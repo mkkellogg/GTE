@@ -33,7 +33,8 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 		Position = 0,
 		VertexNormal = 1,
 		FaceNormal = 2,
-		Transform = 3
+		VertexTangent = 3,
+		Transform = 4
 	};
 
 	// the renderer for which this transformer acts
@@ -67,9 +68,16 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	// saved values of face normals that have been transformed
 	Vector3Array transformedFaceNormals;
 
+	// saved values of vertex tangents that have been transformed
+	Vector3Array transformedVertexTangents;
+
 	// flag for each (unique) vertex that indicates whether the normals for all instances of that
 	// vertex are equal
 	unsigned char * identicalNormalFlags;
+
+	// flag for each (unique) vertex that indicates whether the tangents for all instances of that
+	// vertex are equal
+	unsigned char * identicalTangentFlags;
 
 	void UpdateTransformedBoneCacheSize();
 	void DestroyTransformedBoneFlagsArray();
@@ -81,10 +89,10 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
 	void ClearCacheFlags();
 	void SetAllTransformCacheFlags(unsigned char value);
 
-	void DestroyIdenticalNormalsFlags();
-	bool CreateIdenticalNormalsFlags();
-	void ClearIdenticalNormalsFlags();
-	bool FindIdenticalNormals(Vector3Array& fullNormalLists);
+	void DestroyIdenticalNormalsTangentsFlags();
+	bool CreateIdenticalNormalsTangentsFlags();
+	void ClearIdenticalNormalsTangentsFlags();
+	bool FindIdenticalNormalsOrTangents(Vector3Array& fullNormalLists, bool forNormals);
 
 	bool CreateCaches();
 	void DestroyCaches();
@@ -98,13 +106,12 @@ class SkinnedMesh3DAttributeTransformer : public AttributeTransformer
     void SetRenderer(SkinnedMesh3DRenderer* renderer);
     void SetVertexBoneMapIndex(int index);
 
-    void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut,
-    		 	 	 	 	 	 	  const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
-    		 	 	 	 	 	 	  const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
-    		 	 	 	 	 	 	  const Point3& centerIn, Point3& centerOut);
-    void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut, const Point3& centerIn, Point3& centerOut);
-    void TransformNormals(const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
-    					  const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut);
+    void TransformAttributes(const Point3Array& positionsIn,  Point3Array& positionsOut,
+						     const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
+						     const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
+						     const Vector3Array& vertexTangentsIn, Vector3Array& vertexTangentsOut,
+						     const Point3& centerIn, Point3& centerOut,
+						     bool transformPositions, bool transformNormals, bool transformTangents);
 };
 
 #endif

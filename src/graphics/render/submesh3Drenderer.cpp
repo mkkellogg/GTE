@@ -62,6 +62,7 @@ SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, AttributeTransformer * a
 	doAttributeTransform = attributeTransformer == NULL ? false : true;
 	doPositionTransform = false;
 	doNormalTransform = false;
+	doTangentTransform = false;
 	useBadGeometryShadowFix = false;
 	doBackSetShadowVolume = true;
 
@@ -111,6 +112,7 @@ void SubMesh3DRenderer::DestroyBuffers()
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Position]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Normal]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::FaceNormal]);
+	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Tangent]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::VertexColor]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture0]);
 	DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture1]);
@@ -493,6 +495,14 @@ void SubMesh3DRenderer::SetFaceNormalData(Vector3Array * faceNormals)
 }
 
 /*
+ * Set the vertex attribute buffer data for the mesh vertex tangents.
+ */
+void SubMesh3DRenderer::SetTangentData(Vector3Array * tangents)
+{
+	attributeBuffers[(int)StandardAttribute::Tangent]->SetData(tangents->GetDataPtr());
+}
+
+/*
  * Set the vertex attribute buffer data for the mesh vertex colors.
  */
 void SubMesh3DRenderer::SetVertexColorData(Color4Array * colors)
@@ -627,12 +637,32 @@ bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 					doAttributeTransform = false;
 					doPositionTransform = false;
 					doNormalTransform = false;
-					Debug::PrintError("SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to transformed normals array.");
+					Debug::PrintError("SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed normals array.");
 					return false;
 				}
 			}
 
 			doNormalTransform = true;
+		}
+
+		if(StandardAttributes::HasAttribute(attributesToTransform, StandardAttribute::Tangent) &&
+		StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Tangent))
+		{
+			Vector3Array * tangents = mesh->GetVertexTangents();
+			unsigned int tangentCount = tangents->GetCount();
+			if(transformedVertexTangents.GetCount() != tangentCount)
+			{
+				if(!transformedVertexTangents.Init(tangentCount))
+				{
+					doAttributeTransform = false;
+					doPositionTransform = false;
+					doNormalTransform = false;
+					Debug::PrintError("SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed tangents array.");
+					return false;
+				}
+			}
+
+			doTangentTransform = true;
 		}
 	}
 
@@ -654,9 +684,10 @@ void SubMesh3DRenderer::CopyMeshData()
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetVertexNormals());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::FaceNormal))SetFaceNormalData(mesh->GetFaceNormals());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Tangent))SetTangentData(mesh->GetVertexTangents());
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetVertexColorData(mesh->GetColors());
-	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVsTexture0());
-	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVsTexture1());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVs0());
+	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVs1());
 }
 
 /*
@@ -795,54 +826,32 @@ void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& model
 		// pass the local->world-space transformation matrix and its inverse to the attribute transformer
 		attributeTransformer->SetModelMatrix(model, modelInverse);
 
-		if(doPositionTransform && doNormalTransform)
-		{
-			Point3Array * positions = mesh->GetPostions();
-			Vector3Array * vertexNormals = mesh->GetVertexNormals();
-			Vector3Array * faceNormals = mesh->GetFaceNormals();
+		Point3Array * positions = mesh->GetPostions();
+		Vector3Array * vertexNormals = mesh->GetVertexNormals();
+		Vector3Array * faceNormals = mesh->GetFaceNormals();
+		Vector3Array * vertexTangents = mesh->GetVertexTangents();
 
-			ASSERT(positions != NULL && vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null positions or normals.");
-			ASSERT(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null vertex normals.");
-			ASSERT(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null face normals.");
+		ASSERT(positions != NULL && vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null positions or normals.");
+		ASSERT(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null vertex normals.");
+		ASSERT(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null face normals.");
+		ASSERT(vertexTangents != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null vertex tangents.");
 
-			// invoke the attribute transformer
-			attributeTransformer->TransformPositionsAndNormals(*positions, transformedPositions, *vertexNormals, transformedVertexNormals, *faceNormals, transformedFaceNormals, mesh->GetCenter(), transformedCenter);
+		// invoke the attribute transformer
+		attributeTransformer->TransformAttributes(*positions, transformedPositions,
+												  *vertexNormals, transformedVertexNormals,
+												  *faceNormals, transformedFaceNormals,
+												  *vertexTangents, transformedVertexTangents,
+												  mesh->GetCenter(), transformedCenter,
+												  doPositionTransform, doNormalTransform, doTangentTransform);
 
-			// update the positions vertex attribute buffer with transformed positions
-			SetPositionData(&transformedPositions);
+		// update the positions vertex attribute buffer with transformed positions
+		if(doPositionTransform)SetPositionData(&transformedPositions);
 
-			// update the normals vertex attribute buffer with transformed normals
-			SetNormalData(&transformedVertexNormals);
-		}
-		else
-		{
-			if(doPositionTransform)
-			{
-				Point3Array * positions = mesh->GetPostions();
-				ASSERT(positions != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null positions.");
+		// update the normals vertex attribute buffer with transformed normals
+		if(doNormalTransform)SetNormalData(&transformedVertexNormals);
 
-				// invoke the attribute transformer
-				attributeTransformer->TransformPositions(*positions, transformedPositions,  mesh->GetCenter(), transformedCenter);
-
-				// update the positions vertex attribute buffer with transformed positions
-				SetPositionData(&transformedPositions);
-			}
-
-			if(doNormalTransform)
-			{
-				Vector3Array * vertexNormals = mesh->GetVertexNormals();
-				Vector3Array * faceNormals = mesh->GetFaceNormals();
-
-				ASSERT(vertexNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null vertex normals.");
-				ASSERT(faceNormals != NULL,"SubMesh3DRenderer::PreRender -> Mesh contains null face normals.");
-
-				// invoke the attribute transformer
-				attributeTransformer->TransformNormals(*vertexNormals, transformedVertexNormals, *faceNormals, transformedFaceNormals);
-
-				// update the normals vertex attribute buffer with transformed normals
-				SetNormalData(&transformedVertexNormals);
-			}
-		}
+		// update the tangents vertex attribute buffer with transformed tangents
+		if(doTangentTransform)SetTangentData(&transformedVertexTangents);
 	}
 }
 

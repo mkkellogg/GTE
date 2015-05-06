@@ -193,6 +193,7 @@ class Game
     void Init();
     void Update();
     void OnPreRender();
+    void OnQuit();
 };
 
 #endif

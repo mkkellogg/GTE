@@ -33,13 +33,12 @@ class AttributeTransformer
 	AttributeTransformer();
     virtual ~AttributeTransformer();
 
-    virtual void TransformPositionsAndNormals(const Point3Array& positionsIn,  Point3Array& positionsOut,
-    										  const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
-    										  const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
-    										  const Point3& centerIn, Point3& centerOut) = 0;
-    virtual void TransformPositions(const Point3Array& positionsIn,  Point3Array& positionsOut, const Point3& centerIn, Point3& centerOut) = 0;
-    virtual void TransformNormals(const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
-    							   const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut) = 0;
+    virtual void TransformAttributes(const Point3Array& positionsIn,  Point3Array& positionsOut,
+								     const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,
+								     const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
+								     const Vector3Array& vertexTangentsIn, Vector3Array& vertexTangentsOut,
+								     const Point3& centerIn, Point3& centerOut,
+								     bool transformPositions, bool transformNormals, bool transformTangents) = 0;
 
     void SetActiveAttributes (StandardAttributeSet attributes);
     StandardAttributeSet GetActiveAttributes() const;

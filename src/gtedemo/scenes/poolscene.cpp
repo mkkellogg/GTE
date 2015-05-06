@@ -517,7 +517,7 @@ void PoolScene::SetupWaterSurface(AssetImporter& importer)
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
-	Mesh3DRef waterMesh = EngineUtility::CreateRectangularMesh(meshAttributes, 2,2,waterMeshResolution,waterMeshResolution, false, false);
+	Mesh3DRef waterMesh = EngineUtility::CreateRectangularMesh(meshAttributes, 2,2,waterMeshResolution,waterMeshResolution, false, false, false);
 
 	// create material for water surface
 	ShaderSource waterShaderSource;

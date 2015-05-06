@@ -74,7 +74,7 @@ void EngineUtility::PrintMatrix(const Matrix4x4& matrix)
 
 Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height,
 											   unsigned int subDivisionsPerWidth, unsigned int subDivisionsPerHeight,
-											   bool calculateNormals, bool buildFaces)
+											   bool calculateNormals, bool calculateTangents, bool buildFaces)
 {
 	if(width <= 0 || height <= 0)
 	{
@@ -147,14 +147,14 @@ Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttribut
 					if(i == 0)
 					{
 						if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))
-							uvs = subMesh->GetUVsTexture0();
+							uvs = subMesh->GetUVs0();
 						else continue;
 					}
 
 					if(i == 1)
 					{
 						if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))
-							uvs = subMesh->GetUVsTexture1();
+							uvs = subMesh->GetUVs1();
 						else continue;
 					}
 
@@ -179,6 +179,7 @@ Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttribut
 	subMesh->SetNormalsSmoothingThreshold(85);
 	subMesh->SetBuildFaces(buildFaces);
 	subMesh->SetCalculateNormals(calculateNormals);
+	subMesh->SetCalculateTangents(calculateTangents);
 	mesh->SetSubMesh(subMesh, 0);
 
 	return mesh;
@@ -280,7 +281,7 @@ Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes, boo
 
 	if(StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))
 	{
-		uvs = subMesh->GetUVsTexture0();
+		uvs = subMesh->GetUVs0();
 
 		// --- Cube UVs -------
 		// cube front, triangle 1

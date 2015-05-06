@@ -5,6 +5,7 @@
 #include "attributetransformer.h"
 #include "graphics/stdattributes.h"
 
+
 AttributeTransformer::AttributeTransformer(StandardAttributeSet attributes)
 {
 	activeAttributes = attributes;

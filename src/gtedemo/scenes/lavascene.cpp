@@ -351,13 +351,16 @@ void LavaScene::SetupExtra(AssetImporter& importer)
 	TextureAttributes texAttributes;
 	texAttributes.FilterMode = TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	TextureRef texture = objectManager->CreateTexture("resources/textures/cartoonTex03.png", texAttributes);
+	TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/corroded/color.png", texAttributes);
+	TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/corroded/normal.png", texAttributes);
+
 
 	// create the cube's material using the "basic" built-in shader
 	ShaderSource basicShaderSource;
 	importer.LoadBuiltInShaderSource("basic", basicShaderSource);
 	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
+	material->SetTexture(normalmap, "NORMALMAP");
 
 	// set the cube mesh attributes
 	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
@@ -365,6 +368,7 @@ void LavaScene::SetupExtra(AssetImporter& importer)
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Tangent);
 
 	// create the cube mesh
 	Mesh3DRef cubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);

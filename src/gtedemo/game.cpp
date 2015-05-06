@@ -625,6 +625,14 @@ void Game::OnPreRender()
 }
 
 /*
+ * Called when the demo ends.
+ */
+void Game::OnQuit()
+{
+	printf("\n\n");
+}
+
+/*
  * Display info for the demo:
  *
  *   - The graphics engine frames-per-second

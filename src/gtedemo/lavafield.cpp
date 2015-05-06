@@ -47,7 +47,7 @@ bool LavaField::InitMeshAndMaterial()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
-	fieldMesh = EngineUtility::CreateRectangularMesh(meshAttributes, fieldWidth, fieldHeight, subDivisions-1, subDivisions-1, false, false);
+	fieldMesh = EngineUtility::CreateRectangularMesh(meshAttributes, fieldWidth, fieldHeight, subDivisions-1, subDivisions-1, false, false, false);
 	ASSERT(fieldMesh.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava field mesh.");
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();

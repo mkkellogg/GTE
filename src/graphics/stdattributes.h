@@ -25,8 +25,8 @@ enum class StandardAttribute
     UVTexture0=6,
     UVTexture1=7,
     UVNormalMap=8,
-    _Last=9, // always keep as last entry
-    _None=10
+    _Last=9, // always keep as second to last entry
+    _None=10 // always keep as last entry
 };
 
 #include "base/intmask.h"

@@ -91,10 +91,11 @@ void SkinnedMesh3DRenderer::InitializeForMesh()
 				// if has not already been done
 				if(subRenderer->GetAttributeTransformer() == NULL)
 				{
-					// setup the attribute transformer to transform both normals and positions
+					// setup the attribute transformer to transform normals, positions, and tangents
 					StandardAttributeSet attributes = StandardAttributes::CreateAttributeSet();
 					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Position);
 					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Normal);
+					StandardAttributes::AddAttribute(&attributes, StandardAttribute::Tangent);
 
 					SkinnedMesh3DAttributeTransformer *attributeTransformer = new SkinnedMesh3DAttributeTransformer(attributes);
 					ASSERT(attributeTransformer != NULL,"SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");

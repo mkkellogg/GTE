@@ -87,8 +87,10 @@ class SubMesh3DRenderer : public EngineObject
     bool doAttributeTransform;
     // should the attribute transform transform vertex positions?
     bool doPositionTransform;
-    // should the attribute transform transform vertex normals?
+    // should the attribute transform vertex normals?
     bool doNormalTransform;
+    // should the attribute transform vertex tangents?
+    bool doTangentTransform;
 
     // pointer to this sub-renderer's attribute transformer
     AttributeTransformer * attributeTransformer;
@@ -100,6 +102,8 @@ class SubMesh3DRenderer : public EngineObject
     Vector3Array transformedVertexNormals;
     // if normals are transformed, the transformed face normals are stored here
     Vector3Array transformedFaceNormals;
+    // if tangents are transformed, the transformed vertex tangents are stored here
+    Vector3Array transformedVertexTangents;
 
     // shadow volume vertex positions, when the shadow volume for this sub-renderer's target sub-mesh is created,
     // its geometry is stored here
@@ -125,6 +129,7 @@ class SubMesh3DRenderer : public EngineObject
     void SetPositionData(Point3Array * points);
     void SetNormalData(Vector3Array * normals);
     void SetFaceNormalData(Vector3Array * normals);
+    void SetTangentData(Vector3Array * tangents);
     void SetVertexColorData(Color4Array * colors);
     void SetUV1Data(UV2Array * uvs);
     void SetUV2Data(UV2Array * uvs);

@@ -128,7 +128,7 @@ bool RenderManager::InitFullScreenQuad()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
-	fullScreenQuad = EngineUtility::CreateRectangularMesh(meshAttributes, 1,1,1,1, true, true);
+	fullScreenQuad = EngineUtility::CreateRectangularMesh(meshAttributes, 1,1,1,1, true, true, false);
 	ASSERT(fullScreenQuad.IsValid(), "RenderManager::Init -> Unable to create full screen quad.");
 
 	// transform full-screen quad to: X: [0..1], Y: [0..1]

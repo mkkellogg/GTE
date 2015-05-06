@@ -53,10 +53,11 @@ class SubMesh3D : public EngineObject
 	// these arrays hold the actual attribute data for this mesh
     Point3Array positions;
     Vector3Array vertexNormals;
+    Vector3Array vertexTangents;
     Vector3Array faceNormals;
     Color4Array colors;
-    UV2Array uvsTexture0;
-    UV2Array uvsTexture1;
+    UV2Array uvs0;
+    UV2Array uvs1;
 
     // inter-face angle above which smoothing/average of vertex normals should
     // not occur
@@ -84,6 +85,8 @@ class SubMesh3D : public EngineObject
     bool buildFaces;
     // should normals be calculated?
     bool calculateNormals;
+    // should tangents be calculated?
+    bool calculateTangents;
 
     SubMesh3D();
     SubMesh3D(StandardAttributeSet attributes);
@@ -100,6 +103,8 @@ class SubMesh3D : public EngineObject
 
     void CalcSphereOfInfluence();
     void CalculateNormals(float smoothingThreshhold);
+    void CalculateTangent(unsigned int vertexIndex, unsigned int rightIndex, unsigned int leftIndex, Vector3& result);
+    void CalculateTangents(float smoothingThreshhold);
     void SetContainerMesh(Mesh3D * mesh);
     void SetSubIndex(int index);
 
@@ -110,6 +115,7 @@ class SubMesh3D : public EngineObject
 	public:
 
     void SetCalculateNormals(bool calculate);
+    void SetCalculateTangents(bool calculate);
     void SetBuildFaces(bool build);
     bool HasFaces() const;
 
@@ -130,10 +136,11 @@ class SubMesh3D : public EngineObject
 
     Point3Array * GetPostions();
     Vector3Array * GetVertexNormals();
+    Vector3Array * GetVertexTangents();
     Vector3Array * GetFaceNormals();
     Color4Array * GetColors();
-    UV2Array * GetUVsTexture0();
-    UV2Array * GetUVsTexture1();
+    UV2Array * GetUVs0();
+    UV2Array * GetUVs1();
 
     void SetInvertNormals(bool invert);
 };

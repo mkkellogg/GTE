@@ -57,6 +57,7 @@ SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 
 	buildFaces = true;
 	calculateNormals = true;
+	calculateTangents = true;
 
 	UpdateTimeStamp();
 }
@@ -229,7 +230,7 @@ void SubMesh3D::CalcSphereOfInfluence()
 /*
  * Calculate vertex normals using the two incident edges to calculate the
  * cross product. For all triangles that share a given vertex,the method will
- * calculate the average normal for that vertex as long as the difference between
+ * calculate the average normal for that vertex as long as the angle between
  * the un-averaged normals is less than [smoothingThreshhold]. [smoothingThreshhold]
  * is specified in degrees.
  */
@@ -263,23 +264,25 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	{
 		// get existing normal for this vertex
 		Vector3 oNormal;
-		oNormal = *(vertexNormals.GetVector(v));
+		oNormal = *(faceNormals.GetVector(v));
 		oNormal.Normalize();
 
-		// get vertex position
-		Point3 * point = positions.GetPoint(v);
-		Point3 targetPoint = *point;
-
-		// retrieve the list of normals for [targetPoint]
+		// retrieve the list of equal vertices for vertex [v]
 		std::vector<unsigned int>* listPtr = vertexCrossMap[v];
-		NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to normal group list", true);
+		NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
 
 		Vector3 avg(0,0,0);
 		float divisor = 0;
-		for(unsigned int i=0; i < listPtr->size(); i++)
+
+		std::vector<unsigned int>& list = *listPtr;
+
+		// compute the cosine of the smoothing threshhold angle
+		float cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
+
+		for(unsigned int i=0; i < list.size(); i++)
 		{
-			unsigned int vIndex = listPtr->operator[](i);
-			Vector3 * currentPtr = vertexNormals.GetVector(vIndex);
+			unsigned int vIndex = list[i];
+			Vector3 * currentPtr = faceNormals.GetVector(vIndex);
 			Vector3 current = *currentPtr;
 			current.Normalize();
 
@@ -287,15 +290,7 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 			// and the current normal in the list.
 			float dot = Vector3::Dot(current, oNormal);
 
-			// clamp to the range -1.0 ... 1.0 to prevent rounding errors in ACos()
-			if (dot < -1.0) dot = -1.0 ;
-			else if (dot > 1.0) dot = 1.0 ;
-
-			float angle = GTEMath::ACos(dot);
-			if(angle <0)angle = -angle;
-			angle *= Constants::RadsToDegrees;
-
-			if(angle < smoothingThreshhold)
+			if(dot > cosSmoothingThreshhold)
 			{
 				avg.x += current.x;
 				avg.y += current.y;
@@ -332,6 +327,162 @@ void SubMesh3D::CalculateNormals(float smoothingThreshhold)
 	}
 
 	if(invertNormals)InvertNormals();
+}
+
+/*
+ * Calculate the tangent for the vertex at [vertexIndex] in member [positions].
+ *
+ * The two edges used in the calculation (e1 and e2) are formed from the three vertices: v0, v1, v2.
+ *
+ * v0 is the vertex at [vertexIndex] in [positions].
+ * v2 is the vertex at [rightIndex] in [positions].
+ * v1 is the vertex at [leftIndex] in [positions].
+ */
+void SubMesh3D::CalculateTangent(unsigned int vertexIndex, unsigned int rightIndex, unsigned int leftIndex, Vector3& result)
+{
+	UV2Array * sourceUVs = &uvs0;
+
+	UV2 * uv0 = sourceUVs->GetCoordinate(vertexIndex);
+	UV2 * uv2 = sourceUVs->GetCoordinate(rightIndex);
+	UV2 * uv1 = sourceUVs->GetCoordinate(leftIndex);
+
+	Vector3 e1, e2;
+
+	Point3 * p0 = positions.GetPoint(vertexIndex);
+	Point3 * p2 = positions.GetPoint(rightIndex);
+	Point3 * p1 = positions.GetPoint(leftIndex);
+
+	Point3::Subtract(*p1, *p0,  e1);
+	Point3::Subtract(*p2, *p0,  e2);
+
+	float u0, u1, u2;
+	float v0, v1, v2;
+
+	u0 = uv0->u;
+	u1 = uv1->u;
+	u2 = uv2->u;
+
+	v0 = uv0->v;
+	v1 = uv1->v;
+	v2 = uv2->v;
+
+	float du1 = u1 - u0;
+	float du2 = u2 - u0;
+
+	float dv1 = v1 - v0;
+	float dv2 = v2 - v0;
+
+	float ood = 1.0 / ((du1 * dv2) - (du2 * dv1));
+
+	result.Set(dv2*e1.x - dv1*e2.x, dv2*e1.y - dv1*e2.y, dv2*e1.z - dv1*e2.z);
+
+	result.Scale(ood);
+}
+
+/*
+ * Calculate vertex tangents using the two incident edges of a given vertex.
+ * For all triangles that share a given vertex,the method will
+ * calculate the average tangent for that vertex as long as the angle between
+ * the un-averaged normals for the same vertices is less than [smoothingThreshhold].
+ * [smoothingThreshhold is specified in degrees.
+ */
+void SubMesh3D::CalculateTangents(float smoothingThreshhold)
+{
+	if(!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))return;
+
+	// loop through each triangle in this mesh's vertices
+	// and calculate tangents for each
+	for(unsigned int v =0; v < totalVertexCount-2; v+=3)
+	{
+		Vector3 t0, t1, t2;
+
+		CalculateTangent(v, v+2, v+1, t0);
+		CalculateTangent(v+1, v, v+2, t1);
+		CalculateTangent(v+2, v+1, v, t2);
+
+		vertexTangents.GetVector(v)->SetTo(t0);
+		vertexTangents.GetVector(v+1)->SetTo(t1);
+		vertexTangents.GetVector(v+2)->SetTo(t2);
+	}
+
+	// This vector is used to store the calculated average tangent for all equal vertices
+	std::vector<Vector3> averageTangents;
+
+	// loop through each vertex and lookup the associated list of
+	// tangents associated with that vertex, and then calculate the
+	// average tangents from that list.
+	for(unsigned int v =0; v < totalVertexCount; v++)
+	{
+		// get existing normal for this vertex
+		Vector3 oNormal;
+		oNormal = *(faceNormals.GetVector(v));
+		oNormal.Normalize();
+
+		Vector3 oTangent;
+		oTangent = *(vertexTangents.GetVector(v));
+		oTangent.Normalize();
+
+		// retrieve the list of equal vertices for vertex [v]
+		std::vector<unsigned int>* listPtr = vertexCrossMap[v];
+		NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
+
+		Vector3 avg(0,0,0);
+		float divisor = 0;
+
+		std::vector<unsigned int>& list = *listPtr;
+
+		// compute the cosine of the smoothing threshhold angle
+		float cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
+
+		for(unsigned int i=0; i < list.size(); i++)
+		{
+			unsigned int vIndex = list[i];
+			Vector3 * currentPtr = faceNormals.GetVector(vIndex);
+			Vector3 current = *currentPtr;
+			current.Normalize();
+
+			// calculate angle between the normal that exists for this vertex,
+			// and the current normal in the list.
+			float dot = Vector3::Dot(current, oNormal);
+
+			if(dot > cosSmoothingThreshhold)
+			{
+				Vector3 * tanPtr = vertexTangents.GetVector(vIndex);
+				Vector3 tangent = *tanPtr;
+
+				avg.x += tangent.x;
+				avg.y += tangent.y;
+				avg.z += tangent.z;
+				divisor++;
+			}
+		}
+
+		// if divisor < 1, then no extra tangents were found to include in the average,
+		// so just use the original one
+		if(divisor <= 1)
+		{
+			avg.x = oTangent.x;
+			avg.y = oTangent.y;
+			avg.z = oTangent.z;
+		}
+		else
+		{
+			float scaleFactor = (float)1.0/divisor;
+			avg.Scale(scaleFactor);
+			//avg.Normalize();
+		}
+
+		averageTangents.push_back(avg);
+	}
+
+	// loop through each vertex and assign the average tangent
+	// calculated for that vertex
+	for(unsigned int v =0; v < totalVertexCount; v++)
+	{
+		Vector3 avg = averageTangents[v];
+		// set the tangent for this vertex to the averaged tangent
+		vertexTangents.GetVector(v)->Set(avg.x,avg.y,avg.z);
+	}
 }
 
 /*
@@ -410,6 +561,14 @@ void SubMesh3D::SetCalculateNormals(bool calculate)
 }
 
 /*
+ * Tell this mesh whether or not to calculate its own tangents.
+ */
+void SubMesh3D::SetCalculateTangents(bool calculate)
+{
+	calculateTangents = calculate;
+}
+
+/*
  * Tell this mesh whether or not to build face data.
  */
 void SubMesh3D::SetBuildFaces(bool build)
@@ -474,7 +633,7 @@ const Vector3& SubMesh3D::GetSphereOfInfluenceZ() const
  */
 void SubMesh3D::Update()
 {
-	if(calculateNormals || buildFaces)
+	if(calculateNormals || calculateTangents || buildFaces)
 	{
 		if(!BuildVertexCrossMap())return;
 	}
@@ -482,6 +641,7 @@ void SubMesh3D::Update()
 	CalcSphereOfInfluence();
 
 	if(calculateNormals)CalculateNormals(normalsSmoothingThreshold);
+	if(calculateTangents)CalculateTangents(normalsSmoothingThreshold);
 	if(buildFaces)BuildFaces();
 
 	if(containerMesh != NULL)
@@ -548,6 +708,12 @@ bool SubMesh3D::Init(unsigned int totalVertexCount)
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
 	}
 
+	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::Tangent))
+	{
+		initSuccess = vertexTangents.Init(totalVertexCount) && initSuccess;
+		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Tangent;
+	}
+
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::VertexColor))
 	{
 		initSuccess = colors.Init(totalVertexCount) && initSuccess;
@@ -556,13 +722,13 @@ bool SubMesh3D::Init(unsigned int totalVertexCount)
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture0))
 	{
-		initSuccess = uvsTexture0.Init(totalVertexCount) && initSuccess;
+		initSuccess = uvs0.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture0;
 	}
 
 	if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture1))
 	{
-		initSuccess = uvsTexture1.Init(totalVertexCount) && initSuccess;
+		initSuccess = uvs1.Init(totalVertexCount) && initSuccess;
 		if(!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture1;
 	}
 
@@ -633,9 +799,9 @@ void SubMesh3D::ReverseAttributeComponentOrder()
 
 		if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture0))
 		{
-			UV2 * u1 = uvsTexture0.GetCoordinate(i);
+			UV2 * u1 = uvs0.GetCoordinate(i);
 			UV2  u1r = *u1;
-			UV2 * u3 = uvsTexture0.GetCoordinate(i+2);
+			UV2 * u3 = uvs0.GetCoordinate(i+2);
 
 			*u1 = *u3;
 			*u3 = u1r;
@@ -643,9 +809,9 @@ void SubMesh3D::ReverseAttributeComponentOrder()
 
 		if(StandardAttributes::HasAttribute(attributeSet,StandardAttribute::UVTexture1))
 		{
-			UV2 * u1 = uvsTexture1.GetCoordinate(i);
+			UV2 * u1 = uvs1.GetCoordinate(i);
 			UV2  u1r = *u1;
-			UV2 * u3 = uvsTexture1.GetCoordinate(i+2);
+			UV2 * u3 = uvs1.GetCoordinate(i+2);
 
 			*u1 = *u3;
 			*u3 = u1r;
@@ -705,12 +871,21 @@ Point3Array * SubMesh3D::GetPostions()
 }
 
 /*
- * Get the vertex positions for this sub-mesh. These may or may not
+ * Get the vertex normals for this sub-mesh. These may or may not
  * be averaged for smooth shading.
  */
 Vector3Array * SubMesh3D::GetVertexNormals()
 {
 	return &vertexNormals;
+}
+
+/*
+ * Get the vertex tangents for this sub-mesh. These may or may not
+ * be averaged for smooth transitions between triangles.
+ */
+Vector3Array * SubMesh3D::GetVertexTangents()
+{
+	return &vertexTangents;
 }
 
 /*
@@ -733,16 +908,16 @@ Color4Array * SubMesh3D::GetColors()
 /*
  * Get UV coordinates array 1 for this sub-mesh.
  */
-UV2Array * SubMesh3D::GetUVsTexture0()
+UV2Array * SubMesh3D::GetUVs0()
 {
-	return &uvsTexture0;
+	return &uvs0;
 }
 
 /*
  * Get UV coordinates array 2 for this sub-mesh.
  */
-UV2Array * SubMesh3D::GetUVsTexture1()
+UV2Array * SubMesh3D::GetUVs1()
 {
-	return &uvsTexture1;
+	return &uvs1;
 }
 

@@ -37,7 +37,7 @@ class EngineUtility
 	static void PrintMatrix(const Matrix4x4& matrix);
 	static Mesh3DRef CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height,
 										   unsigned int subDivisionsWidth, unsigned int subDivisionsHeight,
-										   bool calculateNormals, bool buildFaces);
+										   bool calculateNormals, bool calculateTangents, bool buildFaces);
 	static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes, bool doCCW);
 	static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes);
 };
