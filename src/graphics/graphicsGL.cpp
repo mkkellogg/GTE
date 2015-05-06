@@ -233,7 +233,7 @@ void GraphicsGL::End()
 {
 	Graphics::End();
 
-	 glfwTerminate();
+	glfwTerminate();
 }
 
 /*

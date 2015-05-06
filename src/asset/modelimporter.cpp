@@ -1282,7 +1282,7 @@ UV2Array* ModelImporter::GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D
 	switch(property)
 	{
 		case ShaderMaterialCharacteristic::DiffuseTextured:
-			return mesh.GetUVsTexture0();
+			return mesh.GetUVs0();
 		break;
 		default:
 			return NULL;

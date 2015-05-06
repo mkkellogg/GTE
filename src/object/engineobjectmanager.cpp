@@ -624,12 +624,12 @@ void EngineObjectManager::DeleteRenderTarget(RenderTarget * target)
 MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, ShaderRef shader)
 {
 	Material * m = new Material(name);
-	ASSERT(m != NULL, "EngineObjectManager::CreateMaterial -> Unable to allocate material.");
+	ASSERT(m != NULL, "EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> Unable to allocate material.");
 
 	bool initSuccess = m->Init(shader);
 	if(!initSuccess)
 	{
-		Debug::PrintError("EngineObjectManager::CreateMaterial(Shader *) -> could not Init material");
+		Debug::PrintError("EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> could not Init material");
 		delete m;
 		return MaterialRef::Null();
 	}
@@ -651,7 +651,7 @@ MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, const S
 
 	if(!initSuccess)
 	{
-		Debug::PrintError("EngineObjectManager::CreateMaterial(const char *, const char *) -> could not Init material");
+		Debug::PrintError("EngineObjectManager::CreateMaterial(const std::string&, const std::string&) -> could not Init material");
 		delete m;
 		return MaterialRef::Null();
 	}
