@@ -9,8 +9,9 @@
 enum ErrorCode
 {
 	GENERAL_FATAL = 5,
-	GENERAL_SEVERE = 4,
-	GENERAL_WARNING = 3
+	GENERAL_NONFATAL = 4,
+	GENERAL_SEVERE = 3,
+	GENERAL_WARNING = 2
 };
 
 class ErrorManager
