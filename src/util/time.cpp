@@ -27,7 +27,8 @@ void Time::Initialize()
 {
 	if(!initialized)
 	{
-		startupTime = std::chrono::system_clock::now().time_since_epoch() / std::chrono::microseconds(1);
+		auto _startupTime = std::chrono::high_resolution_clock::now();
+		startupTime = _startupTime.time_since_epoch().count();
 		initialized = true;
 	}
 }
@@ -35,10 +36,11 @@ void Time::Initialize()
 float Time::GetRealTimeSinceStartup()
 {
 	Initialize();
-	unsigned long long currentTime = std::chrono::system_clock::now().time_since_epoch() / std::chrono::microseconds(1);
+	auto _currentTime = std::chrono::high_resolution_clock::now();
+	unsigned long long currentTime = _currentTime.time_since_epoch().count();
 	unsigned long long longDiff = currentTime - startupTime;
 
-	return (float)((float)longDiff/(float)1000000.0);
+	return (float)((float)longDiff / (float)10000000.0);
 }
 
 void Time::Update()

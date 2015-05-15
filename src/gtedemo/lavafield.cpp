@@ -32,10 +32,10 @@
 bool LavaField::InitMeshAndMaterial()
 {
 	// load first displacement image
-	displacementA = ImageLoader::LoadImage("resources/textures/lava/displacementA.png");
+	displacementA = ImageLoader::LoadImageU("resources/textures/lava/displacementA.png");
 	ASSERT(displacementA != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture A.");
 	// load second displacement image
-	displacementB = ImageLoader::LoadImage("resources/textures/lava/displacementB.png");
+	displacementB = ImageLoader::LoadImageU("resources/textures/lava/displacementB.png");
 	ASSERT(displacementB != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture B.");
 
 	// make lava field 1x1 in model space

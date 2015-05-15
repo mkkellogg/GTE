@@ -10,6 +10,7 @@
 #include "filesystem.h"
 #include "filesystemIX.h"
 #include "util/engineutility.h"
+#include "global/global.h"
 
 FileSystemIX::FileSystemIX()
 {
@@ -52,7 +53,10 @@ std::string FileSystemIX::GetPathFromIXPath(const std::string& path) const
 
 std::string FileSystemIX::FixupPath(const std::string& path) const
 {
-	char chars[path.size()+1];
+	const unsigned int size = path.size() + 1;
+	char *chars = new char[size];
+	ASSERT(chars != NULL, " FileSystemIX::FixupPath -> Could not allocate character array.");
+
 	strcpy(chars, path.c_str());
 
 	for(unsigned int i=0; i< path.size(); i++)
@@ -62,6 +66,9 @@ std::string FileSystemIX::FixupPath(const std::string& path) const
 
 	std::string newPath = std::string(chars);
 	//newPath.replace(newPath.begin(),newPath.end(), "\\", "/");
+
+	delete chars;
+
 	return newPath;
 }
 

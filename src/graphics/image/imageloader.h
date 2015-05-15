@@ -29,8 +29,7 @@ class ImageLoader
 
 	public:
 
-	static RawImage * LoadPNG(const std::string& fullPath);
-	static RawImage * LoadImage(const std::string& fullPath);
+	static RawImage * LoadImageU(const std::string& fullPath);
 	static RawImage * GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height);
 	static void DestroyRawImage(RawImage * image);
 	static std::string GetFileExtension(const std::string& filePath);

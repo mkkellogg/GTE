@@ -9,10 +9,14 @@ class BaseVector4;
 #include <iostream>
 #include <math.h>
 #include "geometry/vector/vector3.h"
+#include "global/constants.h"
+
+typedef unsigned int uint32_t;
 
 class Quaternion 
 {
     float mData[4];
+	static float M_PI;
   
     public:
   

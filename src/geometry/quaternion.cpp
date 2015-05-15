@@ -12,6 +12,8 @@
 
 const Quaternion Quaternion::Identity(0,0,0,1);
 
+float Quaternion::M_PI = Constants::PI;
+
 Quaternion::Quaternion()
 {
     mData[0] = mData[1] = mData[2] = 0;

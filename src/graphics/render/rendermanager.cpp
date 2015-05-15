@@ -1098,7 +1098,7 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
-			NONFATAL_ASSERT(currentMaterial.IsValid(),"RenderManager::RenderSceneObjectMeshes -> Null material encountered.", true)
+			NONFATAL_ASSERT(currentMaterial.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null material encountered.", true);
 			NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null sub renderer encountered.", true);
 			NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null sub mesh encountered.", true);
 

@@ -1,0 +1,359 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0906D591-C65A-4EED-A6B1-117D0D8947E2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>E:\Development\External\GLEW\include;E:\Development\External\GLFW\include;E:\Development\External\DevIL\include;E:\Development\External\Assimp\include;E:\Development\External\Assimp\include\assimp;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>E:\Development\GTE\src;E:\Development\External\GLEW\include;E:\Development\External\GLFW\include;E:\Development\External\DevIL\include;E:\Development\External\Assimp\include;E:\Development\External\Assimp\include\assimp;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\Development\External\GLEW\lib\Release\x64;E:\Development\External\GLFW\lib-vc2013;E:\Development\External\DevIL;E:\Development\External\Assimp\lib64;$(LibraryPath)</LibraryPath>
+    <SourcePath>E:\Development\GTE;E:\Development\GTE\src;$(SourcePath)</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>opengl32.lib;assimp.lib;DevIL.lib;ILU.lib;ILUT.lib;glfw3.lib;glfw3dll.lib;glew32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\asset\assetimporter.cpp" />
+    <ClCompile Include="src\asset\importutil.cpp" />
+    <ClCompile Include="src\asset\modelimporter.cpp" />
+    <ClCompile Include="src\asset\shadersourceloader.cpp" />
+    <ClCompile Include="src\asset\shadersourceloaderGL.cpp" />
+    <ClCompile Include="src\base\basevector2.cpp" />
+    <ClCompile Include="src\base\basevector2array.cpp" />
+    <ClCompile Include="src\base\basevector2factory.cpp" />
+    <ClCompile Include="src\base\basevector4.cpp" />
+    <ClCompile Include="src\base\basevector4array.cpp" />
+    <ClCompile Include="src\base\basevector4factory.cpp" />
+    <ClCompile Include="src\base\intmask.cpp" />
+    <ClCompile Include="src\base\longmask.cpp" />
+    <ClCompile Include="src\debug\gtedebug.cpp" />
+    <ClCompile Include="src\engine.cpp" />
+    <ClCompile Include="src\error\errormanager.cpp" />
+    <ClCompile Include="src\filesys\filesystem.cpp" />
+    <ClCompile Include="src\filesys\filesystemIX.cpp" />
+    <ClCompile Include="src\geometry\matrix4x4.cpp" />
+    <ClCompile Include="src\geometry\point\point3.cpp" />
+    <ClCompile Include="src\geometry\point\point3array.cpp" />
+    <ClCompile Include="src\geometry\point\point3factory.cpp" />
+    <ClCompile Include="src\geometry\quaternion.cpp" />
+    <ClCompile Include="src\geometry\sceneobjecttransform.cpp" />
+    <ClCompile Include="src\geometry\transform.cpp" />
+    <ClCompile Include="src\geometry\vector\vector3.cpp" />
+    <ClCompile Include="src\geometry\vector\vector3array.cpp" />
+    <ClCompile Include="src\geometry\vector\vector3factory.cpp" />
+    <ClCompile Include="src\global\constants.cpp" />
+    <ClCompile Include="src\graphics\animation\animation.cpp" />
+    <ClCompile Include="src\graphics\animation\animationinstance.cpp" />
+    <ClCompile Include="src\graphics\animation\animationmanager.cpp" />
+    <ClCompile Include="src\graphics\animation\animationplayer.cpp" />
+    <ClCompile Include="src\graphics\animation\blendop.cpp" />
+    <ClCompile Include="src\graphics\animation\bone.cpp" />
+    <ClCompile Include="src\graphics\animation\crossfadeblendop.cpp" />
+    <ClCompile Include="src\graphics\animation\keyframe.cpp" />
+    <ClCompile Include="src\graphics\animation\keyframeset.cpp" />
+    <ClCompile Include="src\graphics\animation\rotationkeyframe.cpp" />
+    <ClCompile Include="src\graphics\animation\scalekeyframe.cpp" />
+    <ClCompile Include="src\graphics\animation\sceneobjectskeletonnode.cpp" />
+    <ClCompile Include="src\graphics\animation\skeleton.cpp" />
+    <ClCompile Include="src\graphics\animation\skeletonnode.cpp" />
+    <ClCompile Include="src\graphics\animation\translationkeyframe.cpp" />
+    <ClCompile Include="src\graphics\animation\vertexbonemap.cpp" />
+    <ClCompile Include="src\graphics\color\color4.cpp" />
+    <ClCompile Include="src\graphics\color\color4array.cpp" />
+    <ClCompile Include="src\graphics\color\color4factory.cpp" />
+    <ClCompile Include="src\graphics\graphics.cpp" />
+    <ClCompile Include="src\graphics\graphicsGL.cpp" />
+    <ClCompile Include="src\graphics\image\imageloader.cpp" />
+    <ClCompile Include="src\graphics\image\rawimage.cpp" />
+    <ClCompile Include="src\graphics\light\light.cpp" />
+    <ClCompile Include="src\graphics\object\mesh3D.cpp" />
+    <ClCompile Include="src\graphics\object\mesh3Dfilter.cpp" />
+    <ClCompile Include="src\graphics\object\submesh3D.cpp" />
+    <ClCompile Include="src\graphics\object\submesh3Dface.cpp" />
+    <ClCompile Include="src\graphics\object\submesh3Dfaces.cpp" />
+    <ClCompile Include="src\graphics\render\attributetransformer.cpp" />
+    <ClCompile Include="src\graphics\render\material.cpp" />
+    <ClCompile Include="src\graphics\render\mesh3Drenderer.cpp" />
+    <ClCompile Include="src\graphics\render\rendermanager.cpp" />
+    <ClCompile Include="src\graphics\render\rendertarget.cpp" />
+    <ClCompile Include="src\graphics\render\rendertargetGL.cpp" />
+    <ClCompile Include="src\graphics\render\skinnedmesh3Dattrtransformer.cpp" />
+    <ClCompile Include="src\graphics\render\skinnedmesh3Drenderer.cpp" />
+    <ClCompile Include="src\graphics\render\submesh3Drenderer.cpp" />
+    <ClCompile Include="src\graphics\render\vertexattrbuffer.cpp" />
+    <ClCompile Include="src\graphics\render\vertexattrbufferGL.cpp" />
+    <ClCompile Include="src\graphics\screendesc.cpp" />
+    <ClCompile Include="src\graphics\shader\attributedesc.cpp" />
+    <ClCompile Include="src\graphics\shader\shader.cpp" />
+    <ClCompile Include="src\graphics\shader\shaderGL.cpp" />
+    <ClCompile Include="src\graphics\shader\shadersource.cpp" />
+    <ClCompile Include="src\graphics\shader\uniformdesc.cpp" />
+    <ClCompile Include="src\graphics\stdattributes.cpp" />
+    <ClCompile Include="src\graphics\stduniforms.cpp" />
+    <ClCompile Include="src\graphics\texture\texture.cpp" />
+    <ClCompile Include="src\graphics\texture\textureattr.cpp" />
+    <ClCompile Include="src\graphics\texture\textureGL.cpp" />
+    <ClCompile Include="src\graphics\uv\uv2.cpp" />
+    <ClCompile Include="src\graphics\uv\uv2array.cpp" />
+    <ClCompile Include="src\graphics\uv\uv2factory.cpp" />
+    <ClCompile Include="src\graphics\view\camera.cpp" />
+    <ClCompile Include="src\gtedemo\game.cpp" />
+    <ClCompile Include="src\gtedemo\gameutil.cpp" />
+    <ClCompile Include="src\gtedemo\gtedemo.cpp" />
+    <ClCompile Include="src\gtedemo\lavafield.cpp" />
+    <ClCompile Include="src\gtedemo\scene.cpp" />
+    <ClCompile Include="src\gtedemo\scenes\castlescene.cpp" />
+    <ClCompile Include="src\gtedemo\scenes\lavascene.cpp" />
+    <ClCompile Include="src\gtedemo\scenes\poolscene.cpp" />
+    <ClCompile Include="src\gtemath\gtemath.cpp" />
+    <ClCompile Include="src\input\inputmanager.cpp" />
+    <ClCompile Include="src\input\inputmanagerGL.cpp" />
+    <ClCompile Include="src\object\engineobject.cpp" />
+    <ClCompile Include="src\object\engineobjectmanager.cpp" />
+    <ClCompile Include="src\object\layermanager.cpp" />
+    <ClCompile Include="src\object\objectpairkey.cpp" />
+    <ClCompile Include="src\object\sceneobject.cpp" />
+    <ClCompile Include="src\object\sceneobjectcomponent.cpp" />
+    <ClCompile Include="src\object\shaderorganizer.cpp" />
+    <ClCompile Include="src\util\datastack.cpp" />
+    <ClCompile Include="src\util\engineutility.cpp" />
+    <ClCompile Include="src\util\time.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\asset\assetimporter.h" />
+    <ClInclude Include="src\asset\importutil.h" />
+    <ClInclude Include="src\asset\modelimporter.h" />
+    <ClInclude Include="src\asset\shadersourceloader.h" />
+    <ClInclude Include="src\asset\shadersourceloaderGL.h" />
+    <ClInclude Include="src\base\basevector2.h" />
+    <ClInclude Include="src\base\basevector2array.h" />
+    <ClInclude Include="src\base\basevector2factory.h" />
+    <ClInclude Include="src\base\basevector4.h" />
+    <ClInclude Include="src\base\basevector4array.h" />
+    <ClInclude Include="src\base\basevector4factory.h" />
+    <ClInclude Include="src\base\intmask.h" />
+    <ClInclude Include="src\base\longmask.h" />
+    <ClInclude Include="src\debug\gtedebug.h" />
+    <ClInclude Include="src\engine.h" />
+    <ClInclude Include="src\error\errormanager.h" />
+    <ClInclude Include="src\filesys\filesystem.h" />
+    <ClInclude Include="src\filesys\filesystemIX.h" />
+    <ClInclude Include="src\geometry\matrix4x4.h" />
+    <ClInclude Include="src\geometry\point\point3.h" />
+    <ClInclude Include="src\geometry\point\point3array.h" />
+    <ClInclude Include="src\geometry\point\point3factory.h" />
+    <ClInclude Include="src\geometry\quaternion.h" />
+    <ClInclude Include="src\geometry\sceneobjecttransform.h" />
+    <ClInclude Include="src\geometry\transform.h" />
+    <ClInclude Include="src\geometry\vector\vector3.h" />
+    <ClInclude Include="src\geometry\vector\vector3array.h" />
+    <ClInclude Include="src\geometry\vector\vector3factory.h" />
+    <ClInclude Include="src\global\constants.h" />
+    <ClInclude Include="src\global\global.h" />
+    <ClInclude Include="src\graphics\animation\animation.h" />
+    <ClInclude Include="src\graphics\animation\animationinstance.h" />
+    <ClInclude Include="src\graphics\animation\animationmanager.h" />
+    <ClInclude Include="src\graphics\animation\animationplayer.h" />
+    <ClInclude Include="src\graphics\animation\blendop.h" />
+    <ClInclude Include="src\graphics\animation\bone.h" />
+    <ClInclude Include="src\graphics\animation\crossfadeblendop.h" />
+    <ClInclude Include="src\graphics\animation\keyframe.h" />
+    <ClInclude Include="src\graphics\animation\keyframeset.h" />
+    <ClInclude Include="src\graphics\animation\rotationkeyframe.h" />
+    <ClInclude Include="src\graphics\animation\scalekeyframe.h" />
+    <ClInclude Include="src\graphics\animation\sceneobjectskeletonnode.h" />
+    <ClInclude Include="src\graphics\animation\skeleton.h" />
+    <ClInclude Include="src\graphics\animation\skeletonnode.h" />
+    <ClInclude Include="src\graphics\animation\translationkeyframe.h" />
+    <ClInclude Include="src\graphics\animation\vertexbonemap.h" />
+    <ClInclude Include="src\graphics\color\color4.h" />
+    <ClInclude Include="src\graphics\color\color4array.h" />
+    <ClInclude Include="src\graphics\color\color4factory.h" />
+    <ClInclude Include="src\graphics\gl_include.h" />
+    <ClInclude Include="src\graphics\graphics.h" />
+    <ClInclude Include="src\graphics\graphicsattr.h" />
+    <ClInclude Include="src\graphics\graphicsGL.h" />
+    <ClInclude Include="src\graphics\image\imageloader.h" />
+    <ClInclude Include="src\graphics\image\rawimage.h" />
+    <ClInclude Include="src\graphics\light\light.h" />
+    <ClInclude Include="src\graphics\object\mesh3D.h" />
+    <ClInclude Include="src\graphics\object\mesh3Dfilter.h" />
+    <ClInclude Include="src\graphics\object\submesh3D.h" />
+    <ClInclude Include="src\graphics\object\submesh3Dface.h" />
+    <ClInclude Include="src\graphics\object\submesh3Dfaces.h" />
+    <ClInclude Include="src\graphics\render\attributetransformer.h" />
+    <ClInclude Include="src\graphics\render\material.h" />
+    <ClInclude Include="src\graphics\render\mesh3Drenderer.h" />
+    <ClInclude Include="src\graphics\render\renderbuffer.h" />
+    <ClInclude Include="src\graphics\render\rendermanager.h" />
+    <ClInclude Include="src\graphics\render\rendertarget.h" />
+    <ClInclude Include="src\graphics\render\rendertargetGL.h" />
+    <ClInclude Include="src\graphics\render\skinnedmesh3Dattrtransformer.h" />
+    <ClInclude Include="src\graphics\render\skinnedmesh3Drenderer.h" />
+    <ClInclude Include="src\graphics\render\submesh3Drenderer.h" />
+    <ClInclude Include="src\graphics\render\vertexattrbuffer.h" />
+    <ClInclude Include="src\graphics\render\vertexattrbufferGL.h" />
+    <ClInclude Include="src\graphics\screendesc.h" />
+    <ClInclude Include="src\graphics\shader\attributedesc.h" />
+    <ClInclude Include="src\graphics\shader\shader.h" />
+    <ClInclude Include="src\graphics\shader\shaderGL.h" />
+    <ClInclude Include="src\graphics\shader\shadersource.h" />
+    <ClInclude Include="src\graphics\shader\uniformdesc.h" />
+    <ClInclude Include="src\graphics\stdattributes.h" />
+    <ClInclude Include="src\graphics\stduniforms.h" />
+    <ClInclude Include="src\graphics\texture\texture.h" />
+    <ClInclude Include="src\graphics\texture\textureattr.h" />
+    <ClInclude Include="src\graphics\texture\textureGL.h" />
+    <ClInclude Include="src\graphics\uv\uv2.h" />
+    <ClInclude Include="src\graphics\uv\uv2array.h" />
+    <ClInclude Include="src\graphics\uv\uv2factory.h" />
+    <ClInclude Include="src\graphics\view\camera.h" />
+    <ClInclude Include="src\gtedemo\game.h" />
+    <ClInclude Include="src\gtedemo\gameutil.h" />
+    <ClInclude Include="src\gtedemo\gtedemo.h" />
+    <ClInclude Include="src\gtedemo\lavafield.h" />
+    <ClInclude Include="src\gtedemo\scene.h" />
+    <ClInclude Include="src\gtedemo\scenes\castlescene.h" />
+    <ClInclude Include="src\gtedemo\scenes\lavascene.h" />
+    <ClInclude Include="src\gtedemo\scenes\poolscene.h" />
+    <ClInclude Include="src\gtemath\gtemath.h" />
+    <ClInclude Include="src\input\inputmanager.h" />
+    <ClInclude Include="src\input\inputmanagerGL.h" />
+    <ClInclude Include="src\object\engineobject.h" />
+    <ClInclude Include="src\object\engineobjectmanager.h" />
+    <ClInclude Include="src\object\enginetypes.h" />
+    <ClInclude Include="src\object\layermanager.h" />
+    <ClInclude Include="src\object\objectpairkey.h" />
+    <ClInclude Include="src\object\sceneobject.h" />
+    <ClInclude Include="src\object\sceneobjectcomponent.h" />
+    <ClInclude Include="src\object\shaderorganizer.h" />
+    <ClInclude Include="src\util\datastack.h" />
+    <ClInclude Include="src\util\engineutility.h" />
+    <ClInclude Include="src\util\time.h" />
+    <ClInclude Include="src\util\tree.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

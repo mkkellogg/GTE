@@ -6,8 +6,6 @@
 
 #include "imageloader.h"
 #include "rawimage.h"
-#include "lodepng/lodepng.h"
-#include "lodepng/lodepng_util.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
 #include <IL/il.h>
@@ -29,38 +27,7 @@ bool ImageLoader::Initialize()
 	return true;
 }
 
-RawImage * ImageLoader::LoadPNG(const std::string& fullPath)
-{
-	bool initializeSuccess = Initialize();
-	ASSERT(initializeSuccess, "ImageLoader::LoadPNG -> Error occurred while initializing image loader.");
-
-	std::vector<unsigned char> image; // raw pixels
-	unsigned width, height;
-
-	//the raw pixels will be in the vector "image", 4 bytes per pixel, ordered RGBARGBA
-	unsigned error = lodepng::decode(image, width, height, fullPath);
-
-	if(error)
-	{
-		std::string loadErr = std::string("Error loading PNG: ") + lodepng_error_text(error);
-		Debug::PrintError(loadErr);
-		return NULL;
-	}
-
-	RawImage * raw = new RawImage(width,height);
-	bool initSuccess = raw->Init();
-
-	NONFATAL_ASSERT_RTRN(initSuccess, "ImageLoader::LoadPNG -> Could not initialize raw image.", NULL, false);
-
-	for(unsigned int i=0; i < width * height * 4; i++)
-	{
-		raw->SetByte(i,(BYTE)image[i]);
-	}
-
-	return raw;
-}
-
-RawImage * ImageLoader::LoadImage(const std::string& fullPath)
+RawImage * ImageLoader::LoadImageU(const std::string& fullPath)
 {
 	bool initializeSuccess = Initialize();
 	NONFATAL_ASSERT_RTRN(initializeSuccess, "ImageLoader::LoadImage -> Error occurred while initializing image loader.", NULL, false);

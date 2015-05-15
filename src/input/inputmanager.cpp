@@ -387,7 +387,7 @@ bool InputManager::ShouldHandleOnKeyDown(unsigned char key)
 	return false;
 }
 
-bool InputManager::InputManager::ShouldHandleOnKeyDown(Key key)
+bool InputManager::ShouldHandleOnKeyDown(Key key)
 {
 	unsigned int indices[12];
 	unsigned int indexCount;

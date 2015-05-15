@@ -651,7 +651,7 @@ Texture * GraphicsGL::CreateTexture(RawImage * imageData,  const TextureAttribut
  */
 Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes)
 {
-	RawImage * raw = ImageLoader::LoadImage(sourcePath);
+	RawImage * raw = ImageLoader::LoadImageU(sourcePath);
 
 	if(raw == NULL)
 	{
@@ -833,12 +833,12 @@ Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData,  RawImage * backDa
 Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 								        const std::string& bottom, const std::string& left, const std::string& right)
 {
-	RawImage * rawFront = ImageLoader::LoadImage(front);
-	RawImage * rawBack = ImageLoader::LoadImage(back);
-	RawImage * rawTop = ImageLoader::LoadImage(top);
-	RawImage * rawBottom = ImageLoader::LoadImage(bottom);
-	RawImage * rawLeft = ImageLoader::LoadImage(left);
-	RawImage * rawRight = ImageLoader::LoadImage(right);
+	RawImage * rawFront = ImageLoader::LoadImageU(front);
+	RawImage * rawBack = ImageLoader::LoadImageU(back);
+	RawImage * rawTop = ImageLoader::LoadImageU(top);
+	RawImage * rawBottom = ImageLoader::LoadImageU(bottom);
+	RawImage * rawLeft = ImageLoader::LoadImageU(left);
+	RawImage * rawRight = ImageLoader::LoadImageU(right);
 
 	TextureGL * tex = NULL;
 

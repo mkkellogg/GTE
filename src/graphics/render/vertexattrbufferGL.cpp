@@ -101,6 +101,10 @@ void VertexAttrBufferGL::SetData(const float * srcData)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
 		glBufferData(GL_ARRAY_BUFFER, fullDataSize, srcData, GL_DYNAMIC_DRAW);
+		//void * ptr = glMapBuffer(GL_ARRAY_BUFFER,  GL_WRITE_ONLY);
+		//memcpy(ptr, srcData, fullDataSize);
+		//glUnmapBuffer(gpuBufferID);
+
 	}
 }
 

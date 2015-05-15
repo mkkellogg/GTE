@@ -1,4 +1,5 @@
 bin/
+lib/
 obj/
 .cproject
 .project
@@ -7,3 +8,7 @@ ldlibs.sh
 resources/models/
 resources/textures/
 .DS_Store
+
+x64/
+*.sdf
+*.opensdf

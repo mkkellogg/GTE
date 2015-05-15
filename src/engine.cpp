@@ -153,6 +153,7 @@ void Engine::Update()
 		Time::Update();
 		firstFrameEntered = true;
 	}
+	
 	graphicsSystem->Update();
 	animationManager->Update();
 	inputManager->Update();
@@ -161,6 +162,7 @@ void Engine::Update()
 	renderManager->PreProcessScene();
 	if(callbacks!=NULL)callbacks->OnPreRender();
 	graphicsSystem->RenderScene();
+
 	Time::Update();
 }
 
