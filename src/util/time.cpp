@@ -45,7 +45,7 @@ float Time::GetRealTimeSinceStartup()
 
 	float f = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 
-	return (float)((float)longDiff / (float)1000000000.0);
+	return (float)(f / (float)1000000.0);
 }
 
 void Time::Update()
