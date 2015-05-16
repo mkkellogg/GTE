@@ -37,7 +37,7 @@ ANIMATIONOBJ= obj/skeleton.o obj/vertexbonemap.o obj/skeletonnode.o obj/bone.o o
 LIGHTOBJ= obj/light.o
 SHADEROBJ= obj/shadersource.o obj/shader.o obj/uniformdesc.o obj/attributedesc.o 
 TEXTUREOBJ= obj/texture.o obj/textureattr.o  
-IMAGEOBJ= obj/lodepng.o obj/lodepng_util.o obj/rawimage.o obj/imageloader.o
+IMAGEOBJ= obj/rawimage.o obj/imageloader.o
 ENGINEOBJECTOBJ= obj/sceneobjectcomponent.o obj/engineobjectmanager.o obj/engineobject.o obj/sceneobject.o obj/shaderorganizer.o obj/objectpairkey.o obj/layermanager.o
 ASSETOBJ= obj/assetimporter.o obj/importutil.o obj/modelimporter.o obj/shadersourceloader.o obj/shadersourceloaderGL.o
 UTILOBJ= obj/datastack.o obj/engineutility.o obj/time.o
@@ -202,12 +202,6 @@ obj/importutil.o: $(ASSETSRC)/importutil.cpp $(ASSETSRC)/importutil.h
 # ==================================	
 
 image: $(IMAGEOBJ)
-
-obj/lodepng.o: $(IMAGESRC)/lodepng/lodepng.cpp $(IMAGESRC)/lodepng/lodepng.h
-	$(CC) $(CFLAGS) -o obj/lodepng.o -c $(IMAGESRC)/lodepng/lodepng.cpp 
-	
-obj/lodepng_util.o: $(IMAGESRC)/lodepng/lodepng_util.cpp $(IMAGESRC)/lodepng/lodepng_util.h
-	$(CC) $(CFLAGS) -o obj/lodepng_util.o -c $(IMAGESRC)/lodepng/lodepng_util.cpp 
 	
 obj/rawimage.o: $(IMAGESRC)/rawimage.cpp $(IMAGESRC)/rawimage.h
 	$(CC) $(CFLAGS) -o obj/rawimage.o -c $(IMAGESRC)/rawimage.cpp 

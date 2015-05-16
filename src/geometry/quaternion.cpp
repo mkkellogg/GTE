@@ -12,8 +12,6 @@
 
 const Quaternion Quaternion::Identity(0,0,0,1);
 
-float Quaternion::M_PI = Constants::PI;
-
 Quaternion::Quaternion()
 {
     mData[0] = mData[1] = mData[2] = 0;
@@ -449,7 +447,7 @@ void Quaternion::euler(const Vector3& euler)
 Vector3 Quaternion::euler(void) const
 {
     Vector3 euler;
-    const static float PI_OVER_2 = M_PI * 0.5;
+    const static float PI_OVER_2 = Constants::PI * 0.5;
     const static float EPSILON = 1e-10;
     float sqw, sqx, sqy, sqz;
 
@@ -474,7 +472,7 @@ Vector3 Quaternion::euler(void) const
 
         // If facing down, reverse yaw
         if (euler.y < 0)
-            euler.z = M_PI - euler.z;
+            euler.z = Constants::PI - euler.z;
     }
     return euler;
 }

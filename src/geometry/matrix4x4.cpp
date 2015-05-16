@@ -57,7 +57,7 @@ Matrix4x4::Matrix4x4(const float * sourceData) : A0(data[0]), A1(data[4]), A2(da
 {
     Init();
 
-    if(data != NULL)
+    if(sourceData != NULL)
     {
     	memcpy(data, sourceData, sizeof(float) * DATA_SIZE);
     }

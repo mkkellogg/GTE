@@ -2,6 +2,7 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
+#include <cmath>
  
 #include "gtemath.h"
 
@@ -66,7 +67,7 @@ float GTEMath::Sin(float n)
 
 float GTEMath::Abs(float n)
 {
-	return abs(n);
+	return fabs(n);
 }
 
 float GTEMath::Min(float a, float b)

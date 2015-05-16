@@ -16,7 +16,6 @@ typedef unsigned int uint32_t;
 class Quaternion 
 {
     float mData[4];
-	static float M_PI;
   
     public:
   
