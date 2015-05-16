@@ -17,6 +17,6 @@
 
 LIBS= -lassimp -lm -framework OpenGL -lglfw3 -lGLEW -lIL 
 CFLAGS= -Isrc  -stdlib=libc++ -std=c++11 -Wall
-CC=g++
+CC=g++ -DNDEBUG
 
 include Makefile.base

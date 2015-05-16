@@ -18,6 +18,6 @@ OPENGL_LIB=/usr/lib/nvidia-331-updates/
 
 LIBS= -L$(OPENGL_LIB) -lassimp -lm -lGL -lglfw3 -lGLU -lGLEW -lassimp -lIL -lXrandr -lXi -lX11 -lXxf86vm -lpthread  -lXcursor -lXinerama
 CFLAGS=-Isrc -std=c++11 -Wall
-CC=g++
+CC=g++ -DNDEBUG
 
 include Makefile.base
