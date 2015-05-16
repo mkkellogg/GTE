@@ -38,8 +38,6 @@ float Time::GetRealTimeSinceStartup()
 {
 	Initialize();
 	std::chrono::high_resolution_clock::time_point _currentTime = std::chrono::high_resolution_clock::now();
-	unsigned long long currentTime = _currentTime.time_since_epoch().count();
-	unsigned long long longDiff = currentTime - startupTime;
 
 	auto elapsed = _currentTime - _startupTime;
 

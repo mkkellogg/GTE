@@ -80,13 +80,28 @@ bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, b
 
 		if(gpuBufferID > 0)
 		{
-			if(srcData != NULL)SetData(srcData);
 			this->dataOnGPU = true;
 		}
 		else this->dataOnGPU = false;
 	}
 
+	if (srcData != NULL)InitData(srcData);
+
 	return true;
+}
+
+void VertexAttrBufferGL::InitData(const float * srcData)
+{
+	int fullDataSize = CalcFullSize();
+	memcpy(data, srcData, fullDataSize);
+
+	if (dataOnGPU)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
+		glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, fullDataSize, srcData);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 }
 
 /*
@@ -95,17 +110,25 @@ bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, b
 void VertexAttrBufferGL::SetData(const float * srcData)
 {
 	int fullDataSize = CalcFullSize();
-	memcpy(data, srcData, fullDataSize);
 
 	if(dataOnGPU)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
-		glBufferData(GL_ARRAY_BUFFER, fullDataSize, srcData, GL_DYNAMIC_DRAW);
-		//void * ptr = glMapBuffer(GL_ARRAY_BUFFER,  GL_WRITE_ONLY);
-		//memcpy(ptr, srcData, fullDataSize);
-		//glUnmapBuffer(gpuBufferID);
-
+		glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, fullDataSize, srcData);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	/*	glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
+		glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
+		float* ptr = (float*)glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		// if the pointer is valid(mapped), update VBO
+		if (ptr)
+		{
+			memcpy(ptr, srcData, fullDataSize);
+			glUnmapBuffer(GL_ARRAY_BUFFER); // unmap it after use
+		}*/
 	}
+	else memcpy(data, srcData, fullDataSize);
 }
 
 /*
