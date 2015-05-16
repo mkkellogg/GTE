@@ -1,1 +1,1 @@
-start x64\Debug\GTE.exe -wo . 
+start x64\Release\GTE.exe -wo . 
