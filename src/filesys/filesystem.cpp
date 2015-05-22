@@ -6,6 +6,7 @@
 
 #include "filesystem.h"
 #include "filesystemIX.h"
+#include "filesystemWin.h"
 
 FileSystem * FileSystem::theInstance = NULL;
 
@@ -24,8 +25,12 @@ FileSystem * FileSystem::Instance()
 	//TODO: make thread safe and add double checked locking
 	if(theInstance == NULL)
 	{
-		// for now default to Linux/UNIX/OSX
+
+#ifdef _WIN32
+		theInstance = new FileSystemWin();
+#else		
 		theInstance = new FileSystemIX();
+#endif
 	}
 
 	return theInstance;

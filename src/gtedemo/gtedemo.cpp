@@ -63,6 +63,7 @@ int main(int argc, char** argv)
 	graphicsAttributes.WindowWidth = 1280;
 	graphicsAttributes.WindowHeight = 800;
 	graphicsAttributes.WindowTitle = "GTE Test";
+	graphicsAttributes.AAMethod = AntialiasingMethod::MSAAx4;
 
 	// initialize the engine
 	bool initSuccess = Engine::Init(&engineCallbacks, graphicsAttributes);

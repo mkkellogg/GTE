@@ -118,10 +118,12 @@ void VertexAttrBufferGL::SetData(const float * srcData)
 		glBufferSubData(GL_ARRAY_BUFFER, 0, fullDataSize, srcData);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
+		// below is the memory-mapping approach to updating
+		// VBOs. empirically this has shown to be slower.
+
 	/*	glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
 		glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
 		float* ptr = (float*)glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-		// if the pointer is valid(mapped), update VBO
 		if (ptr)
 		{
 			memcpy(ptr, srcData, fullDataSize);

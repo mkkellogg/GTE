@@ -87,20 +87,26 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 {
     this->attributes = attributes;
 
-    /* Initialize the library */
+    // initialize GLFW
     if (!glfwInit())
     {
-	Debug::PrintError("Unable to initialize GLFW.");
-	return false;
+		Debug::PrintError("Unable to initialize GLFW.");
+		return false;
     } 
 
-    glfwWindowHint(GLFW_SAMPLES, 4);
+	// set up GLFW antialiasing
+	if (GraphicsAttributes::IsMSAA(attributes.AAMethod))
+	{
+		unsigned int msaaSamples = GraphicsAttributes::GetMSAASamples(attributes.AAMethod);
+		if (msaaSamples > 0)glfwWindowHint(GLFW_SAMPLES, msaaSamples);
+	}
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    /* Create a windowed mode window and its OpenGL context */
+    // create a windowed mode window and its OpenGL context 
     window = glfwCreateWindow(attributes.WindowWidth, attributes.WindowHeight, attributes.WindowTitle.c_str(), NULL, NULL);
 
     //GLFWvidmode vm;
@@ -109,14 +115,16 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 
     if (window == NULL)
     {
-	Debug::PrintError("Unable to create GLFW window.");
+		Debug::PrintError("Unable to create GLFW window.");
         glfwTerminate();
         return false;
     }
 
-    /* Make the window's context current */
+    // Make the window's context current 
     glfwMakeContextCurrent(window);
 
+	if (attributes.WaitForVSync)glfwSwapInterval(1);
+	else glfwSwapInterval(0);
 
     // initialize GLEW
     glewExperimental = GL_TRUE; 
@@ -129,34 +137,21 @@ bool GraphicsGL::Init(const GraphicsAttributes& attributes)
     	openGLVersion =3;
     	openGLMinorVersion = 2;
     }
-    else if (glewIsSupported("GL_VERSION_3_0"))
-    {
-    	Debug::PrintMessage("Using OpenGL 3.0");
-    	openGLVersion = 3;
-    	openGLMinorVersion = 0;
-    }
-    else if (glewIsSupported("GL_VERSION_2_0"))
-    {
-    	Debug::PrintMessage("Using OpenGL 2.0");
-    	openGLVersion = 2;
-    	openGLMinorVersion = 0;
-    }
-    else
-    {
-    	openGLVersion = 1;
-    	openGLMinorVersion = 0;
-    }
-
-    // require OpenGL 3.2 or greater
-    if(!(openGLVersion >= 3 && openGLMinorVersion >= 2))
-    {
-    	 Debug::PrintError("Requires OpenGL 3.2 or greater.");
-    	 return false;
-    }
+	else
+	{
+		Debug::PrintError("Requires OpenGL 3.2 or greater.");
+		glfwTerminate();
+		return false;
+	}
 
     // call base Init() method
     bool parentInit = Graphics::Init(this->attributes);
-    if(!parentInit)return false;
+	if (!parentInit)
+	{
+		Debug::PrintError("Graphics initialization failure.");
+		glfwTerminate();
+		return false;
+	}
 
     // TODO: think of a better place for these initial calls
     glClearColor(0,0,0,1);
@@ -594,37 +589,15 @@ Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYT
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	TextureGL * texture = new TextureGL(attributes, tex);
-
-	// check allocation of TextureGL object
-	if(texture == NULL)
-	{
-		glDeleteTextures(1, &tex);
-		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateTexture -> Unable to allocate TextureGL object.");
-		return NULL;
-	}
+	ASSERT(texture != NULL, "GraphicsGL::CreateTexture -> Unable to allocate TextureGL object.");
 
 	// assign a RawImage object to the texture
-	bool rawImageAllocationComplete = false;
 	RawImage  * imageData = new RawImage(width, height);
-	if(imageData != NULL)
-	{
-		if(imageData->Init())
-		{
-			if(pixelData != NULL)imageData->SetDataTo(pixelData);
-			texture->AddImageData(imageData);
-			rawImageAllocationComplete = true;
-		}
-	}
+	ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> Unable to allocate raw image data.");
+	ASSERT(imageData->Init(), "GraphicsGL::CreateTexture -> Unable to initialize raw image data.");
 
-	// check allocation of RawImage object
-	if(!rawImageAllocationComplete)
-	{
-		if(imageData !=  NULL)delete imageData;
-
-		glDeleteTextures(1, &tex);
-		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateTexture -> Unable to allocate raw image data.");
-		return NULL;
-	}
+	if(pixelData != NULL)imageData->SetDataTo(pixelData);
+	texture->AddImageData(imageData);
 
 	return texture;
 }
@@ -655,15 +628,12 @@ Texture * GraphicsGL::CreateTexture(const std::string& sourcePath, const Texture
 
 	if(raw == NULL)
 	{
-		Debug::PrintError("GraphicsGL::CreateTexture -> could not load texture image.");
+		Engine::Instance()->GetErrorManager()->AddAndReportError(ErrorCode::GENERAL_NONFATAL, "GraphicsGL::CreateTexture -> could not load texture image.");
 		return NULL;
 	}
 
 	TextureGL * tex = (TextureGL*)CreateTexture(raw, attributes);
-	if(tex == NULL)
-	{
-		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL, "GraphicsGL::CreateTexture -> Unable to create texture.");
-	}
+	NONFATAL_ASSERT_RTRN(tex != NULL, "GraphicsGL::CreateTexture -> Unable to create texture.", NULL, false);
 
 	return tex;
 }
@@ -730,13 +700,7 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 	attributes.MipMapLevel = 0;
 
 	TextureGL * texture = new TextureGL(attributes, tex);
-
-	// check allocation of TextureGL object
-	if(texture == NULL)
-	{
-		glDeleteTextures(1, &tex);
-		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateCubeTexture -> Unable to allocate TextureGL object.");
-	}
+	ASSERT(texture != NULL, "GraphicsGL::CreateCubeTexture -> Unable to allocate TextureGL object.");
 
 	std::vector<RawImage *> imageDatas;
 	BYTE * datas[] = {frontData, backData, topData, bottomData, leftData, rightData};
@@ -747,44 +711,20 @@ Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsig
 	for(unsigned int i = 0; i < 6; i++)
 	{
 		RawImage  * imageData = new RawImage(widths[i], heights[i]);
-		if(imageData != NULL)
-		{
-			if(imageData->Init())
-			{
-				if(datas[i] != NULL)imageData->SetDataTo(datas[i]);
-				imageDatas.push_back(imageData);
-			}
-			else
-			{
-				delete imageData;
-				break;
-			}
-		}
-		else break;
+		ASSERT(imageData != NULL, "GraphicsGL::CreateCubeTexture -> Unable to allocate RawImage object.");
+		ASSERT(imageData->Init(), "GraphicsGL::CreateCubeTexture -> Unable to initialize RawImage object.");
+
+		if(datas[i] != NULL)imageData->SetDataTo(datas[i]);
+		imageDatas.push_back(imageData);
 	}
 
-	// check allocation of RawImage objects
-	if(imageDatas.size() == 6)
+	// assign RawImage object for each side of cube
+	for(unsigned int i = 0; i < 6; i++)
 	{
-		// assign RawImage object for each side of cube
-		for(unsigned int i = 0; i < 6; i++)
-		{
-			texture->AddImageData(imageDatas[i]);
-		}
-
-		return texture;
+		texture->AddImageData(imageDatas[i]);
 	}
-	else
-	{
-		for(unsigned int i = 0; i < imageDatas.size(); i++)
-		{
-			if(imageDatas[i] != NULL)delete imageDatas[i];
-		}
-		glDeleteTextures(1, &tex);
-		Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL,"GraphicsGL::CreateCubeTexture -> Unable to allocate RawImage data.");
 
-		return NULL;
-	}
+	return texture;
 }
 
 /*
@@ -845,7 +785,7 @@ Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::str
 	if(rawFront == NULL || rawBack == NULL || rawTop == NULL ||
 	   rawBottom == NULL || rawLeft == NULL || rawRight == NULL)
 	{
-		Debug::PrintError("GraphicsGL::CreateCubeTexture -> Unable to load cube map texture.");
+		Engine::Instance()->GetErrorManager()->AddAndReportError(ErrorCode::GENERAL_NONFATAL, "GraphicsGL::CreateCubeTexture -> Unable to load cube map texture.");
 		return NULL;
 	}
 
@@ -853,7 +793,7 @@ Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::str
 	std::vector<std::string> sourcePaths;
 
 	tex = (TextureGL*)CreateCubeTexture(rawFront, rawBack, rawTop, rawBottom, rawLeft, rawRight);
-	NONFATAL_ASSERT_RTRN(tex != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL, true);
+	NONFATAL_ASSERT_RTRN(tex != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL, false);
 
 	return tex;
 }

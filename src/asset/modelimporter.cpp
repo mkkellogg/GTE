@@ -146,13 +146,18 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
  */
 SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots)
 {
+	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
+	FileSystem * fileSystem = FileSystem::Instance();
+
+	std::string fixedModelPath = fileSystem->FixupPath(modelPath);
+
 	// the global Assimp scene object
-	const aiScene* scene = LoadAIScene(modelPath, preserveFBXPivots);
+	const aiScene* scene = LoadAIScene(fixedModelPath, preserveFBXPivots);
 
 	if(scene != NULL)
 	{
 		// the model has been loaded from disk into Assimp data structures, now convert to engine-native structures
-		SceneObjectRef result =  ProcessModelScene(modelPath, *scene, importScale, castShadows, receiveShadows);
+		SceneObjectRef result = ProcessModelScene(fixedModelPath, *scene, importScale, castShadows, receiveShadows);
 		return result;
 	}
 	else
@@ -186,10 +191,14 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	SceneObjectRef root = objectManager->CreateSceneObject();
 	NONFATAL_ASSERT_RTRN(root.IsValid(),"ModelImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null(), true);
 
+	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
+	FileSystem * fileSystem = FileSystem::Instance();
+	std::string fixedModelPath = fileSystem->FixupPath(modelPath);
+
 	// process all the Assimp materials in [scene] and create equivalent engine native materials.
 	// store those materials and their properties in MaterialImportDescriptor instances, which get
 	// added to [materialImportDescriptors]
-	bool processMaterialsSuccess = ProcessMaterials(modelPath, scene, materialImportDescriptors);
+	bool processMaterialsSuccess = ProcessMaterials(fixedModelPath, scene, materialImportDescriptors);
 	if(!processMaterialsSuccess)
 	{
 		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::ProcessMaterialsFailed, "ModelImporter::ProcessModelScene -> ProcessMaterials() returned an error.");
@@ -588,6 +597,8 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	}
 
 	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
+	FileSystem * fileSystem = FileSystem::Instance();
+	std::string fixedModelPath = fileSystem->FixupPath(modelPath);
 
 	// loop through each scene material and extract relevant textures and
 	// other properties and create a MaterialDescriptor object that will hold those
@@ -614,7 +625,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 
 		// get diffuse texture (for now support only 1)
 		texFound = assimpMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexturePath);
-		if(texFound == AI_SUCCESS)diffuseTexture = LoadAITexture(*assimpMaterial, aiTextureType_DIFFUSE, modelPath);
+		if (texFound == AI_SUCCESS)diffuseTexture = LoadAITexture(*assimpMaterial, aiTextureType_DIFFUSE, fixedModelPath);
 		if(!diffuseTexture.IsValid())
 		{
 			std::string msg = "ModelImporter::ProcessMaterials -> Could not load diffuse texture: ";
@@ -709,8 +720,9 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
 	FileSystem * fileSystem = FileSystem::Instance();
 
 	// get the path to the directory that contains the scene/model
-	std::string modelDirectory = fileSystem->GetBasePath(modelPath);
-
+	std::string fixedModelPath = fileSystem->FixupPath(modelPath);
+	std::string modelDirectory = fileSystem->GetBasePath(fixedModelPath);
+	
 	// retrieve the first texture descriptor (at index 0) matching [textureType] from the Assimp material
 	texFound = assimpMaterial.GetTexture(textureType, 0, &aiTexturePath);
 

@@ -1,1 +1,1 @@
-start x64\Release\GTE.exe -wo . 
+start /B x64\Release\GTE.exe -wo . 

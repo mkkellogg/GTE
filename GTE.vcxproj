@@ -158,6 +158,7 @@
     <ClCompile Include="src\error\errormanager.cpp" />
     <ClCompile Include="src\filesys\filesystem.cpp" />
     <ClCompile Include="src\filesys\filesystemIX.cpp" />
+    <ClCompile Include="src\filesys\filesystemWin.cpp" />
     <ClCompile Include="src\geometry\matrix4x4.cpp" />
     <ClCompile Include="src\geometry\point\point3.cpp" />
     <ClCompile Include="src\geometry\point\point3array.cpp" />
@@ -265,6 +266,7 @@
     <ClInclude Include="src\error\errormanager.h" />
     <ClInclude Include="src\filesys\filesystem.h" />
     <ClInclude Include="src\filesys\filesystemIX.h" />
+    <ClInclude Include="src\filesys\filesystemWin.h" />
     <ClInclude Include="src\geometry\matrix4x4.h" />
     <ClInclude Include="src\geometry\point\point3.h" />
     <ClInclude Include="src\geometry\point\point3array.h" />
