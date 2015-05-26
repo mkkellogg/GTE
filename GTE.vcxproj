@@ -74,9 +74,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\Development\GTE\src;E:\Development\External\GLEW\include;E:\Development\External\GLFW\include;E:\Development\External\DevIL\include;E:\Development\External\Assimp\include;E:\Development\External\Assimp\include\assimp;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\Development\External\GLEW\lib\Release\x64;E:\Development\External\GLFW\lib-vc2013;E:\Development\External\DevIL;E:\Development\External\Assimp\lib64;$(LibraryPath)</LibraryPath>
-    <SourcePath>E:\Development\GTE;E:\Development\GTE\src;$(SourcePath)</SourcePath>
+    <IncludePath>$(SourcePath);$(SolutionDir)\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <SourcePath>$(SolutionDir)\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -129,6 +129,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\External\GLEW\include;$(SolutionDir)\..\External\GLFW\include;$(SolutionDir)\..\External\DevIL\include;$(SolutionDir)\..\External\Assimp\include;$(SolutionDir)\..\External\Assimp\include\assimp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -137,6 +138,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>opengl32.lib;assimp.lib;DevIL.lib;ILU.lib;ILUT.lib;glfw3.lib;glfw3dll.lib;glew32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\External\GLEW\lib\Release\x64;$(SolutionDir)\..\External\GLFW\lib-vc2013;$(SolutionDir)\..\External\DevIL;$(SolutionDir)\..\External\Assimp\lib64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
