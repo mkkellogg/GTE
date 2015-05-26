@@ -18,7 +18,7 @@
 
 	Minimum OpenGL version: 3.2
 	
-	Supported operating systems: Apple OS X, Linux, Unix
+	Supported operating systems: Windows, Apple OS X, Linux, Unix
 
 	
 
@@ -35,8 +35,24 @@
 	
 	Your Assimp installation needs to include the ability to load FBX files in order to run the demo included in the project.
 
+	2.2 Windows notes
+	
+	The binaries for all required libraries are available for Windows and can be downloaded from the following links:
+	
+		Assimp: http://sourceforge.net/projects/assimp/files/assimp-3.1/
+		DevIL:  http://openil.sourceforge.net/download.php (choose SDK for 64-bit Windows)
+		GLFW 3: http://www.glfw.org/download.html
+		GLEW:   http://glew.sourceforge.net/index.html
+	
+	This repository includes a Visual Studio 2012 solution for GTE. You will need to update it to point to the correct include and library folders for the above libraries on your system.
+	
+	The include paths can be set by right clicking on the "GTE" project, selecting "Properties", and then expanding "Configuration Properties" to find the "C/C++" page, which contains the field "Additional Include Directories". Edit that field as appropriate.
+	
+	The library paths can be set by right clicking on the "GTE" project, selecting "Properties", and then expanding "Configuration Properties" to find the "Linker" page, which contains the field "Additional Library Directories". Edit that field as appropriate.
+	
+	Lastly before running the included demo you will need to add the appropriate executable directories for each library's DLL to your PATH environment variable.
 
-	2.2 Linux notes
+	2.3 Linux notes
 	
 	On multiple flavors of Linux the Assimp package that is available through standard package management channels seems to not have the ability to load FBX files. Therefore if you are trying to build GTE on Linux you will probably have to build Assimp from source.
 	
@@ -87,7 +103,7 @@
 	On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location.
 	
 
-	2.3 OSX Notes
+	2.4 OSX notes
 	
 	On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Homebrew package management utility, and the version of Assimp available through Homebrew seems to support FBX models. The actual names of the Homebrew packages you need to install are as follows:
 	
@@ -101,9 +117,13 @@
 		brew install gcc
 	
 	
-	2.4 Compiling GTE
+	2.5 Compiling & building GTE on Windows
+
+	Using the standard build commands from within Visual Studio will produce an executable named "GTE.exe" in x64/release.
 	
-	Currently, the build process produces a single executable: bin/gtedemo. It has not yet been modified to produce a library (shared or static); that is still on the to-do list. The 'gtedemo' executable is a sample of what the engine can do, and the source for the demo is in the engine's source tree at src/gtedemo.
+	2.6 Compiling & building GTE on Linux, Unix, or OS X
+	
+	On Linux, Unix, and OS X the build process produces a single executable: bin/gtedemo. It has not yet been modified to produce a library (shared or static); that is still on the to-do list. The 'gtedemo' executable is a sample of what the engine can do, and the source for the demo is in the engine's source tree at src/gtedemo.
 	
 	To invoke the build process, navigate to the root of the GTE installation and run the following command:
 	
@@ -116,12 +136,16 @@
 		
 	Assuming the build succeeded, the 'gtedemo' executable will be produced in the 'bin' subdirectory of the GTE installation. 
 
-
 3. Running the demo
 
 	Before running the demo, make sure you have downloaded the models and textures that it needs. They can be found at: http://projects.markkellogg.org/downloads/models-textures.zip. Uncompress the archive in the 'resources' sub-folder, the process should create two new folders: 'resources/models' and 'resources/textures'.
 
-	To run the demo, do not run the 'gtedemo' executable directly. Instead, execute the 'rungtedemo.sh' script that is in the root of the GTE installation, which will ensure the demo's working directory is correctly set up.
+	To run the demo, do not run the executable directly. Instead, there are scripts in the root of the GTE installation that will ensure the demo's working directory is correctly set up. 
+	
+		In Linux, Unix, or OS X execute the 'rungtedemo.sh' script.
+		In Windows, execute the 'rungtedemo.bat' script.
+	
+	On all platforms, ensure that the shared libraries for the external libraries Assimp, DevIL, GLFW, and GLEW are all added to your PATH environment variable.
 	
 	Note: Screen-Space Ambient Occlusion is still in the alpha stage, so it won't look right in some places (such as terrain meshes).
 	
