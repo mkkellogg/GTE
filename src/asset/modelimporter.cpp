@@ -146,9 +146,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
  */
 SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots)
 {
-	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 	FileSystem * fileSystem = FileSystem::Instance();
-
 	std::string fixedModelPath = fileSystem->FixupPath(modelPath);
 
 	// the global Assimp scene object
@@ -191,7 +189,6 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	SceneObjectRef root = objectManager->CreateSceneObject();
 	NONFATAL_ASSERT_RTRN(root.IsValid(),"ModelImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null(), true);
 
-	EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 	FileSystem * fileSystem = FileSystem::Instance();
 	std::string fixedModelPath = fileSystem->FixupPath(modelPath);
 
