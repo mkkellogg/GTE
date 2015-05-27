@@ -18,7 +18,7 @@
 
 	Minimum OpenGL version: 3.2
 	
-	Supported operating systems: Windows, Apple OS X, Linux, Unix
+	Supported operating systems: Microsoft Windows, Apple OS X, Linux, Unix
 
 	
 
@@ -41,10 +41,10 @@
 	
 		Assimp: http://sourceforge.net/projects/assimp/files/assimp-3.1/
 		DevIL:  http://openil.sourceforge.net/download.php (choose SDK for 64-bit Windows)
-		GLFW 3: http://www.glfw.org/download.html
+		GLFW 3: http://www.glfw.org/download.html (choose 64-bit Windows binaries)
 		GLEW:   http://glew.sourceforge.net/index.html
 	
-	This repository includes a Visual Studio 2012 solution for GTE. You will need to update it to point to the correct include and library folders for the above libraries on your system.
+	This repository includes a Visual Studio 2013 solution for GTE. You will need to update it to point to the correct include and library folders for the above libraries on your system. The solution is configured for 64-bit development so make sure to link to the 64-bit versions of those libraries.
 	
 	The include paths can be set by right clicking on the "GTE" project, selecting "Properties", and then expanding "Configuration Properties" to find the "C/C++" page, which contains the field "Additional Include Directories". Edit that field as appropriate.
 	
