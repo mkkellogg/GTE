@@ -75,7 +75,7 @@ bool EngineObjectManager::InitBuiltinShaders()
 	AssetImporter assetImporter;
 
 	FileSystem * fileSystem = FileSystem::Instance();
-	std::string builtinPath = fileSystem->GetPathFromIXPath(Constants::BuiltinShaderPath);
+	std::string builtinPath = fileSystem->FixupPathForLocalFilesystem(Constants::BuiltinShaderPath);
 
 	LongMask shaderProperties;
 

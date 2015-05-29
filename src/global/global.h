@@ -11,6 +11,9 @@
   	delete (ptr);					       \
     (ptr) = NULL;						   \
   }										   \
+  else                                     \
+  {                                        \
+  }                                        \
 }
 
 #define SAFE_DELETE_DEBUG(ptr, msg)        \
@@ -32,6 +35,9 @@
 		Debug::PrintError((msg));			\
 		exit(-1);							\
 	}									   	\
+    else                                    \
+    {                                       \
+    }                                       \
 }
 
 #define GET_NONFATAL_ASSERT_RTRN_MACRO(_1,_2,_3,_4,_5, NAME,...) NAME
@@ -55,6 +61,9 @@
 		Debug::PrintAtLevel((msg), DebugLevel::Error);														\
 		return (returnExp);			       																	\
 	}									   																	\
+	else																	                                \
+	{																								        \
+	}																										\
 }
 
 #define GET_NONFATAL_ASSERT_MACRO(_1,_2,_3,_4, NAME,...) NAME
@@ -68,6 +77,9 @@
 		Debug::PrintAtLevel((msg), DebugLevel::Error);									\
 		return;			       			 												\
 	}									   		 				    					\
+	else																	            \
+	{																					\
+	}																					\
 }
 
 #define NONFATAL_ASSERT3(exp, msg, reset)        	         											\
@@ -78,6 +90,9 @@
 		Debug::PrintAtLevel((msg), DebugLevel::Error);													\
 		return;			       		 			 														\
 	}									   		 														\
+	else																	                            \
+	{																								    \
+	}																									\
 }
 
 typedef unsigned char BYTE;

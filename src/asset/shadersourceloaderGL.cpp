@@ -27,7 +27,7 @@ void ShaderSourceLoaderGL::LoadShaderSouce(const std::string name, ShaderSource&
 	std::string fragmentSource;
 
 	FileSystem * fileSystem = FileSystem::Instance();
-	std::string builtinPath = fileSystem->GetPathFromIXPath(Constants::BuiltinShaderPathOpenGL);
+	std::string builtinPath = fileSystem->FixupPathForLocalFilesystem(Constants::BuiltinShaderPathOpenGL);
 
 	vertexSource = fileSystem->ConcatenatePaths(builtinPath, std::string(name + std::string(".vertex.shader")));
 	fragmentSource = fileSystem->ConcatenatePaths(builtinPath, std::string(name + std::string(".fragment.shader")));

@@ -28,8 +28,7 @@ class FileSystemWin : public FileSystem
 
 	std::string ConcatenatePaths(const std::string& pathA, const std::string& pathB) const;
     std::string GetBasePath(const std::string& path) const;
-	std::string GetPathFromIXPath(const std::string& path) const;
-	std::string FixupPath(const std::string& path) const;
+	std::string FixupPathForLocalFilesystem(const std::string& path) const;
 	std::string GetFileName(const std::string& fullPath) const;
 	bool FileExists(const std::string& fullPath) const;
 };

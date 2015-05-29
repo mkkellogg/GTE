@@ -46,12 +46,7 @@ std::string FileSystemWin::GetBasePath(const std::string& path) const
 	return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
 }
 
-std::string FileSystemWin::GetPathFromIXPath(const std::string& path) const
-{
-	return path;
-}
-
-std::string FileSystemWin::FixupPath(const std::string& path) const
+std::string FileSystemWin::FixupPathForLocalFilesystem(const std::string& path) const
 {
 	const unsigned int size = path.size() + 1;
 	char *chars = new char[size];

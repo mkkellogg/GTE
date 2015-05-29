@@ -166,7 +166,7 @@ void Camera::SetRenderOrderIndex(unsigned int index)
 	renderOrderIndex = index;
 }
 
-unsigned int Camera::GetRendeOrderIndex()
+unsigned int Camera::GetRenderOrderIndex()
 {
 	return renderOrderIndex;
 }

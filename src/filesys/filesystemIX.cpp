@@ -46,12 +46,7 @@ std::string FileSystemIX::GetBasePath(const std::string& path) const
 	return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
 }
 
-std::string FileSystemIX::GetPathFromIXPath(const std::string& path) const
-{
-	return path;
-}
-
-std::string FileSystemIX::FixupPath(const std::string& path) const
+std::string FileSystemIX::FixupPathForLocalFilesystem(const std::string& path) const
 {
 	const unsigned int size = path.size() + 1;
 	char *chars = new char[size];

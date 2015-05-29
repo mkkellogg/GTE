@@ -38,8 +38,7 @@
 #include "debug/gtedebug.h"
 
 /*
- * Single constructor, which requires pointers the Graphics and EngineObjectManager
- * singleton instances.
+ * Single default constructor
  */
 RenderManager::RenderManager() : sceneProcessingStack(Constants::MaxObjectRecursionDepth, 1)
 {
@@ -129,7 +128,7 @@ bool RenderManager::InitFullScreenQuad()
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
 	fullScreenQuad = EngineUtility::CreateRectangularMesh(meshAttributes, 1,1,1,1, true, true, false);
-	ASSERT(fullScreenQuad.IsValid(), "RenderManager::Init -> Unable to create full screen quad.");
+	ASSERT(fullScreenQuad.IsValid(), "RenderManager::InitFullScreenQuad -> Unable to create full screen quad.");
 
 	// transform full-screen quad to: X: [0..1], Y: [0..1]
 	for(unsigned int i =0; i < fullScreenQuad->GetSubMesh(0)->GetPostions()->GetCount();i++)
@@ -142,14 +141,14 @@ bool RenderManager::InitFullScreenQuad()
 
 	// create camera for rendering to [fullScreenQuad]
 	fullScreenQuadCam = objectManager->CreateCamera();
-	ASSERT(fullScreenQuadCam.IsValid(), "RenderManager::Init -> Unable to camera for full screen quad.");
+	ASSERT(fullScreenQuadCam.IsValid(), "RenderManager::InitFullScreenQuad -> Unable to camera for full screen quad.");
 	fullScreenQuadCam->SetProjectionMode(ProjectionMode::Orthographic);
 
 	fullScreenQuadObject = objectManager->CreateSceneObject();
-	ASSERT(fullScreenQuadObject.IsValid(), "RenderManager::Init -> Unable to scene object for full screen quad.");
+	ASSERT(fullScreenQuadObject.IsValid(), "RenderManager::InitFullScreenQuad -> Unable to scene object for full screen quad.");
 
 	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
-	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to mesh filter for full screen quad.");
+	ASSERT(filter.IsValid(), "RenderManager::InitFullScreenQuad -> Unable to mesh filter for full screen quad.");
 
 	filter->SetCastShadows(false);
 	filter->SetReceiveShadows(false);
@@ -157,7 +156,7 @@ bool RenderManager::InitFullScreenQuad()
 	fullScreenQuadObject->SetMesh3DFilter(filter);
 
 	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
-	ASSERT(filter.IsValid(), "RenderManager::Init -> Unable to renderer for full screen quad.");
+	ASSERT(filter.IsValid(), "RenderManager::InitFullScreenQuad -> Unable to renderer for full screen quad.");
 	fullScreenQuadObject->SetMesh3DRenderer(renderer);
 
 	fullScreenQuadObject->SetActive(false);
@@ -349,7 +348,7 @@ void RenderManager::PreProcessScene()
 	Transform cameraModelView;
 
 	SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
-	ASSERT(sceneRoot.IsValid(),"RenderManager::ProcessScene -> sceneRoot is NULL.");
+	ASSERT(sceneRoot.IsValid(),"RenderManager::PreProcessScene -> 'sceneRoot' is NULL.");
 
 	// gather information about the cameras, lights, and renderable meshes in the scene
 	PreProcessScene(sceneRoot.GetRef(), cameraModelView);
@@ -393,7 +392,7 @@ void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTra
 
 		if(!child.IsValid())
 		{
-			Debug::PrintWarning("RenderManager::ProcessScene -> NULL scene object encountered.");
+			Debug::PrintWarning("RenderManager::PreProcessScene -> Null scene object encountered.");
 			continue;
 		}
 
@@ -415,7 +414,7 @@ void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTra
 				// the array is sort in ascending order
 				for(unsigned int i = 0; i <= cameraCount; i++)
 				{
-					if(i == cameraCount || sceneCameras[i]->GetCamera()->GetRendeOrderIndex() > camera->GetRendeOrderIndex())
+					if(i == cameraCount || sceneCameras[i]->GetCamera()->GetRenderOrderIndex() > camera->GetRenderOrderIndex())
 					{
 						for(unsigned int ii=cameraCount; ii > i; ii--)
 							sceneCameras[ii] = sceneCameras[ii-1];
@@ -679,10 +678,10 @@ void RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& ca
 	for(unsigned int l = 0; l < ambientLightCount; l++)
 	{
 		SceneObjectRef lightObject = sceneAmbientLights[l];
-		NONFATAL_ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light's scene object is not valid.", true);
+		ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light's scene object is not valid.");
 
 		LightRef lightRef = lightObject->GetLight();
-		NONFATAL_ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Ambient light is not valid.", true);
+		ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light is not valid.");
 
 		// render all objects in the scene that have non self-lit materials
 		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewTransform, viewInverse, camera);
@@ -703,10 +702,10 @@ void RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& ca
 	for(unsigned int l = 0; l < lightCount; l++)
 	{
 		SceneObjectRef lightObject = sceneLights[l];
-		NONFATAL_ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderScene -> Light's scene object is not valid.", true);
+		ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light's scene object is not valid.");
 
 		LightRef lightRef = lightObject->GetLight();
-		NONFATAL_ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderScene -> Light is not valid.", true);
+		ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light is not valid.");
 
 		// render all objects in the scene that have non self-lit materials
 		ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewTransform, viewInverse, camera);
@@ -1067,9 +1066,9 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 	{
 		Mesh3DRef mesh = renderer->GetTargetMesh();
 
-		NONFATAL_ASSERT(mesh.IsValid(),"RenderManager::RenderSceneObjectMeshes -> Renderer returned null mesh.", true);
-		NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::RenderSceneObjectMeshes -> Sub mesh count does not match sub renderer count!.", true);
-		NONFATAL_ASSERT(renderer->GetMaterialCount() > 0,"RenderManager::RenderSceneObjectMeshes -> Renderer has no materials.", true);
+		NONFATAL_ASSERT(mesh.IsValid(),"RenderManager::ForwardRenderSceneObject -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(),"RenderManager::ForwardRenderSceneObject -> Sub mesh count does not match sub renderer count!.", true);
+		NONFATAL_ASSERT(renderer->GetMaterialCount() > 0,"RenderManager::ForwardRenderSceneObject -> Renderer has no materials.", true);
 
 		unsigned int materialIndex = 0;
 		bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
@@ -1098,9 +1097,9 @@ void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const Lig
 			SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 			SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
-			NONFATAL_ASSERT(currentMaterial.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null material encountered.", true);
-			NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null sub renderer encountered.", true);
-			NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderSceneObjectMeshes -> Null sub mesh encountered.", true);
+			NONFATAL_ASSERT(currentMaterial.IsValid(), "RenderManager::ForwardRenderSceneObject -> Null material encountered.", true);
+			NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::ForwardRenderSceneObject -> Null sub renderer encountered.", true);
+			NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::ForwardRenderSceneObject -> Null sub mesh encountered.", true);
 
 			// determine if this mesh has been rendered before
 			ObjectPairKey key(sceneObject.GetObjectID(), subMesh->GetObjectID());
@@ -1463,7 +1462,7 @@ bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject) 
 {
 	if(!sceneObject.IsValid())
 	{
-		Debug::PrintWarning("RenderManager::IsSceneObjectReadyForRendering -> NULL scene object encountered.");
+		Debug::PrintWarning("RenderManager::ValidateSceneObjectForRendering -> NULL scene object encountered.");
 		return false;
 	}
 
@@ -1478,7 +1477,7 @@ bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject) 
 	else if(object->GetSkinnedMesh3DRenderer().IsValid())renderer = (Mesh3DRenderer *)object->GetSkinnedMesh3DRenderer().GetPtr();
 	else
 	{
-		Debug::PrintWarning("RenderManager::IsSceneObjectReadyForRendering -> Could not find renderer for mesh.");
+		Debug::PrintWarning("RenderManager::ValidateSceneObjectForRendering -> Could not find renderer for mesh.");
 		return false;
 	}
 
@@ -1836,6 +1835,8 @@ void RenderManager::SendCameraAttributesToShader(const Camera& camera, const Poi
 	ShaderRef shader = activeMaterial->GetShader();
 	ASSERT(shader.IsValid(),"RenderManager::SendClipPlaneToShader -> Active material contains null shader.");
 
+	// for now we only support up to one clip plane
+	//TODO: Add support for > 1 clip plane
 	if(camera.GetClipPlaneCount() > 0)
 	{
 		Engine::Instance()->GetGraphicsSystem()->DeactiveAllClipPlanes();
