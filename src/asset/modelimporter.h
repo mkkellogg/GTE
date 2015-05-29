@@ -146,7 +146,7 @@ class ModelImporter
 	static TextureType ConvertAITextureKeyToTextureType(int aiTextureKey);
 	static int ConvertTextureTypeToAITextureKey(TextureType textureType);
 
-	static bool HasInvertedScale(Matrix4x4& mat);
+	static bool HasOddReflections(Matrix4x4& mat);
 
 	public:
 

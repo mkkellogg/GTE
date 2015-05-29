@@ -244,7 +244,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 
 			// if the transformation matrix for this scene object has an inverted scale, we need to process the
 			// vertex bone map in reverse order. we pass the [reverseVertexOrder] flag to SetupVertexBoneMapForRenderer()
-			bool reverseVertexOrder = HasInvertedScale(mat);
+			bool reverseVertexOrder = HasOddReflections(mat);
 			SetupVertexBoneMapForRenderer(scene, skeletonClone, renderer, reverseVertexOrder);
 		}
 	}
@@ -366,7 +366,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 			// if the transformation matrix for this node has an inverted scale, we need to process the mesh
 			// differently or else it won't display correctly. we pass the [invert] flag to ConvertAssimpMesh()
-			bool invert = HasInvertedScale(mat);
+			bool invert = HasOddReflections(mat);
 			// convert Assimp mesh to a Mesh3D object
 			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor, invert);
 			NONFATAL_ASSERT(subMesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.", false);
@@ -1402,17 +1402,13 @@ int ModelImporter::ConvertTextureTypeToAITextureKey(TextureType textureType)
 }
 
 /*
- * Determine if the scale components of [mat] are inverted.
+ * Determine if [mat] has an odd number of reflections.
  */
-bool ModelImporter::HasInvertedScale(Matrix4x4& mat)
+bool ModelImporter::HasOddReflections(Matrix4x4& mat)
 {
-	Vector3 trans, scale;
-	Quaternion rot;
-	mat.Decompose(trans,rot,scale);
-	bool invert = false;
-	if(scale.x < 0 && scale.y < 0 && scale.z < 0)invert = true;
-	else invert = false;
-	return invert;
+	float determinant = mat.CalculateDeterminant();
+	if (determinant < 0.0)return true;
+	return false;
 }
 
 

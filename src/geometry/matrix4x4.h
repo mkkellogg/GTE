@@ -69,6 +69,8 @@ class Matrix4x4
     bool IsAffine(void) const;
     static bool IsAffine(const float * data);
 
+	float CalculateDeterminant();
+
     void MultiplyByScalar(float scalar);
 
     void Transform(const Vector3& vector, Vector3& out) const;
