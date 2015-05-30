@@ -11,122 +11,125 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
-/*
- * Only constructor, parameterized.
- */
-VertexBoneMap::VertexBoneMap(unsigned int vertexCount, unsigned int uVertexCount)
+namespace GTE
 {
-	this->vertexCount = vertexCount;
-	this->uniqueVertexCount = uVertexCount;
-	mappingDescriptors = NULL;
-}
-
-/*
- * Destructor.
- */
-VertexBoneMap::~VertexBoneMap()
-{
-	Destroy();
-}
-
-/*
- * Destroy this VertexBoneMap object.
- */
-void VertexBoneMap::Destroy()
-{
-	// delete [mappingDescriptors] and set to NULL
-	if(mappingDescriptors != NULL)
+	/*
+	* Only constructor, parameterized.
+	*/
+	VertexBoneMap::VertexBoneMap(unsigned int vertexCount, unsigned int uVertexCount)
 	{
-		delete[] mappingDescriptors;
+		this->vertexCount = vertexCount;
+		this->uniqueVertexCount = uVertexCount;
 		mappingDescriptors = NULL;
 	}
-}
 
-/*
- * Initialize this VertexBoneMap object. This method MUST be called before this object can be used.
- */
-bool VertexBoneMap::Init()
-{
-	// destroy existing data, if it exists
-	Destroy();
-
-	mappingDescriptors = new VertexMappingDescriptor[vertexCount];
-	ASSERT(mappingDescriptors != NULL, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.");
-
-	return true;
-}
-
-/*
- * Get VertexMappingDescriptor for vertex (non-unique) at [index]
- */
-VertexBoneMap::VertexMappingDescriptor* VertexBoneMap::GetDescriptor(unsigned int index)
-{
-	if(index >= vertexCount)
+	/*
+	 * Destructor.
+	 */
+	VertexBoneMap::~VertexBoneMap()
 	{
-		Debug::PrintError("VertexBoneMap::GetDescriptor -> Index out of range.");
-		return NULL;
+		Destroy();
 	}
 
-	return mappingDescriptors + index;
-}
-
-/*
- * Get total number of vertices that are mapped.
- */
-unsigned int VertexBoneMap::GetVertexCount()
-{
-	return vertexCount;
-}
-
-/*
- * Get number of unique vertices that are mapped.
- */
-unsigned int VertexBoneMap::GetUniqueVertexCount()
-{
-	return uniqueVertexCount;
-}
-
-/*
- * Update the bone indices in this map to match that of [skeleton]
- */
-void VertexBoneMap::BindTo(SkeletonRef skeleton)
-{
-	NONFATAL_ASSERT(skeleton.IsValid(), "VertexBoneMap::BindTo -> 'skeleton' is not valid.", true);
-
-	for(unsigned int v = 0; v < vertexCount; v++)
+	/*
+	 * Destroy this VertexBoneMap object.
+	 */
+	void VertexBoneMap::Destroy()
 	{
-		VertexBoneMap::VertexMappingDescriptor * desc = GetDescriptor(v);
-		for(unsigned int b = 0; b < desc->BoneCount; b++)
+		// delete [mappingDescriptors] and set to NULL
+		if (mappingDescriptors != NULL)
 		{
-			int boneIndex = skeleton->GetBoneMapping(desc->Name[b]);
-			desc->BoneIndex[b] = boneIndex;
+			delete[] mappingDescriptors;
+			mappingDescriptors = NULL;
 		}
 	}
-}
 
-/*
- * Create a full (deep) clone of this VertexBoneMap object.
- */
-VertexBoneMap * VertexBoneMap::FullClone()
-{
-	// allocate new VertexBoneMap objects
-	VertexBoneMap * clone = new VertexBoneMap(vertexCount, uniqueVertexCount);
-	ASSERT(clone != NULL, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.");
-
-	// initialize the new map
-	bool initSuccess = clone->Init();
-	if(!initSuccess)
+	/*
+	 * Initialize this VertexBoneMap object. This method MUST be called before this object can be used.
+	 */
+	bool VertexBoneMap::Init()
 	{
-		Debug::PrintError("VertexBoneMap::FullClone -> Could not initialize vertex bone map.");
-		delete clone;
-		return NULL;
+		// destroy existing data, if it exists
+		Destroy();
+
+		mappingDescriptors = new VertexMappingDescriptor[vertexCount];
+		ASSERT(mappingDescriptors != NULL, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.");
+
+		return true;
 	}
 
-	// copy over VertexMappingDescriptors one-by-one
-	for(unsigned int v = 0; v < vertexCount; v++)
+	/*
+	 * Get VertexMappingDescriptor for vertex (non-unique) at [index]
+	 */
+	VertexBoneMap::VertexMappingDescriptor* VertexBoneMap::GetDescriptor(unsigned int index)
 	{
-		clone->GetDescriptor(v)->SetTo(GetDescriptor(v));
+		if (index >= vertexCount)
+		{
+			Debug::PrintError("VertexBoneMap::GetDescriptor -> Index out of range.");
+			return NULL;
+		}
+
+		return mappingDescriptors + index;
 	}
 
-	return clone;
+	/*
+	 * Get total number of vertices that are mapped.
+	 */
+	unsigned int VertexBoneMap::GetVertexCount()
+	{
+		return vertexCount;
+	}
+
+	/*
+	 * Get number of unique vertices that are mapped.
+	 */
+	unsigned int VertexBoneMap::GetUniqueVertexCount()
+	{
+		return uniqueVertexCount;
+	}
+
+	/*
+	 * Update the bone indices in this map to match that of [skeleton]
+	 */
+	void VertexBoneMap::BindTo(SkeletonRef skeleton)
+	{
+		NONFATAL_ASSERT(skeleton.IsValid(), "VertexBoneMap::BindTo -> 'skeleton' is not valid.", true);
+
+		for (unsigned int v = 0; v < vertexCount; v++)
+		{
+			VertexBoneMap::VertexMappingDescriptor * desc = GetDescriptor(v);
+			for (unsigned int b = 0; b < desc->BoneCount; b++)
+			{
+				int boneIndex = skeleton->GetBoneMapping(desc->Name[b]);
+				desc->BoneIndex[b] = boneIndex;
+			}
+		}
+	}
+
+	/*
+	 * Create a full (deep) clone of this VertexBoneMap object.
+	 */
+	VertexBoneMap * VertexBoneMap::FullClone()
+	{
+		// allocate new VertexBoneMap objects
+		VertexBoneMap * clone = new VertexBoneMap(vertexCount, uniqueVertexCount);
+		ASSERT(clone != NULL, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.");
+
+		// initialize the new map
+		bool initSuccess = clone->Init();
+		if (!initSuccess)
+		{
+			Debug::PrintError("VertexBoneMap::FullClone -> Could not initialize vertex bone map.");
+			delete clone;
+			return NULL;
+		}
+
+		// copy over VertexMappingDescriptors one-by-one
+		for (unsigned int v = 0; v < vertexCount; v++)
+		{
+			clone->GetDescriptor(v)->SetTo(GetDescriptor(v));
+		}
+
+		return clone;
+	}
 }

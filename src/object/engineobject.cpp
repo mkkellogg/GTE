@@ -6,23 +6,26 @@
 
 #include "engineobject.h"
 
-EngineObject::EngineObject() : objectID((ObjectID)-1)
+namespace GTE
 {
+	EngineObject::EngineObject() : objectID((ObjectID)-1)
+	{
 
-}
+	}
 
-EngineObject::~EngineObject()
-{
+	EngineObject::~EngineObject()
+	{
 
-}
+	}
 
-ObjectID EngineObject::GetObjectID() const
-{
-	return objectID;
-}
+	ObjectID EngineObject::GetObjectID() const
+	{
+		return objectID;
+	}
 
-void EngineObject::SetObjectID(ObjectID id)
-{
-	objectID = id;
+	void EngineObject::SetObjectID(ObjectID id)
+	{
+		objectID = id;
+	}
 }
 

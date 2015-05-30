@@ -1,9 +1,3 @@
-//forward declarations
-class AssetImporter;
-class Vector3;
-class Quaternion;
-class LavaField;
-
 #include "scene.h"
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
@@ -13,6 +7,7 @@ class LavaField;
 #include <functional>
 #include <vector>
 
+using namespace GTE;
 
 Scene::Scene()
 {

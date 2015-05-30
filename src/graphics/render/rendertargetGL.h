@@ -11,30 +11,33 @@
 #ifndef _GTE_RENDER_TARGET_GL_H_
 #define _GTE_RENDER_TARGET_GL_H_
 
-// forward declarations
-class TextureAttributes;
-
 #include "graphics/gl_include.h"
 #include "rendertarget.h"
 #include "base/intmask.h"
 
-class RenderTargetGL : public RenderTarget
+namespace GTE
 {
-	friend class GraphicsGL;
+	// forward declarations
+	class TextureAttributes;
 
-	// OpenGL Framebuffer Object ID.
-	GLuint fboID;
+	class RenderTargetGL : public RenderTarget
+	{
+		friend class GraphicsGL;
 
-	RenderTargetGL(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-				   const TextureAttributes& colorTextureAttributes,unsigned int width, unsigned int height);
-    ~RenderTargetGL();
+		// OpenGL Framebuffer Object ID.
+		GLuint fboID;
 
-    void Destroy();
+		RenderTargetGL(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+			const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+		~RenderTargetGL();
 
-    public:
+		void Destroy();
 
-    bool Init();
-    GLuint GetFBOID();
-};
+	public:
+
+		bool Init();
+		GLuint GetFBOID();
+	};
+}
 
 #endif

@@ -11,20 +11,23 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
-/*
- * Only constructor.
- */
-SkeletonNode::SkeletonNode(int boneIndex, const std::string& name)
+namespace GTE
 {
-	this->BoneIndex = boneIndex;
-	this->Name = name;
-}
+	/*
+	* Only constructor.
+	*/
+	SkeletonNode::SkeletonNode(int boneIndex, const std::string& name)
+	{
+		this->BoneIndex = boneIndex;
+		this->Name = name;
+	}
 
-/*
- * Destructor.
- */
-SkeletonNode::~SkeletonNode()
-{
+	/*
+	 * Destructor.
+	 */
+	SkeletonNode::~SkeletonNode()
+	{
 
+	}
 }
 

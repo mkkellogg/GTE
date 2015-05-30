@@ -11,14 +11,6 @@
 #ifndef _GTE_SUBMESH3D_H_
 #define _GTE_SUBMESH3D_H_
 
-//forward declarations
-class Point3;
-class Vector3;
-class color4;
-class UV2;
-class EngineObjectManager;
-class SubMesh3DRenderer;
-
 #include "mesh3D.h"
 #include "object/sceneobjectcomponent.h"
 #include "graphics/stdattributes.h"
@@ -31,119 +23,130 @@ class SubMesh3DRenderer;
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
 
-class SubMesh3D : public EngineObject
+namespace GTE
 {
-	// Since this derives from EngineObject, we make this class
-	// a friend of EngineObjectManager, and the constructor & destructor
-	// protected so its life-cycle can be handled completely by EngineObjectManager.
-	friend class EngineObjectManager;
-	friend class Mesh3D;
+	//forward declarations
+	class Point3;
+	class Vector3;
+	class color4;
+	class UV2;
+	class EngineObjectManager;
+	class SubMesh3DRenderer;
 
-	// the attributes for which this mesh contains data
-	StandardAttributeSet attributeSet;
-	// total number of vertices in this mesh
-	unsigned int totalVertexCount;
-	// this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
-	int subIndex;
+	class SubMesh3D : public EngineObject
+	{
+		// Since this derives from EngineObject, we make this class
+		// a friend of EngineObjectManager, and the constructor & destructor
+		// protected so its life-cycle can be handled completely by EngineObjectManager.
+		friend class EngineObjectManager;
+		friend class Mesh3D;
 
-	// structure that describes (among other things) the adjacency relationship that
-	// faces of this mesh have with each other
-	SubMesh3DFaces faces;
+		// the attributes for which this mesh contains data
+		StandardAttributeSet attributeSet;
+		// total number of vertices in this mesh
+		unsigned int totalVertexCount;
+		// this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
+		int subIndex;
 
-	// these arrays hold the actual attribute data for this mesh
-    Point3Array positions;
-    Vector3Array vertexNormals;
-    Vector3Array vertexTangents;
-    Vector3Array faceNormals;
-    Color4Array colors;
-    UV2Array uvs0;
-    UV2Array uvs1;
+		// structure that describes (among other things) the adjacency relationship that
+		// faces of this mesh have with each other
+		SubMesh3DFaces faces;
 
-    // inter-face angle above which smoothing/average of vertex normals should
-    // not occur
-    int normalsSmoothingThreshold;
-    // invert normals every time they are calculated
-    bool invertNormals;
-    // local center position for sub-mesh.
-	Point3 center;
-	// radius of the sphere of influence along the X-axis
-	Vector3 sphereOfInfluenceX;
-	// radius of the sphere of influence along the Y-axis
-	Vector3 sphereOfInfluenceY;
-	// radius of the sphere  of influence along the Z-axis
-	Vector3 sphereOfInfluenceZ;
+		// these arrays hold the actual attribute data for this mesh
+		Point3Array positions;
+		Vector3Array vertexNormals;
+		Vector3Array vertexTangents;
+		Vector3Array faceNormals;
+		Color4Array colors;
+		UV2Array uvs0;
+		UV2Array uvs1;
 
-	// pointer to the containing MEsh3D object
-    Mesh3D * containerMesh;
+		// inter-face angle above which smoothing/average of vertex normals should
+		// not occur
+		int normalsSmoothingThreshold;
+		// invert normals every time they are calculated
+		bool invertNormals;
+		// local center position for sub-mesh.
+		Point3 center;
+		// radius of the sphere of influence along the X-axis
+		Vector3 sphereOfInfluenceX;
+		// radius of the sphere of influence along the Y-axis
+		Vector3 sphereOfInfluenceY;
+		// radius of the sphere  of influence along the Z-axis
+		Vector3 sphereOfInfluenceZ;
 
-    // last time this mesh was modified
-    float timeStamp;
+		// pointer to the containing MEsh3D object
+		Mesh3D * containerMesh;
 
-    // maps vertices to other equal vertices
-    std::vector<unsigned int>** vertexCrossMap;
-    // should face-related data be calculated?
-    bool buildFaces;
-    // should normals be calculated?
-    bool calculateNormals;
-    // should tangents be calculated?
-    bool calculateTangents;
+		// last time this mesh was modified
+		float timeStamp;
 
-    SubMesh3D();
-    SubMesh3D(StandardAttributeSet attributes);
-    virtual ~SubMesh3D();
+		// maps vertices to other equal vertices
+		std::vector<unsigned int>** vertexCrossMap;
+		// should face-related data be calculated?
+		bool buildFaces;
+		// should normals be calculated?
+		bool calculateNormals;
+		// should tangents be calculated?
+		bool calculateTangents;
 
-    void Destroy();
-    void DestroyVertexCrossMap();
-    bool BuildVertexCrossMap();
+		SubMesh3D();
+		SubMesh3D(StandardAttributeSet attributes);
+		virtual ~SubMesh3D();
 
-    void CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const;
-    void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
-    int FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, unsigned int vbIndex) const;
-    void BuildFaces();
+		void Destroy();
+		void DestroyVertexCrossMap();
+		bool BuildVertexCrossMap();
 
-    void CalcSphereOfInfluence();
-    void CalculateNormals(float smoothingThreshhold);
-    void CalculateTangent(unsigned int vertexIndex, unsigned int rightIndex, unsigned int leftIndex, Vector3& result);
-    void CalculateTangents(float smoothingThreshhold);
-    void SetContainerMesh(Mesh3D * mesh);
-    void SetSubIndex(int index);
+		void CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const;
+		void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
+		int FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, unsigned int vbIndex) const;
+		void BuildFaces();
 
-    void ReverseAttributeComponentOrder();
-    void InvertNormals();
-    void UpdateTimeStamp();
+		void CalcSphereOfInfluence();
+		void CalculateNormals(float smoothingThreshhold);
+		void CalculateTangent(unsigned int vertexIndex, unsigned int rightIndex, unsigned int leftIndex, Vector3& result);
+		void CalculateTangents(float smoothingThreshhold);
+		void SetContainerMesh(Mesh3D * mesh);
+		void SetSubIndex(int index);
+
+		void ReverseAttributeComponentOrder();
+		void InvertNormals();
+		void UpdateTimeStamp();
 
 	public:
 
-    void SetCalculateNormals(bool calculate);
-    void SetCalculateTangents(bool calculate);
-    void SetBuildFaces(bool build);
-    bool HasFaces() const;
+		void SetCalculateNormals(bool calculate);
+		void SetCalculateTangents(bool calculate);
+		void SetBuildFaces(bool build);
+		bool HasFaces() const;
 
-    SubMesh3DFaces& GetFaces();
+		SubMesh3DFaces& GetFaces();
 
-    const Point3& GetCenter() const;
-    const Vector3& GetSphereOfInfluenceX() const;
-    const Vector3& GetSphereOfInfluenceY() const;
-    const Vector3& GetSphereOfInfluenceZ() const;
-    void SetNormalsSmoothingThreshold(unsigned int threshhold);
-    void Update();
-    void QuickUpdate();
+		const Point3& GetCenter() const;
+		const Vector3& GetSphereOfInfluenceX() const;
+		const Vector3& GetSphereOfInfluenceY() const;
+		const Vector3& GetSphereOfInfluenceZ() const;
+		void SetNormalsSmoothingThreshold(unsigned int threshhold);
+		void Update();
+		void QuickUpdate();
 
-    bool Init(unsigned int totalVertexCount);
-    unsigned int GetTotalVertexCount() const;
-    StandardAttributeSet GetAttributeSet() const ;
-    float GetTimeStamp();
+		bool Init(unsigned int totalVertexCount);
+		unsigned int GetTotalVertexCount() const;
+		StandardAttributeSet GetAttributeSet() const;
+		float GetTimeStamp();
 
-    Point3Array * GetPostions();
-    Vector3Array * GetVertexNormals();
-    Vector3Array * GetVertexTangents();
-    Vector3Array * GetFaceNormals();
-    Color4Array * GetColors();
-    UV2Array * GetUVs0();
-    UV2Array * GetUVs1();
+		Point3Array * GetPostions();
+		Vector3Array * GetVertexNormals();
+		Vector3Array * GetVertexTangents();
+		Vector3Array * GetFaceNormals();
+		Color4Array * GetColors();
+		UV2Array * GetUVs0();
+		UV2Array * GetUVs1();
 
-    void SetInvertNormals(bool invert);
-};
+		void SetInvertNormals(bool invert);
+	};
+}
 
 #endif
 

@@ -3,72 +3,75 @@
 #include "base/intmask.h"
 #include "global/global.h"
 
-/*
- * Single constructor, set all member variables.
- */
-RenderTarget::RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
+namespace GTE
 {
-	this->hasColorBuffer = hasColor;
-	this->hasDepthBuffer = hasDepth;
-	this->enableStencilBuffer = enableStencilBuffer;
-	this->width = width;
-	this->height = height;
-	this->colorTextureAttributes = colorTextureAttributes;
-}
-
-
-/*
- * Clean-up.
- */
-RenderTarget::~RenderTarget()
-{
-
-}
-
-/*
- * Return true if this render target supports [bufferType].
- */
-bool RenderTarget::HasBuffer(RenderBufferType bufferType) const
-{
-	switch(bufferType)
+	/*
+	* Single constructor, set all member variables.
+	*/
+	RenderTarget::RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
 	{
-		case RenderBufferType::Color:
-			return hasColorBuffer;
-		break;
-		case RenderBufferType::Depth:
-			return hasDepthBuffer;
-		break;
-		default:
-			return false;
-		break;
+		this->hasColorBuffer = hasColor;
+		this->hasDepthBuffer = hasDepth;
+		this->enableStencilBuffer = enableStencilBuffer;
+		this->width = width;
+		this->height = height;
+		this->colorTextureAttributes = colorTextureAttributes;
 	}
 
-	return false;
-}
 
-/*
- * Get a reference to the depth texture.
- */
-TextureRef RenderTarget::GetDepthTexture()
-{
-	return depthTexture;
-}
+	/*
+	 * Clean-up.
+	 */
+	RenderTarget::~RenderTarget()
+	{
 
-/*
- * Get a reference to the color texture.
- */
-TextureRef RenderTarget::GetColorTexture()
-{
-	return colorTexture;
-}
+	}
 
-unsigned int RenderTarget::GetWidth()
-{
-	return width;
-}
+	/*
+	 * Return true if this render target supports [bufferType].
+	 */
+	bool RenderTarget::HasBuffer(RenderBufferType bufferType) const
+	{
+		switch (bufferType)
+		{
+		case RenderBufferType::Color:
+			return hasColorBuffer;
+			break;
+		case RenderBufferType::Depth:
+			return hasDepthBuffer;
+			break;
+		default:
+			return false;
+			break;
+		}
 
-unsigned int RenderTarget::GetHeight()
-{
-	return height;
+		return false;
+	}
+
+	/*
+	 * Get a reference to the depth texture.
+	 */
+	TextureRef RenderTarget::GetDepthTexture()
+	{
+		return depthTexture;
+	}
+
+	/*
+	 * Get a reference to the color texture.
+	 */
+	TextureRef RenderTarget::GetColorTexture()
+	{
+		return colorTexture;
+	}
+
+	unsigned int RenderTarget::GetWidth()
+	{
+		return width;
+	}
+
+	unsigned int RenderTarget::GetHeight()
+	{
+		return height;
+	}
 }
 

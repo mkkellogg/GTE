@@ -7,102 +7,105 @@
 #include "intmask.h"
 #include "debug/gtedebug.h"
 
-IntMask IntMaskUtil::InvertBitsForIndexMask(unsigned short index)
+namespace GTE
 {
-	IntMask maskValue = IndexToMaskValue(index);
-	return InvertBits(maskValue);
-}
-
-IntMask IntMaskUtil::InvertBits(IntMask a)
-{
-	return ~a;
-}
-
-IntMask IntMaskUtil::MaskValueToIndex(IntMask maskValue)
-{
-	if(maskValue == 0) return 0;
-
-	IntMask index=0x00000001;
-	int count = 0;
-	while(!(maskValue & index) && count < 32)
+	IntMask IntMaskUtil::InvertBitsForIndexMask(unsigned short index)
 	{
-		index <<= 1;
-		count++;
+		IntMask maskValue = IndexToMaskValue(index);
+		return InvertBits(maskValue);
 	}
 
-	return index;
-}
+	IntMask IntMaskUtil::InvertBits(IntMask a)
+	{
+		return ~a;
+	}
 
-IntMask IntMaskUtil::IndexToMaskValue(unsigned short index)
-{
-	return 0x00000001 << index;
-}
+	IntMask IntMaskUtil::MaskValueToIndex(IntMask maskValue)
+	{
+		if (maskValue == 0) return 0;
 
-void IntMaskUtil::SetBit(IntMask * target, unsigned short index)
-{
-	IntMask maskValue = IndexToMaskValue(index);
-	IntMask uPtr = (IntMask)*target;
-	uPtr |= (IntMask)maskValue;
-	*target = uPtr;
-}
+		IntMask index = 0x00000001;
+		int count = 0;
+		while (!(maskValue & index) && count < 32)
+		{
+			index <<= 1;
+			count++;
+		}
 
-void IntMaskUtil::ClearBit(IntMask * target, unsigned short index)
-{
-	IntMask uPtr = (IntMask)*target;
-	IntMask mask = InvertBitsForIndexMask(index);
+		return index;
+	}
 
-	uPtr &= mask;
-	*target = uPtr;
-}
+	IntMask IntMaskUtil::IndexToMaskValue(unsigned short index)
+	{
+		return 0x00000001 << index;
+	}
 
-void IntMaskUtil::SetBitForMask(IntMask * target, IntMask mask)
-{
-	IntMask uPtr = (IntMask)*target;
-	uPtr |= mask;
-	*target = uPtr;
-}
+	void IntMaskUtil::SetBit(IntMask * target, unsigned short index)
+	{
+		IntMask maskValue = IndexToMaskValue(index);
+		IntMask uPtr = (IntMask)*target;
+		uPtr |= (IntMask)maskValue;
+		*target = uPtr;
+	}
 
-void IntMaskUtil::ClearBitForMask(IntMask * target, IntMask mask)
-{
-	IntMask uPtr = (IntMask)*target;
-	IntMask iMask = InvertBits(mask);
+	void IntMaskUtil::ClearBit(IntMask * target, unsigned short index)
+	{
+		IntMask uPtr = (IntMask)*target;
+		IntMask mask = InvertBitsForIndexMask(index);
 
-	uPtr &= iMask;
-	*target = uPtr;
-}
+		uPtr &= mask;
+		*target = uPtr;
+	}
 
-bool IntMaskUtil::IsBitSet(IntMask target, unsigned short index)
-{
-	IntMask mask = IndexToMaskValue(index);
-	return target & mask;
-}
+	void IntMaskUtil::SetBitForMask(IntMask * target, IntMask mask)
+	{
+		IntMask uPtr = (IntMask)*target;
+		uPtr |= mask;
+		*target = uPtr;
+	}
 
-bool IntMaskUtil::IsBitSetForMask(IntMask target,IntMask mask)
-{
-	return target & mask;
-}
+	void IntMaskUtil::ClearBitForMask(IntMask * target, IntMask mask)
+	{
+		IntMask uPtr = (IntMask)*target;
+		IntMask iMask = InvertBits(mask);
 
-IntMask IntMaskUtil::CreateIntMask()
-{
-	return 0;
-}
+		uPtr &= iMask;
+		*target = uPtr;
+	}
 
-IntMask IntMaskUtil::MergeMasks(IntMask a, IntMask b)
-{
-	return a | b;
-}
+	bool IntMaskUtil::IsBitSet(IntMask target, unsigned short index)
+	{
+		IntMask mask = IndexToMaskValue(index);
+		return target & mask;
+	}
 
-bool IntMaskUtil::HaveAtLeastOneInCommon(IntMask a, IntMask b)
-{
-	return (a & b) != 0;
-}
+	bool IntMaskUtil::IsBitSetForMask(IntMask target, IntMask mask)
+	{
+		return target & mask;
+	}
 
-void IntMaskUtil::ClearMask(IntMask * mask)
-{
-	*mask = 0;
-}
+	IntMask IntMaskUtil::CreateIntMask()
+	{
+		return 0;
+	}
 
-void IntMaskUtil::SetAll(IntMask * mask)
-{
-	*mask = (unsigned int)~0;
+	IntMask IntMaskUtil::MergeMasks(IntMask a, IntMask b)
+	{
+		return a | b;
+	}
+
+	bool IntMaskUtil::HaveAtLeastOneInCommon(IntMask a, IntMask b)
+	{
+		return (a & b) != 0;
+	}
+
+	void IntMaskUtil::ClearMask(IntMask * mask)
+	{
+		*mask = 0;
+	}
+
+	void IntMaskUtil::SetAll(IntMask * mask)
+	{
+		*mask = (unsigned int)~0;
+	}
 }

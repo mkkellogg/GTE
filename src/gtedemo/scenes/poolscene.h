@@ -1,12 +1,6 @@
 #ifndef _GTE_POOLSCENE_H_
 #define _GTE_POOLSCENE_H_
 
-//forward declarations
-class AssetImporter;
-class Vector3;
-class Quaternion;
-class LavaField;
-
 #include "gtedemo/scene.h"
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
@@ -15,6 +9,8 @@ class LavaField;
 #include "base/intmask.h"
 #include <functional>
 #include <vector>
+
+using namespace GTE;
 
 class PoolScene : public Scene
 {

@@ -1,9 +1,3 @@
-//forward declarations
-class AssetImporter;
-class Vector3;
-class Quaternion;
-class LavaField;
-
 #include <functional>
 #include <vector>
 #include "lavascene.h"
@@ -47,6 +41,8 @@ class LavaField;
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
+
+using namespace GTE;
 
 /*
  * Constructor - initialize member variables.

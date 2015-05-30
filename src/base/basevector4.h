@@ -72,37 +72,40 @@
   (dest)++;					   		   		       \
 }
 
-class BaseVector4
+namespace GTE
 {
-	friend class BaseVector4Array;
+	class BaseVector4
+	{
+		friend class BaseVector4Array;
 
-    protected:
+	protected:
 
-    void Init(float *target, bool permAttach);
+		void Init(float *target, bool permAttach);
 
-    float * data;
-    float baseData[4];
-    bool attached;
-    bool canDetach;
+		float * data;
+		float baseData[4];
+		bool attached;
+		bool canDetach;
 
-    public:
+	public:
 
-    BaseVector4();
-    BaseVector4(bool permAttached, float * target);
-    BaseVector4(float x, float y, float z, float w);
-    BaseVector4(const BaseVector4& baseVector);
-    BaseVector4(const float * copyData);
-    virtual ~BaseVector4();
+		BaseVector4();
+		BaseVector4(bool permAttached, float * target);
+		BaseVector4(float x, float y, float z, float w);
+		BaseVector4(const BaseVector4& baseVector);
+		BaseVector4(const float * copyData);
+		virtual ~BaseVector4();
 
-    virtual BaseVector4& operator=(const BaseVector4& source);
+		virtual BaseVector4& operator=(const BaseVector4& source);
 
-    float * GetDataPtr();
-    void Set(float x, float y, float z, float w);
-    void SetTo(const BaseVector4& baseVector);
-    void Get(BaseVector4& baseVector) const;
+		float * GetDataPtr();
+		void Set(float x, float y, float z, float w);
+		void SetTo(const BaseVector4& baseVector);
+		void Get(BaseVector4& baseVector) const;
 
-    virtual void AttachTo(float * data);
-    virtual void Detach();
-};
+		virtual void AttachTo(float * data);
+		virtual void Detach();
+	};
+}
 
 #endif

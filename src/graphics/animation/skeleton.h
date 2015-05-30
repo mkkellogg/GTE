@@ -19,11 +19,6 @@
 #ifndef _GTE_SKELETON_H_
 #define _GTE_SKELETON_H_
 
-//forward declarations
-class Bone;
-class VertexBoneMap;
-class Transform;
-
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -32,54 +27,62 @@ class Transform;
 #include "skeletonnode.h"
 #include "util/tree.h"
 
-class Skeleton : public EngineObject
+namespace GTE
 {
-	friend class EngineObjectManager;
+	//forward declarations
+	class Bone;
+	class VertexBoneMap;
+	class Transform;
 
-	// number of bones in this skeleton
-	unsigned int boneCount;
-	// indexed list of all the bones in this skeleton
-	Bone * bones;
-	// map from bone name to index in [bones] for the matching Bone object
-	std::unordered_map<std::string, unsigned int> boneNameMap;
+	class Skeleton : public EngineObject
+	{
+		friend class EngineObjectManager;
 
-	// map from node name to index in [nodeList] for the mtching SkeletonNode object
-	std::unordered_map<std::string, unsigned int> nodeNameMap;
+		// number of bones in this skeleton
+		unsigned int boneCount;
+		// indexed list of all the bones in this skeleton
+		Bone * bones;
+		// map from bone name to index in [bones] for the matching Bone object
+		std::unordered_map<std::string, unsigned int> boneNameMap;
 
-	// indexed list of all the nodes in this skeleton
-	std::vector<SkeletonNode *> nodeList;
+		// map from node name to index in [nodeList] for the mtching SkeletonNode object
+		std::unordered_map<std::string, unsigned int> nodeNameMap;
 
-	// contains transformation hierarchy structure
-	Tree<SkeletonNode*> skeleton;
+		// indexed list of all the nodes in this skeleton
+		std::vector<SkeletonNode *> nodeList;
 
-	Skeleton(unsigned int boneCount);
-	~Skeleton();
+		// contains transformation hierarchy structure
+		Tree<SkeletonNode*> skeleton;
 
-	void Destroy();
+		Skeleton(unsigned int boneCount);
+		~Skeleton();
 
-	public :
+		void Destroy();
 
-    unsigned int GetBoneCount();
-    unsigned int GetNodeCount();
+	public:
 
-    bool Init();
-    Tree<SkeletonNode*>::TreeNode * CreateRoot(SkeletonNode* node);
-    Tree<SkeletonNode*>::TreeNode * AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode* node);
+		unsigned int GetBoneCount();
+		unsigned int GetNodeCount();
 
-    void MapBone(std::string& name, unsigned int boneIndex);
-    int GetBoneMapping(std::string& name);
-    Bone* GetBone(unsigned int boneIndex);
+		bool Init();
+		Tree<SkeletonNode*>::TreeNode * CreateRoot(SkeletonNode* node);
+		Tree<SkeletonNode*>::TreeNode * AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode* node);
 
-    void MapNode(std::string& name, unsigned int nodeIndex);
-    int GetNodeMapping(std::string& name);
-    SkeletonNode * GetNodeFromList(unsigned int nodeIndex);
-    void AddNodeToList(SkeletonNode * node);
+		void MapBone(std::string& name, unsigned int boneIndex);
+		int GetBoneMapping(std::string& name);
+		Bone* GetBone(unsigned int boneIndex);
 
-    void OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode);
-    void OverrideBonesFrom(Skeleton * skeleton, bool takeOffset, bool takeNode);
+		void MapNode(std::string& name, unsigned int nodeIndex);
+		int GetNodeMapping(std::string& name);
+		SkeletonNode * GetNodeFromList(unsigned int nodeIndex);
+		void AddNodeToList(SkeletonNode * node);
 
-    Skeleton * FullClone();
-};
+		void OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode);
+		void OverrideBonesFrom(Skeleton * skeleton, bool takeOffset, bool takeNode);
+
+		Skeleton * FullClone();
+	};
+}
 
 #endif
 

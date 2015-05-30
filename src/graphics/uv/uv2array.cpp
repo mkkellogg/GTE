@@ -10,25 +10,28 @@
 #include "base/basevector2array.h"
 #include "debug/gtedebug.h"
 
-UV2Array::UV2Array() : BaseVector2Array(UV2Factory::GetInstance())
+namespace GTE
 {
-}
+	UV2Array::UV2Array() : BaseVector2Array(UV2Factory::GetInstance())
+	{
+	}
 
-UV2Array::~UV2Array()
-{
-}
+	UV2Array::~UV2Array()
+	{
+	}
 
-void UV2Array::SetData(const float * data)
-{
+	void UV2Array::SetData(const float * data)
+	{
 
-}
+	}
 
-UV2 * UV2Array::GetCoordinate(int index)
-{
-	return (UV2*)objects[index];
-}
+	UV2 * UV2Array::GetCoordinate(int index)
+	{
+		return (UV2*)objects[index];
+	}
 
-UV2 ** UV2Array::GetCoordinates()
-{
-	return (UV2**)objects;
+	UV2 ** UV2Array::GetCoordinates()
+	{
+		return (UV2**)objects;
+	}
 }

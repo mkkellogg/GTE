@@ -11,47 +11,50 @@
 #ifndef _GTE_RENDER_TARGET_H_
 #define _GTE_RENDER_TARGET_H_
 
-// forward declarations
-class TextureAttributes;
-
 #include "base/intmask.h"
 #include "renderbuffer.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "graphics/texture/textureattr.h"
 
-class RenderTarget : public EngineObject
+namespace GTE
 {
-    protected:
+	// forward declarations
+	class TextureAttributes;
 
-	// does this render target support standard color-buffer rendering?
-	bool hasColorBuffer;
-	// does this render target support depth rendering?
-	bool hasDepthBuffer;
-	// enable stencil buffer for render (but not as a render target)
-	bool enableStencilBuffer;
-	// width of this render target
-	unsigned int width;
-	// height of this render target
-	unsigned int height;
-	// texture to which color rendering will occur
-	TextureRef colorTexture;
-	// texture to which depth rendering will occur
-	TextureRef depthTexture;
-	// texture attributes of [colorTexture]
-	TextureAttributes colorTextureAttributes;
+	class RenderTarget : public EngineObject
+	{
+	protected:
 
-	RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
-    virtual ~RenderTarget();
+		// does this render target support standard color-buffer rendering?
+		bool hasColorBuffer;
+		// does this render target support depth rendering?
+		bool hasDepthBuffer;
+		// enable stencil buffer for render (but not as a render target)
+		bool enableStencilBuffer;
+		// width of this render target
+		unsigned int width;
+		// height of this render target
+		unsigned int height;
+		// texture to which color rendering will occur
+		TextureRef colorTexture;
+		// texture to which depth rendering will occur
+		TextureRef depthTexture;
+		// texture attributes of [colorTexture]
+		TextureAttributes colorTextureAttributes;
 
-    public:
+		RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+		virtual ~RenderTarget();
 
-    virtual bool Init() = 0;
-    bool HasBuffer(RenderBufferType bufferType) const;
-    TextureRef GetDepthTexture();
-    TextureRef GetColorTexture();
-    unsigned int GetWidth();
-    unsigned int GetHeight();
-};
+	public:
+
+		virtual bool Init() = 0;
+		bool HasBuffer(RenderBufferType bufferType) const;
+		TextureRef GetDepthTexture();
+		TextureRef GetColorTexture();
+		unsigned int GetWidth();
+		unsigned int GetHeight();
+	};
+}
 
 #endif

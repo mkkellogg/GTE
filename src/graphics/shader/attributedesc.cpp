@@ -6,16 +6,19 @@
 
 #include "attributedesc.h"
 
-AttributeDescriptor::AttributeDescriptor()
+namespace GTE
 {
-	ShaderVarID = -1;
-	FloatData = NULL;
-	Size = -1;
-	IsSet = false;
-	Type = AttributeType::Unknown;
-}
+	AttributeDescriptor::AttributeDescriptor()
+	{
+		ShaderVarID = -1;
+		FloatData = NULL;
+		Size = -1;
+		IsSet = false;
+		Type = AttributeType::Unknown;
+	}
 
-AttributeDescriptor::~AttributeDescriptor()
-{
+	AttributeDescriptor::~AttributeDescriptor()
+	{
 
+	}
 }

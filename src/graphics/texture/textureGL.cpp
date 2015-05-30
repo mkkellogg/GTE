@@ -11,18 +11,20 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
-
-TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID) : Texture(attributes)
+namespace GTE
 {
-	this->textureID = textureID;
-}
+	TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID) : Texture(attributes)
+	{
+		this->textureID = textureID;
+	}
 
-TextureGL::~TextureGL()
-{
+	TextureGL::~TextureGL()
+	{
 
-}
+	}
 
-GLuint TextureGL::GetTextureID() const
-{
-	return textureID;
+	GLuint TextureGL::GetTextureID() const
+	{
+		return textureID;
+	}
 }

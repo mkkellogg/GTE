@@ -6,17 +6,20 @@
 
 #include "sceneobjectcomponent.h"
 
-SceneObjectComponent::SceneObjectComponent()
+namespace GTE
 {
+	SceneObjectComponent::SceneObjectComponent()
+	{
 
-}
+	}
 
-SceneObjectComponent::~SceneObjectComponent()
-{
+	SceneObjectComponent::~SceneObjectComponent()
+	{
 
-}
+	}
 
-SceneObjectRef SceneObjectComponent::GetSceneObject()
-{
-	return sceneObject;
+	SceneObjectRef SceneObjectComponent::GetSceneObject()
+	{
+		return sceneObject;
+	}
 }

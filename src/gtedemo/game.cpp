@@ -46,6 +46,8 @@
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
 
+using namespace GTE;
+
 const std::string Game::PlayerObjectLayer = "Player";
 
 /*

@@ -1,25 +1,28 @@
 #ifndef _GTE_COLOR4_FACTORY_H_
 #define _GTE_COLOR4_FACTORY_H_
 
-//forward declarations
-class Color4Factory;
-class Color4;
-
 #include "base/basevector4factory.h"
 
-class Color4Factory : public BaseVector4Factory
+namespace GTE
 {
-	static Color4Factory * instance;
+	//forward declarations
+	class Color4Factory;
+	class Color4;
 
-    public:
+	class Color4Factory : public BaseVector4Factory
+	{
+		static Color4Factory * instance;
 
-	static Color4Factory * GetInstance();
+	public:
 
-	Color4Factory();
-    virtual ~Color4Factory();
+		static Color4Factory * GetInstance();
 
-    virtual BaseVector4 * CreatePermAttached(float * target);
-    virtual BaseVector4 ** CreateArray(int count);
-};
+		Color4Factory();
+		virtual ~Color4Factory();
+
+		virtual BaseVector4 * CreatePermAttached(float * target);
+		virtual BaseVector4 ** CreateArray(int count);
+	};
+}
 
 #endif

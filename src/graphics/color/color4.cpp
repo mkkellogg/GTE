@@ -6,64 +6,67 @@
  
 #include "color4.h"
 
-Color4::Color4() : BaseVector4(), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+namespace GTE
 {
+	Color4::Color4() : BaseVector4(), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	{
 
-}
+	}
 
-Color4::Color4(bool permAttached, float * target) : BaseVector4(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
-{
-
-
-}
-
-Color4::Color4(float r, float g, float b, float a) : BaseVector4(r,g,b,a), r(data[0]), g(data[1]), b(data[2]), a(data[3])
-{
-   
-}
-
-Color4::Color4(const Color4& color) : BaseVector4(color), r(data[0]), g(data[1]), b(data[2]), a(data[3])
-{
-   
-}
-
-Color4::~Color4()
-{
-    
-}
-
-/*
- * Assignment operator
- */
-Color4 & Color4::operator= (const Color4 & source)
-{
-    if(this == &source)return *this;
-    BaseVector4::operator=(source);
-    return *this;
-}
-
-/*
- * Over-ridden assignment operator from BaseVector4
- */
-BaseVector4& Color4::operator= (const BaseVector4& source)
-{
-	if(this == &source)return *this;
-	BaseVector4::operator=(source);
-	return *this;
-}
-
-void Color4::Set(float r, float g, float b, float a)
-{
-	BaseVector4::Set(r,g,b,a);
-}
-
-void Color4::AttachTo(float * data)
-{
-	BaseVector4::AttachTo(data);
-}
+	Color4::Color4(bool permAttached, float * target) : BaseVector4(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	{
 
 
-void Color4::Detach()
-{
-	BaseVector4::Detach();
+	}
+
+	Color4::Color4(float r, float g, float b, float a) : BaseVector4(r, g, b, a), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	{
+
+	}
+
+	Color4::Color4(const Color4& color) : BaseVector4(color), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	{
+
+	}
+
+	Color4::~Color4()
+	{
+
+	}
+
+	/*
+	 * Assignment operator
+	 */
+	Color4 & Color4::operator= (const Color4 & source)
+	{
+		if (this == &source)return *this;
+		BaseVector4::operator=(source);
+		return *this;
+	}
+
+	/*
+	 * Over-ridden assignment operator from BaseVector4
+	 */
+	BaseVector4& Color4::operator= (const BaseVector4& source)
+	{
+		if (this == &source)return *this;
+		BaseVector4::operator=(source);
+		return *this;
+	}
+
+	void Color4::Set(float r, float g, float b, float a)
+	{
+		BaseVector4::Set(r, g, b, a);
+	}
+
+	void Color4::AttachTo(float * data)
+	{
+		BaseVector4::AttachTo(data);
+	}
+
+
+	void Color4::Detach()
+	{
+		BaseVector4::Detach();
+	}
 }

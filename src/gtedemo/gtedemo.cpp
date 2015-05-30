@@ -10,6 +10,8 @@
 #include "gtedemo.h"
 #include "gtedemo/game.h"
 
+using namespace GTE;
+
 /*
  * Custom implementation of EngineCallbacks to handle GTE engine events.
  */

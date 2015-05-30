@@ -1,9 +1,3 @@
-//forward declarations
-class AssetImporter;
-class Vector3;
-class Quaternion;
-class LavaField;
-
 #include <functional>
 #include <vector>
 #include "lavascene.h"

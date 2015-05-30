@@ -95,6 +95,9 @@
 	}																									\
 }
 
-typedef unsigned char BYTE;
+namespace GTE
+{
+	typedef unsigned char BYTE;
+}
 
 #endif

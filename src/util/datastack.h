@@ -3,99 +3,102 @@
 
 #include "global/global.h"
 
-template <typename T> class DataStack
+namespace GTE
 {
-	unsigned int maxEntryCount;
-	unsigned int elementsPerEntry;
-	unsigned int entries;
-	T * data;
-	T * stackPointer;
-
-	void Destroy()
+	template <typename T> class DataStack
 	{
-		if(data != NULL)
+		unsigned int maxEntryCount;
+		unsigned int elementsPerEntry;
+		unsigned int entries;
+		T * data;
+		T * stackPointer;
+
+		void Destroy()
 		{
-			delete[] data;
-			data = NULL;
+			if (data != NULL)
+			{
+				delete[] data;
+				data = NULL;
+			}
 		}
-	}
 
 	public:
 
-	DataStack()
-	{
-		this->maxEntryCount = 256;
-		this->elementsPerEntry = 1;
-		entries = 0;
-		data = NULL;
-		stackPointer = NULL;
-	}
-
-	DataStack(int maxEntryCount, int elementsPerEntry)
-	{
-		this->maxEntryCount = maxEntryCount;
-		this->elementsPerEntry = elementsPerEntry;
-		entries = 0;
-		data = NULL;
-		stackPointer = NULL;
-	}
-
-	~DataStack()
-	{
-		Destroy();
-	}
-
-	bool Init()
-	{
-		Destroy();
-
-		data = new T[maxEntryCount * elementsPerEntry];
-		if(data == NULL)
+		DataStack()
 		{
-			return false;
+			this->maxEntryCount = 256;
+			this->elementsPerEntry = 1;
+			entries = 0;
+			data = NULL;
+			stackPointer = NULL;
 		}
 
-		stackPointer = data;
-
-		return true;
-	}
-
-	void Push(const T * entryData)
-	{
-		if(data != NULL && stackPointer != NULL && entries < maxEntryCount)
+		DataStack(int maxEntryCount, int elementsPerEntry)
 		{
-			memcpy(stackPointer, entryData, elementsPerEntry * sizeof(T));
-			stackPointer += elementsPerEntry;
-			entries++;
-		}
-	}
-
-	/*
-	 * !!! IMPORTANT: The pointer returned from this method points to the data array for this stack. This
-	 * means the data this pointer points to can be overwritten by Push() operations. Therefore the return
-	 * value from this method is only guaranteed to be valid up until any subsequent Push() calls.
-	 */
-	T * Pop()
-	{
-		if(data != NULL && stackPointer != NULL && entries > 0)
-		{
-			stackPointer -= elementsPerEntry;
-			entries--;
-			return stackPointer;
+			this->maxEntryCount = maxEntryCount;
+			this->elementsPerEntry = elementsPerEntry;
+			entries = 0;
+			data = NULL;
+			stackPointer = NULL;
 		}
 
-		return NULL;
-	}
+		~DataStack()
+		{
+			Destroy();
+		}
 
-	int GetMaxEntryCount() const
-	{
-		return maxEntryCount;
-	}
+		bool Init()
+		{
+			Destroy();
 
-	unsigned int GetEntryCount() const
-	{
-		return entries;
-	}
-};
+			data = new T[maxEntryCount * elementsPerEntry];
+			if (data == NULL)
+			{
+				return false;
+			}
+
+			stackPointer = data;
+
+			return true;
+		}
+
+		void Push(const T * entryData)
+		{
+			if (data != NULL && stackPointer != NULL && entries < maxEntryCount)
+			{
+				memcpy(stackPointer, entryData, elementsPerEntry * sizeof(T));
+				stackPointer += elementsPerEntry;
+				entries++;
+			}
+		}
+
+		/*
+		 * !!! IMPORTANT: The pointer returned from this method points to the data array for this stack. This
+		 * means the data this pointer points to can be overwritten by Push() operations. Therefore the return
+		 * value from this method is only guaranteed to be valid up until any subsequent Push() calls.
+		 */
+		T * Pop()
+		{
+			if (data != NULL && stackPointer != NULL && entries > 0)
+			{
+				stackPointer -= elementsPerEntry;
+				entries--;
+				return stackPointer;
+			}
+
+			return NULL;
+		}
+
+		int GetMaxEntryCount() const
+		{
+			return maxEntryCount;
+		}
+
+		unsigned int GetEntryCount() const
+		{
+			return entries;
+		}
+	};
+}
 
 #endif

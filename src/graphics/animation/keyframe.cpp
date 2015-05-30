@@ -5,30 +5,33 @@
 #include "keyframe.h"
 #include <string>
 
-/*
- * Default constructor.
- */
-KeyFrame::KeyFrame()
+namespace GTE
 {
-	NormalizedTime = 0;
-	RealTime = 0;
-	RealTimeTicks = 1;
-}
+	/*
+	* Default constructor.
+	*/
+	KeyFrame::KeyFrame()
+	{
+		NormalizedTime = 0;
+		RealTime = 0;
+		RealTimeTicks = 1;
+	}
 
-/*
- * Parameterized constructor.
- */
-KeyFrame::KeyFrame(float normalizedTime, float realTime, float realTimeTicks)
-{
-	this->NormalizedTime = normalizedTime;
-	this->RealTime = realTime;
-	this->RealTimeTicks = realTimeTicks;
-}
+	/*
+	 * Parameterized constructor.
+	 */
+	KeyFrame::KeyFrame(float normalizedTime, float realTime, float realTimeTicks)
+	{
+		this->NormalizedTime = normalizedTime;
+		this->RealTime = realTime;
+		this->RealTimeTicks = realTimeTicks;
+	}
 
-/*
- * Destructor.
- */
-KeyFrame::~KeyFrame()
-{
+	/*
+	 * Destructor.
+	 */
+	KeyFrame::~KeyFrame()
+	{
 
+	}
 }

@@ -4,38 +4,41 @@
 #include <memory.h>
 #include <math.h>
 
-#include "vector3array.h"
+#include "vector3Array.h"
 #include "vector3.h"
 #include "vector3factory.h"
 #include "base/basevector4array.h"
 #include "debug/gtedebug.h"
 
-Vector3Array::Vector3Array() : BaseVector4Array(Vector3Factory::Instance())
+namespace GTE
 {
+	Vector3Array::Vector3Array() : BaseVector4Array(Vector3Factory::Instance())
+	{
 
-}
+	}
 
-Vector3Array::~Vector3Array()
-{
+	Vector3Array::~Vector3Array()
+	{
 
-}
+	}
 
-void Vector3Array::SetData(const float * data, bool includeW)
-{
+	void Vector3Array::SetData(const float * data, bool includeW)
+	{
 
-}
+	}
 
+	Vector3 * Vector3Array::GetVector(int index)
+	{
+		return (Vector3*)objects[index];
+	}
 
-Vector3 * Vector3Array::GetVector(int index)
-{
-	return (Vector3*)objects[index];
-}
+	const Vector3 * Vector3Array::GetVectorConst(int index) const
+	{
+		return (const Vector3*)objects[index];
+	}
 
-const Vector3 * Vector3Array::GetVectorConst(int index) const
-{
-	return (const Vector3*)objects[index];
-}
-Vector3 ** Vector3Array::GetVectors()
-{
-	return (Vector3**)objects;
+	Vector3 ** Vector3Array::GetVectors()
+	{
+		return (Vector3**)objects;
+	}
 }

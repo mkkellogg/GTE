@@ -10,35 +10,36 @@
 #ifndef _GTE_RAWIMAGE_H_
 #define _GTE_RAWIMAGE_H_
 
-//forward declarations
-
 #include "global/global.h"
 
-class RawImage
+namespace GTE
 {
-	friend class ImageLoader;
+	class RawImage
+	{
+		friend class ImageLoader;
 
 	protected:
 
-	unsigned int width;
-	unsigned int height;
-	BYTE * imageBytes;
+		unsigned int width;
+		unsigned int height;
+		BYTE * imageBytes;
 
-	unsigned int ImageSizeBytes();
-	void Destroy();
+		unsigned int ImageSizeBytes();
+		void Destroy();
 
 	public:
 
-	RawImage(unsigned int width, unsigned int height);
-	~RawImage();
+		RawImage(unsigned int width, unsigned int height);
+		~RawImage();
 
-	bool Init();
-	void SetDataTo(BYTE * data);
-	void SetByte(unsigned int index, BYTE byte);
+		bool Init();
+		void SetDataTo(BYTE * data);
+		void SetByte(unsigned int index, BYTE byte);
 
-	BYTE * GetPixels();
-	unsigned int GetWidth();
-	unsigned int GetHeight();
-};
+		BYTE * GetPixels();
+		unsigned int GetWidth();
+		unsigned int GetHeight();
+	};
+}
 
 #endif

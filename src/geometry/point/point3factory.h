@@ -1,24 +1,27 @@
 #ifndef _GTE_POINT3_FACTORY_H_
 #define _GTE_POINT3_FACTORY_H_
 
-//forward declarations
-class Point3;
-
 #include "base/basevector4factory.h"
 
-class Point3Factory : public BaseVector4Factory
+namespace GTE
 {
-	static Point3Factory * instance;
+	//forward declarations
+	class Point3;
 
-    public:
+	class Point3Factory : public BaseVector4Factory
+	{
+		static Point3Factory * instance;
 
-	static Point3Factory * Instance();
+	public:
 
-	Point3Factory();
-    virtual ~Point3Factory();
+		static Point3Factory * Instance();
 
-    virtual BaseVector4 * CreatePermAttached(float * target);
-    virtual BaseVector4** CreateArray(int count);
-};
+		Point3Factory();
+		virtual ~Point3Factory();
+
+		virtual BaseVector4 * CreatePermAttached(float * target);
+		virtual BaseVector4** CreateArray(int count);
+	};
+}
 
 #endif

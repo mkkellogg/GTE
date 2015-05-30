@@ -7,21 +7,24 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
-/*
- * Constructor - initialize all member variables.
- */
-SubMesh3DFace::SubMesh3DFace()
+namespace GTE
 {
-	FirstVertexIndex = -1;
-	AdjacentFaceIndex1 = -1;
-	AdjacentFaceIndex2 = -1;
-	AdjacentFaceIndex3 = -1;
-}
+	/*
+* Constructor - initialize all member variables.
+*/
+	SubMesh3DFace::SubMesh3DFace()
+	{
+		FirstVertexIndex = -1;
+		AdjacentFaceIndex1 = -1;
+		AdjacentFaceIndex2 = -1;
+		AdjacentFaceIndex3 = -1;
+	}
 
-/*
- * Clean up.
- */
-SubMesh3DFace::~SubMesh3DFace()
-{
+	/*
+	 * Clean up.
+	 */
+	SubMesh3DFace::~SubMesh3DFace()
+	{
 
+	}
 }

@@ -1,21 +1,22 @@
 #ifndef _GTE_SCREENDESC_H_
 #define _GTE_SCREENDESC_H_
 
-// forward declarations
-
-class ScreenDescriptor
+namespace GTE
 {
-	int screenWidth;
-	int screenHeight;
+	class ScreenDescriptor
+	{
+		int screenWidth;
+		int screenHeight;
 
-    public:
+	public:
 
-	ScreenDescriptor();
-	ScreenDescriptor(int screenWidth, int screenHeight);
-    ~ScreenDescriptor();
+		ScreenDescriptor();
+		ScreenDescriptor(int screenWidth, int screenHeight);
+		~ScreenDescriptor();
 
-    int GetScreenWidth();
-    int getScreenHeight();
-};
+		int GetScreenWidth();
+		int getScreenHeight();
+	};
+}
 
 #endif

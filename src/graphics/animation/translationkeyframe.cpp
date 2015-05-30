@@ -6,26 +6,29 @@
 #include "geometry/vector/vector3.h"
 #include <string>
 
-/*
- * Default constructor.
- */
-TranslationKeyFrame::TranslationKeyFrame() : KeyFrame()
+namespace GTE
 {
+	/*
+	* Default constructor.
+	*/
+	TranslationKeyFrame::TranslationKeyFrame() : KeyFrame()
+	{
 
-}
+	}
 
-/*
- * Parameterized constructor..
- */
-TranslationKeyFrame::TranslationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Vector3& translation) : KeyFrame(normalizedTime, realTime, realTimeTicks)
-{
-	this->Translation = translation;
-}
+	/*
+	 * Parameterized constructor..
+	 */
+	TranslationKeyFrame::TranslationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Vector3& translation) : KeyFrame(normalizedTime, realTime, realTimeTicks)
+	{
+		this->Translation = translation;
+	}
 
-/*
- * Destructor.
- */
-TranslationKeyFrame::~TranslationKeyFrame()
-{
+	/*
+	 * Destructor.
+	 */
+	TranslationKeyFrame::~TranslationKeyFrame()
+	{
 
+	}
 }

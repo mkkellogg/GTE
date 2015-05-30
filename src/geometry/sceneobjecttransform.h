@@ -11,47 +11,50 @@
 #ifndef _GTE_SCENEOBJECT_TRANSFORM_H_
 #define _GTE_SCENEOBJECT_TRANSFORM_H_
 
-// forward declarations
-class Transform;
-
 #include "object/enginetypes.h"
 #include "transform.h"
 #include "matrix4x4.h"
 
-class SceneObjectTransform : public Transform
+namespace GTE
 {
-	friend class SceneObject;
+	// forward declarations
+	class Transform;
 
-	SceneObject * sceneObject;
+	class SceneObjectTransform : public Transform
+	{
+		friend class SceneObject;
 
-	void GetInheritedTransform(Transform& transform, bool invert) const;
-	void SetSceneObject(SceneObject* sceneObject);
-	void GetLocalTransformationFromWorldTransformation(const Transform& worldTransformation, Transform& localTransformation);
+		SceneObject * sceneObject;
 
-    public:
+		void GetInheritedTransform(Transform& transform, bool invert) const;
+		void SetSceneObject(SceneObject* sceneObject);
+		void GetLocalTransformationFromWorldTransformation(const Transform& worldTransformation, Transform& localTransformation);
 
-	SceneObjectTransform();
-	SceneObjectTransform(SceneObject* sceneObject);
-    ~SceneObjectTransform();
+	public:
 
-    static void GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert);
-    static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, bool includeSelf,  bool invert);
+		SceneObjectTransform();
+		SceneObjectTransform(SceneObject* sceneObject);
+		~SceneObjectTransform();
 
-    void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-    void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
+		static void GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert);
+		static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, bool includeSelf, bool invert);
 
-    void Translate(float x, float y, float z, bool local);
-    void Translate(Vector3& vector, bool local);
-    void RotateAround(const Point3& point, const Vector3& axis, float angle, bool local);
-    void RotateAround(float px, float py, float pz, float ax, float ay, float az,  float angle, bool local);
-    void Scale(const Vector3& mag,  bool local);
-    void Scale(float x, float y, float z,  bool local);
-    void Rotate(const Vector3& vector, float a,  bool local);
-    void Rotate(float x, float y, float z, float a,  bool local);
+		void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+		void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
 
-    void TransformVector(Vector3& vector) const;
-    void TransformPoint(Point3& point3) const;
-    void TransformVector4f(float * vector) const;
-};
+		void Translate(float x, float y, float z, bool local);
+		void Translate(Vector3& vector, bool local);
+		void RotateAround(const Point3& point, const Vector3& axis, float angle, bool local);
+		void RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle, bool local);
+		void Scale(const Vector3& mag, bool local);
+		void Scale(float x, float y, float z, bool local);
+		void Rotate(const Vector3& vector, float a, bool local);
+		void Rotate(float x, float y, float z, float a, bool local);
+
+		void TransformVector(Vector3& vector) const;
+		void TransformPoint(Point3& point3) const;
+		void TransformVector4f(float * vector) const;
+	};
+}
 
 #endif

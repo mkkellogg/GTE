@@ -18,15 +18,6 @@
 #ifndef _GTE_MATERIAL_H_
 #define _GTE_MATERIAL_H_
 
-//forward declarations
-class Graphics;
-class Shader;
-class VertexAttrBuffer;
-class Light;
-class Texture;
-class Point3;
-class Vector3;
-
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
 #include "graphics/color/color4.h"
@@ -37,155 +28,167 @@ class Vector3;
 #include <map>
 #include <string>
 
-class VertexAttrBufferBinding
+namespace GTE
 {
+	//forward declarations
+	class Graphics;
+	class Shader;
+	class VertexAttrBuffer;
+	class Light;
+	class Texture;
+	class Point3;
+	class Vector3;
+
+	class VertexAttrBufferBinding
+	{
 	public:
 
-	VertexAttrBuffer * Buffer;
-	StandardAttribute Attribute;
-	int AltBinding;
+		VertexAttrBuffer * Buffer;
+		StandardAttribute Attribute;
+		int AltBinding;
 
-	VertexAttrBufferBinding()
+		VertexAttrBufferBinding()
+		{
+			Attribute = StandardAttribute::_None;
+			Buffer = NULL;
+			AltBinding = -1;
+		}
+
+		VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute attribute, int altBinding)
+		{
+			this->Buffer = buffer;
+			this->Attribute = attribute;
+			this->AltBinding = altBinding;
+		}
+	};
+
+	class Material : public EngineObject
 	{
-		Attribute = StandardAttribute::_None;
-		Buffer = NULL;
-		AltBinding = -1;
-	}
+		// Since this derives from EngineObject, we make this class
+		// a friend of EngineObjectManager, and the constructor & destructor
+		// protected so its life-cycle can be handled completely by EngineObjectManager.
+		friend class EngineObjectManager;
 
-	VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute attribute, int altBinding)
-	{
-		this->Buffer = buffer;
-		this->Attribute = attribute;
-		this->AltBinding = altBinding;
-	}
-};
+		// length of the array that contains binding information for stand attributes & uniforms
+		static const int BINDINGS_ARRAY_MAX_LENGTH = 128;
 
-class Material : public EngineObject
-{
-	// Since this derives from EngineObject, we make this class
-	// a friend of EngineObjectManager, and the constructor & destructor
-	// protected so its life-cycle can be handled completely by EngineObjectManager.
-	friend class EngineObjectManager;
+		// the following are values for the sizes of data required by various types of uniforms
+		static const int SAMPLER_2D_DATA_SIZE = 64;
+		static const int SAMPLER_CUBE_DATA_SIZE = 384;
+		static const int MATRIX4X4_DATA_SIZE = 16;
 
-	// length of the array that contains binding information for stand attributes & uniforms
-	static const int BINDINGS_ARRAY_MAX_LENGTH= 128;
+		// string that holds the material's name
+		std::string materialName;
 
-	// the following are values for the sizes of data required by various types of uniforms
-	static const int SAMPLER_2D_DATA_SIZE=64;
-	static const int SAMPLER_CUBE_DATA_SIZE=384;
-	static const int MATRIX4X4_DATA_SIZE=16;
+		// pointer to this material's shader
+		ShaderRef shader;
 
-	// string that holds the material's name
-	std::string materialName;
+		// bit masks to hold binding status for standard uniforms and attributes
+		StandardAttributeSet standardAttributes;
+		StandardUniformSet standardUniforms;
 
-	// pointer to this material's shader
-	ShaderRef shader;
+		// ids/locations of shader variables corresponding to standard attributes
+		int standardAttributeBindings[BINDINGS_ARRAY_MAX_LENGTH];
+		// ids/locations of shader variables corresponding to standard uniforms
+		int standardUniformBindings[BINDINGS_ARRAY_MAX_LENGTH];
 
-	// bit masks to hold binding status for standard uniforms and attributes
-	StandardAttributeSet standardAttributes;
-	StandardUniformSet standardUniforms;
+		// a vector UniformDescriptor objects that describe custom uniforms that are set
+		// by the developer and
+		std::vector<UniformDescriptor*> setUniforms;
 
-	// ids/locations of shader variables corresponding to standard attributes
-	int standardAttributeBindings[BINDINGS_ARRAY_MAX_LENGTH];
-	// ids/locations of shader variables corresponding to standard uniforms
-	int standardUniformBindings[BINDINGS_ARRAY_MAX_LENGTH];
+		// have all the attributes been given valid values?
+		bool attributesSetAndVerified;
 
-	// a vector UniformDescriptor objects that describe custom uniforms that are set
-	// by the developer and
-	std::vector<UniformDescriptor*> setUniforms;
+		// length of values for each attribute that has been set
+		int * attributesSetValues;
 
-	// have all the attributes been given valid values?
-	bool attributesSetAndVerified;
+		// map a shader variable ID/location to its index in attributesSetValues
+		std::map<int, int> attributeLocationsToVerificationIndex;
 
-	// length of values for each attribute that has been set
-	int * attributesSetValues;
+		// have all the uniforms been given valid values?
+		bool uniformsSetAndVerified;
 
-	// map a shader variable ID/location to its index in attributesSetValues
-	std::map<int,int> attributeLocationsToVerificationIndex;
+		// length of values for each uniform that has been set
+		int * uniformsSetValues;
 
-	// have all the uniforms been given valid values?
-	bool uniformsSetAndVerified;
+		// map a shader variable ID/location to its index in uniformsSetValues
+		std::map<int, int> uniformLocationsToVerificationIndex;
 
-	// length of values for each uniform that has been set
-	int * uniformsSetValues;
+		// current highest used sampler unit index
+		unsigned int currentSampletUnityIndex;
+		// map a texture uniform to its sampler unit
+		std::map<std::string, int> textureUniformSamplerUnitIndex;
 
-	// map a shader variable ID/location to its index in uniformsSetValues
-	std::map<int,int> uniformLocationsToVerificationIndex;
+		// does this material require a light to be rendered?
+		bool selfLit;
 
-	// current highest used sampler unit index
-	unsigned int currentSampletUnityIndex;
-	// map a texture uniform to its sampler unit
-	std::map<std::string, int> textureUniformSamplerUnitIndex;
+		unsigned int GetRequiredUniformSize(UniformType uniformType);
+		bool allSetUniformsandAttributesVerified;
 
-	// does this material require a light to be rendered?
-	bool selfLit;
+		void BindStandardVars();
+		void ClearStandardBindings();
+		bool SetupSetVerifiers();
 
-	unsigned int GetRequiredUniformSize(UniformType uniformType);
-	bool allSetUniformsandAttributesVerified;
+		bool SetupSetUniforms();
+		void DestroySetUniforms();
 
-	void BindStandardVars();
-	void ClearStandardBindings();
-	bool SetupSetVerifiers();
+		void SetStandardAttributeBinding(int varID, StandardAttribute attr);
+		int GetStandardAttributeBinding(StandardAttribute attr) const;
+		int TestForStandardAttribute(StandardAttribute attr) const;
 
-	bool SetupSetUniforms();
-	void DestroySetUniforms();
+		int GetUniformIndex(const std::string& uniformName);
+		unsigned int GetSamplerUnitForName(const std::string& name);
+		void SetStandardUniformBinding(int varID, StandardUniform uniform);
+		int GetStandardUniformBinding(StandardUniform uniform) const;
+		int TestForStandardUniform(StandardUniform uniform) const;
+		bool ValidateUniformName(const std::string& name, int& loc, int& index);
 
-	void SetStandardAttributeBinding( int varID, StandardAttribute attr);
-    int GetStandardAttributeBinding(StandardAttribute attr) const;
-	int TestForStandardAttribute(StandardAttribute attr) const;
-
-	int GetUniformIndex(const std::string& uniformName);
-	unsigned int GetSamplerUnitForName(const std::string& name);
-	void SetStandardUniformBinding( int varID, StandardUniform uniform);
-	int GetStandardUniformBinding(StandardUniform uniform) const;
-	int TestForStandardUniform(StandardUniform uniform) const;
-	bool ValidateUniformName(const std::string& name, int& loc, int& index);
-
-	void SetAttributeSetValue(int varID, int size);
-	void SetUniformSetValue(int varID, int size);
+		void SetAttributeSetValue(int varID, int size);
+		void SetUniformSetValue(int varID, int size);
 
 
-    protected:
+	protected:
 
-    Material(const std::string& materialName);
-    virtual ~Material();
-    bool Init(ShaderRef shader);
+		Material(const std::string& materialName);
+		virtual ~Material();
+		bool Init(ShaderRef shader);
 
-    public:
+	public:
 
-    void ResetVerificationState();
+		void ResetVerificationState();
 
-    ShaderRef GetShader() const;
+		ShaderRef GetShader() const;
 
-    StandardAttributeSet GetStandardAttributes() const;
-    void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
-    void SendAttributeBufferToShader(int varID, VertexAttrBuffer *buffer);
+		StandardAttributeSet GetStandardAttributes() const;
+		void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
+		void SendAttributeBufferToShader(int varID, VertexAttrBuffer *buffer);
 
-    StandardUniformSet GetStandardUniforms() const;
+		StandardUniformSet GetStandardUniforms() const;
 
-    void SendSetUniformToShader(unsigned int index);
-    void SendAllSetUniformsToShader();
-    void SetTexture(TextureRef texture, const std::string& varName);
-    void SetMatrix4x4(const Matrix4x4& mat, const std::string& varName);
-    void SetUniform1f(float val, const std::string& varName);
-    void SetUniform2f(float v1, float v2, const std::string& varName);
-    void SetUniform4f(float v1, float v2, float v3, float v4, const std::string& varName);
-    void SetColor(Color4 val, const std::string& varName);
-    unsigned int GetSetUniformCount() const ;
+		void SendSetUniformToShader(unsigned int index);
+		void SendAllSetUniformsToShader();
+		void SetTexture(TextureRef texture, const std::string& varName);
+		void SetMatrix4x4(const Matrix4x4& mat, const std::string& varName);
+		void SetUniform1f(float val, const std::string& varName);
+		void SetUniform2f(float v1, float v2, const std::string& varName);
+		void SetUniform4f(float v1, float v2, float v3, float v4, const std::string& varName);
+		void SetColor(Color4 val, const std::string& varName);
+		unsigned int GetSetUniformCount() const;
 
-    void SendClipPlaneCountToShader(unsigned int count);
-    void SendClipPlaneToShader(unsigned int index, float eq1, float eq2, float eq3, float eq4);
-    void SendModelMatrixToShader(const Matrix4x4 * mat);
-    void SendModelViewMatrixToShader(const Matrix4x4 * mat);
-    void SendProjectionMatrixToShader(const Matrix4x4 * mat);
-    void SendMVPMatrixToShader(const Matrix4x4 * mat);
-    void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
-    void SendEyePositionToShader(const Point3 * position);
+		void SendClipPlaneCountToShader(unsigned int count);
+		void SendClipPlaneToShader(unsigned int index, float eq1, float eq2, float eq3, float eq4);
+		void SendModelMatrixToShader(const Matrix4x4 * mat);
+		void SendModelViewMatrixToShader(const Matrix4x4 * mat);
+		void SendProjectionMatrixToShader(const Matrix4x4 * mat);
+		void SendMVPMatrixToShader(const Matrix4x4 * mat);
+		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
+		void SendEyePositionToShader(const Point3 * position);
 
-    bool VerifySetVars(int vertexCount);
+		bool VerifySetVars(int vertexCount);
 
-    void SetSelfLit(bool selfLit);
-    bool IsSelfLit();
-};
+		void SetSelfLit(bool selfLit);
+		bool IsSelfLit();
+	};
+}
 
 #endif

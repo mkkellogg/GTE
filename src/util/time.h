@@ -12,27 +12,30 @@
 
 #include <chrono>
 
-class Time
+namespace GTE
 {
-	static bool initialized;
-	static unsigned long long startupTime;
-	static std::chrono::high_resolution_clock::time_point _startupTime;
-	static float lastRecordedTime;
-	static float deltaTime;
+	class Time
+	{
+		static bool initialized;
+		static unsigned long long startupTime;
+		static std::chrono::high_resolution_clock::time_point _startupTime;
+		static float lastRecordedTime;
+		static float deltaTime;
 
-	static void Initialize();
+		static void Initialize();
 
-	Time();
-	~Time();
+		Time();
+		~Time();
 
 	protected:
 
 	public:
 
-	static void Update();
+		static void Update();
 
-	static float GetRealTimeSinceStartup();
-	static float GetDeltaTime();
-};
+		static float GetRealTimeSinceStartup();
+		static float GetDeltaTime();
+	};
+}
 
 #endif

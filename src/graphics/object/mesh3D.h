@@ -12,10 +12,6 @@
 #ifndef _GTE_MESH3D_H_
 #define _GTE_MESH3D_H_
 
-//forward declarations
-class EngineObjectManager;
-class SubMesh3D;
-
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
@@ -23,55 +19,62 @@ class SubMesh3D;
 #include "graphics/light/light.h"
 #include <vector>
 
-class Mesh3D : public EngineObject
+namespace GTE
 {
-	// Since this derives from EngineObject, we make this class
-	// a friend of EngineObjectManager, and the constructor & destructor
-	// protected so its life-cycle can be handled completely by EngineObjectManager.
-	friend class EngineObjectManager;
-	friend class SubMesh3D;
+	//forward declarations
+	class EngineObjectManager;
+	class SubMesh3D;
 
-	protected :
+	class Mesh3D : public EngineObject
+	{
+		// Since this derives from EngineObject, we make this class
+		// a friend of EngineObjectManager, and the constructor & destructor
+		// protected so its life-cycle can be handled completely by EngineObjectManager.
+		friend class EngineObjectManager;
+		friend class SubMesh3D;
 
-	// type of light culling to perform on this mesh
-	LightCullType lightCullType;
+	protected:
 
-	// local center position for entire mesh, calculated by averaging
-	// centers of each sub-mesh.
-	Point3 center;
-	// radius of the sphere of influence along the X-axis
-	Vector3 sphereOfInfluenceX;
-	// radius of the sphere of influence along the Y-axis
-	Vector3 sphereOfInfluenceY;
-	// radius of the sphere  of influence along the Z-axis
-	Vector3 sphereOfInfluenceZ;
+		// type of light culling to perform on this mesh
+		LightCullType lightCullType;
 
-	// numnber of sub-meshes managed by the Mesh3D instance
-	unsigned int subMeshCount;
-	// container for the submeshes
-	std::vector<SubMesh3DRef> subMeshes;
+		// local center position for entire mesh, calculated by averaging
+		// centers of each sub-mesh.
+		Point3 center;
+		// radius of the sphere of influence along the X-axis
+		Vector3 sphereOfInfluenceX;
+		// radius of the sphere of influence along the Y-axis
+		Vector3 sphereOfInfluenceY;
+		// radius of the sphere  of influence along the Z-axis
+		Vector3 sphereOfInfluenceZ;
 
-    Mesh3D(unsigned int subMeshCount);
-    ~Mesh3D();
-    void Destroy();
+		// numnber of sub-meshes managed by the Mesh3D instance
+		unsigned int subMeshCount;
+		// container for the submeshes
+		std::vector<SubMesh3DRef> subMeshes;
 
-    void CalculateSphereOfInfluence();
+		Mesh3D(unsigned int subMeshCount);
+		~Mesh3D();
+		void Destroy();
+
+		void CalculateSphereOfInfluence();
 
 	public:
 
-    unsigned int GetSubMeshCount() const;
-    void SetSubMesh(SubMesh3DRef mesh, unsigned int index);
-    SubMesh3DRef GetSubMesh(unsigned int index);
-    bool Init();
-    void Update();
+		unsigned int GetSubMeshCount() const;
+		void SetSubMesh(SubMesh3DRef mesh, unsigned int index);
+		SubMesh3DRef GetSubMesh(unsigned int index);
+		bool Init();
+		void Update();
 
 
-    const Point3& GetCenter() const;
-    const Vector3& GetSphereOfInfluenceX() const;
-    const Vector3& GetSphereOfInfluenceY() const;
-    const Vector3& GetSphereOfInfluenceZ() const;
-    LightCullType GetLightCullType() const;
-};
+		const Point3& GetCenter() const;
+		const Vector3& GetSphereOfInfluenceX() const;
+		const Vector3& GetSphereOfInfluenceY() const;
+		const Vector3& GetSphereOfInfluenceZ() const;
+		LightCullType GetLightCullType() const;
+	};
+}
 
 #endif
 

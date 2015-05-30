@@ -10,26 +10,29 @@
 #include "base/basevector4array.h"
 #include "debug/gtedebug.h"
 
-Color4Array::Color4Array() : BaseVector4Array(Color4Factory::GetInstance())
+namespace GTE
 {
-}
+	Color4Array::Color4Array() : BaseVector4Array(Color4Factory::GetInstance())
+	{
+	}
 
-Color4Array::~Color4Array()
-{
-}
+	Color4Array::~Color4Array()
+	{
+	}
 
-void Color4Array::SetData(const float * data, bool includeW)
-{
+	void Color4Array::SetData(const float * data, bool includeW)
+	{
 
-}
+	}
 
 
-Color4 * Color4Array::GetColor(int index)
-{
-	return (Color4*)objects[index];
-}
+	Color4 * Color4Array::GetColor(int index)
+	{
+		return (Color4*)objects[index];
+	}
 
-Color4 ** Color4Array::GetColors()
-{
-	return (Color4**)objects;
+	Color4 ** Color4Array::GetColors()
+	{
+		return (Color4**)objects;
+	}
 }

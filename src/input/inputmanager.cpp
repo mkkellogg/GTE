@@ -9,173 +9,175 @@
 #include "util/time.h"
 #include "debug/gtedebug.h"
 
-InputManager::InputManager()
+namespace GTE
 {
-	ClearStates();
-	ClearDigitalInput();
-}
-
-InputManager::~InputManager()
-{
-
-}
-
-bool InputManager::Init()
-{
-	return true;
-}
-
-void InputManager::ClearStates()
-{
-	for(unsigned int i=0; i < MAX_KEY_INDICES; i++)
+	InputManager::InputManager()
 	{
-		onKeyDown[i] = false;
-		keyState[i] = KeyState::Up;
+		ClearStates();
+		ClearDigitalInput();
 	}
-}
 
-void InputManager::ClearDigitalInput()
-{
-	for(unsigned int i = 0; i < (unsigned int)DigitalInput::_Last; i++)
+	InputManager::~InputManager()
 	{
-		digitalInputState[i] = false;
+
 	}
-}
 
-void InputManager::GetKeyIndex(Key key, unsigned int * indices, unsigned int& indexCount)
-{
-	switch(key)
+	bool InputManager::Init()
 	{
+		return true;
+	}
+
+	void InputManager::ClearStates()
+	{
+		for (unsigned int i = 0; i < MAX_KEY_INDICES; i++)
+		{
+			onKeyDown[i] = false;
+			keyState[i] = KeyState::Up;
+		}
+	}
+
+	void InputManager::ClearDigitalInput()
+	{
+		for (unsigned int i = 0; i < (unsigned int)DigitalInput::_Last; i++)
+		{
+			digitalInputState[i] = false;
+		}
+	}
+
+	void InputManager::GetKeyIndex(Key key, unsigned int * indices, unsigned int& indexCount)
+	{
+		switch (key)
+		{
 		case Key::A:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'A');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'a');
-		break;
+			break;
 		case Key::B:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'B');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'b');
-		break;
+			break;
 		case Key::C:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'C');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'c');
-		break;
+			break;
 		case Key::D:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'D');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'d');
-		break;
+			break;
 		case Key::E:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'E');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'e');
-		break;
+			break;
 		case Key::F:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'F');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'f');
-		break;
+			break;
 		case Key::G:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'G');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'g');
-		break;
+			break;
 		case Key::H:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'H');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'h');
-		break;
+			break;
 		case Key::I:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'I');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'i');
-		break;
+			break;
 		case Key::J:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'J');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'j');
-		break;
+			break;
 		case Key::K:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'K');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'k');
-		break;
+			break;
 		case Key::L:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'L');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'l');
-		break;
+			break;
 		case Key::M:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'M');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'m');
-		break;
+			break;
 		case Key::N:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'N');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'n');
-		break;
+			break;
 		case Key::O:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'O');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'o');
-		break;
+			break;
 		case Key::P:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'P');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'p');
-		break;
+			break;
 		case Key::Q:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'Q');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'q');
-		break;
+			break;
 		case Key::R:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'R');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'r');
-		break;
+			break;
 		case Key::S:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'S');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'s');
-		break;
+			break;
 		case Key::T:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'T');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'t');
-		break;
+			break;
 		case Key::U:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'U');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'u');
-		break;
+			break;
 		case Key::V:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'V');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'v');
-		break;
+			break;
 		case Key::W:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'W');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'w');
-		break;
+			break;
 		case Key::X:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'X');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'x');
-		break;
+			break;
 		case Key::Y:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'Y');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'y');
-		break;
+			break;
 		case Key::Z:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'Z');
 			indices[1] = GetKeyIndexFromCharacter((unsigned char)'z');
-		break;
+			break;
 		case Key::One:
 			indexCount = 2;
 			indices[0] = GetKeyIndexFromCharacter((unsigned char)'1');
@@ -343,101 +345,102 @@ void InputManager::GetKeyIndex(Key key, unsigned int * indices, unsigned int& in
 			break;
 		default:
 			indexCount = 0;
-		break;
+			break;
+		}
 	}
-}
 
-void InputManager::SetOnKeyDown(unsigned int index, bool value)
-{
-	if(index >= MAX_KEY_INDICES)return;
-	onKeyDown[index] = value;
-}
-
-bool InputManager::GetOnKeyDown(unsigned int index)
-{
-	if(index >= MAX_KEY_INDICES)return false;
-	return onKeyDown[index];
-}
-
-void InputManager::SetKeyState(unsigned int index, KeyState state)
-{
-	if(index >= MAX_KEY_INDICES)return;
-	keyState[index] = state;
-}
-
-KeyState InputManager::GetKeyState(unsigned int index)
-{
-	if(index >= MAX_KEY_INDICES)return KeyState::_Invalid;
-	return keyState[index];
-}
-
-KeyState InputManager::GetKeyState(unsigned char key)
-{
-	return GetKeyState(GetKeyIndexFromCharacter(key));
-}
-
-bool InputManager::ShouldHandleOnKeyDown(unsigned char key)
-{
-	unsigned int index = GetKeyIndexFromCharacter(key);
-	if(GetOnKeyDown(index))
+	void InputManager::SetOnKeyDown(unsigned int index, bool value)
 	{
-		SetOnKeyDown(index,false);
-		return true;
+		if (index >= MAX_KEY_INDICES)return;
+		onKeyDown[index] = value;
 	}
-	return false;
-}
 
-bool InputManager::ShouldHandleOnKeyDown(Key key)
-{
-	unsigned int indices[12];
-	unsigned int indexCount;
-	GetKeyIndex(key, indices, indexCount);
-	if(indexCount > 0)
+	bool InputManager::GetOnKeyDown(unsigned int index)
 	{
-		for(unsigned int i=0; i < indexCount; i ++)
+		if (index >= MAX_KEY_INDICES)return false;
+		return onKeyDown[index];
+	}
+
+	void InputManager::SetKeyState(unsigned int index, KeyState state)
+	{
+		if (index >= MAX_KEY_INDICES)return;
+		keyState[index] = state;
+	}
+
+	KeyState InputManager::GetKeyState(unsigned int index)
+	{
+		if (index >= MAX_KEY_INDICES)return KeyState::_Invalid;
+		return keyState[index];
+	}
+
+	KeyState InputManager::GetKeyState(unsigned char key)
+	{
+		return GetKeyState(GetKeyIndexFromCharacter(key));
+	}
+
+	bool InputManager::ShouldHandleOnKeyDown(unsigned char key)
+	{
+		unsigned int index = GetKeyIndexFromCharacter(key);
+		if (GetOnKeyDown(index))
 		{
-			unsigned int index = indices[i];
-			if(GetOnKeyDown(index))
+			SetOnKeyDown(index, false);
+			return true;
+		}
+		return false;
+	}
+
+	bool InputManager::ShouldHandleOnKeyDown(Key key)
+	{
+		unsigned int indices[12];
+		unsigned int indexCount;
+		GetKeyIndex(key, indices, indexCount);
+		if (indexCount > 0)
+		{
+			for (unsigned int i = 0; i < indexCount; i++)
 			{
-				SetOnKeyDown(index,false);
-				return true;
+				unsigned int index = indices[i];
+				if (GetOnKeyDown(index))
+				{
+					SetOnKeyDown(index, false);
+					return true;
+				}
 			}
 		}
+		return false;
 	}
-	return false;
-}
 
-bool InputManager::IsKeyDown(unsigned char key)
-{
-	return GetKeyState(key) == KeyState::Down;
-}
-
-bool InputManager::IsKeyDown(Key key)
-{
-	unsigned int indices[12];
-	unsigned int indexCount;
-	GetKeyIndex(key, indices, indexCount);
-	if(indexCount > 0)
+	bool InputManager::IsKeyDown(unsigned char key)
 	{
-		for(unsigned int i=0; i < indexCount; i ++)
-		{
-			unsigned int index = indices[i];
-			if(GetKeyState(index) == KeyState::Down)return true;
-		}
+		return GetKeyState(key) == KeyState::Down;
 	}
 
-	return false;
-}
+	bool InputManager::IsKeyDown(Key key)
+	{
+		unsigned int indices[12];
+		unsigned int indexCount;
+		GetKeyIndex(key, indices, indexCount);
+		if (indexCount > 0)
+		{
+			for (unsigned int i = 0; i < indexCount; i++)
+			{
+				unsigned int index = indices[i];
+				if (GetKeyState(index) == KeyState::Down)return true;
+			}
+		}
+
+		return false;
+	}
 
 
-void InputManager::SetDigitalInputState(DigitalInput input, bool state)
-{
-	digitalInputState[(int)input] = state;
-}
+	void InputManager::SetDigitalInputState(DigitalInput input, bool state)
+	{
+		digitalInputState[(int)input] = state;
+	}
 
-bool InputManager::GetDigitalInputState(DigitalInput input)
-{
-	return digitalInputState[(int)input];
+	bool InputManager::GetDigitalInputState(DigitalInput input)
+	{
+		return digitalInputState[(int)input];
+	}
 }
 
 

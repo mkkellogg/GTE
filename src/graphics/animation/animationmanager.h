@@ -16,25 +16,28 @@
 #include "object/engineobject.h"
 #include <unordered_map>
 
-class AnimationManager
+namespace GTE
 {
-	friend class Engine;
+	class AnimationManager
+	{
+		friend class Engine;
 
-	AnimationManager();
-    ~AnimationManager();
+		AnimationManager();
+		~AnimationManager();
 
-    // map object IDs of Skeleton objects to their assign animation player
-    std::unordered_map<ObjectID, AnimationPlayerRef> activePlayers;
+		// map object IDs of Skeleton objects to their assign animation player
+		std::unordered_map<ObjectID, AnimationPlayerRef> activePlayers;
 
-	public :
+	public:
 
-    bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const;
-    bool IsCompatible(SkeletonRef skeleton, AnimationRef animation) const;
+		bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const;
+		bool IsCompatible(SkeletonRef skeleton, AnimationRef animation) const;
 
-    void Update();
+		void Update();
 
-    AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkeletonRef target);
-    AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRef renderer);
-};
+		AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkeletonRef target);
+		AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRef renderer);
+	};
+}
 
 #endif

@@ -15,16 +15,19 @@
 #include "geometry/quaternion.h"
 #include "geometry/matrix4x4.h"
 
-class RotationKeyFrame : public KeyFrame
+namespace GTE
 {
+	class RotationKeyFrame : public KeyFrame
+	{
 	public:
 
-	// The rotation transformation
-	Quaternion Rotation;
+		// The rotation transformation
+		Quaternion Rotation;
 
-	RotationKeyFrame();
-	RotationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Quaternion& rotation);
-    ~RotationKeyFrame();
-};
+		RotationKeyFrame();
+		RotationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Quaternion& rotation);
+		~RotationKeyFrame();
+	};
+}
 
 #endif

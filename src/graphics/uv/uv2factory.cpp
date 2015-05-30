@@ -9,39 +9,42 @@
 #include "base/basevector2.h"
 #include "global/global.h"
 
-UV2Factory * UV2Factory::instance;
-
-UV2Factory::UV2Factory()
+namespace GTE
 {
+	UV2Factory * UV2Factory::instance;
 
-}
-
-UV2Factory:: ~UV2Factory()
-{
-
-}
-
-UV2  * UV2Factory::CreatePermAttached(float * target)
-{
-	return new UV2(true, target);
-}
-
-BaseVector2** UV2Factory::CreateArray(int count)
-{
-	BaseVector2** pptr = (BaseVector2**)new UV2*[count];
-	ASSERT(pptr != NULL, "UV2Factory::CreateArray -> Could not allocate array.");
-
-	memset(pptr, (int)NULL, sizeof(UV2*) * count);
-
-	return pptr;
-}
-
-UV2Factory * UV2Factory::GetInstance()
-{
-	if(instance == NULL)
+	UV2Factory::UV2Factory()
 	{
-		instance = new UV2Factory();
+
 	}
 
-	return instance;
+	UV2Factory:: ~UV2Factory()
+	{
+
+	}
+
+	UV2  * UV2Factory::CreatePermAttached(float * target)
+	{
+		return new UV2(true, target);
+	}
+
+	BaseVector2** UV2Factory::CreateArray(int count)
+	{
+		BaseVector2** pptr = (BaseVector2**)new UV2*[count];
+		ASSERT(pptr != NULL, "UV2Factory::CreateArray -> Could not allocate array.");
+
+		memset(pptr, (int)NULL, sizeof(UV2*) * count);
+
+		return pptr;
+	}
+
+	UV2Factory * UV2Factory::GetInstance()
+	{
+		if (instance == NULL)
+		{
+			instance = new UV2Factory();
+		}
+
+		return instance;
+	}
 }

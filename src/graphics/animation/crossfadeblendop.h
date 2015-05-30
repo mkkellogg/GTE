@@ -11,41 +11,44 @@
 #ifndef _GTE_CROSSFADE_BLENDOP_H_
 #define _GTE_CROSSFADE_BLENDOP_H_
 
-//forward declarations
-class Transform;
-class SkeletonNode;
-
 #include "blendop.h"
 #include "object/enginetypes.h"
 #include <vector>
 #include <string>
 #include <memory>
 
-class CrossFadeBlendOp : public BlendOp
+namespace GTE
 {
-	friend class AnimationPlayer;
+	//forward declarations
+	class Transform;
+	class SkeletonNode;
 
-	unsigned int targetIndex;
-	std::function<void(CrossFadeBlendOp*)> startCallback;
-	std::function<void(CrossFadeBlendOp*)> completeCallback;
-	std::function<void(CrossFadeBlendOp*)> stoppedEarlyCallback;
+	class CrossFadeBlendOp : public BlendOp
+	{
+		friend class AnimationPlayer;
 
-	CrossFadeBlendOp(float duration, unsigned int targetIndex);
+		unsigned int targetIndex;
+		std::function<void(CrossFadeBlendOp*)> startCallback;
+		std::function<void(CrossFadeBlendOp*)> completeCallback;
+		std::function<void(CrossFadeBlendOp*)> stoppedEarlyCallback;
+
+		CrossFadeBlendOp(float duration, unsigned int targetIndex);
 
 	protected:
 
-	~CrossFadeBlendOp();
+		~CrossFadeBlendOp();
 
-	public :
+	public:
 
-	void Update(std::vector<float>& weights);
-	void OnStart();
-	void OnComplete();
-	void OnStoppedEarly();
-	void SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback);
-	void SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback);
-	void SetOnStoppedEarlyCallback(std::function<void(CrossFadeBlendOp*)> callback);
-	unsigned int GetTargetIndex();
-};
+		void Update(std::vector<float>& weights);
+		void OnStart();
+		void OnComplete();
+		void OnStoppedEarly();
+		void SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback);
+		void SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback);
+		void SetOnStoppedEarlyCallback(std::function<void(CrossFadeBlendOp*)> callback);
+		unsigned int GetTargetIndex();
+	};
+}
 
 #endif

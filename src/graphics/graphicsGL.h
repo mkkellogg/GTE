@@ -19,18 +19,6 @@
 #ifndef _GTE_GRAPHICS_GL_H_
 #define _GTE_GRAPHICS_GL_H_
 
-//forward declarations
-class Shader;
-class SubMesh3DRenderer;
-class SubMesh3DRendererGL;
-class Material;
-class Camera;
-class VertexAttrBuffer;
-class TextureAttributes;
-class AttributeTransformer;
-class RenderTarget;
-class RawImage;
-
 #include "graphics/gl_include.h"
 #include "graphics.h"
 #include "base/intmask.h"
@@ -38,133 +26,148 @@ class RawImage;
 
 #define GL_GLEXT_PROTOTYPES
 
-class GraphicsGL : public Graphics
+namespace GTE
 {
-    friend class Graphics;
-    friend class Engine;
+	//forward declarations
+	class Shader;
+	class SubMesh3DRenderer;
+	class SubMesh3DRendererGL;
+	class Material;
+	class Camera;
+	class VertexAttrBuffer;
+	class TextureAttributes;
+	class AttributeTransformer;
+	class RenderTarget;
+	class RawImage;
 
-    GLFWwindow* window;
+	class GraphicsGL : public Graphics
+	{
+		friend class Graphics;
+		friend class Engine;
 
-    protected:
+		GLFWwindow* window;
 
-    // is OpenGL blending enabled?
-    bool blendingEnabled;
-    // is OpenGL depth buffer enabled?
-    bool depthBufferEnabled;
-    // is OpenGL depth buffer currently read only?
-    bool depthBufferReadOnly;
-    // is the OpenGL color buffer enabled?
-    bool colorBufferEnabled;
-    // is the OpenGL stencil buffer enabled?
-    bool stencilBufferEnabled;
-    // is OpenGL stencil testing enabled?
-    bool stencilTestEnabled;
-    // is face culling enabled in OpenGL?
-    bool faceCullingEnabled;
-    // number of bits per channel in the OpenGL color buffer
-    int redBits, greenBits, blueBits, alphaBits;
-    // bit depth of the OpenGL depth buffer
-    int depthBufferBits;
-    // bit depth of the OpenGL stencil buffer
-    int stencilBufferBits;
-    // which faces will be culled during rendering?
-    FaceCullingMode faceCullingMode;
+	protected:
 
-    // number of currently active clip planes
-    unsigned int activeClipPlanes;
+		// is OpenGL blending enabled?
+		bool blendingEnabled;
+		// is OpenGL depth buffer enabled?
+		bool depthBufferEnabled;
+		// is OpenGL depth buffer currently read only?
+		bool depthBufferReadOnly;
+		// is the OpenGL color buffer enabled?
+		bool colorBufferEnabled;
+		// is the OpenGL stencil buffer enabled?
+		bool stencilBufferEnabled;
+		// is OpenGL stencil testing enabled?
+		bool stencilTestEnabled;
+		// is face culling enabled in OpenGL?
+		bool faceCullingEnabled;
+		// number of bits per channel in the OpenGL color buffer
+		int redBits, greenBits, blueBits, alphaBits;
+		// bit depth of the OpenGL depth buffer
+		int depthBufferBits;
+		// bit depth of the OpenGL stencil buffer
+		int stencilBufferBits;
+		// which faces will be culled during rendering?
+		FaceCullingMode faceCullingMode;
 
-    // is the graphics system initialized?
-    bool initialized;
+		// number of currently active clip planes
+		unsigned int activeClipPlanes;
 
-    // RenderTarget objects that encapsulates the OpenGL default framebuffer
-    RenderTargetRef defaultRenderTarget;
-    // currently bound render target;
-    RenderTargetRef currentRenderTarget;
+		// is the graphics system initialized?
+		bool initialized;
 
-    GraphicsGL();
-    ~GraphicsGL();
+		// RenderTarget objects that encapsulates the OpenGL default framebuffer
+		RenderTargetRef defaultRenderTarget;
+		// currently bound render target;
+		RenderTargetRef currentRenderTarget;
 
-    // local version of OpenGL
-    unsigned int openGLVersion;
-    unsigned int openGLMinorVersion;
+		GraphicsGL();
+		~GraphicsGL();
 
-    void PreProcessScene();
-    bool Start();
-    void End();
-    void Update();
-    void RenderScene();
+		// local version of OpenGL
+		unsigned int openGLVersion;
+		unsigned int openGLMinorVersion;
 
-    RenderTarget * CreateDefaultRenderTarget();
+		void PreProcessScene();
+		bool Start();
+		void End();
+		void Update();
+		void RenderScene();
 
-    GLenum GetGLCubeTarget(CubeTextureSide side);
-    GLenum GetGLTextureFormat(TextureFormat format);
-    GLenum GetGLPixelFormat(TextureFormat format);
-    GLenum GetGLPixelType(TextureFormat format);
+		RenderTarget * CreateDefaultRenderTarget();
 
-    public :
+		GLenum GetGLCubeTarget(CubeTextureSide side);
+		GLenum GetGLTextureFormat(TextureFormat format);
+		GLenum GetGLPixelFormat(TextureFormat format);
+		GLenum GetGLPixelType(TextureFormat format);
 
-    GLFWwindow* GetGLFWWindow();
+	public:
 
-    Shader * CreateShader(const ShaderSource& shaderSource);
-   void DestroyShader(Shader * shader);
-   VertexAttrBuffer * CreateVertexAttributeBuffer();
-   void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
-   Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes);
-   Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes);
-   Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes);
-   Texture * CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
-		   	   	   	   	   	   BYTE * backData, unsigned int backw, unsigned int backh,
-		   	   	   	   	   	   BYTE * topData, unsigned int tw, unsigned int th,
-		   	   	   	   	   	   BYTE * bottomData, unsigned int botw, unsigned int both,
-		   	   	   	   	   	   BYTE * leftData, unsigned int lw, unsigned int lh,
-		   	   	   	   	   	   BYTE * rightData, unsigned int rw, unsigned int rh);
-   Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-							RawImage * bottomData, RawImage * leftData, RawImage * rightData);
-   Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-							const std::string& bottom, const std::string& left, const std::string& right);
-   void DestroyTexture(Texture * texture);
-   RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-		   	   	   	   	   	   	     const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
-   void DestroyRenderTarget(RenderTarget * target);
+		GLFWwindow* GetGLFWWindow();
 
-    RenderTargetRef GetDefaultRenderTarget();
-    void ClearRenderBuffers(IntMask bufferMask);
+		Shader * CreateShader(const ShaderSource& shaderSource);
+		void DestroyShader(Shader * shader);
+		VertexAttrBuffer * CreateVertexAttributeBuffer();
+		void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
+		Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes);
+		Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes);
+		Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes);
+		Texture * CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
+									BYTE * backData, unsigned int backw, unsigned int backh,
+									BYTE * topData, unsigned int tw, unsigned int th,
+									BYTE * bottomData, unsigned int botw, unsigned int both,
+									BYTE * leftData, unsigned int lw, unsigned int lh,
+									BYTE * rightData, unsigned int rw, unsigned int rh);
+		Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
+									RawImage * bottomData, RawImage * leftData, RawImage * rightData);
+		Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+									const std::string& bottom, const std::string& left, const std::string& right);
+		void DestroyTexture(Texture * texture);
+		RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+										  const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+		void DestroyRenderTarget(RenderTarget * target);
 
-    void SetFaceCullingMode(FaceCullingMode mode);
-    FaceCullingMode GetFaceCullingMode();
-    void SetFaceCullingEnabled(bool enabled);
+		RenderTargetRef GetDefaultRenderTarget();
+		void ClearRenderBuffers(IntMask bufferMask);
 
-    void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
-    void SetDepthBufferEnabled(bool enabled);
-    void SetDepthBufferReadOnly(bool readOnly);
-    void SetDepthBufferFunction(DepthBufferFunction function);
-    void SetStencilBufferEnabled(bool enabled);
-    void SetStencilTestEnabled(bool enabled);
+		void SetFaceCullingMode(FaceCullingMode mode);
+		FaceCullingMode GetFaceCullingMode();
+		void SetFaceCullingEnabled(bool enabled);
 
-    void SetBlendingEnabled(bool enabled);
-    void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
-    GLenum GetGLBlendProperty(BlendingProperty property);
-    void ActivateMaterial(MaterialRef material);
+		void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
+		void SetDepthBufferEnabled(bool enabled);
+		void SetDepthBufferReadOnly(bool readOnly);
+		void SetDepthBufferFunction(DepthBufferFunction function);
+		void SetStencilBufferEnabled(bool enabled);
+		void SetStencilTestEnabled(bool enabled);
 
-    void EnterRenderMode(RenderMode renderMode);
+		void SetBlendingEnabled(bool enabled);
+		void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
+		GLenum GetGLBlendProperty(BlendingProperty property);
+		void ActivateMaterial(MaterialRef material);
 
-    bool Init(const GraphicsAttributes& attributes);
-    unsigned int GetOpenGLVersion();
+		void EnterRenderMode(RenderMode renderMode);
 
-    bool ActivateRenderTarget(RenderTargetRef target);
-    RenderTargetRef GetCurrrentRenderTarget();
-    bool ActivateCubeRenderTargetSide(CubeTextureSide side);
-    bool RestoreDefaultRenderTarget();
-    void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest);
+		bool Init(const GraphicsAttributes& attributes);
+		unsigned int GetOpenGLVersion();
 
-    void SetTextureData(TextureRef texture, BYTE * data);
-    void SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side);
-    void RebuildMipMaps(TextureRef texture);
+		bool ActivateRenderTarget(RenderTargetRef target);
+		RenderTargetRef GetCurrrentRenderTarget();
+		bool ActivateCubeRenderTargetSide(CubeTextureSide side);
+		bool RestoreDefaultRenderTarget();
+		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest);
 
-    bool AddClipPlane();
-    void DeactiveAllClipPlanes();
+		void SetTextureData(TextureRef texture, BYTE * data);
+		void SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side);
+		void RebuildMipMaps(TextureRef texture);
 
-    void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate);
-};
+		bool AddClipPlane();
+		void DeactiveAllClipPlanes();
+
+		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate);
+	};
+}
 
 #endif

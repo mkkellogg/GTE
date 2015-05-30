@@ -14,6 +14,8 @@
 #include "graphics/image/rawimage.h"
 #include "graphics/image/imageloader.h"
 
+using namespace GTE;
+
 class LavaField
 {
 	// the lava field mesh is divided into subDivisions x subDivisions sub-sections

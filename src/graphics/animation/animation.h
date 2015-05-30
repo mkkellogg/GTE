@@ -20,53 +20,56 @@
 #include "geometry/matrix4x4.h"
 #include <vector>
 
-class Animation : public EngineObject
+namespace GTE
 {
-	friend class EngineObjectManager;
-	friend class ModelImporter;
+	class Animation : public EngineObject
+	{
+		friend class EngineObjectManager;
+		friend class ModelImporter;
 
-	// A KeyFrameSet for each node in the target skeleton
-	KeyFrameSet * keyFrames;
+		// A KeyFrameSet for each node in the target skeleton
+		KeyFrameSet * keyFrames;
 
-	// the channel name of each key frame set, used in animation targeting
-	// 1:1 correspondence with [keyFrames]
-	std::string * channelNames;
+		// the channel name of each key frame set, used in animation targeting
+		// 1:1 correspondence with [keyFrames]
+		std::string * channelNames;
 
-	// store the number of KeyFrameSet objects that have been allocated, which
-	// is also the length of [channelNames]
-	unsigned int channelCount;
+		// store the number of KeyFrameSet objects that have been allocated, which
+		// is also the length of [channelNames]
+		unsigned int channelCount;
 
-	// the duration of this animation in  device/clock independent ticks
-	float durationTicks;
-	// map the ticks duration to actual time
-	float ticksPerSecond;
+		// the duration of this animation in  device/clock independent ticks
+		float durationTicks;
+		// map the ticks duration to actual time
+		float ticksPerSecond;
 
-	// we can have the animation start with progress > 0
-	float startOffsetTicks;
+		// we can have the animation start with progress > 0
+		float startOffsetTicks;
 
-	// we can have the animation end earlier than [durationTicks]
-	float earlyEndTicks;
+		// we can have the animation end earlier than [durationTicks]
+		float earlyEndTicks;
 
-	Animation(float durationTicks, float ticksPerSecond);
-	Animation(float durationTicks, float ticksPerSecond, float startOffsetTicks, float earlyEndTicks);
-	~Animation();
-	void Destroy();
-	bool Init(unsigned int channelCount);
+		Animation(float durationTicks, float ticksPerSecond);
+		Animation(float durationTicks, float ticksPerSecond, float startOffsetTicks, float earlyEndTicks);
+		~Animation();
+		void Destroy();
+		bool Init(unsigned int channelCount);
 
 	public:
 
-	void ClipEnds(float startOffsetTicks, float earlyEndTicks);
-	unsigned int GetChannelCount();
-	KeyFrameSet * GetKeyFrameSet(unsigned int nodeIndex);
-	const std::string * GetChannelName(unsigned int index);
-	void SetChannelName(unsigned int index, const std::string& name);
-	float GetTicksPerSecond() const;
-	float GetDurationTicks() const;
-	float GetStartOffsetTicks() const;
-	float GetEarlyEndTicks() const;
-	float GetDuration() const;
-	float GetStartOffset() const;
-	float GetEarlyEnd() const;
-};
+		void ClipEnds(float startOffsetTicks, float earlyEndTicks);
+		unsigned int GetChannelCount();
+		KeyFrameSet * GetKeyFrameSet(unsigned int nodeIndex);
+		const std::string * GetChannelName(unsigned int index);
+		void SetChannelName(unsigned int index, const std::string& name);
+		float GetTicksPerSecond() const;
+		float GetDurationTicks() const;
+		float GetStartOffsetTicks() const;
+		float GetEarlyEndTicks() const;
+		float GetDuration() const;
+		float GetStartOffset() const;
+		float GetEarlyEnd() const;
+	};
+}
 
 #endif

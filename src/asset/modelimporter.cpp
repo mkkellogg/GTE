@@ -63,6 +63,8 @@
 #include "error/errormanager.h"
 #include "util/engineutility.h"
 
+namespace GTE
+{
 /**
  * Default constructor.
  */
@@ -1410,5 +1412,5 @@ bool ModelImporter::HasOddReflections(Matrix4x4& mat)
 	if (determinant < 0.0)return true;
 	return false;
 }
-
+}
 

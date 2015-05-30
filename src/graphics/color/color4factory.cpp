@@ -9,39 +9,42 @@
 #include "base/basevector4.h"
 #include "global/global.h"
 
-Color4Factory * Color4Factory::instance;
-
-Color4Factory::Color4Factory()
+namespace GTE
 {
+	Color4Factory * Color4Factory::instance;
 
-}
-
-Color4Factory::~Color4Factory()
-{
-
-}
-
-BaseVector4 * Color4Factory::CreatePermAttached(float * target)
-{
-	return new Color4(true, target);
-}
-
-BaseVector4 ** Color4Factory::CreateArray(int count)
-{
-	BaseVector4** pptr = (BaseVector4**)new Color4*[count];
-	ASSERT(pptr != NULL, "Color4Factory::CreateArray -> Unable to allocate array");
-
-	memset(pptr, (int)NULL, sizeof(Color4*) * count);
-
-	return pptr;
-}
-
-Color4Factory * Color4Factory::GetInstance()
-{
-	if(instance == NULL)
+	Color4Factory::Color4Factory()
 	{
-		instance = new Color4Factory();
+
 	}
 
-	return instance;
+	Color4Factory::~Color4Factory()
+	{
+
+	}
+
+	BaseVector4 * Color4Factory::CreatePermAttached(float * target)
+	{
+		return new Color4(true, target);
+	}
+
+	BaseVector4 ** Color4Factory::CreateArray(int count)
+	{
+		BaseVector4** pptr = (BaseVector4**)new Color4*[count];
+		ASSERT(pptr != NULL, "Color4Factory::CreateArray -> Unable to allocate array");
+
+		memset(pptr, (int)NULL, sizeof(Color4*) * count);
+
+		return pptr;
+	}
+
+	Color4Factory * Color4Factory::GetInstance()
+	{
+		if (instance == NULL)
+		{
+			instance = new Color4Factory();
+		}
+
+		return instance;
+	}
 }

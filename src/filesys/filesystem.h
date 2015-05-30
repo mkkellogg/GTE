@@ -11,28 +11,29 @@
 #ifndef _GTE_FILE_SYSTEM_H_
 #define _GTE_FILE_SYSTEM_H_
 
-//forward declarations
-
 #include <string>
 
-class FileSystem
+namespace GTE
 {
-	static FileSystem * theInstance;
+	class FileSystem
+	{
+		static FileSystem * theInstance;
 
 	protected:
 
-	FileSystem();
-	virtual ~FileSystem();
+		FileSystem();
+		virtual ~FileSystem();
 
 	public:
 
-	static FileSystem * Instance();
+		static FileSystem * Instance();
 
-	virtual std::string ConcatenatePaths(const std::string& pathA, const std::string& pathB) const = 0;
-	virtual std::string GetBasePath(const std::string& path) const = 0;
-	virtual std::string FixupPathForLocalFilesystem(const std::string& path) const = 0;
-	virtual std::string GetFileName(const std::string& fullPath) const = 0;
-	virtual bool FileExists(const std::string& fullPath) const = 0;
-};
+		virtual std::string ConcatenatePaths(const std::string& pathA, const std::string& pathB) const = 0;
+		virtual std::string GetBasePath(const std::string& path) const = 0;
+		virtual std::string FixupPathForLocalFilesystem(const std::string& path) const = 0;
+		virtual std::string GetFileName(const std::string& fullPath) const = 0;
+		virtual bool FileExists(const std::string& fullPath) const = 0;
+	};
+}
 
 #endif

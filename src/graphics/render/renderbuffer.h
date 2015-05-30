@@ -3,23 +3,25 @@
 
 #include "base/intmask.h"
 
-enum class RenderBufferType
+namespace GTE
 {
-	Color=1,
-	Depth=2,
-	Stencil=4
-};
+	enum class RenderBufferType
+	{
+		Color = 1,
+		Depth = 2,
+		Stencil = 4
+	};
 
-enum class DepthBufferFunction
-{
-	Always=0,
-	Less=1,
-	LessThanOrEqual=2,
-	Greater=3,
-	GreaterThanOrEqual=4,
-	Equal=5
-
-};
+	enum class DepthBufferFunction
+	{
+		Always = 0,
+		Less = 1,
+		LessThanOrEqual = 2,
+		Greater = 3,
+		GreaterThanOrEqual = 4,
+		Equal = 5
+	};
+}
 
 #endif
 

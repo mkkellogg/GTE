@@ -15,6 +15,8 @@
 #include "graphics/stdattributes.h"
 #include "base/intmask.h"
 
+using namespace GTE;
+
 class GameUtil
 {
 	public:

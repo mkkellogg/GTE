@@ -1,20 +1,20 @@
 #ifndef _GTE_LAVASCENE_H_
 #define _GTE_LAVASCENE_H_
 
-//forward declarations
-class AssetImporter;
-class Vector3;
-class Quaternion;
-class LavaField;
-
 #include "gtedemo/scene.h"
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
+#include "asset/assetimporter.h"
 #include "geometry/transform.h"
 #include "base/intmask.h"
 #include <functional>
 #include <vector>
+
+//forward declarations
+class LavaField;
+
+using namespace GTE;
 
 class LavaScene : public Scene
 {

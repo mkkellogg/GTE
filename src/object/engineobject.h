@@ -1,28 +1,31 @@
 #ifndef _GTE_ENGINEOBJECT_H_
 #define _GTE_ENGINEOBJECT_H_
 
-//forward declarations
-class EngineObjectManager;
-
-typedef unsigned int ObjectID;
-
-class EngineObject
+namespace GTE
 {
-	// all instances of EngineObject and classes that derive from
-	// EngineObject should have their life-cycle managed by EngineObjectManager
-	friend class EngineObjectManager;
+	//forward declarations
+	class EngineObjectManager;
 
-	ObjectID objectID;
-	void SetObjectID(ObjectID id);
+	typedef unsigned int ObjectID;
 
-    protected:
+	class EngineObject
+	{
+		// all instances of EngineObject and classes that derive from
+		// EngineObject should have their life-cycle managed by EngineObjectManager
+		friend class EngineObjectManager;
 
-	EngineObject();
-	virtual ~EngineObject();
+		ObjectID objectID;
+		void SetObjectID(ObjectID id);
 
-    public:
+	protected:
 
-	ObjectID GetObjectID() const;
-};
+		EngineObject();
+		virtual ~EngineObject();
+
+	public:
+
+		ObjectID GetObjectID() const;
+	};
+}
 
 #endif

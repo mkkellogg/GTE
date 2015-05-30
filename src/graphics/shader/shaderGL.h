@@ -23,94 +23,96 @@
 #define _GTE_SHADER_GL_H_
 
 #include "graphics/gl_include.h"
-
-//forward declarations
-class ShaderSource;
-class GraphicsGL;
-class Texture;
-class AttributeDescriptor;
-class UniformDescriptor;
-
 #include "shader.h"
 #include <string>
 
-class ShaderGL : public Shader
+namespace GTE
 {
-    friend class GraphicsGL;
+	//forward declarations
+	class ShaderSource;
+	class GraphicsGL;
+	class Texture;
+	class AttributeDescriptor;
+	class UniformDescriptor;
 
-    // is this shader loaded, compiled and linked?
-    bool ready;
+	class ShaderGL : public Shader
+	{
+		friend class GraphicsGL;
 
-    std::string name;
+		// is this shader loaded, compiled and linked?
+		bool ready;
 
-    // OpenGL identifier for the linked shader program
-    GLuint programID;
+		std::string name;
 
-    // OpenGL identifier for the loaded and compiled vertex shader
-    GLuint vertexShaderID;
+		// OpenGL identifier for the linked shader program
+		GLuint programID;
 
-    // OpenGL identifier for the loaded and compiled fragment shader
-    GLuint fragmentShaderID;
+		// OpenGL identifier for the loaded and compiled vertex shader
+		GLuint vertexShaderID;
 
-    // number of attributes exposed by this shader
-    unsigned int attributeCount;
+		// OpenGL identifier for the loaded and compiled fragment shader
+		GLuint fragmentShaderID;
 
-    // number of uniforms exposed by this shader
-    unsigned int uniformCount;
+		// number of attributes exposed by this shader
+		unsigned int attributeCount;
 
-    // descriptors for this shader's attributes
-    AttributeDescriptor ** attributes;
+		// number of uniforms exposed by this shader
+		unsigned int uniformCount;
 
-    // descriptors for this shader's uniforms
-    UniformDescriptor ** uniforms;
+		// descriptors for this shader's attributes
+		AttributeDescriptor ** attributes;
 
-    void DestroyShaders();
-    void DestroyProgram();
-    void DestroyComponents();
-    void DestroyUniformAndAttributeInfo();
+		// descriptors for this shader's uniforms
+		UniformDescriptor ** uniforms;
 
-    char * GetShaderLog(GLuint obj);
-    char * GetProgramLog(GLuint obj);
-    bool CheckCompilation(int shaderID, ShaderType shaderType);
+		void DestroyShaders();
+		void DestroyProgram();
+		void DestroyComponents();
+		void DestroyUniformAndAttributeInfo();
 
-    bool StoreUniformAndAttributeInfo();
+		char * GetShaderLog(GLuint obj);
+		char * GetProgramLog(GLuint obj);
+		bool CheckCompilation(int shaderID, ShaderType shaderType);
 
-    protected:
+		bool StoreUniformAndAttributeInfo();
 
-    ShaderGL(const ShaderSource& shaderSource);
-    virtual ~ShaderGL();
+	protected:
 
-    public :
+		ShaderGL(const ShaderSource& shaderSource);
+		virtual ~ShaderGL();
 
-    bool Load();
-    bool IsLoaded();
-    int GetAttributeVarID(const std::string& varName) const;
-    int GetUniformVarID(const std::string& varName) const;
-    GLuint GetProgramID();
+	public:
 
-    void SendBufferToShader(int varID, VertexAttrBuffer * buffer);
+		bool Load();
+		bool IsLoaded();
+		int GetAttributeVarID(const std::string& varName) const;
+		int GetUniformVarID(const std::string& varName) const;
+		GLuint GetProgramID();
 
-    void SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture);
-    void SendUniformToShader(int varID, const Matrix4x4 * mat);
-    void SendUniformToShader(int varID, const Point3 * point);
-    void SendUniformToShader(int varID, const Vector3 * vector);
-    void SendUniformToShader(int varID, const Color4 * color);
+		void SendBufferToShader(int varID, VertexAttrBuffer * buffer);
 
-    void SendUniformToShader4v(int varID, const float * data);
-    void SendUniformToShader3v(int varID, const float * data);
-    void SendUniformToShader2v(int varID, const float * data);
-    void SendUniformToShader4(int varID, float x, float y, float z, float w);
-    void SendUniformToShader3(int varID, float x, float y, float z);
-    void SendUniformToShader2(int varID, float x, float y);
-    void SendUniformToShader(int varID, float  data);
+		void SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture);
+		void SendUniformToShader(int varID, const Matrix4x4 * mat);
+		void SendUniformToShader(int varID, const Point3 * point);
+		void SendUniformToShader(int varID, const Vector3 * vector);
+		void SendUniformToShader(int varID, const Color4 * color);
 
-    void SendUniformToShader(int varID, int  data);
+		void SendUniformToShader4v(int varID, const float * data);
+		void SendUniformToShader3v(int varID, const float * data);
+		void SendUniformToShader2v(int varID, const float * data);
+		void SendUniformToShader4(int varID, float x, float y, float z, float w);
+		void SendUniformToShader3(int varID, float x, float y, float z);
+		void SendUniformToShader2(int varID, float x, float y);
+		void SendUniformToShader(int varID, float  data);
 
-    unsigned int GetUniformCount() const;
-    const UniformDescriptor * GetUniformDescriptor(unsigned int index) const;
+		void SendUniformToShader(int varID, int  data);
 
-    unsigned int GetAttributeCount() const;
-    const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const;
-};
+		unsigned int GetUniformCount() const;
+		const UniformDescriptor * GetUniformDescriptor(unsigned int index) const;
+
+		unsigned int GetAttributeCount() const;
+		const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const;
+	};
+}
 
 #endif

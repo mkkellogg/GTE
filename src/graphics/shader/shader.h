@@ -15,64 +15,67 @@
 #ifndef _GTE_SHADER_H_
 #define _GTE_SHADER_H_
 
-// forward declarations
-class VertexAttrBuffer;
-class Matrix4x4;
-class Point3;
-class Vector3;
-class Color4;
-class Texture;
-class UniformDescriptor;
-class AttributeDescriptor;
-
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "shadersource.h"
 #include <string>
 
-enum class ShaderType
+namespace GTE
 {
-    Vertex,
-    Fragment
-};
+	// forward declarations
+	class VertexAttrBuffer;
+	class Matrix4x4;
+	class Point3;
+	class Vector3;
+	class Color4;
+	class Texture;
+	class UniformDescriptor;
+	class AttributeDescriptor;
 
-class Shader : public EngineObject
-{
-    protected: 
+	enum class ShaderType
+	{
+		Vertex,
+		Fragment
+	};
 
-    ShaderSource shaderSource;
+	class Shader : public EngineObject
+	{
+	protected:
 
-    public :
+		ShaderSource shaderSource;
 
-    Shader(const ShaderSource& shaderSource);
-    virtual ~Shader();
-    virtual bool Load() = 0;
-    virtual bool IsLoaded() = 0;
-    virtual int GetAttributeVarID(const std::string& varName) const = 0;
-    virtual int GetUniformVarID(const std::string& varName) const = 0;
-    virtual void SendBufferToShader(int varID, VertexAttrBuffer * buffer) = 0;
+	public:
 
-    virtual void SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture) = 0;
-    virtual void SendUniformToShader(int varID, const Matrix4x4 * mat) = 0;
-    virtual void SendUniformToShader(int varID, const Point3 * point) = 0;
-    virtual void SendUniformToShader(int varID, const Vector3 * vector) = 0;
-    virtual void SendUniformToShader(int varID, const Color4 * color) = 0;
+		Shader(const ShaderSource& shaderSource);
+		virtual ~Shader();
+		virtual bool Load() = 0;
+		virtual bool IsLoaded() = 0;
+		virtual int GetAttributeVarID(const std::string& varName) const = 0;
+		virtual int GetUniformVarID(const std::string& varName) const = 0;
+		virtual void SendBufferToShader(int varID, VertexAttrBuffer * buffer) = 0;
 
-    virtual void SendUniformToShader4v(int varID, const float * data) = 0;
-    virtual void SendUniformToShader3v(int varID, const float * data) = 0;
-    virtual void SendUniformToShader2v(int varID, const float * data) = 0;
-    virtual void SendUniformToShader4(int varID, float x, float y, float z, float w) = 0;
-    virtual void SendUniformToShader3(int varID, float x, float y, float z) = 0;
-    virtual void SendUniformToShader2(int varID, float x, float y) = 0;
-    virtual void SendUniformToShader(int varID, float  data) = 0;
+		virtual void SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture) = 0;
+		virtual void SendUniformToShader(int varID, const Matrix4x4 * mat) = 0;
+		virtual void SendUniformToShader(int varID, const Point3 * point) = 0;
+		virtual void SendUniformToShader(int varID, const Vector3 * vector) = 0;
+		virtual void SendUniformToShader(int varID, const Color4 * color) = 0;
 
-    virtual void SendUniformToShader(int varID, int  data) = 0;
+		virtual void SendUniformToShader4v(int varID, const float * data) = 0;
+		virtual void SendUniformToShader3v(int varID, const float * data) = 0;
+		virtual void SendUniformToShader2v(int varID, const float * data) = 0;
+		virtual void SendUniformToShader4(int varID, float x, float y, float z, float w) = 0;
+		virtual void SendUniformToShader3(int varID, float x, float y, float z) = 0;
+		virtual void SendUniformToShader2(int varID, float x, float y) = 0;
+		virtual void SendUniformToShader(int varID, float  data) = 0;
 
-    virtual unsigned int GetUniformCount() const = 0;
-    virtual const UniformDescriptor * GetUniformDescriptor(unsigned int index) const = 0;
+		virtual void SendUniformToShader(int varID, int  data) = 0;
 
-    virtual unsigned int GetAttributeCount() const = 0;
-    virtual const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const = 0;
-};
+		virtual unsigned int GetUniformCount() const = 0;
+		virtual const UniformDescriptor * GetUniformDescriptor(unsigned int index) const = 0;
+
+		virtual unsigned int GetAttributeCount() const = 0;
+		virtual const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const = 0;
+	};
+}
 
 #endif

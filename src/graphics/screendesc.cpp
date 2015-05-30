@@ -3,29 +3,32 @@
 
 #include "screendesc.h"
 
-ScreenDescriptor::ScreenDescriptor() : ScreenDescriptor(0,0)
+namespace GTE
 {
+	ScreenDescriptor::ScreenDescriptor() : ScreenDescriptor(0, 0)
+	{
 
-}
+	}
 
-ScreenDescriptor::ScreenDescriptor(int screenWidth, int screenHeight)
-{
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
-}
+	ScreenDescriptor::ScreenDescriptor(int screenWidth, int screenHeight)
+	{
+		this->screenWidth = screenWidth;
+		this->screenHeight = screenHeight;
+	}
 
-ScreenDescriptor::~ScreenDescriptor()
-{
+	ScreenDescriptor::~ScreenDescriptor()
+	{
 
-}
+	}
 
-int ScreenDescriptor::GetScreenWidth()
-{
-	return screenWidth;
-}
+	int ScreenDescriptor::GetScreenWidth()
+	{
+		return screenWidth;
+	}
 
-int ScreenDescriptor::getScreenHeight()
-{
-	return screenHeight;
+	int ScreenDescriptor::getScreenHeight()
+	{
+		return screenHeight;
+	}
 }
 

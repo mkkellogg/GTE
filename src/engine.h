@@ -14,87 +14,89 @@
 #ifndef _GTE_ENGINE_H_
 #define _GTE_ENGINE_H_
 
-//forward declarations
-class Graphics;
-class EngineObjectManager;
-class AnimationManager;
-class InputManager;
-class ErrorManager;
-class GraphicsAttributes;
-class RenderManager;
-
 #include <string>
 #include "object/enginetypes.h"
 
-
-class EngineCallbacks
+namespace GTE
 {
-    public:
+	//forward declarations
+	class Graphics;
+	class EngineObjectManager;
+	class AnimationManager;
+	class InputManager;
+	class ErrorManager;
+	class GraphicsAttributes;
+	class RenderManager;
 
-    virtual void OnInit() = 0;
-    virtual void OnQuit() = 0;
-    virtual void OnUpdate() = 0;
-    virtual void OnPreRender() = 0;
-    virtual ~EngineCallbacks();
-};
+	class EngineCallbacks
+	{
+	public:
 
-class Engine
-{
-	friend class Graphics;
-	friend class GraphicsGL;
+		virtual void OnInit() = 0;
+		virtual void OnQuit() = 0;
+		virtual void OnUpdate() = 0;
+		virtual void OnPreRender() = 0;
+		virtual ~EngineCallbacks();
+	};
 
-	// Singleton instance of Engine
-	static Engine * theInstance;
+	class Engine
+	{
+		friend class Graphics;
+		friend class GraphicsGL;
 
-	// Manages all objects that derive from EngineObject
-	EngineObjectManager * engineObjectManager;
+		// Singleton instance of Engine
+		static Engine * theInstance;
 
-	// Interface for all lower-level graphics-related functionality
-	Graphics * graphicsSystem;
+		// Manages all objects that derive from EngineObject
+		EngineObjectManager * engineObjectManager;
 
-	// Manages the rendering of the scene
-    RenderManager * renderManager;
+		// Interface for all lower-level graphics-related functionality
+		Graphics * graphicsSystem;
 
-	// Manages active animations
-	AnimationManager * animationManager;
+		// Manages the rendering of the scene
+		RenderManager * renderManager;
 
-	// Manages user input
-	InputManager * inputManager;
+		// Manages active animations
+		AnimationManager * animationManager;
 
-	// Manages/reports errors reported by any engine component
-	ErrorManager * errorManager;
+		// Manages user input
+		InputManager * inputManager;
 
-	// Registered call-backs for engine life-cycle events
-	EngineCallbacks * callbacks;
+		// Manages/reports errors reported by any engine component
+		ErrorManager * errorManager;
 
-	// flag that indicates the engine has been initialized
-	bool initialized;
+		// Registered call-backs for engine life-cycle events
+		EngineCallbacks * callbacks;
 
-	bool firstFrameEntered;
+		// flag that indicates the engine has been initialized
+		bool initialized;
 
-	Engine();
-    ~Engine();
+		bool firstFrameEntered;
 
-    void Update();
-    void Quit();
-    bool _Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
-    void _Start();
+		Engine();
+		~Engine();
 
-    public :
+		void Update();
+		void Quit();
+		bool _Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
+		void _Start();
 
-    static Engine * Instance();
-    static void ShutDown();
-    static bool Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
-    static void Start();
+	public:
 
-    bool IsInitialized() const;
+		static Engine * Instance();
+		static void ShutDown();
+		static bool Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
+		static void Start();
 
-    EngineObjectManager * GetEngineObjectManager();
-    Graphics * GetGraphicsSystem();
-    RenderManager * GetRenderManager();
-    AnimationManager * GetAnimationManager();
-    InputManager * GetInputManager();
-    ErrorManager * GetErrorManager();
-};
+		bool IsInitialized() const;
+
+		EngineObjectManager * GetEngineObjectManager();
+		Graphics * GetGraphicsSystem();
+		RenderManager * GetRenderManager();
+		AnimationManager * GetAnimationManager();
+		InputManager * GetInputManager();
+		ErrorManager * GetErrorManager();
+	};
+}
 
 #endif

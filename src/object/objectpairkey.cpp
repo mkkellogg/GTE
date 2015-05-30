@@ -6,14 +6,17 @@
 
 #include "objectpairkey.h"
 
-ObjectPairKey::ObjectPairKey()
+namespace GTE
 {
-	ObjectAID = 0;
-	ObjectBID = 0;
-}
+	ObjectPairKey::ObjectPairKey()
+	{
+		ObjectAID = 0;
+		ObjectBID = 0;
+	}
 
-ObjectPairKey::ObjectPairKey(ObjectID objectAID, ObjectID objectBID)
-{
-	ObjectAID = objectAID;
-	ObjectBID = objectBID;
+	ObjectPairKey::ObjectPairKey(ObjectID objectAID, ObjectID objectBID)
+	{
+		ObjectAID = objectAID;
+		ObjectBID = objectBID;
+	}
 }

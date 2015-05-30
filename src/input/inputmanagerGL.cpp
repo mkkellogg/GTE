@@ -12,73 +12,75 @@
 #include "util/time.h"
 #include "debug/gtedebug.h"
 
-InputManagerGL * _thisPtr = NULL;
-
-void _keyboardFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
+namespace GTE
 {
-    if(_thisPtr != NULL)
-    {
-        if(action == GLFW_PRESS || action == GLFW_REPEAT)_thisPtr->KeyboardFunction(key, scancode, mods);
-	else _thisPtr->KeyboardFunctionUp(key, scancode, mods);
-    }
-}
+	InputManagerGL * _thisPtr = NULL;
 
-InputManagerGL::InputManagerGL()
-{
-	_thisPtr = this;
-}
-
-InputManagerGL::~InputManagerGL()
-{
-
-}
-
-bool InputManagerGL::Init()
-{
-    Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-    GraphicsGL * graphicsGL = dynamic_cast<GraphicsGL*>(graphics);
-
-    ASSERT(graphicsGL != NULL, "InputManagerGL::Init -> Unable to cast to GraphicsGL.");
-	
-    GLFWwindow* window = graphicsGL->GetGLFWWindow();
-    glfwSetKeyCallback(window, _keyboardFunc);
-    return true;
-}
-
-void InputManagerGL::Update()
-{
-
-}
-
-void InputManagerGL::KeyboardFunction(int key, int scanCode, int mods)
-{
-	SetKeyState(GetKeyIndexFromCharacter(key), KeyState::Down);
-	SetOnKeyDown(GetKeyIndexFromCharacter(key), true);
-
-	DigitalInput input = MapSpecialInputToDigitalInput(key);
-	if(input != DigitalInput::None)
+	void _keyboardFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		this->SetDigitalInputState(input, true);
+		if (_thisPtr != NULL)
+		{
+			if (action == GLFW_PRESS || action == GLFW_REPEAT)_thisPtr->KeyboardFunction(key, scancode, mods);
+			else _thisPtr->KeyboardFunctionUp(key, scancode, mods);
+		}
 	}
 
-	//printf("key down: %d, scancode:%d\n", key, scanCode);
-}
-
-void InputManagerGL::KeyboardFunctionUp(int key, int scanCode, int mods)
-{
-	SetKeyState(GetKeyIndexFromCharacter(key), KeyState::Up);
-	//printf("key up: %d, x:%d, y:%d\n", key,x,y);
-
-	DigitalInput input = MapSpecialInputToDigitalInput(key);
-	if(input != DigitalInput::None)
+	InputManagerGL::InputManagerGL()
 	{
-		this->SetDigitalInputState(input, false);
+		_thisPtr = this;
 	}
-}
 
-/*
-void InputManagerGL::SpecialInput(int key, int x, int y)
-{
+	InputManagerGL::~InputManagerGL()
+	{
+
+	}
+
+	bool InputManagerGL::Init()
+	{
+		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
+		GraphicsGL * graphicsGL = dynamic_cast<GraphicsGL*>(graphics);
+
+		ASSERT(graphicsGL != NULL, "InputManagerGL::Init -> Unable to cast to GraphicsGL.");
+
+		GLFWwindow* window = graphicsGL->GetGLFWWindow();
+		glfwSetKeyCallback(window, _keyboardFunc);
+		return true;
+	}
+
+	void InputManagerGL::Update()
+	{
+
+	}
+
+	void InputManagerGL::KeyboardFunction(int key, int scanCode, int mods)
+	{
+		SetKeyState(GetKeyIndexFromCharacter(key), KeyState::Down);
+		SetOnKeyDown(GetKeyIndexFromCharacter(key), true);
+
+		DigitalInput input = MapSpecialInputToDigitalInput(key);
+		if (input != DigitalInput::None)
+		{
+			this->SetDigitalInputState(input, true);
+		}
+
+		//printf("key down: %d, scancode:%d\n", key, scanCode);
+	}
+
+	void InputManagerGL::KeyboardFunctionUp(int key, int scanCode, int mods)
+	{
+		SetKeyState(GetKeyIndexFromCharacter(key), KeyState::Up);
+		//printf("key up: %d, x:%d, y:%d\n", key,x,y);
+
+		DigitalInput input = MapSpecialInputToDigitalInput(key);
+		if (input != DigitalInput::None)
+		{
+			this->SetDigitalInputState(input, false);
+		}
+	}
+
+	/*
+	void InputManagerGL::SpecialInput(int key, int x, int y)
+	{
 	//printf("key: %d, x:%d, y:%d\n", key,x,y);
 
 	if( key >= 0)SetKeyState(MapSpecialInputToKeyIndex(key), KeyState::Down);
@@ -86,12 +88,12 @@ void InputManagerGL::SpecialInput(int key, int x, int y)
 	DigitalInput input = MapSpecialInputToDigitalInput(key);
 	if(input != DigitalInput::None)
 	{
-		this->SetDigitalInputState(input, true);
+	this->SetDigitalInputState(input, true);
 	}
-}
+	}
 
-void InputManagerGL::SpecialInputUp(int key, int x, int y)
-{
+	void InputManagerGL::SpecialInputUp(int key, int x, int y)
+	{
 	//printf("key: %d, x:%d, y:%d\n", key,x,y);
 
 	if( key >= 0)SetKeyState(MapSpecialInputToKeyIndex(key), KeyState::Up);
@@ -100,14 +102,14 @@ void InputManagerGL::SpecialInputUp(int key, int x, int y)
 
 	if(input != DigitalInput::None)
 	{
-		this->SetDigitalInputState(input, false);
+	this->SetDigitalInputState(input, false);
 	}
-}*/
+	}*/
 
-DigitalInput InputManagerGL::MapSpecialInputToDigitalInput(int key)
-{
-	switch(key)
+	DigitalInput InputManagerGL::MapSpecialInputToDigitalInput(int key)
 	{
+		switch (key)
+		{
 		case GLFW_KEY_LEFT:
 			return DigitalInput::Left;
 			break;
@@ -122,13 +124,13 @@ DigitalInput InputManagerGL::MapSpecialInputToDigitalInput(int key)
 			break;
 		default:
 			return DigitalInput::None;
+		}
 	}
-}
 
-int InputManagerGL::MapSpecialInputToKeyIndex(int key)
-{
-	switch(key)
+	int InputManagerGL::MapSpecialInputToKeyIndex(int key)
 	{
+		switch (key)
+		{
 		case  GLFW_KEY_F1:
 			return 256;
 			break;
@@ -192,14 +194,14 @@ int InputManagerGL::MapSpecialInputToKeyIndex(int key)
 		case  GLFW_KEY_INSERT:
 			return 276;
 			break;
+		}
+		return 0;
 	}
-	return 0;
-}
 
-int InputManagerGL::MapModifierToKeyIndex(int modifier)
-{
-	switch(modifier)
+	int InputManagerGL::MapModifierToKeyIndex(int modifier)
 	{
+		switch (modifier)
+		{
 		case GLFW_KEY_RIGHT_SHIFT:
 			return 320;
 			break;
@@ -219,96 +221,97 @@ int InputManagerGL::MapModifierToKeyIndex(int modifier)
 			return 325;
 			break;
 
+		}
+		return 0;
 	}
-	return 0;
-}
 
 
-unsigned int InputManagerGL::GetKeyIndexForNonCharacterKey(NonCharacterKey key)
-{
-	switch(key)
+	unsigned int InputManagerGL::GetKeyIndexForNonCharacterKey(NonCharacterKey key)
 	{
-	case NonCharacterKey::SpaceBar:
-		return KEY_SPACE_ASCII;
-		break;
-	case NonCharacterKey::Tab:
-		return KEY_TAB_ASCII;
-		break;
-	case NonCharacterKey::LeftShift:
-		return MapModifierToKeyIndex(GLFW_KEY_LEFT_SHIFT);
-		break;
-	case NonCharacterKey::RightShift:
-		return MapModifierToKeyIndex(GLFW_KEY_RIGHT_SHIFT);
-		break;
-	case NonCharacterKey::LeftCtrl:
-		return MapModifierToKeyIndex(GLFW_KEY_LEFT_CONTROL);
-		break;
-	case NonCharacterKey::RightCtrl:
-		return MapModifierToKeyIndex(GLFW_KEY_RIGHT_CONTROL);
-		break;
-	case NonCharacterKey::LeftAlt:
-		return MapModifierToKeyIndex(GLFW_KEY_LEFT_ALT);
-		break;
-	case NonCharacterKey::RightAlt:
-		return MapModifierToKeyIndex(GLFW_KEY_RIGHT_ALT);
-		break;
-	case NonCharacterKey::F1:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F1);
-		break;
-	case NonCharacterKey::F2:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F2);
-		break;
-	case NonCharacterKey::F3:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F3);
-		break;
-	case NonCharacterKey::F4:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F4);
-		break;
-	case NonCharacterKey::F5:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F5);
-		break;
-	case NonCharacterKey::F6:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F6);
-		break;
-	case NonCharacterKey::F7:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F7);
-		break;
-	case NonCharacterKey::F8:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F8);
-		break;
-	case NonCharacterKey::F9:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F9);
-		break;
-	case NonCharacterKey::F10:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F10);
-		break;
-	case NonCharacterKey::F11:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F11);
-		break;
-	case NonCharacterKey::F12:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_F12);
-		break;
-	case NonCharacterKey::PageUp:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_PAGE_UP);
-		break;
-	case NonCharacterKey::PageDown:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_PAGE_DOWN);
-		break;
-	case NonCharacterKey::Hone:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_HOME);
-		break;
-	case NonCharacterKey::End:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_END);
-		break;
-	case NonCharacterKey::Insert:
-		return MapSpecialInputToKeyIndex(GLFW_KEY_INSERT);
-		break;
+		switch (key)
+		{
+		case NonCharacterKey::SpaceBar:
+			return KEY_SPACE_ASCII;
+			break;
+		case NonCharacterKey::Tab:
+			return KEY_TAB_ASCII;
+			break;
+		case NonCharacterKey::LeftShift:
+			return MapModifierToKeyIndex(GLFW_KEY_LEFT_SHIFT);
+			break;
+		case NonCharacterKey::RightShift:
+			return MapModifierToKeyIndex(GLFW_KEY_RIGHT_SHIFT);
+			break;
+		case NonCharacterKey::LeftCtrl:
+			return MapModifierToKeyIndex(GLFW_KEY_LEFT_CONTROL);
+			break;
+		case NonCharacterKey::RightCtrl:
+			return MapModifierToKeyIndex(GLFW_KEY_RIGHT_CONTROL);
+			break;
+		case NonCharacterKey::LeftAlt:
+			return MapModifierToKeyIndex(GLFW_KEY_LEFT_ALT);
+			break;
+		case NonCharacterKey::RightAlt:
+			return MapModifierToKeyIndex(GLFW_KEY_RIGHT_ALT);
+			break;
+		case NonCharacterKey::F1:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F1);
+			break;
+		case NonCharacterKey::F2:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F2);
+			break;
+		case NonCharacterKey::F3:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F3);
+			break;
+		case NonCharacterKey::F4:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F4);
+			break;
+		case NonCharacterKey::F5:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F5);
+			break;
+		case NonCharacterKey::F6:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F6);
+			break;
+		case NonCharacterKey::F7:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F7);
+			break;
+		case NonCharacterKey::F8:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F8);
+			break;
+		case NonCharacterKey::F9:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F9);
+			break;
+		case NonCharacterKey::F10:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F10);
+			break;
+		case NonCharacterKey::F11:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F11);
+			break;
+		case NonCharacterKey::F12:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_F12);
+			break;
+		case NonCharacterKey::PageUp:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_PAGE_UP);
+			break;
+		case NonCharacterKey::PageDown:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_PAGE_DOWN);
+			break;
+		case NonCharacterKey::Hone:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_HOME);
+			break;
+		case NonCharacterKey::End:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_END);
+			break;
+		case NonCharacterKey::Insert:
+			return MapSpecialInputToKeyIndex(GLFW_KEY_INSERT);
+			break;
+		}
+
+		return 0;
 	}
 
-	return 0;
-}
-
-unsigned int InputManagerGL::GetKeyIndexFromCharacter(unsigned char key)
-{
-	return (unsigned int)key;
+	unsigned int InputManagerGL::GetKeyIndexFromCharacter(unsigned char key)
+	{
+		return (unsigned int)key;
+	}
 }

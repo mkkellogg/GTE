@@ -10,41 +10,44 @@
 #ifndef _GTE_MESH3D_FILTER_H_
 #define _GTE_MESH3D_FILTER_H_
 
-//forward declarations
-class EngineObjectManager;
-
 #include "object/engineobject.h"
 #include "object/sceneobjectcomponent.h"
 #include "object/enginetypes.h"
 #include <vector>
 
-class Mesh3DFilter : public SceneObjectComponent
+namespace GTE
 {
-	// Since this ultimately derives from EngineObject, we make this class
-	// a friend of EngineObjectManager, and the constructor & destructor
-	// protected so its life-cycle can be handled completely by EngineObjectManager.
-	friend class EngineObjectManager;
+	//forward declarations
+	class EngineObjectManager;
 
-	Mesh3DRef mesh;
+	class Mesh3DFilter : public SceneObjectComponent
+	{
+		// Since this ultimately derives from EngineObject, we make this class
+		// a friend of EngineObjectManager, and the constructor & destructor
+		// protected so its life-cycle can be handled completely by EngineObjectManager.
+		friend class EngineObjectManager;
 
-	// should [mesh] cast shadows?
-	bool castShadows;
-	// should this mesh receive shadows?
-	bool receiveShadows;
+		Mesh3DRef mesh;
 
-    Mesh3DFilter();
-    ~Mesh3DFilter();
+		// should [mesh] cast shadows?
+		bool castShadows;
+		// should this mesh receive shadows?
+		bool receiveShadows;
+
+		Mesh3DFilter();
+		~Mesh3DFilter();
 
 	public:
 
-    void SetMesh3D(Mesh3DRef mesh);
-    Mesh3DRef GetMesh3D();
+		void SetMesh3D(Mesh3DRef mesh);
+		Mesh3DRef GetMesh3D();
 
-    void SetCastShadows(bool castShadows);
-   bool GetCastShadows() const;
-   void SetReceiveShadows(bool receiveShadows);
-   bool GetReceiveShadows() const;
-};
+		void SetCastShadows(bool castShadows);
+		bool GetCastShadows() const;
+		void SetReceiveShadows(bool receiveShadows);
+		bool GetReceiveShadows() const;
+	};
+}
 
 #endif
 

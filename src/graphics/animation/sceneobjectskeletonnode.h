@@ -12,28 +12,31 @@
 #ifndef _GTE_SCENEOBJECT_BONE_H_
 #define _GTE_SCENEOBJECT_BONE_H_
 
-//forward declarations
-class Transform;
-
 #include "skeletonnode.h"
 #include <vector>
 #include <string>
 #include "object/enginetypes.h"
 
-class SceneObjectSkeletonNode : public SkeletonNode
+namespace GTE
 {
-	public :
+	//forward declarations
+	class Transform;
 
-	// target SceneObject
-	SceneObjectRef Target;
+	class SceneObjectSkeletonNode : public SkeletonNode
+	{
+	public:
 
-	SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex, const std::string& name);
-     ~SceneObjectSkeletonNode();
+		// target SceneObject
+		SceneObjectRef Target;
 
- 	const Transform * GetFullTransform() const;
- 	Transform * GetLocalTransform();
-     bool HasTarget() const;
-     SkeletonNode * FullClone() const;
-};
+		SceneObjectSkeletonNode(SceneObjectRef target, int boneIndex, const std::string& name);
+		~SceneObjectSkeletonNode();
+
+		const Transform * GetFullTransform() const;
+		Transform * GetLocalTransform();
+		bool HasTarget() const;
+		SkeletonNode * FullClone() const;
+	};
+}
 
 #endif

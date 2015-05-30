@@ -19,73 +19,76 @@
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
-/*
- * Default constructor.
- */
-Mesh3DFilter::Mesh3DFilter()
+namespace GTE
 {
-	castShadows = false;
-	receiveShadows = false;
-}
-
-/*
- * Cleanup.
- */
-Mesh3DFilter::~Mesh3DFilter()
-{
-
-}
-
-/*
- * Set this mesh filter's target mesh.
- */
-void Mesh3DFilter::SetMesh3D(Mesh3DRef mesh)
-{
-	this->mesh = mesh;
-
-	if(this->sceneObject.IsValid())
+	/*
+	* Default constructor.
+	*/
+	Mesh3DFilter::Mesh3DFilter()
 	{
-		sceneObject->NotifyNewMesh3D();
+		castShadows = false;
+		receiveShadows = false;
 	}
-}
 
-/*
- * Get the target mesh for this mesh filter.
- */
-Mesh3DRef Mesh3DFilter::GetMesh3D()
-{
-	return mesh;
-}
+	/*
+	 * Cleanup.
+	 */
+	Mesh3DFilter::~Mesh3DFilter()
+	{
 
-/*
- * Specify whether or not [mesh] should cast shadows.
- */
-void Mesh3DFilter::SetCastShadows(bool castShadows)
-{
-	this->castShadows = castShadows;
-}
+	}
 
-/*
- * Should [mesh] cast shadows?
- */
-bool Mesh3DFilter::GetCastShadows() const
-{
-	return castShadows;
-}
+	/*
+	 * Set this mesh filter's target mesh.
+	 */
+	void Mesh3DFilter::SetMesh3D(Mesh3DRef mesh)
+	{
+		this->mesh = mesh;
 
-/*
- * Specify whether or not [mesh] should receive shadows.
- */
-void Mesh3DFilter::SetReceiveShadows(bool receiveShadows)
-{
-	this->receiveShadows = receiveShadows;
-}
+		if (this->sceneObject.IsValid())
+		{
+			sceneObject->NotifyNewMesh3D();
+		}
+	}
 
-/*
- * Should [mesh] receive shadows?
- */
-bool Mesh3DFilter::GetReceiveShadows() const
-{
-	return receiveShadows;
+	/*
+	 * Get the target mesh for this mesh filter.
+	 */
+	Mesh3DRef Mesh3DFilter::GetMesh3D()
+	{
+		return mesh;
+	}
+
+	/*
+	 * Specify whether or not [mesh] should cast shadows.
+	 */
+	void Mesh3DFilter::SetCastShadows(bool castShadows)
+	{
+		this->castShadows = castShadows;
+	}
+
+	/*
+	 * Should [mesh] cast shadows?
+	 */
+	bool Mesh3DFilter::GetCastShadows() const
+	{
+		return castShadows;
+	}
+
+	/*
+	 * Specify whether or not [mesh] should receive shadows.
+	 */
+	void Mesh3DFilter::SetReceiveShadows(bool receiveShadows)
+	{
+		this->receiveShadows = receiveShadows;
+	}
+
+	/*
+	 * Should [mesh] receive shadows?
+	 */
+	bool Mesh3DFilter::GetReceiveShadows() const
+	{
+		return receiveShadows;
+	}
 }
 

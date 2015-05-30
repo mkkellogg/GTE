@@ -1,24 +1,27 @@
 #ifndef _GTE_VECTOR3_FACTORY_H_
 #define _GTE_VECTOR3_FACTORY_H_
 
-// forward declarations
-class Vector3;
-
 #include "base/basevector4factory.h"
 
-class Vector3Factory : public BaseVector4Factory
+namespace GTE
 {
-	static Vector3Factory * instance;
+	// forward declarations
+	class Vector3;
 
-    public:
+	class Vector3Factory : public BaseVector4Factory
+	{
+		static Vector3Factory * instance;
 
-	static Vector3Factory * Instance();
+	public:
 
-	Vector3Factory();
-    virtual ~Vector3Factory();
+		static Vector3Factory * Instance();
 
-    BaseVector4 * CreatePermAttached(float * target);
-    BaseVector4 ** CreateArray(int count);
-};
+		Vector3Factory();
+		virtual ~Vector3Factory();
+
+		BaseVector4 * CreatePermAttached(float * target);
+		BaseVector4 ** CreateArray(int count);
+	};
+}
 
 #endif

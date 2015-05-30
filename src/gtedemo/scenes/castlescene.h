@@ -1,20 +1,17 @@
 #ifndef _GTE_CASTLESCENE_H_
 #define _GTE_CASTLESCENE_H_
 
-//forward declarations
-class AssetImporter;
-class Vector3;
-class Quaternion;
-class LavaField;
-
 #include "gtedemo/scene.h"
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/transform.h"
+#include "asset/assetimporter.h"
 #include "base/intmask.h"
 #include <functional>
 #include <vector>
+
+using namespace GTE;
 
 class CastleScene : public Scene
 {

@@ -1,9 +1,3 @@
-//forward declarations
-class AssetImporter;
-class Vector3;
-class Quaternion;
-class LavaField;
-
 #include <functional>
 #include <vector>
 #include "lavascene.h"
@@ -334,7 +328,7 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 	Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
 	MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
 
-	// place initial castle wall in scene
+	// place initial pool wall in scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.06,.025,.04, false);
 	modelSceneObject->GetTransform().Translate(-10,-10,9.5,false);
@@ -363,7 +357,7 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 
 
-	// load castle wall model for pool walls
+	// load castle wall model for pool floor
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
 	ASSERT(modelSceneObject.IsValid(), "Could not load wall model!\n");
 	sceneRoot->AddChild(modelSceneObject);
@@ -371,14 +365,14 @@ void PoolScene::SetupStructures(AssetImporter& importer)
 
 	wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	wallBlockMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(35);
+	wallBlockMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(5);
 	wallBlockMesh->Update();
 
-	// place initial castle wall in scene
+	// place pool floor in scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Rotate(1,0,0,-90, true);
-	modelSceneObject->GetTransform().Scale(.15,.025,.175, false);
-	modelSceneObject->GetTransform().Translate(-5.5,-10.5,33,false);
+	modelSceneObject->GetTransform().Scale(.175,.175,.175, false);
+	modelSceneObject->GetTransform().Translate(-5.5,-17.5,33,false);
 }
 
 /*

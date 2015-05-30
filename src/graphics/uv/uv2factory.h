@@ -4,19 +4,22 @@
 #include "base/basevector2factory.h"
 #include "uv2.h"
 
-class UV2Factory : public BaseVector2Factory
+namespace GTE
 {
-	static UV2Factory * instance;
+	class UV2Factory : public BaseVector2Factory
+	{
+		static UV2Factory * instance;
 
-    public:
+	public:
 
-	static UV2Factory * GetInstance();
+		static UV2Factory * GetInstance();
 
-	UV2Factory();
-    virtual ~UV2Factory();
+		UV2Factory();
+		virtual ~UV2Factory();
 
-    virtual UV2 * CreatePermAttached(float * target);
-    virtual BaseVector2** CreateArray(int count);
-};
+		virtual UV2 * CreatePermAttached(float * target);
+		virtual BaseVector2** CreateArray(int count);
+	};
+}
 
 #endif

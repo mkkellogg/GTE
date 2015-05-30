@@ -33,6 +33,7 @@
 #include "object/enginetypes.h"
 #include "gameutil.h"
 
+using namespace GTE;
 
 /*
  * Recursively search the scene hierarchy starting at [ref] for an

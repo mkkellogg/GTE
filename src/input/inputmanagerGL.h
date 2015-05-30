@@ -1,32 +1,34 @@
 #ifndef _GTE_INPUT_MANAGER_GL_H_
 #define _GTE_INPUT_MANAGER_GL_H_
 
-//forward declarations
-
 #include <string>
 #include "inputmanager.h"
 #include "object/enginetypes.h"
 
-class InputManagerGL : public InputManager
+namespace GTE
 {
-	friend class Engine;
+
+	class InputManagerGL : public InputManager
+	{
+		friend class Engine;
 
 	protected:
 
-   InputManagerGL();
-    ~InputManagerGL();
-   DigitalInput MapSpecialInputToDigitalInput(int key);
-   int MapSpecialInputToKeyIndex(int key);
-   int MapModifierToKeyIndex(int modifier);
-    unsigned int GetKeyIndexForNonCharacterKey(NonCharacterKey key);
-    unsigned int GetKeyIndexFromCharacter(unsigned char key);
+		InputManagerGL();
+		~InputManagerGL();
+		DigitalInput MapSpecialInputToDigitalInput(int key);
+		int MapSpecialInputToKeyIndex(int key);
+		int MapModifierToKeyIndex(int modifier);
+		unsigned int GetKeyIndexForNonCharacterKey(NonCharacterKey key);
+		unsigned int GetKeyIndexFromCharacter(unsigned char key);
 
-    public :
+	public:
 
-    bool Init();
-    void Update();
-    void KeyboardFunction(int key, int scanCode, int mods);
-    void KeyboardFunctionUp(int key, int scanCode, int mods);
-};
+		bool Init();
+		void Update();
+		void KeyboardFunction(int key, int scanCode, int mods);
+		void KeyboardFunctionUp(int key, int scanCode, int mods);
+	};
+}
 
 #endif

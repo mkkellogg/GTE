@@ -25,6 +25,8 @@
 #include "util/time.h"
 #include "util/engineutility.h"
 
+using namespace GTE;
+
 /*
  * Initialize the lava field mesh and material, the textures used to render it, and load the
  * images that hold its displacement values.
