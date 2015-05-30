@@ -14,8 +14,6 @@
 #include "graphics/image/rawimage.h"
 #include "graphics/image/imageloader.h"
 
-using namespace GTE;
-
 class LavaField
 {
 	// the lava field mesh is divided into subDivisions x subDivisions sub-sections
@@ -40,7 +38,7 @@ class LavaField
 	// current offset/position of [lavaTextureB].
 	float textBOffset;
 	// SceneObject instance that holds the lava field mesh
-	SceneObjectRef lavaFieldObject;
+	GTE::SceneObjectRef lavaFieldObject;
 
 	// width/height of both displacementA & displacementB
 	const unsigned int diplacementImageDimensionSize=128;
@@ -50,16 +48,16 @@ class LavaField
 	float fieldHeight;
 
 	// material used to render the lava field mesh
-	MaterialRef lavaMaterial;
+	GTE::MaterialRef lavaMaterial;
 	// the lava field mesh
-	Mesh3DRef fieldMesh;
+	GTE::Mesh3DRef fieldMesh;
 	// both textures are combined in the shader for the lava field mesh
-	TextureRef lavaTextureA;
-	TextureRef lavaTextureB;
+	GTE::TextureRef lavaTextureA;
+	GTE::TextureRef lavaTextureB;
 	// first displacement map used is displacing the lava field mesh
-	RawImage * displacementA;
+	GTE::RawImage * displacementA;
 	// second displacement map used is displacing the lava field mesh
-	RawImage * displacementB;
+	GTE::RawImage * displacementB;
 
 	bool InitMeshAndMaterial();
 	void DisplaceField();
@@ -70,7 +68,7 @@ class LavaField
 	~LavaField();
 
 	bool Init();
-	SceneObjectRef GetSceneObject();
+	GTE::SceneObjectRef GetSceneObject();
 	void Update();
 
 	void SetDisplacementSpeed(float speed);

@@ -11,34 +11,32 @@
 #include <functional>
 #include <vector>
 
-using namespace GTE;
-
 class CastleScene : public Scene
 {
 	// the SceneObject instance at the root of the scene
-	SceneObjectRef sceneRoot;
+	GTE::SceneObjectRef sceneRoot;
 	// point lights in this scene
-	std::vector<SceneObjectRef> pointLights;
+	std::vector<GTE::SceneObjectRef> pointLights;
 	// global directional light
-	SceneObjectRef directionalLightObject;
+	GTE::SceneObjectRef directionalLightObject;
 
 	public:
 
 	CastleScene();
 	~CastleScene();
 
-	SceneObjectRef GetSceneRoot();
+	GTE::SceneObjectRef GetSceneRoot();
 	void OnActivate();
 	void Update();
-	void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject);
+	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject);
 
-	void SetupTerrain(AssetImporter& importer);
-	void SetupStructures(AssetImporter& importer);
-	void SetupPlants(AssetImporter& importer);
-	void SetupExtra(AssetImporter& importer);
-	void SetupLights(AssetImporter& importer, SceneObjectRef playerObject);
+	void SetupTerrain(GTE::AssetImporter& importer);
+	void SetupStructures(GTE::AssetImporter& importer);
+	void SetupPlants(GTE::AssetImporter& importer);
+	void SetupExtra(GTE::AssetImporter& importer);
+	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject);
 
-	std::vector<SceneObjectRef>& GetPointLights();
+	std::vector<GTE::SceneObjectRef>& GetPointLights();
 };
 
 #endif

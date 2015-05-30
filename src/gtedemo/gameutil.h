@@ -15,23 +15,20 @@
 #include "graphics/stdattributes.h"
 #include "base/intmask.h"
 
-using namespace GTE;
-
 class GameUtil
 {
 	public:
 
-	static void ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func);
-	static SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(SceneObjectRef ref);
-	static SceneObjectRef FindFirstSceneObjectWithMesh(SceneObjectRef ref);
-	static void SetAllObjectsStatic(SceneObjectRef root);
-	static void SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask);
-	static void SetAllMeshesStandardShadowVolume(SceneObjectRef root);
-	static void SetAllObjectsCastShadows(SceneObjectRef root, bool castShadows);
+		static void ProcessSceneObjects(GTE::SceneObjectRef ref, std::function<void(GTE::SceneObjectRef)> func);
+		static GTE::SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(GTE::SceneObjectRef ref);
+		static GTE::SceneObjectRef FindFirstSceneObjectWithMesh(GTE::SceneObjectRef ref);
+		static void SetAllObjectsStatic(GTE::SceneObjectRef root);
+		static void SetAllObjectsLayerMask(GTE::SceneObjectRef root, GTE::IntMask mask);
+		static void SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root);
+		static void SetAllObjectsCastShadows(GTE::SceneObjectRef root, bool castShadows);
 
-	static SceneObjectRef AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz,
+		static GTE::SceneObjectRef AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz,
 									  bool isStatic, bool castShadows, bool receiveShadows);
-
 };
 
 #endif

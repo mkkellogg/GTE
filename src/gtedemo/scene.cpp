@@ -7,11 +7,9 @@
 #include <functional>
 #include <vector>
 
-using namespace GTE;
-
 Scene::Scene()
 {
-	baseCameraForward = Vector3::Forward;
+	baseCameraForward = GTE::Vector3::Forward;
 }
 
 Scene::~Scene()

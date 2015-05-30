@@ -19,23 +19,22 @@
 #include <functional>
 #include <vector>
 
-using namespace GTE;
-
 class Scene
 {
 	protected:
 
-	Vector3 baseCameraForward;
+	GTE::Vector3 baseCameraForward;
 
 	public:
 
 	Scene();
 	virtual ~Scene();
 
-	virtual SceneObjectRef GetSceneRoot() = 0;
+	virtual GTE::SceneObjectRef GetSceneRoot() = 0;
 	virtual void OnActivate() = 0;
 	virtual void Update() = 0;
-	virtual void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject) = 0;
+	virtual void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, 
+					   GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject) = 0;
 };
 
 #endif

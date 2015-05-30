@@ -144,6 +144,7 @@ namespace GTE
 		SubMesh3DRenderer(bool buffersOnGPU, AttributeTransformer * attributeTransformer);
 		virtual ~SubMesh3DRenderer();
 
+		bool ShouldUpdateFromMesh();
 		void CopyMeshData();
 		void UpdateTimeStamp();
 

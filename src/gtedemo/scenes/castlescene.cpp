@@ -42,8 +42,6 @@
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
 
-using namespace GTE;
-
 /*
  * Constructor - initialize member variables.
  */
@@ -63,7 +61,7 @@ CastleScene::~CastleScene()
 /*
  * Get the SceneObject instance at the root of the scene.
  */
-SceneObjectRef CastleScene::GetSceneRoot()
+GTE::SceneObjectRef CastleScene::GetSceneRoot()
 {
 	return sceneRoot;
 }
@@ -93,12 +91,12 @@ void CastleScene::Update()
  * [directLightObject] - Global scene object that contains the global directional light.
  * [playerObject] - Scene object that contains the player mesh & renderer.
  */
-void CastleScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject)
+void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject)
 {
-	importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
+	importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
 
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	sceneRoot = objectManager->CreateSceneObject();
 	ASSERT(sceneRoot.IsValid(), "Could not create scene root for castle scene!\n");
@@ -121,10 +119,10 @@ void CastleScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObje
 /*
 * Set up the "land" elements in the scene.
 */
-void CastleScene::SetupTerrain(AssetImporter& importer)
+void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	SceneObjectRef modelSceneObject;
+	GTE::SceneObjectRef modelSceneObject;
 
 	//========================================================
 	//
@@ -147,10 +145,10 @@ void CastleScene::SetupTerrain(AssetImporter& importer)
 /*
 * Set up all the man-made structures, buildings, etc. in the scene.
 */
-void CastleScene::SetupStructures(AssetImporter& importer)
+void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	SceneObjectRef modelSceneObject;
+	GTE::SceneObjectRef modelSceneObject;
 
 	//========================================================
 	//
@@ -165,10 +163,10 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract mesh & material from castle tower model
-	SceneObjectRef tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
-	Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
-	MaterialRef towerMaterial = towerRenderer->GetMaterial(0);
+	GTE::SceneObjectRef tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef towerMaterial = towerRenderer->GetMaterial(0);
 
 	// place initial castle tower in scene
 	modelSceneObject->SetActive(true);
@@ -210,10 +208,10 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract mesh & material from castle wall model
-	SceneObjectRef wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
-	MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
+	GTE::SceneObjectRef wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
 
 	// place initial castle wall in scene
 	modelSceneObject->SetActive(true);
@@ -242,10 +240,10 @@ void CastleScene::SetupStructures(AssetImporter& importer)
 /*
 * Add all the plants to the scene.
 */
-void CastleScene::SetupPlants(AssetImporter& importer)
+void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	SceneObjectRef modelSceneObject;
+	GTE::SceneObjectRef modelSceneObject;
 
 	//========================================================
 	//
@@ -261,10 +259,10 @@ void CastleScene::SetupPlants(AssetImporter& importer)
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
 
 	// extract tree mesh & material
-	SceneObjectRef treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
-	Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
-	MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
+	GTE::SceneObjectRef treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
 
 	// place initial tree in the scene
 	modelSceneObject->SetActive(true);
@@ -299,10 +297,10 @@ void CastleScene::SetupPlants(AssetImporter& importer)
 /*
 * Add miscellaneous elements to the scene.
 */
-void CastleScene::SetupExtra(AssetImporter& importer)
+void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 {
 	// misc. reference variables
-	SceneObjectRef modelSceneObject;
+	GTE::SceneObjectRef modelSceneObject;
 
 	//========================================================
 	//
@@ -317,10 +315,10 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract fence mesh & material
-	SceneObjectRef fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
-	Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
-	MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
+	GTE::SceneObjectRef fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
 
 	// place initial fence in the scene
 	modelSceneObject->SetActive(true);
@@ -374,10 +372,10 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract barrel mesh and material
-	SceneObjectRef barrelMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef barrelMesh = barrelMeshObject->GetMesh3D();
-	Mesh3DRendererRef barrelRenderer = barrelMeshObject->GetMesh3DRenderer();
-	MaterialRef barrelMaterial = barrelRenderer->GetMaterial(0);
+	GTE::SceneObjectRef barrelMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef barrelMesh = barrelMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef barrelRenderer = barrelMeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef barrelMaterial = barrelRenderer->GetMaterial(0);
 
 	// place initial barrel in the scene
 	modelSceneObject->SetActive(true);
@@ -398,7 +396,7 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 
 
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	//========================================================
 	//
@@ -407,45 +405,45 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 	//========================================================
 
 	// create instance of SceneObject to hold the cube mesh and its renderer
-	SceneObjectRef cubeSceneObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectRef cubeSceneObject = objectManager->CreateSceneObject();
 	cubeSceneObject->SetStatic(true);
 	sceneRoot->AddChild(cubeSceneObject);
 
 	// load texture for the cube
-	TextureAttributes texAttributes;
-	texAttributes.FilterMode = TextureFilter::TriLinear;
+	GTE::TextureAttributes texAttributes;
+	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
-	TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
+	GTE::TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
+	GTE::TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
 
 
 	// create the cube's material using the "basic" built-in shader
-	ShaderSource basicShaderSource;
-	importer.LoadBuiltInShaderSource("basic", basicShaderSource);
-	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
+	GTE::ShaderSource basicShaderSource;
+	importer.LoadBuiltInShaderSource("basic_normal", basicShaderSource);
+	GTE::MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
 	material->SetTexture(normalmap, "NORMALMAP");
 	material->SetUniform1f(3.4, "USCALE");
 	material->SetUniform1f(3.4, "VSCALE");
 
 	// set the cube mesh attributes
-	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Tangent);
+	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Position);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture0);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::VertexColor);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Tangent);
 
 	// create the cube mesh
-	Mesh3DRef cubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
-	Mesh3DFilterRef cubeMeshfilter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DRef cubeMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
+	GTE::Mesh3DFilterRef cubeMeshfilter = objectManager->CreateMesh3DFilter();
 	cubeSceneObject->SetMesh3DFilter(cubeMeshfilter);
 	cubeMeshfilter->SetMesh3D(cubeMesh);
 	cubeMeshfilter->SetCastShadows(false);
 	cubeMeshfilter->SetReceiveShadows(true);
 
 	// create the cube mesh's renderer
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
 	cubeSceneObject->SetMesh3DRenderer(renderer);
 
@@ -457,18 +455,18 @@ void CastleScene::SetupExtra(AssetImporter& importer)
 /*
 * Set up the lights that belong to thsi scene.
 */
-void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject)
+void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject)
 {
-	SceneObjectRef sceneObject;
+	GTE::SceneObjectRef sceneObject;
 
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	// create material for light meshes
-	ShaderSource selfLitShaderSource;
+	GTE::ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("selflit", selfLitShaderSource);
-	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
-	selflitMaterial->SetColor(Color4(1,1,1,1), "SELFCOLOR");
+	GTE::MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
+	selflitMaterial->SetColor(GTE::Color4(1, 1, 1, 1), "SELFCOLOR");
 
 	//========================================================
 	//
@@ -476,38 +474,38 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	//
 	//========================================================
 
-	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Position);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
 
 	// create mesh & material for castle lantern
-	Mesh3DRef lanternLightMesh = EngineUtility::CreateCubeMesh(meshAttributes);
-	Color4 lanternLightColor(1,.66,.231,1);
-	Color4 lanternLightMeshColor(1,.95,.5,1);
-	MaterialRef lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
+	GTE::Mesh3DRef lanternLightMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
+	GTE::Color4 lanternLightColor(1, .66, .231, 1);
+	GTE::Color4 lanternLightMeshColor(1, .95, .5, 1);
+	GTE::MaterialRef lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
 	lanterLightMeshMaterial->SetColor(lanternLightMeshColor, "SELFCOLOR");
 	lanterLightMeshMaterial->SetSelfLit(true);
 
 	// create castle center lantern
-	SceneObjectRef lanternObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectRef lanternObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(lanternObject);
 	lanternObject->SetStatic(true);
-	LightRef lanternLight = objectManager->CreateLight();
+	GTE::LightRef lanternLight = objectManager->CreateLight();
 	lanternLight->SetIntensity(1.8);
 	lanternLight->SetRange(25);
 	lanternLight->SetColor(lanternLightColor);
-	IntMask mergedMask = lanternLight->GetCullingMask();
+	GTE::IntMask mergedMask = lanternLight->GetCullingMask();
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
 	lanternLight->SetCullingMask(mergedMask);
 	lanternLight->SetShadowsEnabled(true);
-	lanternLight->SetType(LightType::Point);
+	lanternLight->SetType(GTE::LightType::Point);
 	lanternObject->SetLight(lanternLight);
 	lanternObject->GetTransform().Scale(.2,.2,.2, true);
 	lanternObject->GetTransform().Translate(75.2, -6, -5, false);
-	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);
-	Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
 	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
 	pointLights.push_back(lanternObject);
@@ -524,7 +522,7 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
 	lanternLight->SetCullingMask(mergedMask);
 	lanternLight->SetShadowsEnabled(true);
-	lanternLight->SetType(LightType::Point);
+	lanternLight->SetType(GTE::LightType::Point);
 	lanternObject->SetLight(lanternLight);
 	lanternObject->GetTransform().Scale(.2,.2,.2, true);
 	lanternObject->GetTransform().Translate(77.4, -5, 8.7, false);
@@ -537,7 +535,7 @@ void CastleScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObje
 	pointLights.push_back(lanternObject);
 }
 
-std::vector<SceneObjectRef>& CastleScene::GetPointLights()
+std::vector<GTE::SceneObjectRef>& CastleScene::GetPointLights()
 {
 	return pointLights;
 }

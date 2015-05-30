@@ -33,27 +33,25 @@
 #include "object/enginetypes.h"
 #include "gameutil.h"
 
-using namespace GTE;
-
 /*
  * Recursively search the scene hierarchy starting at [ref] for an
  * instance of SceneObject that contains a SkinnedMesh3DRenderer component,
  * but return just the SkinnedMesh3DRenderer instance.
  */
-SkinnedMesh3DRendererRef GameUtil::FindFirstSkinnedMeshRenderer(SceneObjectRef ref)
+GTE::SkinnedMesh3DRendererRef GameUtil::FindFirstSkinnedMeshRenderer(GTE::SceneObjectRef ref)
 {
-	if(!ref.IsValid())return SkinnedMesh3DRendererRef::Null();
+	if (!ref.IsValid())return GTE::SkinnedMesh3DRendererRef::Null();
 
 	if(ref->GetSkinnedMesh3DRenderer().IsValid())return ref->GetSkinnedMesh3DRenderer();
 
 	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
 	{
-		SceneObjectRef childRef = ref->GetChildAt(i);
-		SkinnedMesh3DRendererRef subRef = FindFirstSkinnedMeshRenderer(childRef);
+		GTE::SceneObjectRef childRef = ref->GetChildAt(i);
+		GTE::SkinnedMesh3DRendererRef subRef = FindFirstSkinnedMeshRenderer(childRef);
 		if(subRef.IsValid())return subRef;
 	}
 
-	return SkinnedMesh3DRendererRef::Null();
+	return GTE::SkinnedMesh3DRendererRef::Null();
 }
 
 
@@ -62,27 +60,27 @@ SkinnedMesh3DRendererRef GameUtil::FindFirstSkinnedMeshRenderer(SceneObjectRef r
  * instance of SceneObject that contains a Mesh3D component, and return
  * the containing SceneObject instance.
  */
-SceneObjectRef GameUtil::FindFirstSceneObjectWithMesh(SceneObjectRef ref)
+GTE::SceneObjectRef GameUtil::FindFirstSceneObjectWithMesh(GTE::SceneObjectRef ref)
 {
-	if(!ref.IsValid())return SceneObjectRef::Null();
+	if (!ref.IsValid())return GTE::SceneObjectRef::Null();
 
 	if(ref->GetMesh3D().IsValid())return ref;
 
 	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
 	{
-		SceneObjectRef childRef = ref->GetChildAt(i);
-		SceneObjectRef subRef = FindFirstSceneObjectWithMesh(childRef);
+		GTE::SceneObjectRef childRef = ref->GetChildAt(i);
+		GTE::SceneObjectRef subRef = FindFirstSceneObjectWithMesh(childRef);
 		if(subRef.IsValid())return subRef;
 	}
 
-	return SceneObjectRef::Null();
+	return GTE::SceneObjectRef::Null();
 }
 
 /*
  * Recursively visit objects in the scene hierarchy with root at [ref] and for each
  * invoke [func] with the current SceneObject instance as the only parameter.
  */
-void GameUtil::ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneObjectRef)> func)
+void GameUtil::ProcessSceneObjects(GTE::SceneObjectRef ref, std::function<void(GTE::SceneObjectRef)> func)
 {
 	if(!ref.IsValid())return;
 
@@ -91,7 +89,7 @@ void GameUtil::ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneO
 
 	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
 	{
-		SceneObjectRef childRef = ref->GetChildAt(i);
+		GTE::SceneObjectRef childRef = ref->GetChildAt(i);
 		ProcessSceneObjects(childRef, func);
 	}
 }
@@ -99,9 +97,9 @@ void GameUtil::ProcessSceneObjects(SceneObjectRef ref, std::function<void(SceneO
 /*
  * Set the SceneObject [root] and all children to be static.
  */
-void GameUtil::SetAllObjectsStatic(SceneObjectRef root)
+void GameUtil::SetAllObjectsStatic(GTE::SceneObjectRef root)
 {
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
+	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
 	{
 		current->SetStatic(true);
 	});
@@ -110,9 +108,9 @@ void GameUtil::SetAllObjectsStatic(SceneObjectRef root)
 /*
  * Set the SceneObject [root] and all children to have layer mask [mask].
  */
-void GameUtil::SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask)
+void GameUtil::SetAllObjectsLayerMask(GTE::SceneObjectRef root, GTE::IntMask mask)
 {
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
+	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
 	{
 		current->SetLayerMask(mask);
 	});
@@ -122,11 +120,11 @@ void GameUtil::SetAllObjectsLayerMask(SceneObjectRef root, IntMask mask)
  * Set any mesh encountered in the scene hierarchy beginning with [root]
  * to use the standard shadow volume generation algorithm.
  */
-void GameUtil::SetAllMeshesStandardShadowVolume(SceneObjectRef root)
+void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root)
 {
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
+	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
 	{
-		SkinnedMesh3DRendererRef skinnedRenderer = current->GetSkinnedMesh3DRenderer();
+		GTE::SkinnedMesh3DRendererRef skinnedRenderer = current->GetSkinnedMesh3DRenderer();
 		if(skinnedRenderer.IsValid())
 		{
 			for(unsigned int i = 0; i < skinnedRenderer->GetSubRendererCount(); i++)
@@ -135,7 +133,7 @@ void GameUtil::SetAllMeshesStandardShadowVolume(SceneObjectRef root)
 			}
 		}
 
-		Mesh3DRendererRef renderer = current->GetMesh3DRenderer();
+		GTE::Mesh3DRendererRef renderer = current->GetMesh3DRenderer();
 		if(renderer.IsValid())
 		{
 			for(unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
@@ -150,11 +148,11 @@ void GameUtil::SetAllMeshesStandardShadowVolume(SceneObjectRef root)
  * Set any mesh encountered in the scene hierarchy beginning with [root]
  * to set shadow casting to [castShadows].
  */
-void GameUtil::SetAllObjectsCastShadows(SceneObjectRef root, bool castShadows)
+void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, bool castShadows)
 {
-	ProcessSceneObjects(root, [=](SceneObjectRef current)
+	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
 	{
-		Mesh3DFilterRef filter = current->GetMesh3DFilter();
+		GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
 		if(filter.IsValid())
 		{
 			filter->SetCastShadows(castShadows);
@@ -170,18 +168,18 @@ void GameUtil::SetAllObjectsCastShadows(SceneObjectRef root, bool castShadows)
  *
  * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
  */
-SceneObjectRef GameUtil::AddMeshToScene(Mesh3DRef mesh, MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra,
+GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra,
 									float tx, float ty, float tz, bool isStatic, bool castShadows, bool receiveShadows)
 {
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+	GTE::SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();
 	meshSceneObject->SetActive(true);
-	Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
 	meshFilter->SetMesh3D(mesh);
 	meshFilter->SetCastShadows(castShadows);
 	meshFilter->SetReceiveShadows(receiveShadows);
 	meshSceneObject->SetMesh3DFilter(meshFilter);
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
 	meshSceneObject->SetMesh3DRenderer(renderer);
 

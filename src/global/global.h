@@ -16,28 +16,28 @@
   }                                        \
 }
 
-#define SAFE_DELETE_DEBUG(ptr, msg)        \
-{                                          \
-  if((ptr) != NULL){                       \
-  	delete (ptr);					       \
-    (ptr) = NULL;						   \
-  }										   \
-  else									   \
-  {										   \
-	  Debug::PrintError(msg);              \
-  }										   \
+#define SAFE_DELETE_DEBUG(ptr, msg)               \
+{                                                 \
+  if((ptr) != NULL){                              \
+  	delete (ptr);					              \
+    (ptr) = NULL;						          \
+  }										          \
+  else									          \
+  {										          \
+	  ::GTE::Debug::PrintError(msg);              \
+  }										          \
 }
 
-#define ASSERT(exp, msg)    				\
-{										   	\
-	if(!(exp))					     		\
-	{										\
-		Debug::PrintError((msg));			\
-		exit(-1);							\
-	}									   	\
-    else                                    \
-    {                                       \
-    }                                       \
+#define ASSERT(exp, msg)    				        \
+{										   	        \
+	if(!(exp))					     		        \
+	{										        \
+		::GTE::Debug::PrintError((msg));			\
+		exit(-1);							        \
+	}									   	        \
+    else                                            \
+    {                                               \
+    }                                               \
 }
 
 #define GET_NONFATAL_ASSERT_RTRN_MACRO(_1,_2,_3,_4,_5, NAME,...) NAME
@@ -47,23 +47,23 @@
 {										   																	\
 	if(!(exp))					     			 															\
 	{																										\
-		Engine::Instance()->GetErrorManager()->SetError((errCode), (msg));    								\
-		Debug::PrintAtLevel((msg), DebugLevel::Error);														\
+		::GTE::Engine::Instance()->GetErrorManager()->SetError((errCode), (msg));    						\
+		::GTE::Debug::PrintAtLevel((msg), ::GTE::DebugLevel::Error);										\
 		return (returnExp);			       		 															\
 	}									   		 															\
 }
 
-#define NONFATAL_ASSERT_RTRN4(exp, msg, returnExp, reset)             										\
-{										   		 															\
-	if(!(exp))					     			 															\
-	{																										\
-		Engine::Instance()->GetErrorManager()->SetError((int)ErrorCode::GENERAL_NONFATAL, (msg));  			\
-		Debug::PrintAtLevel((msg), DebugLevel::Error);														\
-		return (returnExp);			       																	\
-	}									   																	\
-	else																	                                \
-	{																								        \
-	}																										\
+#define NONFATAL_ASSERT_RTRN4(exp, msg, returnExp, reset)             												\
+{										   		 																	\
+	if(!(exp))					     			 																	\
+	{																												\
+		::GTE::Engine::Instance()->GetErrorManager()->SetError((int)::GTE::ErrorCode::GENERAL_NONFATAL, (msg));     \
+		::GTE::Debug::PrintAtLevel((msg), DebugLevel::Error);														\
+		return (returnExp);			       																			\
+	}									   																			\
+	else																	                                		\
+	{																								        		\
+	}																												\
 }
 
 #define GET_NONFATAL_ASSERT_MACRO(_1,_2,_3,_4, NAME,...) NAME
@@ -73,8 +73,8 @@
 {										   		 										\
 	if(!(exp))					     			 										\
 	{																					\
-		Engine::Instance()->GetErrorManager()->SetError((errCode), (msg));    			\
-		Debug::PrintAtLevel((msg), DebugLevel::Error);									\
+		::GTE::Engine::Instance()->GetErrorManager()->SetError((errCode), (msg));    	\
+		::GTE::Debug::PrintAtLevel((msg), ::GTE::DebugLevel::Error);					\
 		return;			       			 												\
 	}									   		 				    					\
 	else																	            \
@@ -82,17 +82,17 @@
 	}																					\
 }
 
-#define NONFATAL_ASSERT3(exp, msg, reset)        	         											\
-{										   																\
-	if(!(exp))					     			 														\
-	{									   		 														\
-		Engine::Instance()->GetErrorManager()->SetError((int)ErrorCode::GENERAL_NONFATAL, (msg)); 		\
-		Debug::PrintAtLevel((msg), DebugLevel::Error);													\
-		return;			       		 			 														\
-	}									   		 														\
-	else																	                            \
-	{																								    \
-	}																									\
+#define NONFATAL_ASSERT3(exp, msg, reset)        	         														\
+{										   																			\
+	if(!(exp))					     			 																	\
+	{									   		 																	\
+		::GTE::Engine::Instance()->GetErrorManager()->SetError((int)::GTE::ErrorCode::GENERAL_NONFATAL, (msg)); 	\
+		::GTE::Debug::PrintAtLevel((msg), ::GTE::DebugLevel::Error);												\
+		return;			       		 			 																	\
+	}									   		 																	\
+	else																											\
+	{																												\
+	}																												\
 }
 
 namespace GTE

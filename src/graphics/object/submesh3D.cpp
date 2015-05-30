@@ -61,6 +61,7 @@ namespace GTE
 		calculateNormals = true;
 		calculateTangents = true;
 
+		SetDirty(true);
 		UpdateTimeStamp();
 	}
 
@@ -554,6 +555,16 @@ namespace GTE
 		return true;
 	}
 
+	void SubMesh3D::SetDirty(bool isDirty)
+	{
+		this->isDirty = isDirty;
+	}
+
+	bool SubMesh3D::IsDirty()
+	{
+		return isDirty;
+	}
+
 	/*
 	 * Tell this mesh whether or not to calculate its own normals.
 	 */
@@ -651,6 +662,7 @@ namespace GTE
 			containerMesh->CalculateSphereOfInfluence();
 		}
 
+		SetDirty(true);
 		UpdateTimeStamp();
 	}
 
@@ -660,6 +672,7 @@ namespace GTE
 	 */
 	void SubMesh3D::QuickUpdate()
 	{
+		SetDirty(true);
 		UpdateTimeStamp();
 	}
 	/*

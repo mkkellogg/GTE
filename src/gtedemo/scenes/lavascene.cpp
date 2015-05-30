@@ -71,7 +71,7 @@ LavaScene::~LavaScene()
 /*
  * Get the SceneObject instance at the root of the scene.
  */
-SceneObjectRef LavaScene::GetSceneRoot()
+GTE::SceneObjectRef LavaScene::GetSceneRoot()
 {
 	return sceneRoot;
 }
@@ -90,13 +90,13 @@ void LavaScene::OnActivate()
  */
 void LavaScene::Update()
 {
-	Point3 lightRotatePoint(-20,5,10);
+	GTE::Point3 lightRotatePoint(-20, 5, 10);
 	// rotate the point light around [lightRotatePoint]
-	spinningPointLightObject->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z,0,1,0,60 * Time::GetDeltaTime(), false);
+	spinningPointLightObject->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z, 0, 1, 0, 60 * GTE::Time::GetDeltaTime(), false);
 	//pointLightObject->SetActive(false);
 
 	// rotate the cube around its center and the y-axis
-	cubeSceneObject->GetTransform().Rotate(0,1,0,20 * Time::GetDeltaTime(), true);
+	cubeSceneObject->GetTransform().Rotate(0, 1, 0, 20 * GTE::Time::GetDeltaTime(), true);
 
 	if(lavaField->GetSceneObject()->IsActive())lavaField->Update();
 }
@@ -108,14 +108,14 @@ void LavaScene::Update()
  * [directLightObject] - Global scene object that contains the global directional light.
  * [playerObject] - Scene object that contains the player mesh & renderer.
  */
-void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject)
+void LavaScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject)
 {
-	importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
+	importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
 
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
-	LayerManager& layerManager = objectManager->GetLayerManager();
+	GTE::LayerManager& layerManager = objectManager->GetLayerManager();
 	int lavaWallLayerIndex = layerManager.AddLayer(LavaWallLayer);
 	int lavaIslandLayerIndex = layerManager.AddLayer(LavaIslandLayer);
 	int lavaIslandObjectsLayerIndex = layerManager.AddLayer(LavaIslandObjectsLayer);
@@ -124,16 +124,16 @@ void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject
 	lavaIslandLayerMask = layerManager.GetLayerMask(lavaIslandLayerIndex);
 	lavaIslandObjectsLayerMask = layerManager.GetLayerMask(lavaIslandObjectsLayerIndex);
 
-	IntMask mergedMask;
+	GTE::IntMask mergedMask;
 
-	LightRef ambientLight = ambientLightObject->GetLight();
+	GTE::LightRef ambientLight = ambientLightObject->GetLight();
 	mergedMask = ambientLight->GetCullingMask();
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandLayerMask);
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandObjectsLayerMask);
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaWallLayerMask);
 	ambientLight->SetCullingMask(mergedMask);
 
-	LightRef directionalLight = directionalLightObject->GetLight();
+	GTE::LightRef directionalLight = directionalLightObject->GetLight();
 	mergedMask = directionalLight->GetCullingMask();
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandLayerMask);
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandObjectsLayerMask);
@@ -157,10 +157,10 @@ void LavaScene::Setup(AssetImporter& importer, SceneObjectRef ambientLightObject
 /*
 * Set up the "land" elements in the scene.
 */
-void LavaScene::SetupTerrain(AssetImporter& importer)
+void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	SceneObjectRef modelSceneObject;
+	GTE::SceneObjectRef modelSceneObject;
 
 	//========================================================
 	//
@@ -194,7 +194,7 @@ void LavaScene::SetupTerrain(AssetImporter& importer)
 	lavaField->SetDisplacementHeight(6);
 	lavaField->SetDisplacementTileSize(3);
 
-	SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
+	GTE::SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
 	sceneRoot->AddChild(lavaFieldObject);
 	lavaFieldObject->GetTransform().Scale(100,1,97, false);
 	lavaFieldObject->GetTransform().Translate(-40,-17,0, false);
@@ -214,10 +214,10 @@ void LavaScene::SetupTerrain(AssetImporter& importer)
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaWallLayerMask);
 
 	// extract mesh & material from stone model
-	SceneObjectRef stone1MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	Mesh3DRef stone1Mesh = stone1MeshObject->GetMesh3D();
-	Mesh3DRendererRef stone1Renderer = stone1MeshObject->GetMesh3DRenderer();
-	MaterialRef stone1Material = stone1Renderer->GetMaterial(0);
+	GTE::SceneObjectRef stone1MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef stone1Mesh = stone1MeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef stone1Renderer = stone1MeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef stone1Material = stone1Renderer->GetMaterial(0);
 
 	// place initial stone in scene
 	modelSceneObject->SetActive(true);
@@ -267,10 +267,10 @@ void LavaScene::SetupTerrain(AssetImporter& importer)
 /*
 * Set up all the man-made structures, buildings, etc. in the scene.
 */
-void LavaScene::SetupStructures(AssetImporter& importer)
+void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	SceneObjectRef modelSceneObject;
+	GTE::SceneObjectRef modelSceneObject;
 
 	//========================================================
 	//
@@ -318,17 +318,15 @@ void LavaScene::SetupStructures(AssetImporter& importer)
 	modelSceneObject->GetTransform().Scale(.1,.1,.075, false);
 	modelSceneObject->GetTransform().Translate(-20,-11.5,27,false);
 	modelSceneObject->GetTransform().Rotate(0,1,0,20,true);
-
-
 }
 
 /*
 * Add miscellaneous elements to the scene.
 */
-void LavaScene::SetupExtra(AssetImporter& importer)
+void LavaScene::SetupExtra(GTE::AssetImporter& importer)
 {
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	//========================================================
 	//
@@ -342,40 +340,40 @@ void LavaScene::SetupExtra(AssetImporter& importer)
 	GameUtil::SetAllObjectsLayerMask(cubeSceneObject, lavaIslandObjectsLayerMask);
 
 	// load texture for the cube
-	TextureAttributes texAttributes;
-	texAttributes.FilterMode = TextureFilter::TriLinear;
+	GTE::TextureAttributes texAttributes;
+	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
-	TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
+	GTE::TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
+	GTE::TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
 
 
 	// create the cube's material using the "basic" built-in shader
-	ShaderSource basicShaderSource;
-	importer.LoadBuiltInShaderSource("basic", basicShaderSource);
-	MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
+	GTE::ShaderSource basicShaderSource;
+	importer.LoadBuiltInShaderSource("basic_normal", basicShaderSource);
+	GTE::MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
 	material->SetTexture(normalmap, "NORMALMAP");
 	material->SetUniform1f(1.0, "USCALE");
 	material->SetUniform1f(1.0, "VSCALE");
 
 	// set the cube mesh attributes
-	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Tangent);
+	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Position);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture0);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::VertexColor);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Tangent);
 
 	// create the cube mesh
-	Mesh3DRef cubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
-	Mesh3DFilterRef cubeMeshfilter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DRef cubeMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
+	GTE::Mesh3DFilterRef cubeMeshfilter = objectManager->CreateMesh3DFilter();
 	cubeSceneObject->SetMesh3DFilter(cubeMeshfilter);
 	cubeMeshfilter->SetMesh3D(cubeMesh);
 	cubeMeshfilter->SetCastShadows(true);
 	cubeMeshfilter->SetReceiveShadows(true);
 
 	// create the cube mesh's renderer
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
 	cubeSceneObject->SetMesh3DRenderer(renderer);
 
@@ -387,13 +385,13 @@ void LavaScene::SetupExtra(AssetImporter& importer)
 /*
 * Set up the lights that belong to thsi scene.
 */
-void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject)
+void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject)
 {
 	// multi-use reference
-	SceneObjectRef modelSceneObject;
+	GTE::SceneObjectRef modelSceneObject;
 
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	//========================================================
 	//
@@ -402,37 +400,37 @@ void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	//========================================================
 
 	// create self-illuminated cube mesh to represent spinning point light
-	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
-	Mesh3DRef pointLightCubeMesh = EngineUtility::CreateCubeMesh(meshAttributes);
+	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Position);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
+	GTE::Mesh3DRef pointLightCubeMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
 
 	// create material for spinning point light mesh
-	ShaderSource selfLitShaderSource;
+	GTE::ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("selflit", selfLitShaderSource);
-	MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
+	GTE::MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
 	selflitMaterial->SetSelfLit(true);
-	selflitMaterial->SetColor(Color4(1,1,1,1), "SELFCOLOR");
+	selflitMaterial->SetColor(GTE::Color4(1, 1, 1, 1), "SELFCOLOR");
 
 	// create spinning point light
 	spinningPointLightObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(spinningPointLightObject);
-	Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
 	spinningPointLightObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(pointLightCubeMesh);
 	filter->SetCastShadows(false);
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
 	spinningPointLightObject->SetMesh3DRenderer(renderer);
-	LightRef light = objectManager->CreateLight();
+	GTE::LightRef light = objectManager->CreateLight();
 	light->SetIntensity(1.7);
-	IntMask mergedMask = lavaIslandObjectsLayerMask;
+	GTE::IntMask mergedMask = lavaIslandObjectsLayerMask;
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandLayerMask);
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
 	light->SetCullingMask(mergedMask);
 	light->SetRange(25);
 	light->SetShadowsEnabled(true);
-	light->SetType(LightType::Point);
+	light->SetType(GTE::LightType::Point);
 	spinningPointLightObject->SetLight(light);
 	spinningPointLightObject->GetTransform().Scale(.4,.4,.4, true);
 	spinningPointLightObject->GetTransform().Translate(-26, 2, 10, false);
@@ -444,31 +442,31 @@ void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 	//========================================================
 
 	// create lava pool wall light
-	SceneObjectRef lavaLightObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectRef lavaLightObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(lavaLightObject);
 	lavaLightObject->SetStatic(true);
-	LightRef lavaLight = objectManager->CreateLight();
+	GTE::LightRef lavaLight = objectManager->CreateLight();
 	lavaLight->SetIntensity(6);
 	lavaLight->SetCullingMask(lavaWallLayerMask);
 	lavaLight->SetRange(60);
-	lavaLight->SetColor(Color4(1,.5,0,1));
+	lavaLight->SetColor(GTE::Color4(1, .5, 0, 1));
 	lavaLight->SetShadowsEnabled(false);
-	lavaLight->SetType(LightType::Point);
+	lavaLight->SetType(GTE::LightType::Point);
 	lavaLightObject->SetLight(lavaLight);
 	lavaLightObject->GetTransform().Translate(-25, -15, 3, false);
 	lavaLightObjects.push_back(lavaLightObject);
 
 	// create lava island light
-	SceneObjectRef lavaDirectionalLightObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectRef lavaDirectionalLightObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(lavaDirectionalLightObject);
 	lavaDirectionalLightObject->SetStatic(true);
 	lavaLight = objectManager->CreateLight();
 	lavaLight->SetDirection(0,1,0);
 	lavaLight->SetIntensity(3);
 	lavaLight->SetCullingMask(lavaIslandLayerMask);
-	lavaLight->SetColor(Color4(1,.5,0,1));
+	lavaLight->SetColor(GTE::Color4(1, .5, 0, 1));
 	lavaLight->SetShadowsEnabled(false);
-	lavaLight->SetType(LightType::Directional);
+	lavaLight->SetType(GTE::LightType::Directional);
 	lavaDirectionalLightObject->SetLight(lavaLight);
 	lavaLightObjects.push_back(lavaDirectionalLightObject);
 }
@@ -476,7 +474,7 @@ void LavaScene::SetupLights(AssetImporter& importer, SceneObjectRef playerObject
 /*
  * Get the SceneObject instance that contains the scene's spinning point light.
  */
-SceneObjectRef LavaScene::GetSpinningPointLightObject()
+GTE::SceneObjectRef LavaScene::GetSpinningPointLightObject()
 {
 	return spinningPointLightObject;
 }
@@ -484,7 +482,7 @@ SceneObjectRef LavaScene::GetSpinningPointLightObject()
 /*
  * Get all light objects that provide lava illumination.
  */
-std::vector<SceneObjectRef>& LavaScene::GetLavaLightObjects()
+std::vector<GTE::SceneObjectRef>& LavaScene::GetLavaLightObjects()
 {
 	return lavaLightObjects;
 }

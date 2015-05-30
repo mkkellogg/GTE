@@ -19,8 +19,6 @@
 #include <functional>
 #include <vector>
 
-using namespace GTE;
-
 class Game
 {
 	enum class PlayerType
@@ -64,7 +62,7 @@ class Game
 	// layer name for player object
 	static const std::string PlayerObjectLayer;
 	// layer mask for player object
-	IntMask playerObjectLayerMask;
+	GTE::IntMask playerObjectLayerMask;
 
 	static const unsigned int MaxPlayerStates = 32;
 
@@ -78,20 +76,20 @@ class Game
 
 
 	// SceneObject that contains the main camera for the scene
-	SceneObjectRef cameraObject;
+	GTE::SceneObjectRef cameraObject;
 	// The SceneObject to which the player model hierarchy is attached
-	SceneObjectRef playerObject;
+	GTE::SceneObjectRef playerObject;
 
 	// scene object that holds the scene's directional light
-	SceneObjectRef directionalLightObject;
+	GTE::SceneObjectRef directionalLightObject;
 	// scene object that holds the scene's ambient light
-	SceneObjectRef ambientLightObject;
+	GTE::SceneObjectRef ambientLightObject;
 	//The SkinnedMesh3DRenderer that render the player's skinned mesh
-	SkinnedMesh3DRendererRef playerRenderer;
+	GTE::SkinnedMesh3DRendererRef playerRenderer;
 	// player animations
-	AnimationRef playerAnimations[PlayerState::_Count];
+	GTE::AnimationRef playerAnimations[PlayerState::_Count];
 	// The AnimationPlayer responsible for managing the animations of the player character
-	AnimationPlayerRef animationPlayer;
+	GTE::AnimationPlayerRef animationPlayer;
 
 	// number of frames rendered;
 	unsigned int frameCount;
@@ -111,7 +109,7 @@ class Game
 	{
 		public:
 
-		Transform OriginalTransform;
+		GTE::Transform OriginalTransform;
 	};
 
 	// total number of scenes
@@ -148,16 +146,16 @@ class Game
 	bool displayInfoChanged;
 
 	// player direction vectors
-	Vector3 playerMoveDirection;
-	Vector3 playerLookDirection;
+	GTE::Vector3 playerMoveDirection;
+	GTE::Vector3 playerLookDirection;
 
 	// default direction vectors
-	Vector3 basePlayerForward;
-	Vector3 baseCameraForward;
+	GTE::Vector3 basePlayerForward;
+	GTE::Vector3 baseCameraForward;
 
-	void SetupScenes(AssetImporter& importer);
-	void SetupScene(AssetImporter& importer, Scenes scene);
-	void SetupGlobalElements(AssetImporter& importer);
+	void SetupScenes(GTE::AssetImporter& importer);
+	void SetupScene(GTE::AssetImporter& importer, Scenes scene);
+	void SetupGlobalElements(GTE::AssetImporter& importer);
 
 	void SwitchToScene(Scenes scene);
 	void TransitionToScene(Scenes scene);
@@ -165,7 +163,7 @@ class Game
 	void SetupTransitionForScene(Scenes scene);
 
 	void SetupCamera();
-	void SetupPlayer(AssetImporter& importer);
+	void SetupPlayer(GTE::AssetImporter& importer);
 
 	void InitializePlayerPosition();
 	void UpdatePlayerHorizontalSpeedAndDirection();
@@ -177,7 +175,7 @@ class Game
 	void ActivatePlayerState(PlayerState state);
 	void ManagePlayerState();
 	void HandleGeneralInput();
-	void UpdateLight(SceneObjectRef sceneObject, bool toggleLight, float intensityChange, bool toggleCastShadows);
+	void UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, float intensityChange, bool toggleCastShadows);
 
 	void DisplayInfo();
 	void SignalDisplayInfoChanged();

@@ -211,7 +211,7 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> Mesh is invalid.");
 
-		if (mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
+		if (ShouldUpdateFromMesh())this->UpdateFromMesh();
 
 		// if this sub-renderer is utilizing an attribute transformer, we want to use the positions that result
 		// from that transformation to build the shadow volume. otherwise we want to use the original positions
@@ -672,6 +672,20 @@ namespace GTE
 	}
 
 	/*
+	* Should this renderer update its data from its target mesh?
+	*/
+	bool SubMesh3DRenderer::ShouldUpdateFromMesh()
+	{
+		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::ShouldUpdateFromMesh -> Container renderer is null.");
+
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::ShouldUpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
+
+		if (mesh->GetTimeStamp() > GetTimeStamp() || mesh->IsDirty())return true;
+		return false;
+	}
+
+	/*
 	 * Copy the attribute data from the target sub-mesh into the local vertex attribute buffers.
 	 */
 	void SubMesh3DRenderer::CopyMeshData()
@@ -697,7 +711,14 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::UpdateTimeStamp()
 	{
-		timeStamp = Time::GetRealTimeSinceStartup();
+		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::UpdateTimeStamp -> Container renderer is null.");
+
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateTimeStamp -> Could not find matching sub mesh for sub renderer.");
+
+		// make sure the time stamp equals the target mesh's timestamp exactly,
+		// not the current time
+		timeStamp = mesh->GetTimeStamp();
 	}
 
 	/*
@@ -735,6 +756,7 @@ namespace GTE
 		CopyMeshData();
 
 		UpdateTimeStamp();
+		mesh->SetDirty(false);
 	}
 
 	/*
@@ -893,7 +915,7 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
-		if (mesh->GetTimeStamp() > GetTimeStamp())this->UpdateFromMesh();
+		if (ShouldUpdateFromMesh())this->UpdateFromMesh();
 
 		MaterialRef currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");

@@ -61,6 +61,7 @@ namespace GTE
 		UV2Array uvs0;
 		UV2Array uvs1;
 
+		bool isDirty;
 		// inter-face angle above which smoothing/average of vertex normals should
 		// not occur
 		int normalsSmoothingThreshold;
@@ -115,6 +116,9 @@ namespace GTE
 		void UpdateTimeStamp();
 
 	public:
+
+		void SetDirty(bool isDirty);
+		bool IsDirty();
 
 		void SetCalculateNormals(bool calculate);
 		void SetCalculateTangents(bool calculate);

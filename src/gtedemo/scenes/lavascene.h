@@ -14,12 +14,10 @@
 //forward declarations
 class LavaField;
 
-using namespace GTE;
-
 class LavaScene : public Scene
 {
 	// the SceneObject instance at the root of the scene
-	SceneObjectRef sceneRoot;
+	GTE::SceneObjectRef sceneRoot;
 
 	// layer name for lava pool wall
 	static const std::string LavaWallLayer;
@@ -28,40 +26,40 @@ class LavaScene : public Scene
 	// layer name for lava pool island objects
 	static const std::string LavaIslandObjectsLayer;
 	// layer mask for lava wall layer
-	IntMask lavaWallLayerMask;
+	GTE::IntMask lavaWallLayerMask;
 	// layer mask for lava island layer
-	IntMask lavaIslandLayerMask;
+	GTE::IntMask lavaIslandLayerMask;
 	// layer mask for lava island layer objects
-	IntMask lavaIslandObjectsLayerMask;
+	GTE::IntMask lavaIslandObjectsLayerMask;
 
 	// SceneObject that contains the spinning point light in the scene
-	SceneObjectRef spinningPointLightObject;
+	GTE::SceneObjectRef spinningPointLightObject;
 	// scene lava
 	LavaField * lavaField;
 	// container lava lights
-	std::vector<SceneObjectRef> lavaLightObjects;
+	std::vector<GTE::SceneObjectRef> lavaLightObjects;
 	// The single cube in the scene
-	SceneObjectRef cubeSceneObject;
+	GTE::SceneObjectRef cubeSceneObject;
 	// global directional light
-	SceneObjectRef directionalLightObject;
+	GTE::SceneObjectRef directionalLightObject;
 
 	public:
 
 	LavaScene();
 	~LavaScene();
 
-	SceneObjectRef GetSceneRoot();
+	GTE::SceneObjectRef GetSceneRoot();
 	void OnActivate();
 	void Update();
-	void Setup(AssetImporter& importer, SceneObjectRef ambientLightObject, SceneObjectRef directionalLightObject, SceneObjectRef playerObject);
+	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject);
 
-	void SetupTerrain(AssetImporter& importer);
-	void SetupStructures(AssetImporter& importer);
-	void SetupExtra(AssetImporter& importer);
-	void SetupLights(AssetImporter& importer, SceneObjectRef playerObject);
+	void SetupTerrain(GTE::AssetImporter& importer);
+	void SetupStructures(GTE::AssetImporter& importer);
+	void SetupExtra(GTE::AssetImporter& importer);
+	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject);
 
-	SceneObjectRef GetSpinningPointLightObject();
-	std::vector<SceneObjectRef>& GetLavaLightObjects();
+	GTE::SceneObjectRef GetSpinningPointLightObject();
+	std::vector<GTE::SceneObjectRef>& GetLavaLightObjects();
 	LavaField * GetLavaField();
 };
 

@@ -10,12 +10,10 @@
 #include "gtedemo.h"
 #include "gtedemo/game.h"
 
-using namespace GTE;
-
 /*
  * Custom implementation of EngineCallbacks to handle GTE engine events.
  */
-class CustomEngineCallbacks: public EngineCallbacks
+class CustomEngineCallbacks : public GTE::EngineCallbacks
 {
 	Game * game = NULL;
 
@@ -61,29 +59,29 @@ int main(int argc, char** argv)
 	CustomEngineCallbacks engineCallbacks;
 
 	// specify basic graphics attributes
-	GraphicsAttributes graphicsAttributes;
+	GTE::GraphicsAttributes graphicsAttributes;
 	graphicsAttributes.WindowWidth = 1280;
 	graphicsAttributes.WindowHeight = 800;
 	graphicsAttributes.WindowTitle = "GTE Test";
-	graphicsAttributes.AAMethod = AntialiasingMethod::MSAAx4;
+	graphicsAttributes.AAMethod = GTE::AntialiasingMethod::MSAAx4;
 	graphicsAttributes.WaitForVSync = false;
 
 	// initialize the engine
-	bool initSuccess = Engine::Init(&engineCallbacks, graphicsAttributes);
+	bool initSuccess = GTE::Engine::Init(&engineCallbacks, graphicsAttributes);
 
 	if(initSuccess)
 	{
 		// start the engine
-		Engine::Start();
+		GTE::Engine::Start();
 	}
 	else
 	{
-		Debug::PrintError("Error occurred while initializing engine.");
+		GTE::Debug::PrintError("Error occurred while initializing engine.");
 		return EXIT_FAILURE;
 	}
 
 	// shutdown the engine
-	Engine::ShutDown();
+	GTE::Engine::ShutDown();
 	return EXIT_SUCCESS;
 }
 

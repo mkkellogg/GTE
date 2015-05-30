@@ -25,7 +25,6 @@
 #include "util/time.h"
 #include "util/engineutility.h"
 
-using namespace GTE;
 
 /*
  * Initialize the lava field mesh and material, the textures used to render it, and load the
@@ -34,10 +33,10 @@ using namespace GTE;
 bool LavaField::InitMeshAndMaterial()
 {
 	// load first displacement image
-	displacementA = ImageLoader::LoadImageU("resources/textures/lava/displacementA.png");
+	displacementA = GTE::ImageLoader::LoadImageU("resources/textures/lava/displacementA.png");
 	ASSERT(displacementA != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture A.");
 	// load second displacement image
-	displacementB = ImageLoader::LoadImageU("resources/textures/lava/displacementB.png");
+	displacementB = GTE::ImageLoader::LoadImageU("resources/textures/lava/displacementB.png");
 	ASSERT(displacementB != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture B.");
 
 	// make lava field 1x1 in model space
@@ -45,18 +44,18 @@ bool LavaField::InitMeshAndMaterial()
 	fieldHeight = 1;
 
 	// create the lava field mesh
-	StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
-	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture1);
-	fieldMesh = EngineUtility::CreateRectangularMesh(meshAttributes, fieldWidth, fieldHeight, subDivisions-1, subDivisions-1, false, false, false);
+	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Position);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture0);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture1);
+	fieldMesh = GTE::EngineUtility::CreateRectangularMesh(meshAttributes, fieldWidth, fieldHeight, subDivisions - 1, subDivisions - 1, false, false, false);
 	ASSERT(fieldMesh.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava field mesh.");
 
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	AssetImporter importer;
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+	GTE::AssetImporter importer;
 
-	TextureAttributes texAttributes;
-	texAttributes.FilterMode = TextureFilter::TriLinear;
+	GTE::TextureAttributes texAttributes;
+	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
 
 	// create the first texture
@@ -68,7 +67,7 @@ bool LavaField::InitMeshAndMaterial()
 
 	// load the lava shader and use it to create the material for rendering
 	// the lava field mesh
-	ShaderSource selfLitShaderSource;
+	GTE::ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("lava", selfLitShaderSource);
 	lavaMaterial = objectManager->CreateMaterial("SelfLitTexture", selfLitShaderSource);
 	ASSERT(lavaMaterial.IsValid(), "LavaField::InitMeshAndMaterial -> Could not create lava material.");
@@ -87,20 +86,20 @@ bool LavaField::InitMeshAndMaterial()
 void LavaField::DisplaceField()
 {
 	// get base pointer to displacement data in [displacementA]
-	BYTE * pixelsA = displacementA->GetPixels();
-	BYTE * curPixelsA;
+	GTE::BYTE * pixelsA = displacementA->GetPixels();
+	GTE::BYTE * curPixelsA;
 
 	// get base pointer to displacement data in [displacementB]
-	BYTE * pixelsB = displacementB->GetPixels();
-	BYTE * curPixelsB;
+	GTE::BYTE * pixelsB = displacementB->GetPixels();
+	GTE::BYTE * curPixelsB;
 
-	SubMesh3DRef subMesh = fieldMesh->GetSubMesh(0);
-	Point3Array * positions = subMesh->GetPostions();
+	GTE::SubMesh3DRef subMesh = fieldMesh->GetSubMesh(0);
+	GTE::Point3Array * positions = subMesh->GetPostions();
 
 	// loop through each vertex in the lava field mesh and displace each
 	for(unsigned int i = 0; i < positions->GetCount(); i++)
 	{
-		Point3 * p = positions->GetPoint(i);
+		GTE::Point3 * p = positions->GetPoint(i);
 
 		// calculate the x & y position (in model space) of the position in
 		// the displacements maps from which to read displacement data
@@ -124,7 +123,7 @@ void LavaField::DisplaceField()
 		// read pixel values from both displacement maps
 		curPixelsA = pixelsA + ((pixelY * diplacementImageDimensionSize + pixelX) * 4); // 4 bytes per pixel
 		curPixelsB = pixelsB + ((pixelY * diplacementImageDimensionSize + pixelX) * 4); // 4 bytes per pixel
-		BYTE r = *curPixelsA;
+		GTE::BYTE r = *curPixelsA;
 		float dispA = (float)r / (float)255;
 		r = *curPixelsB;
 		float dispB = (float)r / (float)255;
@@ -133,7 +132,7 @@ void LavaField::DisplaceField()
 		float disp = (dispA + dispB) * dispHeight - dispHeight;
 
 		// lerp to new displacement for smooth motion
-		float lerpDisp = GTEMath::Lerp(p->z, disp, .1);
+		float lerpDisp = GTE::GTEMath::Lerp(p->z, disp, .1);
 
 		// apply displacement to Z-coordinate since mesh was aligned to XY-plane in model space.
 		p->Set(p->x,p->y,lerpDisp);
@@ -185,21 +184,21 @@ bool LavaField::Init()
 	bool baseInitSuccess = InitMeshAndMaterial();
 	ASSERT(baseInitSuccess == true, "LavaField::Init -> Could not initialize lava material or lava field mesh.");
 
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	// create SceneObject
 	lavaFieldObject = objectManager->CreateSceneObject();
 	ASSERT(lavaFieldObject.IsValid(), "LavaField::Init -> Could not create lava field scene object.");
 
 	// set up mesh filter
-	Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
 	ASSERT(meshFilter.IsValid(), "LavaField::Init -> Could not create lava field mesh filter.");
 	meshFilter->SetMesh3D(fieldMesh);
 	meshFilter->SetCastShadows(false);
 	meshFilter->SetReceiveShadows(false);
 
 	// set up renderer
-	Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
 	ASSERT(renderer.IsValid(), "LavaField::Init -> Could not create lava field renderer.");
 	renderer->AddMaterial(lavaMaterial);
 
@@ -215,7 +214,7 @@ bool LavaField::Init()
 /*
  * Get the SceneObject instance that holds the lava field mesh.
  */
-SceneObjectRef LavaField::GetSceneObject()
+GTE::SceneObjectRef LavaField::GetSceneObject()
 {
 	return lavaFieldObject;
 }
@@ -268,13 +267,13 @@ void LavaField::SetDisplacementHeight(float height)
  */
 void LavaField::Update()
 {
-	dispOffset += Time::GetDeltaTime() * dispSpeed;
+	dispOffset += GTE::Time::GetDeltaTime() * dispSpeed;
 	if(dispOffset >= (float)diplacementImageDimensionSize * 2.0)dispOffset = 0;
 	DisplaceField();
 
-	textAOffset -= Time::GetDeltaTime() * textureASpeed;
+	textAOffset -= GTE::Time::GetDeltaTime() * textureASpeed;
 	lavaMaterial->SetUniform2f(0,textAOffset, "UVTEXTURE0_OFFSET");
 
-	textBOffset -=  Time::GetDeltaTime() * textureBSpeed;
+	textBOffset -= GTE::Time::GetDeltaTime() * textureBSpeed;
 	lavaMaterial->SetUniform2f(0,textBOffset, "UVTEXTURE1_OFFSET");
 }

@@ -46,8 +46,6 @@
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
 
-using namespace GTE;
-
 const std::string Game::PlayerObjectLayer = "Player";
 
 /*
@@ -68,9 +66,9 @@ Game::Game()
 	playerJumpApexReached = false;
 	playerLanded = false;
 
-	basePlayerForward = Vector3::Forward;
+	basePlayerForward = GTE::Vector3::Forward;
 	basePlayerForward.Invert();
-	baseCameraForward = Vector3::Forward;
+	baseCameraForward = GTE::Vector3::Forward;
 
 	// initialize player state
 	playerType = PlayerType::Warrior;
@@ -112,10 +110,10 @@ Game::~Game()
 void Game::Init()
 {
 	// instantiate an asset importer to load models
-	AssetImporter importer;
+	GTE::AssetImporter importer;
 
 	// set up player layer mask
-	LayerManager& layerManager = Engine::Instance()->GetEngineObjectManager()->GetLayerManager();
+	GTE::LayerManager& layerManager = GTE::Engine::Instance()->GetEngineObjectManager()->GetLayerManager();
 	int playerObjectLayerIndex = layerManager.AddLayer(PlayerObjectLayer);
 	playerObjectLayerMask = layerManager.GetLayerMask(playerObjectLayerIndex);
 
@@ -136,7 +134,7 @@ void Game::Init()
  * Set up the individual scenes that showcase the various features of the
  * engine, and initialize the transitions between them.
  */
-void Game::SetupScenes(AssetImporter& importer)
+void Game::SetupScenes(GTE::AssetImporter& importer)
 {
 	SetupScene(importer, Scenes::LavaScene);
 	SetupScene(importer, Scenes::CastleScene);
@@ -150,7 +148,7 @@ void Game::SetupScenes(AssetImporter& importer)
 /*
  * Redirect to appropriate scene loading function base on [scene].
  */
-void Game::SetupScene(AssetImporter& importer, Scenes scene)
+void Game::SetupScene(GTE::AssetImporter& importer, Scenes scene)
 {
 	LavaScene * lavaScene = NULL;
 	CastleScene * castleScene = NULL;
@@ -180,10 +178,10 @@ void Game::SetupScene(AssetImporter& importer, Scenes scene)
 /*
  * Set up scene elements that are not specific not any particular scene.
  */
-void Game::SetupGlobalElements(AssetImporter& importer)
+void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 {
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	//========================================================
 	//
@@ -191,13 +189,13 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 	//
 	//========================================================
 
-	IntMask mergedMask;
+	GTE::IntMask mergedMask;
 
 	// create ambient light
 	ambientLightObject = objectManager->CreateSceneObject();
-	LightRef light = objectManager->CreateLight();
+	GTE::LightRef light = objectManager->CreateLight();
 	light->SetIntensity(.30);
-	light->SetType(LightType::Ambient);
+	light->SetType(GTE::LightType::Ambient);
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(light->GetCullingMask(), playerObjectLayerMask);
 	light->SetCullingMask(mergedMask);
 	ambientLightObject->SetLight(light);
@@ -217,10 +215,10 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(light->GetCullingMask(), playerObjectLayerMask);
 	light->SetCullingMask(mergedMask);
 	light->SetShadowsEnabled(true);
-	light->SetType(LightType::Directional);
+	light->SetType(GTE::LightType::Directional);
 	directionalLightObject->SetLight(light);
 
-	importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
+	importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
 
 	//========================================================
 	//
@@ -229,7 +227,7 @@ void Game::SetupGlobalElements(AssetImporter& importer)
 	//========================================================
 
 	// load castle island model
-	SceneObjectRef modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
+	GTE::SceneObjectRef modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1, false, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -290,7 +288,7 @@ void Game::TransitionToScene(Scenes scene)
 	{
 		sceneTransitionSrc = currentScene;
 		sceneTransitionDest = scene;
-		sceneTransitionStartTime = Time::GetRealTimeSinceStartup();
+		sceneTransitionStartTime = GTE::Time::GetRealTimeSinceStartup();
 		sceneTransitioning = true;
 		currentScene = scene;
 		scenes[(unsigned int)scene]->OnActivate();
@@ -309,7 +307,7 @@ void Game::UpdateSceneTransition()
 		// total time transition should last
 		float transitionTime = .25;
 		// full elapsed time
-		float elapsedTime = Time::GetRealTimeSinceStartup() - sceneTransitionStartTime;
+		float elapsedTime = GTE::Time::GetRealTimeSinceStartup() - sceneTransitionStartTime;
 		// elapsed time scaled to the range 0..1
 		float normalizedElapsedTime = elapsedTime / transitionTime;
 
@@ -319,9 +317,9 @@ void Game::UpdateSceneTransition()
 		Scene* destSceneObj = scenes[(unsigned int)sceneTransitionDest];
 
 		// source scene root
-		SceneObjectRef srcRoot = srcSceneObj->GetSceneRoot();
+		GTE::SceneObjectRef srcRoot = srcSceneObj->GetSceneRoot();
 		// destination scene root
-		SceneObjectRef destRoot = destSceneObj->GetSceneRoot();
+		GTE::SceneObjectRef destRoot = destSceneObj->GetSceneRoot();
 
 		// activate destination scene
 		destRoot->SetActive(true);
@@ -353,9 +351,9 @@ void Game::UpdateSceneTransition()
 		SceneTransition& destTransition = sceneTransitions[(unsigned int)sceneTransitionDest];
 
 		// apply calculated/interpolated scale
-		Transform destTransform;
+		GTE::Transform destTransform;
 		destTransform.SetTo(destTransition.OriginalTransform);
-		Vector3 destScaleVec(destScale,destScale,destScale);
+		GTE::Vector3 destScaleVec(destScale, destScale, destScale);
 		destTransform.Scale(destScaleVec, true);
 		destRoot->GetTransform().SetTo(destTransform);
 
@@ -377,7 +375,7 @@ void Game::SetupTransitionForScene(Scenes scene)
 	Scene* sceneObj = scenes[(unsigned int)scene];
 
 	// for now we are only saving the original transform of the scene root
-	SceneObjectRef sceneRoot = sceneObj->GetSceneRoot();
+	GTE::SceneObjectRef sceneRoot = sceneObj->GetSceneRoot();
 	sceneTransition.OriginalTransform.SetTo(sceneRoot->GetTransform());
 }
 
@@ -387,26 +385,26 @@ void Game::SetupTransitionForScene(Scenes scene)
 void Game::SetupCamera()
 {
 	// get reference to the engine's object manager
-	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	// create camera
 	cameraObject = objectManager->CreateSceneObject();
-	CameraRef camera = objectManager->CreateCamera();
+	GTE::CameraRef camera = objectManager->CreateCamera();
 	camera->SetRenderOrderIndex(5);
 	camera->SetupCopyRenderTarget();
 	cameraObject->SetCamera(camera);
 
 	// specify which kinds of render buffers to use for this camera
-	camera->AddClearBuffer(RenderBufferType::Color);
-	camera->AddClearBuffer(RenderBufferType::Depth);
+	camera->AddClearBuffer(GTE::RenderBufferType::Color);
+	camera->AddClearBuffer(GTE::RenderBufferType::Depth);
 
 	camera->SetSSAOEnabled(true);
 
 	// move camera object to its initial position
-	Vector3 trans;
-	Vector3 scale;
-	Quaternion rot;
-	Matrix4x4 mat;
+	GTE::Vector3 trans;
+	GTE::Vector3 scale;
+	GTE::Quaternion rot;
+	GTE::Matrix4x4 mat;
 
 	// decompose player's transform into position, rotation and scale
 	playerObject->GetTransform().CopyMatrix(mat);
@@ -414,12 +412,12 @@ void Game::SetupCamera()
 	cameraObject->GetTransform().Translate(trans.x+20,trans.y+10,trans.z+15, true);
 
 	// create skybox texture
-	TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky_north.png",
-														 	 	"resources/textures/skybox-night/nightsky_south.png",
-														 	 	"resources/textures/skybox-night/nightsky_up.png",
-														 	 	"resources/textures/skybox-night/nightsky_down.png",
-														 	 	"resources/textures/skybox-night/nightsky_west.png",
-														 	 	"resources/textures/skybox-night/nightsky_east.png");
+	GTE::TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky_north.png",
+														 	 		"resources/textures/skybox-night/nightsky_south.png",
+														 	 		"resources/textures/skybox-night/nightsky_up.png",
+														 	 		"resources/textures/skybox-night/nightsky_down.png",
+														 	 		"resources/textures/skybox-night/nightsky_west.png",
+														 	 		"resources/textures/skybox-night/nightsky_east.png");
 	// activate skybox
 	camera->SetupSkybox(skyboxTexture);
 	camera->SetSkyboxEnabled(true);
@@ -429,10 +427,10 @@ void Game::SetupCamera()
 /*
  * Set up the player model and animations, use [importer] to load model files from disk.
  */
-void Game::SetupPlayer(AssetImporter& importer)
+void Game::SetupPlayer(GTE::AssetImporter& importer)
 {
-	SkinnedMesh3DRendererRef playerMeshRenderer;
-	Mesh3DRef firstMesh;
+	GTE::SkinnedMesh3DRendererRef playerMeshRenderer;
+	GTE::Mesh3DRef firstMesh;
 	playerType = PlayerType::Warrior;
 	playerState = PlayerState::Waiting;
 	playerIsGrounded = true;
@@ -446,7 +444,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 	switch(playerType)
 	{
 		case PlayerType::Koopa:
-			importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, false);
+			importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
 			playerObject = importer.LoadModelDirect("resources/models/koopa/koopamod.fbx");
 			ASSERT(playerObject.IsValid(), "Could not load Koopa model!\n");
 			playerObject->GetTransform().SetIdentity();
@@ -454,7 +452,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 			playerObject->GetTransform().Scale(.05, .05, .05, true);
 		break;
 		case PlayerType::Warrior:
-			importer.SetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots, true);
+			importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, true);
 			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx");
 			ASSERT(playerObject.IsValid(), "Could not load Warrior model!\n");
 			playerObject->GetTransform().Translate(45,-10,55,false);
@@ -492,7 +490,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 	playerObject->SetActive(true);
 	GameUtil::SetAllObjectsLayerMask(playerObject, playerObjectLayerMask);
 	playerRenderer = GameUtil::FindFirstSkinnedMeshRenderer(playerObject);
-	AnimationManager * animManager = Engine::Instance()->GetAnimationManager();
+	GTE::AnimationManager * animManager = GTE::Engine::Instance()->GetAnimationManager();
 	bool compatible = true;
 
 	//========================================================
@@ -526,7 +524,7 @@ void Game::SetupPlayer(AssetImporter& importer)
 			animationPlayer->AddAnimation(playerAnimations[PlayerState::Roaring]);
 			animationPlayer->SetSpeed(playerAnimations[PlayerState::Walking], 2);
 			animationPlayer->SetSpeed(playerAnimations[PlayerState::JumpStart], 4);
-			animationPlayer->SetPlaybackMode(playerAnimations[PlayerState::JumpFall], PlaybackMode::Clamp);
+			animationPlayer->SetPlaybackMode(playerAnimations[PlayerState::JumpFall], GTE::PlaybackMode::Clamp);
 			animationPlayer->Play(playerAnimations[PlayerState::Waiting]);
 
 		break;
@@ -541,9 +539,9 @@ void Game::SetupPlayer(AssetImporter& importer)
 			ASSERT(compatible, "Warrior animations are not compatible!");
 
 			// set all meshes to use standard shadow volume
-			GameUtil::ProcessSceneObjects(playerObject, [=](SceneObjectRef current)
+			GameUtil::ProcessSceneObjects(playerObject, [=](GTE::SceneObjectRef current)
 			{
-				SkinnedMesh3DRendererRef renderer = current->GetSkinnedMesh3DRenderer();
+				GTE::SkinnedMesh3DRendererRef renderer = current->GetSkinnedMesh3DRenderer();
 				if(renderer.IsValid())
 				{
 					for(unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
@@ -574,16 +572,16 @@ void Game::SetupPlayer(AssetImporter& importer)
  */
 void Game::InitializePlayerPosition()
 {
-	Vector3 playerForward = basePlayerForward;
+	GTE::Vector3 playerForward = basePlayerForward;
 	playerObject->GetTransform().TransformVector(playerForward);
 	playerForward.y = 0;
 	playerForward.Normalize();
 
 	playerLookDirection = playerForward;
 
-	Quaternion currentRotation;
-	Vector3 currentTranslation;
-	Vector3 currentScale;
+	GTE::Quaternion currentRotation;
+	GTE::Vector3 currentTranslation;
+	GTE::Vector3 currentScale;
 
 	playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
 	playerBaseY = currentTranslation.y;
@@ -642,14 +640,14 @@ void Game::OnQuit()
  */
 void Game::DisplayInfo()
 {
-	float elapsedPrintTime = Time::GetRealTimeSinceStartup() - lastInfoPrintTime;
+	float elapsedPrintTime = GTE::Time::GetRealTimeSinceStartup() - lastInfoPrintTime;
 	if(elapsedPrintTime > 1 || displayInfoChanged)
 	{
-		float elapsedFPSTime = Time::GetRealTimeSinceStartup() - lastFPSRetrieveTime;
+		float elapsedFPSTime = GTE::Time::GetRealTimeSinceStartup() - lastFPSRetrieveTime;
 		if(elapsedFPSTime > 1)
 		{
-			lastFPS = Engine::Instance()->GetGraphicsSystem()->GetCurrentFPS();
-			lastFPSRetrieveTime = Time::GetRealTimeSinceStartup();
+			lastFPS = GTE::Engine::Instance()->GetGraphicsSystem()->GetCurrentFPS();
+			lastFPSRetrieveTime = GTE::Time::GetRealTimeSinceStartup();
 		}
 
 		printf("FPS: %f ", lastFPS);
@@ -689,7 +687,7 @@ void Game::DisplayInfo()
 		printf("                             \r");
 		fflush(stdout);
 
-		lastInfoPrintTime = Time::GetRealTimeSinceStartup();
+		lastInfoPrintTime = GTE::Time::GetRealTimeSinceStartup();
 	}
 
 	displayInfoChanged = false;
@@ -709,19 +707,19 @@ void Game::SignalDisplayInfoChanged()
  */
 void Game::UpdatePlayerHorizontalSpeedAndDirection()
 {
-	float curSmooth = playerSpeedSmoothing * Time::GetDeltaTime();
+	float curSmooth = playerSpeedSmoothing * GTE::Time::GetDeltaTime();
 
 	if(playerState == PlayerState::Roaring ||
 	   playerState == PlayerState::Defend1 ||
 	   playerState == PlayerState::Attack1 ||
 	   playerState == PlayerState::Attack2)
 	{
-		playerHorizontalSpeed = GTEMath::Lerp(playerHorizontalSpeed, 0, curSmooth);
+		playerHorizontalSpeed = GTE::GTEMath::Lerp(playerHorizontalSpeed, 0, curSmooth);
 		return;
 	}
 
-	Point3 cameraPos;
-	Point3 playerPos;
+	GTE::Point3 cameraPos;
+	GTE::Point3 playerPos;
 
 	// convert camera position from local to world space
 	cameraObject->GetTransform().TransformPoint(cameraPos);
@@ -730,60 +728,60 @@ void Game::UpdatePlayerHorizontalSpeedAndDirection()
 	playerObject->GetTransform().TransformPoint(playerPos);
 
 	// convert player forward vector from local to world space
-	Vector3 playerForward = basePlayerForward;
+	GTE::Vector3 playerForward = basePlayerForward;
 	playerObject->GetTransform().TransformVector(playerForward);
 	playerForward.y = 0;
 	playerForward.Normalize();
 
 	// convert camera forward vector from local to world space
-	Vector3 cameraForward = baseCameraForward;
+	GTE::Vector3 cameraForward = baseCameraForward;
 	cameraObject->GetTransform().TransformVector(cameraForward);
 	cameraForward.y = 0;
 	cameraForward.Normalize();
 
 	// calculate the vector that is 90 degrees to the player's right
-	Vector3 cameraRight;
-	Vector3::Cross(cameraForward, Vector3::Up, cameraRight);
+	GTE::Vector3 cameraRight;
+	GTE::Vector3::Cross(cameraForward, GTE::Vector3::Up, cameraRight);
 
 	float h = 0;
 	float v = 0;
-	InputManager * inputManager = Engine::Instance()->GetInputManager();
+	GTE::InputManager * inputManager = GTE::Engine::Instance()->GetInputManager();
 
 	// get directional input
-	if(inputManager->GetDigitalInputState(DigitalInput::Left))h -= 1;
-	if(inputManager->GetDigitalInputState(DigitalInput::Right))h += 1;
-	if(inputManager->GetDigitalInputState(DigitalInput::Up))v += 1;
-	if(inputManager->GetDigitalInputState(DigitalInput::Down))v -= 1;
+	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Left))h -= 1;
+	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Right))h += 1;
+	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Up))v += 1;
+	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Down))v -= 1;
 
-	playerIsMoving = GTEMath::Abs(h) > .1 || GTEMath::Abs(v) > .1;
+	playerIsMoving = GTE::GTEMath::Abs(h) > .1 || GTE::GTEMath::Abs(v) > .1;
 
 	// scale right vector according to horizontal input
-	Vector3 cameraRightScaled = cameraRight;
+	GTE::Vector3 cameraRightScaled = cameraRight;
 	cameraRightScaled.Scale(h);
 
 	// scale forward vector according to vertical input
-	Vector3 cameraForwardScaled = cameraForward;
+	GTE::Vector3 cameraForwardScaled = cameraForward;
 	cameraForwardScaled.Scale(v);
 
-	Vector3 targetDirection;
+	GTE::Vector3 targetDirection;
 
 	// add scaled vectors to get final target facing vector
-	Vector3::Add(cameraRightScaled, cameraForwardScaled, targetDirection);
+	GTE::Vector3::Add(cameraRightScaled, cameraForwardScaled, targetDirection);
 	targetDirection.Normalize();
 
 	if(targetDirection.x != 0 || targetDirection.y != 0 || targetDirection.z != 0)
 	{
 		// rotate from the current facing vector to the target facing vector, instead of jumping directly to it to
 		// create smooth rotation
-		bool success = Vector3::RotateTowards(playerLookDirection, targetDirection,  playerRotateSpeed * Time::GetDeltaTime(), playerMoveDirection);
+		bool success = GTE::Vector3::RotateTowards(playerLookDirection, targetDirection, playerRotateSpeed * GTE::Time::GetDeltaTime(), playerMoveDirection);
 
 		// the RotateTowards() operation can fail if the 'from' and 'to' vectors are opposite (180 degrees from each other).
 		// in such a case we create a new target direction that is 90 degrees from the current facing vector to
 		// either the left or right (as appropriate).
 		if(!success)
 		{
-			Vector3::Cross(Vector3::Up, playerLookDirection, targetDirection);
-			Vector3::RotateTowards(playerLookDirection, targetDirection,  playerRotateSpeed * Time::GetDeltaTime(), playerMoveDirection);
+			GTE::Vector3::Cross(GTE::Vector3::Up, playerLookDirection, targetDirection);
+			GTE::Vector3::RotateTowards(playerLookDirection, targetDirection, playerRotateSpeed * GTE::Time::GetDeltaTime(), playerMoveDirection);
 		}
 
 		playerLookDirection = playerMoveDirection;
@@ -799,7 +797,7 @@ void Game::UpdatePlayerHorizontalSpeedAndDirection()
 		{
 			targetSpeed = playerWalkSpeed;
 		}
-		playerHorizontalSpeed = GTEMath::Lerp(playerHorizontalSpeed, targetSpeed, curSmooth);
+		playerHorizontalSpeed = GTE::GTEMath::Lerp(playerHorizontalSpeed, targetSpeed, curSmooth);
 	}
 }
 
@@ -809,9 +807,9 @@ void Game::UpdatePlayerHorizontalSpeedAndDirection()
  */
 void Game::UpdatePlayerVerticalSpeed()
 {
-	Quaternion currentRotation;
-	Vector3 currentTranslation;
-	Vector3 currentScale;
+	GTE::Quaternion currentRotation;
+	GTE::Vector3 currentTranslation;
+	GTE::Vector3 currentScale;
 
 	playerJumpApexReached = false;
 	playerLanded = false;
@@ -828,7 +826,7 @@ void Game::UpdatePlayerVerticalSpeed()
 	// has been in the jump state for a sufficient amount of time
 	if(playerIsGrounded && playerState == PlayerState::Jump)
 	{
-		float jumpTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(int) PlayerState::Jump] ;
+		float jumpTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(int)PlayerState::Jump];
 		if(jumpTime > .2)
 		{
 			playerVerticalSpeed = 50;
@@ -837,7 +835,7 @@ void Game::UpdatePlayerVerticalSpeed()
 	}
 
 	// apply gravity to the player's Y velocity
-	if(!playerIsGrounded)playerVerticalSpeed -= 95 * Time::GetDeltaTime();
+	if (!playerIsGrounded)playerVerticalSpeed -= 95 * GTE::Time::GetDeltaTime();
 
 	// if the player was moving upwards but now is not after the application
 	// of gravity, then the jump's apex has been reached.
@@ -865,15 +863,15 @@ void Game::ApplyPlayerMovement()
 	// apply player's Y velocity
 	if(!playerIsGrounded)
 	{
-		Vector3 move(0, playerVerticalSpeed * Time::GetDeltaTime(), 0);
+		GTE::Vector3 move(0, playerVerticalSpeed * GTE::Time::GetDeltaTime(), 0);
 		playerObject->GetTransform().Translate(move, false);
 	}
 
 	// apply horizontal (x-z) movement
 	if(playerHorizontalSpeed > .1)
 	{
-		Vector3 move = playerLookDirection;
-		move.Scale(playerHorizontalSpeed * Time::GetDeltaTime());
+		GTE::Vector3 move = playerLookDirection;
+		move.Scale(playerHorizontalSpeed * GTE::Time::GetDeltaTime());
 		playerObject->GetTransform().Translate(move, false);
 	}
 }
@@ -889,16 +887,16 @@ void Game::UpdatePlayerLookDirection()
 	   playerState == PlayerState::Attack2)return;
 
 	// axis around which to rotate player object
-	Vector3 rotationAxis(0,1,0);
+	GTE::Vector3 rotationAxis(0, 1, 0);
 
 	// get a quaternion that represents the rotation from the player object's original forward vector
 	// to [lookDirection] in world space.
-	Quaternion modRotation = Quaternion::getRotation(basePlayerForward, playerLookDirection, rotationAxis);
+	GTE::Quaternion modRotation = GTE::Quaternion::getRotation(basePlayerForward, playerLookDirection, rotationAxis);
 	modRotation.normalize();
 
-	Quaternion currentRotation;
-	Vector3 currentTranslation;
-	Vector3 currentScale;
+	GTE::Quaternion currentRotation;
+	GTE::Vector3 currentTranslation;
+	GTE::Vector3 currentScale;
 
 	// apply the quaternion calculated above
 	playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
@@ -950,17 +948,17 @@ void Game::UpdatePlayerAnimation()
  */
 void Game::ManagePlayerState()
 {
-	float currentStateTime = Time::GetRealTimeSinceStartup() - stateActivationTime[(unsigned int)playerState];
+	float currentStateTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(unsigned int)playerState];
 	switch(playerType)
 	{
 		case PlayerType::Koopa:
-			if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::C))
+			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::C))
 			{
 				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
 					ActivatePlayerState(PlayerState::Roaring);
 			}
 
-			if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::X))
+			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::X))
 			{
 				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
 					ActivatePlayerState(PlayerState::JumpStart);
@@ -985,25 +983,25 @@ void Game::ManagePlayerState()
 		break;
 		case PlayerType::Warrior:
 
-			if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::X))
+			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::X))
 			{
 				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
 					ActivatePlayerState(PlayerState::Attack1);
 			}
 
-			if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::C))
+			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::C))
 			{
 				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
 					ActivatePlayerState(PlayerState::Attack2);
 			}
 
-			if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::V))
+			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::V))
 			{
 				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
 					ActivatePlayerState(PlayerState::Attack3);
 			}
 
-			if(Engine::Instance()->GetInputManager()->IsKeyDown(Key::B))
+			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::B))
 			{
 				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking || playerState == PlayerState::Defend1 )
 					ActivatePlayerState(PlayerState::Defend1);
@@ -1029,23 +1027,25 @@ void Game::ManagePlayerState()
  */
 void Game::HandleGeneralInput()
 {
+	GTE::InputManager * inputManager = GTE::Engine::Instance()->GetInputManager();
+
 	// toggle ssao
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::O))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::O))
 	{
-		CameraRef mainCamera = cameraObject->GetCamera();
+		GTE::CameraRef mainCamera = cameraObject->GetCamera();
 		mainCamera->SetSSAOEnabled(!mainCamera->IsSSAOEnabled());
 	}
 
 	// toggle ssao render mode
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::I))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::I))
 	{
-		CameraRef mainCamera = cameraObject->GetCamera();
-		if(mainCamera->GetSSAORenderMode() == SSAORenderMode::Outline)mainCamera->SetSSAORenderMode(SSAORenderMode::Standard);
-		else mainCamera->SetSSAORenderMode(SSAORenderMode::Outline);
+		GTE::CameraRef mainCamera = cameraObject->GetCamera();
+		if (mainCamera->GetSSAORenderMode() == GTE::SSAORenderMode::Outline)mainCamera->SetSSAORenderMode(GTE::SSAORenderMode::Standard);
+		else mainCamera->SetSSAORenderMode(GTE::SSAORenderMode::Outline);
 	}
 
 	// select ambient lights
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::A))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::A))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Ambient;
@@ -1053,7 +1053,7 @@ void Game::HandleGeneralInput()
 	}
 
 	// select directional light
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::D))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::D))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Directional;
@@ -1061,7 +1061,7 @@ void Game::HandleGeneralInput()
 	}
 
 	// select point lights
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::P))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::P))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Point;
@@ -1069,7 +1069,7 @@ void Game::HandleGeneralInput()
 	}
 
 	// select lava lights
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::L))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::L))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Lava;
@@ -1083,27 +1083,27 @@ void Game::HandleGeneralInput()
 	LavaField *lavaField = lavaScene->GetLavaField();
 
 	// toggle lava
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::K))
+	if (GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::K))
 	{
-		SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
+		GTE::SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
 		lavaFieldObject->SetActive(!lavaFieldObject->IsActive());
 	}
 
 	// determine light actions based on key input
-	bool toggleCastShadows = Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::R);
-	bool boostLightIntensity = Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::W);
-	bool reduceLightIntensity =  Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::E);
-	bool toggleLight = Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::Q);
+	bool toggleCastShadows = GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::R);
+	bool boostLightIntensity = GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::W);
+	bool reduceLightIntensity = GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::E);
+	bool toggleLight = GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::Q);
 
 	float intensityBoost = 0;
 	if(boostLightIntensity)intensityBoost = .05;
 	else if(reduceLightIntensity)intensityBoost = -.05;
 
 	// get references to various lights across multiple scenes
-	std::vector<SceneObjectRef>& lavaLightObjects = lavaScene->GetLavaLightObjects();
-	std::vector<SceneObjectRef>& castleLights = castleScene->GetPointLights();
-	SceneObjectRef lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
-	std::vector<SceneObjectRef>& reflectingPoolLights = poolScene->GetPointLights();
+	std::vector<GTE::SceneObjectRef>& lavaLightObjects = lavaScene->GetLavaLightObjects();
+	std::vector<GTE::SceneObjectRef>& castleLights = castleScene->GetPointLights();
+	GTE::SceneObjectRef lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
+	std::vector<GTE::SceneObjectRef>& reflectingPoolLights = poolScene->GetPointLights();
 
 	// update selected lights
 	switch(selectedLighting)
@@ -1137,7 +1137,7 @@ void Game::HandleGeneralInput()
 	}
 
 	// toggle skybox
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::S))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::S))
 	{
 		if(cameraObject.IsValid())
 		{
@@ -1146,19 +1146,19 @@ void Game::HandleGeneralInput()
 	}
 
 	// change to lava scene
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::One))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::One))
 	{
 		TransitionToScene(Scenes::LavaScene);
 	}
 
 	// change to castle scene
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::Two))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Two))
 	{
 		TransitionToScene(Scenes::CastleScene);
 	}
 
 	// change to pool scene
-	if(Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(Key::Three))
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Three))
 	{
 		TransitionToScene(Scenes::PoolScene);
 	}
@@ -1171,7 +1171,7 @@ void Game::HandleGeneralInput()
  * [intensityChange] - Amount by which light intensity should be adjusted.
  * [toggleCastShadows] - Toggle whether or not shadows are enabled for the light.
  */
-void Game::UpdateLight(SceneObjectRef sceneObject, bool toggleLight, float intensityChange, bool toggleCastShadows)
+void Game::UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, float intensityChange, bool toggleCastShadows)
 {
 	if(sceneObject.IsValid())
 	{
@@ -1197,16 +1197,16 @@ void Game::UpdateLight(SceneObjectRef sceneObject, bool toggleLight, float inten
  */
 void Game::UpdatePlayerFollowCamera()
 {
-	Point3 cameraPos;
-	Point3 playerPos;
+	GTE::Point3 cameraPos;
+	GTE::Point3 playerPos;
 
 	// points that will determine the camera's final orientation. the camera
 	// will first rotate to look at [playerPosCameraLookTargetA], and from there
 	// will rotate to look at [playerPosCameraLookTargetB]
-	Point3 playerPosCameraLookTargetA;
-	Point3 playerPosCameraLookTargetB;
+	GTE::Point3 playerPosCameraLookTargetA;
+	GTE::Point3 playerPosCameraLookTargetB;
 	// position to which the camera will move
-	Point3 playerPosCameraMoveTarget;
+	GTE::Point3 playerPosCameraMoveTarget;
 
 	// get the gamera's position in world space into [cameraPos]
 	cameraObject->GetTransform().TransformPoint(cameraPos);
@@ -1227,18 +1227,18 @@ void Game::UpdatePlayerFollowCamera()
 	playerPosCameraMoveTarget.y = playerPos.y + 13;
 
 	// vector that represent the camera's direction when looking at [playerPosCameraLookTargetA]
-	Vector3 cameraToPlayerLookA;
+	GTE::Vector3 cameraToPlayerLookA;
 	// vector that represent the camera's direction when looking at [playerPosCameraLookTargetB]
-	Vector3 cameraToPlayerLookB;
+	GTE::Vector3 cameraToPlayerLookB;
 	// get a vector from the camera's current position to [cameraToPlayerLookA] and store in [cameraToPlayerLookA]
-	Point3::Subtract(playerPosCameraLookTargetA, cameraPos, cameraToPlayerLookA);
+	GTE::Point3::Subtract(playerPosCameraLookTargetA, cameraPos, cameraToPlayerLookA);
 	// get a vector from the camera's current position to [cameraToPlayerLookB] and store in [cameraToPlayerLookB]
-	Point3::Subtract(playerPosCameraLookTargetB, cameraPos, cameraToPlayerLookB);
+	GTE::Point3::Subtract(playerPosCameraLookTargetB, cameraPos, cameraToPlayerLookB);
 
 	// get a vector from the camera's current position to its target position,
 	// and store in [cameraToPlayerMove]
-	Vector3 cameraToPlayerMove;
-	Point3::Subtract(playerPosCameraMoveTarget, cameraPos, cameraToPlayerMove);
+	GTE::Vector3 cameraToPlayerMove;
+	GTE::Point3::Subtract(playerPosCameraMoveTarget, cameraPos, cameraToPlayerMove);
 
 	// project [cameraToPlayerMove] into the x-z plane
 	cameraToPlayerMove.y=0;
@@ -1248,7 +1248,7 @@ void Game::UpdatePlayerFollowCamera()
 	float desiredFollowDistance = 25;
 
 	// create copy of [cameraToPlayerMove] and scale it a magnitude of [desiredFollowDistance]
-	Vector3 newCameraToPlayer = cameraToPlayerMove;
+	GTE::Vector3 newCameraToPlayer = cameraToPlayerMove;
 	newCameraToPlayer.Normalize();
 	newCameraToPlayer.Scale(desiredFollowDistance);
 
@@ -1258,32 +1258,32 @@ void Game::UpdatePlayerFollowCamera()
 
 	// calculate camera's real target position, [realCameraTargetPos], which will be [desiredFollowDistance] units
 	// away from [playerPosCameraMoveTarget] along the vector [newCameraToPlayer]
-	Point3 realCameraTargetPos;
-	Point3::Add(playerPosCameraMoveTarget, newCameraToPlayer, realCameraTargetPos);
+	GTE::Point3 realCameraTargetPos;
+	GTE::Point3::Add(playerPosCameraMoveTarget, newCameraToPlayer, realCameraTargetPos);
 
 	// lerp the camera's current position towards its real target position
-	Point3 newCameraPos;
-	Point3::Lerp(cameraPos, realCameraTargetPos, newCameraPos, 2 * Time::GetDeltaTime());
+	GTE::Point3 newCameraPos;
+	GTE::Point3::Lerp(cameraPos, realCameraTargetPos, newCameraPos, 2 * GTE::Time::GetDeltaTime());
 
 	// get a vector that represents the lerp operation above
-	Vector3 cameraMove;
-	Point3::Subtract(newCameraPos, cameraPos, cameraMove);
+	GTE::Vector3 cameraMove;
+	GTE::Point3::Subtract(newCameraPos, cameraPos, cameraMove);
 
 	// get quaternion that represents a rotation from the camera's original forward vector
 	// to [cameraToPlayerLookA], then from [cameraToPlayerLookA] to [cameraToPlayerLookB]
 	// to form the final camera rotation [cameraRotation]
-	Quaternion cameraRotationXZ;
-	Quaternion cameraRotationY;
-	Quaternion cameraRotation;
-	cameraRotationXZ = Quaternion::getRotation(baseCameraForward,cameraToPlayerLookA);
-	cameraRotationY = Quaternion::getRotation(cameraToPlayerLookA,cameraToPlayerLookB);
+	GTE::Quaternion cameraRotationXZ;
+	GTE::Quaternion cameraRotationY;
+	GTE::Quaternion cameraRotation;
+	cameraRotationXZ = GTE::Quaternion::getRotation(baseCameraForward, cameraToPlayerLookA);
+	cameraRotationY = GTE::Quaternion::getRotation(cameraToPlayerLookA, cameraToPlayerLookB);
 	cameraRotationXZ.normalize();
 	cameraRotationY.normalize();
 	cameraRotation = cameraRotationY * cameraRotationXZ;
 
-	Quaternion currentRotation;
-	Vector3 currentTranslation;
-	Vector3 currentScale;
+	GTE::Quaternion currentRotation;
+	GTE::Vector3 currentTranslation;
+	GTE::Vector3 currentScale;
 
 	// apply quaternion calculated above to make the camera look towards the player
 	cameraObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
@@ -1299,6 +1299,6 @@ void Game::UpdatePlayerFollowCamera()
 void Game::ActivatePlayerState(PlayerState state)
 {
 	playerState = state;
-	stateActivationTime[(int) state] = Time::GetRealTimeSinceStartup();
+	stateActivationTime[(int)state] = GTE::Time::GetRealTimeSinceStartup();
 }
 
