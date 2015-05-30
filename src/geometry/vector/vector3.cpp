@@ -4,7 +4,7 @@
 #include <memory.h>
 #include <math.h>
  
-#include "Vector3.h"
+#include "vector3.h"
 #include "gtemath/gtemath.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"

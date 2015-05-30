@@ -4,7 +4,7 @@
 #include <memory.h>
 #include <math.h>
 
-#include "vector3Array.h"
+#include "vector3array.h"
 #include "vector3.h"
 #include "vector3factory.h"
 #include "base/basevector4array.h"
