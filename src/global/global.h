@@ -57,7 +57,7 @@
 {										   		 																	\
 	if(!(exp))					     			 																	\
 	{																												\
-		::GTE::Engine::Instance()->GetErrorManager()->SetError((int)::GTE::ErrorCode::GENERAL_NONFATAL, (msg));     \
+		::GTE::Engine::Instance()->GetErrorManager()->SetError((Int32)::GTE::ErrorCode::GENERAL_NONFATAL, (msg));     \
 		::GTE::Debug::PrintAtLevel((msg), DebugLevel::Error);														\
 		return (returnExp);			       																			\
 	}									   																			\
@@ -86,7 +86,7 @@
 {										   																			\
 	if(!(exp))					     			 																	\
 	{									   		 																	\
-		::GTE::Engine::Instance()->GetErrorManager()->SetError((int)::GTE::ErrorCode::GENERAL_NONFATAL, (msg)); 	\
+		::GTE::Engine::Instance()->GetErrorManager()->SetError((Int32)::GTE::ErrorCode::GENERAL_NONFATAL, (msg)); 	\
 		::GTE::Debug::PrintAtLevel((msg), ::GTE::DebugLevel::Error);												\
 		return;			       		 			 																	\
 	}									   		 																	\

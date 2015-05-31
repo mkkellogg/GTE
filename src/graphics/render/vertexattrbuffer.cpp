@@ -29,7 +29,7 @@ namespace GTE
 	/*
 	 * Get the number of vertices in this buffer.
 	 */
-	int VertexAttrBuffer::GetVertexCount() const
+	Int32 VertexAttrBuffer::GetVertexCount() const
 	{
 		return vertexCount;
 	}
@@ -38,7 +38,7 @@ namespace GTE
 	 * Get the number of components in this buffer's target attribute (e.g. vertex
 	 * position has 4 components: x,y,z,w).
 	 */
-	int VertexAttrBuffer::GetComponentCount() const
+	Int32 VertexAttrBuffer::GetComponentCount() const
 	{
 		return componentCount;
 	}
@@ -46,7 +46,7 @@ namespace GTE
 	/*
 	 * Get the padding between vertices.
 	 */
-	int VertexAttrBuffer::GetStride() const
+	Int32 VertexAttrBuffer::GetStride() const
 	{
 		return stride;
 	}

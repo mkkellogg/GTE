@@ -124,7 +124,7 @@ namespace GTE
 		FILE *fp;
 		char *content = NULL;
 
-		int count = 0;
+		Int32 count = 0;
 
 		if (fn != NULL)
 		{

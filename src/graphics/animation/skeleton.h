@@ -69,11 +69,11 @@ namespace GTE
 		Tree<SkeletonNode*>::TreeNode * AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode* node);
 
 		void MapBone(std::string& name, UInt32 boneIndex);
-		int GetBoneMapping(std::string& name);
+		Int32 GetBoneMapping(std::string& name);
 		Bone* GetBone(UInt32 boneIndex);
 
 		void MapNode(std::string& name, UInt32 nodeIndex);
-		int GetNodeMapping(std::string& name);
+		Int32 GetNodeMapping(std::string& name);
 		SkeletonNode * GetNodeFromList(UInt32 nodeIndex);
 		void AddNodeToList(SkeletonNode * node);
 

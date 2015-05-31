@@ -204,7 +204,7 @@ namespace GTE
 			SkeletonNode * targetNode = target->GetNodeFromList(node);
 
 			// loop through all registered animations
-			for (int i = registeredAnimations.size() - 1; i >= 0; i--)
+			for (Int32 i = registeredAnimations.size() - 1; i >= 0; i--)
 			{
 				AnimationInstanceRef instance = registeredAnimations[i];
 
@@ -212,7 +212,7 @@ namespace GTE
 				if (instance.IsValid() && instance->Playing)
 				{
 					// if this node does not have an animation channel for it in the current animation, then ignore
-					int mappedChannel = instance->GetChannelMappingForTargetNode(node);
+					Int32 mappedChannel = instance->GetChannelMappingForTargetNode(node);
 
 					// retrieve this animation's weight
 					Real weight = animationWeights[i];
@@ -590,7 +590,7 @@ namespace GTE
 	/*
 	 * Get the key frame time for the frame at [frameIndex] for the desired transformation component [transformationComponent].
 	 */
-	Real AnimationPlayer::GetKeyFrameTime(TransformationCompnent transformationComponent, int frameIndex, const KeyFrameSet& keyFrameSet) const
+	Real AnimationPlayer::GetKeyFrameTime(TransformationCompnent transformationComponent, Int32 frameIndex, const KeyFrameSet& keyFrameSet) const
 	{
 		Real keyFrameTime = 0;
 		if (transformationComponent == TransformationCompnent::Translation)

@@ -81,7 +81,7 @@ namespace GTE
 			// loop through each sub-mesh in the target mesh
 			for (UInt32 i = 0; i < mesh->GetSubMeshCount(); i++)
 			{
-				int vertexBoneMapIndex = -1;
+				Int32 vertexBoneMapIndex = -1;
 				SubMesh3DRendererRef subRenderer = this->GetSubRenderer(i);
 
 				// does the sub-mesh at index [i] have a corresponding VertexBoneMap object?
@@ -149,7 +149,7 @@ namespace GTE
 	 *
 	 * Setting vertexBoneMapIndex to -1 effectively turns off skinning for the specified sub-mesh
 	 */
-	void SkinnedMesh3DRenderer::MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, int vertexBoneMapIndex)
+	void SkinnedMesh3DRenderer::MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, Int32 vertexBoneMapIndex)
 	{
 		subMeshIndexMap[subMeshIndex] = vertexBoneMapIndex;
 	}

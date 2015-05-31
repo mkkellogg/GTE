@@ -75,9 +75,9 @@ namespace GTE
 			}
 		};
 
-		static const int MAX_LIGHTS = 16;
-		static const int MAX_CAMERAS = 8;
-		static const int MAX_SCENE_MESHES = 128;
+		static const Int32 MAX_LIGHTS = 16;
+		static const Int32 MAX_CAMERAS = 8;
+		static const Int32 MAX_SCENE_MESHES = 128;
 
 		// mesh for doing full screen effects
 		Mesh3DRef fullScreenQuad;

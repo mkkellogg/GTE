@@ -28,12 +28,12 @@ namespace GTE
 		return new Color4(true, target);
 	}
 
-	BaseVector4 ** Color4Factory::CreateArray(int count)
+	BaseVector4 ** Color4Factory::CreateArray(Int32 count)
 	{
 		BaseVector4** pptr = (BaseVector4**)new Color4*[count];
 		ASSERT(pptr != NULL, "Color4Factory::CreateArray -> Unable to allocate array");
 
-		memset(pptr, (int)NULL, sizeof(Color4*) * count);
+		memset(pptr, (Int32)NULL, sizeof(Color4*) * count);
 
 		return pptr;
 	}

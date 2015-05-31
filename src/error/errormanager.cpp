@@ -1,5 +1,4 @@
 #include "errormanager.h"
-#include "global/global.h"
 #include "debug/gtedebug.h"
 
 namespace GTE
@@ -14,46 +13,46 @@ namespace GTE
 
 	}
 
-	void ErrorManager::SetError(int code, const std::string& message)
+	void ErrorManager::SetError(Int32 code, const std::string& message)
 	{
 		errorCode = code;
 		errorMessage = message;
 	}
 
-	void ErrorManager::SetError(int code, const char * message)
+	void ErrorManager::SetError(Int32 code, const char * message)
 	{
 		SetError(code, std::string(message));
 	}
 
-	void ErrorManager::AddError(int code, const std::string& message)
+	void ErrorManager::AddError(Int32 code, const std::string& message)
 	{
 		errorCode = code;
 		errorMessage = message;
 	}
 
-	void ErrorManager::AddError(int code, const char * message)
+	void ErrorManager::AddError(Int32 code, const char * message)
 	{
 		AddError(code, std::string(message));
 	}
 
-	void ErrorManager::SetAndReportError(int code, const std::string& message)
+	void ErrorManager::SetAndReportError(Int32 code, const std::string& message)
 	{
 		SetError(code, message);
 		Debug::PrintAtLevel(message, DebugLevel::Error);
 	}
 
-	void ErrorManager::SetAndReportError(int code, const char * message)
+	void ErrorManager::SetAndReportError(Int32 code, const char * message)
 	{
 		SetAndReportError(code, std::string(message));
 	}
 
-	void ErrorManager::AddAndReportError(int code, const std::string& message)
+	void ErrorManager::AddAndReportError(Int32 code, const std::string& message)
 	{
 		AddError(code, message);
 		Debug::PrintAtLevel(message, DebugLevel::Error);
 	}
 
-	void ErrorManager::AddAndReportError(int code, const char * message)
+	void ErrorManager::AddAndReportError(Int32 code, const char * message)
 	{
 		AddAndReportError(code, std::string(message));
 	}
@@ -64,7 +63,7 @@ namespace GTE
 		errorMessage = std::string("No error");
 	}
 
-	int ErrorManager::GetErrorCode() const
+	Int32 ErrorManager::GetErrorCode() const
 	{
 		return errorCode;
 	}

@@ -100,7 +100,7 @@ namespace GTE
 			VertexBoneMap::VertexMappingDescriptor * desc = GetDescriptor(v);
 			for (UInt32 b = 0; b < desc->BoneCount; b++)
 			{
-				int boneIndex = skeleton->GetBoneMapping(desc->Name[b]);
+				Int32 boneIndex = skeleton->GetBoneMapping(desc->Name[b]);
 				desc->BoneIndex[b] = boneIndex;
 			}
 		}

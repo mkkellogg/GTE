@@ -434,12 +434,12 @@ namespace GTE
 
 	void InputManager::SetDigitalInputState(DigitalInput input, bool state)
 	{
-		digitalInputState[(int)input] = state;
+		digitalInputState[(Int32)input] = state;
 	}
 
 	bool InputManager::GetDigitalInputState(DigitalInput input)
 	{
-		return digitalInputState[(int)input];
+		return digitalInputState[(Int32)input];
 	}
 }
 

@@ -419,7 +419,7 @@ namespace GTE
 	/*
 	 * Set the index of this instance's VertexBoneMap in [skeleton].
 	 */
-	void SkinnedMesh3DAttributeTransformer::SetVertexBoneMapIndex(int index)
+	void SkinnedMesh3DAttributeTransformer::SetVertexBoneMapIndex(Int32 index)
 	{
 		vertexBoneMapIndex = index;
 	}

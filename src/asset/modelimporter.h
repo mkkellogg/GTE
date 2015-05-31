@@ -73,7 +73,7 @@ namespace GTE
 		{
 		public:
 
-			int vertexColorsIndex;
+			Int32 vertexColorsIndex;
 			LongMask shaderProperties;
 			MaterialRef material;
 			bool invertVCoords;
@@ -99,7 +99,7 @@ namespace GTE
 
 			std::map<int, MeshSpecificMaterialDescriptor> meshSpecificProperties;
 
-			bool UsedByMesh(int index)
+			bool UsedByMesh(Int32 index)
 			{
 				if (meshSpecificProperties.find(index) != meshSpecificProperties.end())return true;
 				return false;
@@ -144,8 +144,8 @@ namespace GTE
 		static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property);
 		static std::string GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property);
 		static std::string GetBuiltinVariableNameForTextureType(TextureType textureType);
-		static TextureType ConvertAITextureKeyToTextureType(int aiTextureKey);
-		static int ConvertTextureTypeToAITextureKey(TextureType textureType);
+		static TextureType ConvertAITextureKeyToTextureType(Int32 aiTextureKey);
+		static Int32 ConvertTextureTypeToAITextureKey(TextureType textureType);
 
 		static bool HasOddReflections(Matrix4x4& mat);
 

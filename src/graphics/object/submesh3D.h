@@ -48,7 +48,7 @@ namespace GTE
 		// total number of vertices in this mesh
 		UInt32 totalVertexCount;
 		// this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
-		int subIndex;
+		Int32 subIndex;
 
 		// structure that describes (among other things) the adjacency relationship that
 		// faces of this mesh have with each other
@@ -66,7 +66,7 @@ namespace GTE
 		bool isDirty;
 		// inter-face angle above which smoothing/average of vertex normals should
 		// not occur
-		int normalsSmoothingThreshold;
+		Int32 normalsSmoothingThreshold;
 		// invert normals every time they are calculated
 		bool invertNormals;
 		// local center position for sub-mesh.
@@ -103,7 +103,7 @@ namespace GTE
 
 		void CalculateFaceNormal(UInt32 faceIndex, Vector3& result) const;
 		void FindAdjacentFaceIndex(UInt32 faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
-		int FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const;
+		Int32 FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const;
 		void BuildFaces();
 
 		void CalcSphereOfInfluence();
@@ -111,7 +111,7 @@ namespace GTE
 		void CalculateTangent(UInt32 vertexIndex, UInt32 rightIndex, UInt32 leftIndex, Vector3& result);
 		void CalculateTangents(Real smoothingThreshhold);
 		void SetContainerMesh(Mesh3D * mesh);
-		void SetSubIndex(int index);
+		void SetSubIndex(Int32 index);
 
 		void ReverseAttributeComponentOrder();
 		void InvertNormals();

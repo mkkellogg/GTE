@@ -34,7 +34,7 @@ namespace GTE
 			stackPointer = NULL;
 		}
 
-		DataStack(int maxEntryCount, int elementsPerEntry)
+		DataStack(Int32 maxEntryCount, Int32 elementsPerEntry)
 		{
 			this->maxEntryCount = maxEntryCount;
 			this->elementsPerEntry = elementsPerEntry;
@@ -90,7 +90,7 @@ namespace GTE
 			return NULL;
 		}
 
-		int GetMaxEntryCount() const
+		Int32 GetMaxEntryCount() const
 		{
 			return maxEntryCount;
 		}

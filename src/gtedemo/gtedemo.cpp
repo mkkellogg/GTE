@@ -53,7 +53,7 @@ class CustomEngineCallbacks : public GTE::EngineCallbacks
  * Entry point for the GTE Demo. This method is minimal; its only purpose
  * is to initialize and start the engine.
  */
-int main(int argc, char** argv)
+int main(GTE::Int32 argc, char** argv)
 {
 	// instance CustomEngineCallbacks to handle engine events
 	CustomEngineCallbacks engineCallbacks;

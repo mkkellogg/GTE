@@ -37,7 +37,7 @@ namespace GTE
 		AttributeDescriptor();
 		~AttributeDescriptor();
 
-		int Size;
+		Int32 Size;
 		bool IsSet;
 		AttributeType Type;
 		UInt32 ShaderVarID;

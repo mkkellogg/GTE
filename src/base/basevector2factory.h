@@ -17,7 +17,7 @@ namespace GTE
 		virtual ~BaseVector2Factory();
 
 		virtual BaseVector2 * CreatePermAttached(Real * target);
-		virtual BaseVector2 ** CreateArray(int count);
+		virtual BaseVector2 ** CreateArray(Int32 count);
 		virtual void DestroyArray(BaseVector2 ** array, UInt32 size);
 	};
 }

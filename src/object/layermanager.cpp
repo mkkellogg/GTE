@@ -22,7 +22,7 @@ namespace GTE
 	{
 		if (currentLayerIndex >= MAX_LAYERS)return -1;
 
-		int layerIndex = GetLayerIndex(name);
+		Int32 layerIndex = GetLayerIndex(name);
 		if (layerIndex < 0)
 		{
 			layerIndexes[name] = layerIndex = currentLayerIndex;
@@ -32,7 +32,7 @@ namespace GTE
 		return layerIndex;
 	}
 
-	int LayerManager::GetLayerIndex(const std::string& name) const
+	Int32 LayerManager::GetLayerIndex(const std::string& name) const
 	{
 		if (layerIndexes.find(name) == layerIndexes.end())
 		{
@@ -44,7 +44,7 @@ namespace GTE
 
 	IntMask LayerManager::GetLayerMask(const std::string& name) const
 	{
-		int layerIndex = GetLayerIndex(name);
+		Int32 layerIndex = GetLayerIndex(name);
 		return GetLayerMask(layerIndex);
 	}
 

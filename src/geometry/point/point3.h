@@ -61,14 +61,14 @@ namespace GTE
 		// TODO: optimize this hashing function (implement correctly)
 		typedef struct
 		{
-			int operator()(const Point3& p) const
+			Int32 operator()(const Point3& p) const
 			{
-				return (int)p.x + (6 << (int)p.y) + (12 << (int)p.z);
+				return (Int32)p.x + (6 << (Int32)p.y) + (12 << (Int32)p.z);
 			}
 
-			int operator()(const Point3& p)
+			Int32 operator()(const Point3& p)
 			{
-				return (int)p.x + (6 << (int)p.y) + (12 << (int)p.z);
+				return (Int32)p.x + (6 << (Int32)p.y) + (12 << (Int32)p.z);
 			}
 		}Point3Hasher;
 

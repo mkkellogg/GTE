@@ -29,16 +29,16 @@ namespace GTE
 
 		// index in the respective mesh's attribute arrays of the first
 		// vertex of this face
-		int FirstVertexIndex;
+		Int32 FirstVertexIndex;
 		// index in the respective mesh's attribute arrays of the first
 		// vertex of this face's first adjacent face
-		int AdjacentFaceIndex1;
+		Int32 AdjacentFaceIndex1;
 		// index in the respective mesh's attribute arrays of the second
 		// vertex of this face's first adjacent face
-		int AdjacentFaceIndex2;
+		Int32 AdjacentFaceIndex2;
 		// index in the respective mesh's attribute arrays of the third
 		// vertex of this face's first adjacent face
-		int AdjacentFaceIndex3;
+		Int32 AdjacentFaceIndex3;
 	};
 }
 

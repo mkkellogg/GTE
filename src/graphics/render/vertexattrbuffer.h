@@ -26,22 +26,22 @@ namespace GTE
 
 		// number of components per attribute, e.g. vertex positions have
 		// a component count of 4 (x,y,z,w)
-		int componentCount;
+		Int32 componentCount;
 		// total number of vertices in the buffer
-		int vertexCount;
+		Int32 vertexCount;
 		// padding space between attributes, can be used to achieve optimal memory alignment
-		int stride;
+		Int32 stride;
 
 	public:
 
 		VertexAttrBuffer();
 		virtual ~VertexAttrBuffer();
 
-		virtual bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, Real *srcData) = 0;
+		virtual bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, bool dataOnGPU, Real *srcData) = 0;
 		virtual void SetData(const Real * data) = 0;
-		int GetVertexCount() const;
-		int GetComponentCount() const;
-		int GetStride() const;
+		Int32 GetVertexCount() const;
+		Int32 GetComponentCount() const;
+		Int32 GetStride() const;
 		virtual UInt32 GetFullSize() const = 0;
 	};
 }

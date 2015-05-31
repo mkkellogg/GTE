@@ -34,7 +34,7 @@ namespace GTE
 
 		// the index of the corresponding bone (if there is one) in the container Skeleton object's
 		// bone array.
-		int BoneIndex;
+		Int32 BoneIndex;
 		// the name of this node
 		std::string Name;
 		// save the original transformations
@@ -43,7 +43,7 @@ namespace GTE
 		Vector3 InitialScale;
 		Quaternion InitialRotation;
 
-		SkeletonNode(int boneIndex, const std::string& name);
+		SkeletonNode(Int32 boneIndex, const std::string& name);
 		virtual ~SkeletonNode();
 
 		virtual const Transform * GetFullTransform() const = 0;

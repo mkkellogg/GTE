@@ -75,7 +75,7 @@ namespace GTE
 		// length of current span over which FPS is calculated
 		Real currentFPSSpanTime;
 		// number of frames in rendered in current FPS calculation span
-		int framesInFPSSpan;
+		Int32 framesInFPSSpan;
 		// last calculated FPS value
 		Real currentFPS;
 

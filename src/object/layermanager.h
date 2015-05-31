@@ -25,7 +25,7 @@ namespace GTE
 	public:
 
 		UInt32 AddLayer(const std::string& name);
-		int GetLayerIndex(const std::string& name) const;
+		Int32 GetLayerIndex(const std::string& name) const;
 		IntMask GetLayerMask(const std::string& name) const;
 		IntMask GetLayerMask(UInt32 layerIndex) const;
 		IntMask RemoveLayerFromMask(IntMask mask, UInt32 layerIndex);

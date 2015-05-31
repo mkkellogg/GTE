@@ -14,7 +14,7 @@ namespace GTE
 	{
 	protected:
 		
-		int count;
+		Int32 count;
 		Real * data;
 		BaseVector2 ** objects;
 		BaseVector2Factory * baseFactory;
@@ -27,7 +27,7 @@ namespace GTE
 		virtual ~BaseVector2Array();
 
 		const Real * GetDataPtr() const;
-		bool Init(int count);
+		bool Init(Int32 count);
 	};
 }
 

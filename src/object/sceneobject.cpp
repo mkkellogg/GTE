@@ -256,12 +256,12 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(child.IsValid(), "SceneObject::RemoveChild -> 'child' is invalid.", true);
 
-		int foundIndex = -1;
+		Int32 foundIndex = -1;
 		for (UInt32 i = 0; i < children.size(); i++)
 		{
 			if (children[i] == child)
 			{
-				foundIndex = (int)i;
+				foundIndex = (Int32)i;
 				break;
 			}
 		}

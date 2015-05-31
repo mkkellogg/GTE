@@ -60,7 +60,7 @@ namespace GTE
 		friend class RenderManager;
 
 		// index of this sub-renderer in containing Mesh3DRenderer instance's list of sub-renderers
-		int targetSubMeshIndex;
+		Int32 targetSubMeshIndex;
 		// a reference to the last valid material used to for rendering
 		MaterialRef lastUsedMaterial;
 		// pointer to the Mesh3DRenderer instance that contains this instance of SubMesh3DRenderer
@@ -69,7 +69,7 @@ namespace GTE
 		// attribute buffers store vertex attribute data such as positions, normals, UV coordinates, etc.
 		// they are copies of the attribute data stored in this renderer's target sub-mesh, but are stored in
 		// a manner that is more suitable for delivery to the GPU
-		const static int MAX_ATTRIBUTE_BUFFERS = 64;
+		const static Int32 MAX_ATTRIBUTE_BUFFERS = 64;
 		VertexAttrBuffer * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
 		std::vector<VertexAttrBufferBinding> boundAttributeBuffers;
 		std::vector<VertexAttrBufferBinding> boundShadowVolumeAttributeBuffers;
@@ -120,11 +120,11 @@ namespace GTE
 		void SetContainerRenderer(Mesh3DRenderer * renderer);
 		void SetTargetSubMeshIndex(UInt32 index);
 
-		bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount, int stride);
+		bool InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride);
 		void Destroy();
 		void DestroyBuffers();
 		void DestroyBuffer(VertexAttrBuffer ** buffer);
-		bool InitAttributeData(StandardAttribute attr, int length, int componentCount, int stride);
+		bool InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride);
 
 		const Point3Array * GetShadowVolumePositions();
 		void SetShadowVolumePositionData(const Point3Array * points);

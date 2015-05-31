@@ -62,7 +62,7 @@ namespace GTE
 	private:
 
 		// map each node in [Target] to a channel in [SourceAnimation]
-		int * NodeToChannelMap;
+		Int32 * NodeToChannelMap;
 
 		// the target of this instance
 		SkeletonRef Target;
@@ -123,7 +123,7 @@ namespace GTE
 		void Reset();
 
 		FrameState * GetFrameState(UInt32 stateIndex);
-		int GetChannelMappingForTargetNode(UInt32 nodeIndex);
+		Int32 GetChannelMappingForTargetNode(UInt32 nodeIndex);
 	};
 
 }

@@ -26,7 +26,7 @@ namespace GTE
 	}
 
 
-	Color4 * Color4Array::GetColor(int index)
+	Color4 * Color4Array::GetColor(Int32 index)
 	{
 		return (Color4*)objects[index];
 	}

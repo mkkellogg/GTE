@@ -50,25 +50,25 @@ namespace GTE
 		virtual ~Shader();
 		virtual bool Load() = 0;
 		virtual bool IsLoaded() = 0;
-		virtual int GetAttributeVarID(const std::string& varName) const = 0;
-		virtual int GetUniformVarID(const std::string& varName) const = 0;
-		virtual void SendBufferToShader(int varID, VertexAttrBuffer * buffer) = 0;
+		virtual Int32 GetAttributeVarID(const std::string& varName) const = 0;
+		virtual Int32 GetUniformVarID(const std::string& varName) const = 0;
+		virtual void SendBufferToShader(Int32 varID, VertexAttrBuffer * buffer) = 0;
 
-		virtual void SendUniformToShader(int varID, UInt32 samplerUnitIndex, const TextureRef texture) = 0;
-		virtual void SendUniformToShader(int varID, const Matrix4x4 * mat) = 0;
-		virtual void SendUniformToShader(int varID, const Point3 * point) = 0;
-		virtual void SendUniformToShader(int varID, const Vector3 * vector) = 0;
-		virtual void SendUniformToShader(int varID, const Color4 * color) = 0;
+		virtual void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureRef texture) = 0;
+		virtual void SendUniformToShader(Int32 varID, const Matrix4x4 * mat) = 0;
+		virtual void SendUniformToShader(Int32 varID, const Point3 * point) = 0;
+		virtual void SendUniformToShader(Int32 varID, const Vector3 * vector) = 0;
+		virtual void SendUniformToShader(Int32 varID, const Color4 * color) = 0;
 
-		virtual void SendUniformToShader4v(int varID, const Real * data) = 0;
-		virtual void SendUniformToShader3v(int varID, const Real * data) = 0;
-		virtual void SendUniformToShader2v(int varID, const Real * data) = 0;
-		virtual void SendUniformToShader4(int varID, Real x, Real y, Real z, Real w) = 0;
-		virtual void SendUniformToShader3(int varID, Real x, Real y, Real z) = 0;
-		virtual void SendUniformToShader2(int varID, Real x, Real y) = 0;
-		virtual void SendUniformToShader(int varID, Real  data) = 0;
+		virtual void SendUniformToShader4v(Int32 varID, const Real * data) = 0;
+		virtual void SendUniformToShader3v(Int32 varID, const Real * data) = 0;
+		virtual void SendUniformToShader2v(Int32 varID, const Real * data) = 0;
+		virtual void SendUniformToShader4(Int32 varID, Real x, Real y, Real z, Real w) = 0;
+		virtual void SendUniformToShader3(Int32 varID, Real x, Real y, Real z) = 0;
+		virtual void SendUniformToShader2(Int32 varID, Real x, Real y) = 0;
+		virtual void SendUniformToShader(Int32 varID, Real  data) = 0;
 
-		virtual void SendUniformToShader(int varID, int  data) = 0;
+		virtual void SendUniformToShader(Int32 varID, Int32  data) = 0;
 
 		virtual UInt32 GetUniformCount() const = 0;
 		virtual const UniformDescriptor * GetUniformDescriptor(UInt32 index) const = 0;

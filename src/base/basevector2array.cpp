@@ -30,7 +30,7 @@ namespace GTE
 		SAFE_DELETE(data);
 	}
 
-	bool BaseVector2Array::Init(int count)
+	bool BaseVector2Array::Init(Int32 count)
 	{
 		Destroy();
 
@@ -44,7 +44,7 @@ namespace GTE
 
 		Real *dataPtr = data;
 
-		int index = 0;
+		Int32 index = 0;
 		while (index < count)
 		{
 			BaseVector2 * currentObject = (BaseVector2*)baseFactory->CreatePermAttached(dataPtr);

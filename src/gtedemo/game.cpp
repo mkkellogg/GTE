@@ -114,7 +114,7 @@ void Game::Init()
 
 	// set up player layer mask
 	GTE::LayerManager& layerManager = GTE::Engine::Instance()->GetEngineObjectManager()->GetLayerManager();
-	int playerObjectLayerIndex = layerManager.AddLayer(PlayerObjectLayer);
+	GTE::Int32 playerObjectLayerIndex = layerManager.AddLayer(PlayerObjectLayer);
 	playerObjectLayerMask = layerManager.GetLayerMask(playerObjectLayerIndex);
 
 	// set up global scene elements
@@ -826,7 +826,7 @@ void Game::UpdatePlayerVerticalSpeed()
 	// has been in the jump state for a sufficient amount of time
 	if(playerIsGrounded && playerState == PlayerState::Jump)
 	{
-		GTE::Real jumpTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(int)PlayerState::Jump];
+		GTE::Real jumpTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(GTE::Int32)PlayerState::Jump];
 		if(jumpTime > .2)
 		{
 			playerVerticalSpeed = 50;
@@ -1177,10 +1177,10 @@ void Game::UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, GTE::R
 	{
 		if(toggleLight)sceneObject->SetActive(!sceneObject->IsActive());
 
-		if(intensityChange != 0)
+		if (intensityChange != 0)
 		{
 			GTE::Real intensity = sceneObject->GetLight()->GetIntensity();
-			if(intensity + intensityChange < 0 && intensityChange < 0)intensityChange = -intensity;
+			if (intensity + intensityChange < 0 && intensityChange < 0)intensityChange = -intensity;
 			sceneObject->GetLight()->SetIntensity(intensity + intensityChange);
 		}
 
@@ -1299,6 +1299,6 @@ void Game::UpdatePlayerFollowCamera()
 void Game::ActivatePlayerState(PlayerState state)
 {
 	playerState = state;
-	stateActivationTime[(int)state] = GTE::Time::GetRealTimeSinceStartup();
+	stateActivationTime[(GTE::Int32)state] = GTE::Time::GetRealTimeSinceStartup();
 }
 

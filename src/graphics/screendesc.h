@@ -7,17 +7,17 @@ namespace GTE
 {
 	class ScreenDescriptor
 	{
-		int screenWidth;
-		int screenHeight;
+		Int32 screenWidth;
+		Int32 screenHeight;
 
 	public:
 
 		ScreenDescriptor();
-		ScreenDescriptor(int screenWidth, int screenHeight);
+		ScreenDescriptor(Int32 screenWidth, Int32 screenHeight);
 		~ScreenDescriptor();
 
-		int GetScreenWidth();
-		int getScreenHeight();
+		Int32 GetScreenWidth();
+		Int32 getScreenHeight();
 	};
 }
 

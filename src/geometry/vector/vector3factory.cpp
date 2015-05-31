@@ -28,12 +28,12 @@ namespace GTE
 		return new Vector3(true, target);
 	}
 
-	BaseVector4 ** Vector3Factory::CreateArray(int count)
+	BaseVector4 ** Vector3Factory::CreateArray(Int32 count)
 	{
 		BaseVector4** pptr = (BaseVector4**)new Vector3*[count];
 		ASSERT(pptr != NULL, "Vector3Factory::CreateArray -> Could not allocate new array.");
 
-		memset(pptr, (int)NULL, sizeof(Vector3*) * count);
+		memset(pptr, (Int32)NULL, sizeof(Vector3*) * count);
 
 		return pptr;
 	}

@@ -84,7 +84,7 @@ namespace GTE
 	/*
 	 * Set this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
 	 */
-	void SubMesh3D::SetSubIndex(int index)
+	void SubMesh3D::SetSubIndex(Int32 index)
 	{
 		subIndex = index;
 	}
@@ -130,11 +130,11 @@ namespace GTE
 		NONFATAL_ASSERT(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> 'faceIndex' is out range.", true);
 		const SubMesh3DFace * face = faces.GetFaceConst(faceIndex);
 
-		int faceVertexIndex = face->FirstVertexIndex;
+		Int32 faceVertexIndex = face->FirstVertexIndex;
 
-		int aResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex, (UInt32)faceVertexIndex + 1);
-		int bResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex + 1, (UInt32)faceVertexIndex + 2);
-		int cResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex + 2, (UInt32)faceVertexIndex);
+		Int32 aResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex, (UInt32)faceVertexIndex + 1);
+		Int32 bResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex + 1, (UInt32)faceVertexIndex + 2);
+		Int32 cResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex + 2, (UInt32)faceVertexIndex);
 
 		if (aResult >= 0)edgeA = aResult;
 		if (bResult >= 0)edgeB = bResult;
@@ -145,7 +145,7 @@ namespace GTE
 	 * Find the face to which vertices at [vaIndex] and [vbIndex] in member [positions] both belong, excluding
 	 * the face specified by [excludeFace].
 	 */
-	int SubMesh3D::FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const
+	Int32 SubMesh3D::FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const
 	{
 		std::vector<UInt32>* indicentVerticesA = vertexCrossMap[vaIndex];
 		std::vector<UInt32>* indicentVerticesB = vertexCrossMap[vbIndex];
@@ -708,43 +708,43 @@ namespace GTE
 		this->totalVertexCount = totalVertexCount;
 
 		bool initSuccess = true;
-		int errorMask = 0;
+		Int32 errorMask = 0;
 
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Position))
 		{
 			initSuccess = positions.Init(totalVertexCount) && initSuccess;
-			if (!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Position;
+			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::Position;
 		}
 
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))
 		{
 			initSuccess = vertexNormals.Init(totalVertexCount) && initSuccess;
 			initSuccess = faceNormals.Init(totalVertexCount) && initSuccess;
-			if (!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Normal;
+			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::Normal;
 		}
 
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))
 		{
 			initSuccess = vertexTangents.Init(totalVertexCount) && initSuccess;
-			if (!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::Tangent;
+			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::Tangent;
 		}
 
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::VertexColor))
 		{
 			initSuccess = colors.Init(totalVertexCount) && initSuccess;
-			if (!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::VertexColor;
+			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::VertexColor;
 		}
 
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::UVTexture0))
 		{
 			initSuccess = uvs0.Init(totalVertexCount) && initSuccess;
-			if (!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture0;
+			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::UVTexture0;
 		}
 
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::UVTexture1))
 		{
 			initSuccess = uvs1.Init(totalVertexCount) && initSuccess;
-			if (!initSuccess)errorMask |= (int)StandardAttributeMaskComponent::UVTexture1;
+			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::UVTexture1;
 		}
 
 		if (!initSuccess)

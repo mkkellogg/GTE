@@ -16,7 +16,7 @@ namespace GTE
 {
 	InputManagerGL * _thisPtr = NULL;
 
-	void _keyboardFunc(GLFWwindow* window, int key, int scancode, int action, int mods)
+	void _keyboardFunc(GLFWwindow* window, Int32 key, Int32 scancode, Int32 action, Int32 mods)
 	{
 		if (_thisPtr != NULL)
 		{
@@ -52,7 +52,7 @@ namespace GTE
 
 	}
 
-	void InputManagerGL::KeyboardFunction(int key, int scanCode, int mods)
+	void InputManagerGL::KeyboardFunction(Int32 key, Int32 scanCode, Int32 mods)
 	{
 		SetKeyState(GetKeyIndexFromCharacter(key), KeyState::Down);
 		SetOnKeyDown(GetKeyIndexFromCharacter(key), true);
@@ -66,7 +66,7 @@ namespace GTE
 		//printf("key down: %d, scancode:%d\n", key, scanCode);
 	}
 
-	void InputManagerGL::KeyboardFunctionUp(int key, int scanCode, int mods)
+	void InputManagerGL::KeyboardFunctionUp(Int32 key, Int32 scanCode, Int32 mods)
 	{
 		SetKeyState(GetKeyIndexFromCharacter(key), KeyState::Up);
 		//printf("key up: %d, x:%d, y:%d\n", key,x,y);
@@ -79,7 +79,7 @@ namespace GTE
 	}
 
 	/*
-	void InputManagerGL::SpecialInput(int key, int x, int y)
+	void InputManagerGL::SpecialInput(Int32 key, Int32 x, Int32 y)
 	{
 	//printf("key: %d, x:%d, y:%d\n", key,x,y);
 
@@ -92,7 +92,7 @@ namespace GTE
 	}
 	}
 
-	void InputManagerGL::SpecialInputUp(int key, int x, int y)
+	void InputManagerGL::SpecialInputUp(Int32 key, Int32 x, Int32 y)
 	{
 	//printf("key: %d, x:%d, y:%d\n", key,x,y);
 
@@ -106,7 +106,7 @@ namespace GTE
 	}
 	}*/
 
-	DigitalInput InputManagerGL::MapSpecialInputToDigitalInput(int key)
+	DigitalInput InputManagerGL::MapSpecialInputToDigitalInput(Int32 key)
 	{
 		switch (key)
 		{
@@ -127,7 +127,7 @@ namespace GTE
 		}
 	}
 
-	int InputManagerGL::MapSpecialInputToKeyIndex(int key)
+	Int32 InputManagerGL::MapSpecialInputToKeyIndex(Int32 key)
 	{
 		switch (key)
 		{
@@ -198,7 +198,7 @@ namespace GTE
 		return 0;
 	}
 
-	int InputManagerGL::MapModifierToKeyIndex(int modifier)
+	Int32 InputManagerGL::MapModifierToKeyIndex(Int32 modifier)
 	{
 		switch (modifier)
 		{

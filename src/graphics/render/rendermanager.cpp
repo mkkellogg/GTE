@@ -770,7 +770,7 @@ namespace GTE
 			_PassCount = 2
 		};
 
-		for (int pass = 0; pass < RenderPass::_PassCount; pass++)
+		for (Int32 pass = 0; pass < RenderPass::_PassCount; pass++)
 		{
 			if (pass == ShadowVolumeRender) // shadow volume pass
 			{

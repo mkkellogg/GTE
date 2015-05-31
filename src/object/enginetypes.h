@@ -1,7 +1,6 @@
 #ifndef _GTE_ENGINE_TYPES_H_
 #define _GTE_ENGINE_TYPES_H_
 
-#include "global/global.h"
 #include <memory>
 #include <functional>
 

@@ -45,7 +45,7 @@ namespace GTE
 
 		VertexAttrBuffer * Buffer;
 		StandardAttribute Attribute;
-		int AltBinding;
+		Int32 AltBinding;
 
 		VertexAttrBufferBinding()
 		{
@@ -54,7 +54,7 @@ namespace GTE
 			AltBinding = -1;
 		}
 
-		VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute attribute, int altBinding)
+		VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute attribute, Int32 altBinding)
 		{
 			this->Buffer = buffer;
 			this->Attribute = attribute;
@@ -70,12 +70,12 @@ namespace GTE
 		friend class EngineObjectManager;
 
 		// length of the array that contains binding information for stand attributes & uniforms
-		static const int BINDINGS_ARRAY_MAX_LENGTH = 128;
+		static const Int32 BINDINGS_ARRAY_MAX_LENGTH = 128;
 
 		// the following are values for the sizes of data required by various types of uniforms
-		static const int SAMPLER_2D_DATA_SIZE = 64;
-		static const int SAMPLER_CUBE_DATA_SIZE = 384;
-		static const int MATRIX4X4_DATA_SIZE = 16;
+		static const Int32 SAMPLER_2D_DATA_SIZE = 64;
+		static const Int32 SAMPLER_CUBE_DATA_SIZE = 384;
+		static const Int32 MATRIX4X4_DATA_SIZE = 16;
 
 		// string that holds the material's name
 		std::string materialName;
@@ -88,9 +88,9 @@ namespace GTE
 		StandardUniformSet standardUniforms;
 
 		// ids/locations of shader variables corresponding to standard attributes
-		int standardAttributeBindings[BINDINGS_ARRAY_MAX_LENGTH];
+		Int32 standardAttributeBindings[BINDINGS_ARRAY_MAX_LENGTH];
 		// ids/locations of shader variables corresponding to standard uniforms
-		int standardUniformBindings[BINDINGS_ARRAY_MAX_LENGTH];
+		Int32 standardUniformBindings[BINDINGS_ARRAY_MAX_LENGTH];
 
 		// a vector UniformDescriptor objects that describe custom uniforms that are set
 		// by the developer and
@@ -100,7 +100,7 @@ namespace GTE
 		bool attributesSetAndVerified;
 
 		// length of values for each attribute that has been set
-		int * attributesSetValues;
+		Int32 * attributesSetValues;
 
 		// map a shader variable ID/location to its index in attributesSetValues
 		std::map<int, int> attributeLocationsToVerificationIndex;
@@ -109,7 +109,7 @@ namespace GTE
 		bool uniformsSetAndVerified;
 
 		// length of values for each uniform that has been set
-		int * uniformsSetValues;
+		Int32 * uniformsSetValues;
 
 		// map a shader variable ID/location to its index in uniformsSetValues
 		std::map<int, int> uniformLocationsToVerificationIndex;
@@ -132,19 +132,19 @@ namespace GTE
 		bool SetupSetUniforms();
 		void DestroySetUniforms();
 
-		void SetStandardAttributeBinding(int varID, StandardAttribute attr);
-		int GetStandardAttributeBinding(StandardAttribute attr) const;
-		int TestForStandardAttribute(StandardAttribute attr) const;
+		void SetStandardAttributeBinding(Int32 varID, StandardAttribute attr);
+		Int32 GetStandardAttributeBinding(StandardAttribute attr) const;
+		Int32 TestForStandardAttribute(StandardAttribute attr) const;
 
-		int GetUniformIndex(const std::string& uniformName);
+		Int32 GetUniformIndex(const std::string& uniformName);
 		UInt32 GetSamplerUnitForName(const std::string& name);
-		void SetStandardUniformBinding(int varID, StandardUniform uniform);
-		int GetStandardUniformBinding(StandardUniform uniform) const;
-		int TestForStandardUniform(StandardUniform uniform) const;
+		void SetStandardUniformBinding(Int32 varID, StandardUniform uniform);
+		Int32 GetStandardUniformBinding(StandardUniform uniform) const;
+		Int32 TestForStandardUniform(StandardUniform uniform) const;
 		bool ValidateUniformName(const std::string& name, int& loc, int& index);
 
-		void SetAttributeSetValue(int varID, int size);
-		void SetUniformSetValue(int varID, int size);
+		void SetAttributeSetValue(Int32 varID, Int32 size);
+		void SetUniformSetValue(Int32 varID, Int32 size);
 
 
 	protected:
@@ -161,7 +161,7 @@ namespace GTE
 
 		StandardAttributeSet GetStandardAttributes() const;
 		void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
-		void SendAttributeBufferToShader(int varID, VertexAttrBuffer *buffer);
+		void SendAttributeBufferToShader(Int32 varID, VertexAttrBuffer *buffer);
 
 		StandardUniformSet GetStandardUniforms() const;
 
@@ -184,7 +184,7 @@ namespace GTE
 		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
 		void SendEyePositionToShader(const Point3 * position);
 
-		bool VerifySetVars(int vertexCount);
+		bool VerifySetVars(Int32 vertexCount);
 
 		void SetSelfLit(bool selfLit);
 		bool IsSelfLit();

@@ -10,7 +10,7 @@ namespace GTE
 {
 	union IntFloatUnion
 	{
-		int i;
+		Int32 i;
 		Real f;
 	};
 

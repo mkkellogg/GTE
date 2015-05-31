@@ -96,9 +96,9 @@ namespace GTE
 		// TODO: optimize this hashing function (implement correctly)
 		typedef struct
 		{
-			int operator()(const SceneObject& s) const
+			Int32 operator()(const SceneObject& s) const
 			{
-				return (int)s.GetObjectID() << 1;
+				return (Int32)s.GetObjectID() << 1;
 			}
 		}SceneObjectHasher;
 

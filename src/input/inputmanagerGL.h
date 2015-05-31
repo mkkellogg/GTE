@@ -16,9 +16,9 @@ namespace GTE
 
 		InputManagerGL();
 		~InputManagerGL();
-		DigitalInput MapSpecialInputToDigitalInput(int key);
-		int MapSpecialInputToKeyIndex(int key);
-		int MapModifierToKeyIndex(int modifier);
+		DigitalInput MapSpecialInputToDigitalInput(Int32 key);
+		Int32 MapSpecialInputToKeyIndex(Int32 key);
+		Int32 MapModifierToKeyIndex(Int32 modifier);
 		UInt32 GetKeyIndexForNonCharacterKey(NonCharacterKey key);
 		UInt32 GetKeyIndexFromCharacter(unsigned char key);
 
@@ -26,8 +26,8 @@ namespace GTE
 
 		bool Init();
 		void Update();
-		void KeyboardFunction(int key, int scanCode, int mods);
-		void KeyboardFunctionUp(int key, int scanCode, int mods);
+		void KeyboardFunction(Int32 key, Int32 scanCode, Int32 mods);
+		void KeyboardFunctionUp(Int32 key, Int32 scanCode, Int32 mods);
 	};
 }
 

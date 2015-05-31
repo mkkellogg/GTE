@@ -48,7 +48,7 @@ namespace GTE
 		UniformDescriptor();
 		~UniformDescriptor();
 
-		int Size;
+		Int32 Size;
 		char Name[128];
 		UInt32 ShaderVarID;
 		UInt32 SamplerUnitIndex;

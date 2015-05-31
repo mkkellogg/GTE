@@ -207,9 +207,9 @@ namespace GTE
 	 * Indicate the set data size for an attribute in [attributesSetValues]. [varID] is
 	 * used to specify the attribute, but is mapped to an index in [attributesSetValues]
 	 */
-	void Material::SetAttributeSetValue(int varID, int size)
+	void Material::SetAttributeSetValue(Int32 varID, Int32 size)
 	{
-		int varIndex = attributeLocationsToVerificationIndex[varID];
+		Int32 varIndex = attributeLocationsToVerificationIndex[varID];
 		if (varIndex >= 0)
 		{
 			attributesSetValues[varIndex] = size;
@@ -220,9 +220,9 @@ namespace GTE
 	 * Indicate the set data size for an uniform in [uniformsSetValues]. [varID] is
 	 * used to specify the uniform, but is mapped to an index in [uniformsSetValues]
 	 */
-	void Material::SetUniformSetValue(int varID, int size)
+	void Material::SetUniformSetValue(Int32 varID, Int32 size)
 	{
-		int varIndex = uniformLocationsToVerificationIndex[varID];
+		Int32 varIndex = uniformLocationsToVerificationIndex[varID];
 		if (varIndex >= 0)
 		{
 			uniformsSetValues[varIndex] = size;
@@ -236,35 +236,35 @@ namespace GTE
 	 */
 	void Material::ResetVerificationState()
 	{
-		if (attributesSetValues != NULL && shader.IsValid())memset(attributesSetValues, 0, sizeof(int) * shader->GetAttributeCount());
-		if (uniformsSetValues != NULL && shader.IsValid())memset(uniformsSetValues, 0, sizeof(int) * shader->GetUniformCount());
+		if (attributesSetValues != NULL && shader.IsValid())memset(attributesSetValues, 0, sizeof(Int32) * shader->GetAttributeCount());
+		if (uniformsSetValues != NULL && shader.IsValid())memset(uniformsSetValues, 0, sizeof(Int32) * shader->GetUniformCount());
 		allSetUniformsandAttributesVerified = false;
 	}
 
 	/*
 	 * Map a standard attribute [attr] to a shader var ID/location [varID]
 	 */
-	void Material::SetStandardAttributeBinding(int varID, StandardAttribute attr)
+	void Material::SetStandardAttributeBinding(Int32 varID, StandardAttribute attr)
 	{
-		standardAttributeBindings[(int)attr] = varID;
+		standardAttributeBindings[(Int32)attr] = varID;
 	}
 
 	/*
 	 * Get the shader var ID/location for [attr]
 	 */
-	int Material::GetStandardAttributeBinding(StandardAttribute attr) const
+	Int32 Material::GetStandardAttributeBinding(StandardAttribute attr) const
 	{
-		return standardAttributeBindings[(int)attr];
+		return standardAttributeBindings[(Int32)attr];
 	}
 
 	/*
 	 * Check if the standard attribute specified by [attr] is used by
 	 * the shader connected to this material
 	 */
-	int Material::TestForStandardAttribute(StandardAttribute attr) const
+	Int32 Material::TestForStandardAttribute(StandardAttribute attr) const
 	{
 		const char * attrName = StandardAttributes::GetAttributeName(attr);
-		int varID = shader->GetAttributeVarID(attrName);
+		Int32 varID = shader->GetAttributeVarID(attrName);
 
 		return varID;
 	}
@@ -273,16 +273,16 @@ namespace GTE
 	 * Get the index in the shader's list of uniforms corresponding
 	 * to the uniform named [uniformName]
 	 */
-	int Material::GetUniformIndex(const std::string& uniformName)
+	Int32 Material::GetUniformIndex(const std::string& uniformName)
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::GetUniformIndex -> Shader is invalid.", -1, true);
 
-		int foundIndex = -1;
+		Int32 foundIndex = -1;
 		for (UInt32 i = 0; i < setUniforms.size(); i++)
 		{
 			if (uniformName == setUniforms[i]->Name)
 			{
-				foundIndex = (int)i;
+				foundIndex = (Int32)i;
 			}
 		}
 
@@ -310,27 +310,27 @@ namespace GTE
 	/*
 	 * Map a standard uniform to a shader var ID/location
 	 */
-	void Material::SetStandardUniformBinding(int varID, StandardUniform uniform)
+	void Material::SetStandardUniformBinding(Int32 varID, StandardUniform uniform)
 	{
-		standardUniformBindings[(int)uniform] = varID;
+		standardUniformBindings[(Int32)uniform] = varID;
 	}
 
 	/*
 	 * Get the shader var ID/location for [uniform]
 	 */
-	int Material::GetStandardUniformBinding(StandardUniform uniform) const
+	Int32 Material::GetStandardUniformBinding(StandardUniform uniform) const
 	{
-		return standardUniformBindings[(int)uniform];
+		return standardUniformBindings[(Int32)uniform];
 	}
 
 	/*
 	 * Check if the standard uniform specified by [uniform] is used by
 	 * the shader connected to this material
 	 */
-	int Material::TestForStandardUniform(StandardUniform uniform) const
+	Int32 Material::TestForStandardUniform(StandardUniform uniform) const
 	{
 		const char * uniformName = StandardUniforms::GetUniformName(uniform);
-		int loc = shader->GetUniformVarID(uniformName);
+		Int32 loc = shader->GetUniformVarID(uniformName);
 		return loc;
 	}
 
@@ -378,11 +378,11 @@ namespace GTE
 	void Material::BindStandardVars()
 	{
 		standardAttributes = StandardAttributes::CreateAttributeSet();
-		for (int i = 0; i < (int)StandardAttribute::_Last; i++)
+		for (Int32 i = 0; i < (Int32)StandardAttribute::_Last; i++)
 		{
 			StandardAttribute attr = (StandardAttribute)i;
 
-			int varID = TestForStandardAttribute(attr);
+			Int32 varID = TestForStandardAttribute(attr);
 			if (varID >= 0)
 			{
 				SetStandardAttributeBinding(varID, attr);
@@ -391,11 +391,11 @@ namespace GTE
 		}
 
 		standardUniforms = StandardUniforms::CreateUniformSet();
-		for (int i = 0; i < (int)StandardUniform::_Last; i++)
+		for (Int32 i = 0; i < (Int32)StandardUniform::_Last; i++)
 		{
 			StandardUniform uniform = (StandardUniform)i;
 
-			int varID = TestForStandardUniform(uniform);
+			Int32 varID = TestForStandardUniform(uniform);
 			if (varID >= 0)
 			{
 				SetStandardUniformBinding(varID, uniform);
@@ -409,8 +409,8 @@ namespace GTE
 	 */
 	void Material::ClearStandardBindings()
 	{
-		for (int i = 0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardAttributeBindings[i] = -1;
-		for (int i = 0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardUniformBindings[i] = -1;
+		for (Int32 i = 0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardAttributeBindings[i] = -1;
+		for (Int32 i = 0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardUniformBindings[i] = -1;
 	}
 
 	// =====================================================
@@ -443,7 +443,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(buffer != NULL, "Material::SendStandardAttributeBufferToShader -> 'buffer' is null.", true);
 
-		int varID = GetStandardAttributeBinding(attr);
+		Int32 varID = GetStandardAttributeBinding(attr);
 		if (varID >= 0)
 		{
 			shader->SendBufferToShader(varID, buffer);
@@ -458,7 +458,7 @@ namespace GTE
 	 * shader variable.
 	 *
 	 */
-	void Material::SendAttributeBufferToShader(int varID, VertexAttrBuffer *buffer)
+	void Material::SendAttributeBufferToShader(Int32 varID, VertexAttrBuffer *buffer)
 	{
 		NONFATAL_ASSERT(buffer != NULL, "Material::SendAttributeBufferToShader -> 'buffer' is null.", true);
 		NONFATAL_ASSERT(varID >= 0, "Material::SendAttributeBufferToShader -> 'varID' cannot be less than 0.", true);
@@ -555,7 +555,7 @@ namespace GTE
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetTexture -> Shader is null.", true);
 		NONFATAL_ASSERT(texture.IsValid(), "Material::SetTexture -> 'texture' is null.", true);
 
-		int loc, foundIndex;
+		Int32 loc, foundIndex;
 		bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
@@ -578,7 +578,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetMatrix4x4 -> Shader is null.", true);
 
-		int loc, foundIndex;
+		Int32 loc, foundIndex;
 		bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
@@ -598,7 +598,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform1f -> 'shader' is null.", true);
 
-		int loc, foundIndex;
+		Int32 loc, foundIndex;
 		bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
@@ -617,7 +617,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform2f -> 'shader' is null.", true);
 
-		int loc, foundIndex;
+		Int32 loc, foundIndex;
 		bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
@@ -637,7 +637,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform4f -> 'shader' is null.", true);
 
-		int loc, foundIndex;
+		Int32 loc, foundIndex;
 		bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
@@ -658,7 +658,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetColor -> 'shader' is null.", true);
 
-		int loc, foundIndex;
+		Int32 loc, foundIndex;
 		bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
@@ -688,10 +688,10 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding(StandardUniform::ClipPlaneCount);
+		Int32 varID = GetStandardUniformBinding(StandardUniform::ClipPlaneCount);
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, (int)count);
+			shader->SendUniformToShader(varID, (Int32)count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
 		}
 	}
@@ -704,7 +704,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding((StandardUniform)((UInt32)StandardUniform::ClipPlane0 + index));
+		Int32 varID = GetStandardUniformBinding((StandardUniform)((UInt32)StandardUniform::ClipPlane0 + index));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader4(varID, eq1, eq2, eq3, eq4);
@@ -720,7 +720,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelMatrixToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding(StandardUniform::ModelMatrix);
+		Int32 varID = GetStandardUniformBinding(StandardUniform::ModelMatrix);
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -736,7 +736,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelViewMatrixToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding(StandardUniform::ModelViewMatrix);
+		Int32 varID = GetStandardUniformBinding(StandardUniform::ModelViewMatrix);
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -752,7 +752,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendProjectionMatrixToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
+		Int32 varID = GetStandardUniformBinding(StandardUniform::ProjectionMatrix);
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -768,7 +768,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendMVPMatrixToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding(StandardUniform::ModelViewProjectionMatrix);
+		Int32 varID = GetStandardUniformBinding(StandardUniform::ModelViewProjectionMatrix);
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -786,10 +786,10 @@ namespace GTE
 		NONFATAL_ASSERT(light != NULL, "Material::SendLightToShader -> 'light' is null.", true);
 		NONFATAL_ASSERT(position != NULL, "Material::SendLightToShader -> 'position' is null.", true);
 
-		int varID = GetStandardUniformBinding(StandardUniform::LightType);
+		Int32 varID = GetStandardUniformBinding(StandardUniform::LightType);
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, (int)light->GetType());
+			shader->SendUniformToShader(varID, (Int32)light->GetType());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
@@ -834,7 +834,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendViewPositionToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding(StandardUniform::EyePosition);
+		Int32 varID = GetStandardUniformBinding(StandardUniform::EyePosition);
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, position);
@@ -846,7 +846,7 @@ namespace GTE
 	 * Verify that all uniforms and attributes exposed by this material's shader have values
 	 * set for them and that those values are of the correct size.
 	 */
-	bool Material::VerifySetVars(int vertexCount)
+	bool Material::VerifySetVars(Int32 vertexCount)
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::VerifySetVars -> 'shader' is null.", false, true);
 		if (allSetUniformsandAttributesVerified == true)return true;
@@ -868,7 +868,7 @@ namespace GTE
 		for (UInt32 i = 0; i < shader->GetUniformCount(); i++)
 		{
 			const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
-			int requiredSize = GetRequiredUniformSize(desc->Type);
+			Int32 requiredSize = GetRequiredUniformSize(desc->Type);
 
 			if (uniformsSetValues[i] != requiredSize)
 			{

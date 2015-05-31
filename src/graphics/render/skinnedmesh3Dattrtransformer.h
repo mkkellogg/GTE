@@ -44,9 +44,9 @@ namespace GTE
 		// [renderer] has an array of VertexBoneMap objects. [vertexBoneMapIndex] is the
 		// index in that array that contains the VertexBoneMap for this instance of
 		// SkinnedMesh3DAttributeTransformer.
-		int vertexBoneMapIndex;
+		Int32 vertexBoneMapIndex;
 
-		int boneCount;
+		Int32 boneCount;
 		// flag for each Bone object in the list of bones held by the skeleton in [renderer]. the flag indicates
 		// whether the transformation for that bone has been calculated already (bones are often visited
 		// multiple times during a single vertex skinning operation).
@@ -54,7 +54,7 @@ namespace GTE
 
 
 		// existing size of each cache
-		int currentCacheSize;
+		Int32 currentCacheSize;
 		// flags that indicate that an entry in any cache at a specified index is valid
 		unsigned char * cacheFlags;
 
@@ -106,7 +106,7 @@ namespace GTE
 		~SkinnedMesh3DAttributeTransformer();
 
 		void SetRenderer(SkinnedMesh3DRenderer* renderer);
-		void SetVertexBoneMapIndex(int index);
+		void SetVertexBoneMapIndex(Int32 index);
 
 		void TransformAttributes(const Point3Array& positionsIn, Point3Array& positionsOut,
 			const Vector3Array& vertexNormalsIn, Vector3Array& vertexNormalsOut,

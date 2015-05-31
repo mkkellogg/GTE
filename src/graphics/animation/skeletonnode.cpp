@@ -16,7 +16,7 @@ namespace GTE
 	/*
 	* Only constructor.
 	*/
-	SkeletonNode::SkeletonNode(int boneIndex, const std::string& name)
+	SkeletonNode::SkeletonNode(Int32 boneIndex, const std::string& name)
 	{
 		this->BoneIndex = boneIndex;
 		this->Name = name;

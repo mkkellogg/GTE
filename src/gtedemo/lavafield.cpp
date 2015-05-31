@@ -111,8 +111,8 @@ void LavaField::DisplaceField()
 		GTE::Real percentageY = (GTE::Real)y / fieldHeight;
 
 		// calculate pixel position in displacement map images
-		int pixelX = percentageX * diplacementImageDimensionSize;
-		int pixelY = percentageY * diplacementImageDimensionSize;
+		GTE::Int32 pixelX = percentageX * diplacementImageDimensionSize;
+		GTE::Int32 pixelY = percentageY * diplacementImageDimensionSize;
 
 		// enforce wrapping if pixel position is outside image boundaries
 		if(pixelX > 0 && (GTE::UInt32)pixelX >= diplacementImageDimensionSize)pixelX = pixelX % diplacementImageDimensionSize;

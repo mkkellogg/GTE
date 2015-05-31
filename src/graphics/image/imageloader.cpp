@@ -110,7 +110,7 @@ namespace GTE
 
 	std::string ImageLoader::GetFileExtension(const std::string& filePath)
 	{
-		int dotIndex = filePath.find_last_of(".");
+		Int32 dotIndex = filePath.find_last_of(".");
 		if (dotIndex < 0)dotIndex = 0;
 		std::string extension = filePath.substr(dotIndex, filePath.size() - dotIndex);
 		return extension;

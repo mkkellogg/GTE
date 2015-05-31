@@ -22,7 +22,7 @@ namespace GTE
 
 			BaseVector4Array& targetArray;
 			BaseVector4& targetVector;
-			int currentIndex;
+			Int32 currentIndex;
 
 			Iterator(BaseVector4Array& targetArray, BaseVector4& targetVector) : targetArray(targetArray), targetVector(targetVector)
 			{
@@ -33,12 +33,12 @@ namespace GTE
 
 			bool HasNext()
 			{
-				return currentIndex < (int)targetArray.count - 1;
+				return currentIndex < (Int32)targetArray.count - 1;
 			}
 
 			void Next()
 			{
-				if (currentIndex >= (int)targetArray.count - 1)return;
+				if (currentIndex >= (Int32)targetArray.count - 1)return;
 				currentIndex++;
 				targetVector.AttachTo(targetArray.data + (currentIndex * 4));
 			}

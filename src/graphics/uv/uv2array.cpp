@@ -25,7 +25,7 @@ namespace GTE
 
 	}
 
-	UV2 * UV2Array::GetCoordinate(int index)
+	UV2 * UV2Array::GetCoordinate(Int32 index)
 	{
 		return (UV2*)objects[index];
 	}

@@ -47,8 +47,8 @@ namespace GTE
 
 	protected:
 
-		static const int KEY_SPACE_ASCII = 32;
-		static const int KEY_TAB_ASCII = 9;
+		static const Int32 KEY_SPACE_ASCII = 32;
+		static const Int32 KEY_TAB_ASCII = 9;
 
 		enum class NonCharacterKey
 		{
@@ -67,7 +67,7 @@ namespace GTE
 		static const UInt32 MAX_KEY_INDICES = 512;
 		KeyState keyState[MAX_KEY_INDICES];
 		bool onKeyDown[MAX_KEY_INDICES];
-		bool digitalInputState[(int)DigitalInput::_Last];
+		bool digitalInputState[(Int32)DigitalInput::_Last];
 
 		InputManager();
 		virtual ~InputManager();

@@ -25,7 +25,7 @@ namespace GTE
 		if (maskValue == 0) return 0;
 
 		IntMask index = 0x00000001;
-		int count = 0;
+		Int32 count = 0;
 		while (!(maskValue & index) && count < 32)
 		{
 			index <<= 1;

@@ -62,7 +62,7 @@ namespace GTE
 		// flags that indicate if the animation at a specified index is the target of a cross fade operation in activeBlendOperations
 		std::vector<bool> crossFadeTargets;
 		// number of animations currently playing
-		int playingAnimationsCount;
+		Int32 playingAnimationsCount;
 
 		AnimationPlayer(SkeletonRef target);
 		~AnimationPlayer();
@@ -82,7 +82,7 @@ namespace GTE
 		void CalculateInterpolatedScale(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
 		void CalculateInterpolatedRotation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
 		bool CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, UInt32& lastIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const;
-		Real GetKeyFrameTime(TransformationCompnent transformationComponent, int frameIndex, const KeyFrameSet& keyFrameSet) const;
+		Real GetKeyFrameTime(TransformationCompnent transformationComponent, Int32 frameIndex, const KeyFrameSet& keyFrameSet) const;
 
 		void SetSpeed(UInt32 animationIndex, Real speedFactor);
 		void Play(UInt32 animationIndex);

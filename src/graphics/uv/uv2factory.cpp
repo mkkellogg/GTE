@@ -28,12 +28,12 @@ namespace GTE
 		return new UV2(true, target);
 	}
 
-	BaseVector2** UV2Factory::CreateArray(int count)
+	BaseVector2** UV2Factory::CreateArray(Int32 count)
 	{
 		BaseVector2** pptr = (BaseVector2**)new UV2*[count];
 		ASSERT(pptr != NULL, "UV2Factory::CreateArray -> Could not allocate array.");
 
-		memset(pptr, (int)NULL, sizeof(UV2*) * count);
+		memset(pptr, (Int32)NULL, sizeof(UV2*) * count);
 
 		return pptr;
 	}

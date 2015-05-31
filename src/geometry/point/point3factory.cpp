@@ -28,12 +28,12 @@ namespace GTE
 		return new Point3(true, target);
 	}
 
-	BaseVector4** Point3Factory::CreateArray(int count)
+	BaseVector4** Point3Factory::CreateArray(Int32 count)
 	{
 		BaseVector4** pptr = (BaseVector4**)new Point3*[count];
 		ASSERT(pptr != NULL, "Point3Factory::CreateArray -> Could not allocate new array.");
 
-		memset(pptr, (int)NULL, sizeof(Point3*) * count);
+		memset(pptr, (Int32)NULL, sizeof(Point3*) * count);
 
 		return pptr;
 	}

@@ -106,7 +106,7 @@ namespace GTE
 		for (UInt32 n = 0; n < nodeCount; n++)
 		{
 			SkeletonNode * node = Target->GetNodeFromList(n);
-			int foundIndex = -1;
+			Int32 foundIndex = -1;
 
 			if (node != NULL)
 			{
@@ -169,7 +169,7 @@ namespace GTE
 		return FrameStates + stateIndex;
 	}
 
-	int AnimationInstance::GetChannelMappingForTargetNode(UInt32 nodeIndex)
+	Int32 AnimationInstance::GetChannelMappingForTargetNode(UInt32 nodeIndex)
 	{
 		NONFATAL_ASSERT_RTRN(Target.IsValid(), "AnimationInstance::GetChannelMappingForTargetNode -> target skeleton is not valid.", -1, true);
 		NONFATAL_ASSERT_RTRN(nodeIndex < Target->GetNodeCount(), "AnimationInstance::GetChannelMappingForTargetNode -> nodeIndex is out of range.", -1, true);

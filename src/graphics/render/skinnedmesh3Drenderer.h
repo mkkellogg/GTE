@@ -59,7 +59,7 @@ namespace GTE
 		void SetSkeleton(SkeletonRef skeleton);
 		SkeletonRef GetSkeleton();
 		void InitializeForMesh();
-		void MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, int vertexBoneMapIndex);
+		void MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, Int32 vertexBoneMapIndex);
 
 		void AddVertexBoneMap(VertexBoneMap * map);
 		VertexBoneMap * GetVertexBoneMap(UInt32 index);

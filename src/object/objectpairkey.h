@@ -25,9 +25,9 @@ namespace GTE
 		// TODO: optimize this hashing function (implement correctly)
 		typedef struct
 		{
-			int operator()(const ObjectPairKey& s) const
+			Int32 operator()(const ObjectPairKey& s) const
 			{
-				return ((int)s.ObjectAID << 1) + ((int)s.ObjectBID << 2);
+				return ((Int32)s.ObjectAID << 1) + ((Int32)s.ObjectBID << 2);
 			}
 		}ObjectPairKeyHasher;
 

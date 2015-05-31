@@ -20,7 +20,7 @@ namespace GTE
 		LongMask result = 0;
 		LongMask b = 0x8000000000000000L;
 
-		for (int i = 0; i < 64; i++)
+		for (Int32 i = 0; i < 64; i++)
 		{
 			if (!(b & mask))
 			{
@@ -39,7 +39,7 @@ namespace GTE
 		if (maskValue == 0) return 0;
 
 		LongMask index = 0x0000000000000001L;
-		int count = 0;
+		Int32 count = 0;
 		while (!(maskValue & index) && count < 128)
 		{
 			index <<= 1;

@@ -113,7 +113,7 @@ class Game
 	};
 
 	// total number of scenes
-	static const int SceneCount = 3;
+	static const GTE::Int32 SceneCount = 3;
 	// scene transition descriptors
 	SceneTransition sceneTransitions[SceneCount];
 	// scenes

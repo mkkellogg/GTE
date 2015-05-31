@@ -111,14 +111,14 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::DestroyBuffers()
 	{
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Position]);
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Normal]);
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::FaceNormal]);
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::Tangent]);
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::VertexColor]);
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture0]);
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::UVTexture1]);
-		DestroyBuffer(&attributeBuffers[(int)StandardAttribute::ShadowPosition]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::Position]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::Normal]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::FaceNormal]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::Tangent]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::VertexColor]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::UVTexture0]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::UVTexture1]);
+		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::ShadowPosition]);
 	}
 
 	/*
@@ -136,7 +136,7 @@ namespace GTE
 	/*
 	 * Create and initialize an instance of VertexAttrBuffer.
 	 */
-	bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount, int stride)
+	bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride)
 	{
 		NONFATAL_ASSERT_RTRN(buffer != NULL, "SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false, true);
 
@@ -155,12 +155,12 @@ namespace GTE
 	/*
 	 * Create & initialize the vertex attribute buffer in [attributeBuffers] that corresponds to [attr].
 	 */
-	bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, int length, int componentCount, int stride)
+	bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride)
 	{
 		// if the buffer already exists, destroy it first
-		DestroyBuffer(&attributeBuffers[(int)attr]);
+		DestroyBuffer(&attributeBuffers[(Int32)attr]);
 		// create and initialize buffer
-		bool initSuccess = InitBuffer(&attributeBuffers[(int)attr], length, componentCount, stride);
+		bool initSuccess = InitBuffer(&attributeBuffers[(Int32)attr], length, componentCount, stride);
 
 		return initSuccess;
 	}
@@ -259,7 +259,7 @@ namespace GTE
 		Real* adjVertex3 = NULL;
 		Vector3 adjFaceToLightDir;
 		UInt32 adjacentFaceVertexIndex = 0;
-		int adjacentFaceIndex = -1;
+		Int32 adjacentFaceIndex = -1;
 		Vector3 * adjacentFaceNormal = NULL;
 		SubMesh3DFace * adjacentFace = NULL;
 
@@ -350,7 +350,7 @@ namespace GTE
 			}
 			else continue;
 
-			int facesFound = 0;
+			Int32 facesFound = 0;
 			// loop through each edge of the face and examine the adjacent face
 			for (UInt32 ai = 0; ai < 3; ai++)
 			{
@@ -469,7 +469,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetShadowVolumePositionData(const Point3Array * points)
 	{
-		attributeBuffers[(int)StandardAttribute::ShadowPosition]->SetData(points->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::ShadowPosition]->SetData(points->GetDataPtr());
 	}
 
 	/*
@@ -477,7 +477,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetPositionData(Point3Array * points)
 	{
-		attributeBuffers[(int)StandardAttribute::Position]->SetData(points->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::Position]->SetData(points->GetDataPtr());
 	}
 
 	/*
@@ -485,7 +485,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetNormalData(Vector3Array * normals)
 	{
-		attributeBuffers[(int)StandardAttribute::Normal]->SetData(normals->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::Normal]->SetData(normals->GetDataPtr());
 	}
 
 	/*
@@ -493,7 +493,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetFaceNormalData(Vector3Array * faceNormals)
 	{
-		attributeBuffers[(int)StandardAttribute::FaceNormal]->SetData(faceNormals->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::FaceNormal]->SetData(faceNormals->GetDataPtr());
 	}
 
 	/*
@@ -501,7 +501,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetTangentData(Vector3Array * tangents)
 	{
-		attributeBuffers[(int)StandardAttribute::Tangent]->SetData(tangents->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::Tangent]->SetData(tangents->GetDataPtr());
 	}
 
 	/*
@@ -509,7 +509,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetVertexColorData(Color4Array * colors)
 	{
-		attributeBuffers[(int)StandardAttribute::VertexColor]->SetData(colors->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::VertexColor]->SetData(colors->GetDataPtr());
 	}
 
 	/*
@@ -517,7 +517,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetUV1Data(UV2Array * uvs)
 	{
-		attributeBuffers[(int)StandardAttribute::UVTexture0]->SetData(uvs->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::UVTexture0]->SetData(uvs->GetDataPtr());
 	}
 
 	/*
@@ -525,7 +525,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetUV2Data(UV2Array * uvs)
 	{
-		attributeBuffers[(int)StandardAttribute::UVTexture1]->SetData(uvs->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::UVTexture1]->SetData(uvs->GetDataPtr());
 	}
 
 	/*
@@ -546,17 +546,17 @@ namespace GTE
 
 		boundAttributeBuffers.clear();
 		// loop through each standard attribute and create/initialize vertex attribute buffer for each
-		for (int i = 0; i < (int)StandardAttribute::_Last; i++)
+		for (Int32 i = 0; i < (Int32)StandardAttribute::_Last; i++)
 		{
 			StandardAttribute attr = (StandardAttribute)i;
 			if (StandardAttributes::HasAttribute(meshAttributes, attr))
 			{
-				int componentCount = 4;
+				Int32 componentCount = 4;
 				if (attr == StandardAttribute::UVTexture0 || attr == StandardAttribute::UVTexture1)componentCount = 2;
 
-				int stride = 0;
+				Int32 stride = 0;
 
-				int initSuccess = InitAttributeData(attr, mesh->GetTotalVertexCount(), componentCount, stride);
+				Int32 initSuccess = InitAttributeData(attr, mesh->GetTotalVertexCount(), componentCount, stride);
 				if (!initSuccess)StandardAttributes::AddAttribute(&err, attr);
 
 				VertexAttrBufferBinding binding(attributeBuffers[i], attr, -1);
@@ -580,7 +580,7 @@ namespace GTE
 		}
 
 		boundShadowVolumeAttributeBuffers.clear();
-		VertexAttrBufferBinding shadowVolumePositionBinding(attributeBuffers[(int)StandardAttribute::ShadowPosition], StandardAttribute::ShadowPosition, -1);
+		VertexAttrBufferBinding shadowVolumePositionBinding(attributeBuffers[(Int32)StandardAttribute::ShadowPosition], StandardAttribute::ShadowPosition, -1);
 		boundShadowVolumeAttributeBuffers.push_back(shadowVolumePositionBinding);
 
 		storedAttributes = meshAttributes;
@@ -780,7 +780,7 @@ namespace GTE
 		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
 
 		// look for mismatched shader variables and mesh attributes
-		for (int i = 0; i < (int)StandardAttribute::_Last; i++)
+		for (Int32 i = 0; i < (Int32)StandardAttribute::_Last; i++)
 		{
 			StandardAttribute attr = (StandardAttribute)i;
 

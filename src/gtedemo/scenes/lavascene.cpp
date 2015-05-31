@@ -116,9 +116,9 @@ void LavaScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientL
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
 	GTE::LayerManager& layerManager = objectManager->GetLayerManager();
-	int lavaWallLayerIndex = layerManager.AddLayer(LavaWallLayer);
-	int lavaIslandLayerIndex = layerManager.AddLayer(LavaIslandLayer);
-	int lavaIslandObjectsLayerIndex = layerManager.AddLayer(LavaIslandObjectsLayer);
+	GTE::Int32 lavaWallLayerIndex = layerManager.AddLayer(LavaWallLayer);
+	GTE::Int32 lavaIslandLayerIndex = layerManager.AddLayer(LavaIslandLayer);
+	GTE::Int32 lavaIslandObjectsLayerIndex = layerManager.AddLayer(LavaIslandObjectsLayer);
 
 	lavaWallLayerMask = layerManager.GetLayerMask(lavaWallLayerIndex);
 	lavaIslandLayerMask = layerManager.GetLayerMask(lavaIslandLayerIndex);

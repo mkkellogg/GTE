@@ -1,7 +1,7 @@
 #ifndef _GTE_ERRORMANAGER_H_
 #define _GTE_ERRORMANAGER_H_
 
-#include "global/global.h"
+#include "object/enginetypes.h"
 #include <vector>
 #include <string>
 
@@ -22,23 +22,23 @@ namespace GTE
 	protected:
 
 		std::string errorMessage;
-		int errorCode;
+		Int32 errorCode;
 
 		ErrorManager();
 		~ErrorManager();
 
 	public:
 
-		void SetError(int code, const std::string& message);
-		void SetError(int code, const char * message);
-		void AddError(int code, const std::string& message);
-		void AddError(int code, const char * message);
-		void SetAndReportError(int code, const std::string& message);
-		void SetAndReportError(int code, const char * message);
-		void AddAndReportError(int code, const std::string& message);
-		void AddAndReportError(int code, const char * message);
+		void SetError(Int32 code, const std::string& message);
+		void SetError(Int32 code, const char * message);
+		void AddError(Int32 code, const std::string& message);
+		void AddError(Int32 code, const char * message);
+		void SetAndReportError(Int32 code, const std::string& message);
+		void SetAndReportError(Int32 code, const char * message);
+		void AddAndReportError(Int32 code, const std::string& message);
+		void AddAndReportError(Int32 code, const char * message);
 		void Reset();
-		int GetErrorCode() const;
+		Int32 GetErrorCode() const;
 		const std::string& GetErrorMessage() const;
 	};
 }

@@ -428,7 +428,7 @@ namespace GTE
 	public static void avgVectors(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Real[] weights, Vector3 avg)
 	{
 	Real totalWeight =0f;
-	for(int i=0; i <4; i++)totalWeight += weights[i];
+	for(Int32 i=0; i <4; i++)totalWeight += weights[i];
 	avg.X = ((weights[0]*a.X)+(weights[1]*b.X)+(weights[2]*c.X)+(weights[3]*d.X))/totalWeight;
 	avg.Y = ((weights[0]*a.Y)+(weights[1]*b.Y)+(weights[2]*c.Y)+(weights[3]*d.Y))/totalWeight;
 	avg.Z = ((weights[0]*a.Z)+(weights[1]*b.Z)+(weights[2]*c.Z)+(weights[3]*d.Z))/totalWeight;

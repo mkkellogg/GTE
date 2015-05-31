@@ -275,7 +275,7 @@ namespace GTE
 		{
 			Color4Array * colors = subMesh->GetColors();
 
-			for (int i = 0; i < 36; i++)
+			for (Int32 i = 0; i < 36; i++)
 			{
 				colors->GetColor(i)->Set(1, 1, 1, 1);
 			}

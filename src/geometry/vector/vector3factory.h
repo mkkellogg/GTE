@@ -20,7 +20,7 @@ namespace GTE
 		virtual ~Vector3Factory();
 
 		BaseVector4 * CreatePermAttached(Real * target);
-		BaseVector4 ** CreateArray(int count);
+		BaseVector4 ** CreateArray(Int32 count);
 	};
 }
 

@@ -89,7 +89,7 @@ namespace GTE
 
 	}
 
-	int Matrix4x4::GetDataSize() const
+	Int32 Matrix4x4::GetDataSize() const
 	{
 		return DATA_SIZE;
 	}
@@ -472,14 +472,14 @@ namespace GTE
 
 	void Matrix4x4::MultiplyMM(const Real * lhs, const Real *rhs, Real * out)
 	{
-		for (int i = 0; i < DIM_SIZE; i++)
+		for (Int32 i = 0; i < DIM_SIZE; i++)
 		{
 			const Real rhs_i0 = rhs[I(i, 0)];
 			Real ri0 = lhs[I(0, 0)] * rhs_i0;
 			Real ri1 = lhs[I(0, 1)] * rhs_i0;
 			Real ri2 = lhs[I(0, 2)] * rhs_i0;
 			Real ri3 = lhs[I(0, 3)] * rhs_i0;
-			for (int j = 1; j < DIM_SIZE; j++)
+			for (Int32 j = 1; j < DIM_SIZE; j++)
 			{
 				const Real rhs_ij = rhs[I(i, j)];
 				ri0 += lhs[I(j, 0)] * rhs_ij;
@@ -512,9 +512,9 @@ namespace GTE
 		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Transpose -> 'source' is null.", true);
 		NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Transpose -> 'dest' is null.", true);
 
-		for (int i = 0; i < DIM_SIZE; i++)
+		for (Int32 i = 0; i < DIM_SIZE; i++)
 		{
-			int mBase = i * DIM_SIZE;
+			Int32 mBase = i * DIM_SIZE;
 			dest[i] = source[mBase];
 			dest[i + DIM_SIZE] = source[mBase + 1];
 			dest[i + DIM_SIZE * 2] = source[mBase + 2];
@@ -651,7 +651,7 @@ namespace GTE
 
 		// calculate matrix inverse
 		det = 1 / det;
-		for (int j = 0; j < DATA_SIZE; j++)
+		for (Int32 j = 0; j < DATA_SIZE; j++)
 			dest[j] = dst[j] * det;
 
 		// if the matrix was affine before inversion, make it affine again
@@ -682,12 +682,12 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(target != NULL, "Matrix4x4::SetIdentity -> 'target' is null.", true);
 
-		for (int i = 0; i < DATA_SIZE; i++)
+		for (Int32 i = 0; i < DATA_SIZE; i++)
 		{
 			target[i] = 0;
 		}
 
-		for (int i = 0; i < DATA_SIZE; i += 5)
+		for (Int32 i = 0; i < DATA_SIZE; i += 5)
 		{
 			target[i] = 1.0f;
 		}
@@ -766,10 +766,10 @@ namespace GTE
 		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Scale -> 'source' is null.", true);
 		NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Scale -> 'dest' is null.", true);
 
-		for (int i = 0; i < DIM_SIZE; i++)
+		for (Int32 i = 0; i < DIM_SIZE; i++)
 		{
-			int smi = i;
-			int mi = i;
+			Int32 smi = i;
+			Int32 mi = i;
 			dest[smi] = source[mi] * x;
 			dest[4 + smi] = source[4 + mi] * y;
 			dest[8 + smi] = source[8 + mi] * z;
@@ -859,16 +859,16 @@ namespace GTE
 
 		if (source != dest)
 		{
-			for (int i = 0; i < 12; i++)
+			for (Int32 i = 0; i < 12; i++)
 			{
 				dest[i] = source[i];
 			}
 		}
 
-		for (int i = 0; i < DIM_SIZE; i++)
+		for (Int32 i = 0; i < DIM_SIZE; i++)
 		{
-			int tmi = i;
-			int mi = i;
+			Int32 tmi = i;
+			Int32 mi = i;
 			dest[12 + tmi] = source[mi] * x + source[4 + mi] * y + source[8 + mi] * z + source[12 + mi];
 		}
 	}

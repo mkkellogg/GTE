@@ -25,12 +25,12 @@ namespace GTE
 
 	}
 
-	Point3 * Point3Array::GetPoint(int index)
+	Point3 * Point3Array::GetPoint(Int32 index)
 	{
 		return (Point3*)objects[index];
 	}
 
-	const Point3 * Point3Array::GetPointConst(int index) const
+	const Point3 * Point3Array::GetPointConst(Int32 index) const
 	{
 		return (const Point3*)objects[index];
 	}

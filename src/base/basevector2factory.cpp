@@ -26,7 +26,7 @@ namespace GTE
 		return new BaseVector2(true, target);
 	}
 
-	BaseVector2** BaseVector2Factory::CreateArray(int count)
+	BaseVector2** BaseVector2Factory::CreateArray(Int32 count)
 	{
 		BaseVector2** pptr = new BaseVector2*[count];
 		return pptr;

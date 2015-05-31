@@ -15,7 +15,7 @@ namespace GTE
 		virtual ~UV2Array();
 
 		void SetData(const Real * data);
-		UV2 * GetCoordinate(int index);
+		UV2 * GetCoordinate(Int32 index);
 		UV2 ** GetCoordinates();
 	};
 }

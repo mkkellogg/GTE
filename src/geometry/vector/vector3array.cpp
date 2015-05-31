@@ -27,12 +27,12 @@ namespace GTE
 
 	}
 
-	Vector3 * Vector3Array::GetVector(int index)
+	Vector3 * Vector3Array::GetVector(Int32 index)
 	{
 		return (Vector3*)objects[index];
 	}
 
-	const Vector3 * Vector3Array::GetVectorConst(int index) const
+	const Vector3 * Vector3Array::GetVectorConst(Int32 index) const
 	{
 		return (const Vector3*)objects[index];
 	}

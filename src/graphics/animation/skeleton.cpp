@@ -127,7 +127,7 @@ namespace GTE
 	 * Get the index in [boneNameMap] to which [name] corresponds. If no valid mapping
 	 * is found, -1 is returned.
 	 */
-	int Skeleton::GetBoneMapping(std::string& name)
+	Int32 Skeleton::GetBoneMapping(std::string& name)
 	{
 		std::unordered_map<std::string, UInt32>::const_iterator result = boneNameMap.find(name);
 		if (result != boneNameMap.end())
@@ -160,7 +160,7 @@ namespace GTE
 	 * Get the index in [nodeName] to which [name] corresponds. If no valid mapping
 	 * is found, -1 is returned.
 	 */
-	int Skeleton::GetNodeMapping(std::string& name)
+	Int32 Skeleton::GetNodeMapping(std::string& name)
 	{
 		std::unordered_map<std::string, UInt32>::const_iterator result = nodeNameMap.find(name);
 		if (result != nodeNameMap.end())
@@ -346,7 +346,7 @@ namespace GTE
 				clonedTreeNode->Data = clonedSkeletonNode;
 
 				// enter the cloned SkeletonNode in the [nodeList] of the new Skeleton object.
-				int targetListIndex = thisSkeleton->GetNodeMapping(clonedSkeletonNode->Name);
+				Int32 targetListIndex = thisSkeleton->GetNodeMapping(clonedSkeletonNode->Name);
 				if (targetListIndex >= 0)newSkeleton->nodeList[targetListIndex] = clonedSkeletonNode;
 
 				// the cloned TreeNode will still have a pointer to its original parent in the existing skeleton
@@ -361,7 +361,7 @@ namespace GTE
 
 				// find the Bone object in the new skeleton that corresponds to the cloned SkeletonNode,
 				// and set its SkeletonNode pointer [Node] to the clone SkeletonNode object.
-				int boneIndex = node->Data->BoneIndex;
+				Int32 boneIndex = node->Data->BoneIndex;
 				if (boneIndex >= 0)
 				{
 					newSkeleton->GetBone(boneIndex)->Node = clonedSkeletonNode;

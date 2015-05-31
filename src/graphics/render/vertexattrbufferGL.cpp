@@ -31,7 +31,7 @@ namespace GTE
 	/*
 	 * Calculate the number of Realing-point entries in the buffer.
 	 */
-	int VertexAttrBufferGL::CalcFloatCount() const
+	Int32 VertexAttrBufferGL::CalcFloatCount() const
 	{
 		return (componentCount + stride) * vertexCount;
 	}
@@ -39,7 +39,7 @@ namespace GTE
 	/*
 	 * Calculate the total size (in bytes) of the buffer.
 	 */
-	int VertexAttrBufferGL::CalcFullSize() const
+	Int32 VertexAttrBufferGL::CalcFullSize() const
 	{
 		return CalcFloatCount() * sizeof(Real);
 	}
@@ -54,7 +54,7 @@ namespace GTE
 	 * [dataOnGPU] - Make this a VBO.
 	 * [srcData] - Data to be copied into the buffer after initialization.
 	 */
-	bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, Real *srcData)
+	bool VertexAttrBufferGL::Init(Int32 vertexCount, Int32 componentCount, Int32 stride, bool dataOnGPU, Real *srcData)
 	{
 		// if this buffer has already be initialized we need to destroy it and start fresh
 		Destroy();
@@ -64,7 +64,7 @@ namespace GTE
 		this->stride = stride;
 
 		// calculate number of bytes in the buffer
-		int fullDataSize = CalcFullSize();
+		Int32 fullDataSize = CalcFullSize();
 
 		data = new Real[CalcFloatCount()];
 		ASSERT(data != NULL, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.");
@@ -94,7 +94,7 @@ namespace GTE
 
 	void VertexAttrBufferGL::InitData(const Real * srcData)
 	{
-		int fullDataSize = CalcFullSize();
+		Int32 fullDataSize = CalcFullSize();
 		memcpy(data, srcData, fullDataSize);
 
 		if (dataOnGPU)
@@ -111,7 +111,7 @@ namespace GTE
 	 */
 	void VertexAttrBufferGL::SetData(const Real * srcData)
 	{
-		int fullDataSize = CalcFullSize();
+		Int32 fullDataSize = CalcFullSize();
 
 		if (dataOnGPU)
 		{

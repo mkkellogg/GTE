@@ -64,11 +64,11 @@ namespace GTE
 		// is face culling enabled in OpenGL?
 		bool faceCullingEnabled;
 		// number of bits per channel in the OpenGL color buffer
-		int redBits, greenBits, blueBits, alphaBits;
+		Int32 redBits, greenBits, blueBits, alphaBits;
 		// bit depth of the OpenGL depth buffer
-		int depthBufferBits;
+		Int32 depthBufferBits;
 		// bit depth of the OpenGL stencil buffer
-		int stencilBufferBits;
+		Int32 stencilBufferBits;
 		// which faces will be culled during rendering?
 		FaceCullingMode faceCullingMode;
 

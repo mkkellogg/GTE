@@ -104,8 +104,8 @@ namespace GTE
 		void RemoveClearBuffer(RenderBufferType buffer);
 		IntMask GetClearBufferMask() const;
 
-		void SetupOffscreenRenderTarget(int width, int height);
-		void SetupOffscreenRenderTarget(int width, int height, bool cube);
+		void SetupOffscreenRenderTarget(Int32 width, Int32 height);
+		void SetupOffscreenRenderTarget(Int32 width, Int32 height, bool cube);
 		RenderTargetRef GetRenderTarget();
 		void SetWidthHeightRatio(Real width, Real height);
 

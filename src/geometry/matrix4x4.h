@@ -36,8 +36,8 @@ namespace GTE
 
 	class Matrix4x4
 	{
-		static const int DATA_SIZE = 16;
-		static const int DIM_SIZE = 4;
+		static const Int32 DATA_SIZE = 16;
+		static const Int32 DIM_SIZE = 4;
 
 		Real data[DATA_SIZE];
 		void Init();
@@ -54,7 +54,7 @@ namespace GTE
 		Real& C0; Real& C1; Real& C2; Real& C3;
 		Real& D0; Real& D1; Real& D2; Real& D3;
 
-		int GetDataSize() const;
+		Int32 GetDataSize() const;
 
 		Matrix4x4& operator= (const Matrix4x4 & source);
 

@@ -10,7 +10,7 @@ namespace GTE
 
 	}
 
-	ScreenDescriptor::ScreenDescriptor(int screenWidth, int screenHeight)
+	ScreenDescriptor::ScreenDescriptor(Int32 screenWidth, Int32 screenHeight)
 	{
 		this->screenWidth = screenWidth;
 		this->screenHeight = screenHeight;
@@ -21,12 +21,12 @@ namespace GTE
 
 	}
 
-	int ScreenDescriptor::GetScreenWidth()
+	Int32 ScreenDescriptor::GetScreenWidth()
 	{
 		return screenWidth;
 	}
 
-	int ScreenDescriptor::getScreenHeight()
+	Int32 ScreenDescriptor::getScreenHeight()
 	{
 		return screenHeight;
 	}

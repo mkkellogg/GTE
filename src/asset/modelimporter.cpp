@@ -358,7 +358,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
 			NONFATAL_ASSERT(mesh != NULL, "ModelImporter::RecursiveProcessModelScene -> Assimp node mesh is NULL.", true);
 
-			int materialIndex = mesh->mMaterialIndex;
+			Int32 materialIndex = mesh->mMaterialIndex;
 			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
 			MaterialRef material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
 			NONFATAL_ASSERT(material.IsValid(),"ModelImporter::RecursiveProcessModelScene -> NULL Material object encountered.", true);
@@ -415,7 +415,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 	if(hasSkeleton)
 	{
-		int nodeMapping = skeleton->GetNodeMapping(nodeName);
+		Int32 nodeMapping = skeleton->GetNodeMapping(nodeName);
 		if(nodeMapping>=0)
 		{
 			SkeletonNode * node = skeleton->GetNodeFromList(nodeMapping);
@@ -475,7 +475,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 	// all meshes must have vertex positions
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 
-	int diffuseTextureUVIndex = -1;
+	Int32 diffuseTextureUVIndex = -1;
 	// update the StandardAttributeSet to contain appropriate attributes (UV coords) for a diffuse texture
 	if(materialImportDescriptor.meshSpecificProperties[meshIndex].UVMappingHasKey(TextureType::Diffuse))
 	{
@@ -511,7 +511,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 		return SubMesh3DRef::Null();
 	}
 
-	int vertexIndex = 0;
+	Int32 vertexIndex = 0;
 
 	// loop through each face in the mesh and copy relevant vertex attributes
 	// into the newly created Mesh3D object
@@ -519,7 +519,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 	{
 		const aiFace* face = mesh.mFaces + faceIndex;
 
-		int start, end, inc;
+		Int32 start, end, inc;
 		if(!invert)
 		{
 			start = face->mNumIndices-1;end = -1;inc = -1;
@@ -532,9 +532,9 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 		// ** IMPORTANT ** Normally we iterate through face vertices in reverse order. This is
 		// necessary because vertices are stored in counter-clockwise order for each face.
 		// if [invert] == true, then we instead iterate in forward order
-		for( int i = start; i != end; i+=inc)
+		for( Int32 i = start; i != end; i+=inc)
 		{
-			int vIndex = face->mIndices[i];
+			Int32 vIndex = face->mIndices[i];
 
 			aiVector3D srcPosition = mesh.mVertices[vIndex];
 
@@ -550,7 +550,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 			}
 
 			// copy vertex colors (if present)
-			int c = materialImportDescriptor.meshSpecificProperties[meshIndex].vertexColorsIndex;
+			Int32 c = materialImportDescriptor.meshSpecificProperties[meshIndex].vertexColorsIndex;
 			if(c >=0)
 			{
 				mesh3D->GetColors()->GetColor(vertexIndex)->Set(mesh.mColors[c]->r,mesh.mColors[c]->g,mesh.mColors[c]->b,mesh.mColors[c]->a);
@@ -791,7 +791,7 @@ bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assim
 	// set the diffuse texture in the material for the mesh specified by [meshIndex]
 	materialImportDesc.meshSpecificProperties[meshIndex].material->SetTexture(texture, textureName);
 
-	int mappedIndex;
+	Int32 mappedIndex;
 
 	// get the Assimp UV channel for the texture. the mapping will be used later when
 	// processing the meshes in the scene
@@ -977,7 +977,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	{
 		aiFace& face = mesh.mFaces[f];
 
-		int start, end, inc;
+		Int32 start, end, inc;
 		if(!reverseVertexOrder)
 		{
 			start = face.mNumIndices-1;end = -1;inc = -1;
@@ -989,7 +989,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 		// ** IMPORTANT ** Iterate through face vertices in reverse order. This is necessary because
 		// vertices are stored in counter-clockwise order for each face. if [reverseVertexOrder] == true,
 		// then we iterate in normal forward order
-		for( int i = start; i != end; i+=inc)
+		for( Int32 i = start; i != end; i+=inc)
 		{
 			UInt32 vertexIndex = face.mIndices[i];
 			fullBoneMap->GetDescriptor(fullIndex)->SetTo(indexBoneMap.GetDescriptor(vertexIndex));
@@ -1112,7 +1112,7 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	TraverseScene(scene, SceneTraverseOrder::PreOrder, [skeletonPtr, lastNode, &success](const aiNode& node) -> bool
 	{
 		std::string boneName(node.mName.C_Str());
-		int mappedBoneIndex = skeletonPtr->GetBoneMapping(boneName);
+		Int32 mappedBoneIndex = skeletonPtr->GetBoneMapping(boneName);
 
 		SceneObjectSkeletonNode * childSkeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), mappedBoneIndex, boneName);
 		if(childSkeletonNode == NULL)
@@ -1182,7 +1182,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 		animationRef->SetChannelName(n,nodeName);
 
 		//int nodeIndex = skeleton->GetNodeMapping(nodeName);
-		int nodeIndex = n;
+		Int32 nodeIndex = n;
 		if(nodeIndex >= 0)
 		{
 			KeyFrameSet * keyFrameSet = animationRef->GetKeyFrameSet(nodeIndex);
@@ -1384,7 +1384,7 @@ std::string ModelImporter::GetBuiltinVariableNameForTextureType(TextureType text
 	return "";
 }
 
-ModelImporter::TextureType ModelImporter::ConvertAITextureKeyToTextureType(int aiTextureKey)
+ModelImporter::TextureType ModelImporter::ConvertAITextureKeyToTextureType(Int32 aiTextureKey)
 {
 	TextureType textureType = TextureType::_None;
 	if(aiTextureKey == aiTextureType_SPECULAR)textureType = TextureType::Specular;
@@ -1396,7 +1396,7 @@ ModelImporter::TextureType ModelImporter::ConvertAITextureKeyToTextureType(int a
 
 int ModelImporter::ConvertTextureTypeToAITextureKey(TextureType textureType)
 {
-	int aiTextureKey = -1;
+	Int32 aiTextureKey = -1;
 	if(textureType == TextureType::Specular)aiTextureKey = aiTextureType_SPECULAR;
 	else if(textureType == TextureType::BumpMap)aiTextureKey = aiTextureType_NORMALS;
 	else if(textureType == TextureType::Diffuse)aiTextureKey = aiTextureType_DIFFUSE;

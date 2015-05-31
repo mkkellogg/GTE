@@ -203,12 +203,12 @@ namespace GTE
 		projection.PreTransformBy(transform);
 	}
 
-	void Camera::SetupOffscreenRenderTarget(int width, int height)
+	void Camera::SetupOffscreenRenderTarget(Int32 width, Int32 height)
 	{
 		SetupOffscreenRenderTarget(width, height, false);
 	}
 
-	void Camera::SetupOffscreenRenderTarget(int width, int height, bool cube)
+	void Camera::SetupOffscreenRenderTarget(Int32 width, Int32 height, bool cube)
 	{
 		// get reference to the engine's object manager
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
