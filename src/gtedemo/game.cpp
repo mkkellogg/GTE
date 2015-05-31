@@ -453,7 +453,7 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 		break;
 		case PlayerType::Warrior:
 			importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, true);
-			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/Character/warrior.fbx");
+			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx");
 			ASSERT(playerObject.IsValid(), "Could not load Warrior model!\n");
 			playerObject->GetTransform().Translate(45,-10,55,false);
 			playerObject->GetTransform().Scale(4, 4, 4, true);
