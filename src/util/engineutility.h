@@ -39,8 +39,8 @@ namespace GTE
 		static void PrintMatrix(const Matrix4x4& matrix);
 		static Mesh3DRef CreateRectangularMesh(StandardAttributeSet meshAttributes, Real width, Real height,
 			UInt32 subDivisionsWidth, UInt32 subDivisionsHeight,
-			bool calculateNormals, bool calculateTangents, bool buildFaces);
-		static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes, bool doCCW);
+			Bool calculateNormals, Bool calculateTangents, Bool buildFaces);
+		static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes, Bool doCCW);
 		static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes);
 	};
 }

@@ -19,7 +19,7 @@ namespace GTE
 		errorMessage = message;
 	}
 
-	void ErrorManager::SetError(Int32 code, const char * message)
+	void ErrorManager::SetError(Int32 code, const Char * message)
 	{
 		SetError(code, std::string(message));
 	}
@@ -30,7 +30,7 @@ namespace GTE
 		errorMessage = message;
 	}
 
-	void ErrorManager::AddError(Int32 code, const char * message)
+	void ErrorManager::AddError(Int32 code, const Char * message)
 	{
 		AddError(code, std::string(message));
 	}
@@ -41,7 +41,7 @@ namespace GTE
 		Debug::PrintAtLevel(message, DebugLevel::Error);
 	}
 
-	void ErrorManager::SetAndReportError(Int32 code, const char * message)
+	void ErrorManager::SetAndReportError(Int32 code, const Char * message)
 	{
 		SetAndReportError(code, std::string(message));
 	}
@@ -52,7 +52,7 @@ namespace GTE
 		Debug::PrintAtLevel(message, DebugLevel::Error);
 	}
 
-	void ErrorManager::AddAndReportError(Int32 code, const char * message)
+	void ErrorManager::AddAndReportError(Int32 code, const Char * message)
 	{
 		AddAndReportError(code, std::string(message));
 	}

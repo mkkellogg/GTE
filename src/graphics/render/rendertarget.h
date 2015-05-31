@@ -27,11 +27,11 @@ namespace GTE
 	protected:
 
 		// does this render target support standard color-buffer rendering?
-		bool hasColorBuffer;
+		Bool hasColorBuffer;
 		// does this render target support depth rendering?
-		bool hasDepthBuffer;
+		Bool hasDepthBuffer;
 		// enable stencil buffer for render (but not as a render target)
-		bool enableStencilBuffer;
+		Bool enableStencilBuffer;
 		// width of this render target
 		UInt32 width;
 		// height of this render target
@@ -43,13 +43,13 @@ namespace GTE
 		// texture attributes of [colorTexture]
 		TextureAttributes colorTextureAttributes;
 
-		RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
+		RenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
 		virtual ~RenderTarget();
 
 	public:
 
-		virtual bool Init() = 0;
-		bool HasBuffer(RenderBufferType bufferType) const;
+		virtual Bool Init() = 0;
+		Bool HasBuffer(RenderBufferType bufferType) const;
 		TextureRef GetDepthTexture();
 		TextureRef GetColorTexture();
 		UInt32 GetWidth();

@@ -24,13 +24,13 @@ namespace GTE
 		static void SetBitForMask(IntMask * target, IntMask mask);
 		static void ClearBitForMask(IntMask * target, IntMask mask);
 
-		static bool IsBitSet(IntMask target, UInt16 index);
-		static bool IsBitSetForMask(IntMask target, IntMask mask);
+		static Bool IsBitSet(IntMask target, UInt16 index);
+		static Bool IsBitSetForMask(IntMask target, IntMask mask);
 
 		static IntMask CreateIntMask();
 
 		static IntMask MergeMasks(IntMask a, IntMask b);
-		static bool HaveAtLeastOneInCommon(IntMask a, IntMask b);
+		static Bool HaveAtLeastOneInCommon(IntMask a, IntMask b);
 
 		static void ClearMask(IntMask * mask);
 		static void SetAll(IntMask * mask);

@@ -21,7 +21,7 @@ namespace GTE
 	{
 		ShaderSourceLoader * shaderSourceLoader;
 
-		bool boolProperties[(UInt32)AssetImporterBoolProperty::_Count];
+		Bool BoolProperties[(UInt32)AssetImporterBoolProperty::_Count];
 
 	public:
 
@@ -29,12 +29,12 @@ namespace GTE
 		~AssetImporter();
 
 		SceneObjectRef LoadModelDirect(const std::string& filePath) const;
-		SceneObjectRef LoadModelDirect(const std::string& filePath, Real importScale, bool castShadows, bool receiveShadows) const;
-		AnimationRef LoadAnimation(const std::string& filePath, bool addLoopPadding) const;
+		SceneObjectRef LoadModelDirect(const std::string& filePath, Real importScale, Bool castShadows, Bool receiveShadows) const;
+		AnimationRef LoadAnimation(const std::string& filePath, Bool addLoopPadding) const;
 		void LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource);
 
-		void SetBoolProperty(AssetImporterBoolProperty, bool value);
-		bool GetBoolProperty(AssetImporterBoolProperty prop) const;
+		void SetBoolProperty(AssetImporterBoolProperty, Bool value);
+		Bool GetBoolProperty(AssetImporterBoolProperty prop) const;
 	};
 }
 

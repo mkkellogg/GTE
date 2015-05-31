@@ -37,7 +37,7 @@ namespace GTE
 		VertexAttrBuffer();
 		virtual ~VertexAttrBuffer();
 
-		virtual bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, bool dataOnGPU, Real *srcData) = 0;
+		virtual Bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, Real *srcData) = 0;
 		virtual void SetData(const Real * data) = 0;
 		Int32 GetVertexCount() const;
 		Int32 GetComponentCount() const;

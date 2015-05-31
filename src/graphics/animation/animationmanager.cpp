@@ -46,7 +46,7 @@ namespace GTE
 	 * [skeleton. This match-up is accomplished by matching the name of the channel to the name
 	 * of the skeleton node.
 	 */
-	bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation) const
+	Bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation) const
 	{
 		NONFATAL_ASSERT_RTRN(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false, true);
 		NONFATAL_ASSERT_RTRN(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false, true);
@@ -66,7 +66,7 @@ namespace GTE
 		// verify each channel in the animation has a matching node in [skeleton]
 		for (UInt32 c = 0; c < channelCount; c++)
 		{
-			bool foundNodeForChannel = false;
+			Bool foundNodeForChannel = false;
 			const std::string * channelName = animation->GetChannelName(c);
 			if (channelName == NULL)continue;
 
@@ -95,7 +95,7 @@ namespace GTE
 	/*
 	 * Determine if the Skeleton object belonging to [meshRenderer] is compatible with target Skeleton of [animation].
 	 */
-	bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const
+	Bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const
 	{
 		NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false, true);
 		NONFATAL_ASSERT_RTRN(meshRenderer->GetSkeleton().IsValid(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false, true);

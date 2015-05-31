@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	const char* const StandardUniforms::uniformNames[] = { "MODEL_MATRIX",
+	const Char* const StandardUniforms::uniformNames[] = { "MODEL_MATRIX",
 		"MODELVIEW_MATRIX",
 		"MODELVIEWPROJECTION_MATRIX",
 		"PROJECTION_MATRIX",
@@ -29,7 +29,7 @@ namespace GTE
 		"CLIP_PLANE_COUNT",
 		"CLIP_PLANE0" };
 
-	const char * StandardUniforms::GetUniformName(StandardUniform uniform)
+	const Char * StandardUniforms::GetUniformName(StandardUniform uniform)
 	{
 		return uniformNames[(Int16)uniform];
 	}
@@ -54,7 +54,7 @@ namespace GTE
 		IntMaskUtil::ClearBit((IntMask *)set, (IntMask)uniform);
 	}
 
-	bool StandardUniforms::HasUniform(StandardUniformSet set, StandardUniform uniform)
+	Bool StandardUniforms::HasUniform(StandardUniformSet set, StandardUniform uniform)
 	{
 		return IntMaskUtil::IsBitSet((IntMask)set, (IntMask)uniform);
 	}

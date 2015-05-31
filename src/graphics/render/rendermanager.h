@@ -65,9 +65,9 @@ namespace GTE
 			const Light* LightObject;
 			const Point3* LightPosition;
 			const Vector3* LightDirection;
-			bool SelfLit;
+			Bool SelfLit;
 
-			LightingDescriptor(const Light* lightObject, const Point3* lightPosition, const Vector3 * lightDirection, bool selfLit) : LightObject(lightObject),
+			LightingDescriptor(const Light* lightObject, const Point3* lightPosition, const Vector3 * lightDirection, Bool selfLit) : LightObject(lightObject),
 				LightPosition(lightPosition),
 				LightDirection(lightDirection)
 			{
@@ -120,7 +120,7 @@ namespace GTE
 
 		// keep track of objects that have been rendered
 		// TODO: optimize usage of this hashing structure
-		std::unordered_map<ObjectPairKey, bool, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> renderedObjects;
+		std::unordered_map<ObjectPairKey, Bool, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> renderedObjects;
 		// cache shadow volumes that don't need to be constantly rebuilt
 		std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
@@ -138,16 +138,16 @@ namespace GTE
 		void ForwardRenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
 			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
-			bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+			Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransform, const Transform& viewTransformInverse);
 		void ForwardRenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void ForwardRenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-			MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+			MaterialRef material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-			MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
-			std::function<bool(SceneObjectRef)> filterFunction);
-		bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
+			MaterialRef material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+			std::function<Bool(SceneObjectRef)> filterFunction);
+		Bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 		void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
 			const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
 		void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
@@ -157,7 +157,7 @@ namespace GTE
 		void BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection);
 		void CacheShadowVolume(const ObjectPairKey& key, const Point3Array * positions);
 		void ClearCachedShadowVolume(const ObjectPairKey& key);
-		bool HasCachedShadowVolume(const ObjectPairKey& key)  const;
+		Bool HasCachedShadowVolume(const ObjectPairKey& key)  const;
 		const Point3Array * GetCachedShadowVolume(const ObjectPairKey& key);
 		void DestroyCachedShadowVolumes();
 
@@ -176,27 +176,27 @@ namespace GTE
 		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);
 		void SendActiveMaterialUniformsToShader() const;
 
-		bool ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const;
-		bool ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const SceneObject& sceneObject) const;
-		bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
-		bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
+		Bool ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const;
+		Bool ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const SceneObject& sceneObject) const;
+		Bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
+		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 
 		void PushRenderTarget(RenderTargetRef renderTarget);
 		RenderTargetRef PopRenderTarget();
 		void ClearRenderTargetStack();
 
-		bool InitFullScreenQuad();
+		Bool InitFullScreenQuad();
 
 	public:
 
 		RenderManager();
 		~RenderManager();
 
-		bool Init();
+		Bool Init();
 		void RenderScene();
 		void ClearCaches();
 
-		void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, bool clearBuffers);
+		void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers);
 	};
 }
 

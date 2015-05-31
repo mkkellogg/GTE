@@ -48,7 +48,7 @@ namespace GTE
 			Destroy();
 		}
 
-		bool Init()
+		Bool Init()
 		{
 			Destroy();
 

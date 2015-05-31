@@ -146,7 +146,7 @@ namespace GTE
 	 * determines if the transformation is relative to world space or the transform's
 	 * local space.
 	 */
-	void Transform::Translate(Real x, Real y, Real z, bool local)
+	void Transform::Translate(Real x, Real y, Real z, Bool local)
 	{
 		if (!local)
 		{
@@ -160,7 +160,7 @@ namespace GTE
 	 * determines if the transformation is relative to world space or the transform's
 	 * local space.
 	 */
-	void Transform::Translate(Vector3& vector, bool local)
+	void Transform::Translate(Vector3& vector, Bool local)
 	{
 		if (!local)
 		{
@@ -173,7 +173,7 @@ namespace GTE
 	 * Rotate around a specific point and orientation vector.  The parameter [local] determines whether
 	 * local or world space is used.
 	 */
-	void Transform::RotateAround(const Point3& point, const Vector3& axis, Real angle, bool local)
+	void Transform::RotateAround(const Point3& point, const Vector3& axis, Real angle, Bool local)
 	{
 		RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle, local);
 	}
@@ -189,7 +189,7 @@ namespace GTE
 	* is used to achieved the effect in local space. The parameter [local] determines which of those cases
 	* to use.
 	*/
-	void Transform::RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, bool local)
+	void Transform::RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, Bool local)
 	{
 		if (local)
 		{
@@ -208,7 +208,7 @@ namespace GTE
 	/*
 	 * Scale this transform by the x,y, and z components of [mag]
 	 */
-	void Transform::Scale(const Vector3& mag, bool local)
+	void Transform::Scale(const Vector3& mag, Bool local)
 	{
 		Scale(mag.x, mag.y, mag.z, local);
 	}
@@ -217,7 +217,7 @@ namespace GTE
 	 * Scale this transform by [x], [y], [z]. If [local] is true then the operation is
 	 * performed in local space, otherwise it is performed in world space.
 	 */
-	void Transform::Scale(Real x, Real y, Real z, bool local)
+	void Transform::Scale(Real x, Real y, Real z, Bool local)
 	{
 		if (!local)
 		{
@@ -230,7 +230,7 @@ namespace GTE
 	 * Rotate this transform around [vector]. If [local] is true, perform in
 	 * local space, otherwise perform in world space.
 	 */
-	void Transform::Rotate(const Vector3& vector, Real a, bool local)
+	void Transform::Rotate(const Vector3& vector, Real a, Bool local)
 	{
 		Rotate(vector.x, vector.y, vector.z, a, local);
 	}
@@ -239,7 +239,7 @@ namespace GTE
 	 * Rotate this transform around the vector specified by [x], [y], [z].
 	 * If [local] is true, perform in local space, otherwise perform in world space.
 	 */
-	void Transform::Rotate(Real x, Real y, Real z, Real a, bool local)
+	void Transform::Rotate(Real x, Real y, Real z, Real a, Bool local)
 	{
 		if (!local)
 		{
@@ -307,7 +307,7 @@ namespace GTE
 	void Transform::BuildPerspectiveProjectionMatrix(Matrix4x4& matrix, Real fov, Real ratio, Real nearP, Real farP)
 	{
 		// convert fov to radians
-		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 *.5);
+		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 * .5f);
 
 		matrix.SetIdentity();
 
@@ -343,8 +343,8 @@ namespace GTE
 
 		data[0] = f / ratio;
 		data[1 * 4 + 1] = f;
-		data[2 * 4 + 2] = -1.0;
-		data[3 * 4 + 2] = -2.0 * nearP;
+		data[2 * 4 + 2] = -1.0f;
+		data[3 * 4 + 2] = -2.0f * nearP;
 		data[2 * 4 + 3] = -1.0f;
 		data[3 * 4 + 3] = 0.0f;
 		matrix.SetTo(data);

@@ -30,7 +30,7 @@
  * Initialize the lava field mesh and material, the textures used to render it, and load the
  * images that hold its displacement values.
  */
-bool LavaField::InitMeshAndMaterial()
+GTE::Bool LavaField::InitMeshAndMaterial()
 {
 	// load first displacement image
 	displacementA = GTE::ImageLoader::LoadImageU("resources/textures/lava/displacementA.png");
@@ -111,8 +111,8 @@ void LavaField::DisplaceField()
 		GTE::Real percentageY = (GTE::Real)y / fieldHeight;
 
 		// calculate pixel position in displacement map images
-		GTE::Int32 pixelX = percentageX * diplacementImageDimensionSize;
-		GTE::Int32 pixelY = percentageY * diplacementImageDimensionSize;
+		GTE::Int32 pixelX = (GTE::Int32)(percentageX * (GTE::Real)diplacementImageDimensionSize);
+		GTE::Int32 pixelY = (GTE::Int32)(percentageY * (GTE::Real)diplacementImageDimensionSize);
 
 		// enforce wrapping if pixel position is outside image boundaries
 		if(pixelX > 0 && (GTE::UInt32)pixelX >= diplacementImageDimensionSize)pixelX = pixelX % diplacementImageDimensionSize;
@@ -132,7 +132,7 @@ void LavaField::DisplaceField()
 		GTE::Real disp = (dispA + dispB) * dispHeight - dispHeight;
 
 		// lerp to new displacement for smooth motion
-		GTE::Real lerpDisp = GTE::GTEMath::Lerp(p->z, disp, .1);
+		GTE::Real lerpDisp = GTE::GTEMath::Lerp(p->z, disp, .1f);
 
 		// apply displacement to Z-coordinate since mesh was aligned to XY-plane in model space.
 		p->Set(p->x,p->y,lerpDisp);
@@ -178,10 +178,10 @@ LavaField::~LavaField()
 /*
  * Initialize the lava field. Create all scene components and objects.
  */
-bool LavaField::Init()
+GTE::Bool LavaField::Init()
 {
 	// initialize mesh, materials, textures, and displacement data
-	bool baseInitSuccess = InitMeshAndMaterial();
+	GTE::Bool baseInitSuccess = InitMeshAndMaterial();
 	ASSERT(baseInitSuccess == true, "LavaField::Init -> Could not initialize lava material or lava field mesh.");
 
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();

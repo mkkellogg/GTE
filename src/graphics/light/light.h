@@ -42,7 +42,7 @@ namespace GTE
 		Real intensity;
 		Real attenuation;
 		Real range;
-		bool shadowsEnabled;
+		Bool shadowsEnabled;
 		IntMask cullingMask;
 
 	protected:
@@ -76,8 +76,8 @@ namespace GTE
 		void SetAttenuation(Real attenuation);
 		Real GetAttenuation() const;
 
-		void SetShadowsEnabled(bool enabled);
-		bool GetShadowsEnabled() const;
+		void SetShadowsEnabled(Bool enabled);
+		Bool GetShadowsEnabled() const;
 
 		void SetCullingMask(IntMask mask);
 		IntMask GetCullingMask() const;

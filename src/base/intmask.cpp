@@ -73,15 +73,15 @@ namespace GTE
 		*target = uPtr;
 	}
 
-	bool IntMaskUtil::IsBitSet(IntMask target, UInt16 index)
+	Bool IntMaskUtil::IsBitSet(IntMask target, UInt16 index)
 	{
 		IntMask mask = IndexToMaskValue(index);
-		return target & mask;
+		return (target & mask) != 0;
 	}
 
-	bool IntMaskUtil::IsBitSetForMask(IntMask target, IntMask mask)
+	Bool IntMaskUtil::IsBitSetForMask(IntMask target, IntMask mask)
 	{
-		return target & mask;
+		return (target & mask) != 0;
 	}
 
 	IntMask IntMaskUtil::CreateIntMask()
@@ -94,7 +94,7 @@ namespace GTE
 		return a | b;
 	}
 
-	bool IntMaskUtil::HaveAtLeastOneInCommon(IntMask a, IntMask b)
+	Bool IntMaskUtil::HaveAtLeastOneInCommon(IntMask a, IntMask b)
 	{
 		return (a & b) != 0;
 	}

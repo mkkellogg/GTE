@@ -9,34 +9,34 @@
 
 namespace GTE
 {
-	void Debug::PrintMessage(const char * message)
+	void Debug::PrintMessage(const Char * message)
 	{
 		printf("%s\n", message);
 	}
 
-	void Debug::PrintWarning(const char * message)
+	void Debug::PrintWarning(const Char * message)
 	{
 		printf("%s\n", message);
 	}
 
-	void Debug::PrintError(const char * message)
+	void Debug::PrintError(const Char * message)
 	{
 		printf("%s\n", message);
 	}
 
 	void Debug::PrintMessage(std::string& message)
 	{
-		PrintMessage((const char *)message.c_str());
+		PrintMessage((const Char *)message.c_str());
 	}
 
 	void Debug::PrintWarning(std::string& message)
 	{
-		PrintWarning((const char *)message.c_str());
+		PrintWarning((const Char *)message.c_str());
 	}
 
 	void Debug::PrintError(std::string& message)
 	{
-		PrintError((const char *)message.c_str());
+		PrintError((const Char *)message.c_str());
 	}
 
 	void Debug::PrintAtLevel(const std::string& message, DebugLevel level)
@@ -44,7 +44,7 @@ namespace GTE
 		PrintAtLevel(message.c_str(), level);
 	}
 
-	void Debug::PrintAtLevel(const char* message, DebugLevel level)
+	void Debug::PrintAtLevel(const Char* message, DebugLevel level)
 	{
 		switch (level)
 		{

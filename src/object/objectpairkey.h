@@ -33,10 +33,10 @@ namespace GTE
 
 		typedef struct
 		{
-			bool operator() (const ObjectPairKey& a, const ObjectPairKey& b) const { return a == b; }
+			Bool operator() (const ObjectPairKey& a, const ObjectPairKey& b) const { return a == b; }
 		} ObjectPairKeyEq;
 
-		bool operator==(const ObjectPairKey& s) const
+		Bool operator==(const ObjectPairKey& s) const
 		{
 			return s.ObjectAID == this->ObjectAID && s.ObjectBID == this->ObjectBID;
 		}

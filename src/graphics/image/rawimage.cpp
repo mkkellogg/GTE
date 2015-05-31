@@ -32,7 +32,7 @@ namespace GTE
 		return width * height * 4;
 	}
 
-	bool RawImage::Init()
+	Bool RawImage::Init()
 	{
 		imageBytes = new Byte[ImageSizeBytes()];
 		ASSERT(imageBytes != NULL, "RawImage::Init -> Unable to allocate image bytes.");

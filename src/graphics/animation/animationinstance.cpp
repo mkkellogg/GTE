@@ -78,7 +78,7 @@ namespace GTE
 	 * It will also verify the the number of nodes in [Target] matches the number of KeyFrameSet objects
 	 * contained in [SourceAnimation].
 	 */
-	bool AnimationInstance::Init()
+	Bool AnimationInstance::Init()
 	{
 		Destroy();
 

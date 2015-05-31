@@ -6,7 +6,7 @@
 
 namespace GTE
 {
-	typedef unsigned long LongMask;
+	typedef UInt64 LongMask;
 
 	class LongMaskUtil
 	{
@@ -24,8 +24,8 @@ namespace GTE
 		static void SetBitForMask(LongMask * target, LongMask mask);
 		static void ClearBitForMask(LongMask * target, LongMask mask);
 
-		static bool IsBitSet(LongMask target, UInt16 index);
-		static bool IsBitSetForMask(LongMask target, LongMask mask);
+		static Bool IsBitSet(LongMask target, UInt16 index);
+		static Bool IsBitSetForMask(LongMask target, LongMask mask);
 
 		static LongMask CreateLongMask();
 	};

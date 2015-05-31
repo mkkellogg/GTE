@@ -81,12 +81,12 @@ namespace GTE
 		return IntMaskUtil::CreateIntMask();
 	}
 
-	bool LayerManager::ContainsLayer(IntMask mask, UInt32 layerIndex)
+	Bool LayerManager::ContainsLayer(IntMask mask, UInt32 layerIndex)
 	{
 		return IntMaskUtil::IsBitSetForMask(mask, layerIndex);
 	}
 
-	bool LayerManager::AtLeastOneLayerInCommon(IntMask a, IntMask b)
+	Bool LayerManager::AtLeastOneLayerInCommon(IntMask a, IntMask b)
 	{
 		return IntMaskUtil::HaveAtLeastOneInCommon(a, b);
 	}

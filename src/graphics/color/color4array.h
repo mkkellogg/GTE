@@ -15,7 +15,7 @@ namespace GTE
 		Color4Array();
 		virtual ~Color4Array();
 
-		void SetData(const Real * data, bool includeW);
+		void SetData(const Real * data, Bool includeW);
 		Color4 * GetColor(Int32 index);
 		Color4 ** GetColors();
 	};

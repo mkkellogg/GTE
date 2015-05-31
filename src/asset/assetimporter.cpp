@@ -22,7 +22,7 @@ namespace GTE
 
 		for (UInt32 i = 0; i < (UInt32)AssetImporterBoolProperty::_Count; i++)
 		{
-			boolProperties[i] = false;
+			BoolProperties[i] = false;
 		}
 	}
 
@@ -36,13 +36,13 @@ namespace GTE
 		return LoadModelDirect(filePath, 1, true, true);
 	}
 
-	SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, Real importScale, bool castShadows, bool receiveShadows) const
+	SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, Real importScale, Bool castShadows, Bool receiveShadows) const
 	{
 		ModelImporter importer;
 		return importer.LoadModelDirect(filePath, importScale, castShadows, receiveShadows, GetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots));
 	}
 
-	AnimationRef AssetImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding) const
+	AnimationRef AssetImporter::LoadAnimation(const std::string& filePath, Bool addLoopPadding) const
 	{
 		ModelImporter importer;
 		return importer.LoadAnimation(filePath, addLoopPadding, GetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots));
@@ -54,14 +54,14 @@ namespace GTE
 		shaderSourceLoader->LoadShaderSouce(name, shaderSource);
 	}
 
-	void AssetImporter::SetBoolProperty(AssetImporterBoolProperty prop, bool value)
+	void AssetImporter::SetBoolProperty(AssetImporterBoolProperty prop, Bool value)
 	{
-		boolProperties[(UInt32)prop] = value;
+		BoolProperties[(UInt32)prop] = value;
 	}
 
-	bool AssetImporter::GetBoolProperty(AssetImporterBoolProperty prop) const
+	Bool AssetImporter::GetBoolProperty(AssetImporterBoolProperty prop) const
 	{
-		return boolProperties[(UInt32)prop];
+		return BoolProperties[(UInt32)prop];
 	}
 }
 

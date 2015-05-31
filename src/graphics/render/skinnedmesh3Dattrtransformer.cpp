@@ -91,13 +91,13 @@ namespace GTE
 	/*
 	 * Create the bone transformation flags array [boneTransformed].
 	 */
-	bool SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray()
+	Bool SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray()
 	{
 		if (renderer != NULL && renderer->GetSkeleton().IsValid())
 		{
 			SkeletonRef skeleton = renderer->GetSkeleton();
 			boneCount = skeleton->GetBoneCount();
-			boneTransformed = new unsigned char[boneCount];
+			boneTransformed = new UChar[boneCount];
 			ASSERT(boneTransformed != NULL, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray -> Unable to allocate flags array.");
 			return true;
 		}
@@ -113,7 +113,7 @@ namespace GTE
 		if (renderer != NULL && renderer->GetSkeleton().IsValid())
 		{
 			SkeletonRef skeleton = renderer->GetSkeleton();
-			memset(boneTransformed, 0, sizeof(unsigned char) * skeleton->GetBoneCount());
+			memset(boneTransformed, 0, sizeof(UChar) * skeleton->GetBoneCount());
 		}
 	}
 
@@ -152,7 +152,7 @@ namespace GTE
 	 * Create the flag array specified by [target], and initialize
 	 * the saved/transformed data array to the appropriate length.
 	 */
-	bool SkinnedMesh3DAttributeTransformer::CreateCache(CacheType target)
+	Bool SkinnedMesh3DAttributeTransformer::CreateCache(CacheType target)
 	{
 		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> Renderer is null.");
 
@@ -164,7 +164,7 @@ namespace GTE
 
 		if (target == CacheType::Position)
 		{
-			bool initSuccess = transformedPositions.Init(count);
+			Bool initSuccess = transformedPositions.Init(count);
 			if (!initSuccess)
 			{
 				Debug::PrintError("SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed vertex array.");
@@ -175,7 +175,7 @@ namespace GTE
 		}
 		else if (target == CacheType::VertexNormal)
 		{
-			bool initSuccess = transformedVertexNormals.Init(count);
+			Bool initSuccess = transformedVertexNormals.Init(count);
 			ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed vertex normal array.");
 
 
@@ -183,14 +183,14 @@ namespace GTE
 		}
 		else if (target == CacheType::FaceNormal)
 		{
-			bool initSuccess = transformedFaceNormals.Init(count);
+			Bool initSuccess = transformedFaceNormals.Init(count);
 			ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed face normal array.");
 
 			return true;
 		}
 		else if (target == CacheType::VertexTangent)
 		{
-			bool initSuccess = transformedVertexTangents.Init(count);
+			Bool initSuccess = transformedVertexTangents.Init(count);
 			ASSERT(initSuccess, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not init transformed vertex tangent array.");
 
 
@@ -218,7 +218,7 @@ namespace GTE
 	/*
 	 * Set all the flags in the array specified by [target] to be [value].
 	 */
-	void SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags(unsigned char value)
+	void SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags(UChar value)
 	{
 		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> Renderer is NULL.");
 
@@ -228,7 +228,7 @@ namespace GTE
 
 		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
-		memset(cacheFlags, value, sizeof(unsigned char) * count);
+		memset(cacheFlags, value, sizeof(UChar) * count);
 	}
 
 	/*
@@ -243,7 +243,7 @@ namespace GTE
 	/*
 	 * Create the identical normal flags array and identical tangent flags array.
 	 */
-	bool SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags()
+	Bool SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags()
 	{
 		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> 'renderer' is null.");
 
@@ -253,10 +253,10 @@ namespace GTE
 
 		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
-		identicalNormalFlags = new unsigned char[count];
+		identicalNormalFlags = new UChar[count];
 		ASSERT(identicalNormalFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> Unable to allocate identical normal flags array.");
 
-		identicalTangentFlags = new unsigned char[count];
+		identicalTangentFlags = new UChar[count];
 		ASSERT(identicalTangentFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> Unable to allocate identical tangent flags array.");
 
 		return true;
@@ -275,8 +275,8 @@ namespace GTE
 
 		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
-		memset(identicalNormalFlags, 0, sizeof(unsigned char) * count);
-		memset(identicalTangentFlags, 0, sizeof(unsigned char) * count);
+		memset(identicalNormalFlags, 0, sizeof(UChar) * count);
+		memset(identicalTangentFlags, 0, sizeof(UChar) * count);
 	}
 
 
@@ -296,7 +296,7 @@ namespace GTE
 	 * where angles between faces are too sharp for smoothing and therefore the transformation
 	 * for each instance must be calculated individually).
 	 */
-	bool SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents(Vector3Array& fullList, bool forNormals)
+	Bool SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents(Vector3Array& fullList, Bool forNormals)
 	{
 		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> renderer is NULL.");
 
@@ -309,9 +309,9 @@ namespace GTE
 			"SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents -> 'fullList' vertex count does not match vertex bone map.");
 
 		Vector3Array seenVectorValues;
-		std::vector<bool> seenVectors;
+		std::vector<Bool> seenVectors;
 
-		bool initSeenVectorValues = seenVectorValues.Init(uniqueVertexCount);
+		Bool initSeenVectorValues = seenVectorValues.Init(uniqueVertexCount);
 		ASSERT(initSeenVectorValues != false, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents -> Unable to init seenVectorValues.");
 
 		for (UInt32 i = 0; i < uniqueVertexCount; i++)
@@ -358,7 +358,7 @@ namespace GTE
 	 *
 	 *  This method also initializes the [cacheFlags] array, which is used to flag which entries in all the other caches are valid.
 	 */
-	bool SkinnedMesh3DAttributeTransformer::CreateCaches()
+	Bool SkinnedMesh3DAttributeTransformer::CreateCaches()
 	{
 		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> 'renderer' is null.");
 
@@ -368,11 +368,11 @@ namespace GTE
 
 		UInt32 uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 
-		cacheFlags = new unsigned char[uniqueVertexCount];
+		cacheFlags = new UChar[uniqueVertexCount];
 		ASSERT(cacheFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to allocate cacheFlags flags array.");
 
 		DestroyCache(CacheType::Position);
-		bool createSuccess = CreateCache(CacheType::Position);
+		Bool createSuccess = CreateCache(CacheType::Position);
 		ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to create position transform flags array.");
 
 		DestroyCache(CacheType::VertexNormal);
@@ -437,7 +437,7 @@ namespace GTE
 		const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
 		const Vector3Array& vertexTangentsIn, Vector3Array& vertexTangentsOut,
 		const Point3& centerIn, Point3& centerOut,
-		bool transformPositions, bool transformNormals, bool transformTangents)
+		Bool transformPositions, Bool transformNormals, Bool transformTangents)
 	{
 		// make sure the target skeleton is valid and has a VertexBoneMap object for this instance
 		if (renderer != NULL && vertexBoneMapIndex >= 0)
@@ -486,7 +486,7 @@ namespace GTE
 					if (currentCacheSize < 0 || uniqueVertexCount != (UInt32)currentCacheSize)
 					{
 						DestroyCaches();
-						bool createSuccess = CreateCaches();
+						Bool createSuccess = CreateCaches();
 						ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Unable to create caches.");
 
 						DestroyIdenticalNormalsTangentsFlags();

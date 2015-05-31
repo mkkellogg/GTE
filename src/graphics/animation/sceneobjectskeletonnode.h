@@ -34,7 +34,7 @@ namespace GTE
 
 		const Transform * GetFullTransform() const;
 		Transform * GetLocalTransform();
-		bool HasTarget() const;
+		Bool HasTarget() const;
 		SkeletonNode * FullClone() const;
 	};
 }

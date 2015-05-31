@@ -64,7 +64,7 @@ namespace GTE
 		UInt32 GetBoneCount();
 		UInt32 GetNodeCount();
 
-		bool Init();
+		Bool Init();
 		Tree<SkeletonNode*>::TreeNode * CreateRoot(SkeletonNode* node);
 		Tree<SkeletonNode*>::TreeNode * AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode* node);
 
@@ -77,8 +77,8 @@ namespace GTE
 		SkeletonNode * GetNodeFromList(UInt32 nodeIndex);
 		void AddNodeToList(SkeletonNode * node);
 
-		void OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode);
-		void OverrideBonesFrom(Skeleton * skeleton, bool takeOffset, bool takeNode);
+		void OverrideBonesFrom(SkeletonRef skeleton, Bool takeOffset, Bool takeNode);
+		void OverrideBonesFrom(Skeleton * skeleton, Bool takeOffset, Bool takeNode);
 
 		Skeleton * FullClone();
 	};

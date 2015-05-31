@@ -54,7 +54,7 @@ namespace GTE
 		Animation(Real durationTicks, Real ticksPerSecond, Real startOffsetTicks, Real earlyEndTicks);
 		~Animation();
 		void Destroy();
-		bool Init(UInt32 channelCount);
+		Bool Init(UInt32 channelCount);
 
 	public:
 

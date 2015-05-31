@@ -47,7 +47,7 @@ namespace GTE
 	/*
 	 * Initialize this VertexBoneMap object. This method MUST be called before this object can be used.
 	 */
-	bool VertexBoneMap::Init()
+	Bool VertexBoneMap::Init()
 	{
 		// destroy existing data, if it exists
 		Destroy();
@@ -116,7 +116,7 @@ namespace GTE
 		ASSERT(clone != NULL, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.");
 
 		// initialize the new map
-		bool initSuccess = clone->Init();
+		Bool initSuccess = clone->Init();
 		if (!initSuccess)
 		{
 			Debug::PrintError("VertexBoneMap::FullClone -> Could not initialize vertex bone map.");

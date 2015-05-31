@@ -85,7 +85,7 @@ namespace GTE
 	 * during initialization such as screen dimensions are passed in
 	 * via [attributes].
 	 */
-	bool GraphicsGL::Init(const GraphicsAttributes& attributes)
+	Bool GraphicsGL::Init(const GraphicsAttributes& attributes)
 	{
 		this->attributes = attributes;
 
@@ -147,7 +147,7 @@ namespace GTE
 		}
 
 		// call base Init() method
-		bool parentInit = Graphics::Init(this->attributes);
+		Bool parentInit = Graphics::Init(this->attributes);
 		if (!parentInit)
 		{
 			Debug::PrintError("Graphics initialization failure.");
@@ -206,7 +206,7 @@ namespace GTE
 	/*
 	 * Start the graphics system.
 	 */
-	bool GraphicsGL::Start()
+	Bool GraphicsGL::Start()
 	{
 		Graphics::Start();
 		/* Loop until the user closes the window */
@@ -278,7 +278,7 @@ namespace GTE
 		ASSERT(shader != NULL, "GraphicsGL::CreateShader -> Unable to allocate new shader.");
 
 		// load, compile, and link the shader into a complete OpenGL shader program
-		bool loadSuccess = shader->Load();
+		Bool loadSuccess = shader->Load();
 		if (!loadSuccess)
 		{
 			std::string msg = "GraphicsGL::CreateShader -> could not load shader: ";
@@ -347,7 +347,7 @@ namespace GTE
 	/*
 	 * Eanble/disable face culling.
 	 */
-	void GraphicsGL::SetFaceCullingEnabled(bool enabled)
+	void GraphicsGL::SetFaceCullingEnabled(Bool enabled)
 	{
 		if (faceCullingEnabled != enabled || !initialized)
 		{
@@ -366,7 +366,7 @@ namespace GTE
 	 * [a] - Enable/disable the alpha channel.
 	 *
 	 */
-	void GraphicsGL::SetColorBufferChannelState(bool r, bool g, bool b, bool a)
+	void GraphicsGL::SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a)
 	{
 		GLboolean red = r == true ? GL_TRUE : GL_FALSE;
 		GLboolean green = g == true ? GL_TRUE : GL_FALSE;
@@ -378,7 +378,7 @@ namespace GTE
 	/*
 	 * Enable or disable the depth buffer.
 	 */
-	void GraphicsGL::SetDepthBufferEnabled(bool enabled)
+	void GraphicsGL::SetDepthBufferEnabled(Bool enabled)
 	{
 		if (depthBufferEnabled != enabled || !initialized)
 		{
@@ -391,7 +391,7 @@ namespace GTE
 	/*
 	 * Toggle write enable on the depth buffer.
 	 */
-	void GraphicsGL::SetDepthBufferReadOnly(bool readOnly)
+	void GraphicsGL::SetDepthBufferReadOnly(Bool readOnly)
 	{
 		if (depthBufferReadOnly != readOnly || !initialized)
 		{
@@ -432,7 +432,7 @@ namespace GTE
 	/*
 	 * Enable/disable the stencil buffer.
 	 */
-	void GraphicsGL::SetStencilBufferEnabled(bool enabled)
+	void GraphicsGL::SetStencilBufferEnabled(Bool enabled)
 	{
 		if (stencilBufferEnabled != enabled || !initialized)
 		{
@@ -445,7 +445,7 @@ namespace GTE
 	/*
 	 * Enable/disable stencil testing.
 	 */
-	void GraphicsGL::SetStencilTestEnabled(bool enabled)
+	void GraphicsGL::SetStencilTestEnabled(Bool enabled)
 	{
 		if (stencilTestEnabled != enabled || !initialized)
 		{
@@ -457,7 +457,7 @@ namespace GTE
 
 
 	/*
-	void GraphicsGL::SetRenderBufferEnabled(RenderBufferType buffer, bool enabled) const
+	void GraphicsGL::SetRenderBufferEnabled(RenderBufferType buffer, Bool enabled) const
 	{
 	if(buffer == RenderBufferType::Color && enabled != colorBufferEnabled)
 	{
@@ -828,7 +828,7 @@ namespace GTE
 	 * [width] - Width of both the color and depth render textures.
 	 * [height] - Width of both the color and depth render textures.
 	 */
-	RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+	RenderTarget * GraphicsGL::CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		RenderTargetGL * buffer;
@@ -871,7 +871,7 @@ namespace GTE
 	/*
 	 * Enable/disable blending.
 	 */
-	void GraphicsGL::SetBlendingEnabled(bool enabled)
+	void GraphicsGL::SetBlendingEnabled(Bool enabled)
 	{
 		if (blendingEnabled != enabled || !initialized)
 		{
@@ -1189,7 +1189,7 @@ namespace GTE
 	/*
 	 * Make [target] the target for all standard rendering operations.
 	 */
-	bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
+	Bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
 	{
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> 'target' is not valid.", false, true);
 
@@ -1223,7 +1223,7 @@ namespace GTE
 	/*
 	 * For the current render target, if it is cubed, activate [side] as the target for rendering.
 	 */
-	bool GraphicsGL::ActivateCubeRenderTargetSide(CubeTextureSide side)
+	Bool GraphicsGL::ActivateCubeRenderTargetSide(CubeTextureSide side)
 	{
 		if (currentRenderTarget.IsValid())
 		{
@@ -1257,7 +1257,7 @@ namespace GTE
 	/*
 	 * Make the default framebuffer the active render target.
 	 */
-	bool GraphicsGL::RestoreDefaultRenderTarget()
+	Bool GraphicsGL::RestoreDefaultRenderTarget()
 	{
 		ActivateRenderTarget(defaultRenderTarget);
 		return true;
@@ -1359,7 +1359,7 @@ namespace GTE
 	/*
 	 * Enable one more clip plane than is currently enabled.
 	 */
-	bool GraphicsGL::AddClipPlane()
+	Bool GraphicsGL::AddClipPlane()
 	{
 		NONFATAL_ASSERT_RTRN(activeClipPlanes < Constants::MaxClipPlanes, "GraphicsGL::ActivateClipPlane -> Maximum clip planes exceeded.", false, true);
 		glEnable(GL_CLIP_PLANE0 + activeClipPlanes);
@@ -1387,7 +1387,7 @@ namespace GTE
 	 * [vertexCount] - Number of vertices being sent to the GPU.
 	 * [validate] - Specifies whether or not to validate the shader variables that have been set prior to rendering.
 	 */
-	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, bool validate)
+	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate)
 	{
 		MaterialRef currentMaterial = GetActiveMaterial();
 

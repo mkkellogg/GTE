@@ -99,7 +99,7 @@ void ModelImporter::InitImporter()
  * compatible path, so the the engine's FileSystem singleton should be used to derive the correct platform-specific
  * path before calling this method.
  */
-const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool preserveFBXPivots)
+const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, Bool preserveFBXPivots)
 {
 	// the global Assimp scene object
 	const aiScene* scene = NULL;
@@ -146,7 +146,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
  * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
  * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
  */
-SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, Real importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots)
+SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, Real importScale, Bool castShadows, Bool receiveShadows, Bool preserveFBXPivots)
 {
 	FileSystem * fileSystem = FileSystem::Instance();
 	std::string fixedModelPath = fileSystem->FixupPathForLocalFilesystem(modelPath);
@@ -177,7 +177,7 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, Real
  * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
  * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
  */
-SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, bool castShadows, bool receiveShadows) const
+SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, Bool castShadows, Bool receiveShadows) const
 {
 	// get a pointer to the Engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -197,7 +197,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	// process all the Assimp materials in [scene] and create equivalent engine native materials.
 	// store those materials and their properties in MaterialImportDescriptor instances, which get
 	// added to [materialImportDescriptors]
-	bool processMaterialsSuccess = ProcessMaterials(fixedModelPath, scene, materialImportDescriptors);
+	Bool processMaterialsSuccess = ProcessMaterials(fixedModelPath, scene, materialImportDescriptors);
 	if(!processMaterialsSuccess)
 	{
 		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::ProcessMaterialsFailed, "ModelImporter::ProcessModelScene -> ProcessMaterials() returned an error.");
@@ -246,7 +246,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 
 			// if the transformation matrix for this scene object has an inverted scale, we need to process the
 			// vertex bone map in reverse order. we pass the [reverseVertexOrder] flag to SetupVertexBoneMapForRenderer()
-			bool reverseVertexOrder = HasOddReflections(mat);
+			Bool reverseVertexOrder = HasOddReflections(mat);
 			SetupVertexBoneMapForRenderer(scene, skeletonClone, renderer, reverseVertexOrder);
 		}
 	}
@@ -278,8 +278,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 											   std::vector<MaterialImportDescriptor>& materialImportDescriptors,
 											   SkeletonRef skeleton,
 											   std::vector<SceneObjectRef>& createdSceneObjects,
-											   bool castShadows,
-											   bool receiveShadows) const
+											   Bool castShadows,
+											   Bool receiveShadows) const
 {
 	Matrix4x4 mat;
 	aiMatrix4x4 matBaseTransformation = node.mTransformation;
@@ -293,8 +293,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	NONFATAL_ASSERT(sceneObject.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create scene object.", false);
 
 	// determine if [skeleton] is valid
-	bool hasSkeleton = skeleton.IsValid() && skeleton->GetBoneCount() ? true : false;
-	bool requiresSkinnedRenderer = false;
+	Bool hasSkeleton = skeleton.IsValid() && skeleton->GetBoneCount() ? true : false;
+	Bool requiresSkinnedRenderer = false;
 
 	Mesh3DRenderer * rendererPtr = NULL;
 	SkinnedMesh3DRendererRef skinnedMeshRenderer;
@@ -322,7 +322,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		NONFATAL_ASSERT(mesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.", false);
 
 		// initialize the new Mesh3D instance
-		bool meshInitSuccess = mesh3D->Init();
+		Bool meshInitSuccess = mesh3D->Init();
 		NONFATAL_ASSERT(meshInitSuccess,"ModelImporter::RecursiveProcessModelScene -> Unable to init Mesh3D object.", false);
 
 		// if there are meshes with bones on this node, then we create a SkinnedMesh3DRenderer instead of a Mesh3DRenderer
@@ -368,7 +368,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 			// if the transformation matrix for this node has an inverted scale, we need to process the mesh
 			// differently or else it won't display correctly. we pass the [invert] flag to ConvertAssimpMesh()
-			bool invert = HasOddReflections(mat);
+			Bool invert = HasOddReflections(mat);
 			// convert Assimp mesh to a Mesh3D object
 			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor, invert);
 			NONFATAL_ASSERT(subMesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.", false);
@@ -458,7 +458,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
  * [materialImportDescriptor] - Descriptor for the mesh's material.
  * [invert] - If true it means the mesh has an inverted scale transformation to deal with
  */
-SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const
+SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, Bool invert) const
 {
 	NONFATAL_ASSERT_RTRN(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DRef::Null(), true);
 
@@ -501,7 +501,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 	SubMesh3DRef mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
 	NONFATAL_ASSERT_RTRN(mesh3D.IsValid(),"ModelImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null(), false);
 
-	bool initSuccess = mesh3D->Init(vertexCount);
+	Bool initSuccess = mesh3D->Init(vertexCount);
 
 	// make sure allocation of required number of vertex attributes is successful
 	if(!initSuccess)
@@ -586,7 +586,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
  * [scene] - The Assimp model/scene.
  * [materialImportDescriptors] - A vector of MaterialImportDescriptor structures that will be populated by ProcessMaterials().
  */
-bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const
+Bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const
 {
 	// TODO: Implement support for embedded textures
 	if (scene.HasTextures())
@@ -675,7 +675,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 				{
 					// Add [diffuseTexture] to the new material (and for the appropriate shader variable), and store
 					// Assimp UV channel for it in [materialImportDescriptor] for later processing of the mesh
-					bool setupSuccess = SetupMeshSpecificMaterialWithTexture(*assimpMaterial, TextureType::Diffuse, diffuseTexture, i, materialImportDescriptor);
+					Bool setupSuccess = SetupMeshSpecificMaterialWithTexture(*assimpMaterial, TextureType::Diffuse, diffuseTexture, i, materialImportDescriptor);
 					if(!setupSuccess)
 					{
 						std::string msg ="ModelImporter::ProcessMaterials -> Could not set up diffuse texture.";
@@ -776,7 +776,7 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
  * The method then locates the Assimp UV data for that texture and stores that in the mesh-specific properties of
  * [materialImportDesc].
  */
-bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, TextureType textureType, const TextureRef texture,
+Bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, TextureType textureType, const TextureRef texture,
 		 	 	 	 	 	 	 	 	 	 	 	 	 UInt32 meshIndex, MaterialImportDescriptor& materialImportDesc) const
 {
 	// get the Assimp material key for textures of type [textureType]
@@ -882,7 +882,7 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	}
 }
 
-void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, bool reverseVertexOrder) const
+void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, Bool reverseVertexOrder) const
 {
 	for(UInt32 m = 0; m < scene.mNumMeshes; m++)
 	{
@@ -891,7 +891,7 @@ void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, Skeleton
 		{
 			VertexBoneMap indexBoneMap(cMesh->mNumVertices, cMesh->mNumVertices);
 
-			bool mapInitSuccess = indexBoneMap.Init();
+			Bool mapInitSuccess = indexBoneMap.Init();
 			if(!mapInitSuccess)
 			{
 				Debug::PrintError("ModelImporter::SetupVertexBoneMapForRenderer -> Could not initialize index bone map.");
@@ -926,7 +926,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 	SkeletonRef target = objectManager->CreateSkeleton(boneCount);
 	NONFATAL_ASSERT_RTRN(target.IsValid(),"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",SkeletonRef::Null(), false);
 
-	bool skeletonInitSuccess = target->Init();
+	Bool skeletonInitSuccess = target->Init();
 	if(!skeletonInitSuccess)
 	{
 		Debug::PrintError("ModelImporter::LoadSkeleton -> Unable to initialize skeleton.");
@@ -945,7 +945,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 		}
 	}
 
-	bool hierarchysuccess = CreateAndMapNodeHierarchy(target, scene);
+	Bool hierarchysuccess = CreateAndMapNodeHierarchy(target, scene);
 	if(!hierarchysuccess)
 	{
 		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not create node hierarchy.");
@@ -956,7 +956,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 	return target;
 }
 
-VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, bool reverseVertexOrder) const
+VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, Bool reverseVertexOrder) const
 {
 	VertexBoneMap * fullBoneMap = new VertexBoneMap(mesh.mNumFaces * 3, mesh.mNumVertices);
 	if(fullBoneMap == NULL)
@@ -965,7 +965,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 		return NULL;
 	}
 
-	bool mapInitSuccess = fullBoneMap->Init();
+	Bool mapInitSuccess = fullBoneMap->Init();
 	if(!mapInitSuccess)
 	{
 		Debug::PrintError("ModelImporter::ExpandIndexBoneMapping -> Could not initialize vertex bone map.");
@@ -1091,7 +1091,7 @@ unsigned ModelImporter::CountBones(const aiScene& scene) const
 	return boneCount;
 }
 
-bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const
+Bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const
 {
 	SceneObjectSkeletonNode * skeletonNode = new SceneObjectSkeletonNode(SceneObjectRef::Null(), -1, "");
 	if(skeletonNode == NULL)
@@ -1108,8 +1108,8 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	}
 
 	Skeleton * skeletonPtr = skeleton.GetPtr();
-	bool success = true;
-	TraverseScene(scene, SceneTraverseOrder::PreOrder, [skeletonPtr, lastNode, &success](const aiNode& node) -> bool
+	Bool success = true;
+	TraverseScene(scene, SceneTraverseOrder::PreOrder, [skeletonPtr, lastNode, &success](const aiNode& node) -> Bool
 	{
 		std::string boneName(node.mName.C_Str());
 		Int32 mappedBoneIndex = skeletonPtr->GetBoneMapping(boneName);
@@ -1145,7 +1145,7 @@ bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	return success;
 }
 
-AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopPadding) const
+AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Bool addLoopPadding) const
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	NONFATAL_ASSERT_RTRN(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null(), true);
@@ -1155,7 +1155,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 	// adding little extra time to the animation allows for the interpolation between the last
 	// and the first frame, which smoothes out looping animations
 	// TODO: figure out a better way to do this, possibly a setting for smoothing looped animations
-	Real loopPadding = ticksPerSecond * .05;
+	Real loopPadding = ticksPerSecond * .05f;
 	Real durationTicks = (Real)animation.mDuration;
 
 	if(addLoopPadding) durationTicks += loopPadding;
@@ -1166,7 +1166,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond);
 	NONFATAL_ASSERT_RTRN(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null(), false);
 
-	bool initSuccess = animationRef->Init(animation.mNumChannels);
+	Bool initSuccess = animationRef->Init(animation.mNumChannels);
 	if(!initSuccess)
 	{
 		objectManager->DestroyAnimation(animationRef);
@@ -1242,7 +1242,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
  * Currently this loads only the first animation found in the model file.
  *
  */
-AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, bool addLoopPadding, bool preserveFBXPivots)
+AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, Bool addLoopPadding, Bool preserveFBXPivots)
 {
 	InitImporter();
 
@@ -1258,7 +1258,7 @@ AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, bool addL
 	return animation;
 }
 
-void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback) const
+void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<Bool(const aiNode&)> callback) const
 {
 	if(scene.mRootNode != NULL)
 	{
@@ -1268,9 +1268,9 @@ void ModelImporter::TraverseScene(const aiScene& scene, SceneTraverseOrder trave
 	}
 }
 
-void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback) const
+void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<Bool(const aiNode&)> callback) const
 {
-	bool doContinue = callback(node);
+	Bool doContinue = callback(node);
 	if(!doContinue)return;
 
 	for(UInt32 i = 0; i < node.mNumChildren; i++)
@@ -1406,7 +1406,7 @@ int ModelImporter::ConvertTextureTypeToAITextureKey(TextureType textureType)
 /*
  * Determine if [mat] has an odd number of reflections.
  */
-bool ModelImporter::HasOddReflections(Matrix4x4& mat)
+Bool ModelImporter::HasOddReflections(Matrix4x4& mat)
 {
 	Real determinant = mat.CalculateDeterminant();
 	if (determinant < 0.0)return true;

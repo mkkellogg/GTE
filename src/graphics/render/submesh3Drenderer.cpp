@@ -43,7 +43,7 @@ namespace GTE
 	/*
 	 * Constructor with pointer to an attribute transformer, and parameter to choose CPU-side or GPU-side vertex attribute buffers
 	 */
-	SubMesh3DRenderer::SubMesh3DRenderer(bool buffersOnGPU, AttributeTransformer * attributeTransformer)
+	SubMesh3DRenderer::SubMesh3DRenderer(Bool buffersOnGPU, AttributeTransformer * attributeTransformer)
 	{
 		this->containerRenderer = NULL;
 		this->targetSubMeshIndex = -1;
@@ -136,7 +136,7 @@ namespace GTE
 	/*
 	 * Create and initialize an instance of VertexAttrBuffer.
 	 */
-	bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride)
+	Bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride)
 	{
 		NONFATAL_ASSERT_RTRN(buffer != NULL, "SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false, true);
 
@@ -155,12 +155,12 @@ namespace GTE
 	/*
 	 * Create & initialize the vertex attribute buffer in [attributeBuffers] that corresponds to [attr].
 	 */
-	bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride)
+	Bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride)
 	{
 		// if the buffer already exists, destroy it first
 		DestroyBuffer(&attributeBuffers[(Int32)attr]);
 		// create and initialize buffer
-		bool initSuccess = InitBuffer(&attributeBuffers[(Int32)attr], length, componentCount, stride);
+		Bool initSuccess = InitBuffer(&attributeBuffers[(Int32)attr], length, componentCount, stride);
 
 		return initSuccess;
 	}
@@ -176,14 +176,14 @@ namespace GTE
 	/*
 	 * Specify whether or not to use the fix for shadow volume artifacts that arise when mesh geometry is bad.
 	 */
-	void SubMesh3DRenderer::SetUseBadGeometryShadowFix(bool useFix)
+	void SubMesh3DRenderer::SetUseBadGeometryShadowFix(Bool useFix)
 	{
 		useBadGeometryShadowFix = useFix;
 	}
 
 	/*
 	 * Build a shadow volume for this mesh. For point lights, the position of the light is in
-	 * [lightPosDir], for directional lights the direction is also in [lightPosDir]. The boolean
+	 * [lightPosDir], for directional lights the direction is also in [lightPosDir]. The 
 	 * flag [directional] indicates if the light is directional or not.
 	 *
 	 * The algorithm utilized in this method was inspired by the method used in the GPU gems article:
@@ -206,7 +206,7 @@ namespace GTE
 	 * this algorithm generates a shadow volume for each back-facing triangle individually. This results in much more
 	 * complex shadow volume geometry that incurs a significant performance penalty, but it will fix artifacts from really bad meshes.
 	 */
-	void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, bool directional, bool backFacesFrontCap)
+	void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, Bool directional, Bool backFacesFrontCap)
 	{
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> Mesh is invalid.");
@@ -532,7 +532,7 @@ namespace GTE
 	 * Update the vertex attribute buffers of this sub-renderer to reflect type & size of the attribute
 	 * data in the target sub-mesh.
 	 */
-	bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
+	Bool SubMesh3DRenderer::UpdateMeshAttributeBuffers()
 	{
 		// if vertex attribute buffers are already created, destroy them
 		DestroyBuffers();
@@ -569,7 +569,7 @@ namespace GTE
 
 		// TODO: current shadow volume data memory is allocated for all mesh renderers, regardless if they cast a
 		// shadow or not. This could be quite wasteful, so implement a way to avoid this excess memory usage.
-		bool shadowVolumeInitSuccess = true;
+		Bool shadowVolumeInitSuccess = true;
 		shadowVolumeInitSuccess = shadowVolumePositions.Init(storedVertexCount * 8);
 		shadowVolumeInitSuccess &= InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 8, 4, 0);
 		if (!shadowVolumeInitSuccess)
@@ -593,7 +593,7 @@ namespace GTE
 	 * correct amount of space to store the transformed copies of those attributes. This method
 	 * accomplishes that.
 	 */
-	bool SubMesh3DRenderer::UpdateAttributeTransformerData()
+	Bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 	{
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateAttributeTransformerData -> Could not find matching sub mesh for sub renderer.");
@@ -674,7 +674,7 @@ namespace GTE
 	/*
 	* Should this renderer update its data from its target mesh?
 	*/
-	bool SubMesh3DRenderer::ShouldUpdateFromMesh()
+	Bool SubMesh3DRenderer::ShouldUpdateFromMesh()
 	{
 		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::ShouldUpdateFromMesh -> Container renderer is null.");
 
@@ -738,7 +738,7 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
-		bool updateSuccess = true;
+		Bool updateSuccess = true;
 
 		// if the vertex count of this sub-renderer does not match that of the target sub-mesh, call
 		// the UpdateMeshAttributeBuffers() method to resize
@@ -764,7 +764,7 @@ namespace GTE
 	 * expected by the shader belonging to [material] match the attributes that are supplied by the target sub-mesh. It also
 	 * means calling VerifySetVars() to ensure all uniforms & attributes expected by the shader have been set correctly.
 	 */
-	bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialRef material)
+	Bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialRef material)
 	{
 		// don't bother validating this material if it has already been validated
 		if (material == lastUsedMaterial)return true;
@@ -826,7 +826,7 @@ namespace GTE
 	/*
 	 * Return the [doAttributeTransform] flag.
 	 */
-	bool SubMesh3DRenderer::DoesAttributeTransform() const
+	Bool SubMesh3DRenderer::DoesAttributeTransform() const
 	{
 		return doAttributeTransform;
 	}
@@ -956,7 +956,7 @@ namespace GTE
 	/*
 	 * Set the [doBackSetShadowVolume] member boolean.
 	 */
-	void SubMesh3DRenderer::SetUseBackSetShadowVolume(bool use)
+	void SubMesh3DRenderer::SetUseBackSetShadowVolume(Bool use)
 	{
 		doBackSetShadowVolume = use;
 	}
@@ -964,7 +964,7 @@ namespace GTE
 	/*
 	 * Access [doBackSetShadowVolume] member boolean.
 	 */
-	bool SubMesh3DRenderer::GetUseBackSetShadowVolume()
+	Bool SubMesh3DRenderer::GetUseBackSetShadowVolume()
 	{
 		return doBackSetShadowVolume;
 	}

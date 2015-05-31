@@ -48,8 +48,8 @@ namespace GTE
 
 		Shader(const ShaderSource& shaderSource);
 		virtual ~Shader();
-		virtual bool Load() = 0;
-		virtual bool IsLoaded() = 0;
+		virtual Bool Load() = 0;
+		virtual Bool IsLoaded() = 0;
 		virtual Int32 GetAttributeVarID(const std::string& varName) const = 0;
 		virtual Int32 GetUniformVarID(const std::string& varName) const = 0;
 		virtual void SendBufferToShader(Int32 varID, VertexAttrBuffer * buffer) = 0;

@@ -27,8 +27,8 @@ namespace GTE
 
 	class ImageLoader
 	{
-		static bool ilInitialized;
-		static bool Initialize();
+		static Bool ilInitialized;
+		static Bool Initialize();
 
 	public:
 

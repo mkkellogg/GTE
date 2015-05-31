@@ -50,19 +50,19 @@ namespace GTE
 	protected:
 
 		// is OpenGL blending enabled?
-		bool blendingEnabled;
+		Bool blendingEnabled;
 		// is OpenGL depth buffer enabled?
-		bool depthBufferEnabled;
+		Bool depthBufferEnabled;
 		// is OpenGL depth buffer currently read only?
-		bool depthBufferReadOnly;
+		Bool depthBufferReadOnly;
 		// is the OpenGL color buffer enabled?
-		bool colorBufferEnabled;
+		Bool colorBufferEnabled;
 		// is the OpenGL stencil buffer enabled?
-		bool stencilBufferEnabled;
+		Bool stencilBufferEnabled;
 		// is OpenGL stencil testing enabled?
-		bool stencilTestEnabled;
+		Bool stencilTestEnabled;
 		// is face culling enabled in OpenGL?
-		bool faceCullingEnabled;
+		Bool faceCullingEnabled;
 		// number of bits per channel in the OpenGL color buffer
 		Int32 redBits, greenBits, blueBits, alphaBits;
 		// bit depth of the OpenGL depth buffer
@@ -76,7 +76,7 @@ namespace GTE
 		UInt32 activeClipPlanes;
 
 		// is the graphics system initialized?
-		bool initialized;
+		Bool initialized;
 
 		// RenderTarget objects that encapsulates the OpenGL default framebuffer
 		RenderTargetRef defaultRenderTarget;
@@ -91,7 +91,7 @@ namespace GTE
 		UInt32 openGLMinorVersion;
 
 		void PreProcessScene();
-		bool Start();
+		Bool Start();
 		void End();
 		void Update();
 		void RenderScene();
@@ -125,7 +125,7 @@ namespace GTE
 		Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 									const std::string& bottom, const std::string& left, const std::string& right);
 		void DestroyTexture(Texture * texture);
-		RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+		RenderTarget * CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 										  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
 		void DestroyRenderTarget(RenderTarget * target);
 
@@ -134,39 +134,39 @@ namespace GTE
 
 		void SetFaceCullingMode(FaceCullingMode mode);
 		FaceCullingMode GetFaceCullingMode();
-		void SetFaceCullingEnabled(bool enabled);
+		void SetFaceCullingEnabled(Bool enabled);
 
-		void SetColorBufferChannelState(bool r, bool g, bool b, bool a);
-		void SetDepthBufferEnabled(bool enabled);
-		void SetDepthBufferReadOnly(bool readOnly);
+		void SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a);
+		void SetDepthBufferEnabled(Bool enabled);
+		void SetDepthBufferReadOnly(Bool readOnly);
 		void SetDepthBufferFunction(DepthBufferFunction function);
-		void SetStencilBufferEnabled(bool enabled);
-		void SetStencilTestEnabled(bool enabled);
+		void SetStencilBufferEnabled(Bool enabled);
+		void SetStencilTestEnabled(Bool enabled);
 
-		void SetBlendingEnabled(bool enabled);
+		void SetBlendingEnabled(Bool enabled);
 		void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
 		GLenum GetGLBlendProperty(BlendingProperty property);
 		void ActivateMaterial(MaterialRef material);
 
 		void EnterRenderMode(RenderMode renderMode);
 
-		bool Init(const GraphicsAttributes& attributes);
+		Bool Init(const GraphicsAttributes& attributes);
 		UInt32 GetOpenGLVersion();
 
-		bool ActivateRenderTarget(RenderTargetRef target);
+		Bool ActivateRenderTarget(RenderTargetRef target);
 		RenderTargetRef GetCurrrentRenderTarget();
-		bool ActivateCubeRenderTargetSide(CubeTextureSide side);
-		bool RestoreDefaultRenderTarget();
+		Bool ActivateCubeRenderTargetSide(CubeTextureSide side);
+		Bool RestoreDefaultRenderTarget();
 		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest);
 
 		void SetTextureData(TextureRef texture, Byte * data);
 		void SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side);
 		void RebuildMipMaps(TextureRef texture);
 
-		bool AddClipPlane();
+		Bool AddClipPlane();
 		void DeactiveAllClipPlanes();
 
-		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, bool validate);
+		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate);
 	};
 }
 

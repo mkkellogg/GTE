@@ -24,7 +24,7 @@ namespace GTE
 	public:
 
 		// is this key frame set active?
-		bool Used;
+		Bool Used;
 		// key frames with translation transformations
 		std::vector<TranslationKeyFrame> TranslationKeyFrames;
 		// key frames with scale transformations

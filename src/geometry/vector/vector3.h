@@ -34,7 +34,7 @@ namespace GTE
 		Real &z;
 
 		Vector3();
-		Vector3(bool permAttached, Real * target);
+		Vector3(Bool permAttached, Real * target);
 		Vector3(Real x, Real y, Real z);
 		Vector3(const Vector3& vector);
 		Vector3(const Real * data);
@@ -42,9 +42,9 @@ namespace GTE
 
 		Vector3& operator=(const Vector3 & source);
 		BaseVector4 & operator= (const BaseVector4 & source);
-		bool operator==(const Vector3 & source) const;
-		bool operator==(const Vector3 & source);
-		static bool AreStrictlyEqual(const Vector3* a, const Vector3* b);
+		Bool operator==(const Vector3 & source) const;
+		Bool operator==(const Vector3 & source);
+		static Bool AreStrictlyEqual(const Vector3* a, const Vector3* b);
 		void Set(Real x, Real y, Real z);
 
 		void Add(const Vector3& v);
@@ -63,11 +63,11 @@ namespace GTE
 		static void Cross(const Vector3& a, const Vector3& b, Vector3& results);
 		static void CalcNormal(const Vector3& a, const Vector3& b, Vector3& result);
 		static Real Dot(const Vector3& a, const Vector3& b);
-		static bool RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result);
-		static bool RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result, const Vector3& fallbackAxis);
+		static Bool RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result);
+		static Bool RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result, const Vector3& fallbackAxis);
 		static Real AngleBetween(const Vector3 * a, const Vector3 * b, const Vector3 * refRightNormal);
 
-		bool IsZeroLength() const;
+		Bool IsZeroLength() const;
 
 		void AttachTo(Real * data);
 		void Detach();

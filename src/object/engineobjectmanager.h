@@ -76,7 +76,7 @@ namespace GTE
 		void DeleteAnimationInstance(AnimationInstance * animation);
 		void DeleteAnimationPlayer(AnimationPlayer * player);
 
-		bool InitBuiltinShaders();
+		Bool InitBuiltinShaders();
 
 		RenderTargetRef WrapRenderTarget(RenderTarget * target);
 
@@ -84,7 +84,7 @@ namespace GTE
 
 		static const std::string DefaultLayer;
 
-		bool Init();
+		Bool Init();
 
 		ShaderRef GetLoadedShader(LongMask properties);
 
@@ -136,7 +136,7 @@ namespace GTE
 		TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 			RawImage * bottomData, RawImage * leftData, RawImage * rightData);
 		void DestroyTexture(TextureRef texture);
-		RenderTargetRef CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+		RenderTargetRef CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 			const TextureAttributes& colorTextureAttributes,
 			UInt32 width, UInt32 height);
 		void DestroyRenderTarget(RenderTargetRef target);

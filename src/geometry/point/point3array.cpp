@@ -20,7 +20,7 @@ namespace GTE
 	{
 	}
 
-	void Point3Array::SetData(const Real * data, bool includeW)
+	void Point3Array::SetData(const Real * data, Bool includeW)
 	{
 
 	}

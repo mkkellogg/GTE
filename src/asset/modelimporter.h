@@ -76,7 +76,7 @@ namespace GTE
 			Int32 vertexColorsIndex;
 			LongMask shaderProperties;
 			MaterialRef material;
-			bool invertVCoords;
+			Bool invertVCoords;
 			std::map<TextureType, int> uvMapping;
 
 			MeshSpecificMaterialDescriptor()
@@ -86,7 +86,7 @@ namespace GTE
 				invertVCoords = true;
 			}
 
-			bool UVMappingHasKey(TextureType key)
+			Bool UVMappingHasKey(TextureType key)
 			{
 				if (uvMapping.find(key) != uvMapping.end())return true;
 				return false;
@@ -99,7 +99,7 @@ namespace GTE
 
 			std::map<int, MeshSpecificMaterialDescriptor> meshSpecificProperties;
 
-			bool UsedByMesh(Int32 index)
+			Bool UsedByMesh(Int32 index)
 			{
 				if (meshSpecificProperties.find(index) != meshSpecificProperties.end())return true;
 				return false;
@@ -112,30 +112,30 @@ namespace GTE
 		~ModelImporter();
 
 		void InitImporter();
-		const aiScene * LoadAIScene(const std::string& filePath, bool preserveFBXPivots);
+		const aiScene * LoadAIScene(const std::string& filePath, Bool preserveFBXPivots);
 
 		void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, Real scale, SceneObjectRef parent,
 			std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton,
-			std::vector<SceneObjectRef>& createdSceneObjects, bool castShadows, bool receiveShadows) const;
-		SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, bool castShadows, bool receiveShadows) const;
-		bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
+			std::vector<SceneObjectRef>& createdSceneObjects, Bool castShadows, Bool receiveShadows) const;
+		SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, Bool castShadows, Bool receiveShadows) const;
+		Bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
 		TextureRef LoadAITexture(aiMaterial& material, aiTextureType textureType, const std::string& modelPath) const;
-		bool SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, const TextureType textureType, TextureRef texture,
+		Bool SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, const TextureType textureType, TextureRef texture,
 			UInt32 meshIndex, MaterialImportDescriptor& materialImportDesc) const;
 		static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
-		SubMesh3DRef ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const;
-		void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, bool reverseVertexOrder) const;
+		SubMesh3DRef ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, Bool invert) const;
+		void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, Bool reverseVertexOrder) const;
 
 		SkeletonRef LoadSkeleton(const aiScene& scene) const;
-		VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, bool reverseVertexOrder) const;
+		VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, Bool reverseVertexOrder) const;
 		void AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const;
 		void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
 		unsigned CountBones(const aiScene& scene) const;
-		bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
-		AnimationRef LoadAnimation(aiAnimation& animation, bool addLoopPadding) const;
+		Bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
+		AnimationRef LoadAnimation(aiAnimation& animation, Bool addLoopPadding) const;
 
-		void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<bool(const aiNode&)> callback) const;
-		void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<bool(const aiNode&)> callback) const;
+		void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<Bool(const aiNode&)> callback) const;
+		void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<Bool(const aiNode&)> callback) const;
 
 		static StandardUniform MapShaderMaterialCharacteristicToUniform(ShaderMaterialCharacteristic property);
 		static StandardAttribute MapShaderMaterialCharacteristicToAttribute(ShaderMaterialCharacteristic property);
@@ -147,12 +147,12 @@ namespace GTE
 		static TextureType ConvertAITextureKeyToTextureType(Int32 aiTextureKey);
 		static Int32 ConvertTextureTypeToAITextureKey(TextureType textureType);
 
-		static bool HasOddReflections(Matrix4x4& mat);
+		static Bool HasOddReflections(Matrix4x4& mat);
 
 	public:
 
-		SceneObjectRef LoadModelDirect(const std::string& modelPath, Real importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots);
-		AnimationRef LoadAnimation(const std::string& filePath, bool addLoopPadding, bool preserveFBXPivots);
+		SceneObjectRef LoadModelDirect(const std::string& modelPath, Real importScale, Bool castShadows, Bool receiveShadows, Bool preserveFBXPivots);
+		AnimationRef LoadAnimation(const std::string& filePath, Bool addLoopPadding, Bool preserveFBXPivots);
 
 	};
 }

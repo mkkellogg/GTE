@@ -70,7 +70,7 @@ namespace GTE
 	 */
 	UInt32 Mesh3DRenderer::GetMaterialCount() const
 	{
-		return materials.size();
+		return (UInt32)materials.size();
 	}
 
 	/*
@@ -133,7 +133,7 @@ namespace GTE
 		// the number of sub-meshes contained by [mesh], then delete the excess sub-renderers
 		if (subMeshCount < subRenderers.size())
 		{
-			for (UInt32 i = subRenderers.size(); i > subMeshCount; i--)
+			for (UInt32 i = (UInt32)subRenderers.size(); i > subMeshCount; i--)
 			{
 				DestroyRenderer(i - 1);
 			}
@@ -143,7 +143,7 @@ namespace GTE
 		// numbers match
 		else if (subMeshCount > subRenderers.size())
 		{
-			for (UInt32 i = subRenderers.size(); i < subMeshCount; i++)
+			for (UInt32 i = (UInt32)subRenderers.size(); i < subMeshCount; i++)
 			{
 				SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
 				NONFATAL_ASSERT(renderer.IsValid(), "Mesh3DRenderer::UpdateFromMesh(Mesh3DRef) -> Could not create new SubMesh3DRenderer.", false);
@@ -249,6 +249,6 @@ namespace GTE
 	 */
 	UInt32 Mesh3DRenderer::GetSubRendererCount() const
 	{
-		return subRenderers.size();
+		return (UInt32)subRenderers.size();
 	}
 }

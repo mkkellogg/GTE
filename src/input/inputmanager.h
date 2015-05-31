@@ -66,33 +66,33 @@ namespace GTE
 
 		static const UInt32 MAX_KEY_INDICES = 512;
 		KeyState keyState[MAX_KEY_INDICES];
-		bool onKeyDown[MAX_KEY_INDICES];
-		bool digitalInputState[(Int32)DigitalInput::_Last];
+		Bool onKeyDown[MAX_KEY_INDICES];
+		Bool digitalInputState[(Int32)DigitalInput::_Last];
 
 		InputManager();
 		virtual ~InputManager();
 		void ClearStates();
 		void ClearDigitalInput();
-		void SetOnKeyDown(UInt32 index, bool value);
-		bool GetOnKeyDown(UInt32 index);
+		void SetOnKeyDown(UInt32 index, Bool value);
+		Bool GetOnKeyDown(UInt32 index);
 		void SetKeyState(UInt32 index, KeyState state);
-		void SetDigitalInputState(DigitalInput input, bool state);
+		void SetDigitalInputState(DigitalInput input, Bool state);
 		void GetKeyIndex(Key key, UInt32 * indices, UInt32& indexCount);
 		virtual UInt32 GetKeyIndexForNonCharacterKey(NonCharacterKey key) = 0;
-		virtual UInt32 GetKeyIndexFromCharacter(unsigned char key) = 0;
+		virtual UInt32 GetKeyIndexFromCharacter(UChar key) = 0;
 
 	public:
 
-		virtual bool Init();
+		virtual Bool Init();
 		virtual void Update() = 0;
 
-		bool ShouldHandleOnKeyDown(unsigned char key);
-		bool ShouldHandleOnKeyDown(Key key);
-		bool IsKeyDown(unsigned char key);
-		bool IsKeyDown(Key key);
+		Bool ShouldHandleOnKeyDown(UChar key);
+		Bool ShouldHandleOnKeyDown(Key key);
+		Bool IsKeyDown(UChar key);
+		Bool IsKeyDown(Key key);
 		KeyState GetKeyState(UInt32 index);
-		KeyState GetKeyState(unsigned char key);
-		bool GetDigitalInputState(DigitalInput input);
+		KeyState GetKeyState(UChar key);
+		Bool GetDigitalInputState(DigitalInput input);
 	};
 }
 

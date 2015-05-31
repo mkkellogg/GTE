@@ -62,7 +62,7 @@ namespace GTE
 	/*
 	 * Specify whether or not [mesh] should cast shadows.
 	 */
-	void Mesh3DFilter::SetCastShadows(bool castShadows)
+	void Mesh3DFilter::SetCastShadows(Bool castShadows)
 	{
 		this->castShadows = castShadows;
 	}
@@ -70,7 +70,7 @@ namespace GTE
 	/*
 	 * Should [mesh] cast shadows?
 	 */
-	bool Mesh3DFilter::GetCastShadows() const
+	Bool Mesh3DFilter::GetCastShadows() const
 	{
 		return castShadows;
 	}
@@ -78,7 +78,7 @@ namespace GTE
 	/*
 	 * Specify whether or not [mesh] should receive shadows.
 	 */
-	void Mesh3DFilter::SetReceiveShadows(bool receiveShadows)
+	void Mesh3DFilter::SetReceiveShadows(Bool receiveShadows)
 	{
 		this->receiveShadows = receiveShadows;
 	}
@@ -86,7 +86,7 @@ namespace GTE
 	/*
 	 * Should [mesh] receive shadows?
 	 */
-	bool Mesh3DFilter::GetReceiveShadows() const
+	Bool Mesh3DFilter::GetReceiveShadows() const
 	{
 		return receiveShadows;
 	}

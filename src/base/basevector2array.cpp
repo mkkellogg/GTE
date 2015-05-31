@@ -30,7 +30,7 @@ namespace GTE
 		SAFE_DELETE(data);
 	}
 
-	bool BaseVector2Array::Init(Int32 count)
+	Bool BaseVector2Array::Init(Int32 count)
 	{
 		Destroy();
 

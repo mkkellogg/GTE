@@ -41,7 +41,7 @@ namespace GTE
 			const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
 			const Vector3Array& vertexTangentsIn, Vector3Array& vertexTangentsOut,
 			const Point3& centerIn, Point3& centerOut,
-			bool transformPositions, bool transformNormals, bool transformTangents) = 0;
+			Bool transformPositions, Bool transformNormals, Bool transformTangents) = 0;
 
 		void SetActiveAttributes(StandardAttributeSet attributes);
 		StandardAttributeSet GetActiveAttributes() const;

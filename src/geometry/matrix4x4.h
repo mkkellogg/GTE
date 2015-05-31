@@ -62,16 +62,16 @@ namespace GTE
 		void SetTo(const Real * sourceData);
 		void Transpose();
 		static void Transpose(const Real* source, Real *dest);
-		bool Invert();
-		bool Invert(Matrix4x4& out);
-		static bool Invert(const Real * source, Real * dest);
+		Bool Invert();
+		Bool Invert(Matrix4x4& out);
+		static Bool Invert(const Real * source, Real * dest);
 		void SetIdentity();
 		static void SetIdentity(Real * target);
 
 		void BuildFromComponents(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
 		void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-		bool IsAffine(void) const;
-		static bool IsAffine(const Real * data);
+		Bool IsAffine(void) const;
+		static Bool IsAffine(const Real * data);
 
 		Real CalculateDeterminant();
 

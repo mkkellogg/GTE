@@ -60,7 +60,7 @@ namespace GTE
 	 * scene object, and concatenate each ancestor's transform to form the transform
 	 * that is inherited by connected scene object.
 	 */
-	void SceneObjectTransform::GetInheritedTransform(Transform& transform, bool invert) const
+	void SceneObjectTransform::GetInheritedTransform(Transform& transform, Bool invert) const
 	{
 		GetWorldTransform(transform, sceneObject, false, invert);
 	}
@@ -70,7 +70,7 @@ namespace GTE
 	 * concatenate each ancestor's transform to form the transform that is inherited by
 	 * [sceneObject].
 	 */
-	void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, bool includeSelf, bool invert)
+	void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, Bool includeSelf, Bool invert)
 	{
 		NONFATAL_ASSERT(sceneObject.IsValid(), "SceneObjectTransform::GetWorldTransform() -> 'sceneObject' is not valid.", true);
 		GetWorldTransform(transform, sceneObject.GetPtr(), includeSelf, invert);
@@ -81,7 +81,7 @@ namespace GTE
 	 * concatenate each ancestor's transform to form the transform that is inherited by
 	 * [sceneObject].
 	 */
-	void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert)
+	void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObject * sceneObject, Bool includeSelf, Bool invert)
 	{
 		NONFATAL_ASSERT(sceneObject != NULL, "SceneObjectTransform::GetWorldTransform() -> 'sceneObject' is null.", true);
 
@@ -157,7 +157,7 @@ namespace GTE
 	 * determines if the transformation is relative to world coordinates or the transform's
 	 * local space, which includes the aggregated transform of the scene object's ancestors.
 	 */
-	void SceneObjectTransform::Translate(Real x, Real y, Real z, bool local)
+	void SceneObjectTransform::Translate(Real x, Real y, Real z, Bool local)
 	{
 		if (!local)
 		{
@@ -182,7 +182,7 @@ namespace GTE
 	 * determines if the transformation is relative to world coordinates or the transform's
 	 * local space, which includes the aggregated transform of the scene object's ancestors.
 	 */
-	void SceneObjectTransform::Translate(Vector3& vector, bool local)
+	void SceneObjectTransform::Translate(Vector3& vector, Bool local)
 	{
 		Translate(vector.x, vector.y, vector.z, local);
 	}
@@ -192,7 +192,7 @@ namespace GTE
 	 * local or world space is used. If world space is used, it takes into account the  aggregated transform
 	 * of the scene object's ancestors.
 	 */
-	void SceneObjectTransform::RotateAround(const Point3& point, const Vector3& axis, Real angle, bool local)
+	void SceneObjectTransform::RotateAround(const Point3& point, const Vector3& axis, Real angle, Bool local)
 	{
 		RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle, local);
 	}
@@ -208,7 +208,7 @@ namespace GTE
 	* If world space is used, it takes into account the  aggregated transform
 	* of the scene object's ancestors.
 	*/
-	void SceneObjectTransform::RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, bool local)
+	void SceneObjectTransform::RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, Bool local)
 	{
 		if (!local)
 		{
@@ -236,7 +236,7 @@ namespace GTE
 	 * If world space is used, it takes into account the  aggregated transform of the scene
 	 * object's ancestors.
 	 */
-	void SceneObjectTransform::Scale(const Vector3& mag, bool local)
+	void SceneObjectTransform::Scale(const Vector3& mag, Bool local)
 	{
 		Scale(mag.x, mag.y, mag.z, local);
 	}
@@ -247,7 +247,7 @@ namespace GTE
 	 * If world space is used, it takes into account the  aggregated transform of the scene
 	 * object's ancestors.
 	 */
-	void SceneObjectTransform::Scale(Real x, Real y, Real z, bool local)
+	void SceneObjectTransform::Scale(Real x, Real y, Real z, Bool local)
 	{
 		if (!local)
 		{
@@ -272,7 +272,7 @@ namespace GTE
 	 * local space, otherwise perform in world space. If world space is used, it
 	 * takes into account the  aggregated transform of the scene object's ancestors.
 	 */
-	void SceneObjectTransform::Rotate(const Vector3& vector, Real a, bool local)
+	void SceneObjectTransform::Rotate(const Vector3& vector, Real a, Bool local)
 	{
 		Rotate(vector.x, vector.y, vector.z, a, local);
 	}
@@ -283,7 +283,7 @@ namespace GTE
 	 * world space is used, it takes into account the  aggregated transform of the scene
 	 * object's ancestors.
 	 */
-	void SceneObjectTransform::Rotate(Real x, Real y, Real z, Real a, bool local)
+	void SceneObjectTransform::Rotate(Real x, Real y, Real z, Real a, Bool local)
 	{
 		if (!local)
 		{

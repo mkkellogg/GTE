@@ -4,7 +4,7 @@
  * author: Mark Kellogg
  *
  * Purpose of this class is to hide platform-specific
- * file-system characteristics.
+ * file-system attributes and properties.
  *
  */
 
@@ -33,7 +33,7 @@ namespace GTE
 		virtual std::string GetBasePath(const std::string& path) const = 0;
 		virtual std::string FixupPathForLocalFilesystem(const std::string& path) const = 0;
 		virtual std::string GetFileName(const std::string& fullPath) const = 0;
-		virtual bool FileExists(const std::string& fullPath) const = 0;
+		virtual Bool FileExists(const std::string& fullPath) const = 0;
 	};
 }
 

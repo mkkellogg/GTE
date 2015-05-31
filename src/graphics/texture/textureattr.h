@@ -56,9 +56,9 @@ namespace GTE
 	public:
 
 		UInt32 MipMapLevel;
-		bool IsDepthTexture;
-		bool UseAlpha;
-		bool IsCube;
+		Bool IsDepthTexture;
+		Bool UseAlpha;
+		Bool IsCube;
 		TextureFilter FilterMode;
 		TextureWrap WrapMode;
 		TextureFormat Format;

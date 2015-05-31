@@ -99,10 +99,10 @@ namespace GTE
 		Real EarlyEndTicks;
 
 		// is the animation playing?
-		bool Playing;
+		Bool Playing;
 
 		// is the animation paused?
-		bool Paused;
+		Bool Paused;
 
 		// what should happen when playback reaches the end of the clip?
 		PlaybackMode PlayBackMode;
@@ -119,7 +119,7 @@ namespace GTE
 
 	public:
 
-		bool Init();
+		Bool Init();
 		void Reset();
 
 		FrameState * GetFrameState(UInt32 stateIndex);

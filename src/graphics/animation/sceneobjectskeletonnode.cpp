@@ -52,7 +52,7 @@ namespace GTE
 	/*
 	 * Is this node pointed at a valid SceneObject target?
 	 */
-	bool SceneObjectSkeletonNode::HasTarget() const
+	Bool SceneObjectSkeletonNode::HasTarget() const
 	{
 		return Target.IsValid();
 	}

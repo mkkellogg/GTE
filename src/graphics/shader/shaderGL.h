@@ -41,7 +41,7 @@ namespace GTE
 		friend class GraphicsGL;
 
 		// is this shader loaded, compiled and linked?
-		bool ready;
+		Bool ready;
 
 		std::string name;
 
@@ -71,11 +71,11 @@ namespace GTE
 		void DestroyComponents();
 		void DestroyUniformAndAttributeInfo();
 
-		char * GetShaderLog(GLuint obj);
-		char * GetProgramLog(GLuint obj);
-		bool CheckCompilation(Int32 shaderID, ShaderType shaderType);
+		Char * GetShaderLog(GLuint obj);
+		Char * GetProgramLog(GLuint obj);
+		Bool CheckCompilation(Int32 shaderID, ShaderType shaderType);
 
-		bool StoreUniformAndAttributeInfo();
+		Bool StoreUniformAndAttributeInfo();
 
 	protected:
 
@@ -84,8 +84,8 @@ namespace GTE
 
 	public:
 
-		bool Load();
-		bool IsLoaded();
+		Bool Load();
+		Bool IsLoaded();
 		Int32 GetAttributeVarID(const std::string& varName) const;
 		Int32 GetUniformVarID(const std::string& varName) const;
 		GLuint GetProgramID();

@@ -27,7 +27,7 @@ namespace GTE
 
 	}
 
-	bool BlendOp::Init(std::vector<Real>& initialWeights)
+	Bool BlendOp::Init(std::vector<Real>& initialWeights)
 	{
 		this->initialWeights = initialWeights;
 		Reset();
@@ -45,22 +45,22 @@ namespace GTE
 		progress += Time::GetDeltaTime();
 	}
 
-	bool BlendOp::HasStarted()
+	Bool BlendOp::HasStarted()
 	{
 		return started;
 	}
 
-	void BlendOp::SetStarted(bool started)
+	void BlendOp::SetStarted(Bool started)
 	{
 		this->started = started;
 	}
 
-	void BlendOp::SetComplete(bool complete)
+	void BlendOp::SetComplete(Bool complete)
 	{
 		this->complete = complete;
 	}
 
-	bool BlendOp::HasCompleted()
+	Bool BlendOp::HasCompleted()
 	{
 		return complete;
 	}

@@ -22,7 +22,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	Point3::Point3(bool permAttached, Real * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
+	Point3::Point3(Bool permAttached, Real * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
 	{
 		data[3] = 1;
 	}
@@ -156,25 +156,25 @@ namespace GTE
 	/*
 	 * Comparison operator
 	 */
-	bool Point3::operator==(const Point3 & source)
+	Bool Point3::operator==(const Point3 & source)
 	{
-		Real epsilon = .005;
+		Real epsilon = .005f;
 		return GTEMath::Abs(source.x - x) < epsilon && GTEMath::Abs(source.y - y) < epsilon && GTEMath::Abs(source.z - z) < epsilon;
 	}
 
 	/*
 	 * Comparison operator
 	 */
-	bool Point3::operator==(const Point3& p) const
+	Bool Point3::operator==(const Point3& p) const
 	{
-		Real epsilon = .005;
+		Real epsilon = .005f;
 		return GTEMath::Abs(p.x - this->x) < epsilon && GTEMath::Abs(p.y - this->y) < epsilon && GTEMath::Abs(p.z - this->z) < epsilon;
 	}
 
 	/*
 	 * Comparison function for references
 	 */
-	bool Point3::AreEqual(const Point3& a, const Point3& b)
+	Bool Point3::AreEqual(const Point3& a, const Point3& b)
 	{
 		return AreEqual(&a, &b);
 	}
@@ -182,18 +182,18 @@ namespace GTE
 	/*
 	 * Comparison function for pointers
 	 */
-	bool Point3::AreEqual(const Point3* a, const Point3* b)
+	Bool Point3::AreEqual(const Point3* a, const Point3* b)
 	{
 		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Point3::AreEqual -> Null point passed.", false, true);
 
-		Real epsilon = .0005;
+		Real epsilon = .0005f;
 		return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
 	}
 
 	/*
 	 * Test for exact equality
 	 */
-	bool Point3::AreStrictlyEqual(const Point3* a, const Point3* b)
+	Bool Point3::AreStrictlyEqual(const Point3* a, const Point3* b)
 	{
 		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Point3::AreStrictlyEqual -> Null point passed.", false, true);
 

@@ -17,7 +17,7 @@ namespace GTE
 {
 	class Time
 	{
-		static bool initialized;
+		static Bool initialized;
 		static unsigned long long startupTime;
 		static std::chrono::high_resolution_clock::time_point _startupTime;
 		static Real lastRecordedTime;

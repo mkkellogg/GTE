@@ -42,8 +42,8 @@ namespace GTE
 		Transform projection;
 		Transform skyboxTextureTransform;
 
-		bool skyboxSetup;
-		bool skyboxEnabled;
+		Bool skyboxSetup;
+		Bool skyboxEnabled;
 		MaterialRef skyboxMaterial;
 		TextureRef skyboxTexture;
 		SceneObjectRef skyboxSceneObject;
@@ -53,7 +53,7 @@ namespace GTE
 		CameraRef sharedSkyboxCamera;
 
 		SSAORenderMode ssaoMode;
-		bool ssaoEnabled;
+		Bool ssaoEnabled;
 
 		UInt32 renderOrderIndex;
 
@@ -70,7 +70,7 @@ namespace GTE
 		ClipPlane clipPlanes[Constants::MaxClipPlanes];
 
 		Transform uniformWorldSceneObjectTransform;
-		bool reverseCulling;
+		Bool reverseCulling;
 
 		ProjectionMode projectionMode;
 
@@ -81,15 +81,15 @@ namespace GTE
 
 		void SetupSkybox(TextureRef cubeTexture);
 		void ShareSkybox(CameraRef camera);
-		bool IsSkyboxSetup() const;
-		void SetSkyboxEnabled(bool enabled);
-		bool IsSkyboxEnabled() const;
+		Bool IsSkyboxSetup() const;
+		void SetSkyboxEnabled(Bool enabled);
+		Bool IsSkyboxEnabled() const;
 		SceneObjectRef GetSkyboxSceneObject();
 		TextureRef GetSkyboxTexture();
 		MaterialRef GetSkyboxMaterial();
 
-		void SetSSAOEnabled(bool enabled);
-		bool IsSSAOEnabled();
+		void SetSSAOEnabled(Bool enabled);
+		Bool IsSSAOEnabled();
 		void SetSSAORenderMode(SSAORenderMode mode);
 		SSAORenderMode GetSSAORenderMode();
 
@@ -105,7 +105,7 @@ namespace GTE
 		IntMask GetClearBufferMask() const;
 
 		void SetupOffscreenRenderTarget(Int32 width, Int32 height);
-		void SetupOffscreenRenderTarget(Int32 width, Int32 height, bool cube);
+		void SetupOffscreenRenderTarget(Int32 width, Int32 height, Bool cube);
 		RenderTargetRef GetRenderTarget();
 		void SetWidthHeightRatio(Real width, Real height);
 
@@ -123,12 +123,12 @@ namespace GTE
 		void SetSkyboxTextureTransform(Transform& trans);
 		const Transform& GetSkyboxTransform();
 
-		bool AddClipPlane(const Vector3& normal, Real offset);
+		Bool AddClipPlane(const Vector3& normal, Real offset);
 		const ClipPlane* GetClipPlane(UInt32 index);
 		UInt32 GetClipPlaneCount() const;
 
-		void SetReverseCulling(bool reverseCulling);
-		bool GetReverseCulling();
+		void SetReverseCulling(Bool reverseCulling);
+		Bool GetReverseCulling();
 
 		void SetUniformWorldSceneObjectTransform(const Transform& transform);
 		const Transform& GetUniformWorldSceneObjectTransform();

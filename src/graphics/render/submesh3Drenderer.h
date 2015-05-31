@@ -79,20 +79,20 @@ namespace GTE
 		// mask that describes the different types of attributes stored in [storedAttributes]
 		StandardAttributeSet storedAttributes;
 		// are the vertex attributes stored in GPU-based buffers?
-		bool buffersOnGPU;
+		Bool buffersOnGPU;
 
 		// last time this renderer was updated from its target sub-mesh
 		Real timeStamp;
 
 		// doAttributeTransform == true means this sub-renderer's attribute transformer should be used to
 		// transform vertex attributes prior to rendering
-		bool doAttributeTransform;
+		Bool doAttributeTransform;
 		// should the attribute transform transform vertex positions?
-		bool doPositionTransform;
+		Bool doPositionTransform;
 		// should the attribute transform vertex normals?
-		bool doNormalTransform;
+		Bool doNormalTransform;
 		// should the attribute transform vertex tangents?
-		bool doTangentTransform;
+		Bool doTangentTransform;
 
 		// pointer to this sub-renderer's attribute transformer
 		AttributeTransformer * attributeTransformer;
@@ -112,19 +112,19 @@ namespace GTE
 		Point3Array shadowVolumePositions;
 		// do some extra processing that will fix shadow volume artifacts that arise when mesh geometry is bad,
 		// this incurs a performance penalty because it results in a shadow volume with many more triangles
-		bool useBadGeometryShadowFix;
+		Bool useBadGeometryShadowFix;
 		// use an alternate shadow volume technique where the front caps are made up
 		// up the back-facing triangles
-		bool doBackSetShadowVolume;
+		Bool doBackSetShadowVolume;
 
 		void SetContainerRenderer(Mesh3DRenderer * renderer);
 		void SetTargetSubMeshIndex(UInt32 index);
 
-		bool InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride);
+		Bool InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride);
 		void Destroy();
 		void DestroyBuffers();
 		void DestroyBuffer(VertexAttrBuffer ** buffer);
-		bool InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride);
+		Bool InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride);
 
 		const Point3Array * GetShadowVolumePositions();
 		void SetShadowVolumePositionData(const Point3Array * points);
@@ -136,15 +136,15 @@ namespace GTE
 		void SetUV1Data(UV2Array * uvs);
 		void SetUV2Data(UV2Array * uvs);
 
-		bool ValidateMaterialForMesh(MaterialRef material);
-		bool UpdateMeshAttributeBuffers();
-		bool UpdateAttributeTransformerData();
+		Bool ValidateMaterialForMesh(MaterialRef material);
+		Bool UpdateMeshAttributeBuffers();
+		Bool UpdateAttributeTransformerData();
 
 		SubMesh3DRenderer(AttributeTransformer * attributeTransformer);
-		SubMesh3DRenderer(bool buffersOnGPU, AttributeTransformer * attributeTransformer);
+		SubMesh3DRenderer(Bool buffersOnGPU, AttributeTransformer * attributeTransformer);
 		virtual ~SubMesh3DRenderer();
 
-		bool ShouldUpdateFromMesh();
+		Bool ShouldUpdateFromMesh();
 		void CopyMeshData();
 		void UpdateTimeStamp();
 
@@ -152,14 +152,14 @@ namespace GTE
 
 		Real GetTimeStamp() const;
 
-		void SetUseBadGeometryShadowFix(bool useFix);
+		void SetUseBadGeometryShadowFix(Bool useFix);
 
-		void BuildShadowVolume(Vector3& lightPosDir, bool directional, bool backFacesFrontCap);
+		void BuildShadowVolume(Vector3& lightPosDir, Bool directional, Bool backFacesFrontCap);
 		void UpdateFromMesh();
 
 		void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
 		AttributeTransformer * GetAttributeTransformer();
-		bool DoesAttributeTransform() const;
+		Bool DoesAttributeTransform() const;
 
 		const Point3* GetFinalCenter();
 
@@ -169,8 +169,8 @@ namespace GTE
 		void RenderShadowVolume();
 		void RenderShadowVolume(const Point3Array * shadowVolumePositions);
 
-		void SetUseBackSetShadowVolume(bool use);
-		bool GetUseBackSetShadowVolume();
+		void SetUseBackSetShadowVolume(Bool use);
+		Bool GetUseBackSetShadowVolume();
 	};
 }
 

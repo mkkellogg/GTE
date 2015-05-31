@@ -38,8 +38,8 @@ namespace GTE
 	protected:
 
 		std::string name;
-		bool isActive;
-		bool isStatic;
+		Bool isActive;
+		Bool isStatic;
 		SceneObjectTransform transform;
 		Transform processingTransform;
 		std::vector<SceneObjectRef > children;
@@ -59,10 +59,10 @@ namespace GTE
 
 	public:
 
-		bool IsActive();
-		void SetActive(bool active);
-		bool IsStatic();
-		void SetStatic(bool isStatic);
+		Bool IsActive();
+		void SetActive(Bool active);
+		Bool IsStatic();
+		void SetStatic(Bool isStatic);
 		void SetName(const std::string& name);
 		const std::string& GetName();
 
@@ -72,12 +72,12 @@ namespace GTE
 		SceneObjectTransform& GetTransform();
 		const Transform& GetAggregateTransform() const;
 
-		bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
-		bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
-		bool SetMesh3DFilter(Mesh3DFilterRef filter);
+		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
+		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
+		Bool SetMesh3DFilter(Mesh3DFilterRef filter);
 
-		bool SetCamera(CameraRef camera);
-		bool SetLight(LightRef light);
+		Bool SetCamera(CameraRef camera);
+		Bool SetLight(LightRef light);
 
 		Mesh3DRef GetMesh3D();
 		Mesh3DFilterRef GetMesh3DFilter();
@@ -104,10 +104,10 @@ namespace GTE
 
 		typedef struct
 		{
-			bool operator() (const SceneObject& a, const SceneObject& b) const { return a == b; }
+			Bool operator() (const SceneObject& a, const SceneObject& b) const { return a == b; }
 		} SceneObjectEq;
 
-		bool operator==(const SceneObject& s) const
+		Bool operator==(const SceneObject& s) const
 		{
 			return s.GetObjectID() == this->GetObjectID();
 		}

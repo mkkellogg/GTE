@@ -62,7 +62,7 @@ namespace GTE
 	/*
 	 * Initialize. Return false if initialization false, true if it succeeds.
 	 */
-	bool RenderManager::Init()
+	Bool RenderManager::Init()
 	{
 		ASSERT(sceneProcessingStack.Init(), "RenderManager::Init -> unable to initialize view transform stack.");
 
@@ -118,7 +118,7 @@ namespace GTE
 	/*
 	 * Initialize the components needed to render a full screen quad.
 	 */
-	bool RenderManager::InitFullScreenQuad()
+	Bool RenderManager::InitFullScreenQuad()
 	{
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
@@ -285,7 +285,7 @@ namespace GTE
 	 * [clearBuffers] - Should the buffers belonging to [renderTarget] be cleared before rendering?
 	 *
 	 */
-	void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, bool clearBuffers)
+	void RenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers)
 	{
 		Transform model;
 		Transform modelView;
@@ -674,7 +674,7 @@ namespace GTE
 		else Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Back);
 
 		// we have not yet rendered any ambient lights
-		bool renderedAmbient = false;
+		Bool renderedAmbient = false;
 
 		// loop through each ambient light and render the scene for that light
 		for (UInt32 l = 0; l < ambientLightCount; l++)
@@ -944,10 +944,10 @@ namespace GTE
 		// set SSAO material values
 		ssaoOutlineMaterial->SetTexture(depthTexture, "DEPTH_TEXTURE");
 		ssaoOutlineMaterial->SetMatrix4x4(projectionInvMat, "INV_PROJECTION_MATRIX");
-		ssaoOutlineMaterial->SetUniform1f(.5, "DISTANCE_THRESHHOLD");
-		ssaoOutlineMaterial->SetUniform2f(.3, .75, "FILTER_RADIUS");
-		ssaoOutlineMaterial->SetUniform1f(depthRenderTarget->GetWidth(), "SCREEN_WIDTH");
-		ssaoOutlineMaterial->SetUniform1f(depthRenderTarget->GetHeight(), "SCREEN_HEIGHT");
+		ssaoOutlineMaterial->SetUniform1f(.5f, "DISTANCE_THRESHHOLD");
+		ssaoOutlineMaterial->SetUniform2f(.3f, .75f, "FILTER_RADIUS");
+		ssaoOutlineMaterial->SetUniform1f((GTE::Real)depthRenderTarget->GetWidth(), "SCREEN_WIDTH");
+		ssaoOutlineMaterial->SetUniform1f((GTE::Real)depthRenderTarget->GetHeight(), "SCREEN_HEIGHT");
 
 		FowardBlendingMethod currentFoward = GetForwardBlending();
 
@@ -970,8 +970,8 @@ namespace GTE
 	 * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object & light.
 	 */
 	void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse,
-		const Camera& camera, MaterialRef material, bool flagRendered,
-		bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
+		const Camera& camera, MaterialRef material, Bool flagRendered,
+		Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
 		ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter, nullptr);
 	}
@@ -995,8 +995,8 @@ namespace GTE
 	 * Render from the perspective of [camera] using [viewTransformInverse] as the camera's position and orientation.
 	 */
 	void RenderManager::ForwardRenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse,
-		const Camera& camera, MaterialRef material, bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
-		std::function<bool(SceneObjectRef)> filterFunction)
+		const Camera& camera, MaterialRef material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+		std::function<Bool(SceneObjectRef)> filterFunction)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
@@ -1014,7 +1014,7 @@ namespace GTE
 			// execute filter function (if one is specified)
 			if (filterFunction != nullptr)
 			{
-				bool filter = filterFunction(childRef);
+				Bool filter = filterFunction(childRef);
 				if (filter)continue;
 			}
 
@@ -1045,7 +1045,7 @@ namespace GTE
 	 */
 	void RenderManager::ForwardRenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
 		const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
-		bool flagRendered, bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
+		Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
 		Mesh3DRenderer * renderer = NULL;
 		Transform modelViewProjection;
@@ -1073,7 +1073,7 @@ namespace GTE
 			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "RenderManager::ForwardRenderSceneObject -> Renderer has no materials.", true);
 
 			UInt32 materialIndex = 0;
-			bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
+			Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
 
 			model.SetTo(sceneObject.GetAggregateTransform());
 			model.PreTransformBy(modelPreTransform);
@@ -1105,9 +1105,9 @@ namespace GTE
 
 				// determine if this mesh has been rendered before
 				ObjectPairKey key(sceneObject.GetObjectID(), subMesh->GetObjectID());
-				bool rendered = renderedObjects[key];
+				Bool rendered = renderedObjects[key];
 
-				bool skipMesh = false;
+				Bool skipMesh = false;
 				// current material is self-lit, the we only want to render if the
 				//lighting descriptor specifies self-lit and vice-versa
 				if (currentMaterial->IsSelfLit() && !lightingDescriptor.SelfLit)skipMesh = true;
@@ -1240,7 +1240,7 @@ namespace GTE
 				NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
 
 				// build special MVP transform for rendering shadow volumes
-				Real scaleFactor = subRenderer->GetUseBackSetShadowVolume() ? .99 : 1;
+				Real scaleFactor = subRenderer->GetUseBackSetShadowVolume() ? .99f : 1;
 				BuildShadowVolumeMVPTransform(light, subMesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
 
 				// activate the material, which will switch the GPU's active shader to
@@ -1248,8 +1248,8 @@ namespace GTE
 				ActivateMaterial(shadowVolumeMaterial);
 
 				// set the epsilon offset for the shadow volume shader
-				if (subRenderer->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.0002, "EPSILON");
-				else shadowVolumeMaterial->SetUniform1f(.2, "EPSILON");
+				if (subRenderer->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.00002f, "EPSILON");
+				else shadowVolumeMaterial->SetUniform1f(.2f, "EPSILON");
 
 				// send uniforms set for the shadow volume material to its shader
 				SendActiveMaterialUniformsToShader();
@@ -1424,11 +1424,11 @@ namespace GTE
 				SceneObjectRef lightObject = castLight.GetSceneObject();
 
 				ObjectPairKey cacheKey;
-				bool cached = false;
+				Bool cached = false;
 
 				// a shadow volume is dynamic if the light's scene object is not static or the mesh's
 				// scene object is not static
-				bool dynamic = !(sceneObject.IsStatic()) || !(lightObject->IsStatic());
+				Bool dynamic = !(sceneObject.IsStatic()) || !(lightObject->IsStatic());
 
 				// form cache key from sub-renderer's object ID and light's object ID
 				cacheKey.ObjectAID = subRenderer->GetObjectID();
@@ -1460,7 +1460,7 @@ namespace GTE
 	 * is a mesh and a mesh renderer present, and verifying that [sceneObject]
 	 * is active.
 	 */
-	bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const
+	Bool RenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const
 	{
 		if (!sceneObject.IsValid())
 		{
@@ -1575,7 +1575,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shadowVolume != NULL, "RenderManager::CacheShadowVolume -> Shadow volume is null.", true);
 
-		bool needsInit = false;
+		Bool needsInit = false;
 		Point3Array * target = NULL;
 
 		if (!HasCachedShadowVolume(key))
@@ -1597,7 +1597,7 @@ namespace GTE
 			target = new Point3Array();
 			ASSERT(target != NULL, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
 
-			bool initSuccess = target->Init(shadowVolume->GetReservedCount());
+			Bool initSuccess = target->Init(shadowVolume->GetReservedCount());
 			ASSERT(initSuccess, "RenderManager::CacheShadowVolume -> Unable to initialize shadow volume copy.");
 
 			target->SetCount(shadowVolume->GetCount());
@@ -1627,7 +1627,7 @@ namespace GTE
 	/*
 	 * Is a shadow volume cached for [key].
 	 */
-	bool RenderManager::HasCachedShadowVolume(const ObjectPairKey& key)  const
+	Bool RenderManager::HasCachedShadowVolume(const ObjectPairKey& key)  const
 	{
 		if (shadowVolumeCache.find(key) != shadowVolumeCache.end())
 		{
@@ -1687,7 +1687,7 @@ namespace GTE
 	 * Should [camera] render the meshes on [sceneObject]? This is determined by comparing the
 	 * layer mask of [sceneObject] with the culling mask of [camera].
 	 */
-	bool RenderManager::ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const
+	Bool RenderManager::ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const
 	{
 		// make sure camera's culling mask includes at least one of layers of [sceneObject]
 		return !(Engine::Instance()->GetEngineObjectManager()->GetLayerManager().AtLeastOneLayerInCommon(sceneObject.GetLayerMask(), camera.GetCullingMask()));
@@ -1697,7 +1697,7 @@ namespace GTE
 	 * Check if [mesh] should be rendered with [light], first based on the culling mask of the light and the layer to
 	 * which [sceneObject] belongs, and then based on the distance of the center of [mesh] from [lightPosition].
 	 */
-	bool RenderManager::ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const SceneObject& sceneObject) const
+	Bool RenderManager::ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const SceneObject& sceneObject) const
 	{
 		// exclude objects that have layer masks that are not compatible
 		// with the culling mask of the light contained in [lightingDescriptor].
@@ -1746,7 +1746,7 @@ namespace GTE
 	 * sphere does not intersect with the sphere that is formed by the light's range, then the light should
 	 * be culled from the meshes.
 	 */
-	bool RenderManager::ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const
+	Bool RenderManager::ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const
 	{
 		// get the maximum distances from mesh center along each axis
 		Vector3 soiX = mesh.GetSphereOfInfluenceX();
@@ -1788,7 +1788,7 @@ namespace GTE
 	/*
 	 * TODO: (Eventually) - Implement tile-base culling.
 	 */
-	bool RenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const
+	Bool RenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const
 	{
 		return false;
 	}

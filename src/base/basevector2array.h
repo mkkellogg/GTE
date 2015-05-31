@@ -27,7 +27,7 @@ namespace GTE
 		virtual ~BaseVector2Array();
 
 		const Real * GetDataPtr() const;
-		bool Init(Int32 count);
+		Bool Init(Int32 count);
 	};
 }
 

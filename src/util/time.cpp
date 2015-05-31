@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	bool Time::initialized = false;
+	Bool Time::initialized = false;
 	unsigned long long Time::startupTime = 0;
 	Real Time::lastRecordedTime = 0;
 	Real Time::deltaTime = 0;
@@ -43,9 +43,9 @@ namespace GTE
 
 		auto elapsed = _currentTime - _startupTime;
 
-		Real f = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
-
-		return (Real)(f / (Real)1000000.0);
+		UInt64 d = (UInt64)std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+		Real f = (Real)((RealDouble)d / (RealDouble)1000000.0);
+		return f;
 	}
 
 	void Time::Update()

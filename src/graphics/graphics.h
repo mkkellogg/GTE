@@ -82,7 +82,7 @@ namespace GTE
 		Graphics();
 		virtual ~Graphics();
 
-		virtual bool Start();
+		virtual Bool Start();
 		virtual void End();
 		virtual void Update();
 		virtual void PreProcessScene();
@@ -90,7 +90,7 @@ namespace GTE
 
 		void UpdateFPS();
 
-		virtual bool Init(const GraphicsAttributes& attributes);
+		virtual Bool Init(const GraphicsAttributes& attributes);
 		virtual RenderTarget * CreateDefaultRenderTarget() = 0;
 		RenderTargetRef SetupDefaultRenderTarget();
 
@@ -114,7 +114,7 @@ namespace GTE
 		virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 											RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
 		virtual void DestroyTexture(Texture * texture) = 0;
-		virtual RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+		virtual RenderTarget * CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 												  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) = 0;
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 		virtual RenderTargetRef GetDefaultRenderTarget() = 0;
@@ -126,18 +126,18 @@ namespace GTE
 		virtual void SetFaceCullingMode(FaceCullingMode mode) = 0;
 		virtual FaceCullingMode GetFaceCullingMode() = 0;
 
-		virtual void SetColorBufferChannelState(bool r, bool g, bool b, bool a) = 0;
+		virtual void SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a) = 0;
 
-		virtual void SetDepthBufferEnabled(bool enabled) = 0;
-		virtual void SetDepthBufferReadOnly(bool readOnly) = 0;
+		virtual void SetDepthBufferEnabled(Bool enabled) = 0;
+		virtual void SetDepthBufferReadOnly(Bool readOnly) = 0;
 		virtual void SetDepthBufferFunction(DepthBufferFunction function) = 0;
 
-		virtual void SetStencilBufferEnabled(bool enabled) = 0;
-		virtual void SetStencilTestEnabled(bool enabled) = 0;
+		virtual void SetStencilBufferEnabled(Bool enabled) = 0;
+		virtual void SetStencilTestEnabled(Bool enabled) = 0;
 
-		virtual void SetFaceCullingEnabled(bool enabled) = 0;
+		virtual void SetFaceCullingEnabled(Bool enabled) = 0;
 
-		virtual void SetBlendingEnabled(bool enabled) = 0;
+		virtual void SetBlendingEnabled(Bool enabled) = 0;
 		virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
 
 		virtual void ActivateMaterial(MaterialRef material);
@@ -147,20 +147,20 @@ namespace GTE
 
 		virtual void EnterRenderMode(RenderMode renderMode) = 0;
 
-		virtual bool ActivateRenderTarget(RenderTargetRef target) = 0;
+		virtual Bool ActivateRenderTarget(RenderTargetRef target) = 0;
 		virtual RenderTargetRef GetCurrrentRenderTarget() = 0;
-		virtual bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
-		virtual bool RestoreDefaultRenderTarget() = 0;
+		virtual Bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
+		virtual Bool RestoreDefaultRenderTarget() = 0;
 		virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest) = 0;
 
 		virtual void SetTextureData(TextureRef texture, Byte * data) = 0;
 		virtual void SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side) = 0;
 		virtual void RebuildMipMaps(TextureRef texture) = 0;
 
-		virtual bool AddClipPlane() = 0;
+		virtual Bool AddClipPlane() = 0;
 		virtual void DeactiveAllClipPlanes() = 0;
 
-		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, bool validate) = 0;
+		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate) = 0;
 	};
 }
 

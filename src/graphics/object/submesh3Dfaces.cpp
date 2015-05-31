@@ -51,7 +51,7 @@ namespace GTE
 	/*
 	 * Initialization, allocates [faces].
 	 */
-	bool SubMesh3DFaces::Init(UInt32 faceCount)
+	Bool SubMesh3DFaces::Init(UInt32 faceCount)
 	{
 		Destroy();
 

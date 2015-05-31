@@ -72,9 +72,9 @@ namespace GTE
 
 		TreeNode* root;
 
-		bool fullTraversal;
-		std::function<bool(TreeNode*)> traversalCallback;
-		std::function<bool(TreeNode*)> fullTraversalCallback;
+		Bool fullTraversal;
+		std::function<Bool(TreeNode*)> traversalCallback;
+		std::function<Bool(TreeNode*)> fullTraversalCallback;
 
 
 	public:
@@ -108,7 +108,7 @@ namespace GTE
 			return root;
 		}
 
-		void SetTraversalCallback(std::function<bool(TreeNode*)> callback)
+		void SetTraversalCallback(std::function<Bool(TreeNode*)> callback)
 		{
 			this->traversalCallback = callback;
 		}
@@ -167,7 +167,7 @@ namespace GTE
 					}
 					else
 					{
-						bool continueTraversal = true;
+						Bool continueTraversal = true;
 						if (fullTraversal)
 						{
 							if (fullTraversalCallback)

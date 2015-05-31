@@ -18,7 +18,7 @@ namespace GTE
 		Real &a;
 
 		Color4();
-		Color4(bool permAttached, Real * target);
+		Color4(Bool permAttached, Real * target);
 		Color4(Real r, Real g, Real b, Real a);
 		Color4(const Color4& point);
 		Color4(const Real * data);

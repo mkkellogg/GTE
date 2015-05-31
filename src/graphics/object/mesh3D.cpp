@@ -59,7 +59,7 @@ namespace GTE
 	 * Initialize this instance. This method will pre-allocate [subMeshCount] entries
 	 * in [subMeshes], to be set at a later time.
 	 */
-	bool Mesh3D::Init()
+	Bool Mesh3D::Init()
 	{
 		// if this instance has already been initialized, we must first destroy this instance.
 		Destroy();

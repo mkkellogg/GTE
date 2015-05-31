@@ -138,10 +138,10 @@ namespace GTE
 	 * The function will return true if the loading, compilation, and linking
 	 * are successful. Otherwise it will return false.
 	 */
-	bool ShaderGL::Load()
+	Bool ShaderGL::Load()
 	{
 		// attempt to load the shaders' source code
-		bool shaderSourceLoaded = shaderSource.IsLoaded();
+		Bool shaderSourceLoaded = shaderSource.IsLoaded();
 
 		if (!shaderSourceLoaded)
 		{
@@ -162,8 +162,8 @@ namespace GTE
 			return false;
 		}
 
-		const char * vertexSourceString = shaderSource.GetVertexSourceString().c_str();
-		const char * fragmentSourceString = shaderSource.GetFragmentSourceString().c_str();
+		const Char * vertexSourceString = shaderSource.GetVertexSourceString().c_str();
+		const Char * fragmentSourceString = shaderSource.GetFragmentSourceString().c_str();
 
 		// point OpenGL to the source for each shader
 		glShaderSource(vertexShaderID, 1, &vertexSourceString, NULL);
@@ -205,7 +205,7 @@ namespace GTE
 		if (programLinked == GL_FALSE)
 		{
 			Debug::PrintError("Error linking program: ");
-			char * info = GetProgramLog(programID);
+			Char * info = GetProgramLog(programID);
 			Debug::PrintError(info != NULL ? info : "(no error info provided).");
 			return false;
 		}
@@ -223,7 +223,7 @@ namespace GTE
 	/*
 	 * Are the vertex and fragment shaders successfully loaded, compiled, and linked?
 	 */
-	bool ShaderGL::IsLoaded()
+	Bool ShaderGL::IsLoaded()
 	{
 		return ready;
 	}
@@ -234,7 +234,7 @@ namespace GTE
 	 * [shaderID] - The OpenGL shader object id.
 	 * [shaderType] - Type of shader (either vertex or fragment)
 	 */
-	bool ShaderGL::CheckCompilation(Int32 shaderID, ShaderType shaderType)
+	Bool ShaderGL::CheckCompilation(Int32 shaderID, ShaderType shaderType)
 	{
 		GLint shaderCompiled;
 		glGetShaderiv(shaderID, GL_COMPILE_STATUS, &shaderCompiled);
@@ -245,7 +245,7 @@ namespace GTE
 				Debug::PrintError("Error compiling vertex shader: ");
 			else if (shaderType == ShaderType::Fragment)
 				Debug::PrintError("Error compiling fragment shader: ");
-			char * info = GetShaderLog(shaderID);
+			Char * info = GetShaderLog(shaderID);
 			Debug::PrintError(info != NULL ? info : "(no error info provided).");
 			return false;
 		}
@@ -258,19 +258,19 @@ namespace GTE
 	 *
 	 * [program] - The OpenGL program to retrieve status for.
 	 */
-	char * ShaderGL::GetProgramLog(GLuint program)
+	Char * ShaderGL::GetProgramLog(GLuint program)
 	{
 		Int32 infologLength = 0;
 
-		Int32 charsWritten = 0;
-		char *infoLog;
+		Int32 CharsWritten = 0;
+		Char *infoLog;
 
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infologLength);
 
 		if (infologLength > 0)
 		{
-			infoLog = (char *)malloc(infologLength);
-			glGetProgramInfoLog(program, infologLength, &charsWritten, infoLog);
+			infoLog = (Char *)malloc(infologLength);
+			glGetProgramInfoLog(program, infologLength, &CharsWritten, infoLog);
 
 			return infoLog;
 		}
@@ -283,19 +283,19 @@ namespace GTE
 	 *
 	 * [shader] - The OpenGL shader to retrieve status for.
 	 */
-	char * ShaderGL::GetShaderLog(GLuint shader)
+	Char * ShaderGL::GetShaderLog(GLuint shader)
 	{
 		Int32 infologLength = 0;
 
-		Int32 charsWritten = 0;
-		char *infoLog;
+		Int32 CharsWritten = 0;
+		Char *infoLog;
 
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLength);
 
 		if (infologLength > 0)
 		{
-			infoLog = (char *)malloc(infologLength);
-			glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
+			infoLog = (Char *)malloc(infologLength);
+			glGetShaderInfoLog(shader, infologLength, &CharsWritten, infoLog);
 
 			return infoLog;
 		}
@@ -308,7 +308,7 @@ namespace GTE
 	 * either shader, and AttributeDescriptor objects for each attribute
 	 * exposed by the vertex shader.
 	 */
-	bool ShaderGL::StoreUniformAndAttributeInfo()
+	Bool ShaderGL::StoreUniformAndAttributeInfo()
 	{
 		Int32 totalUniforms = -1;
 		glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &totalUniforms);
@@ -329,7 +329,7 @@ namespace GTE
 				Int32 nameLen = -1;
 				Int32 size = -1;
 				GLenum type = GL_ZERO;
-				char name[126];
+				Char name[126];
 
 				glGetActiveUniform(programID, GLuint(i), 125, &nameLen, &size, &type, name);
 				GLuint loc = glGetUniformLocation(programID, name);
@@ -400,7 +400,7 @@ namespace GTE
 				Int32 nameLen = -1;
 				Int32 size = -1;
 				GLenum type = GL_ZERO;
-				char name[126];
+				Char name[126];
 
 				glGetActiveAttrib(programID, GLuint(i), 125, &nameLen, &size, &type, name);
 				GLuint loc = glGetAttribLocation(programID, name);

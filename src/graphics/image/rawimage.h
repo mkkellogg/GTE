@@ -32,7 +32,7 @@ namespace GTE
 		RawImage(UInt32 width, UInt32 height);
 		~RawImage();
 
-		bool Init();
+		Bool Init();
 		void SetDataTo(Byte * data);
 		void SetByte(UInt32 index, Byte byte);
 

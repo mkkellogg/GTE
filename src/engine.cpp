@@ -82,7 +82,7 @@ namespace GTE
 	 * [graphicsAttributes] - Describes the settings that will be used to initialize the graphics
 	 * 						  engine component
 	 */
-	bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAttributes)
+	Bool Engine::_Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAttributes)
 	{
 		// The error manager must be initialized before any other engine component so that errors
 		// during initialization of those components can be reported
@@ -92,7 +92,7 @@ namespace GTE
 		engineObjectManager = new EngineObjectManager();
 		ASSERT(engineObjectManager != NULL, "Engine::Init -> Unable to create engine object manager.");
 
-		bool engineObjectManagerInitSuccess = engineObjectManager->Init();
+		Bool engineObjectManagerInitSuccess = engineObjectManager->Init();
 		ASSERT(engineObjectManagerInitSuccess == true, "Engine::Init -> Unable to initialize engine object manager.");
 
 		// TODO: add switch to detect correct type for platform
@@ -100,18 +100,18 @@ namespace GTE
 		graphicsSystem = new GraphicsGL();
 		ASSERT(graphicsSystem != NULL, "Engine::Init -> Unable to allocate graphics engine.");
 
-		bool graphicsInitSuccess = graphicsSystem->Init(graphicsAttributes);
+		Bool graphicsInitSuccess = graphicsSystem->Init(graphicsAttributes);
 		ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.");
 
 		renderManager = new RenderManager();
 		ASSERT(renderManager != NULL, "Engine::Init -> Unable to allocate render manager");
 
-		bool renderInitSuccess = renderManager->Init();
+		Bool renderInitSuccess = renderManager->Init();
 		ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager");
 
 		// This portion of the initialization of the engine object manager must be called
 		// after the graphics engine is initialized
-		bool initShadersSuccess = engineObjectManager->InitBuiltinShaders();
+		Bool initShadersSuccess = engineObjectManager->InitBuiltinShaders();
 		ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initiliaze built-in shaders");
 
 		animationManager = new AnimationManager();
@@ -122,7 +122,7 @@ namespace GTE
 		inputManager = new InputManagerGL();
 		ASSERT(inputManager != NULL, "Engine::Init -> Unable to create input manager.");
 
-		bool inputInitSuccess = inputManager->Init();
+		Bool inputInitSuccess = inputManager->Init();
 		ASSERT(inputInitSuccess, "Engine::Init -> Unable to initialize input manager.");
 
 		this->callbacks = callbacks;
@@ -136,7 +136,7 @@ namespace GTE
 	 * Public initialization method. This method first makes sure the singleton instance has
 	 * been created successfully, then calls the private initialization function _Init();
 	 */
-	bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes)
+	Bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes)
 	{
 		Engine * engine = Engine::Instance();
 		ASSERT(engine != NULL, "Engine::Init -> Unable retrieve Engine instance.");
@@ -217,7 +217,7 @@ namespace GTE
 	/*
 	 * Has the Init() method been called successfully?
 	 */
-	bool Engine::IsInitialized() const
+	Bool Engine::IsInitialized() const
 	{
 		return initialized;
 	}

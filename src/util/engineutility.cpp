@@ -76,7 +76,7 @@ namespace GTE
 
 	Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, Real width, Real height,
 		UInt32 subDivisionsPerWidth, UInt32 subDivisionsPerHeight,
-		bool calculateNormals, bool calculateTangents, bool buildFaces)
+		Bool calculateNormals, Bool calculateTangents, Bool buildFaces)
 	{
 		if (width <= 0 || height <= 0)
 		{
@@ -107,8 +107,8 @@ namespace GTE
 		Point3Array * points = subMesh->GetPostions();
 		UV2Array *uvs = NULL;
 
-		Real halfWidth = width / 2.0;
-		Real halfHeight = height / 2.0;
+		Real halfWidth = width / 2.0f;
+		Real halfHeight = height / 2.0f;
 
 		Real initialWidth = -halfWidth;
 		Real initialHeight = halfHeight;
@@ -192,7 +192,7 @@ namespace GTE
 		return CreateCubeMesh(meshAttributes, false);
 	}
 
-	Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes, bool doCCW)
+	Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes, Bool doCCW)
 	{
 		// force mesh to have at least positions and normals
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);

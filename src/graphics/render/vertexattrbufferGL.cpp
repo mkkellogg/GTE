@@ -29,7 +29,7 @@ namespace GTE
 	}
 
 	/*
-	 * Calculate the number of Realing-point entries in the buffer.
+	 * Calculate the number of floating-point entries in the buffer.
 	 */
 	Int32 VertexAttrBufferGL::CalcFloatCount() const
 	{
@@ -54,7 +54,7 @@ namespace GTE
 	 * [dataOnGPU] - Make this a VBO.
 	 * [srcData] - Data to be copied into the buffer after initialization.
 	 */
-	bool VertexAttrBufferGL::Init(Int32 vertexCount, Int32 componentCount, Int32 stride, bool dataOnGPU, Real *srcData)
+	Bool VertexAttrBufferGL::Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, Real *srcData)
 	{
 		// if this buffer has already be initialized we need to destroy it and start fresh
 		Destroy();
@@ -166,7 +166,7 @@ namespace GTE
 	/*
 	 * Is the buffer a VBO?
 	 */
-	bool VertexAttrBufferGL::IsGPUBuffer() const
+	Bool VertexAttrBufferGL::IsGPUBuffer() const
 	{
 		return dataOnGPU;
 	}

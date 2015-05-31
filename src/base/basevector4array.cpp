@@ -30,7 +30,7 @@ namespace GTE
 		SAFE_DELETE(data);
 	}
 
-	bool BaseVector4Array::Init(UInt32 reservedCount)
+	Bool BaseVector4Array::Init(UInt32 reservedCount)
 	{
 		Destroy();
 
@@ -88,7 +88,7 @@ namespace GTE
 		return count;
 	}
 
-	bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
+	Bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
 	{
 		NONFATAL_ASSERT_RTRN(dest != NULL, " BaseVector4Array::CopyTo -> 'dest' is null.", false, true);
 

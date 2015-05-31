@@ -49,11 +49,11 @@ namespace GTE
 		~UniformDescriptor();
 
 		Int32 Size;
-		char Name[128];
+		Char Name[128];
 		UInt32 ShaderVarID;
 		UInt32 SamplerUnitIndex;
 		UniformType Type;
-		bool IsSet;
+		Bool IsSet;
 
 		TextureRef SamplerData;
 		Matrix4x4 MatrixData;

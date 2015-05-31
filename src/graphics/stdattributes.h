@@ -38,11 +38,11 @@ namespace GTE
 
 	class StandardAttributes
 	{
-		static const char* const attributeNames[];
+		static const Char* const attributeNames[];
 
 	public:
 
-		static const char * GetAttributeName(StandardAttribute attr);
+		static const Char * GetAttributeName(StandardAttribute attr);
 		static StandardAttribute AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component);
 		static StandardAttributeMaskComponent AttributeToAttributeMaskComponent(StandardAttribute attr);
 
@@ -50,7 +50,7 @@ namespace GTE
 		static void AddAttribute(StandardAttributeSet * set, StandardAttribute attr);
 		static void RemoveAttribute(StandardAttributeSet * set, StandardAttribute attr);
 
-		static bool HasAttribute(StandardAttributeSet set, StandardAttribute attr);
+		static Bool HasAttribute(StandardAttributeSet set, StandardAttribute attr);
 	};
 }
 

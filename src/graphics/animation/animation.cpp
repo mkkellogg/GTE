@@ -74,7 +74,7 @@ namespace GTE
 	/*
 	 * Initialize this animation. This method will allocate [keyFrameSetCount]] key frame sets.
 	 */
-	bool Animation::Init(UInt32 channelCount)
+	Bool Animation::Init(UInt32 channelCount)
 	{
 		Destroy();
 

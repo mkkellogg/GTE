@@ -30,13 +30,13 @@ namespace GTE
 	public:
 
 		void SetError(Int32 code, const std::string& message);
-		void SetError(Int32 code, const char * message);
+		void SetError(Int32 code, const Char * message);
 		void AddError(Int32 code, const std::string& message);
-		void AddError(Int32 code, const char * message);
+		void AddError(Int32 code, const Char * message);
 		void SetAndReportError(Int32 code, const std::string& message);
-		void SetAndReportError(Int32 code, const char * message);
+		void SetAndReportError(Int32 code, const Char * message);
 		void AddAndReportError(Int32 code, const std::string& message);
-		void AddAndReportError(Int32 code, const char * message);
+		void AddAndReportError(Int32 code, const Char * message);
 		void Reset();
 		Int32 GetErrorCode() const;
 		const std::string& GetErrorMessage() const;

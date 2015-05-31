@@ -20,11 +20,11 @@ namespace GTE
 		Int32 MapSpecialInputToKeyIndex(Int32 key);
 		Int32 MapModifierToKeyIndex(Int32 modifier);
 		UInt32 GetKeyIndexForNonCharacterKey(NonCharacterKey key);
-		UInt32 GetKeyIndexFromCharacter(unsigned char key);
+		UInt32 GetKeyIndexFromCharacter(UChar key);
 
 	public:
 
-		bool Init();
+		Bool Init();
 		void Update();
 		void KeyboardFunction(Int32 key, Int32 scanCode, Int32 mods);
 		void KeyboardFunctionUp(Int32 key, Int32 scanCode, Int32 mods);

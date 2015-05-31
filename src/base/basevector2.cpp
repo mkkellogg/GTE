@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	void BaseVector2::Init(Real *target, bool permAttach)
+	void BaseVector2::Init(Real *target, Bool permAttach)
 	{
 		data = baseData;
 
@@ -47,7 +47,7 @@ namespace GTE
 		Set(0, 0);
 	}
 
-	BaseVector2::BaseVector2(bool permAttached, Real * target)
+	BaseVector2::BaseVector2(Bool permAttached, Real * target)
 	{
 		Init(target, true);
 		Set(0, 0);

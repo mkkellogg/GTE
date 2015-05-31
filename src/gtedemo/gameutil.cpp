@@ -148,7 +148,7 @@ void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root)
  * Set any mesh encountered in the scene hierarchy beginning with [root]
  * to set shadow casting to [castShadows].
  */
-void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, bool castShadows)
+void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, GTE::Bool castShadows)
 {
 	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
 	{
@@ -169,7 +169,7 @@ void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, bool castShado
  * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
  */
 GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra,
-									GTE::Real tx, GTE::Real ty, GTE::Real tz, bool isStatic, bool castShadows, bool receiveShadows)
+									GTE::Real tx, GTE::Real ty, GTE::Real tz, GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
 {
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 	GTE::SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();

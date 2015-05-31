@@ -110,17 +110,17 @@ namespace GTE
 		skyboxSetup = true;
 	}
 
-	bool Camera::IsSkyboxSetup() const
+	Bool Camera::IsSkyboxSetup() const
 	{
 		return skyboxSetup;
 	}
 
-	void Camera::SetSkyboxEnabled(bool enabled)
+	void Camera::SetSkyboxEnabled(Bool enabled)
 	{
 		skyboxEnabled = enabled;
 	}
 
-	bool Camera::IsSkyboxEnabled() const
+	Bool Camera::IsSkyboxEnabled() const
 	{
 		return skyboxEnabled;
 	}
@@ -143,12 +143,12 @@ namespace GTE
 		return skyboxMaterial;
 	}
 
-	void Camera::SetSSAOEnabled(bool enabled)
+	void Camera::SetSSAOEnabled(Bool enabled)
 	{
 		ssaoEnabled = enabled;
 	}
 
-	bool Camera::IsSSAOEnabled()
+	Bool Camera::IsSSAOEnabled()
 	{
 		return ssaoEnabled;
 	}
@@ -208,7 +208,7 @@ namespace GTE
 		SetupOffscreenRenderTarget(width, height, false);
 	}
 
-	void Camera::SetupOffscreenRenderTarget(Int32 width, Int32 height, bool cube)
+	void Camera::SetupOffscreenRenderTarget(Int32 width, Int32 height, Bool cube)
 	{
 		// get reference to the engine's object manager
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -277,10 +277,10 @@ namespace GTE
 		else
 		{
 			RenderTargetRef renderTarget = GetRenderTarget();
-			Real height = renderTarget->GetHeight();
-			Real width = renderTarget->GetWidth();
-			Real halfWidth = width / 2.0;
-			Real halfHeight = height / 2.0;
+			Real height = (Real)renderTarget->GetHeight();
+			Real width = (Real)renderTarget->GetWidth();
+			Real halfWidth = width / 2.0f;
+			Real halfHeight = height / 2.0f;
 			Real left = -halfWidth;
 			Real right = left + width;
 			Real top = halfHeight;
@@ -323,7 +323,7 @@ namespace GTE
 		return skyboxTextureTransform;
 	}
 
-	bool Camera::AddClipPlane(const Vector3& normal, Real offset)
+	Bool Camera::AddClipPlane(const Vector3& normal, Real offset)
 	{
 		NONFATAL_ASSERT_RTRN(clipPlaneCount < Constants::MaxClipPlanes, "Camera::AddClipPlane -> Maximum clip planes exceeded.", false, true);
 		clipPlanes[clipPlaneCount].Normal = normal;
@@ -343,12 +343,12 @@ namespace GTE
 		return clipPlaneCount;
 	}
 
-	void Camera::SetReverseCulling(bool reverseCulling)
+	void Camera::SetReverseCulling(Bool reverseCulling)
 	{
 		this->reverseCulling = reverseCulling;
 	}
 
-	bool Camera::GetReverseCulling()
+	Bool Camera::GetReverseCulling()
 	{
 		return reverseCulling;
 	}

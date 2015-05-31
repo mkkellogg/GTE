@@ -62,13 +62,13 @@ namespace GTE
 		return currentEngineObjectID++;
 	}
 
-	bool EngineObjectManager::Init()
+	Bool EngineObjectManager::Init()
 	{
 		layerManager.AddLayer(DefaultLayer);
 		return true;
 	}
 
-	bool EngineObjectManager::InitBuiltinShaders()
+	Bool EngineObjectManager::InitBuiltinShaders()
 	{
 		std::string vertexSource;
 		std::string fragmentSource;
@@ -580,7 +580,7 @@ namespace GTE
 		graphics->DestroyTexture(texture);
 	}
 
-	RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+	RenderTargetRef EngineObjectManager::CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
@@ -589,7 +589,7 @@ namespace GTE
 		RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
 		NONFATAL_ASSERT_RTRN(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null(), false);
 
-		bool success = target->Init();
+		Bool success = target->Init();
 		NONFATAL_ASSERT_RTRN(success == true, "EngineObjectManager::CreateRenderBuffer -> Could not initialize RenderTarget object.", RenderTargetRef::Null(), false);
 
 		return RenderTargetRef(target, [=](RenderTarget * target)
@@ -628,7 +628,7 @@ namespace GTE
 		Material * m = new Material(name);
 		ASSERT(m != NULL, "EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> Unable to allocate material.");
 
-		bool initSuccess = m->Init(shader);
+		Bool initSuccess = m->Init(shader);
 		if (!initSuccess)
 		{
 			Debug::PrintError("EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> could not Init material");
@@ -649,7 +649,7 @@ namespace GTE
 		if (!shader.IsValid())return MaterialRef::Null();
 
 		Material * m = new Material(name);
-		bool initSuccess = m->Init(shader);
+		Bool initSuccess = m->Init(shader);
 
 		if (!initSuccess)
 		{

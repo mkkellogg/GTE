@@ -114,7 +114,7 @@ namespace GTE
 	 *
 	 * This method will return true if initialization succeeds, otherwise it returns false.
 	 */
-	bool Material::Init(ShaderRef shader)
+	Bool Material::Init(ShaderRef shader)
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), " Material::Init -> tried to initialize with invalid shader.", false, true);
 		NONFATAL_ASSERT_RTRN(shader->IsLoaded(), " Material::Init -> tried to initialize with unloaded shader.", false, true);
@@ -140,7 +140,7 @@ namespace GTE
 	 * information is used to determine if an active uniform or attribute has no data set
 	 * for it, which could cause rendering artifacts or crashes.
 	 */
-	bool Material::SetupSetVerifiers()
+	Bool Material::SetupSetVerifiers()
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::SetupSetVerifiers -> Shader is invalid.", false, true);
 
@@ -177,7 +177,7 @@ namespace GTE
 	 * Set up an array of UniformDescriptor objects corresponding to each uniform
 	 * exposed by this material's shader.
 	 */
-	bool Material::SetupSetUniforms()
+	Bool Material::SetupSetUniforms()
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::SetupSetUniforms -> Shader is invalid.", false, true);
 
@@ -263,7 +263,7 @@ namespace GTE
 	 */
 	Int32 Material::TestForStandardAttribute(StandardAttribute attr) const
 	{
-		const char * attrName = StandardAttributes::GetAttributeName(attr);
+		const Char * attrName = StandardAttributes::GetAttributeName(attr);
 		Int32 varID = shader->GetAttributeVarID(attrName);
 
 		return varID;
@@ -329,7 +329,7 @@ namespace GTE
 	 */
 	Int32 Material::TestForStandardUniform(StandardUniform uniform) const
 	{
-		const char * uniformName = StandardUniforms::GetUniformName(uniform);
+		const Char * uniformName = StandardUniforms::GetUniformName(uniform);
 		Int32 loc = shader->GetUniformVarID(uniformName);
 		return loc;
 	}
@@ -339,7 +339,7 @@ namespace GTE
 	 * Store the shader variable location in [loc] and mapped index in [setUniforms] of
 	 * that variable in [index].
 	 */
-	bool Material::ValidateUniformName(const std::string& name, int& loc, int& index)
+	Bool Material::ValidateUniformName(const std::string& name, int& loc, int& index)
 	{
 		loc = shader->GetUniformVarID(name);
 		if (loc < 0)
@@ -556,7 +556,7 @@ namespace GTE
 		NONFATAL_ASSERT(texture.IsValid(), "Material::SetTexture -> 'texture' is null.", true);
 
 		Int32 loc, foundIndex;
-		bool success = ValidateUniformName(varName, loc, foundIndex);
+		Bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
 		TextureAttributes textureAttributes = texture->GetAttributes();
@@ -579,7 +579,7 @@ namespace GTE
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetMatrix4x4 -> Shader is null.", true);
 
 		Int32 loc, foundIndex;
-		bool success = ValidateUniformName(varName, loc, foundIndex);
+		Bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
 		UniformDescriptor * desc = setUniforms[foundIndex];
@@ -599,7 +599,7 @@ namespace GTE
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform1f -> 'shader' is null.", true);
 
 		Int32 loc, foundIndex;
-		bool success = ValidateUniformName(varName, loc, foundIndex);
+		Bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
 		UniformDescriptor * desc = setUniforms[foundIndex];
@@ -618,7 +618,7 @@ namespace GTE
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform2f -> 'shader' is null.", true);
 
 		Int32 loc, foundIndex;
-		bool success = ValidateUniformName(varName, loc, foundIndex);
+		Bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
 		UniformDescriptor * desc = setUniforms[foundIndex];
@@ -638,7 +638,7 @@ namespace GTE
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform4f -> 'shader' is null.", true);
 
 		Int32 loc, foundIndex;
-		bool success = ValidateUniformName(varName, loc, foundIndex);
+		Bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
 		UniformDescriptor * desc = setUniforms[foundIndex];
@@ -659,7 +659,7 @@ namespace GTE
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetColor -> 'shader' is null.", true);
 
 		Int32 loc, foundIndex;
-		bool success = ValidateUniformName(varName, loc, foundIndex);
+		Bool success = ValidateUniformName(varName, loc, foundIndex);
 		if (!success)return;
 
 		UniformDescriptor * desc = setUniforms[foundIndex];
@@ -678,7 +678,7 @@ namespace GTE
 	 */
 	UInt32 Material::GetSetUniformCount() const
 	{
-		return setUniforms.size();
+		return (UInt32)setUniforms.size();
 	}
 
 	/*
@@ -846,7 +846,7 @@ namespace GTE
 	 * Verify that all uniforms and attributes exposed by this material's shader have values
 	 * set for them and that those values are of the correct size.
 	 */
-	bool Material::VerifySetVars(Int32 vertexCount)
+	Bool Material::VerifySetVars(Int32 vertexCount)
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::VerifySetVars -> 'shader' is null.", false, true);
 		if (allSetUniformsandAttributesVerified == true)return true;
@@ -889,7 +889,7 @@ namespace GTE
 	/*
 	 * Specify whether this material is self-lit or not.
 	 */
-	void Material::SetSelfLit(bool selfLit)
+	void Material::SetSelfLit(Bool selfLit)
 	{
 		this->selfLit = selfLit;
 	}
@@ -897,7 +897,7 @@ namespace GTE
 	/*
 	 * Is this material self-lit?
 	 */
-	bool Material::IsSelfLit()
+	Bool Material::IsSelfLit()
 	{
 		return selfLit;
 	}

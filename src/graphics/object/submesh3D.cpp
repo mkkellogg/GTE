@@ -225,9 +225,9 @@ namespace GTE
 		center.z = depth / 2 + minZ;
 
 		// form the sphere of influence vectors for each axis
-		sphereOfInfluenceX.Set(width * .6125, 0, 0);
-		sphereOfInfluenceY.Set(0, height * .6125, 0);
-		sphereOfInfluenceZ.Set(0, 0, depth * .6125);
+		sphereOfInfluenceX.Set(width * .6125f, 0, 0);
+		sphereOfInfluenceY.Set(0, height * .6125f, 0);
+		sphereOfInfluenceZ.Set(0, 0, depth * .6125f);
 	}
 
 	/*
@@ -375,7 +375,7 @@ namespace GTE
 		Real dv1 = v1 - v0;
 		Real dv2 = v2 - v0;
 
-		Real ood = 1.0 / ((du1 * dv2) - (du2 * dv1));
+		Real ood = 1.0f / ((du1 * dv2) - (du2 * dv1));
 
 		result.Set(dv2*e1.x - dv1*e2.x, dv2*e1.y - dv1*e2.y, dv2*e1.z - dv1*e2.z);
 
@@ -503,7 +503,7 @@ namespace GTE
 	{
 		if (vertexCrossMap != NULL)
 		{
-			std::unordered_map<long, bool> deleted;
+			std::unordered_map<long, Bool> deleted;
 			for (UInt32 i = 0; i < totalVertexCount; i++)
 			{
 				std::vector<UInt32>* list = vertexCrossMap[i];
@@ -524,7 +524,7 @@ namespace GTE
 	 * For a given combination of x,y,z, a corresponding list exists in [vertexCrossMap] with all the indices
 	 * of vertices in [positions] which have a matching value for x,y, and z.
 	 */
-	bool SubMesh3D::BuildVertexCrossMap()
+	Bool SubMesh3D::BuildVertexCrossMap()
 	{
 		// destroy existing cross map (if there is one).
 		DestroyVertexCrossMap();
@@ -555,12 +555,12 @@ namespace GTE
 		return true;
 	}
 
-	void SubMesh3D::SetDirty(bool isDirty)
+	void SubMesh3D::SetDirty(Bool isDirty)
 	{
 		this->isDirty = isDirty;
 	}
 
-	bool SubMesh3D::IsDirty()
+	Bool SubMesh3D::IsDirty()
 	{
 		return isDirty;
 	}
@@ -568,7 +568,7 @@ namespace GTE
 	/*
 	 * Tell this mesh whether or not to calculate its own normals.
 	 */
-	void SubMesh3D::SetCalculateNormals(bool calculate)
+	void SubMesh3D::SetCalculateNormals(Bool calculate)
 	{
 		calculateNormals = calculate;
 	}
@@ -576,7 +576,7 @@ namespace GTE
 	/*
 	 * Tell this mesh whether or not to calculate its own tangents.
 	 */
-	void SubMesh3D::SetCalculateTangents(bool calculate)
+	void SubMesh3D::SetCalculateTangents(Bool calculate)
 	{
 		calculateTangents = calculate;
 	}
@@ -584,7 +584,7 @@ namespace GTE
 	/*
 	 * Tell this mesh whether or not to build face data.
 	 */
-	void SubMesh3D::SetBuildFaces(bool build)
+	void SubMesh3D::SetBuildFaces(Bool build)
 	{
 		buildFaces = build;
 	}
@@ -592,7 +592,7 @@ namespace GTE
 	/*
 	 * Does this mesh have face data?
 	 */
-	bool SubMesh3D::HasFaces() const
+	Bool SubMesh3D::HasFaces() const
 	{
 		return buildFaces;
 	}
@@ -653,8 +653,8 @@ namespace GTE
 
 		CalcSphereOfInfluence();
 
-		if (calculateNormals)CalculateNormals(normalsSmoothingThreshold);
-		if (calculateTangents)CalculateTangents(normalsSmoothingThreshold);
+		if (calculateNormals)CalculateNormals((GTE::Real)normalsSmoothingThreshold);
+		if (calculateTangents)CalculateTangents((GTE::Real)normalsSmoothingThreshold);
 		if (buildFaces)BuildFaces();
 
 		if (containerMesh != NULL)
@@ -703,11 +703,11 @@ namespace GTE
 	/*
 	 * Initialize this sub-mesh to contain space for [totalVertexCount] vertices.
 	 */
-	bool SubMesh3D::Init(UInt32 totalVertexCount)
+	Bool SubMesh3D::Init(UInt32 totalVertexCount)
 	{
 		this->totalVertexCount = totalVertexCount;
 
-		bool initSuccess = true;
+		Bool initSuccess = true;
 		Int32 errorMask = 0;
 
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Position))
@@ -756,7 +756,7 @@ namespace GTE
 		}
 
 		UInt32 faceCount = totalVertexCount / 3;
-		bool facesInitSuccess = faces.Init(faceCount);
+		Bool facesInitSuccess = faces.Init(faceCount);
 
 		if (!facesInitSuccess)
 		{
@@ -837,7 +837,7 @@ namespace GTE
 	/*
 	 * Indicate whether or not mesh normals should be inverted when they are calculated.
 	 */
-	void SubMesh3D::SetInvertNormals(bool invert)
+	void SubMesh3D::SetInvertNormals(Bool invert)
 	{
 		invertNormals = invert;
 	}

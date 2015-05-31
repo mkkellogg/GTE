@@ -35,7 +35,7 @@ namespace GTE
 
 	}
 
-	bool InputManagerGL::Init()
+	Bool InputManagerGL::Init()
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		GraphicsGL * graphicsGL = dynamic_cast<GraphicsGL*>(graphics);
@@ -310,7 +310,7 @@ namespace GTE
 		return 0;
 	}
 
-	UInt32 InputManagerGL::GetKeyIndexFromCharacter(unsigned char key)
+	UInt32 InputManagerGL::GetKeyIndexFromCharacter(UChar key)
 	{
 		return (UInt32)key;
 	}

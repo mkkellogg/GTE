@@ -76,7 +76,7 @@ namespace GTE
 
 		VertexBoneMap(UInt32 vertexCount, UInt32 uVertexCount);
 		~VertexBoneMap();
-		bool Init();
+		Bool Init();
 		VertexMappingDescriptor* GetDescriptor(UInt32 index);
 		UInt32 GetVertexCount();
 		UInt32 GetUniqueVertexCount();

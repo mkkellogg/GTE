@@ -38,7 +38,7 @@ namespace GTE
 		~SubMesh3DFaces();
 
 		UInt32 GetFaceCount() const;
-		bool Init(UInt32 faceCount);
+		Bool Init(UInt32 faceCount);
 		SubMesh3DFace * GetFace(UInt32 index);
 		const SubMesh3DFace * GetFaceConst(UInt32 index) const;
 	};

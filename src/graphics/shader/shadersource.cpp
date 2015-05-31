@@ -73,11 +73,11 @@ namespace GTE
 		initialized = true;
 	}
 
-	bool ShaderSource::Load()
+	Bool ShaderSource::Load()
 	{
 		if (sourceType != ShaderSourceType::File)return true;
-		char * vTemp = ReadShaderSource(vertexSourcePath.c_str());
-		char * fTemp = ReadShaderSource(fragmentSourcePath.c_str());
+		Char * vTemp = ReadShaderSource(vertexSourcePath.c_str());
+		Char * fTemp = ReadShaderSource(fragmentSourcePath.c_str());
 		loaded = vTemp != NULL && fTemp != NULL ? true : false;
 		if (loaded)
 		{
@@ -119,10 +119,10 @@ namespace GTE
 		return name;
 	}
 
-	char * ShaderSource::ReadShaderSource(const char *fn)
+	Char * ShaderSource::ReadShaderSource(const Char *fn)
 	{
 		FILE *fp;
-		char *content = NULL;
+		Char *content = NULL;
 
 		Int32 count = 0;
 
@@ -138,8 +138,8 @@ namespace GTE
 
 				if (count > 0)
 				{
-					content = new char[count + 1];
-					count = fread(content, sizeof(char), count, fp);
+					content = new Char[count + 1];
+					count = fread(content, sizeof(Char), count, fp);
 					content[count] = '\0';
 				}
 				fclose(fp);
@@ -148,7 +148,7 @@ namespace GTE
 		return content;
 	}
 
-	bool ShaderSource::IsLoaded()
+	Bool ShaderSource::IsLoaded()
 	{
 		return loaded;
 	}

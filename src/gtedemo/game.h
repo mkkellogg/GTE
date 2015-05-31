@@ -88,13 +88,13 @@ class Game
 	GTE::SkinnedMesh3DRendererRef playerRenderer;
 	// player animations
 	GTE::AnimationRef playerAnimations[PlayerState::_Count];
-	// The AnimationPlayer responsible for managing the animations of the player character
+	// The AnimationPlayer responsible for managing the animations of the player 
 	GTE::AnimationPlayerRef animationPlayer;
 
 	// number of frames rendered;
 	GTE::UInt32 frameCount;
 	// should we print out the graphics engine FPS?
-	bool printFPS;
+	GTE::Bool printFPS;
 	// last time FPS was retrieved from the graphics engine
 	GTE::Real lastFPSRetrieveTime;
 	// last fps value retrieved from the graphics engine
@@ -121,7 +121,7 @@ class Game
 	// current scene index
 	Scenes currentScene;
 	// are we transitioning between scenes?
-	bool sceneTransitioning;
+	GTE::Bool sceneTransitioning;
 	// when did the current scene transition start?
 	GTE::Real sceneTransitionStartTime;
 	// scene we are transitioning from
@@ -137,13 +137,13 @@ class Game
 	GTE::Real playerHorizontalSpeed;
 	GTE::Real playerBaseY;
 	GTE::Real playerVerticalSpeed;
-	bool playerIsMoving;
-	bool playerIsGrounded;
+	GTE::Bool playerIsMoving;
+	GTE::Bool playerIsGrounded;
 
 	// booleans that are only true during the frame they become true
-	bool playerJumpApexReached;
-	bool playerLanded;
-	bool displayInfoChanged;
+	GTE::Bool playerJumpApexReached;
+	GTE::Bool playerLanded;
+	GTE::Bool displayInfoChanged;
 
 	// player direction vectors
 	GTE::Vector3 playerMoveDirection;
@@ -175,7 +175,7 @@ class Game
 	void ActivatePlayerState(PlayerState state);
 	void ManagePlayerState();
 	void HandleGeneralInput();
-	void UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, GTE::Real intensityChange, bool toggleCastShadows);
+	void UpdateLight(GTE::SceneObjectRef sceneObject, GTE::Bool toggleLight, GTE::Real intensityChange, GTE::Bool toggleCastShadows);
 
 	void DisplayInfo();
 	void SignalDisplayInfoChanged();

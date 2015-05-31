@@ -74,7 +74,7 @@ namespace GTE
 		UInt32 WindowWidth;
 		UInt32 WindowHeight;
 		std::string WindowTitle;
-		bool WaitForVSync;
+		Bool WaitForVSync;
 		AntialiasingMethod AAMethod;
 
 		GraphicsAttributes()
@@ -108,7 +108,7 @@ namespace GTE
 			}
 		}
 
-		static bool IsMSAA(AntialiasingMethod method)
+		static Bool IsMSAA(AntialiasingMethod method)
 		{
 			switch (method)
 			{

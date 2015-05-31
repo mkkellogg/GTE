@@ -27,7 +27,7 @@ namespace GTE
 
 		SceneObject * sceneObject;
 
-		void GetInheritedTransform(Transform& transform, bool invert) const;
+		void GetInheritedTransform(Transform& transform, Bool invert) const;
 		void SetSceneObject(SceneObject* sceneObject);
 		void GetLocalTransformationFromWorldTransformation(const Transform& worldTransformation, Transform& localTransformation);
 
@@ -37,20 +37,20 @@ namespace GTE
 		SceneObjectTransform(SceneObject* sceneObject);
 		~SceneObjectTransform();
 
-		static void GetWorldTransform(Transform& transform, SceneObject * sceneObject, bool includeSelf, bool invert);
-		static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, bool includeSelf, bool invert);
+		static void GetWorldTransform(Transform& transform, SceneObject * sceneObject, Bool includeSelf, Bool invert);
+		static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, Bool includeSelf, Bool invert);
 
 		void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
 		void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
 
-		void Translate(Real x, Real y, Real z, bool local);
-		void Translate(Vector3& vector, bool local);
-		void RotateAround(const Point3& point, const Vector3& axis, Real angle, bool local);
-		void RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, bool local);
-		void Scale(const Vector3& mag, bool local);
-		void Scale(Real x, Real y, Real z, bool local);
-		void Rotate(const Vector3& vector, Real a, bool local);
-		void Rotate(Real x, Real y, Real z, Real a, bool local);
+		void Translate(Real x, Real y, Real z, Bool local);
+		void Translate(Vector3& vector, Bool local);
+		void RotateAround(const Point3& point, const Vector3& axis, Real angle, Bool local);
+		void RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, Bool local);
+		void Scale(const Vector3& mag, Bool local);
+		void Scale(Real x, Real y, Real z, Bool local);
+		void Rotate(const Vector3& vector, Real a, Bool local);
+		void Rotate(Real x, Real y, Real z, Real a, Bool local);
 
 		void TransformVector(Vector3& vector) const;
 		void TransformPoint(Point3& point3) const;

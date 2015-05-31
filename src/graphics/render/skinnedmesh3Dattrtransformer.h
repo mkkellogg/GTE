@@ -50,13 +50,13 @@ namespace GTE
 		// flag for each Bone object in the list of bones held by the skeleton in [renderer]. the flag indicates
 		// whether the transformation for that bone has been calculated already (bones are often visited
 		// multiple times during a single vertex skinning operation).
-		unsigned char * boneTransformed;
+		UChar * boneTransformed;
 
 
 		// existing size of each cache
 		Int32 currentCacheSize;
 		// flags that indicate that an entry in any cache at a specified index is valid
-		unsigned char * cacheFlags;
+		UChar * cacheFlags;
 
 		// once the full transformation has been calculated for a vertex, save it for later reuse
 		Matrix4x4 * savedTransforms;
@@ -75,28 +75,28 @@ namespace GTE
 
 		// flag for each (unique) vertex that indicates whether the normals for all instances of that
 		// vertex are equal
-		unsigned char * identicalNormalFlags;
+		UChar * identicalNormalFlags;
 
 		// flag for each (unique) vertex that indicates whether the tangents for all instances of that
 		// vertex are equal
-		unsigned char * identicalTangentFlags;
+		UChar * identicalTangentFlags;
 
 		void UpdateTransformedBoneCacheSize();
 		void DestroyTransformedBoneFlagsArray();
-		bool CreateTransformedBoneFlagsArray();
+		Bool CreateTransformedBoneFlagsArray();
 		void ClearTransformedBoneFlagsArray();
 
 		void DestroyCache(CacheType target);
-		bool CreateCache(CacheType target);
+		Bool CreateCache(CacheType target);
 		void ClearCacheFlags();
-		void SetAllTransformCacheFlags(unsigned char value);
+		void SetAllTransformCacheFlags(UChar value);
 
 		void DestroyIdenticalNormalsTangentsFlags();
-		bool CreateIdenticalNormalsTangentsFlags();
+		Bool CreateIdenticalNormalsTangentsFlags();
 		void ClearIdenticalNormalsTangentsFlags();
-		bool FindIdenticalNormalsOrTangents(Vector3Array& fullNormalLists, bool forNormals);
+		Bool FindIdenticalNormalsOrTangents(Vector3Array& fullNormalLists, Bool forNormals);
 
-		bool CreateCaches();
+		Bool CreateCaches();
 		void DestroyCaches();
 
 	public:
@@ -113,7 +113,7 @@ namespace GTE
 			const Vector3Array& faceNormalsIn, Vector3Array& faceNormalsOut,
 			const Vector3Array& vertexTangentsIn, Vector3Array& vertexTangentsOut,
 			const Point3& centerIn, Point3& centerOut,
-			bool transformPositions, bool transformNormals, bool transformTangents);
+			Bool transformPositions, Bool transformNormals, Bool transformTangents);
 	};
 }
 

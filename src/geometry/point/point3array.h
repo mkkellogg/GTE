@@ -15,7 +15,7 @@ namespace GTE
 		Point3Array();
 		virtual ~Point3Array();
 
-		void SetData(const Real * data, bool includeW);
+		void SetData(const Real * data, Bool includeW);
 		Point3 * GetPoint(Int32 index);
 		const Point3 * GetPointConst(Int32 index) const;
 		Point3 ** GetPoints();

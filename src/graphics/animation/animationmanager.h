@@ -30,8 +30,8 @@ namespace GTE
 
 	public:
 
-		bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const;
-		bool IsCompatible(SkeletonRef skeleton, AnimationRef animation) const;
+		Bool IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const;
+		Bool IsCompatible(SkeletonRef skeleton, AnimationRef animation) const;
 
 		void Update();
 

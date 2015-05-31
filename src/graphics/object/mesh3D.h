@@ -64,7 +64,7 @@ namespace GTE
 		UInt32 GetSubMeshCount() const;
 		void SetSubMesh(SubMesh3DRef mesh, UInt32 index);
 		SubMesh3DRef GetSubMesh(UInt32 index);
-		bool Init();
+		Bool Init();
 		void Update();
 
 

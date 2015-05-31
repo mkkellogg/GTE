@@ -204,12 +204,12 @@ namespace GTE
 		translation.Set(A3, B3, C3);
 	}
 
-	bool Matrix4x4::IsAffine(void) const
+	Bool Matrix4x4::IsAffine(void) const
 	{
 		return D0 == 0 && D1 == 0 && D2 == 0 && D3 == 1;
 	}
 
-	bool Matrix4x4::IsAffine(const Real * data)
+	Bool Matrix4x4::IsAffine(const Real * data)
 	{
 		return data[3] == 0 && data[7] == 0 && data[11] == 0 && data[15] == 1;
 	}
@@ -527,10 +527,10 @@ namespace GTE
 	 *
 	 * Returns false if the matrix cannot be inverted
 	 */
-	bool Matrix4x4::Invert()
+	Bool Matrix4x4::Invert()
 	{
 		Real temp[DATA_SIZE];
-		bool success = Invert(data, temp);
+		Bool success = Invert(data, temp);
 		if (success == true)
 		{
 			memcpy(data, temp, sizeof(Real) * DATA_SIZE);
@@ -543,7 +543,7 @@ namespace GTE
 	 *
 	 * Returns false if the matrix cannot be inverted
 	 */
-	bool Matrix4x4::Invert(Matrix4x4& out)
+	Bool Matrix4x4::Invert(Matrix4x4& out)
 	{
 		return Invert(data, out.data);
 	}
@@ -553,13 +553,13 @@ namespace GTE
 	 *
 	 * Returns false if the matrix cannot be inverted
 	 */
-	bool Matrix4x4::Invert(const Real * source, Real * dest)
+	Bool Matrix4x4::Invert(const Real * source, Real * dest)
 	{
 		// we need to know if the matrix is affine so that we can make it affine
 		// once again after the inversion. the inversion process can introduce very small
 		// precision errors that accumulate over time and eventually
 		// result in a non-affine matrix
-		bool isAffine = Matrix4x4::IsAffine(source);
+		Bool isAffine = Matrix4x4::IsAffine(source);
 
 		NONFATAL_ASSERT_RTRN(source != NULL, "Matrix4x4::Invert -> 'source' is null.", false, true);
 		NONFATAL_ASSERT_RTRN(dest != NULL, "Matrix4x4::Invert -> 'dest' is null.", false, true);

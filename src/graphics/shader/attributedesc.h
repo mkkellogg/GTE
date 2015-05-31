@@ -38,10 +38,10 @@ namespace GTE
 		~AttributeDescriptor();
 
 		Int32 Size;
-		bool IsSet;
+		Bool IsSet;
 		AttributeType Type;
 		UInt32 ShaderVarID;
-		char Name[128];
+		Char Name[128];
 		Real * FloatData;
 	};
 }

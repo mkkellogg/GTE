@@ -204,7 +204,7 @@ namespace GTE
 			SkeletonNode * targetNode = target->GetNodeFromList(node);
 
 			// loop through all registered animations
-			for (Int32 i = registeredAnimations.size() - 1; i >= 0; i--)
+			for (Int32 i = (Int32)registeredAnimations.size() - 1; i >= 0; i--)
 			{
 				AnimationInstanceRef instance = registeredAnimations[i];
 
@@ -393,12 +393,12 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedTranslation -> 'instance' is invalid.", true);
 
-		UInt32 frameCount = keyFrameSet.TranslationKeyFrames.size();
+		UInt32 frameCount = (UInt32)keyFrameSet.TranslationKeyFrames.size();
 		NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedTranslation -> Key frame count is zero.", true);
 
 		UInt32 previousIndex, nextIndex;
 		Real interFrameProgress;
-		bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Translation);
+		Bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Translation);
 
 		// did we successfully find 2 frames between which to interpolate?
 		if (foundFrames)
@@ -426,12 +426,12 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedScale -> 'instance' is invalid.", true);
 
-		UInt32 frameCount = keyFrameSet.ScaleKeyFrames.size();
+		UInt32 frameCount = (UInt32)keyFrameSet.ScaleKeyFrames.size();
 		NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedScale -> Key frame count is zero.", true);
 
 		UInt32 previousIndex, nextIndex;
 		Real interFrameProgress;
-		bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Scale);
+		Bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Scale);
 
 		// did we successfully find 2 frames between which to interpolate?
 		if (foundFrames)
@@ -459,12 +459,12 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedRotation -> 'instance' is invalid.", true);
 
-		UInt32 frameCount = keyFrameSet.RotationKeyFrames.size();
+		UInt32 frameCount = (UInt32)keyFrameSet.RotationKeyFrames.size();
 		NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedRotation -> Key frame count is zero.", true);
 
 		UInt32 previousIndex, nextIndex;
 		Real interFrameProgress;
-		bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Rotation);
+		Bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Rotation);
 
 		// did we successfully find 2 frames between which to interpolate?
 		if (foundFrames)
@@ -490,7 +490,7 @@ namespace GTE
 	 * and then stores the indices of those key frames in [previousIndex] and [nextIndex]. Then it uses instance->Progress to determine how far from [lastIndex]
 	 * to [nextIndex] the animation currently is, and stores that value in [interFrameProgress] (range: 0 to 1).
 	 */
-	bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, UInt32& previousIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const
+	Bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, UInt32& previousIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const
 	{
 		NONFATAL_ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CalculateInterpolation -> 'instance' is invalid.", false, true);
 
@@ -499,9 +499,9 @@ namespace GTE
 		Real duration = instance->Duration;
 
 		// get the correct frame count, which depends on [component]
-		if (component == TransformationCompnent::Translation)frameCount = keyFrameSet.TranslationKeyFrames.size();
-		else if (component == TransformationCompnent::Rotation)frameCount = keyFrameSet.RotationKeyFrames.size();
-		else if (component == TransformationCompnent::Scale)frameCount = keyFrameSet.ScaleKeyFrames.size();
+		if (component == TransformationCompnent::Translation)frameCount = (UInt32)keyFrameSet.TranslationKeyFrames.size();
+		else if (component == TransformationCompnent::Rotation)frameCount = (UInt32)keyFrameSet.RotationKeyFrames.size();
+		else if (component == TransformationCompnent::Scale)frameCount = (UInt32)keyFrameSet.ScaleKeyFrames.size();
 		else return false;
 
 		// loop through each key frame
@@ -522,7 +522,7 @@ namespace GTE
 				nextIndex = f;
 
 				// flag that indicates we need to interpolate from the last frame to the first frame
-				bool overShoot = false;
+				Bool overShoot = false;
 
 				// if f==frameCount-1 and keyRealTime <= progress, then we have reached the last frame and progress has moved
 				// beyond it. this means we need to interpolate between the last frame and the first frame (for smoothed animation looping).
@@ -628,7 +628,7 @@ namespace GTE
 			AnimationInstanceRef instance = objectManager->CreateAnimationInstance(target, animation);
 			NONFATAL_ASSERT(instance.IsValid(), " AnimationPlayer::CreateAnimationInstance -> Unable to create animation instance.", false);
 
-			bool initSuccess = instance->Init();
+			Bool initSuccess = instance->Init();
 			NONFATAL_ASSERT(initSuccess, "AnimationPlayer::CreateAnimationInstance -> Unable to initialize animation instance.", false);
 
 			registeredAnimations.push_back(instance);
@@ -813,7 +813,7 @@ namespace GTE
 	 * At the same time the target animation will be faded/blended in at the same rate,
 	 * creating a smooth transition to [target].
 	 */
-	void AnimationPlayer::CrossFade(AnimationRef target, Real duration, bool queued)
+	void AnimationPlayer::CrossFade(AnimationRef target, Real duration, Bool queued)
 	{
 		if (animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
 		{
@@ -829,7 +829,7 @@ namespace GTE
 			CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
 			ASSERT(blendOp, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
 
-			bool initSuccess = blendOp->Init(animationWeights);
+			Bool initSuccess = blendOp->Init(animationWeights);
 			if (!initSuccess)
 			{
 				Debug::PrintError("AnimationPlayer::CrossFade -> Unable to init new CrossFadeBlendOp object.");
@@ -847,7 +847,7 @@ namespace GTE
 					return;
 				}
 
-				bool initSuccess = op->Init(animationWeights);
+				Bool initSuccess = op->Init(animationWeights);
 				if (!initSuccess)
 				{
 					Debug::PrintError("AnimationPlayer::CrossFade::SetOnStartCallback -> Unable to init CrossFadeBlendOp object.");

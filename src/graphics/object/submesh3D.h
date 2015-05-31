@@ -63,12 +63,12 @@ namespace GTE
 		UV2Array uvs0;
 		UV2Array uvs1;
 
-		bool isDirty;
+		Bool isDirty;
 		// inter-face angle above which smoothing/average of vertex normals should
 		// not occur
 		Int32 normalsSmoothingThreshold;
 		// invert normals every time they are calculated
-		bool invertNormals;
+		Bool invertNormals;
 		// local center position for sub-mesh.
 		Point3 center;
 		// radius of the sphere of influence along the X-axis
@@ -87,11 +87,11 @@ namespace GTE
 		// maps vertices to other equal vertices
 		std::vector<UInt32>** vertexCrossMap;
 		// should face-related data be calculated?
-		bool buildFaces;
+		Bool buildFaces;
 		// should normals be calculated?
-		bool calculateNormals;
+		Bool calculateNormals;
 		// should tangents be calculated?
-		bool calculateTangents;
+		Bool calculateTangents;
 
 		SubMesh3D();
 		SubMesh3D(StandardAttributeSet attributes);
@@ -99,7 +99,7 @@ namespace GTE
 
 		void Destroy();
 		void DestroyVertexCrossMap();
-		bool BuildVertexCrossMap();
+		Bool BuildVertexCrossMap();
 
 		void CalculateFaceNormal(UInt32 faceIndex, Vector3& result) const;
 		void FindAdjacentFaceIndex(UInt32 faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
@@ -119,13 +119,13 @@ namespace GTE
 
 	public:
 
-		void SetDirty(bool isDirty);
-		bool IsDirty();
+		void SetDirty(Bool isDirty);
+		Bool IsDirty();
 
-		void SetCalculateNormals(bool calculate);
-		void SetCalculateTangents(bool calculate);
-		void SetBuildFaces(bool build);
-		bool HasFaces() const;
+		void SetCalculateNormals(Bool calculate);
+		void SetCalculateTangents(Bool calculate);
+		void SetBuildFaces(Bool build);
+		Bool HasFaces() const;
 
 		SubMesh3DFaces& GetFaces();
 
@@ -137,7 +137,7 @@ namespace GTE
 		void Update();
 		void QuickUpdate();
 
-		bool Init(UInt32 totalVertexCount);
+		Bool Init(UInt32 totalVertexCount);
 		UInt32 GetTotalVertexCount() const;
 		StandardAttributeSet GetAttributeSet() const;
 		Real GetTimeStamp();
@@ -150,7 +150,7 @@ namespace GTE
 		UV2Array * GetUVs0();
 		UV2Array * GetUVs1();
 
-		void SetInvertNormals(bool invert);
+		void SetInvertNormals(Bool invert);
 	};
 }
 

@@ -59,7 +59,7 @@ class LavaField
 	// second displacement map used is displacing the lava field mesh
 	GTE::RawImage * displacementB;
 
-	bool InitMeshAndMaterial();
+	GTE::Bool InitMeshAndMaterial();
 	void DisplaceField();
 
 	public:
@@ -67,7 +67,7 @@ class LavaField
 	LavaField(GTE::UInt32 subDivisions);
 	~LavaField();
 
-	bool Init();
+	GTE::Bool Init();
 	GTE::SceneObjectRef GetSceneObject();
 	void Update();
 

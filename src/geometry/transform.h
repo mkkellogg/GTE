@@ -45,14 +45,14 @@ namespace GTE
 		void TransformBy(const Transform& transform);
 		void PreTransformBy(const Transform& transform);
 
-		virtual void Translate(Real x, Real y, Real z, bool local);
-		virtual void Translate(Vector3& vector, bool local);
-		virtual void RotateAround(const Point3& point, const Vector3& axis, Real angle, bool local);
-		virtual void RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, bool local);
-		virtual void Scale(const Vector3& mag, bool local);
-		virtual void Scale(Real x, Real y, Real z, bool local);
-		virtual void Rotate(const Vector3& vector, Real a, bool local);
-		virtual void Rotate(Real x, Real y, Real z, Real a, bool local);
+		virtual void Translate(Real x, Real y, Real z, Bool local);
+		virtual void Translate(Vector3& vector, Bool local);
+		virtual void RotateAround(const Point3& point, const Vector3& axis, Real angle, Bool local);
+		virtual void RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, Bool local);
+		virtual void Scale(const Vector3& mag, Bool local);
+		virtual void Scale(Real x, Real y, Real z, Bool local);
+		virtual void Rotate(const Vector3& vector, Real a, Bool local);
+		virtual void Rotate(Real x, Real y, Real z, Real a, Bool local);
 
 		virtual void TransformVector(Vector3& vector) const;
 		virtual void TransformPoint(Point3& point3) const;

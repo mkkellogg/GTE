@@ -31,7 +31,7 @@ namespace GTE
 
 		public:
 
-			bool HasNext()
+			Bool HasNext()
 			{
 				return currentIndex < (Int32)targetArray.count - 1;
 			}
@@ -61,11 +61,11 @@ namespace GTE
 
 		BaseVector4 * GetBaseVector(UInt32 index);
 		const Real * GetDataPtr() const;
-		bool Init(UInt32 reservedCount);
+		Bool Init(UInt32 reservedCount);
 		UInt32 GetReservedCount() const;
 		void SetCount(UInt32 count);
 		UInt32 GetCount() const;
-		bool CopyTo(BaseVector4Array * dest) const;
+		Bool CopyTo(BaseVector4Array * dest) const;
 		Iterator GetIterator(BaseVector4& targetVector);
 	};
 }

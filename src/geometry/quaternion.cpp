@@ -369,7 +369,7 @@ namespace GTE
 		// The quaternion representing the rotation is
 		//   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
-		Real fHalfAngle(0.5*rfAngle);
+		Real fHalfAngle(0.5f * rfAngle);
 		Real fSin = GTEMath::Sin(fHalfAngle);
 		mData[3] = GTEMath::Cos(fHalfAngle);
 		mData[0] = fSin*rkAxis.x;
@@ -429,12 +429,12 @@ namespace GTE
 	 */
 	void Quaternion::euler(const Vector3& euler)
 	{
-		Real c1 = GTEMath::Cos(euler.z * 0.5 * Constants::DegreesToRads);
-		Real c2 = GTEMath::Cos(euler.y * 0.5 * Constants::DegreesToRads);
-		Real c3 = GTEMath::Cos(euler.x * 0.5 * Constants::DegreesToRads);
-		Real s1 = GTEMath::Sin(euler.z * 0.5 * Constants::DegreesToRads);
-		Real s2 = GTEMath::Sin(euler.y * 0.5 * Constants::DegreesToRads);
-		Real s3 = GTEMath::Sin(euler.x * 0.5 * Constants::DegreesToRads);
+		Real c1 = GTEMath::Cos(euler.z * 0.5f * Constants::DegreesToRads);
+		Real c2 = GTEMath::Cos(euler.y * 0.5f * Constants::DegreesToRads);
+		Real c3 = GTEMath::Cos(euler.x * 0.5f * Constants::DegreesToRads);
+		Real s1 = GTEMath::Sin(euler.z * 0.5f * Constants::DegreesToRads);
+		Real s2 = GTEMath::Sin(euler.y * 0.5f * Constants::DegreesToRads);
+		Real s3 = GTEMath::Sin(euler.x * 0.5f * Constants::DegreesToRads);
 
 		mData[0] = c1 * c2 * s3 - s1 * s2 * c3;
 		mData[1] = c1 * s2 * c3 + s1 * c2 * s3;
@@ -449,7 +449,7 @@ namespace GTE
 	Vector3 Quaternion::euler(void) const
 	{
 		Vector3 euler;
-		const static Real PI_OVER_2 = Constants::PI * 0.5;
+		const static Real PI_OVER_2 = Constants::PI * 0.5f;
 		const static Real EPSILON = 1e-10;
 		Real sqw, sqx, sqy, sqz;
 
@@ -459,18 +459,18 @@ namespace GTE
 		sqy = mData[1] * mData[1];
 		sqz = mData[2] * mData[2];
 
-		euler.y = asin(2.0 * (mData[3] * mData[1] - mData[0] * mData[2]));
+		euler.y = asin(2.0f * (mData[3] * mData[1] - mData[0] * mData[2]));
 		if (PI_OVER_2 - fabs(euler.y) > EPSILON)
 		{
-			euler.z = atan2(2.0 * (mData[0] * mData[1] + mData[3] * mData[2]), sqx - sqy - sqz + sqw);
-			euler.x = atan2(2.0 * (mData[3] * mData[0] + mData[1] * mData[2]), sqw - sqx - sqy + sqz);
+			euler.z = atan2(2.0f * (mData[0] * mData[1] + mData[3] * mData[2]), sqx - sqy - sqz + sqw);
+			euler.x = atan2(2.0f * (mData[3] * mData[0] + mData[1] * mData[2]), sqw - sqx - sqy + sqz);
 		}
 		else
 		{
 			// compute heading from local 'down' vector
 			euler.z = atan2(2 * mData[1] * mData[2] - 2 * mData[0] * mData[3],
 				2 * mData[0] * mData[2] + 2 * mData[1] * mData[3]);
-			euler.x = 0.0;
+			euler.x = 0.0f;
 
 			// If facing down, reverse yaw
 			if (euler.y < 0)
@@ -531,7 +531,7 @@ namespace GTE
 		  // if theta = 180 degrees then result is not fully defined
 		  // we could rotate around any axis normal to qa or qb
 		  if (fabs(sinHalfTheta) < 0.001)
-		  { // fabs is Realing point absolute
+		  { // fabs is floating point absolute
 		  qm.mData[3] = (qa.w() * 0.5 + qb.w() * 0.5);
 		  qm.mData[0] = (qa.x() * 0.5 + qb.x() * 0.5);
 		  qm.mData[1] = (qa.y() * 0.5 + qb.y() * 0.5);

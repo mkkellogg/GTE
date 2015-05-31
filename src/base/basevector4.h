@@ -83,17 +83,17 @@ namespace GTE
 
 	protected:
 
-		void Init(Real *target, bool permAttach);
+		void Init(Real *target, Bool permAttach);
 
 		Real * data;
 		Real baseData[4];
-		bool attached;
-		bool canDetach;
+		Bool attached;
+		Bool canDetach;
 
 	public:
 
 		BaseVector4();
-		BaseVector4(bool permAttached, Real * target);
+		BaseVector4(Bool permAttached, Real * target);
 		BaseVector4(Real x, Real y, Real z, Real w);
 		BaseVector4(const BaseVector4& baseVector);
 		BaseVector4(const Real * copyData);

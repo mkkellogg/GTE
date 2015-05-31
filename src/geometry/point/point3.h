@@ -35,7 +35,7 @@ namespace GTE
 		Real &z;
 
 		Point3();
-		Point3(bool permAttached, Real * target);
+		Point3(Bool permAttached, Real * target);
 		Point3(Real x, Real y, Real z);
 		Point3(const Point3& point);
 		Point3(const Real * data);
@@ -48,11 +48,11 @@ namespace GTE
 
 		Point3 & operator= (const Point3 & source);
 		BaseVector4 & operator= (const BaseVector4 & source);
-		bool operator==(const Point3 & source);
-		bool operator==(const Point3& p) const;
-		static bool AreEqual(const Point3& a, const Point3& b);
-		static bool AreEqual(const Point3* a, const Point3* b);
-		static bool AreStrictlyEqual(const Point3* a, const Point3* b);
+		Bool operator==(const Point3 & source);
+		Bool operator==(const Point3& p) const;
+		static Bool AreEqual(const Point3& a, const Point3& b);
+		static Bool AreEqual(const Point3* a, const Point3* b);
+		static Bool AreStrictlyEqual(const Point3* a, const Point3* b);
 		void Set(Real x, Real y, Real z);
 
 		void AttachTo(Real * data);
@@ -74,7 +74,7 @@ namespace GTE
 
 		typedef struct
 		{
-			bool operator() (const Point3& a, const Point3& b) const { return a.x == b.x && a.y == b.y && a.z == b.z; }
+			Bool operator() (const Point3& a, const Point3& b) const { return a.x == b.x && a.y == b.y && a.z == b.z; }
 		} Point3Eq;
 	};
 }

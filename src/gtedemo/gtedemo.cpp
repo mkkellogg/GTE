@@ -53,7 +53,7 @@ class CustomEngineCallbacks : public GTE::EngineCallbacks
  * Entry point for the GTE Demo. This method is minimal; its only purpose
  * is to initialize and start the engine.
  */
-int main(GTE::Int32 argc, char** argv)
+int main(int argc, char** argv)
 {
 	// instance CustomEngineCallbacks to handle engine events
 	CustomEngineCallbacks engineCallbacks;
@@ -67,7 +67,7 @@ int main(GTE::Int32 argc, char** argv)
 	graphicsAttributes.WaitForVSync = false;
 
 	// initialize the engine
-	bool initSuccess = GTE::Engine::Init(&engineCallbacks, graphicsAttributes);
+	GTE::Bool initSuccess = GTE::Engine::Init(&engineCallbacks, graphicsAttributes);
 
 	if(initSuccess)
 	{

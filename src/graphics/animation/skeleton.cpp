@@ -47,7 +47,7 @@ namespace GTE
 
 		// delete all SkeletonNode objects by traversing the node hierarchy and
 		// using a visitor to invoke the callback below, which performsm the delete.
-		skeleton.SetTraversalCallback([](Tree<SkeletonNode *>::TreeNode * node) -> bool
+		skeleton.SetTraversalCallback([](Tree<SkeletonNode *>::TreeNode * node) -> Bool
 		{
 			if (node != NULL && node->Data != NULL)
 			{
@@ -79,7 +79,7 @@ namespace GTE
 	 * Initialize the Skeleton object. This MUST be called before the Skeleton object can
 	 * be used in any way. It will return true if initialization success; false otherwise.
 	 */
-	bool Skeleton::Init()
+	Bool Skeleton::Init()
 	{
 		// destroy existing data (if there is any)
 		Destroy();
@@ -196,7 +196,7 @@ namespace GTE
 	/*
 	 * Replace the bones in this skeleton with matching bones from [skeleton].
 	 */
-	void Skeleton::OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode)
+	void Skeleton::OverrideBonesFrom(SkeletonRef skeleton, Bool takeOffset, Bool takeNode)
 	{
 		NONFATAL_ASSERT(skeleton.IsValid(), "Skeleton::OverrideBonesFrom -> 'skeleton' is not valid.", true);
 		OverrideBonesFrom(skeleton.GetPtr(), takeOffset, takeNode);
@@ -205,7 +205,7 @@ namespace GTE
 	/*
 	 * Replace the bones in this skeleton with matching bones from [skeleton].
 	 */
-	void Skeleton::OverrideBonesFrom(Skeleton * skeleton, bool takeOffset, bool takeNode)
+	void Skeleton::OverrideBonesFrom(Skeleton * skeleton, Bool takeOffset, Bool takeNode)
 	{
 		for (UInt32 n = 0; n < skeleton->GetBoneCount(); n++)
 		{
@@ -233,7 +233,7 @@ namespace GTE
 		ASSERT(newSkeleton != NULL, "Skeleton::FullClone -> could not allocate skeleton.");
 
 		// initialize new skeleton
-		bool initSuccess = newSkeleton->Init();
+		Bool initSuccess = newSkeleton->Init();
 		if (!initSuccess)
 		{
 			delete newSkeleton;
@@ -281,7 +281,7 @@ namespace GTE
 			std::unordered_map<Tree<SkeletonNode *>::TreeNode *, Tree<SkeletonNode *>::TreeNode *> newNodeMap;
 			newNodeMap[rootTreeNode] = newRoot;
 
-			bool allocateTreeSuccess = true;
+			Bool allocateTreeSuccess = true;
 
 			// Create a TreeNode visitor callback that will be used to visit each node in the existing skeleton in order to:
 			// (1) create a copy of that TreeNode
@@ -290,7 +290,7 @@ namespace GTE
 			// point we will only have copies of the TreeNode objects in the skeleton tree, and not the SkeletonNode objects
 			// that TreeNode::Data should point to. Additionally none of those TreeNode copies will have their children or parents
 			// set yet, so there will be no hierarchy information available.
-			skeleton.SetTraversalCallback([&allocateTreeSuccess, &newNodeMap](Tree<SkeletonNode *>::TreeNode * node) -> bool
+			skeleton.SetTraversalCallback([&allocateTreeSuccess, &newNodeMap](Tree<SkeletonNode *>::TreeNode * node) -> Bool
 			{
 				Tree<SkeletonNode *>::TreeNode * newNode = new Tree<SkeletonNode *>::TreeNode();
 				if (newNode == NULL)
@@ -319,14 +319,14 @@ namespace GTE
 			// pre-allocate nodeList space
 			newSkeleton->nodeList.resize(nodeList.size());
 
-			bool cloneTreeSuccess = true;
+			Bool cloneTreeSuccess = true;
 			Skeleton * thisSkeleton = this;
 
 			// Create a second TreeNode visitor callback for the existing skeleton. The purpose of this callback is to:
 			// (1) create a clone of the Data field of each TreeNode that is visited, which is the SkeletonNode object, and attach to
 			//     the corresponding cloned node in the new skeleton.
 			// (2) attach the cloned TreeNode in the new skeleton to its appropriate parent TreeNode in the new skeleton.
-			skeleton.SetTraversalCallback([&cloneTreeSuccess, &newNodeMap, newSkeleton, thisSkeleton](Tree<SkeletonNode *>::TreeNode * node) -> bool
+			skeleton.SetTraversalCallback([&cloneTreeSuccess, &newNodeMap, newSkeleton, thisSkeleton](Tree<SkeletonNode *>::TreeNode * node) -> Bool
 			{
 				SkeletonNode * clonedSkeletonNode = NULL;
 				if (node != NULL && node->Data != NULL)

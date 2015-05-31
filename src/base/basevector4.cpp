@@ -19,7 +19,7 @@ namespace GTE
 * backing storage array. If [permAttach] is false, then this base vector can attach and
 * re-attach to various different backing storage arrays.
 */
-	void BaseVector4::Init(Real *target, bool permAttach)
+	void BaseVector4::Init(Real *target, Bool permAttach)
 	{
 		data = baseData;
 
@@ -62,7 +62,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	BaseVector4::BaseVector4(bool permAttached, Real * target)
+	BaseVector4::BaseVector4(Bool permAttached, Real * target)
 	{
 		Init(target, true);
 	}

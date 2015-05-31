@@ -30,7 +30,7 @@ namespace GTE
 		std::string GetBasePath(const std::string& path) const;
 		std::string FixupPathForLocalFilesystem(const std::string& path) const;
 		std::string GetFileName(const std::string& fullPath) const;
-		bool FileExists(const std::string& fullPath) const;
+		Bool FileExists(const std::string& fullPath) const;
 	};
 }
 

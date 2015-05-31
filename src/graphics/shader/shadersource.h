@@ -21,15 +21,15 @@ namespace GTE
 	{
 		std::string name;
 		ShaderSourceType sourceType;
-		bool loaded;
-		bool initialized;
+		Bool loaded;
+		Bool initialized;
 
 		std::string vertexSourceString;
 		std::string vertexSourcePath;
 		std::string fragmentSourceString;
 		std::string fragmentSourcePath;
 
-		char * ReadShaderSource(const char *fn);
+		Char * ReadShaderSource(const Char *fn);
 		void CopyToThis(const ShaderSource& source);
 
 	public:
@@ -43,8 +43,8 @@ namespace GTE
 		const std::string& GetVertexSourceString() const;
 		const std::string& GetFragmentSourceString() const;
 		const std::string& GetName() const;
-		bool Load();
-		bool IsLoaded();
+		Bool Load();
+		Bool IsLoaded();
 	};
 }
 

@@ -61,7 +61,7 @@ namespace GTE
 	 * deriving class. It is not virtual because it will likely contain code
 	 * as the Graphics class evolves.
 	 */
-	bool Graphics::Init(const GraphicsAttributes& attributes)
+	Bool Graphics::Init(const GraphicsAttributes& attributes)
 	{
 		return true;
 	}
@@ -103,7 +103,7 @@ namespace GTE
 	 * Called when the graphics interface starts up. Convenience method for
 	 * deriving classes to receive a signal when the engine starts.
 	 */
-	bool Graphics::Start()
+	Bool Graphics::Start()
 	{
 		return true;
 	}

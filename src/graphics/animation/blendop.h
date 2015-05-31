@@ -30,26 +30,26 @@ namespace GTE
 
 		Real duration;
 		Real progress;
-		bool complete;
-		bool started;
+		Bool complete;
+		Bool started;
 
 		std::vector<Real> initialWeights;
 
 		BlendOp(Real duration);
 		virtual ~BlendOp();
-		void SetComplete(bool complete);
-		void SetStarted(bool started);
+		void SetComplete(Bool complete);
+		void SetStarted(Bool started);
 
 	public:
 
 		void Reset();
-		bool Init(std::vector<Real>& initialWeights);
+		Bool Init(std::vector<Real>& initialWeights);
 		virtual void Update(std::vector<Real>& weights);
 		virtual void OnStart() = 0;
 		virtual void OnComplete() = 0;
 		virtual void OnStoppedEarly() = 0;
-		bool HasCompleted();
-		bool HasStarted();
+		Bool HasCompleted();
+		Bool HasStarted();
 		Real GetNormalizedProgress();
 		Real GetProgress();
 

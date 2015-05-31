@@ -33,7 +33,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	Vector3::Vector3(bool permAttached, Real * target) : BaseVector4(permAttached, target), x(data[0]), y(data[1]), z(data[2])
+	Vector3::Vector3(Bool permAttached, Real * target) : BaseVector4(permAttached, target), x(data[0]), y(data[1]), z(data[2])
 	{
 
 
@@ -78,18 +78,18 @@ namespace GTE
 	/*
 	 * Comparison operator
 	 */
-	bool Vector3::operator==(const Vector3 & source) const
+	Bool Vector3::operator==(const Vector3 & source) const
 	{
-		Real epsilon = .005;
+		Real epsilon = .005f;
 		return GTEMath::Abs(source.x - this->x) < epsilon && GTEMath::Abs(source.y - this->y) < epsilon && GTEMath::Abs(source.z - this->z) < epsilon;
 	}
 
 	/*
 	 * Comparison operator
 	 */
-	bool Vector3::operator==(const Vector3 & source)
+	Bool Vector3::operator==(const Vector3 & source)
 	{
-		Real epsilon = .005;
+		Real epsilon = .005f;
 		return GTEMath::Abs(source.x - this->x) < epsilon && GTEMath::Abs(source.y - this->y) < epsilon && GTEMath::Abs(source.z - this->z) < epsilon;
 	}
 
@@ -97,7 +97,7 @@ namespace GTE
 	/*
 	 * Test for exact equality
 	 */
-	bool Vector3::AreStrictlyEqual(const Vector3* a, const Vector3* b)
+	Bool Vector3::AreStrictlyEqual(const Vector3* a, const Vector3* b)
 	{
 		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> Null vector passed.", false, true);
 
@@ -313,7 +313,7 @@ namespace GTE
 	/*
 	 * Rotate [a] towards [b] by [theta] degrees.
 	 */
-	bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result)
+	Bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result)
 	{
 		return RotateTowards(from, to, theta, result, Vector3::UnitY);
 	}
@@ -321,7 +321,7 @@ namespace GTE
 	/*
 	 * Rotate [a] towards [b] by [theta] degrees.
 	 */
-	bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result, const Vector3& fallbackAxis)
+	Bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result, const Vector3& fallbackAxis)
 	{
 		// convert theta to radians
 		theta *= Constants::DegreesToRads;
@@ -397,7 +397,7 @@ namespace GTE
 	 *  Returns true if this vector is zero length.
 	 */
 
-	bool Vector3::IsZeroLength() const
+	Bool Vector3::IsZeroLength() const
 	{
 		Real sqlen = (x * x) + (y * y) + (z * z);
 		return (sqlen < (1e-06 * 1e-06));

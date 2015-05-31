@@ -69,26 +69,26 @@ namespace GTE
 		EngineCallbacks * callbacks;
 
 		// flag that indicates the engine has been initialized
-		bool initialized;
+		Bool initialized;
 
-		bool firstFrameEntered;
+		Bool firstFrameEntered;
 
 		Engine();
 		~Engine();
 
 		void Update();
 		void Quit();
-		bool _Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
+		Bool _Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
 		void _Start();
 
 	public:
 
 		static Engine * Instance();
 		static void ShutDown();
-		static bool Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
+		static Bool Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes);
 		static void Start();
 
-		bool IsInitialized() const;
+		Bool IsInitialized() const;
 
 		EngineObjectManager * GetEngineObjectManager();
 		Graphics * GetGraphicsSystem();

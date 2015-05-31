@@ -10,9 +10,9 @@
 
 namespace GTE
 {
-	const char* const StandardAttributes::attributeNames[] = { "POSITION", "SHADOW_POSITION", "NORMAL", "FACENORMAL", "TANGENT", "COLOR", "UVTEXTURE0", "UVTEXTURE1", "UVNORMALMAP" };
+	const Char* const StandardAttributes::attributeNames[] = { "POSITION", "SHADOW_POSITION", "NORMAL", "FACENORMAL", "TANGENT", "COLOR", "UVTEXTURE0", "UVTEXTURE1", "UVNORMALMAP" };
 
-	const char * StandardAttributes::GetAttributeName(StandardAttribute attr)
+	const Char * StandardAttributes::GetAttributeName(StandardAttribute attr)
 	{
 		return attributeNames[(IntMask)attr];
 	}
@@ -37,7 +37,7 @@ namespace GTE
 		IntMaskUtil::ClearBit((IntMask *)set, (IntMask)attr);
 	}
 
-	bool StandardAttributes::HasAttribute(StandardAttributeSet set, StandardAttribute attr)
+	Bool StandardAttributes::HasAttribute(StandardAttributeSet set, StandardAttribute attr)
 	{
 		return IntMaskUtil::IsBitSet((IntMask)set, (IntMask)attr);
 	}

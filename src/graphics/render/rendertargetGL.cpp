@@ -15,7 +15,7 @@ namespace GTE
 	* Single constructor. For the most part acts as a pass-through to the base constructor, but
 	* also initializes member variables.
 	*/
-	RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+	RenderTargetGL::RenderTargetGL(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) :
 		RenderTarget(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height)
 	{
@@ -77,7 +77,7 @@ namespace GTE
 	 * Perform all initialization for this render target. This render target will not
 	 * be valid until this method successfully completes.
 	 */
-	bool RenderTargetGL::Init()
+	Bool RenderTargetGL::Init()
 	{
 		// make sure to clean up existing frame-buffer objects (if they exist).
 		Destroy();

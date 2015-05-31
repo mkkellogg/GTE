@@ -13,7 +13,7 @@ namespace GTE
 
 	}
 
-	Color4::Color4(bool permAttached, Real * target) : BaseVector4(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	Color4::Color4(Bool permAttached, Real * target) : BaseVector4(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 	{
 
 

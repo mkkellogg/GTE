@@ -50,9 +50,9 @@ namespace GTE
 
 	std::string FileSystemIX::FixupPathForLocalFilesystem(const std::string& path) const
 	{
-		const UInt32 size = path.size() + 1;
-		char *chars = new char[size];
-		ASSERT(chars != NULL, " FileSystemIX::FixupPath -> Could not allocate character array.");
+		const UInt32 size = (UInt32)path.size() + 1;
+		Char *chars = new Char[size];
+		ASSERT(chars != NULL, " FileSystemIX::FixupPath -> Could not allocate path array.");
 
 		strcpy(chars, path.c_str());
 
@@ -75,7 +75,7 @@ namespace GTE
 		return (std::string::npos == pos) ? std::string() : fullPath.substr(pos + 1);
 	}
 
-	bool FileSystemIX::FileExists(const std::string& fullPath) const
+	Bool FileSystemIX::FileExists(const std::string& fullPath) const
 	{
 		std::ifstream f(fullPath.c_str());
 		if (f.good())

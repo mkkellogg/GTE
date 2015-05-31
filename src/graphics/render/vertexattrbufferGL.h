@@ -28,7 +28,7 @@ namespace GTE
 		// raw pointer to the buffer data
 		Real * data;
 		// is this a VBO?
-		bool dataOnGPU;
+		Bool dataOnGPU;
 		// OpenGL id for the buffer
 		GLuint gpuBufferID;
 
@@ -44,10 +44,10 @@ namespace GTE
 
 	public:
 
-		bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, bool dataOnGPU, Real *srcData);
+		Bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, Real *srcData);
 		void SetData(const Real * srcData);
 		const Real * GetDataPtr() const;
-		bool IsGPUBuffer() const;
+		Bool IsGPUBuffer() const;
 		GLuint GetGPUBufferID();
 		UInt32 GetFullSize() const;
 	};

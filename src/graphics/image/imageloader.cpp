@@ -12,9 +12,9 @@
 
 namespace GTE
 {
-	bool ImageLoader::ilInitialized = false;
+	Bool ImageLoader::ilInitialized = false;
 
-	bool ImageLoader::Initialize()
+	Bool ImageLoader::Initialize()
 	{
 		if (!ImageLoader::ilInitialized)
 		{
@@ -31,7 +31,7 @@ namespace GTE
 
 	RawImage * ImageLoader::LoadImageU(const std::string& fullPath)
 	{
-		bool initializeSuccess = Initialize();
+		Bool initializeSuccess = Initialize();
 		NONFATAL_ASSERT_RTRN(initializeSuccess, "ImageLoader::LoadImage -> Error occurred while initializing image loader.", NULL, false);
 
 		std::string extension = GetFileExtension(fullPath);
@@ -86,7 +86,7 @@ namespace GTE
 		RawImage * rawImage = new RawImage(width, height);
 		ASSERT(rawImage != NULL, "ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.");
 
-		bool initSuccess = rawImage->Init();
+		Bool initSuccess = rawImage->Init();
 		if (!initSuccess)
 		{
 			Debug::PrintError("ImportUtil::GetRawImageFromILData -> Could not init RawImage.");
@@ -110,7 +110,7 @@ namespace GTE
 
 	std::string ImageLoader::GetFileExtension(const std::string& filePath)
 	{
-		Int32 dotIndex = filePath.find_last_of(".");
+		Int32 dotIndex = (Int32)filePath.find_last_of(".");
 		if (dotIndex < 0)dotIndex = 0;
 		std::string extension = filePath.substr(dotIndex, filePath.size() - dotIndex);
 		return extension;

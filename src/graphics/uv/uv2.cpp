@@ -13,7 +13,7 @@ namespace GTE
 
 	}
 
-	UV2::UV2(bool permAttached, Real * target) : BaseVector2(permAttached, target), u(data[0]), v(data[1])
+	UV2::UV2(Bool permAttached, Real * target) : BaseVector2(permAttached, target), u(data[0]), v(data[1])
 	{
 
 

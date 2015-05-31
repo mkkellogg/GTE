@@ -23,8 +23,8 @@ namespace GTE
 	{
 		IntFloatUnion ifu;
 
-		Real threeHalfs = 1.5;
-		Real x2 = n * .5;
+		Real threeHalfs = 1.5f;
+		Real x2 = n * .5f;
 
 		ifu.f = n;
 		ifu.i = 0x5f375a86 - (ifu.i >> 1);
@@ -35,7 +35,7 @@ namespace GTE
 
 	Real GTEMath::Round(Real n)
 	{
-		return floor(n + 0.5);
+		return (Real)floor(n + 0.5f);
 	}
 
 	Real GTEMath::InverseSquareRoot(Real n)

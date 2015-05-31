@@ -56,11 +56,11 @@ namespace GTE
 
 	class StandardUniforms
 	{
-		static const char* const uniformNames[];
+		static const Char* const uniformNames[];
 
 	public:
 
-		static const char * GetUniformName(StandardUniform uniform);
+		static const Char * GetUniformName(StandardUniform uniform);
 		static StandardUniform UniformMaskComponentToUniform(StandardUniformMaskComponent component);
 		static StandardUniformMaskComponent UniformToUniformMaskComponent(StandardUniform uniform);
 
@@ -68,7 +68,7 @@ namespace GTE
 		static void AddUniform(StandardUniformSet * set, StandardUniform uniform);
 		static void RemoveUniform(StandardUniformSet * set, StandardUniform uniform);
 
-		static bool HasUniform(StandardUniformSet set, StandardUniform uniform);
+		static Bool HasUniform(StandardUniformSet set, StandardUniform uniform);
 	};
 }
 

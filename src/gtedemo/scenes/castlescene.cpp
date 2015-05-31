@@ -110,8 +110,7 @@ void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambien
 	SetupLights(importer,playerObject);
 
 	sceneRoot->GetTransform().Rotate(0,1,0, 155, true);
-	sceneRoot->GetTransform().Translate(-44.3, 0, 52, false);
-
+	sceneRoot->GetTransform().Translate(-44.3f, 0, 52, false);
 
 	this->directionalLightObject = directionalLightObject;
 }
@@ -138,7 +137,7 @@ void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 
 	// place island in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.07,.07,.07, false);
+	modelSceneObject->GetTransform().Scale(.07f,.07f,.07f, false);
 	modelSceneObject->GetTransform().Translate(80,-10,-10,false);
 }
 
@@ -170,15 +169,15 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// place initial castle tower in scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.03,.04, false);
+	modelSceneObject->GetTransform().Scale(.04f,.03f,.04f, false);
 	modelSceneObject->GetTransform().Translate(65,-10,-15,false);
 
 	// re-use the castle tower mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,-15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.03f, 1,0,0, -90, 89,-10,-15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 65,-10,6, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.03f, 1,0,0, -90, 65,-10,6, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.03, 1,0,0, -90, 89,-10,6, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.03f, 1,0,0, -90, 89,-10,6, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 
 	// load & place castle entrance arch-way left side
@@ -187,9 +186,9 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
+	modelSceneObject->GetTransform().Scale(.04f,.04f,.04f, false);
 	modelSceneObject->GetTransform().Rotate(0,1,0,90,false);
-	modelSceneObject->GetTransform().Translate(65,-10,-8.8,false);
+	modelSceneObject->GetTransform().Translate(65,-10,-8.8f,false);
 
 	// load and place castle entrance arch-way right side
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Right_02.fbx");
@@ -197,7 +196,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.04,.04, false);
+	modelSceneObject->GetTransform().Scale(.04f,.04f,.04f, false);
 	modelSceneObject->GetTransform().Rotate(0,1,0, 90,false);
 	modelSceneObject->GetTransform().Translate(65,-10,0,false);
 
@@ -215,24 +214,24 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// place initial castle wall in scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.06,.05,.04, false);
-	modelSceneObject->GetTransform().Translate(70,-10,6.5,false);
+	modelSceneObject->GetTransform().Scale(.06f,.05f,.04f, false);
+	modelSceneObject->GetTransform().Translate(70,-10,6.5f,false);
 
 	// re-use the castle wall mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10,6.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 78,-10,6.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10,6.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 86,-10,6.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 70,-10,-15.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 70,-10,-15.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 78,-10, -15.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 78,-10, -15.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.05, 1,0,0, -90, 86,-10, -15.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 86,-10, -15.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	//modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true,true,true);
 	//sceneRoot->AddChild(modelSceneObject);
 	//modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, .25, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04f,.067f,.05f, 1,0,0, -90, 90,-10, .25f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
 }
@@ -266,30 +265,30 @@ void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 
 	// place initial tree in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.0015,.0015,.0015, false);
-	modelSceneObject->GetTransform().Rotate(.8,0,.2, -6, false);
-	modelSceneObject->GetTransform().Translate(55,-10.5, 11,false);
+	modelSceneObject->GetTransform().Scale(.0015f,.0015f,.0015f, false);
+	modelSceneObject->GetTransform().Rotate(.8f,0,.2f, -6, false);
+	modelSceneObject->GetTransform().Translate(55,-10.5f, 11,false);
 
 	// reuse the tree mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .10,.10,.10, 1,0,0, -85, 57, -10, 24, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .10f,.10f,.10f, 1,0,0, -85, 57, -10, 24, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15,.15,.20, 1,0,0, -94, 61, -9, -15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15f,.15f,.20f, 1,0,0, -94, 61, -9, -15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20,.20,.30, 1,0,0, -93, 80, -9, -15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20f,.20f,.30f, 1,0,0, -93, 80, -9, -15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .17,.17,.20, 1,0,0, -85, 85, -9.5, -13, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .17f,.17f,.20f, 1,0,0, -85, 85, -9.5f, -13, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .22,.22,.38, 1,0,0, -90, 115, -9.5, 15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .22f,.22f,.38f, 1,0,0, -90, 115, -9.5f, 15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .19,.19,.28, 1,0,0, -96, 105, -9.5, 8, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .19f,.19f,.28f, 1,0,0, -96, 105, -9.5f, 8, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .18,.18,.20, 1,0,0, -87, 95, -10, 32, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .18f,.18f,.20f, 1,0,0, -87, 95, -10, 32, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
 }
@@ -322,39 +321,39 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 
 	// place initial fence in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.6,.6,.6, false);
+	modelSceneObject->GetTransform().Scale(.6f,.6f,.6f, false);
 	modelSceneObject->GetTransform().Translate(60,-10,22,false);
 
 	/** re-use the fence mesh & material for multiple instances  **/
 
 	// fence on right side of castle
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 47,-10,14.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 47,-10,14.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-70,true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 52,-10,20, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 52,-10,20, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-25,true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 69.5,-10,21, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 69.5,-10,21, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,15,true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 79.2,-10,19.3, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 79.2f,-10,19.3f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,5,true);
 
 	// fence on left side of castle
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 51,-10,-16, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 51,-10,-16, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-120,true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 55,-10,-25, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 55,-10,-25, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-110,true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 59.9,-10,-33.3, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 59.9f,-10,-33.3f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-135,true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 68.2,-10,-38, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 68.2f,-10,-38, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-160,true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6,.6,.6, 1,0,0, -90, 78,-10,-40, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f,.6f,.6f, 1,0,0, -90, 78,-10,-40, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,-175,true);
 
@@ -379,17 +378,17 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 
 	// place initial barrel in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.8,.8,.8, false);
-	modelSceneObject->GetTransform().Translate(82,-10,10.5, false);
+	modelSceneObject->GetTransform().Scale(.8f,.8f,.8f, false);
+	modelSceneObject->GetTransform().Translate(82,-10,10.5f, false);
 
 	// re-use the barrel mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .8,.8,.8, 1,0,0, -90, 70,-10,10.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .8f,.8f,.8f, 1,0,0, -90, 70,-10,10.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-8.3,1.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9f,.9f,.9f, 0,1,0, 90, 92,-8.3f,1.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-8.3,-1.8, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9f,.9f,.9f, 0,1,0, 90, 92,-8.3f,-1.8f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9,.9,.9, 0,1,0, 90, 92,-5.3,-.15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9f,.9f,.9f, 0,1,0, 90, 92,-5.3f,-.15f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 
 
@@ -423,8 +422,8 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GTE::MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
 	material->SetTexture(normalmap, "NORMALMAP");
-	material->SetUniform1f(3.4, "USCALE");
-	material->SetUniform1f(3.4, "VSCALE");
+	material->SetUniform1f(3.4f, "USCALE");
+	material->SetUniform1f(3.4f, "VSCALE");
 
 	// set the cube mesh attributes
 	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();
@@ -448,8 +447,8 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	cubeSceneObject->SetMesh3DRenderer(renderer);
 
 	// scale the cube and move to its position in the scene
-	cubeSceneObject->GetTransform().Scale(10, 1.5, 10, false);
-	cubeSceneObject->GetTransform().Translate(78, -11.4, -4, false);
+	cubeSceneObject->GetTransform().Scale(10, 1.5f, 10, false);
+	cubeSceneObject->GetTransform().Translate(78, -11.4f, -4, false);
 }
 
 /*
@@ -480,8 +479,8 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 
 	// create mesh & material for castle lantern
 	GTE::Mesh3DRef lanternLightMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
-	GTE::Color4 lanternLightColor(1, .66, .231, 1);
-	GTE::Color4 lanternLightMeshColor(1, .95, .5, 1);
+	GTE::Color4 lanternLightColor(1, .66f, .231f, 1);
+	GTE::Color4 lanternLightMeshColor(1, .95f, .5f, 1);
 	GTE::MaterialRef lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
 	lanterLightMeshMaterial->SetColor(lanternLightMeshColor, "SELFCOLOR");
 	lanterLightMeshMaterial->SetSelfLit(true);
@@ -491,7 +490,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	sceneRoot->AddChild(lanternObject);
 	lanternObject->SetStatic(true);
 	GTE::LightRef lanternLight = objectManager->CreateLight();
-	lanternLight->SetIntensity(1.8);
+	lanternLight->SetIntensity(1.8f);
 	lanternLight->SetRange(25);
 	lanternLight->SetColor(lanternLightColor);
 	GTE::IntMask mergedMask = lanternLight->GetCullingMask();
@@ -500,8 +499,8 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	lanternLight->SetShadowsEnabled(true);
 	lanternLight->SetType(GTE::LightType::Point);
 	lanternObject->SetLight(lanternLight);
-	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(75.2, -6, -5, false);
+	lanternObject->GetTransform().Scale(.2f,.2f,.2f, true);
+	lanternObject->GetTransform().Translate(75.2f, -6, -5, false);
 	GTE::Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);
@@ -515,7 +514,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	sceneRoot->AddChild(lanternObject);
 	lanternObject->SetStatic(true);
 	lanternLight = objectManager->CreateLight();
-	lanternLight->SetIntensity(1.5);
+	lanternLight->SetIntensity(1.5f);
 	lanternLight->SetRange(20);
 	lanternLight->SetColor(lanternLightColor);
 	mergedMask = lanternLight->GetCullingMask();
@@ -524,8 +523,8 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	lanternLight->SetShadowsEnabled(true);
 	lanternLight->SetType(GTE::LightType::Point);
 	lanternObject->SetLight(lanternLight);
-	lanternObject->GetTransform().Scale(.2,.2,.2, true);
-	lanternObject->GetTransform().Translate(77.4, -5, 8.7, false);
+	lanternObject->GetTransform().Scale(.2f,.2f,.2f, true);
+	lanternObject->GetTransform().Translate(77.4f, -5, 8.7f, false);
 	filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);

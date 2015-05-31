@@ -30,9 +30,9 @@ namespace GTE
 		Mesh3DRef mesh;
 
 		// should [mesh] cast shadows?
-		bool castShadows;
+		Bool castShadows;
 		// should this mesh receive shadows?
-		bool receiveShadows;
+		Bool receiveShadows;
 
 		Mesh3DFilter();
 		~Mesh3DFilter();
@@ -42,10 +42,10 @@ namespace GTE
 		void SetMesh3D(Mesh3DRef mesh);
 		Mesh3DRef GetMesh3D();
 
-		void SetCastShadows(bool castShadows);
-		bool GetCastShadows() const;
-		void SetReceiveShadows(bool receiveShadows);
-		bool GetReceiveShadows() const;
+		void SetCastShadows(Bool castShadows);
+		Bool GetCastShadows() const;
+		void SetReceiveShadows(Bool receiveShadows);
+		Bool GetReceiveShadows() const;
 	};
 }
 

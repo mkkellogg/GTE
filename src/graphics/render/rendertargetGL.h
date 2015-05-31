@@ -28,7 +28,7 @@ namespace GTE
 		// OpenGL Framebuffer Object ID.
 		GLuint fboID;
 
-		RenderTargetGL(bool hasColor, bool hasDepth, bool enableStencilBuffer,
+		RenderTargetGL(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 			const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
 		~RenderTargetGL();
 
@@ -36,7 +36,7 @@ namespace GTE
 
 	public:
 
-		bool Init();
+		Bool Init();
 		GLuint GetFBOID();
 	};
 }

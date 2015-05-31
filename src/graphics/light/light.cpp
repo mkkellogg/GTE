@@ -36,7 +36,7 @@ namespace GTE
 
 	void Light::CalcAttentuationForCurrentRange()
 	{
-		attenuation = 1.0 / range;
+		attenuation = 1.0f / range;
 	}
 
 	const Color4 * Light::GetColorPtr() const
@@ -115,12 +115,12 @@ namespace GTE
 		return attenuation;
 	}
 
-	void Light::SetShadowsEnabled(bool enabled)
+	void Light::SetShadowsEnabled(Bool enabled)
 	{
 		shadowsEnabled = enabled;
 	}
 
-	bool Light::GetShadowsEnabled() const
+	Bool Light::GetShadowsEnabled() const
 	{
 		return shadowsEnabled;
 	}

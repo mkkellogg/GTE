@@ -129,7 +129,7 @@ void PoolScene::UpdateRippleSimulation()
 	GTE::Graphics* graphics = GTE::Engine::Instance()->GetGraphicsSystem();
 
 	// calculate the time difference between ripple simulation frames
-	GTE::Real frameTime  = 1.0/60.0;
+	GTE::Real frameTime  = 1.0f/60.0f;
 	GTE::Real simAdvanceTimeDiff = GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
 
 	// make sure the ripple simulation runs at a max of 60 iterations per second
@@ -182,13 +182,13 @@ void PoolScene::UpdateRippleSimulation()
 
 		if(pointLights[0]->IsActive())
 		{
-			waterMaterial->SetUniform1f(.3, "REFLECTED_COLOR_FACTOR");
-			waterMaterial->SetUniform1f(.7, "REFRACTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.3f, "REFLECTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.7f, "REFRACTED_COLOR_FACTOR");
 		}
 		else
 		{
-			waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
-			waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.8f, "REFLECTED_COLOR_FACTOR");
+			waterMaterial->SetUniform1f(.2f, "REFRACTED_COLOR_FACTOR");
 		}
 
 		while (GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime > frameTime)
@@ -271,7 +271,7 @@ void PoolScene::SetupTerrain(GTE::AssetImporter& importer)
 	// place island in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Rotate(0,1,0,45, true);
-	modelSceneObject->GetTransform().Scale(.06,.06,.06, false);
+	modelSceneObject->GetTransform().Scale(.06f,.06f,.06f, false);
 
 	sceneRoot->GetTransform().Translate(-7,-10,14,false);
 }
@@ -304,15 +304,15 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// place initial castle tower in scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.04,.015,.04, false);
-	modelSceneObject->GetTransform().Translate(4.5,-10,10,false);
+	modelSceneObject->GetTransform().Scale(.04f,.015f,.04f, false);
+	modelSceneObject->GetTransform().Translate(4.5f,-10,10,false);
 
 	// re-use the castle tower mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.015, 1,0,0, -90, 4.5,-10,31.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.015f, 1,0,0, -90, 4.5f,-10,31.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.015, 1,0,0, -90, -16.5,-10,10, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.015f, 1,0,0, -90, -16.5f,-10,10, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04,.04,.015, 1,0,0, -90, -16.5,-10,31.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.015f, 1,0,0, -90, -16.5f,-10,31.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 
 	// load castle wall model for pool walls
@@ -329,29 +329,29 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// place initial pool wall in scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.06,.025,.04, false);
-	modelSceneObject->GetTransform().Translate(-10,-10,9.5,false);
+	modelSceneObject->GetTransform().Scale(.06f,.025f,.04f, false);
+	modelSceneObject->GetTransform().Translate(-10,-10,9.5f,false);
 
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.025, 1,0,0, -90, -1.8, -10, 9.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.025f, 1,0,0, -90, -1.8f, -10, 9.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 
 	// re-use the castle wall mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.06,.025, 1,0,0, -90, -17,-10, 16.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04f,.06f,.025f, 1,0,0, -90, -17,-10, 16.5f, true,true,true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90, true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.06,.025, 1,0,0, -90, -17,-10,25, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04f,.06f,.025f, 1,0,0, -90, -17,-10,25, true,true,true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90, true);
 	sceneRoot->AddChild(modelSceneObject);
 
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.025, 1,0,0, -90, -1.8, -10, 31.7, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.025f, 1,0,0, -90, -1.8f, -10, 31.7f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06,.04,.025, 1,0,0, -90, -10, -10, 31.7, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.025f, 1,0,0, -90, -10, -10, 31.7f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.06,.025, 1,0,0, -90, 4.9,-10, 16.5, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04f,.06f,.025f, 1,0,0, -90, 4.9f,-10, 16.5f, true,true,true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90, true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.06,.025, 1,0,0, -90, 4.9, -10,25, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04f,.06f,.025f, 1,0,0, -90, 4.9f, -10,25, true,true,true);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90, true);
 	sceneRoot->AddChild(modelSceneObject);
 
@@ -370,8 +370,8 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	// place pool floor in scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Rotate(1,0,0,-90, true);
-	modelSceneObject->GetTransform().Scale(.175,.175,.175, false);
-	modelSceneObject->GetTransform().Translate(-5.5,-17.5,33,false);
+	modelSceneObject->GetTransform().Scale(.175f,.175f,.175f, false);
+	modelSceneObject->GetTransform().Translate(-5.5f,-17.5f,33,false);
 }
 
 /*
@@ -403,30 +403,30 @@ void PoolScene::SetupPlants(GTE::AssetImporter& importer)
 
 	// place initial tree in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.0015,.0015,.0015, false);
-	modelSceneObject->GetTransform().Rotate(.8,0,.2, -6, false);
-	modelSceneObject->GetTransform().Translate(55,-10.5, 11,false);
+	modelSceneObject->GetTransform().Scale(.0015f,.0015f,.0015f, false);
+	modelSceneObject->GetTransform().Rotate(.8f,0,.2f, -6, false);
+	modelSceneObject->GetTransform().Translate(55,-10.5f, 11,false);
 
 	// reuse the tree mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .10,.10,.10, 1,0,0, -85, 57, -10, 24, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .10f,.10f,.10f, 1,0,0, -85, 57, -10, 24, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15,.15,.20, 1,0,0, -94, 61, -9, -15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15f,.15f,.20f, 1,0,0, -94, 61, -9, -15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20,.20,.30, 1,0,0, -93, 80, -9, -15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20f,.20f,.30f, 1,0,0, -93, 80, -9, -15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .17,.17,.20, 1,0,0, -85, 85, -9.5, -13, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .17f,.17f,.20f, 1,0,0, -85, 85, -9.5f, -13, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .22,.22,.38, 1,0,0, -90, 115, -9.5, 15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .22f,.22f,.38f, 1,0,0, -90, 115, -9.5f, 15, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .19,.19,.28, 1,0,0, -96, 105, -9.5, 8, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .19f,.19f,.28f, 1,0,0, -96, 105, -9.5f, 8, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .18,.18,.20, 1,0,0, -87, 95, -10, 32, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .18f,.18f,.20f, 1,0,0, -87, 95, -10, 32, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
 }
@@ -467,7 +467,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	waterReflectionCamera->SetupOffscreenRenderTarget(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight,false);
 	waterReflectionCamera->ShareSkybox(mainCamera);
 	waterReflectionCamera->SetSkyboxEnabled(true);
-	waterReflectionCamera->SetWidthHeightRatio(graphicsAttr.WindowWidth,graphicsAttr.WindowHeight);
+	waterReflectionCamera->SetWidthHeightRatio((GTE::Real)graphicsAttr.WindowWidth, (GTE::Real)graphicsAttr.WindowHeight);
 
 	// prevent [waterReflectionCamera] from rendering the water surface's mesh
 	cameraMask = waterReflectionCamera->GetCullingMask();
@@ -543,8 +543,8 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	filter->SetReceiveShadows(false);
 
 	// set the size & position of the water's surface
-	waterSurfaceSceneObject->GetTransform().Scale(9.75,1,9.75,false);
-	waterSurfaceSceneObject->GetTransform().Translate(-6.05,-7,20.6,false);
+	waterSurfaceSceneObject->GetTransform().Scale(9.75f,1,9.75f,false);
+	waterSurfaceSceneObject->GetTransform().Translate(-6.05f,-7,20.6f,false);
 	sceneRoot->AddChild(waterSurfaceSceneObject);
 
 
@@ -615,24 +615,24 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	importer.LoadBuiltInShaderSource("waterheights", waterHeightsShaderSource);
 	waterHeightsMaterial = objectManager->CreateMaterial("WaterHeightsMaterial", waterHeightsShaderSource);
 	waterHeightsMaterial->SetSelfLit(true);
-	waterHeightsMaterial->SetUniform1f(1.0 / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
+	waterHeightsMaterial->SetUniform1f(1.0f / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
 	waterHeightsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
-
+	
 	// create material for updating water normal map
 	GTE::ShaderSource waterNormalsShaderSource;
 	importer.LoadBuiltInShaderSource("waternormals", waterNormalsShaderSource);
 	waterNormalsMaterial = objectManager->CreateMaterial("WaterNormalsMaterial", waterNormalsShaderSource);
 	waterNormalsMaterial->SetSelfLit(true);
-	waterNormalsMaterial->SetUniform1f(1.0 / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
-	waterNormalsMaterial->SetUniform1f(2.0 / (GTE::Real)waterNomralMapResolution * 2.0, "PIXEL_DISTANCEX2");
+	waterNormalsMaterial->SetUniform1f(1.0f / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
+	waterNormalsMaterial->SetUniform1f(2.0f / (GTE::Real)waterNomralMapResolution * 2.0f, "PIXEL_DISTANCEX2");
 	waterNormalsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 	// set appropriate sampler uniforms for water surface shader
 	waterMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 	waterMaterial->SetTexture(waterNormals->GetColorTexture(), "WATER_NORMAL_MAP");
 	//waterMaterial->SetUniform1f(1.0 / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
-	waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
-	waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
+	waterMaterial->SetUniform1f(.8f, "REFLECTED_COLOR_FACTOR");
+	waterMaterial->SetUniform1f(.2f, "REFRACTED_COLOR_FACTOR");
 }
 
 /*
@@ -663,8 +663,8 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 
 	// create mesh & material for pool light
 	GTE::Mesh3DRef poolLightMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
-	GTE::Color4 poolLightColor(1, .66, .231, 1);
-	GTE::Color4 poolLightMeshColor(1, .95, .5, 1);
+	GTE::Color4 poolLightColor(1, .66f, .231f, 1);
+	GTE::Color4 poolLightMeshColor(1, .95f, .5f, 1);
 	GTE::MaterialRef poolLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
 	poolLightMeshMaterial->SetColor(poolLightMeshColor, "SELFCOLOR");
 	poolLightMeshMaterial->SetSelfLit(true);
@@ -674,13 +674,13 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	sceneRoot->AddChild(poolLightObject);
 	poolLightObject->SetStatic(true);
 	GTE::LightRef poolLight = objectManager->CreateLight();
-	poolLight->SetIntensity(1.8);
+	poolLight->SetIntensity(1.8f);
 	poolLight->SetRange(25);
 	poolLight->SetColor(poolLightColor);
 	poolLight->SetShadowsEnabled(true);
 	poolLight->SetType(GTE::LightType::Point);
 	poolLightObject->SetLight(poolLight);
-	poolLightObject->GetTransform().Scale(.2,.2,.2, true);
+	poolLightObject->GetTransform().Scale(.2f,.2f,.2f, true);
 	poolLightObject->GetTransform().Translate(0, 0, 20, false);
 
 	// set up culling mask for pool light

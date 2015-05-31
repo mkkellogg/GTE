@@ -48,7 +48,7 @@ namespace GTE
 
 		virtual const Transform * GetFullTransform() const = 0;
 		virtual Transform * GetLocalTransform() = 0;
-		virtual bool HasTarget() const = 0;
+		virtual Bool HasTarget() const = 0;
 
 		virtual SkeletonNode * FullClone() const = 0;
 	};

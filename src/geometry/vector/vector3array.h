@@ -15,7 +15,7 @@ namespace GTE
 		Vector3Array();
 		virtual ~Vector3Array();
 
-		void SetData(const Real * data, bool includeW);
+		void SetData(const Real * data, Bool includeW);
 		Vector3 * GetVector(Int32 index);
 		const Vector3 * GetVectorConst(Int32 index) const;
 		Vector3 ** GetVectors();

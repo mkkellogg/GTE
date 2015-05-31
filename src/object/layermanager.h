@@ -32,8 +32,8 @@ namespace GTE
 		IntMask MergeLayerMask(IntMask maskA, IntMask maskB);
 		IntMask CreateFullLayerMask();
 		IntMask CreateEmptyLayerMask();
-		bool ContainsLayer(IntMask mask, UInt32 layerIndex);
-		bool AtLeastOneLayerInCommon(IntMask a, IntMask b);
+		Bool ContainsLayer(IntMask mask, UInt32 layerIndex);
+		Bool AtLeastOneLayerInCommon(IntMask a, IntMask b);
 	};
 }
 

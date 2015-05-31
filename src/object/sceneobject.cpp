@@ -45,22 +45,22 @@ namespace GTE
 
 	}
 
-	bool SceneObject::IsActive()
+	Bool SceneObject::IsActive()
 	{
 		return isActive;
 	}
 
-	void SceneObject::SetActive(bool active)
+	void SceneObject::SetActive(Bool active)
 	{
 		this->isActive = active;
 	}
 
-	bool SceneObject::IsStatic()
+	Bool SceneObject::IsStatic()
 	{
 		return isStatic;
 	}
 
-	void SceneObject::SetStatic(bool isStatic)
+	void SceneObject::SetStatic(Bool isStatic)
 	{
 		this->isStatic = isStatic;
 	}
@@ -110,7 +110,7 @@ namespace GTE
 		if (skinnedMesh3DRenderer.IsValid() && mesh.IsValid())skinnedMesh3DRenderer->InitializeForMesh();
 	}
 
-	bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
+	Bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 	{
 		if (this->renderer3D == renderer)return true;
 		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::SetMeshRenderer3D -> 'renderer' is invalid.", false, true);
@@ -126,7 +126,7 @@ namespace GTE
 		return true;
 	}
 
-	bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
+	Bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
 	{
 		if (this->skinnedRenderer3D == renderer)return true;
 		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::SkinnedMesh3DRendererRef -> 'renderer' is invalid.", false, true);
@@ -142,7 +142,7 @@ namespace GTE
 		return true;
 	}
 
-	bool SceneObject::SetMesh3DFilter(Mesh3DFilterRef filter)
+	Bool SceneObject::SetMesh3DFilter(Mesh3DFilterRef filter)
 	{
 		NONFATAL_ASSERT_RTRN(filter.IsValid(), "SceneObject::SetMesh3DFilter -> 'filter' is invalid.", false, true);
 
@@ -157,7 +157,7 @@ namespace GTE
 		return true;
 	}
 
-	bool SceneObject::SetCamera(CameraRef camera)
+	Bool SceneObject::SetCamera(CameraRef camera)
 	{
 		NONFATAL_ASSERT_RTRN(camera.IsValid(), "SceneObject::SetCamera -> 'camera' is invalid.", false, true);
 
@@ -170,7 +170,7 @@ namespace GTE
 		return true;
 	}
 
-	bool SceneObject::SetLight(LightRef light)
+	Bool SceneObject::SetLight(LightRef light)
 	{
 		NONFATAL_ASSERT_RTRN(light.IsValid(), "SceneObject::SetLight -> 'light' is invalid.", false, true);
 
@@ -284,7 +284,7 @@ namespace GTE
 
 	UInt32 SceneObject::GetChildrenCount() const
 	{
-		return children.size();
+		return (UInt32)children.size();
 	}
 
 	SceneObjectRef SceneObject::GetChildAt(UInt32 index) const

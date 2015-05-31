@@ -97,7 +97,7 @@ namespace GTE
 		std::vector<UniformDescriptor*> setUniforms;
 
 		// have all the attributes been given valid values?
-		bool attributesSetAndVerified;
+		Bool attributesSetAndVerified;
 
 		// length of values for each attribute that has been set
 		Int32 * attributesSetValues;
@@ -106,7 +106,7 @@ namespace GTE
 		std::map<int, int> attributeLocationsToVerificationIndex;
 
 		// have all the uniforms been given valid values?
-		bool uniformsSetAndVerified;
+		Bool uniformsSetAndVerified;
 
 		// length of values for each uniform that has been set
 		Int32 * uniformsSetValues;
@@ -120,16 +120,16 @@ namespace GTE
 		std::map<std::string, int> textureUniformSamplerUnitIndex;
 
 		// does this material require a light to be rendered?
-		bool selfLit;
+		Bool selfLit;
 
 		UInt32 GetRequiredUniformSize(UniformType uniformType);
-		bool allSetUniformsandAttributesVerified;
+		Bool allSetUniformsandAttributesVerified;
 
 		void BindStandardVars();
 		void ClearStandardBindings();
-		bool SetupSetVerifiers();
+		Bool SetupSetVerifiers();
 
-		bool SetupSetUniforms();
+		Bool SetupSetUniforms();
 		void DestroySetUniforms();
 
 		void SetStandardAttributeBinding(Int32 varID, StandardAttribute attr);
@@ -141,7 +141,7 @@ namespace GTE
 		void SetStandardUniformBinding(Int32 varID, StandardUniform uniform);
 		Int32 GetStandardUniformBinding(StandardUniform uniform) const;
 		Int32 TestForStandardUniform(StandardUniform uniform) const;
-		bool ValidateUniformName(const std::string& name, int& loc, int& index);
+		Bool ValidateUniformName(const std::string& name, int& loc, int& index);
 
 		void SetAttributeSetValue(Int32 varID, Int32 size);
 		void SetUniformSetValue(Int32 varID, Int32 size);
@@ -151,7 +151,7 @@ namespace GTE
 
 		Material(const std::string& materialName);
 		virtual ~Material();
-		bool Init(ShaderRef shader);
+		Bool Init(ShaderRef shader);
 
 	public:
 
@@ -184,10 +184,10 @@ namespace GTE
 		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
 		void SendEyePositionToShader(const Point3 * position);
 
-		bool VerifySetVars(Int32 vertexCount);
+		Bool VerifySetVars(Int32 vertexCount);
 
-		void SetSelfLit(bool selfLit);
-		bool IsSelfLit();
+		void SetSelfLit(Bool selfLit);
+		Bool IsSelfLit();
 	};
 }
 
