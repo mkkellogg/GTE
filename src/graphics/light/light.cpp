@@ -49,7 +49,7 @@ namespace GTE
 		this->color = color;
 	}
 
-	void Light::SetColor(float r, float g, float b, float a)
+	void Light::SetColor(Real r, Real g, Real b, Real a)
 	{
 		color.Set(r, g, b, a);
 	}
@@ -69,7 +69,7 @@ namespace GTE
 		this->direction = direction;
 	}
 
-	void Light::SetDirection(float x, float y, float z)
+	void Light::SetDirection(Real x, Real y, Real z)
 	{
 		direction.Set(x, y, z);
 	}
@@ -84,33 +84,33 @@ namespace GTE
 		this->type = type;
 	}
 
-	float Light::GetRange() const
+	Real Light::GetRange() const
 	{
 		return range;
 	}
 
-	void Light::SetRange(float range)
+	void Light::SetRange(Real range)
 	{
 		this->range = range;
 		CalcAttentuationForCurrentRange();
 	}
 
-	void Light::SetIntensity(float intensity)
+	void Light::SetIntensity(Real intensity)
 	{
 		this->intensity = intensity;
 	}
 
-	float Light::GetIntensity() const
+	Real Light::GetIntensity() const
 	{
 		return intensity;
 	}
 
-	void Light::SetAttenuation(float attenuation)
+	void Light::SetAttenuation(Real attenuation)
 	{
 		this->attenuation = attenuation;
 	}
 
-	float Light::GetAttenuation() const
+	Real Light::GetAttenuation() const
 	{
 		return attenuation;
 	}

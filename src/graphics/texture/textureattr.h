@@ -12,6 +12,7 @@
 #define _GTE_TEXTUREATTR_H_
 
 #include "global/global.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {
@@ -54,7 +55,7 @@ namespace GTE
 	{
 	public:
 
-		unsigned int MipMapLevel;
+		UInt32 MipMapLevel;
 		bool IsDepthTexture;
 		bool UseAlpha;
 		bool IsCube;

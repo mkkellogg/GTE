@@ -22,7 +22,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	Point3::Point3(bool permAttached, float * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
+	Point3::Point3(bool permAttached, Real * target) : BaseVector4(permAttached, target),  x(data[0]), y(data[1]), z(data[2])
 	{
 		data[3] = 1;
 	}
@@ -30,7 +30,7 @@ namespace GTE
 	/*
 	 * Constructor with initialization values
 	 */
-	Point3::Point3(float x, float y, float z) : BaseVector4(x,y,z,1), x(data[0]), y(data[1]), z(data[2])
+	Point3::Point3(Real x, Real y, Real z) : BaseVector4(x,y,z,1), x(data[0]), y(data[1]), z(data[2])
 	{
 
 	}
@@ -84,7 +84,7 @@ namespace GTE
 	/*
 	 * Linearly interpolate from [p1] to [2] and store the result in [result]
 	 */
-	void Point3::Lerp(const Point3& p1, const Point3& p2, Point3& result, float t)
+	void Point3::Lerp(const Point3& p1, const Point3& p2, Point3& result, Real t)
 	{
 		result.x = ((p2.x - p1.x) * t) + p1.x;
 		result.y = ((p2.y - p1.y) * t) + p1.y;
@@ -94,7 +94,7 @@ namespace GTE
 	/*
 	 * Attach to new backing storage in [data]
 	 */
-	void Point3::AttachTo(float * data)
+	void Point3::AttachTo(Real * data)
 	{
 		NONFATAL_ASSERT(data != NULL, "Point3::AttachTo -> 'data' is null.", true);
 		BaseVector4::AttachTo(data);
@@ -120,17 +120,17 @@ namespace GTE
 	{
 		return;
 
-		float *xp = (((float*)&x));
-		float *yp = (((float*)&y));
-		float *zp = (((float*)&z));
+		Real *xp = (((Real*)&x));
+		Real *yp = (((Real*)&y));
+		Real *zp = (((Real*)&z));
 
 		//xp[0] = data;
 		//yp[0] = data+1;
 		//zp[0] = data+2;
 
-		memcpy(xp, &data, sizeof(float *));
-		memcpy(yp, &data+1, sizeof(float *));
-		memcpy(zp, &data+2, sizeof(float *));
+		memcpy(xp, &data, sizeof(Real *));
+		memcpy(yp, &data+1, sizeof(Real *));
+		memcpy(zp, &data+2, sizeof(Real *));
 	}
 
 	/*
@@ -158,7 +158,7 @@ namespace GTE
 	 */
 	bool Point3::operator==(const Point3 & source)
 	{
-		float epsilon = .005;
+		Real epsilon = .005;
 		return GTEMath::Abs(source.x - x) < epsilon && GTEMath::Abs(source.y - y) < epsilon && GTEMath::Abs(source.z - z) < epsilon;
 	}
 
@@ -167,7 +167,7 @@ namespace GTE
 	 */
 	bool Point3::operator==(const Point3& p) const
 	{
-		float epsilon = .005;
+		Real epsilon = .005;
 		return GTEMath::Abs(p.x - this->x) < epsilon && GTEMath::Abs(p.y - this->y) < epsilon && GTEMath::Abs(p.z - this->z) < epsilon;
 	}
 
@@ -186,7 +186,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Point3::AreEqual -> Null point passed.", false, true);
 
-		float epsilon = .0005;
+		Real epsilon = .0005;
 		return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
 	}
 
@@ -203,7 +203,7 @@ namespace GTE
 	/*
 	 * Set the values of this point
 	 */
-	void Point3::Set(float x, float y, float z)
+	void Point3::Set(Real x, Real y, Real z)
 	{
 		BaseVector4::Set(x,y,z,1);
 	}

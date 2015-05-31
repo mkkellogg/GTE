@@ -19,7 +19,7 @@ namespace GTE
 * backing storage array. If [permAttach] is false, then this base vector can attach and
 * re-attach to various different backing storage arrays.
 */
-	void BaseVector4::Init(float *target, bool permAttach)
+	void BaseVector4::Init(Real *target, bool permAttach)
 	{
 		data = baseData;
 
@@ -62,7 +62,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	BaseVector4::BaseVector4(bool permAttached, float * target)
+	BaseVector4::BaseVector4(bool permAttached, Real * target)
 	{
 		Init(target, true);
 	}
@@ -70,7 +70,7 @@ namespace GTE
 	/*
 	 * Constructor with initialization values
 	 */
-	BaseVector4::BaseVector4(float x, float y, float z, float w)
+	BaseVector4::BaseVector4(Real x, Real y, Real z, Real w)
 	{
 		Init(NULL, false);
 		Set(x, y, z, w);
@@ -114,7 +114,7 @@ namespace GTE
 	/*
 	 * Set this base vector's data
 	 */
-	void BaseVector4::Set(float x, float y, float z, float w)
+	void BaseVector4::Set(Real x, Real y, Real z, Real w)
 	{
 		data[0] = x;
 		data[1] = y;
@@ -138,13 +138,13 @@ namespace GTE
 	 */
 	void BaseVector4::Get(BaseVector4& baseVector) const
 	{
-		memcpy(baseVector.data, data, sizeof(float) * 4);
+		memcpy(baseVector.data, data, sizeof(Real) * 4);
 	}
 
 	/*
 	 * Get a pointer the backing data storage
 	 */
-	float * BaseVector4::GetDataPtr()
+	Real * BaseVector4::GetDataPtr()
 	{
 		return data;
 	}
@@ -152,7 +152,7 @@ namespace GTE
 	/*
 	 * Attach the base vector to a new backing storage array [data]
 	 */
-	void BaseVector4::AttachTo(float * data)
+	void BaseVector4::AttachTo(Real * data)
 	{
 		this->data = data;
 		attached = true;

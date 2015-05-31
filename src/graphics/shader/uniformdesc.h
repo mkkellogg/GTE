@@ -50,15 +50,15 @@ namespace GTE
 
 		int Size;
 		char Name[128];
-		unsigned int ShaderVarID;
-		unsigned int SamplerUnitIndex;
+		UInt32 ShaderVarID;
+		UInt32 SamplerUnitIndex;
 		UniformType Type;
 		bool IsSet;
 
 		TextureRef SamplerData;
 		Matrix4x4 MatrixData;
-		float BasicFloatData[4];
-		float * ExtendedFloatData;
+		Real BasicFloatData[4];
+		Real * ExtendedFloatData;
 	};
 }
 

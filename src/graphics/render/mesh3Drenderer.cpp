@@ -40,7 +40,7 @@ namespace GTE
 	 */
 	void Mesh3DRenderer::DestroyRenderers()
 	{
-		for (unsigned int i = 0; i < subRenderers.size(); i++)
+		for (UInt32 i = 0; i < subRenderers.size(); i++)
 		{
 			DestroyRenderer(i);
 		}
@@ -51,7 +51,7 @@ namespace GTE
 	 * Deallocate and destroy the sub-renderer at [index] in the member list of
 	 * sub-renderers: [subRenderers].
 	 */
-	void Mesh3DRenderer::DestroyRenderer(unsigned int index)
+	void Mesh3DRenderer::DestroyRenderer(UInt32 index)
 	{
 		EngineObjectManager *objectManager = Engine::Instance()->GetEngineObjectManager();
 		if (index < subRenderers.size())
@@ -68,7 +68,7 @@ namespace GTE
 	/*
 	 * Get the number of materials attached to this instance.
 	 */
-	unsigned int Mesh3DRenderer::GetMaterialCount() const
+	UInt32 Mesh3DRenderer::GetMaterialCount() const
 	{
 		return materials.size();
 	}
@@ -76,7 +76,7 @@ namespace GTE
 	/*
 	 * Get a reference to the material at [index] in the member list of materials, [materials].
 	 */
-	MaterialRef Mesh3DRenderer::GetMaterial(unsigned int index)
+	MaterialRef Mesh3DRenderer::GetMaterial(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", MaterialRef::Null(), true);
 
@@ -86,7 +86,7 @@ namespace GTE
 	/*
 	 * Set the material at [index] in the member list of materials, [materials].
 	 */
-	void Mesh3DRenderer::SetMaterial(unsigned int index, MaterialRef material)
+	void Mesh3DRenderer::SetMaterial(UInt32 index, MaterialRef material)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "Mesh3DRenderer::SetMaterial -> 'material' is null.", true);
 		NONFATAL_ASSERT(index < GetMaterialCount(), "Mesh3DRenderer::SetMaterial -> 'index' is out of range.", true);
@@ -127,13 +127,13 @@ namespace GTE
 	void Mesh3DRenderer::InitializeForMesh(Mesh3DRef mesh)
 	{
 		EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
-		unsigned int subMeshCount = mesh->GetSubMeshCount();
+		UInt32 subMeshCount = mesh->GetSubMeshCount();
 
 		// if the number of sub-renderers currently contained by this instance is larger than
 		// the number of sub-meshes contained by [mesh], then delete the excess sub-renderers
 		if (subMeshCount < subRenderers.size())
 		{
-			for (unsigned int i = subRenderers.size(); i > subMeshCount; i--)
+			for (UInt32 i = subRenderers.size(); i > subMeshCount; i--)
 			{
 				DestroyRenderer(i - 1);
 			}
@@ -143,7 +143,7 @@ namespace GTE
 		// numbers match
 		else if (subMeshCount > subRenderers.size())
 		{
-			for (unsigned int i = subRenderers.size(); i < subMeshCount; i++)
+			for (UInt32 i = subRenderers.size(); i < subMeshCount; i++)
 			{
 				SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
 				NONFATAL_ASSERT(renderer.IsValid(), "Mesh3DRenderer::UpdateFromMesh(Mesh3DRef) -> Could not create new SubMesh3DRenderer.", false);
@@ -156,7 +156,7 @@ namespace GTE
 
 		// for each sub-renderer, call UpdateFromSubMesh() to update the sub-renderer
 		// for its corresponding sub-mesh in [mesh]
-		for (unsigned int i = 0; i < subMeshCount; i++)
+		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
 			UpdateFromSubMesh(i);
 		}
@@ -166,7 +166,7 @@ namespace GTE
 	 * Update the sub-render at [index] in the member list of sub-renderers [subRenderers]
 	 * for the sub-mesh at [index] in the target mesh for this renderer.
 	 */
-	void Mesh3DRenderer::UpdateFromSubMesh(unsigned int index)
+	void Mesh3DRenderer::UpdateFromSubMesh(UInt32 index)
 	{
 		NONFATAL_ASSERT(index < subRenderers.size(), "Mesh3DRenderer::UpdateFromSubMesh -> 'index' is out of range.", true);
 
@@ -197,7 +197,7 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'sceneObject' is null.", SubMesh3DRef::Null(), true);
 
 		// this loop finds the index in [subRenderers] to which [subRenderer] belongs
-		for (unsigned int i = 0; i < subRenderers.size(); i++)
+		for (UInt32 i = 0; i < subRenderers.size(); i++)
 		{
 			if (subRenderers[i] == subRenderer)
 			{
@@ -217,7 +217,7 @@ namespace GTE
 	/*
 	 * Get the sub-mesh at [index] in the target mesh for this renderer.
 	 */
-	SubMesh3DRef Mesh3DRenderer::GetSubMesh(unsigned int index)
+	SubMesh3DRef Mesh3DRenderer::GetSubMesh(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetSubMesh -> 'sceneObject' is null.", SubMesh3DRef::Null(), true);
 
@@ -233,7 +233,7 @@ namespace GTE
 	/*
 	 * Get the sub-renderer at [index] in the member list of sub-renderers, [subRenderers].
 	 */
-	SubMesh3DRendererRef Mesh3DRenderer::GetSubRenderer(unsigned int index)
+	SubMesh3DRendererRef Mesh3DRenderer::GetSubRenderer(UInt32 index)
 	{
 		if (index >= subRenderers.size())
 		{
@@ -247,7 +247,7 @@ namespace GTE
 	/*
 	 * Get the number of sub-renderers managed by this renderer.
 	 */
-	unsigned int Mesh3DRenderer::GetSubRendererCount() const
+	UInt32 Mesh3DRenderer::GetSubRendererCount() const
 	{
 		return subRenderers.size();
 	}

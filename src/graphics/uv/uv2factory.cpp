@@ -23,7 +23,7 @@ namespace GTE
 
 	}
 
-	UV2  * UV2Factory::CreatePermAttached(float * target)
+	UV2  * UV2Factory::CreatePermAttached(Real * target)
 	{
 		return new UV2(true, target);
 	}

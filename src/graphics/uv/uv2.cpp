@@ -13,13 +13,13 @@ namespace GTE
 
 	}
 
-	UV2::UV2(bool permAttached, float * target) : BaseVector2(permAttached, target), u(data[0]), v(data[1])
+	UV2::UV2(bool permAttached, Real * target) : BaseVector2(permAttached, target), u(data[0]), v(data[1])
 	{
 
 
 	}
 
-	UV2::UV2(float u, float v) : BaseVector2(u, v), u(data[0]), v(data[1])
+	UV2::UV2(Real u, Real v) : BaseVector2(u, v), u(data[0]), v(data[1])
 	{
 
 	}
@@ -54,7 +54,7 @@ namespace GTE
 		return *this;
 	}
 
-	void UV2::AttachTo(float * data)
+	void UV2::AttachTo(Real * data)
 	{
 		BaseVector2::AttachTo(data);
 	}

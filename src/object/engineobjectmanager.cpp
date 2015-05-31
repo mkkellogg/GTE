@@ -85,25 +85,25 @@ namespace GTE
 		shader = CreateShader(shaderSource);
 		ASSERT(shader.IsValid(), "EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored");
 		shaderProperties = LongMaskUtil::CreateLongMask();
-		LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseColored);
-		LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
+		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::DiffuseColored);
+		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexNormals);
 		loadedShaders.AddShader(shaderProperties, shader);
 
 		assetImporter.LoadBuiltInShaderSource("diffuse_texture", shaderSource);
 		shader = CreateShader(shaderSource);
 		ASSERT(shader.IsValid(), "EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured");
 		shaderProperties = LongMaskUtil::CreateLongMask();
-		LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
-		LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
+		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::DiffuseTextured);
+		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexNormals);
 		loadedShaders.AddShader(shaderProperties, shader);
 
 		assetImporter.LoadBuiltInShaderSource("diffuse_texture_vcolor", shaderSource);
 		shader = CreateShader(shaderSource);
 		ASSERT(shader.IsValid(), "EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors");
 		shaderProperties = LongMaskUtil::CreateLongMask();
-		LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::DiffuseTextured);
-		LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexColors);
-		LongMaskUtil::SetBit(&shaderProperties, (short)ShaderMaterialCharacteristic::VertexNormals);
+		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::DiffuseTextured);
+		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexColors);
+		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexNormals);
 		loadedShaders.AddShader(shaderProperties, shader);
 
 		return true;
@@ -173,7 +173,7 @@ namespace GTE
 		return (const SceneObjectRef)sceneRootRef;
 	}
 
-	Mesh3DRef EngineObjectManager::CreateMesh3D(unsigned int subMeshCount)
+	Mesh3DRef EngineObjectManager::CreateMesh3D(UInt32 subMeshCount)
 	{
 		Mesh3D * mesh = new Mesh3D(subMeshCount);
 		ASSERT(mesh != NULL, "EngineObjectManager::CreateMesh3D -> Could not allocate new Mesh3D object.");
@@ -322,7 +322,7 @@ namespace GTE
 		delete renderer;
 	}
 
-	SkeletonRef EngineObjectManager::CreateSkeleton(unsigned int boneCount)
+	SkeletonRef EngineObjectManager::CreateSkeleton(UInt32 boneCount)
 	{
 		Skeleton * skeleton = new Skeleton(boneCount);
 		ASSERT(skeleton != NULL, "EngineObjectManager::CreateSkeleton -> Could not allocate new skeleton.");
@@ -357,7 +357,7 @@ namespace GTE
 		delete target;
 	}
 
-	AnimationRef EngineObjectManager::CreateAnimation(float duration, float ticksPerSecond)
+	AnimationRef EngineObjectManager::CreateAnimation(Real duration, Real ticksPerSecond)
 	{
 		Animation * animation = new Animation(duration, ticksPerSecond);
 		ASSERT(animation != NULL, "EngineObjectManager::CreateAnimation -> Could not allocate new Animation object.");
@@ -492,7 +492,7 @@ namespace GTE
 		});
 	}
 
-	TextureRef EngineObjectManager::CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes)
+	TextureRef EngineObjectManager::CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, TextureAttributes attributes)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != NULL, "EngineObjectManager::CreateTexture -> Graphics system is null.");
@@ -507,12 +507,12 @@ namespace GTE
 		});
 	}
 
-	TextureRef EngineObjectManager::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
-		BYTE * backData, unsigned int backw, unsigned int backh,
-		BYTE * topData, unsigned int tw, unsigned int th,
-		BYTE * bottomData, unsigned int botw, unsigned int both,
-		BYTE * leftData, unsigned int lw, unsigned int lh,
-		BYTE * rightData, unsigned int rw, unsigned int rh)
+	TextureRef EngineObjectManager::CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
+		Byte * backData, UInt32 backw, UInt32 backh,
+		Byte * topData, UInt32 tw, UInt32 th,
+		Byte * bottomData, UInt32 botw, UInt32 both,
+		Byte * leftData, UInt32 lw, UInt32 lh,
+		Byte * rightData, UInt32 rw, UInt32 rh)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != NULL, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
@@ -581,7 +581,7 @@ namespace GTE
 	}
 
 	RenderTargetRef EngineObjectManager::CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-		const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
+		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != NULL, "EngineObjectManager::CreateRenderTarget -> Graphics system is null.");

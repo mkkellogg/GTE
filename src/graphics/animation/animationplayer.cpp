@@ -131,8 +131,8 @@ namespace GTE
 	 */
 	void AnimationPlayer::CheckWeights()
 	{
-		float leftOverWeight = 1;
-		for (unsigned int i = 0; i < registeredAnimations.size(); i++)
+		Real leftOverWeight = 1;
+		for (UInt32 i = 0; i < registeredAnimations.size(); i++)
 		{
 			AnimationInstanceRef instance = registeredAnimations[i];
 
@@ -187,18 +187,18 @@ namespace GTE
 		Matrix4x4 matrix;
 
 		// keep track of the number of playing animations seen as we loop through all registered animations
-		unsigned int playingAnimationsSeen = 0;
+		UInt32 playingAnimationsSeen = 0;
 
 		// loop through each node in the target Skeleton object, and calculate the position based on
 		// weighted average of positions returned from each active animation
-		for (unsigned int node = 0; node < target->GetNodeCount(); node++)
+		for (UInt32 node = 0; node < target->GetNodeCount(); node++)
 		{
 			agScale.Set(0, 0, 0);
 			agTranslation.Set(0, 0, 0);
 			agRotation = Quaternion::Identity;
 
 			playingAnimationsSeen = 0;
-			float agWeight = 0;
+			Real agWeight = 0;
 
 			// get the Skeleton node corresponding to the current node index
 			SkeletonNode * targetNode = target->GetNodeFromList(node);
@@ -215,7 +215,7 @@ namespace GTE
 					int mappedChannel = instance->GetChannelMappingForTargetNode(node);
 
 					// retrieve this animation's weight
-					float weight = animationWeights[i];
+					Real weight = animationWeights[i];
 
 					// if this animation's weight is 0, then ignore it
 					if (weight <= 0)continue;
@@ -296,7 +296,7 @@ namespace GTE
 				if (agWeight < .99)
 				{
 					Matrix4x4 temp = targetNode->InitialTransform;
-					temp.MultiplyByScalar(((float)1.0 - agWeight));
+					temp.MultiplyByScalar(((Real)1.0 - agWeight));
 					matrix.Add(temp);
 				}
 
@@ -316,7 +316,7 @@ namespace GTE
 	 * Then interpolate between those two key frames based on where the progress of [instance] lies between them, and store the
 	 * interpolated translation, rotation, and scale values in [translation], [rotation], and [scale].
 	 */
-	void AnimationPlayer::CalculateInterpolatedValues(AnimationInstanceRef instance, unsigned int channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const
+	void AnimationPlayer::CalculateInterpolatedValues(AnimationInstanceRef instance, UInt32 channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const
 	{
 		KeyFrameSet * frameSet = instance->SourceAnimation->GetKeyFrameSet(channel);
 		NONFATAL_ASSERT(frameSet != NULL, "AnimationPlayer::CalculateInterpolatedValues -> 'frameSet' is null.", false);
@@ -339,7 +339,7 @@ namespace GTE
 	{
 		// loop through each registered animation and check if it is active. if it is,
 		// call UpdateAnimationInstanceProgress() and pass [instance] to it.
-		for (unsigned int i = 0; i < registeredAnimations.size(); i++)
+		for (UInt32 i = 0; i < registeredAnimations.size(); i++)
 		{
 			AnimationInstanceRef instance = registeredAnimations[i];
 			if (instance.IsValid() && instance->Playing)
@@ -360,8 +360,8 @@ namespace GTE
 			// update animation instance progress
 			instance->Progress += Time::GetDeltaTime() * instance->SpeedFactor;
 
-			float effectiveEnd = (instance->Duration > instance->EarlyEnd) ? instance->EarlyEnd : instance->Duration;
-			float effectiveStart = (instance->StartOffset > 0) ? instance->StartOffset : 0;
+			Real effectiveEnd = (instance->Duration > instance->EarlyEnd) ? instance->EarlyEnd : instance->Duration;
+			Real effectiveStart = (instance->StartOffset > 0) ? instance->StartOffset : 0;
 
 			// has the animation reached the end?
 			if (instance->Progress > effectiveEnd)
@@ -393,11 +393,11 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedTranslation -> 'instance' is invalid.", true);
 
-		unsigned int frameCount = keyFrameSet.TranslationKeyFrames.size();
+		UInt32 frameCount = keyFrameSet.TranslationKeyFrames.size();
 		NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedTranslation -> Key frame count is zero.", true);
 
-		unsigned int previousIndex, nextIndex;
-		float interFrameProgress;
+		UInt32 previousIndex, nextIndex;
+		Real interFrameProgress;
 		bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Translation);
 
 		// did we successfully find 2 frames between which to interpolate?
@@ -426,11 +426,11 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedScale -> 'instance' is invalid.", true);
 
-		unsigned int frameCount = keyFrameSet.ScaleKeyFrames.size();
+		UInt32 frameCount = keyFrameSet.ScaleKeyFrames.size();
 		NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedScale -> Key frame count is zero.", true);
 
-		unsigned int previousIndex, nextIndex;
-		float interFrameProgress;
+		UInt32 previousIndex, nextIndex;
+		Real interFrameProgress;
 		bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Scale);
 
 		// did we successfully find 2 frames between which to interpolate?
@@ -459,11 +459,11 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(instance.IsValid(), "AnimationPlayer::CalculateInterpolatedRotation -> 'instance' is invalid.", true);
 
-		unsigned int frameCount = keyFrameSet.RotationKeyFrames.size();
+		UInt32 frameCount = keyFrameSet.RotationKeyFrames.size();
 		NONFATAL_ASSERT(frameCount > 0, "AnimationPlayer::CalculateInterpolatedRotation -> Key frame count is zero.", true);
 
-		unsigned int previousIndex, nextIndex;
-		float interFrameProgress;
+		UInt32 previousIndex, nextIndex;
+		Real interFrameProgress;
 		bool foundFrames = CalculateInterpolation(instance, keyFrameSet, previousIndex, nextIndex, interFrameProgress, TransformationCompnent::Rotation);
 
 		// did we successfully find 2 frames between which to interpolate?
@@ -490,13 +490,13 @@ namespace GTE
 	 * and then stores the indices of those key frames in [previousIndex] and [nextIndex]. Then it uses instance->Progress to determine how far from [lastIndex]
 	 * to [nextIndex] the animation currently is, and stores that value in [interFrameProgress] (range: 0 to 1).
 	 */
-	bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, unsigned int& previousIndex, unsigned int& nextIndex, float& interFrameProgress, TransformationCompnent component) const
+	bool AnimationPlayer::CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, UInt32& previousIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const
 	{
 		NONFATAL_ASSERT_RTRN(instance.IsValid(), "AnimationPlayer::CalculateInterpolation -> 'instance' is invalid.", false, true);
 
-		unsigned int frameCount = 0;
-		float progress = instance->Progress;
-		float duration = instance->Duration;
+		UInt32 frameCount = 0;
+		Real progress = instance->Progress;
+		Real duration = instance->Duration;
 
 		// get the correct frame count, which depends on [component]
 		if (component == TransformationCompnent::Translation)frameCount = keyFrameSet.TranslationKeyFrames.size();
@@ -505,13 +505,13 @@ namespace GTE
 		else return false;
 
 		// loop through each key frame
-		for (unsigned int f = 0; f < frameCount; f++)
+		for (UInt32 f = 0; f < frameCount; f++)
 		{
 			KeyFrame * previousFrame = NULL;
 			KeyFrame * nextFrame = NULL;
 
 			// get the correct time stamp for this frame, which depends on [component]
-			float keyRealTime = GetKeyFrameTime(component, f, keyFrameSet);
+			Real keyRealTime = GetKeyFrameTime(component, f, keyFrameSet);
 
 			// if the RealTime value for this key frame is greater than [progress], then the previous key frame and the current key frame
 			// are the frames we want
@@ -536,10 +536,10 @@ namespace GTE
 					// frame to find which one has a timestamp greater than StartOffset.
 					if (instance->StartOffset > 0)
 					{
-						for (unsigned int ff = 0; ff < frameCount; ff++)
+						for (UInt32 ff = 0; ff < frameCount; ff++)
 						{
 							// get the correct time stamp for for frame [ff], which depends on [component]
-							float nextKeyRealTime = GetKeyFrameTime(component, ff, keyFrameSet);
+							Real nextKeyRealTime = GetKeyFrameTime(component, ff, keyFrameSet);
 							if (nextKeyRealTime > instance->StartOffset || ff == frameCount - 1)
 							{
 								nextIndex = ff;
@@ -573,10 +573,10 @@ namespace GTE
 				}
 
 				// calculate local progress between [previous] and [nextFrame]
-				float interFrameTimeDelta = nextFrame->RealTime - previousFrame->RealTime;
+				Real interFrameTimeDelta = nextFrame->RealTime - previousFrame->RealTime;
 				if (overShoot)  interFrameTimeDelta = duration - previousFrame->RealTime;
 
-				float interFrameElapsed = progress - previousFrame->RealTime;
+				Real interFrameElapsed = progress - previousFrame->RealTime;
 				interFrameProgress = 1;
 				if (interFrameTimeDelta > 0)interFrameProgress = interFrameElapsed / interFrameTimeDelta;
 
@@ -590,9 +590,9 @@ namespace GTE
 	/*
 	 * Get the key frame time for the frame at [frameIndex] for the desired transformation component [transformationComponent].
 	 */
-	float AnimationPlayer::GetKeyFrameTime(TransformationCompnent transformationComponent, int frameIndex, const KeyFrameSet& keyFrameSet) const
+	Real AnimationPlayer::GetKeyFrameTime(TransformationCompnent transformationComponent, int frameIndex, const KeyFrameSet& keyFrameSet) const
 	{
-		float keyFrameTime = 0;
+		Real keyFrameTime = 0;
 		if (transformationComponent == TransformationCompnent::Translation)
 			keyFrameTime = keyFrameSet.TranslationKeyFrames[frameIndex].RealTime;
 		else if (transformationComponent == TransformationCompnent::Rotation)
@@ -643,17 +643,17 @@ namespace GTE
 	/*
 	 * Set the normalized speed of playback of [animation] to [speedFactor].
 	 */
-	void AnimationPlayer::SetSpeed(AnimationRef animation, float speedFactor)
+	void AnimationPlayer::SetSpeed(AnimationRef animation, Real speedFactor)
 	{
 		NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::SetSpeed -> 'animation' is invalid.", true);
 		if (animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 		{
-			unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
+			UInt32 targetIndex = animationIndexMap[animation->GetObjectID()];
 			SetSpeed(targetIndex, speedFactor);
 		}
 	}
 
-	void AnimationPlayer::SetSpeed(unsigned int animationIndex, float speedFactor)
+	void AnimationPlayer::SetSpeed(UInt32 animationIndex, Real speedFactor)
 	{
 		NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::SetSpeed -> 'animationIndex' is invalid.", true);
 
@@ -672,7 +672,7 @@ namespace GTE
 
 		if (animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 		{
-			unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
+			UInt32 targetIndex = animationIndexMap[animation->GetObjectID()];
 			Play(targetIndex);
 		}
 	}
@@ -680,13 +680,13 @@ namespace GTE
 	/*
 	 * Start or resume playback of registered animation at [animationIndex].
 	 */
-	void AnimationPlayer::Play(unsigned int animationIndex)
+	void AnimationPlayer::Play(UInt32 animationIndex)
 	{
 		NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Play -> 'animationIndex' is invalid.", true);
 
 
-		float tempLeftOver = 1;
-		for (unsigned int i = 0; i < registeredAnimations.size(); i++)
+		Real tempLeftOver = 1;
+		for (UInt32 i = 0; i < registeredAnimations.size(); i++)
 		{
 			AnimationInstanceRef instance = registeredAnimations[i];
 
@@ -715,7 +715,7 @@ namespace GTE
 		NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::Stop -> 'animation' is invalid.", true);
 		if (animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 		{
-			unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
+			UInt32 targetIndex = animationIndexMap[animation->GetObjectID()];
 			NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::Stop -> invalid animation index found in index map.", true);
 
 			Stop(targetIndex);
@@ -725,7 +725,7 @@ namespace GTE
 	/*
 	 * Stop playback of registered animation at [animationIndex].
 	 */
-	void AnimationPlayer::Stop(unsigned int animationIndex)
+	void AnimationPlayer::Stop(UInt32 animationIndex)
 	{
 		NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Stop -> 'animationIndex' is invalid.", true);
 
@@ -746,7 +746,7 @@ namespace GTE
 		NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::Pause -> 'animation' is invalid.", true);
 		if (animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 		{
-			unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
+			UInt32 targetIndex = animationIndexMap[animation->GetObjectID()];
 			NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::Pause -> invalid animation index found in index map.", true);
 
 			Pause(targetIndex);
@@ -756,7 +756,7 @@ namespace GTE
 	/*
 	 * Pause playback of registered animation at [animationIndex].
 	 */
-	void AnimationPlayer::Pause(unsigned int animationIndex)
+	void AnimationPlayer::Pause(UInt32 animationIndex)
 	{
 		NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Pause -> 'animationIndex' is invalid.", true);
 
@@ -774,7 +774,7 @@ namespace GTE
 		NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::Resume -> 'animation' is invalid.", true);
 		if (animationIndexMap.find(animation->GetObjectID()) != animationIndexMap.end())
 		{
-			unsigned int targetIndex = animationIndexMap[animation->GetObjectID()];
+			UInt32 targetIndex = animationIndexMap[animation->GetObjectID()];
 			NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::Resume -> invalid animation index found in index map.", true);
 
 			AnimationInstanceRef instance = registeredAnimations[targetIndex];
@@ -787,7 +787,7 @@ namespace GTE
 	/*
 	 * Resume playback of registered animation at [animationIndex].
 	 */
-	void AnimationPlayer::Resume(unsigned int animationIndex)
+	void AnimationPlayer::Resume(UInt32 animationIndex)
 	{
 		NONFATAL_ASSERT(animationIndex < animationCount, "AnimationPlayer::Resume -> 'animationIndex' is invalid.", true);
 
@@ -800,7 +800,7 @@ namespace GTE
 	/*
 	 * Cross-fade any currently playing animations over to the target animation [target].
 	 */
-	void AnimationPlayer::CrossFade(AnimationRef target, float duration)
+	void AnimationPlayer::CrossFade(AnimationRef target, Real duration)
 	{
 		CrossFade(target, duration, false);
 	}
@@ -813,11 +813,11 @@ namespace GTE
 	 * At the same time the target animation will be faded/blended in at the same rate,
 	 * creating a smooth transition to [target].
 	 */
-	void AnimationPlayer::CrossFade(AnimationRef target, float duration, bool queued)
+	void AnimationPlayer::CrossFade(AnimationRef target, Real duration, bool queued)
 	{
 		if (animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
 		{
-			unsigned int targetIndex = animationIndexMap[target->GetObjectID()];
+			UInt32 targetIndex = animationIndexMap[target->GetObjectID()];
 			NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::CrossFade -> invalid animation index found in index map.", true);
 
 			AnimationInstanceRef instance = registeredAnimations[targetIndex];
@@ -869,7 +869,7 @@ namespace GTE
 
 			blendOp->SetOnCompleteCallback([targetIndex, this](CrossFadeBlendOp * op)
 			{
-				for (unsigned int i = 0; i < registeredAnimations.size(); i++)
+				for (UInt32 i = 0; i < registeredAnimations.size(); i++)
 				{
 					if (i != targetIndex)
 					{
@@ -906,7 +906,7 @@ namespace GTE
 	{
 		if (animationIndexMap.find(target->GetObjectID()) != animationIndexMap.end())
 		{
-			unsigned int targetIndex = animationIndexMap[target->GetObjectID()];
+			UInt32 targetIndex = animationIndexMap[target->GetObjectID()];
 			NONFATAL_ASSERT(targetIndex < animationCount, "AnimationPlayer::SetPlaybackMode -> invalid animation index found in index map.", true);
 
 			AnimationInstanceRef instance = registeredAnimations[targetIndex];

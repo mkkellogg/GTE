@@ -1,34 +1,37 @@
 #ifndef _GTE_BASEVECTOR2_H_
 #define _GTE_BASEVECTOR2_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 namespace GTE
 {
 	class BaseVector2
 	{
 	protected:
 
-		void Init(float *target, bool permAttach);
+		void Init(Real *target, bool permAttach);
 
-		float * data;
-		float baseData[2];
+		Real * data;
+		Real baseData[2];
 		bool attached;
 		bool canDetach;
 
 	public:
 
 		BaseVector2();
-		BaseVector2(bool permAttached, float * target);
-		BaseVector2(float x, float y);
+		BaseVector2(bool permAttached, Real * target);
+		BaseVector2(Real x, Real y);
 		BaseVector2(const BaseVector2& baseVector);
-		BaseVector2(const float * copyData);
+		BaseVector2(const Real * copyData);
 		virtual ~BaseVector2();
 
 		BaseVector2 & operator= (const BaseVector2 & source);
-		float * GetDataPtr() const;
-		void Set(float x, float y);
+		Real * GetDataPtr() const;
+		void Set(Real x, Real y);
 		void Get(BaseVector2& baseVector);
 
-		virtual void AttachTo(float * data);
+		virtual void AttachTo(Real * data);
 		virtual void Detach();
 	};
 }

@@ -14,6 +14,7 @@
 #include "keyframe.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {
@@ -25,7 +26,7 @@ namespace GTE
 		Vector3 Translation;
 
 		TranslationKeyFrame();
-		TranslationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Vector3& translation);
+		TranslationKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& translation);
 		~TranslationKeyFrame();
 	};
 }

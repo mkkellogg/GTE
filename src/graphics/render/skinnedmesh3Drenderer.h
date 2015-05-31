@@ -49,7 +49,7 @@ namespace GTE
 		// maps each sub-mesh in the target mesh of this renderer to its corresponding
 		// VertexBoneMap structure, which describe the attachment of mesh vertices to
 		// the bones in [skeleton]
-		std::unordered_map<unsigned int, int>subMeshIndexMap;
+		std::unordered_map<UInt32, int>subMeshIndexMap;
 
 		SkinnedMesh3DRenderer();
 		~SkinnedMesh3DRenderer();
@@ -59,10 +59,10 @@ namespace GTE
 		void SetSkeleton(SkeletonRef skeleton);
 		SkeletonRef GetSkeleton();
 		void InitializeForMesh();
-		void MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, int vertexBoneMapIndex);
+		void MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, int vertexBoneMapIndex);
 
 		void AddVertexBoneMap(VertexBoneMap * map);
-		VertexBoneMap * GetVertexBoneMap(unsigned int index);
+		VertexBoneMap * GetVertexBoneMap(UInt32 index);
 	};
 }
 

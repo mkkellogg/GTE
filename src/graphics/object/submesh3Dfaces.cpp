@@ -43,7 +43,7 @@ namespace GTE
 	/*
 	 * Get the number of faces in [faces].
 	 */
-	unsigned int SubMesh3DFaces::GetFaceCount() const
+	UInt32 SubMesh3DFaces::GetFaceCount() const
 	{
 		return faceCount;
 	}
@@ -51,7 +51,7 @@ namespace GTE
 	/*
 	 * Initialization, allocates [faces].
 	 */
-	bool SubMesh3DFaces::Init(unsigned int faceCount)
+	bool SubMesh3DFaces::Init(UInt32 faceCount)
 	{
 		Destroy();
 
@@ -66,7 +66,7 @@ namespace GTE
 	/*
 	 * Get a pointer to the face at [index] in [faces].
 	 */
-	SubMesh3DFace * SubMesh3DFaces::GetFace(unsigned int index)
+	SubMesh3DFace * SubMesh3DFaces::GetFace(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFace -> 'index' is out of range.", NULL, true);
 		return faces + index;
@@ -76,7 +76,7 @@ namespace GTE
 	/*
 	 * Get a const pointer to the face at [index] in [faces].
 	 */
-	const SubMesh3DFace * SubMesh3DFaces::GetFaceConst(unsigned int index) const
+	const SubMesh3DFace * SubMesh3DFaces::GetFaceConst(UInt32 index) const
 	{
 		NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFaceConst -> 'index' is out of range.", NULL, true);
 		return (const SubMesh3DFace *)(faces + index);

@@ -18,7 +18,7 @@ namespace GTE
 	/*
 	* Only constructor.
 	*/
-	Skeleton::Skeleton(unsigned int boneCount)
+	Skeleton::Skeleton(UInt32 boneCount)
 	{
 		this->boneCount = boneCount;
 		bones = NULL;
@@ -62,7 +62,7 @@ namespace GTE
 	/*
 	 * Get the number of bones in this skeleton.
 	 */
-	unsigned int Skeleton::GetBoneCount()
+	UInt32 Skeleton::GetBoneCount()
 	{
 		return boneCount;
 	}
@@ -70,7 +70,7 @@ namespace GTE
 	/*
 	 * Get the number of nodes in this skeleton.
 	 */
-	unsigned int Skeleton::GetNodeCount()
+	UInt32 Skeleton::GetNodeCount()
 	{
 		return nodeList.size();
 	}
@@ -118,7 +118,7 @@ namespace GTE
 	/*
 	 * Set the mapping from a bone name to its index in [boneNameMap]
 	 */
-	void Skeleton::MapBone(std::string& name, unsigned int boneIndex)
+	void Skeleton::MapBone(std::string& name, UInt32 boneIndex)
 	{
 		boneNameMap[name] = boneIndex;
 	}
@@ -129,7 +129,7 @@ namespace GTE
 	 */
 	int Skeleton::GetBoneMapping(std::string& name)
 	{
-		std::unordered_map<std::string, unsigned int>::const_iterator result = boneNameMap.find(name);
+		std::unordered_map<std::string, UInt32>::const_iterator result = boneNameMap.find(name);
 		if (result != boneNameMap.end())
 		{
 			return (*result).second;
@@ -141,7 +141,7 @@ namespace GTE
 	/*
 	 * Get the Bone object stored at [index] in [bones].
 	 */
-	Bone* Skeleton::GetBone(unsigned int boneIndex)
+	Bone* Skeleton::GetBone(UInt32 boneIndex)
 	{
 		NONFATAL_ASSERT_RTRN(boneIndex < boneCount, "Skeleton::GetBone -> 'boneIndex' is out of range.", NULL, true);
 
@@ -151,7 +151,7 @@ namespace GTE
 	/*
 	 * Set the mapping from a node name to its index in [nodeNameMap]
 	 */
-	void Skeleton::MapNode(std::string& name, unsigned int nodeIndex)
+	void Skeleton::MapNode(std::string& name, UInt32 nodeIndex)
 	{
 		nodeNameMap[name] = nodeIndex;
 	}
@@ -162,7 +162,7 @@ namespace GTE
 	 */
 	int Skeleton::GetNodeMapping(std::string& name)
 	{
-		std::unordered_map<std::string, unsigned int>::const_iterator result = nodeNameMap.find(name);
+		std::unordered_map<std::string, UInt32>::const_iterator result = nodeNameMap.find(name);
 		if (result != nodeNameMap.end())
 		{
 			return (*result).second;
@@ -174,7 +174,7 @@ namespace GTE
 	/*
 	 * Get the SkeletonNode object stored at [index] in [nodeList].
 	 */
-	SkeletonNode * Skeleton::GetNodeFromList(unsigned int nodeIndex)
+	SkeletonNode * Skeleton::GetNodeFromList(UInt32 nodeIndex)
 	{
 		if (nodeIndex >= GetNodeCount())
 		{
@@ -207,10 +207,10 @@ namespace GTE
 	 */
 	void Skeleton::OverrideBonesFrom(Skeleton * skeleton, bool takeOffset, bool takeNode)
 	{
-		for (unsigned int n = 0; n < skeleton->GetBoneCount(); n++)
+		for (UInt32 n = 0; n < skeleton->GetBoneCount(); n++)
 		{
 			Bone * newBone = skeleton->GetBone(n);
-			for (unsigned int c = 0; c < GetBoneCount(); c++)
+			for (UInt32 c = 0; c < GetBoneCount(); c++)
 			{
 				Bone * currentBone = GetBone(c);
 				if (currentBone != NULL && newBone != NULL && newBone->Name == currentBone->Name)
@@ -241,7 +241,7 @@ namespace GTE
 		}
 
 		// copy over all the bones from this skeleton
-		for (unsigned int i = 0; i < boneCount; i++)
+		for (UInt32 i = 0; i < boneCount; i++)
 		{
 			newSkeleton->GetBone(i)->SetTo(GetBone(i));
 		}

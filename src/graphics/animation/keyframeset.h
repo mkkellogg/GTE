@@ -14,6 +14,7 @@
 #include "translationkeyframe.h"
 #include "scalekeyframe.h"
 #include "rotationkeyframe.h"
+#include "global/global.h"
 #include <vector>
 
 namespace GTE

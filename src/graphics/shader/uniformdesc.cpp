@@ -16,7 +16,7 @@ namespace GTE
 		Type = UniformType::Float;
 		ExtendedFloatData = NULL;
 		IsSet = false;
-		memset(BasicFloatData, 0, sizeof(float) * 4);
+		memset(BasicFloatData, 0, sizeof(Real) * 4);
 	}
 
 	UniformDescriptor::~UniformDescriptor()

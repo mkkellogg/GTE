@@ -12,17 +12,17 @@ namespace GTE
 
 	public:
 
-		float &u;
-		float &v;
+		Real &u;
+		Real &v;
 
 		UV2();
-		UV2(bool permAttached, float * target);
-		UV2(float u, float v);
+		UV2(bool permAttached, Real * target);
+		UV2(Real u, Real v);
 		UV2(const UV2& uv);
-		UV2(const float * data);
+		UV2(const Real * data);
 		~UV2();
 
-		void AttachTo(float * data);
+		void AttachTo(Real * data);
 		void Detach();
 
 		UV2 & operator= (const UV2 & source);

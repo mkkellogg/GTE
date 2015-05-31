@@ -16,7 +16,7 @@ namespace GTE
 	* also initializes member variables.
 	*/
 	RenderTargetGL::RenderTargetGL(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-		const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) :
+		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) :
 		RenderTarget(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height)
 	{
 		fboID = 0;
@@ -168,7 +168,7 @@ namespace GTE
 
 		}
 
-		unsigned int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		UInt32 status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		NONFATAL_ASSERT_RTRN(status == GL_FRAMEBUFFER_COMPLETE, "RenderTargetGL::Init -> Framebuffer is incomplete!.", false, true);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

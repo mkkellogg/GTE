@@ -11,20 +11,20 @@ namespace GTE
 	union IntFloatUnion
 	{
 		int i;
-		float f;
+		Real f;
 	};
 
-	float GTEMath::SquareRoot(float n)
+	Real GTEMath::SquareRoot(Real n)
 	{
 		return sqrt(n);
 	}
 
-	float GTEMath::QuickSquareRoot(float n)
+	Real GTEMath::QuickSquareRoot(Real n)
 	{
 		IntFloatUnion ifu;
 
-		float threeHalfs = 1.5;
-		float x2 = n * .5;
+		Real threeHalfs = 1.5;
+		Real x2 = n * .5;
 
 		ifu.f = n;
 		ifu.i = 0x5f375a86 - (ifu.i >> 1);
@@ -33,58 +33,58 @@ namespace GTE
 		return ifu.f * n;
 	}
 
-	float GTEMath::Round(float n)
+	Real GTEMath::Round(Real n)
 	{
 		return floor(n + 0.5);
 	}
 
-	float GTEMath::InverseSquareRoot(float n)
+	Real GTEMath::InverseSquareRoot(Real n)
 	{
-		float root = SquareRoot(n);
+		Real root = SquareRoot(n);
 		if (root == 0)return 0;
 		return 1 / root;
 	}
 
-	float GTEMath::QuickInverseSquareRoot(float n)
+	Real GTEMath::QuickInverseSquareRoot(Real n)
 	{
-		float root = QuickSquareRoot(n);
+		Real root = QuickSquareRoot(n);
 		if (root == 0)return 0;
 		return 1 / root;
 	}
 
-	float GTEMath::Cos(float n)
+	Real GTEMath::Cos(Real n)
 	{
 		return cos(n);
 	}
 
-	float GTEMath::ACos(float n)
+	Real GTEMath::ACos(Real n)
 	{
 		return acos(n);
 	}
 
-	float GTEMath::Sin(float n)
+	Real GTEMath::Sin(Real n)
 	{
 		return sin(n);
 	}
 
-	float GTEMath::Abs(float n)
+	Real GTEMath::Abs(Real n)
 	{
 		return fabs(n);
 	}
 
-	float GTEMath::Min(float a, float b)
+	Real GTEMath::Min(Real a, Real b)
 	{
 		if (a < b)return a;
 		else return b;
 	}
 
-	float GTEMath::Max(float a, float b)
+	Real GTEMath::Max(Real a, Real b)
 	{
 		if (a > b)return a;
 		else return b;
 	}
 
-	float GTEMath::Lerp(float a, float b, float t)
+	Real GTEMath::Lerp(Real a, Real b, Real t)
 	{
 		return (b - a) * t + a;
 	}

@@ -1,15 +1,16 @@
 #ifndef _GTE_DATASTACK_
 #define _GTE_DATASTACK_
 
+#include "object/enginetypes.h"
 #include "global/global.h"
 
 namespace GTE
 {
 	template <typename T> class DataStack
 	{
-		unsigned int maxEntryCount;
-		unsigned int elementsPerEntry;
-		unsigned int entries;
+		UInt32 maxEntryCount;
+		UInt32 elementsPerEntry;
+		UInt32 entries;
 		T * data;
 		T * stackPointer;
 
@@ -94,7 +95,7 @@ namespace GTE
 			return maxEntryCount;
 		}
 
-		unsigned int GetEntryCount() const
+		UInt32 GetEntryCount() const
 		{
 			return entries;
 		}

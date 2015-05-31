@@ -44,7 +44,7 @@ GTE::SkinnedMesh3DRendererRef GameUtil::FindFirstSkinnedMeshRenderer(GTE::SceneO
 
 	if(ref->GetSkinnedMesh3DRenderer().IsValid())return ref->GetSkinnedMesh3DRenderer();
 
-	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
+	for(GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++)
 	{
 		GTE::SceneObjectRef childRef = ref->GetChildAt(i);
 		GTE::SkinnedMesh3DRendererRef subRef = FindFirstSkinnedMeshRenderer(childRef);
@@ -66,7 +66,7 @@ GTE::SceneObjectRef GameUtil::FindFirstSceneObjectWithMesh(GTE::SceneObjectRef r
 
 	if(ref->GetMesh3D().IsValid())return ref;
 
-	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
+	for(GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++)
 	{
 		GTE::SceneObjectRef childRef = ref->GetChildAt(i);
 		GTE::SceneObjectRef subRef = FindFirstSceneObjectWithMesh(childRef);
@@ -87,7 +87,7 @@ void GameUtil::ProcessSceneObjects(GTE::SceneObjectRef ref, std::function<void(G
 	// invoke [func]
 	func(ref);
 
-	for(unsigned int i = 0; i < ref->GetChildrenCount(); i++)
+	for(GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++)
 	{
 		GTE::SceneObjectRef childRef = ref->GetChildAt(i);
 		ProcessSceneObjects(childRef, func);
@@ -127,7 +127,7 @@ void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root)
 		GTE::SkinnedMesh3DRendererRef skinnedRenderer = current->GetSkinnedMesh3DRenderer();
 		if(skinnedRenderer.IsValid())
 		{
-			for(unsigned int i = 0; i < skinnedRenderer->GetSubRendererCount(); i++)
+			for(GTE::UInt32 i = 0; i < skinnedRenderer->GetSubRendererCount(); i++)
 			{
 				skinnedRenderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
 			}
@@ -136,7 +136,7 @@ void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root)
 		GTE::Mesh3DRendererRef renderer = current->GetMesh3DRenderer();
 		if(renderer.IsValid())
 		{
-			for(unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
+			for(GTE::UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
 			{
 				renderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
 			}
@@ -168,8 +168,8 @@ void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, bool castShado
  *
  * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
  */
-GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra,
-									float tx, float ty, float tz, bool isStatic, bool castShadows, bool receiveShadows)
+GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra,
+									GTE::Real tx, GTE::Real ty, GTE::Real tz, bool isStatic, bool castShadows, bool receiveShadows)
 {
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 	GTE::SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();

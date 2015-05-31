@@ -21,7 +21,7 @@ namespace GTE
 	public:
 
 		Vector3 Normal;
-		float Offset;
+		Real Offset;
 	};
 
 	enum class ProjectionMode
@@ -37,7 +37,7 @@ namespace GTE
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
 
-		unsigned int clearBufferMask;
+		UInt32 clearBufferMask;
 
 		Transform projection;
 		Transform skyboxTextureTransform;
@@ -55,7 +55,7 @@ namespace GTE
 		SSAORenderMode ssaoMode;
 		bool ssaoEnabled;
 
-		unsigned int renderOrderIndex;
+		UInt32 renderOrderIndex;
 
 		RenderTargetRef renderTarget;
 
@@ -63,10 +63,10 @@ namespace GTE
 
 		IntMask cullingMask;
 
-		float fov;
-		float widthHeightRatio;
+		Real fov;
+		Real widthHeightRatio;
 
-		unsigned int clipPlaneCount;
+		UInt32 clipPlaneCount;
 		ClipPlane clipPlanes[Constants::MaxClipPlanes];
 
 		Transform uniformWorldSceneObjectTransform;
@@ -93,8 +93,8 @@ namespace GTE
 		void SetSSAORenderMode(SSAORenderMode mode);
 		SSAORenderMode GetSSAORenderMode();
 
-		void SetRenderOrderIndex(unsigned int index);
-		unsigned int GetRenderOrderIndex();
+		void SetRenderOrderIndex(UInt32 index);
+		UInt32 GetRenderOrderIndex();
 
 		const Transform& GetProjectionTransform() const;
 		void TransformProjectionTransformBy(const Transform& transform);
@@ -107,7 +107,7 @@ namespace GTE
 		void SetupOffscreenRenderTarget(int width, int height);
 		void SetupOffscreenRenderTarget(int width, int height, bool cube);
 		RenderTargetRef GetRenderTarget();
-		void SetWidthHeightRatio(float width, float height);
+		void SetWidthHeightRatio(Real width, Real height);
 
 		void SetupCopyRenderTarget();
 		RenderTargetRef GetCopyRenderTarget();
@@ -118,14 +118,14 @@ namespace GTE
 		void MergeCullingMask(IntMask mask);
 		IntMask GetCullingMask() const;
 
-		void SetFOV(float fov);
+		void SetFOV(Real fov);
 
 		void SetSkyboxTextureTransform(Transform& trans);
 		const Transform& GetSkyboxTransform();
 
-		bool AddClipPlane(const Vector3& normal, float offset);
-		const ClipPlane* GetClipPlane(unsigned int index);
-		unsigned int GetClipPlaneCount() const;
+		bool AddClipPlane(const Vector3& normal, Real offset);
+		const ClipPlane* GetClipPlane(UInt32 index);
+		UInt32 GetClipPlaneCount() const;
 
 		void SetReverseCulling(bool reverseCulling);
 		bool GetReverseCulling();

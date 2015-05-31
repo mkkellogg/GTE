@@ -49,11 +49,11 @@ namespace GTE
 		Vector3 sphereOfInfluenceZ;
 
 		// numnber of sub-meshes managed by the Mesh3D instance
-		unsigned int subMeshCount;
+		UInt32 subMeshCount;
 		// container for the submeshes
 		std::vector<SubMesh3DRef> subMeshes;
 
-		Mesh3D(unsigned int subMeshCount);
+		Mesh3D(UInt32 subMeshCount);
 		~Mesh3D();
 		void Destroy();
 
@@ -61,9 +61,9 @@ namespace GTE
 
 	public:
 
-		unsigned int GetSubMeshCount() const;
-		void SetSubMesh(SubMesh3DRef mesh, unsigned int index);
-		SubMesh3DRef GetSubMesh(unsigned int index);
+		UInt32 GetSubMeshCount() const;
+		void SetSubMesh(SubMesh3DRef mesh, UInt32 index);
+		SubMesh3DRef GetSubMesh(UInt32 index);
 		bool Init();
 		void Update();
 

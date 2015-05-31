@@ -115,14 +115,14 @@ namespace GTE
 		std::map<int, int> uniformLocationsToVerificationIndex;
 
 		// current highest used sampler unit index
-		unsigned int currentSampletUnityIndex;
+		UInt32 currentSampletUnityIndex;
 		// map a texture uniform to its sampler unit
 		std::map<std::string, int> textureUniformSamplerUnitIndex;
 
 		// does this material require a light to be rendered?
 		bool selfLit;
 
-		unsigned int GetRequiredUniformSize(UniformType uniformType);
+		UInt32 GetRequiredUniformSize(UniformType uniformType);
 		bool allSetUniformsandAttributesVerified;
 
 		void BindStandardVars();
@@ -137,7 +137,7 @@ namespace GTE
 		int TestForStandardAttribute(StandardAttribute attr) const;
 
 		int GetUniformIndex(const std::string& uniformName);
-		unsigned int GetSamplerUnitForName(const std::string& name);
+		UInt32 GetSamplerUnitForName(const std::string& name);
 		void SetStandardUniformBinding(int varID, StandardUniform uniform);
 		int GetStandardUniformBinding(StandardUniform uniform) const;
 		int TestForStandardUniform(StandardUniform uniform) const;
@@ -165,18 +165,18 @@ namespace GTE
 
 		StandardUniformSet GetStandardUniforms() const;
 
-		void SendSetUniformToShader(unsigned int index);
+		void SendSetUniformToShader(UInt32 index);
 		void SendAllSetUniformsToShader();
 		void SetTexture(TextureRef texture, const std::string& varName);
 		void SetMatrix4x4(const Matrix4x4& mat, const std::string& varName);
-		void SetUniform1f(float val, const std::string& varName);
-		void SetUniform2f(float v1, float v2, const std::string& varName);
-		void SetUniform4f(float v1, float v2, float v3, float v4, const std::string& varName);
+		void SetUniform1f(Real val, const std::string& varName);
+		void SetUniform2f(Real v1, Real v2, const std::string& varName);
+		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName);
 		void SetColor(Color4 val, const std::string& varName);
-		unsigned int GetSetUniformCount() const;
+		UInt32 GetSetUniformCount() const;
 
-		void SendClipPlaneCountToShader(unsigned int count);
-		void SendClipPlaneToShader(unsigned int index, float eq1, float eq2, float eq3, float eq4);
+		void SendClipPlaneCountToShader(UInt32 count);
+		void SendClipPlaneToShader(UInt32 index, Real eq1, Real eq2, Real eq3, Real eq4);
 		void SendModelMatrixToShader(const Matrix4x4 * mat);
 		void SendModelViewMatrixToShader(const Matrix4x4 * mat);
 		void SendProjectionMatrixToShader(const Matrix4x4 * mat);

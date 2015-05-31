@@ -1,6 +1,7 @@
 #ifndef _GTE_ENGINE_TYPES_H_
 #define _GTE_ENGINE_TYPES_H_
 
+#include "global/global.h"
 #include <memory>
 #include <functional>
 
@@ -142,6 +143,58 @@ namespace GTE
 	typedef EngineObjectRef<RenderTarget> RenderTargetRef;
 
 	typedef std::shared_ptr<Transform> TransformRef;
+}
+
+namespace GTE
+{
+#ifdef _WIN32
+
+	typedef bool Bool;
+
+	typedef unsigned char Byte;
+	typedef unsigned char UChar;
+	typedef char Char;
+
+	typedef double RealDouble;
+	typedef float Real;
+
+	typedef __int8 Int8;
+	typedef unsigned __int8 UInt8;
+
+	typedef __int16 Int16;
+	typedef unsigned __int16 UInt16;
+
+	typedef __int32 Int32;
+	typedef unsigned __int32 UInt32;
+
+	typedef __int64 Int64;
+	typedef unsigned __int64 UInt64;
+
+#else
+
+	typedef bool Bool;
+
+	typedef unsigned char Byte;
+	typedef unsigned char UChar;
+	typedef char Char;
+
+	typedef double RealDouble;
+	typedef float Real;
+
+	typedef char Int8;
+	typedef unsigned char UInt8;
+
+	typedef short Int16;
+	typedef unsigned short UInt16;
+
+	typedef int Int32;
+	typedef unsigned int UInt32;
+
+	typedef long Int64;
+	typedef unsigned long UInt64;
+
+#endif
+
 }
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef _GTE_ERRORMANAGER_H_
 #define _GTE_ERRORMANAGER_H_
 
+#include "global/global.h"
 #include <vector>
 #include <string>
 

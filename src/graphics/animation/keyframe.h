@@ -12,6 +12,8 @@
 #ifndef _GTE_KEYFRAME_H_
 #define _GTE_KEYFRAME_H_
 
+#include "global/global.h"
+
 namespace GTE
 {
 	class KeyFrame
@@ -19,14 +21,14 @@ namespace GTE
 	public:
 
 		// the time in the animation of this key frame, in seconds
-		float RealTime;
+		Real RealTime;
 		// the time of this key frame in the animation, normalized to the range 0-1
-		float NormalizedTime;
+		Real NormalizedTime;
 		// the time of this key frame in the animation in ticks
-		float RealTimeTicks;
+		Real RealTimeTicks;
 
 		KeyFrame();
-		KeyFrame(float normalizedTime, float realTime, float realTimeTicks);
+		KeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks);
 		~KeyFrame();
 	};
 }

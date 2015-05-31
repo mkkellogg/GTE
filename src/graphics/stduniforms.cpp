@@ -31,7 +31,7 @@ namespace GTE
 
 	const char * StandardUniforms::GetUniformName(StandardUniform uniform)
 	{
-		return uniformNames[(short)uniform];
+		return uniformNames[(Int16)uniform];
 	}
 
 	StandardUniform StandardUniforms::UniformMaskComponentToUniform(StandardUniformMaskComponent component)

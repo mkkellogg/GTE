@@ -30,22 +30,22 @@ namespace GTE
 		SAFE_DELETE(data);
 	}
 
-	bool BaseVector4Array::Init(unsigned int reservedCount)
+	bool BaseVector4Array::Init(UInt32 reservedCount)
 	{
 		Destroy();
 
 		this->reservedCount = reservedCount;
 		this->count = reservedCount;
 
-		data = new float[reservedCount * 4];
+		data = new Real[reservedCount * 4];
 		ASSERT(data != NULL, "Could not allocate data memory for BaseVector4Array");
 
 		objects = baseFactory->CreateArray(reservedCount);
 		ASSERT(objects != NULL, "Could not allocate objects memory for BaseVector4Array");
 
-		float *dataPtr = data;
+		Real *dataPtr = data;
 
-		unsigned int index = 0;
+		UInt32 index = 0;
 		while (index < reservedCount)
 		{
 			BaseVector4 * currentObject = (BaseVector4*)baseFactory->CreatePermAttached(dataPtr);
@@ -61,29 +61,29 @@ namespace GTE
 		return true;
 	}
 
-	BaseVector4 * BaseVector4Array::GetBaseVector(unsigned int index)
+	BaseVector4 * BaseVector4Array::GetBaseVector(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", NULL, true);
 
 		return objects[index];
 	}
 
-	const float * BaseVector4Array::GetDataPtr() const
+	const Real * BaseVector4Array::GetDataPtr() const
 	{
-		return (const float *)data;
+		return (const Real *)data;
 	}
 
-	unsigned int BaseVector4Array::GetReservedCount() const
+	UInt32 BaseVector4Array::GetReservedCount() const
 	{
 		return reservedCount;
 	}
 
-	void BaseVector4Array::SetCount(unsigned int count)
+	void BaseVector4Array::SetCount(UInt32 count)
 	{
 		this->count = count;
 	}
 
-	unsigned int BaseVector4Array::GetCount() const
+	UInt32 BaseVector4Array::GetCount() const
 	{
 		return count;
 	}
@@ -98,7 +98,7 @@ namespace GTE
 			return false;
 		}
 
-		memcpy(dest->data, data, count * sizeof(float) * 4);
+		memcpy(dest->data, data, count * sizeof(Real) * 4);
 
 		return true;
 	}

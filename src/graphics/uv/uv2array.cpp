@@ -20,7 +20,7 @@ namespace GTE
 	{
 	}
 
-	void UV2Array::SetData(const float * data)
+	void UV2Array::SetData(const Real * data)
 	{
 
 	}

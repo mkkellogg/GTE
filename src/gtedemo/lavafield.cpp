@@ -86,53 +86,53 @@ bool LavaField::InitMeshAndMaterial()
 void LavaField::DisplaceField()
 {
 	// get base pointer to displacement data in [displacementA]
-	GTE::BYTE * pixelsA = displacementA->GetPixels();
-	GTE::BYTE * curPixelsA;
+	GTE::Byte * pixelsA = displacementA->GetPixels();
+	GTE::Byte * curPixelsA;
 
 	// get base pointer to displacement data in [displacementB]
-	GTE::BYTE * pixelsB = displacementB->GetPixels();
-	GTE::BYTE * curPixelsB;
+	GTE::Byte * pixelsB = displacementB->GetPixels();
+	GTE::Byte * curPixelsB;
 
 	GTE::SubMesh3DRef subMesh = fieldMesh->GetSubMesh(0);
 	GTE::Point3Array * positions = subMesh->GetPostions();
 
 	// loop through each vertex in the lava field mesh and displace each
-	for(unsigned int i = 0; i < positions->GetCount(); i++)
+	for(GTE::UInt32 i = 0; i < positions->GetCount(); i++)
 	{
 		GTE::Point3 * p = positions->GetPoint(i);
 
 		// calculate the x & y position (in model space) of the position in
 		// the displacements maps from which to read displacement data
-		float x = (p->x * dispTiling) + dispOffset;
-		float y = (p->y * dispTiling) + dispOffset;
+		GTE::Real x = (p->x * dispTiling) + dispOffset;
+		GTE::Real y = (p->y * dispTiling) + dispOffset;
 
 		// scale displacement position ranges down to [0..1].
-		float percentageX = (float)x / fieldWidth;
-		float percentageY = (float)y / fieldHeight;
+		GTE::Real percentageX = (GTE::Real)x / fieldWidth;
+		GTE::Real percentageY = (GTE::Real)y / fieldHeight;
 
 		// calculate pixel position in displacement map images
 		int pixelX = percentageX * diplacementImageDimensionSize;
 		int pixelY = percentageY * diplacementImageDimensionSize;
 
 		// enforce wrapping if pixel position is outside image boundaries
-		if(pixelX > 0 && (unsigned int)pixelX >= diplacementImageDimensionSize)pixelX = pixelX % diplacementImageDimensionSize;
-		if(pixelY > 0 && (unsigned int)pixelY >= diplacementImageDimensionSize)pixelY = pixelY % diplacementImageDimensionSize;
+		if(pixelX > 0 && (GTE::UInt32)pixelX >= diplacementImageDimensionSize)pixelX = pixelX % diplacementImageDimensionSize;
+		if(pixelY > 0 && (GTE::UInt32)pixelY >= diplacementImageDimensionSize)pixelY = pixelY % diplacementImageDimensionSize;
 		if(pixelX < 0)pixelX = diplacementImageDimensionSize - (pixelX % diplacementImageDimensionSize);
 		if(pixelY < 0)pixelY = diplacementImageDimensionSize - (pixelY % diplacementImageDimensionSize);
 
 		// read pixel values from both displacement maps
 		curPixelsA = pixelsA + ((pixelY * diplacementImageDimensionSize + pixelX) * 4); // 4 bytes per pixel
 		curPixelsB = pixelsB + ((pixelY * diplacementImageDimensionSize + pixelX) * 4); // 4 bytes per pixel
-		GTE::BYTE r = *curPixelsA;
-		float dispA = (float)r / (float)255;
+		GTE::Byte r = *curPixelsA;
+		GTE::Real dispA = (GTE::Real)r / (GTE::Real)255;
 		r = *curPixelsB;
-		float dispB = (float)r / (float)255;
+		GTE::Real dispB = (GTE::Real)r / (GTE::Real)255;
 
 		// calculate final displacement
-		float disp = (dispA + dispB) * dispHeight - dispHeight;
+		GTE::Real disp = (dispA + dispB) * dispHeight - dispHeight;
 
 		// lerp to new displacement for smooth motion
-		float lerpDisp = GTE::GTEMath::Lerp(p->z, disp, .1);
+		GTE::Real lerpDisp = GTE::GTEMath::Lerp(p->z, disp, .1);
 
 		// apply displacement to Z-coordinate since mesh was aligned to XY-plane in model space.
 		p->Set(p->x,p->y,lerpDisp);
@@ -146,7 +146,7 @@ void LavaField::DisplaceField()
 /*
  * Default constructor, initialize all member variables.
  */
-LavaField::LavaField(unsigned int subDivisions)
+LavaField::LavaField(GTE::UInt32 subDivisions)
 {
 	this->subDivisions = subDivisions;
 
@@ -223,7 +223,7 @@ GTE::SceneObjectRef LavaField::GetSceneObject()
  * Set the speed at which the displacement data is shifted through
  * the lava field.
  */
-void LavaField::SetDisplacementSpeed(float speed)
+void LavaField::SetDisplacementSpeed(GTE::Real speed)
 {
 	dispSpeed = speed;
 }
@@ -232,7 +232,7 @@ void LavaField::SetDisplacementSpeed(float speed)
  * Set the factor by which displacement data from the image source is
  * mapped to the lava field mesh.
  */
-void LavaField::SetDisplacementTileSize(float size)
+void LavaField::SetDisplacementTileSize(GTE::Real size)
 {
 	dispTiling = size;
 }
@@ -240,7 +240,7 @@ void LavaField::SetDisplacementTileSize(float size)
 /*
  * Set the speed at which [lavaTextureA] is animated.
  */
-void LavaField::SetTextureASpeed(float speed)
+void LavaField::SetTextureASpeed(GTE::Real speed)
 {
 	textureASpeed = speed;
 }
@@ -248,7 +248,7 @@ void LavaField::SetTextureASpeed(float speed)
 /*
  * Set the speed at which [lavaTextureB] is animated.
  */
-void LavaField::SetTextureBSpeed(float speed)
+void LavaField::SetTextureBSpeed(GTE::Real speed)
 {
 	textureBSpeed = speed;
 }
@@ -256,7 +256,7 @@ void LavaField::SetTextureBSpeed(float speed)
 /*
  * Set the height factor of the lava field displacement.
  */
-void LavaField::SetDisplacementHeight(float height)
+void LavaField::SetDisplacementHeight(GTE::Real height)
 {
 	dispHeight = height;
 }
@@ -268,7 +268,7 @@ void LavaField::SetDisplacementHeight(float height)
 void LavaField::Update()
 {
 	dispOffset += GTE::Time::GetDeltaTime() * dispSpeed;
-	if(dispOffset >= (float)diplacementImageDimensionSize * 2.0)dispOffset = 0;
+	if (dispOffset >= (GTE::Real)diplacementImageDimensionSize * 2.0)dispOffset = 0;
 	DisplaceField();
 
 	textAOffset -= GTE::Time::GetDeltaTime() * textureASpeed;

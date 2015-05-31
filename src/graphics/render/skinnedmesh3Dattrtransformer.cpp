@@ -160,7 +160,7 @@ namespace GTE
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
 		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> No valid vertex bone map found for sub mesh.");
 
-		unsigned int count = vertexBoneMap->GetUniqueVertexCount();
+		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
 		if (target == CacheType::Position)
 		{
@@ -226,7 +226,7 @@ namespace GTE
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
 		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> No valid vertex bone map found for sub mesh.");
 
-		unsigned int count = vertexBoneMap->GetUniqueVertexCount();
+		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
 		memset(cacheFlags, value, sizeof(unsigned char) * count);
 	}
@@ -251,7 +251,7 @@ namespace GTE
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
 		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> No valid vertex bone map found for sub mesh.");
 
-		unsigned int count = vertexBoneMap->GetUniqueVertexCount();
+		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
 		identicalNormalFlags = new unsigned char[count];
 		ASSERT(identicalNormalFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> Unable to allocate identical normal flags array.");
@@ -273,7 +273,7 @@ namespace GTE
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
 		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsTangentsFlags -> No valid vertex bone map found for sub mesh.");
 
-		unsigned int count = vertexBoneMap->GetUniqueVertexCount();
+		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
 		memset(identicalNormalFlags, 0, sizeof(unsigned char) * count);
 		memset(identicalTangentFlags, 0, sizeof(unsigned char) * count);
@@ -304,7 +304,7 @@ namespace GTE
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
 		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents -> No valid vertex bone map found for sub mesh.");
 
-		unsigned int uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
+		UInt32 uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 		ASSERT(fullList.GetCount() == vertexBoneMap->GetVertexCount(),
 			"SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents -> 'fullList' vertex count does not match vertex bone map.");
 
@@ -314,7 +314,7 @@ namespace GTE
 		bool initSeenVectorValues = seenVectorValues.Init(uniqueVertexCount);
 		ASSERT(initSeenVectorValues != false, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents -> Unable to init seenVectorValues.");
 
-		for (unsigned int i = 0; i < uniqueVertexCount; i++)
+		for (UInt32 i = 0; i < uniqueVertexCount; i++)
 		{
 			seenVectors.push_back(false);
 			if (forNormals)identicalNormalFlags[i] = 1;
@@ -322,8 +322,8 @@ namespace GTE
 		}
 
 		VertexBoneMap::VertexMappingDescriptor * desc;
-		unsigned int fullListSize = fullList.GetCount();
-		for (unsigned int i = 0; i < fullListSize; i++)
+		UInt32 fullListSize = fullList.GetCount();
+		for (UInt32 i = 0; i < fullListSize; i++)
 		{
 			desc = vertexBoneMap->GetDescriptor(i);
 			if (desc == NULL)continue;
@@ -366,7 +366,7 @@ namespace GTE
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
 		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> No valid vertex bone map found for sub mesh.");
 
-		unsigned int uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
+		UInt32 uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 
 		cacheFlags = new unsigned char[uniqueVertexCount];
 		ASSERT(cacheFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to allocate cacheFlags flags array.");
@@ -459,7 +459,7 @@ namespace GTE
 			centerOut.Set(centerIn.x, centerIn.y, centerIn.z);
 
 			// number of unique bones encountered, used to calculate the average of the bone offsets
-			unsigned int uniqueBonesEncountered = 0;
+			UInt32 uniqueBonesEncountered = 0;
 			// store the average bone offset, which will be used to transform the center point
 			Matrix4x4 averageBoneOffset;
 
@@ -472,9 +472,9 @@ namespace GTE
 			ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> No valid vertex bone map found for sub mesh.");
 
 			// get the number of unique vertices in the vertex bone map
-			unsigned int uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
+			UInt32 uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 			// get total number of vertices (including multiple instances of a unique vertex)
-			unsigned int fullVertexCount = vertexBoneMap->GetVertexCount();
+			UInt32 fullVertexCount = vertexBoneMap->GetVertexCount();
 
 			if (transformPositions)ASSERT(positionsOut.GetCount() == fullVertexCount, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Mismatched position count.");
 			if (transformNormals)ASSERT(vertexNormalsOut.GetCount() == fullVertexCount, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Mismatched vertex normal count.");
@@ -483,7 +483,7 @@ namespace GTE
 
 					// initialize the position transformation flags array, saved transformed position array,
 					// normal transformation flags array, and saved transformed normal array
-					if (currentCacheSize < 0 || uniqueVertexCount != (unsigned int)currentCacheSize)
+					if (currentCacheSize < 0 || uniqueVertexCount != (UInt32)currentCacheSize)
 					{
 						DestroyCaches();
 						bool createSuccess = CreateCaches();
@@ -502,7 +502,7 @@ namespace GTE
 			SkeletonRef skeleton = renderer->GetSkeleton();
 			ASSERT(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformAttributes -> renderer's skeleton is not valid.");
 
-			if (boneCount < 0 || (unsigned int)boneCount != skeleton->GetBoneCount())
+			if (boneCount < 0 || (UInt32)boneCount != skeleton->GetBoneCount())
 			{
 				UpdateTransformedBoneCacheSize();
 			}
@@ -511,28 +511,28 @@ namespace GTE
 			// clear the flags for all caches
 			ClearCacheFlags();
 
-			float* transformedPositionsPtrBase = const_cast<float*>(transformedPositions.GetDataPtr());
-			float* transformedVertexNormalsPtrBase = const_cast<float*>(transformedVertexNormals.GetDataPtr());
-			float* transformedFaceNormalsPtrBase = const_cast<float*>(transformedFaceNormals.GetDataPtr());
-			float* transformedVertexTangentsPtrBase = const_cast<float*>(transformedVertexTangents.GetDataPtr());
-			float* transformedPositionsPtr = NULL;
-			float* transformedVertexNormalsPtr = NULL;
-			float* transformedFaceNormalsPtr = NULL;
-			float* transformedVertexTangentsPtr = NULL;
+			Real* transformedPositionsPtrBase = const_cast<Real*>(transformedPositions.GetDataPtr());
+			Real* transformedVertexNormalsPtrBase = const_cast<Real*>(transformedVertexNormals.GetDataPtr());
+			Real* transformedFaceNormalsPtrBase = const_cast<Real*>(transformedFaceNormals.GetDataPtr());
+			Real* transformedVertexTangentsPtrBase = const_cast<Real*>(transformedVertexTangents.GetDataPtr());
+			Real* transformedPositionsPtr = NULL;
+			Real* transformedVertexNormalsPtr = NULL;
+			Real* transformedFaceNormalsPtr = NULL;
+			Real* transformedVertexTangentsPtr = NULL;
 
-			float * positionsOutBase = const_cast<float*>(positionsOut.GetDataPtr());
-			float * vertexNormalsOutBase = const_cast<float*>(vertexNormalsOut.GetDataPtr());
-			float * faceNormalsOutBase = const_cast<float*>(faceNormalsOut.GetDataPtr());
-			float * vertexTangentsOutBase = const_cast<float*>(vertexTangentsOut.GetDataPtr());
+			Real * positionsOutBase = const_cast<Real*>(positionsOut.GetDataPtr());
+			Real * vertexNormalsOutBase = const_cast<Real*>(vertexNormalsOut.GetDataPtr());
+			Real * faceNormalsOutBase = const_cast<Real*>(faceNormalsOut.GetDataPtr());
+			Real * vertexTangentsOutBase = const_cast<Real*>(vertexTangentsOut.GetDataPtr());
 
-			unsigned int fullPositionCount = vertexBoneMap->GetVertexCount();
+			UInt32 fullPositionCount = vertexBoneMap->GetVertexCount();
 			// loop through each vertex
-			for (unsigned int i = 0; i < fullPositionCount; i++)
+			for (UInt32 i = 0; i < fullPositionCount; i++)
 			{
-				float * currentPositionPtr = positionsOutBase + (i * 4);
-				float * currentVertexNormalPtr = vertexNormalsOutBase + (i * 4);
-				float * currentFaceNormalPtr = faceNormalsOutBase + (i * 4);
-				float * currentVertexTangentPtr = vertexTangentsOutBase + (i * 4);
+				Real * currentPositionPtr = positionsOutBase + (i * 4);
+				Real * currentVertexNormalPtr = vertexNormalsOutBase + (i * 4);
+				Real * currentFaceNormalPtr = faceNormalsOutBase + (i * 4);
+				Real * currentVertexTangentPtr = vertexTangentsOutBase + (i * 4);
 
 				// get the mapping information for the current vertex
 				VertexBoneMap::VertexMappingDescriptor *desc = vertexBoneMap->GetDescriptor(i);
@@ -584,7 +584,7 @@ namespace GTE
 					// loop through each bone to which this vertex is attached and calculate the final
 					// transformation for this vertex by applying the respective weight for each bone
 					// transformation and adding them up.
-					for (unsigned int b = 0; b < desc->BoneCount; b++)
+					for (UInt32 b = 0; b < desc->BoneCount; b++)
 					{
 						Bone * bone = skeleton->GetBone(desc->BoneIndex[b]);
 
@@ -656,7 +656,7 @@ namespace GTE
 
 			// calculate average bone offset
 			if (uniqueBonesEncountered == 0)uniqueBonesEncountered = 1;
-			averageBoneOffset.MultiplyByScalar(1 / (float)uniqueBonesEncountered);
+			averageBoneOffset.MultiplyByScalar(1 / (Real)uniqueBonesEncountered);
 			// apply average bone offset to center point
 			averageBoneOffset.Transform(centerOut);
 		}

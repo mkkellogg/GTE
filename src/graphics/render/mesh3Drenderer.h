@@ -20,6 +20,7 @@
 #define _GTE_MESH3D_RENDERER_H_
 
 #include "object/engineobject.h"
+#include "object/enginetypes.h"
 #include "object/sceneobjectcomponent.h"
 #include <vector>
 
@@ -49,24 +50,24 @@ namespace GTE
 		Mesh3DRenderer();
 		virtual ~Mesh3DRenderer();
 		void DestroyRenderers();
-		void DestroyRenderer(unsigned int index);
+		void DestroyRenderer(UInt32 index);
 
 	public:
 
-		unsigned int GetMaterialCount() const;
-		MaterialRef GetMaterial(unsigned int index);
-		void SetMaterial(unsigned int index, MaterialRef material);
+		UInt32 GetMaterialCount() const;
+		MaterialRef GetMaterial(UInt32 index);
+		void SetMaterial(UInt32 index, MaterialRef material);
 		void AddMaterial(MaterialRef material);
 
 		virtual void InitializeForMesh();
 		void InitializeForMesh(Mesh3DRef mesh);
-		void UpdateFromSubMesh(unsigned int index);
+		void UpdateFromSubMesh(UInt32 index);
 
 		virtual Mesh3DRef GetTargetMesh();
 		SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer);
-		virtual SubMesh3DRef GetSubMesh(unsigned int index);
-		SubMesh3DRendererRef GetSubRenderer(unsigned int index);
-		unsigned int GetSubRendererCount() const;
+		virtual SubMesh3DRef GetSubMesh(UInt32 index);
+		SubMesh3DRendererRef GetSubRenderer(UInt32 index);
+		UInt32 GetSubRendererCount() const;
 	};
 }
 

@@ -9,7 +9,7 @@
 
 namespace GTE
 {
-	LongMask LongMaskUtil::InvertBitsForIndexMask(unsigned short index)
+	LongMask LongMaskUtil::InvertBitsForIndexMask(UInt16 index)
 	{
 		LongMask maskValue = IndexToMaskValue(index);
 		return InvertBits(maskValue);
@@ -49,23 +49,23 @@ namespace GTE
 		return index;
 	}
 
-	LongMask LongMaskUtil::IndexToMaskValue(unsigned short index)
+	LongMask LongMaskUtil::IndexToMaskValue(UInt16 index)
 	{
 		return 0x0000000000000001L << index;
 	}
 
-	void LongMaskUtil::SetBit(LongMask * target, unsigned short index)
+	void LongMaskUtil::SetBit(LongMask * target, UInt16 index)
 	{
-		unsigned int maskValue = IndexToMaskValue(index);
-		unsigned int uPtr = (unsigned int)*target;
-		uPtr |= (unsigned int)maskValue;
+		UInt32 maskValue = IndexToMaskValue(index);
+		UInt32 uPtr = (UInt32)*target;
+		uPtr |= (UInt32)maskValue;
 		*target = uPtr;
 	}
 
-	void LongMaskUtil::ClearBit(LongMask * target, unsigned short index)
+	void LongMaskUtil::ClearBit(LongMask * target, UInt16 index)
 	{
-		unsigned int uPtr = (unsigned int)*target;
-		unsigned int mask = InvertBitsForIndexMask(index);
+		UInt32 uPtr = (UInt32)*target;
+		UInt32 mask = InvertBitsForIndexMask(index);
 
 		uPtr &= mask;
 		*target = uPtr;
@@ -73,23 +73,23 @@ namespace GTE
 
 	void LongMaskUtil::SetBitForMask(LongMask * target, LongMask mask)
 	{
-		unsigned int uPtr = (unsigned int)*target;
+		UInt32 uPtr = (UInt32)*target;
 		uPtr |= mask;
 		*target = uPtr;
 	}
 
 	void LongMaskUtil::ClearBitForMask(LongMask * target, LongMask mask)
 	{
-		unsigned int uPtr = (unsigned int)*target;
-		unsigned int iMask = InvertBits(mask);
+		UInt32 uPtr = (UInt32)*target;
+		UInt32 iMask = InvertBits(mask);
 
 		uPtr &= iMask;
 		*target = uPtr;
 	}
 
-	bool LongMaskUtil::IsBitSet(LongMask target, unsigned short index)
+	bool LongMaskUtil::IsBitSet(LongMask target, UInt16 index)
 	{
-		unsigned int mask = IndexToMaskValue(index);
+		UInt32 mask = IndexToMaskValue(index);
 		return target & mask;
 	}
 

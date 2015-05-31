@@ -11,7 +11,7 @@ namespace GTE
 	/*
 	 * Default constructor.
 	 */
-	BlendOp::BlendOp(float duration)
+	BlendOp::BlendOp(Real duration)
 	{
 		this->duration = duration;
 		this->progress = 0;
@@ -27,7 +27,7 @@ namespace GTE
 
 	}
 
-	bool BlendOp::Init(std::vector<float>& initialWeights)
+	bool BlendOp::Init(std::vector<Real>& initialWeights)
 	{
 		this->initialWeights = initialWeights;
 		Reset();
@@ -40,7 +40,7 @@ namespace GTE
 		complete = false;
 	}
 
-	void BlendOp::Update(std::vector<float>& weights)
+	void BlendOp::Update(std::vector<Real>& weights)
 	{
 		progress += Time::GetDeltaTime();
 	}
@@ -65,12 +65,12 @@ namespace GTE
 		return complete;
 	}
 
-	float BlendOp::GetNormalizedProgress()
+	Real BlendOp::GetNormalizedProgress()
 	{
 		return progress / duration;
 	}
 
-	float BlendOp::GetProgress()
+	Real BlendOp::GetProgress()
 	{
 		return progress;
 	}

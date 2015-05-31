@@ -79,7 +79,7 @@ namespace GTE
 		return rawImage;
 	}
 
-	RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height)
+	RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, UInt32 width, UInt32 height)
 	{
 		NONFATAL_ASSERT_RTRN(data != NULL, "ImportUtil::GetRawImageFromILData -> 'data' is null.", NULL, true);
 
@@ -94,9 +94,9 @@ namespace GTE
 			return NULL;
 		}
 
-		for (unsigned int i = 0; i < width * height * 4; i++)
+		for (UInt32 i = 0; i < width * height * 4; i++)
 		{
-			rawImage->SetByte(i, (BYTE)data[i]);
+			rawImage->SetByte(i, (Byte)data[i]);
 		}
 
 		return rawImage;

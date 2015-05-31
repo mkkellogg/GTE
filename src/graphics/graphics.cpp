@@ -92,7 +92,7 @@ namespace GTE
 		framesInFPSSpan++;
 		if (currentFPSSpanTime >= 1)
 		{
-			currentFPS = (float)framesInFPSSpan / currentFPSSpanTime;
+			currentFPS = (Real)framesInFPSSpan / currentFPSSpanTime;
 			//printf("fps: %f\n", currentFPS);
 			currentFPSSpanTime = 0;
 			framesInFPSSpan = 0;
@@ -148,7 +148,7 @@ namespace GTE
 	/*
 	 * Get the currently calculated FPS value.
 	 */
-	float Graphics::GetCurrentFPS()
+	Real Graphics::GetCurrentFPS()
 	{
 		return currentFPS;
 	}

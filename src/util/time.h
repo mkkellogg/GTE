@@ -11,6 +11,7 @@
 #define _GTE_TIME_H_
 
 #include <chrono>
+#include "object/enginetypes.h"
 
 namespace GTE
 {
@@ -19,8 +20,8 @@ namespace GTE
 		static bool initialized;
 		static unsigned long long startupTime;
 		static std::chrono::high_resolution_clock::time_point _startupTime;
-		static float lastRecordedTime;
-		static float deltaTime;
+		static Real lastRecordedTime;
+		static Real deltaTime;
 
 		static void Initialize();
 
@@ -33,8 +34,8 @@ namespace GTE
 
 		static void Update();
 
-		static float GetRealTimeSinceStartup();
-		static float GetDeltaTime();
+		static Real GetRealTimeSinceStartup();
+		static Real GetDeltaTime();
 	};
 }
 

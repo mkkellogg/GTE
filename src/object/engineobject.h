@@ -1,12 +1,14 @@
 #ifndef _GTE_ENGINEOBJECT_H_
 #define _GTE_ENGINEOBJECT_H_
 
+#include "object/enginetypes.h"
+
 namespace GTE
 {
 	//forward declarations
 	class EngineObjectManager;
 
-	typedef unsigned int ObjectID;
+	typedef UInt32 ObjectID;
 
 	class EngineObject
 	{

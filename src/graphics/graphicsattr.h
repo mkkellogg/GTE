@@ -10,6 +10,9 @@
 #ifndef _GTE_GRAPHICSATTR_H_
 #define _GTE_GRAPHICSATTR_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 namespace GTE
 {
 	enum class BlendingProperty
@@ -68,8 +71,8 @@ namespace GTE
 	{
 	public:
 
-		unsigned int WindowWidth;
-		unsigned int WindowHeight;
+		UInt32 WindowWidth;
+		UInt32 WindowHeight;
 		std::string WindowTitle;
 		bool WaitForVSync;
 		AntialiasingMethod AAMethod;
@@ -83,7 +86,7 @@ namespace GTE
 			AAMethod = AntialiasingMethod::MSAAx2;
 		}
 
-		static unsigned int GetMSAASamples(AntialiasingMethod method)
+		static UInt32 GetMSAASamples(AntialiasingMethod method)
 		{
 			switch (method)
 			{

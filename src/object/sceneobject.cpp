@@ -257,7 +257,7 @@ namespace GTE
 		NONFATAL_ASSERT(child.IsValid(), "SceneObject::RemoveChild -> 'child' is invalid.", true);
 
 		int foundIndex = -1;
-		for (unsigned int i = 0; i < children.size(); i++)
+		for (UInt32 i = 0; i < children.size(); i++)
 		{
 			if (children[i] == child)
 			{
@@ -282,12 +282,12 @@ namespace GTE
 		}
 	}
 
-	unsigned int SceneObject::GetChildrenCount() const
+	UInt32 SceneObject::GetChildrenCount() const
 	{
 		return children.size();
 	}
 
-	SceneObjectRef SceneObject::GetChildAt(unsigned int index) const
+	SceneObjectRef SceneObject::GetChildAt(UInt32 index) const
 	{
 		if (index < children.size())
 		{

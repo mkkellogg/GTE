@@ -18,7 +18,7 @@ namespace GTE
 	/*
 	 * Parameterized constructor.
 	 */
-	RotationKeyFrame::RotationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Quaternion& rotation) : KeyFrame(normalizedTime, realTime, realTimeTicks)
+	RotationKeyFrame::RotationKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Quaternion& rotation) : KeyFrame(normalizedTime, realTime, realTimeTicks)
 	{
 		this->Rotation = rotation;
 	}

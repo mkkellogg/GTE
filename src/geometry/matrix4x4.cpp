@@ -1,7 +1,7 @@
 /********************************************* 
 *
 * Matrix math utilities. These methods operate on OpenGL ES format matrices and 
-* vectors stored in float arrays. Matrices are 4 x 4 column-vector matrices 
+* vectors stored in Real arrays. Matrices are 4 x 4 column-vector matrices 
 * stored in column-major order:
 *
 * m[offset +  0] m[offset +  4] m[offset +  8] m[offset + 12]
@@ -50,9 +50,9 @@ namespace GTE
 	}
 
 	/*
-	 * Construct matrix with existing float data
+	 * Construct matrix with existing Real data
 	 */
-	Matrix4x4::Matrix4x4(const float * sourceData) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
+	Matrix4x4::Matrix4x4(const Real * sourceData) : A0(data[0]), A1(data[4]), A2(data[8]), A3(data[12]),
 		B0(data[1]), B1(data[5]), B2(data[9]), B3(data[13]),
 		C0(data[2]), C1(data[6]), C2(data[10]), C3(data[14]),
 		D0(data[3]), D1(data[7]), D2(data[11]), D3(data[15])
@@ -61,12 +61,12 @@ namespace GTE
 
 		if (sourceData != NULL)
 		{
-			memcpy(data, sourceData, sizeof(float) * DATA_SIZE);
+			memcpy(data, sourceData, sizeof(Real) * DATA_SIZE);
 		}
 		else
 		{
 			SetIdentity();
-			Debug::PrintWarning("Matrix4x4::Matrix4x4(float *) -> NULL data passed.");
+			Debug::PrintWarning("Matrix4x4::Matrix4x4(Real *) -> NULL data passed.");
 		}
 	}
 
@@ -104,12 +104,12 @@ namespace GTE
 	}
 
 	/*
-	 * Copy existing matrix data (from a float array) to this one
+	 * Copy existing matrix data (from a Real array) to this one
 	 */
-	void Matrix4x4::SetTo(const float * sourceData)
+	void Matrix4x4::SetTo(const Real * sourceData)
 	{
 		NONFATAL_ASSERT(sourceData != NULL, "Matrix4x4::SetTo -> 'srcData' is null", true);
-		memcpy(data, sourceData, sizeof(float) * DATA_SIZE);
+		memcpy(data, sourceData, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -134,13 +134,13 @@ namespace GTE
 		Matrix4x4 rotMatrix;
 
 		// build orthogonal matrix [rotMatrix]
-		float fInvLength = GTEMath::InverseSquareRoot(A0*A0 + B0*B0 + C0*C0);
+		Real fInvLength = GTEMath::InverseSquareRoot(A0*A0 + B0*B0 + C0*C0);
 
 		rotMatrix.A0 = A0*fInvLength;
 		rotMatrix.B0 = B0*fInvLength;
 		rotMatrix.C0 = C0*fInvLength;
 
-		float fDot = rotMatrix.A0*A1 + rotMatrix.B0*B1 + rotMatrix.C0*C1;
+		Real fDot = rotMatrix.A0*A1 + rotMatrix.B0*B1 + rotMatrix.C0*C1;
 		rotMatrix.A1 = A1 - fDot*rotMatrix.A0;
 		rotMatrix.B1 = B1 - fDot*rotMatrix.B0;
 		rotMatrix.C1 = C1 - fDot*rotMatrix.C0;
@@ -167,7 +167,7 @@ namespace GTE
 		rotMatrix.C2 *= fInvLength;
 
 		// guarantee that orthogonal matrix has determinant 1 (no reflections)
-		float fDet = rotMatrix.A0*rotMatrix.B1*rotMatrix.C2 + rotMatrix.A1*rotMatrix.B2*rotMatrix.C0 +
+		Real fDet = rotMatrix.A0*rotMatrix.B1*rotMatrix.C2 + rotMatrix.A1*rotMatrix.B2*rotMatrix.C0 +
 			rotMatrix.A2*rotMatrix.B0*rotMatrix.C1 - rotMatrix.A2*rotMatrix.B1*rotMatrix.C0 -
 			rotMatrix.A1*rotMatrix.B0*rotMatrix.C2 - rotMatrix.A0*rotMatrix.B2*rotMatrix.C1;
 
@@ -195,7 +195,7 @@ namespace GTE
 		Vector3 shear;
 
 		// the shear component
-		float fInvD0 = 1.0f / scale.x;
+		Real fInvD0 = 1.0f / scale.x;
 		shear.x = rightMatrix.A1*fInvD0;
 		shear.y = rightMatrix.A2*fInvD0;
 		shear.z = rightMatrix.B2 / scale.y;
@@ -209,7 +209,7 @@ namespace GTE
 		return D0 == 0 && D1 == 0 && D2 == 0 && D3 == 1;
 	}
 
-	bool Matrix4x4::IsAffine(const float * data)
+	bool Matrix4x4::IsAffine(const Real * data)
 	{
 		return data[3] == 0 && data[7] == 0 && data[11] == 0 && data[15] == 1;
 	}
@@ -235,16 +235,16 @@ namespace GTE
 	/*
 	* Calculate the determinant of this matrix.
 	*/
-	float Matrix4x4::CalculateDeterminant()
+	Real Matrix4x4::CalculateDeterminant()
 	{
 		// array of transpose source matrix
-		float src[DATA_SIZE];
+		Real src[DATA_SIZE];
 
 		// transpose matrix
 		Transpose(this->data, src);
 
 		// temp array for pairs
-		float tmp[DATA_SIZE];
+		Real tmp[DATA_SIZE];
 
 		// calculate pairs for first 8 elements (cofactors)
 		tmp[0] = src[10] * src[15];
@@ -262,7 +262,7 @@ namespace GTE
 		tmp[11] = src[9] * src[12];
 
 		// Holds the destination matrix while we're building it up.
-		float dst[DATA_SIZE];
+		Real dst[DATA_SIZE];
 
 		// calculate first 8 elements (cofactors)
 		dst[0] = tmp[0] * src[5] + tmp[3] * src[6] + tmp[4] * src[7];
@@ -315,7 +315,7 @@ namespace GTE
 		dst[15] -= tmp[8] * src[9] + tmp[11] * src[10] + tmp[5] * src[8];
 
 		// calculate determinant
-		float det = src[0] * dst[0] + src[1] * dst[1] + src[2] * dst[2] + src[3] * dst[3];
+		Real det = src[0] * dst[0] + src[1] * dst[1] + src[2] * dst[2] + src[3] * dst[3];
 
 		return det;
 	}
@@ -323,9 +323,9 @@ namespace GTE
 	/*
 	 * Multiply this matrix by the scalar [scalar]
 	 */
-	void Matrix4x4::MultiplyByScalar(float scalar)
+	void Matrix4x4::MultiplyByScalar(Real scalar)
 	{
-		for (unsigned int i = 0; i < DATA_SIZE; i++)
+		for (UInt32 i = 0; i < DATA_SIZE; i++)
 		{
 			data[i] *= scalar;
 		}
@@ -336,7 +336,7 @@ namespace GTE
 	 */
 	void Matrix4x4::Transform(const Vector3& vector, Vector3& out) const
 	{
-		float * vectorData = const_cast<Vector3&>(vector).GetDataPtr();
+		Real * vectorData = const_cast<Vector3&>(vector).GetDataPtr();
 		MultiplyMV(this->data, vectorData, out.GetDataPtr());
 	}
 
@@ -345,7 +345,7 @@ namespace GTE
 	 */
 	void Matrix4x4::Transform(const Point3& point, Point3& out) const
 	{
-		float * pointData = const_cast<Point3&>(point).GetDataPtr();
+		Real * pointData = const_cast<Point3&>(point).GetDataPtr();
 		MultiplyMV(this->data, pointData, out.GetDataPtr());
 	}
 
@@ -354,9 +354,9 @@ namespace GTE
 	 */
 	void Matrix4x4::Transform(Vector3& vector) const
 	{
-		float temp[DIM_SIZE];
+		Real temp[DIM_SIZE];
 		MultiplyMV(this->data, vector.GetDataPtr(), temp);
-		memcpy(vector.GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
+		memcpy(vector.GetDataPtr(), temp, sizeof(Real) * DIM_SIZE);
 	}
 
 	/*
@@ -364,21 +364,21 @@ namespace GTE
 	 */
 	void Matrix4x4::Transform(Point3& point) const
 	{
-		float temp[DIM_SIZE];
+		Real temp[DIM_SIZE];
 		MultiplyMV(this->data, point.GetDataPtr(), temp);
-		memcpy(point.GetDataPtr(), temp, sizeof(float) * DIM_SIZE);
+		memcpy(point.GetDataPtr(), temp, sizeof(Real) * DIM_SIZE);
 	}
 
 	/*
 	 * Transform [vector4f] by this matrix
 	 */
-	void Matrix4x4::Transform(float * vector4f) const
+	void Matrix4x4::Transform(Real * vector4f) const
 	{
-		NONFATAL_ASSERT(vector4f != NULL, "Matrix4x4::Transform(float *) -> 'vector4f' is null.", true);
+		NONFATAL_ASSERT(vector4f != NULL, "Matrix4x4::Transform(Real *) -> 'vector4f' is null.", true);
 
-		float temp[DIM_SIZE];
+		Real temp[DIM_SIZE];
 		MultiplyMV(this->data, vector4f, temp);
-		memcpy(vector4f, temp, sizeof(float) * DIM_SIZE);
+		memcpy(vector4f, temp, sizeof(Real) * DIM_SIZE);
 	}
 
 	/*
@@ -386,7 +386,7 @@ namespace GTE
 	 */
 	void Matrix4x4::Add(const Matrix4x4& matrix)
 	{
-		for (unsigned int i = 0; i < DATA_SIZE; i++)
+		for (UInt32 i = 0; i < DATA_SIZE; i++)
 		{
 			data[i] += matrix.data[i];
 		}
@@ -397,9 +397,9 @@ namespace GTE
 	 */
 	void Matrix4x4::Multiply(const Matrix4x4& matrix)
 	{
-		float temp[DATA_SIZE];
+		Real temp[DATA_SIZE];
 		MultiplyMM(this->data, matrix.data, temp);
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -407,9 +407,9 @@ namespace GTE
 	 */
 	void Matrix4x4::PreMultiply(const Matrix4x4& matrix)
 	{
-		float temp[DATA_SIZE];
+		Real temp[DATA_SIZE];
 		MultiplyMM(matrix.data, this->data, temp);
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -432,7 +432,7 @@ namespace GTE
 	 * Transform the vector pointed to by [rhsVec], by the matrix pointed to by [lhsMat],
 	 * and store the result in [out]
 	 */
-	void Matrix4x4::MultiplyMV(const float * lhsMat, const float * rhsVec, float * out)
+	void Matrix4x4::MultiplyMV(const Real * lhsMat, const Real * rhsVec, Real * out)
 	{
 		NONFATAL_ASSERT(lhsMat != NULL, "Matrix4x4::MultiplyMV -> 'lhsMat' is null.", true);
 		NONFATAL_ASSERT(rhsVec != NULL, "Matrix4x4::MultiplyMV -> 'rhsVec' is null.", true);
@@ -445,7 +445,7 @@ namespace GTE
 	 * Transform the homogeneous point/vector specified by [x,y,z,w], by the matrix pointed to by [matrix],
 	 * and store the result in [pDest]
 	 */
-	void Matrix4x4::Mx4transform(float x, float y, float z, float w, const float* matrix, float* pDest)
+	void Matrix4x4::Mx4transform(Real x, Real y, Real z, Real w, const Real* matrix, Real* pDest)
 	{
 		NONFATAL_ASSERT(matrix != NULL, "Matrix4x4::Mx4transform -> 'lhsMat' is null.", true);
 		NONFATAL_ASSERT(pDest != NULL, "Matrix4x4::Mx4transform -> 'pDest' is null.", true);
@@ -458,30 +458,30 @@ namespace GTE
 
 	/*********************************************************
 	*
-	* Multiply two 4x4 matrices (in float array form) together and store the result in a third 4x4 matrix.
+	* Multiply two 4x4 matrices (in Real array form) together and store the result in a third 4x4 matrix.
 	* In matrix notation: out = lhs x rhs. Due to the way matrix multiplication works,
 	* the [out] matrix will have the same effect as first multiplying by the [rhs] matrix,
 	* then multiplying by the [lhs] matrix.
 	*
 	* Parameters:
-	* [out] The float array that holds the result.
-	* [lhs] The float array that holds the left-hand-side 4x4 matrix.
-	* [rhs] The float array that holds the right-hand-side 4x4 matrix.
+	* [out] The Real array that holds the result.
+	* [lhs] The Real array that holds the left-hand-side 4x4 matrix.
+	* [rhs] The Real array that holds the right-hand-side 4x4 matrix.
 	*
 	*********************************************************/
 
-	void Matrix4x4::MultiplyMM(const float * lhs, const float *rhs, float * out)
+	void Matrix4x4::MultiplyMM(const Real * lhs, const Real *rhs, Real * out)
 	{
 		for (int i = 0; i < DIM_SIZE; i++)
 		{
-			const float rhs_i0 = rhs[I(i, 0)];
-			float ri0 = lhs[I(0, 0)] * rhs_i0;
-			float ri1 = lhs[I(0, 1)] * rhs_i0;
-			float ri2 = lhs[I(0, 2)] * rhs_i0;
-			float ri3 = lhs[I(0, 3)] * rhs_i0;
+			const Real rhs_i0 = rhs[I(i, 0)];
+			Real ri0 = lhs[I(0, 0)] * rhs_i0;
+			Real ri1 = lhs[I(0, 1)] * rhs_i0;
+			Real ri2 = lhs[I(0, 2)] * rhs_i0;
+			Real ri3 = lhs[I(0, 3)] * rhs_i0;
 			for (int j = 1; j < DIM_SIZE; j++)
 			{
-				const float rhs_ij = rhs[I(i, j)];
+				const Real rhs_ij = rhs[I(i, j)];
 				ri0 += lhs[I(j, 0)] * rhs_ij;
 				ri1 += lhs[I(j, 1)] * rhs_ij;
 				ri2 += lhs[I(j, 2)] * rhs_ij;
@@ -499,15 +499,15 @@ namespace GTE
 	 */
 	void Matrix4x4::Transpose()
 	{
-		float temp[DATA_SIZE];
+		Real temp[DATA_SIZE];
 		Transpose(data, temp);
-		memcpy(temp, data, sizeof(float) * DATA_SIZE);
+		memcpy(temp, data, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
 	 * Transpose the 4x4 matrix pointed to by [source] and store in [dest].
 	 */
-	void Matrix4x4::Transpose(const float* source, float *dest)
+	void Matrix4x4::Transpose(const Real* source, Real *dest)
 	{
 		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Transpose -> 'source' is null.", true);
 		NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Transpose -> 'dest' is null.", true);
@@ -529,11 +529,11 @@ namespace GTE
 	 */
 	bool Matrix4x4::Invert()
 	{
-		float temp[DATA_SIZE];
+		Real temp[DATA_SIZE];
 		bool success = Invert(data, temp);
 		if (success == true)
 		{
-			memcpy(data, temp, sizeof(float) * DATA_SIZE);
+			memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 		}
 		return success;
 	}
@@ -553,7 +553,7 @@ namespace GTE
 	 *
 	 * Returns false if the matrix cannot be inverted
 	 */
-	bool Matrix4x4::Invert(const float * source, float * dest)
+	bool Matrix4x4::Invert(const Real * source, Real * dest)
 	{
 		// we need to know if the matrix is affine so that we can make it affine
 		// once again after the inversion. the inversion process can introduce very small
@@ -565,13 +565,13 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(dest != NULL, "Matrix4x4::Invert -> 'dest' is null.", false, true);
 
 		// array of transpose source matrix
-		float src[DATA_SIZE];
+		Real src[DATA_SIZE];
 
 		// transpose matrix
 		Transpose(source, src);
 
 		// temp array for pairs
-		float tmp[DATA_SIZE];
+		Real tmp[DATA_SIZE];
 
 		// calculate pairs for first 8 elements (cofactors)
 		tmp[0] = src[10] * src[15];
@@ -589,7 +589,7 @@ namespace GTE
 		tmp[11] = src[9] * src[12];
 
 		// Holds the destination matrix while we're building it up.
-		float dst[DATA_SIZE];
+		Real dst[DATA_SIZE];
 
 		// calculate first 8 elements (cofactors)
 		dst[0] = tmp[0] * src[5] + tmp[3] * src[6] + tmp[4] * src[7];
@@ -642,7 +642,7 @@ namespace GTE
 		dst[15] -= tmp[8] * src[9] + tmp[11] * src[10] + tmp[5] * src[8];
 
 		// calculate determinant
-		float det = src[0] * dst[0] + src[1] * dst[1] + src[2] * dst[2] + src[3] * dst[3];
+		Real det = src[0] * dst[0] + src[1] * dst[1] + src[2] * dst[2] + src[3] * dst[3];
 
 		if (det == 0.0f)
 		{
@@ -678,7 +678,7 @@ namespace GTE
 	/*
 	 * Set the 4x4 matrix pointed to by [target]  to the identity matrix.
 	 */
-	void Matrix4x4::SetIdentity(float * target)
+	void Matrix4x4::SetIdentity(Real * target)
 	{
 		NONFATAL_ASSERT(target != NULL, "Matrix4x4::SetIdentity -> 'target' is null.", true);
 
@@ -694,11 +694,11 @@ namespace GTE
 	}
 
 	/*
-	 * Get a pointer the float data that makes up this matrix
+	 * Get a pointer the Real data that makes up this matrix
 	 */
-	const float * Matrix4x4::GetDataPtr() const
+	const Real * Matrix4x4::GetDataPtr() const
 	{
-		return (const float *)data;
+		return (const Real *)data;
 	}
 
 	/*
@@ -718,11 +718,11 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying this
 	 * matrix by a scale matrix
 	 */
-	void Matrix4x4::Scale(float x, float y, float z)
+	void Matrix4x4::Scale(Real x, Real y, Real z)
 	{
-		float temp[DATA_SIZE];
+		Real temp[DATA_SIZE];
 		Scale(this->data, temp, x, y, z);
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -731,16 +731,16 @@ namespace GTE
 	 * This performs a pre-transformation, in that it is equivalent to pre-multiplying this
 	 * matrix by a scale matrix
 	 */
-	void Matrix4x4::PreScale(float x, float y, float z)
+	void Matrix4x4::PreScale(Real x, Real y, Real z)
 	{
-		float temp[DATA_SIZE];
+		Real temp[DATA_SIZE];
 		Matrix4x4 scale;
 		scale.SetIdentity();
 		scale.Scale(x, y, z);
 
 		MultiplyMM(scale.GetDataPtr(), this->data, temp);
 
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -749,7 +749,7 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying this
 	 * matrix by a scale matrix
 	 */
-	void Matrix4x4::Scale(Matrix4x4& out, float x, float y, float z) const
+	void Matrix4x4::Scale(Matrix4x4& out, Real x, Real y, Real z) const
 	{
 		Scale(this->data, out.data, x, y, z);
 	}
@@ -761,7 +761,7 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying
 	 * [source] by a scale matrix
 	 */
-	void Matrix4x4::Scale(const float * source, float * dest, float x, float y, float z)
+	void Matrix4x4::Scale(const Real * source, Real * dest, Real x, Real y, Real z)
 	{
 		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Scale -> 'source' is null.", true);
 		NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Scale -> 'dest' is null.", true);
@@ -785,9 +785,9 @@ namespace GTE
 	 */
 	void Matrix4x4::Translate(const Vector3& vector)
 	{
-		float x = vector.x;
-		float y = vector.y;
-		float z = vector.z;
+		Real x = vector.x;
+		Real y = vector.y;
+		Real z = vector.z;
 		Translate(x, y, z);
 	}
 
@@ -797,7 +797,7 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying
 	 * this matrix by a translation matrix
 	 */
-	void Matrix4x4::Translate(float x, float y, float z)
+	void Matrix4x4::Translate(Real x, Real y, Real z)
 	{
 		Translate(data, data, x, y, z);
 	}
@@ -818,11 +818,11 @@ namespace GTE
 	 * This performs a pre-transformation, in that it is equivalent to pre-multiplying
 	 * this matrix by a translation matrix
 	 */
-	void Matrix4x4::PreTranslate(float x, float y, float z)
+	void Matrix4x4::PreTranslate(Real x, Real y, Real z)
 	{
-		float dest[DATA_SIZE];
+		Real dest[DATA_SIZE];
 		Matrix4x4::PreTranslate(data, dest, x, y, z);
-		memcpy(data, dest, sizeof(float)*DATA_SIZE);
+		memcpy(data, dest, sizeof(Real)*DATA_SIZE);
 	}
 
 	/*
@@ -842,7 +842,7 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying
 	 * [source] by a translation matrix
 	 */
-	void Matrix4x4::Translate(const Matrix4x4& source, Matrix4x4& out, float x, float y, float z)
+	void Matrix4x4::Translate(const Matrix4x4& source, Matrix4x4& out, Real x, Real y, Real z)
 	{
 		Translate(source.data, out.data, x, y, z);
 	}
@@ -853,7 +853,7 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying
 	 * [source] by a translation matrix
 	 */
-	void Matrix4x4::Translate(const float * source, float * dest, float x, float y, float z)
+	void Matrix4x4::Translate(const Real * source, Real * dest, Real x, Real y, Real z)
 	{
 		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Translate -> 'source' is null.", true);
 
@@ -879,12 +879,12 @@ namespace GTE
 	 * This performs a pre-transformation, in that it is equivalent to pre-multiplying
 	 * [source] by a translation matrix
 	 */
-	void Matrix4x4::PreTranslate(const float * source, float * dest, float x, float y, float z)
+	void Matrix4x4::PreTranslate(const Real * source, Real * dest, Real x, Real y, Real z)
 	{
 		Matrix4x4 trans;
 		trans.SetIdentity();
 
-		float *matrixData = const_cast<float *>(trans.GetDataPtr());
+		Real *matrixData = const_cast<Real *>(trans.GetDataPtr());
 		matrixData[12] = x;
 		matrixData[13] = y;
 		matrixData[14] = z;
@@ -898,13 +898,13 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying
 	 * this matrix by a rotation matrix
 	 */
-	void Matrix4x4::Rotate(const Vector3& vector, float a)
+	void Matrix4x4::Rotate(const Vector3& vector, Real a)
 	{
-		float temp[DATA_SIZE];
-		float r[DATA_SIZE];
+		Real temp[DATA_SIZE];
+		Real r[DATA_SIZE];
 		SetRotate(r, vector.x, vector.y, vector.z, a);
 		MultiplyMM(data, r, temp);
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -913,13 +913,13 @@ namespace GTE
 	 * This performs a post-transformation, in that it is equivalent to post-multiplying
 	 * this matrix by a rotation matrix
 	 */
-	void Matrix4x4::Rotate(float x, float y, float z, float a)
+	void Matrix4x4::Rotate(Real x, Real y, Real z, Real a)
 	{
-		float temp[DATA_SIZE];
-		float r[DATA_SIZE];
+		Real temp[DATA_SIZE];
+		Real r[DATA_SIZE];
 		SetRotate(r, x, y, z, a);
 		MultiplyMM(data, r, temp);
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -928,13 +928,13 @@ namespace GTE
 	 * This performs a pre-transformation, in that it is equivalent to pre-multiplying
 	 * this matrix by a rotation matrix
 	 */
-	void Matrix4x4::PreRotate(const Vector3& vector, float a)
+	void Matrix4x4::PreRotate(const Vector3& vector, Real a)
 	{
-		float temp[DATA_SIZE];
-		float r[DATA_SIZE];
+		Real temp[DATA_SIZE];
+		Real r[DATA_SIZE];
 		SetRotate(r, vector.x, vector.y, vector.z, a);
 		MultiplyMM(r, data, temp);
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
@@ -944,19 +944,19 @@ namespace GTE
 	 * this matrix by a rotation matrix
 	 */
 
-	void Matrix4x4::PreRotate(float x, float y, float z, float a)
+	void Matrix4x4::PreRotate(Real x, Real y, Real z, Real a)
 	{
-		float temp[DATA_SIZE];
-		float r[DATA_SIZE];
+		Real temp[DATA_SIZE];
+		Real r[DATA_SIZE];
 		SetRotate(r, x, y, z, a);
 		MultiplyMM(r, data, temp);
-		memcpy(data, temp, sizeof(float) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*
 	 * Set this matrix to be a rotation matrix, with Euler angles [x], [y], [z]
 	 */
-	void Matrix4x4::SetRotateEuler(float x, float y, float z)
+	void Matrix4x4::SetRotateEuler(Real x, Real y, Real z)
 	{
 		SetRotateEuler(data, x, y, z);
 	}
@@ -964,7 +964,7 @@ namespace GTE
 	/*
 	 * Set the 4x4 matrix [m] to be a rotation matrix, around axis [x], [y], [z] by [a] degrees
 	 */
-	void Matrix4x4::SetRotate(Matrix4x4& m, float x, float y, float z, float a)
+	void Matrix4x4::SetRotate(Matrix4x4& m, Real x, Real y, Real z, Real a)
 	{
 		SetRotate(m.data, x, y, z, a);
 	}
@@ -972,7 +972,7 @@ namespace GTE
 	/*
 	 * Set the 4x4 matrix [rm] to be a rotation matrix, around axis [x], [y], [z] by [a] degrees
 	 */
-	void Matrix4x4::SetRotate(float * rm, float x, float y, float z, float a)
+	void Matrix4x4::SetRotate(Real * rm, Real x, Real y, Real z, Real a)
 	{
 		NONFATAL_ASSERT(rm != NULL, "Matrix4x4::SetRotate -> 'rm' is null.", true);
 
@@ -984,8 +984,8 @@ namespace GTE
 		rm[14] = 0;
 		rm[15] = 1;
 		a *= Constants::DegreesToRads;
-		float s = (float)GTEMath::Sin(a);
-		float c = (float)GTEMath::Cos(a);
+		Real s = (Real)GTEMath::Sin(a);
+		Real c = (Real)GTEMath::Cos(a);
 		if (1.0f == x && 0.0f == y && 0.0f == z)
 		{
 			rm[5] = c;   rm[10] = c;
@@ -1012,21 +1012,21 @@ namespace GTE
 		}
 		else
 		{
-			float len = Vector3::Magnitude(x, y, z);
+			Real len = Vector3::Magnitude(x, y, z);
 			if (1.0f != len)
 			{
-				float recipLen = 1.0f / len;
+				Real recipLen = 1.0f / len;
 				x *= recipLen;
 				y *= recipLen;
 				z *= recipLen;
 			}
-			float nc = 1.0f - c;
-			float xy = x * y;
-			float yz = y * z;
-			float zx = z * x;
-			float xs = x * s;
-			float ys = y * s;
-			float zs = z * s;
+			Real nc = 1.0f - c;
+			Real xy = x * y;
+			Real yz = y * z;
+			Real zx = z * x;
+			Real xs = x * s;
+			Real ys = y * s;
+			Real zs = z * s;
 			rm[0] = x*x*nc + c;
 			rm[4] = xy*nc - zs;
 			rm[8] = zx*nc + ys;
@@ -1042,21 +1042,21 @@ namespace GTE
 	/*
 	 * Set the matrix [rm] to be a rotation matrix, with Euler angles [x], [y], [z]
 	 */
-	void Matrix4x4::SetRotateEuler(float * rm, float x, float y, float z)
+	void Matrix4x4::SetRotateEuler(Real * rm, Real x, Real y, Real z)
 	{
 		NONFATAL_ASSERT(rm != NULL, "Matrix4x4::SetRotateEuler -> 'rm' is null.", true);
 
 		x *= Constants::DegreesToRads;
 		y *= Constants::DegreesToRads;
 		z *= Constants::DegreesToRads;
-		float cx = (float)GTEMath::Cos(x);
-		float sx = (float)GTEMath::Sin(x);
-		float cy = (float)GTEMath::Cos(y);
-		float sy = (float)GTEMath::Sin(y);
-		float cz = (float)GTEMath::Cos(z);
-		float sz = (float)GTEMath::Sin(z);
-		float cxsy = cx * sy;
-		float sxsy = sx * sy;
+		Real cx = (Real)GTEMath::Cos(x);
+		Real sx = (Real)GTEMath::Sin(x);
+		Real cy = (Real)GTEMath::Cos(y);
+		Real sy = (Real)GTEMath::Sin(y);
+		Real cz = (Real)GTEMath::Cos(z);
+		Real sz = (Real)GTEMath::Sin(z);
+		Real cxsy = cx * sy;
+		Real sxsy = sx * sy;
 
 		rm[0] = cy * cz;
 		rm[1] = -cy * sz;

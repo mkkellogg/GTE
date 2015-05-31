@@ -1,6 +1,9 @@
 #ifndef _GTE_BASEVECTOR2ARRAY_H_
 #define _GTE_BASEVECTOR2ARRAY_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 namespace GTE
 {
 	// forward declarations
@@ -12,7 +15,7 @@ namespace GTE
 	protected:
 		
 		int count;
-		float * data;
+		Real * data;
 		BaseVector2 ** objects;
 		BaseVector2Factory * baseFactory;
 
@@ -23,7 +26,7 @@ namespace GTE
 		BaseVector2Array(BaseVector2Factory * factory);
 		virtual ~BaseVector2Array();
 
-		const float * GetDataPtr() const;
+		const Real * GetDataPtr() const;
 		bool Init(int count);
 	};
 }

@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	RawImage::RawImage(unsigned int width, unsigned int height)
+	RawImage::RawImage(UInt32 width, UInt32 height)
 	{
 		this->width = width;
 		this->height = height;
@@ -27,20 +27,20 @@ namespace GTE
 		SAFE_DELETE(imageBytes);
 	}
 
-	unsigned int RawImage::ImageSizeBytes()
+	UInt32 RawImage::ImageSizeBytes()
 	{
 		return width * height * 4;
 	}
 
 	bool RawImage::Init()
 	{
-		imageBytes = new BYTE[ImageSizeBytes()];
+		imageBytes = new Byte[ImageSizeBytes()];
 		ASSERT(imageBytes != NULL, "RawImage::Init -> Unable to allocate image bytes.");
 
 		return true;
 	}
 
-	void RawImage::SetDataTo(BYTE * data)
+	void RawImage::SetDataTo(Byte * data)
 	{
 		NONFATAL_ASSERT(data != NULL, "RawImage::SetDataTo -> 'data' is null.", true);
 
@@ -50,22 +50,22 @@ namespace GTE
 		}
 	}
 
-	void RawImage::SetByte(unsigned int index, BYTE byte)
+	void RawImage::SetByte(UInt32 index, Byte byte)
 	{
 		if (index < ImageSizeBytes())imageBytes[index] = byte;
 	}
 
-	BYTE * RawImage::GetPixels()
+	Byte * RawImage::GetPixels()
 	{
 		return imageBytes;
 	}
 
-	unsigned int RawImage::GetWidth()
+	UInt32 RawImage::GetWidth()
 	{
 		return width;
 	}
 
-	unsigned int RawImage::GetHeight()
+	UInt32 RawImage::GetHeight()
 	{
 		return height;
 	}

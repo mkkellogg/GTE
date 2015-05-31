@@ -33,7 +33,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	Vector3::Vector3(bool permAttached, float * target) : BaseVector4(permAttached, target), x(data[0]), y(data[1]), z(data[2])
+	Vector3::Vector3(bool permAttached, Real * target) : BaseVector4(permAttached, target), x(data[0]), y(data[1]), z(data[2])
 	{
 
 
@@ -42,7 +42,7 @@ namespace GTE
 	/*
 	 * Constructor with initialization values
 	 */
-	Vector3::Vector3(float x, float y, float z) : BaseVector4(x, y, z, 0), x(data[0]), y(data[1]), z(data[2])
+	Vector3::Vector3(Real x, Real y, Real z) : BaseVector4(x, y, z, 0), x(data[0]), y(data[1]), z(data[2])
 	{
 
 	}
@@ -80,7 +80,7 @@ namespace GTE
 	 */
 	bool Vector3::operator==(const Vector3 & source) const
 	{
-		float epsilon = .005;
+		Real epsilon = .005;
 		return GTEMath::Abs(source.x - this->x) < epsilon && GTEMath::Abs(source.y - this->y) < epsilon && GTEMath::Abs(source.z - this->z) < epsilon;
 	}
 
@@ -89,7 +89,7 @@ namespace GTE
 	 */
 	bool Vector3::operator==(const Vector3 & source)
 	{
-		float epsilon = .005;
+		Real epsilon = .005;
 		return GTEMath::Abs(source.x - this->x) < epsilon && GTEMath::Abs(source.y - this->y) < epsilon && GTEMath::Abs(source.z - this->z) < epsilon;
 	}
 
@@ -107,7 +107,7 @@ namespace GTE
 	/*
 	 * Set the values of this vector
 	 */
-	void Vector3::Set(float x, float y, float z)
+	void Vector3::Set(Real x, Real y, Real z)
 	{
 		BaseVector4::Set(x, y, z, 0);
 	}
@@ -153,7 +153,7 @@ namespace GTE
 	/*
 	 * Scale this vector by [magnitude]
 	 */
-	void Vector3::Scale(float magnitude)
+	void Vector3::Scale(Real magnitude)
 	{
 		x *= magnitude;
 		y *= magnitude;
@@ -165,7 +165,7 @@ namespace GTE
 	 */
 	void Vector3::Normalize()
 	{
-		float magnitude = Magnitude();
+		Real magnitude = Magnitude();
 		if (magnitude != 0)
 		{
 			Scale(1 / magnitude);
@@ -178,7 +178,7 @@ namespace GTE
 	 */
 	void Vector3::QuickNormalize()
 	{
-		float magnitude = QuickMagnitude();
+		Real magnitude = QuickMagnitude();
 		if (magnitude != 0)
 		{
 			Scale(1 / magnitude);
@@ -188,7 +188,7 @@ namespace GTE
 	/*
 	 * Get the length of this vector
 	 */
-	float Vector3::Magnitude() const
+	Real Vector3::Magnitude() const
 	{
 		return Magnitude(x, y, z);
 	}
@@ -196,7 +196,7 @@ namespace GTE
 	/*
 	 * Get the squared length of this vector
 	 */
-	float Vector3::SquareMagnitude() const
+	Real Vector3::SquareMagnitude() const
 	{
 		return SquareMagnitude(x, y, z);
 	}
@@ -205,15 +205,15 @@ namespace GTE
 	/*
 	 * Get the length of the vector specified by [x], [y], [z]
 	 */
-	float Vector3::Magnitude(float x, float y, float z)
+	Real Vector3::Magnitude(Real x, Real y, Real z)
 	{
-		return (float)GTEMath::SquareRoot(x*x + y*y + z*z);
+		return (Real)GTEMath::SquareRoot(x*x + y*y + z*z);
 	}
 
 	/*
 	 * Get the squared length of the vector specified by [x], [y], [z]
 	 */
-	float Vector3::SquareMagnitude(float x, float y, float z)
+	Real Vector3::SquareMagnitude(Real x, Real y, Real z)
 	{
 		return x*x + y*y + z*z;
 	}
@@ -224,7 +224,7 @@ namespace GTE
 	 * Instead of using a standard square root, it uses the cheat square root, which is not
 	 * correct, but is often "good enough", and is much faster than the correct square root.
 	 */
-	float Vector3::QuickMagnitude() const
+	Real Vector3::QuickMagnitude() const
 	{
 		return GTEMath::QuickSquareRoot(x*x + y*y + z*z);
 	}
@@ -244,7 +244,7 @@ namespace GTE
 	 */
 	void Vector3::Cross(const Vector3& a, const Vector3& b, Vector3& result)
 	{
-		float x, y, z;
+		Real x, y, z;
 		x = (a.y*b.z) - (b.y*a.z);
 		y = (b.x*a.z) - (a.x*b.z);
 		z = (a.x*b.y) - (b.x*a.y);
@@ -271,30 +271,30 @@ namespace GTE
 	{
 		return;
 
-		float ** rPtr;
-		rPtr = (float **)&x;
+		Real ** rPtr;
+		rPtr = (Real **)&x;
 		*rPtr = data;
-		rPtr = (float **)&y;
+		rPtr = (Real **)&y;
 		*rPtr = data + 1;
-		rPtr = (float **)&z;
+		rPtr = (Real **)&z;
 		*rPtr = data + 2;
 	}
 
 	/*
 	 * Calculate the dot product: [a] dot [b]
 	 */
-	float Vector3::Dot(const Vector3& a, const Vector3& b)
+	Real Vector3::Dot(const Vector3& a, const Vector3& b)
 	{
-		float x = a.x * b.x;
-		float y = a.y * b.y;
-		float z = a.z * b.z;
+		Real x = a.x * b.x;
+		Real y = a.y * b.y;
+		Real z = a.z * b.z;
 		return x + y + z;
 	}
 
 	/*
 	 * Attach to new backing storage in [data]
 	 */
-	void Vector3::AttachTo(float * data)
+	void Vector3::AttachTo(Real * data)
 	{
 		NONFATAL_ASSERT(data != NULL, "Vector3::AttachTo -> 'data' is null.", true);
 		BaseVector4::AttachTo(data);
@@ -313,7 +313,7 @@ namespace GTE
 	/*
 	 * Rotate [a] towards [b] by [theta] degrees.
 	 */
-	bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, float theta, Vector3& result)
+	bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result)
 	{
 		return RotateTowards(from, to, theta, result, Vector3::UnitY);
 	}
@@ -321,7 +321,7 @@ namespace GTE
 	/*
 	 * Rotate [a] towards [b] by [theta] degrees.
 	 */
-	bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, float theta, Vector3& result, const Vector3& fallbackAxis)
+	bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result, const Vector3& fallbackAxis)
 	{
 		// convert theta to radians
 		theta *= Constants::DegreesToRads;
@@ -335,13 +335,13 @@ namespace GTE
 		toCopy.Normalize();
 
 		// calculate angle between [from] and [to]
-		float dot = Vector3::Dot(fromCopy, toCopy);
+		Real dot = Vector3::Dot(fromCopy, toCopy);
 
 		// clamp to the range -1.0 ... 1.0 to prevent rounding errors in Acos()
 		if (dot < -1.0) dot = -1.0;
 		else if (dot > 1.0) dot = 1.0;
 
-		float thetaDiff = GTEMath::ACos(dot);
+		Real thetaDiff = GTEMath::ACos(dot);
 
 		// cap theta so we don't rotate past [to]
 		if ((theta > thetaDiff && thetaDiff > 0) || (theta < thetaDiff && thetaDiff < 0))
@@ -388,7 +388,7 @@ namespace GTE
 	}
 
 	// TODO: Implement!!!
-	float Vector3::AngleBetween(const Vector3 * a, const Vector3 * b, const Vector3 * refRightNormal)
+	Real Vector3::AngleBetween(const Vector3 * a, const Vector3 * b, const Vector3 * refRightNormal)
 	{
 		return 0;
 	}
@@ -399,7 +399,7 @@ namespace GTE
 
 	bool Vector3::IsZeroLength() const
 	{
-		float sqlen = (x * x) + (y * y) + (z * z);
+		Real sqlen = (x * x) + (y * y) + (z * z);
 		return (sqlen < (1e-06 * 1e-06));
 	}
 
@@ -425,9 +425,9 @@ namespace GTE
 	avg.Y = (a.Y+b.Y+c.Y+d.Y)/4f;
 	avg.Z = (a.Z+b.Z+c.Z+d.Z)/4f;
 	}
-	public static void avgVectors(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float[] weights, Vector3 avg)
+	public static void avgVectors(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Real[] weights, Vector3 avg)
 	{
-	float totalWeight =0f;
+	Real totalWeight =0f;
 	for(int i=0; i <4; i++)totalWeight += weights[i];
 	avg.X = ((weights[0]*a.X)+(weights[1]*b.X)+(weights[2]*c.X)+(weights[3]*d.X))/totalWeight;
 	avg.Y = ((weights[0]*a.Y)+(weights[1]*b.Y)+(weights[2]*c.Y)+(weights[3]*d.Y))/totalWeight;
@@ -435,7 +435,7 @@ namespace GTE
 	}*/
 
 	/*
-	public static Vector3 createNormal(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3)
+	public static Vector3 createNormal(Real x1, Real y1, Real z1, Real x2, Real y2, Real z2, Real x3, Real y3, Real z3)
 	{
 	Vector3 A = new Vector3(x1,y1,z1, x2,y2,z2);
 	Vector3 B = new Vector3(x1,y1,z1, x3,y3,z3);

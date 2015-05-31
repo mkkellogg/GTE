@@ -1,6 +1,8 @@
 #ifndef _GTE_BASEVECTOR4ARRAY_H_
 #define _GTE_BASEVECTOR4ARRAY_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
 #include "basevector4.h"
 
 namespace GTE
@@ -44,9 +46,9 @@ namespace GTE
 
 	protected:
 
-		unsigned int reservedCount;
-		unsigned int count;
-		float * data;
+		UInt32 reservedCount;
+		UInt32 count;
+		Real * data;
 		BaseVector4 ** objects;
 		BaseVector4Factory * baseFactory;
 
@@ -57,12 +59,12 @@ namespace GTE
 		BaseVector4Array(BaseVector4Factory * factory);
 		virtual ~BaseVector4Array();
 
-		BaseVector4 * GetBaseVector(unsigned int index);
-		const float * GetDataPtr() const;
-		bool Init(unsigned int reservedCount);
-		unsigned int GetReservedCount() const;
-		void SetCount(unsigned int count);
-		unsigned int GetCount() const;
+		BaseVector4 * GetBaseVector(UInt32 index);
+		const Real * GetDataPtr() const;
+		bool Init(UInt32 reservedCount);
+		UInt32 GetReservedCount() const;
+		void SetCount(UInt32 count);
+		UInt32 GetCount() const;
 		bool CopyTo(BaseVector4Array * dest) const;
 		Iterator GetIterator(BaseVector4& targetVector);
 	};

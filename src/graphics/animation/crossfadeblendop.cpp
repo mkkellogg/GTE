@@ -14,7 +14,7 @@ namespace GTE
 	/*
 * Default constructor.
 */
-	CrossFadeBlendOp::CrossFadeBlendOp(float duration, unsigned int targetIndex) : BlendOp(duration)
+	CrossFadeBlendOp::CrossFadeBlendOp(Real duration, UInt32 targetIndex) : BlendOp(duration)
 	{
 		this->targetIndex = targetIndex;
 		SetComplete(false);
@@ -32,26 +32,26 @@ namespace GTE
 	/*
 	 *Adjust the relevant weights of animation player.
 	 */
-	void CrossFadeBlendOp::Update(std::vector<float>& weights)
+	void CrossFadeBlendOp::Update(std::vector<Real>& weights)
 	{
 		if (complete)return;
 		NONFATAL_ASSERT(weights.size() >= initialWeights.size(), "CrossFadeBlendOp::Update -> Weight count is less than initial weight count.", true);
 
 		BlendOp::Update(weights);
-		float normalizedProgress = progress / duration;
+		Real normalizedProgress = progress / duration;
 
-		for (unsigned int i = 0; i < initialWeights.size(); i++)
+		for (UInt32 i = 0; i < initialWeights.size(); i++)
 		{
-			float initialWeight = initialWeights[i];
-			float targetWeight = 0;
+			Real initialWeight = initialWeights[i];
+			Real targetWeight = 0;
 			if (i == targetIndex)targetWeight = 1;
-			float deltaWeight = targetWeight - initialWeight;
+			Real deltaWeight = targetWeight - initialWeight;
 			weights[i] = normalizedProgress * deltaWeight + initialWeight;
 		}
 
 		if (progress > duration)
 		{
-			for (unsigned int i = 0; i < initialWeights.size(); i++)
+			for (UInt32 i = 0; i < initialWeights.size(); i++)
 			{
 				if (i == targetIndex)weights[i] = 1;
 				else weights[i] = 0;
@@ -92,7 +92,7 @@ namespace GTE
 	/*
 	 * Get the target animation index for this cross fade operation.
 	 */
-	unsigned int CrossFadeBlendOp::GetTargetIndex()
+	UInt32 CrossFadeBlendOp::GetTargetIndex()
 	{
 		return targetIndex;
 	}

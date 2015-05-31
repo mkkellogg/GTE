@@ -73,11 +73,11 @@ namespace GTE
 		GraphicsAttributes attributes;
 
 		// length of current span over which FPS is calculated
-		float currentFPSSpanTime;
+		Real currentFPSSpanTime;
 		// number of frames in rendered in current FPS calculation span
 		int framesInFPSSpan;
 		// last calculated FPS value
-		float currentFPS;
+		Real currentFPS;
 
 		Graphics();
 		virtual ~Graphics();
@@ -102,26 +102,26 @@ namespace GTE
 		virtual void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) = 0;
 		virtual Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes& attributes) = 0;
 		virtual Texture * CreateTexture(RawImage * imageData, const TextureAttributes& attributes) = 0;
-		virtual Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes& attributes) = 0;
-		virtual Texture * CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
-											BYTE * backData, unsigned int backw, unsigned int backh,
-											BYTE * topData, unsigned int tw, unsigned int th,
-											BYTE * bottomData, unsigned int botw, unsigned int both,
-											BYTE * leftData, unsigned int lw, unsigned int lh,
-											BYTE * rightData, unsigned int rw, unsigned int rh) = 0;
+		virtual Texture * CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, const TextureAttributes& attributes) = 0;
+		virtual Texture * CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
+											Byte * backData, UInt32 backw, UInt32 backh,
+											Byte * topData, UInt32 tw, UInt32 th,
+											Byte * bottomData, UInt32 botw, UInt32 both,
+											Byte * leftData, UInt32 lw, UInt32 lh,
+											Byte * rightData, UInt32 rw, UInt32 rh) = 0;
 		virtual Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 										    const std::string& bottom, const std::string& left, const std::string& right) = 0;
 		virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 											RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
 		virtual void DestroyTexture(Texture * texture) = 0;
 		virtual RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-												  const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height) = 0;
+												  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) = 0;
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 		virtual RenderTargetRef GetDefaultRenderTarget() = 0;
 
-		float GetCurrentFPS();
+		Real GetCurrentFPS();
 
-		virtual void ClearRenderBuffers(unsigned int bufferMask) = 0;
+		virtual void ClearRenderBuffers(UInt32 bufferMask) = 0;
 
 		virtual void SetFaceCullingMode(FaceCullingMode mode) = 0;
 		virtual FaceCullingMode GetFaceCullingMode() = 0;
@@ -153,14 +153,14 @@ namespace GTE
 		virtual bool RestoreDefaultRenderTarget() = 0;
 		virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest) = 0;
 
-		virtual void SetTextureData(TextureRef texture, BYTE * data) = 0;
-		virtual void SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side) = 0;
+		virtual void SetTextureData(TextureRef texture, Byte * data) = 0;
+		virtual void SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side) = 0;
 		virtual void RebuildMipMaps(TextureRef texture) = 0;
 
 		virtual bool AddClipPlane() = 0;
 		virtual void DeactiveAllClipPlanes() = 0;
 
-		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate) = 0;
+		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, bool validate) = 0;
 	};
 }
 

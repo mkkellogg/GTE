@@ -3,6 +3,7 @@
 
 #include <string>
 #include "shadersourceloader.h"
+#include "global/global.h"
 
 namespace GTE
 {

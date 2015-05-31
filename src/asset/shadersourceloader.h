@@ -1,6 +1,7 @@
 #ifndef _GTE_SHADER_SOURCE_LOADER_H_
 #define _GTE_SHADER_SOURCE_LOADER_H_
 
+#include "global/global.h"
 #include <string>
 
 namespace GTE

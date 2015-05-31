@@ -29,15 +29,15 @@ namespace GTE
 		static const Vector3 Up;
 		static const Vector3 Forward;
 
-		float &x;
-		float &y;
-		float &z;
+		Real &x;
+		Real &y;
+		Real &z;
 
 		Vector3();
-		Vector3(bool permAttached, float * target);
-		Vector3(float x, float y, float z);
+		Vector3(bool permAttached, Real * target);
+		Vector3(Real x, Real y, Real z);
 		Vector3(const Vector3& vector);
-		Vector3(const float * data);
+		Vector3(const Real * data);
 		~Vector3();
 
 		Vector3& operator=(const Vector3 & source);
@@ -45,31 +45,31 @@ namespace GTE
 		bool operator==(const Vector3 & source) const;
 		bool operator==(const Vector3 & source);
 		static bool AreStrictlyEqual(const Vector3* a, const Vector3* b);
-		void Set(float x, float y, float z);
+		void Set(Real x, Real y, Real z);
 
 		void Add(const Vector3& v);
 		static void Add(const Vector3& v1, const Vector3& v2, Vector3& result);
 		static void Subtract(const Vector3& v1, const Vector3& p2, Vector3& result);
 
-		void Scale(float magnitude);
+		void Scale(Real magnitude);
 		void Normalize();
 		void QuickNormalize();
-		float Magnitude() const;
-		float SquareMagnitude() const;
-		static float Magnitude(float x, float y, float z);
-		static float SquareMagnitude(float x, float y, float z);
-		float QuickMagnitude() const;
+		Real Magnitude() const;
+		Real SquareMagnitude() const;
+		static Real Magnitude(Real x, Real y, Real z);
+		static Real SquareMagnitude(Real x, Real y, Real z);
+		Real QuickMagnitude() const;
 		void Invert();
 		static void Cross(const Vector3& a, const Vector3& b, Vector3& results);
 		static void CalcNormal(const Vector3& a, const Vector3& b, Vector3& result);
-		static float Dot(const Vector3& a, const Vector3& b);
-		static bool RotateTowards(const Vector3& from, const Vector3& to, float theta, Vector3& result);
-		static bool RotateTowards(const Vector3& from, const Vector3& to, float theta, Vector3& result, const Vector3& fallbackAxis);
-		static float AngleBetween(const Vector3 * a, const Vector3 * b, const Vector3 * refRightNormal);
+		static Real Dot(const Vector3& a, const Vector3& b);
+		static bool RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result);
+		static bool RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result, const Vector3& fallbackAxis);
+		static Real AngleBetween(const Vector3 * a, const Vector3 * b, const Vector3 * refRightNormal);
 
 		bool IsZeroLength() const;
 
-		void AttachTo(float * data);
+		void AttachTo(Real * data);
 		void Detach();
 	};
 }

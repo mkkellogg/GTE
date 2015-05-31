@@ -12,8 +12,8 @@ namespace GTE
 {
 	bool Time::initialized = false;
 	unsigned long long Time::startupTime = 0;
-	float Time::lastRecordedTime = 0;
-	float Time::deltaTime = 0;
+	Real Time::lastRecordedTime = 0;
+	Real Time::deltaTime = 0;
 	std::chrono::high_resolution_clock::time_point Time::_startupTime;
 
 	Time::Time()
@@ -36,16 +36,16 @@ namespace GTE
 		}
 	}
 
-	float Time::GetRealTimeSinceStartup()
+	Real Time::GetRealTimeSinceStartup()
 	{
 		Initialize();
 		std::chrono::high_resolution_clock::time_point _currentTime = std::chrono::high_resolution_clock::now();
 
 		auto elapsed = _currentTime - _startupTime;
 
-		float f = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
+		Real f = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 
-		return (float)(f / (float)1000000.0);
+		return (Real)(f / (Real)1000000.0);
 	}
 
 	void Time::Update()
@@ -55,7 +55,7 @@ namespace GTE
 		lastRecordedTime = GetRealTimeSinceStartup();
 	}
 
-	float Time::GetDeltaTime()
+	Real Time::GetDeltaTime()
 	{
 		Initialize();
 		return deltaTime;

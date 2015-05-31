@@ -129,22 +129,22 @@ void PoolScene::UpdateRippleSimulation()
 	GTE::Graphics* graphics = GTE::Engine::Instance()->GetGraphicsSystem();
 
 	// calculate the time difference between ripple simulation frames
-	float frameTime  = 1.0/60.0;
-	float simAdvanceTimeDiff = GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
+	GTE::Real frameTime  = 1.0/60.0;
+	GTE::Real simAdvanceTimeDiff = GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
 
 	// make sure the ripple simulation runs at a max of 60 iterations per second
 	if(simAdvanceTimeDiff > frameTime)
 	{
 		GTE::RenderManager * renderManager = GTE::Engine::Instance()->GetRenderManager();
-		unsigned int renderHeightMap = 0;
+		GTE::UInt32 renderHeightMap = 0;
 
 		// add water drop if enough time has passed since the last drop
 		if (GTE::Time::GetRealTimeSinceStartup() - lastWaterDropTime > .6)
 		{
 			// calculate drop position and drop size
-			float dropRadius = 4.0f / (float)waterHeightMapResolution * (float)rand() / (float)RAND_MAX;
-			float x = 2.0f * (float)rand() / (float)RAND_MAX - 1.0f;
-			float y = 1.0f - 2.0f * (float)rand() / (float)RAND_MAX;
+			GTE::Real dropRadius = 4.0f / (GTE::Real)waterHeightMapResolution * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
+			GTE::Real x = 2.0f * (GTE::Real)rand() / (GTE::Real)RAND_MAX - 1.0f;
+			GTE::Real y = 1.0f - 2.0f * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
 
 			// set variable values in [waterDropMaterial]
 			waterDropMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
@@ -528,7 +528,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	// apply rotation of 90 degrees around positive x-axis to water mesh
 	GTE::Transform rot90;
 	rot90.Rotate(1,0,0,-90, true);
-	for(unsigned int i =0; i <  waterMesh->GetSubMesh(0)->GetPostions()->GetCount();i++)
+	for(GTE::UInt32 i =0; i <  waterMesh->GetSubMesh(0)->GetPostions()->GetCount();i++)
 	{
 		GTE::Point3 * p = waterMesh->GetSubMesh(0)->GetPostions()->GetPoint(i);
 		rot90.TransformPoint(*p);
@@ -567,12 +567,12 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	ASSERT(waterHeights[0].IsValid() && waterHeights[1].IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water height map.");
 	ASSERT(waterNormals.IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water normals map.");
 
-	unsigned int mapSize = waterHeightMapResolution * waterHeightMapResolution * 4;
-	float * heightData = new float[mapSize];
+	GTE::UInt32 mapSize = waterHeightMapResolution * waterHeightMapResolution * 4;
+	GTE::Real * heightData = new GTE::Real[mapSize];
 	ASSERT(heightData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water height map.");
 
 	// create water height map initialization data
-	for(unsigned int i = 0; i < mapSize; i += 4)
+	for(GTE::UInt32 i = 0; i < mapSize; i += 4)
 	{
 		heightData[i] = 0;
 		heightData[i+1] = 0;
@@ -581,11 +581,11 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	}
 
 	mapSize = waterNomralMapResolution * waterNomralMapResolution * 4;
-	float * normalData = new float[mapSize];
+	GTE::Real * normalData = new GTE::Real[mapSize];
 	ASSERT(normalData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water normal map.");
 
 	// create water normal map initialization data
-	for(unsigned int i = 0; i < mapSize; i += 4)
+	for(GTE::UInt32 i = 0; i < mapSize; i += 4)
 	{
 		normalData[i] = 0;
 		normalData[i+1] = 0;
@@ -594,11 +594,11 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	}
 
 	// initialize water height maps
-	graphics->SetTextureData(waterHeights[0]->GetColorTexture(), (GTE::BYTE *)heightData);
-	graphics->SetTextureData(waterHeights[1]->GetColorTexture(), (GTE::BYTE *)heightData);
+	graphics->SetTextureData(waterHeights[0]->GetColorTexture(), (GTE::Byte *)heightData);
+	graphics->SetTextureData(waterHeights[1]->GetColorTexture(), (GTE::Byte *)heightData);
 
 	// initialize water normal maps
-	graphics->SetTextureData(waterNormals->GetColorTexture(), (GTE::BYTE *)normalData);
+	graphics->SetTextureData(waterNormals->GetColorTexture(), (GTE::Byte *)normalData);
 
 	delete heightData;
 	delete normalData;
@@ -615,7 +615,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	importer.LoadBuiltInShaderSource("waterheights", waterHeightsShaderSource);
 	waterHeightsMaterial = objectManager->CreateMaterial("WaterHeightsMaterial", waterHeightsShaderSource);
 	waterHeightsMaterial->SetSelfLit(true);
-	waterHeightsMaterial->SetUniform1f(1.0 / (float)waterHeightMapResolution, "PIXEL_DISTANCE");
+	waterHeightsMaterial->SetUniform1f(1.0 / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
 	waterHeightsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 	// create material for updating water normal map
@@ -623,14 +623,14 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	importer.LoadBuiltInShaderSource("waternormals", waterNormalsShaderSource);
 	waterNormalsMaterial = objectManager->CreateMaterial("WaterNormalsMaterial", waterNormalsShaderSource);
 	waterNormalsMaterial->SetSelfLit(true);
-	waterNormalsMaterial->SetUniform1f(1.0 / (float)waterNomralMapResolution, "PIXEL_DISTANCE");
-	waterNormalsMaterial->SetUniform1f(2.0 / (float)waterNomralMapResolution * 2.0, "PIXEL_DISTANCEX2");
+	waterNormalsMaterial->SetUniform1f(1.0 / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
+	waterNormalsMaterial->SetUniform1f(2.0 / (GTE::Real)waterNomralMapResolution * 2.0, "PIXEL_DISTANCEX2");
 	waterNormalsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 	// set appropriate sampler uniforms for water surface shader
 	waterMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 	waterMaterial->SetTexture(waterNormals->GetColorTexture(), "WATER_NORMAL_MAP");
-	//waterMaterial->SetUniform1f(1.0 / (float)waterNomralMapResolution, "PIXEL_DISTANCE");
+	//waterMaterial->SetUniform1f(1.0 / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
 	waterMaterial->SetUniform1f(.8, "REFLECTED_COLOR_FACTOR");
 	waterMaterial->SetUniform1f(.2, "REFRACTED_COLOR_FACTOR");
 }

@@ -30,21 +30,21 @@ namespace GTE
 
 	public:
 
-		float &x;
-		float &y;
-		float &z;
+		Real &x;
+		Real &y;
+		Real &z;
 
 		Point3();
-		Point3(bool permAttached, float * target);
-		Point3(float x, float y, float z);
+		Point3(bool permAttached, Real * target);
+		Point3(Real x, Real y, Real z);
 		Point3(const Point3& point);
-		Point3(const float * data);
+		Point3(const Real * data);
 		~Point3();
 
 		void Add(const Vector3& v);
 		static void Add(const Point3& point, const Vector3& v, Point3& result);
 		static void Subtract(const Point3& p1, const Point3& p2, Vector3&  result);
-		static void Lerp(const Point3& p1, const Point3& p2, Point3& result, float t);
+		static void Lerp(const Point3& p1, const Point3& p2, Point3& result, Real t);
 
 		Point3 & operator= (const Point3 & source);
 		BaseVector4 & operator= (const BaseVector4 & source);
@@ -53,9 +53,9 @@ namespace GTE
 		static bool AreEqual(const Point3& a, const Point3& b);
 		static bool AreEqual(const Point3* a, const Point3* b);
 		static bool AreStrictlyEqual(const Point3* a, const Point3* b);
-		void Set(float x, float y, float z);
+		void Set(Real x, Real y, Real z);
 
-		void AttachTo(float * data);
+		void AttachTo(Real * data);
 		void Detach();
 
 		// TODO: optimize this hashing function (implement correctly)

@@ -2,6 +2,7 @@
 #define _GTE_CONSTANTS_H_
 
 #include <string>
+#include "global/global.h"
 
 namespace GTE
 {
@@ -9,17 +10,17 @@ namespace GTE
 	{
 	public:
 
-		static const float PI;
-		static const float TwoPI;
-		static const float PIOver360;
-		static const float TwoPIOver360;
-		static const float RadsToDegrees;
-		static const float DegreesToRads;
-		static const unsigned int MaxObjectRecursionDepth = 512;
-		static const unsigned int MaxBonesPerVertex = 4;
+		static const Real PI;
+		static const Real TwoPI;
+		static const Real PIOver360;
+		static const Real TwoPIOver360;
+		static const Real RadsToDegrees;
+		static const Real DegreesToRads;
+		static const UInt32 MaxObjectRecursionDepth = 512;
+		static const UInt32 MaxBonesPerVertex = 4;
 		static const std::string BuiltinShaderPath;
 		static const std::string BuiltinShaderPathOpenGL;
-		static const unsigned int MaxClipPlanes = 1;
+		static const UInt32 MaxClipPlanes = 1;
 	};
 }
 

@@ -27,7 +27,7 @@ class GameUtil
 		static void SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root);
 		static void SetAllObjectsCastShadows(GTE::SceneObjectRef root, bool castShadows);
 
-		static GTE::SceneObjectRef AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, float sx, float sy, float sz, float rx, float ry, float rz, float ra, float tx, float ty, float tz,
+		static GTE::SceneObjectRef AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
 									  bool isStatic, bool castShadows, bool receiveShadows);
 };
 

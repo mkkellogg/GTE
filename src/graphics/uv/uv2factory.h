@@ -17,7 +17,7 @@ namespace GTE
 		UV2Factory();
 		virtual ~UV2Factory();
 
-		virtual UV2 * CreatePermAttached(float * target);
+		virtual UV2 * CreatePermAttached(Real * target);
 		virtual BaseVector2** CreateArray(int count);
 	};
 }

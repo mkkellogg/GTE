@@ -1,6 +1,7 @@
 #ifndef _GTE_ATTRIBUTES_H_
 #define _GTE_ATTRIBUTES_H_
 
+#include "object/enginetypes.h"
 #include "base/intmask.h"
 
 namespace GTE

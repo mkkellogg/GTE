@@ -21,6 +21,7 @@
 #include "geometry/matrix4x4.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

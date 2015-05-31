@@ -73,7 +73,7 @@ Game::Game()
 	// initialize player state
 	playerType = PlayerType::Warrior;
 	playerState = PlayerState::Waiting;
-	for(unsigned int i = 0; i < MaxPlayerStates; i++)
+	for(GTE::UInt32 i = 0; i < MaxPlayerStates; i++)
 	{
 		stateActivationTime[i] = 0;
 	}
@@ -158,18 +158,18 @@ void Game::SetupScene(GTE::AssetImporter& importer, Scenes scene)
 	{
 		case Scenes::LavaScene:
 			lavaScene = new LavaScene();
-			scenes[(unsigned int)Scenes::LavaScene] = lavaScene;
+			scenes[(GTE::UInt32)Scenes::LavaScene] = lavaScene;
 			lavaScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 		case Scenes::CastleScene:
 			castleScene = new CastleScene();
-			scenes[(unsigned int)Scenes::CastleScene] = castleScene;
+			scenes[(GTE::UInt32)Scenes::CastleScene] = castleScene;
 			castleScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 		case Scenes::PoolScene:
 			poolScene = new PoolScene();
 			poolScene->SetMainCamera(cameraObject->GetCamera());
-			scenes[(unsigned int)Scenes::PoolScene] = poolScene;
+			scenes[(GTE::UInt32)Scenes::PoolScene] = poolScene;
 			poolScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 	}
@@ -261,7 +261,7 @@ void Game::SwitchToScene(Scenes scene)
 {
 	currentScene = scene;
 
-	for(unsigned int sceneIndex = 0; sceneIndex < SceneCount; sceneIndex++)
+	for(GTE::UInt32 sceneIndex = 0; sceneIndex < SceneCount; sceneIndex++)
 	{
 		if(currentScene != (Scenes)sceneIndex)
 		{
@@ -269,7 +269,7 @@ void Game::SwitchToScene(Scenes scene)
 		}
 	}
 
-	scenes[(unsigned int)currentScene]->GetSceneRoot()->SetActive(true);
+	scenes[(GTE::UInt32)currentScene]->GetSceneRoot()->SetActive(true);
 
 	//Engine::Instance()->GetRenderManager()->ClearCaches();
 }
@@ -291,7 +291,7 @@ void Game::TransitionToScene(Scenes scene)
 		sceneTransitionStartTime = GTE::Time::GetRealTimeSinceStartup();
 		sceneTransitioning = true;
 		currentScene = scene;
-		scenes[(unsigned int)scene]->OnActivate();
+		scenes[(GTE::UInt32)scene]->OnActivate();
 		SignalDisplayInfoChanged();
 	}
 }
@@ -305,16 +305,16 @@ void Game::UpdateSceneTransition()
 	if(sceneTransitioning)
 	{
 		// total time transition should last
-		float transitionTime = .25;
+		GTE::Real transitionTime = .25;
 		// full elapsed time
-		float elapsedTime = GTE::Time::GetRealTimeSinceStartup() - sceneTransitionStartTime;
+		GTE::Real elapsedTime = GTE::Time::GetRealTimeSinceStartup() - sceneTransitionStartTime;
 		// elapsed time scaled to the range 0..1
-		float normalizedElapsedTime = elapsedTime / transitionTime;
+		GTE::Real normalizedElapsedTime = elapsedTime / transitionTime;
 
 		// from scene ...
-		Scene* srcSceneObj = scenes[(unsigned int)sceneTransitionSrc];
+		Scene* srcSceneObj = scenes[(GTE::UInt32)sceneTransitionSrc];
 		// ... to scene
-		Scene* destSceneObj = scenes[(unsigned int)sceneTransitionDest];
+		Scene* destSceneObj = scenes[(GTE::UInt32)sceneTransitionDest];
 
 		// source scene root
 		GTE::SceneObjectRef srcRoot = srcSceneObj->GetSceneRoot();
@@ -326,21 +326,21 @@ void Game::UpdateSceneTransition()
 		// deactivate source scene
 		srcRoot->SetActive(false);
 
-		float destScale = 1;
+		GTE::Real destScale = 1;
 
 		// the transition has 4 phases, each representing a scale value
-		unsigned int phases = 4;
-		float times[] = {0, .6, .8, 1};
-		float scales[] = {0, 1.2, .9, 1};
+		GTE::UInt32 phases = 4;
+		GTE::Real times[] = {0, .6, .8, 1};
+		GTE::Real scales[] = {0, 1.2, .9, 1};
 
 		// find where the elapsed time currently lies relative to the phase
 		// boundaries, and interpolate the scale between the current phase
 		// and the next phase based on elapsed time
-		for(unsigned int i = 1; i < phases; i++)
+		for(GTE::UInt32 i = 1; i < phases; i++)
 		{
 			if(normalizedElapsedTime < times[i])
 			{
-				float cElapsed = normalizedElapsedTime - times[i-1];
+				GTE::Real cElapsed = normalizedElapsedTime - times[i-1];
 				destScale =  ((cElapsed/(times[i]-times[i-1])) * (scales[i] - scales[i-1])) + scales[i-1];
 				break;
 			}
@@ -348,7 +348,7 @@ void Game::UpdateSceneTransition()
 
 		if(elapsedTime > transitionTime)destScale = 1;
 
-		SceneTransition& destTransition = sceneTransitions[(unsigned int)sceneTransitionDest];
+		SceneTransition& destTransition = sceneTransitions[(GTE::UInt32)sceneTransitionDest];
 
 		// apply calculated/interpolated scale
 		GTE::Transform destTransform;
@@ -371,8 +371,8 @@ void Game::UpdateSceneTransition()
  */
 void Game::SetupTransitionForScene(Scenes scene)
 {
-	SceneTransition& sceneTransition = sceneTransitions[(unsigned int)scene];
-	Scene* sceneObj = scenes[(unsigned int)scene];
+	SceneTransition& sceneTransition = sceneTransitions[(GTE::UInt32)scene];
+	Scene* sceneObj = scenes[(GTE::UInt32)scene];
 
 	// for now we are only saving the original transform of the scene root
 	GTE::SceneObjectRef sceneRoot = sceneObj->GetSceneRoot();
@@ -544,7 +544,7 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 				GTE::SkinnedMesh3DRendererRef renderer = current->GetSkinnedMesh3DRenderer();
 				if(renderer.IsValid())
 				{
-					for(unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
+					for(GTE::UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
 					{
 						renderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
 					}
@@ -603,7 +603,7 @@ void Game::Update()
 
 	if(!sceneTransitioning)
 	{
-		scenes[(unsigned int)currentScene]->Update();
+		scenes[(GTE::UInt32)currentScene]->Update();
 	}
 	UpdateSceneTransition();
 
@@ -640,10 +640,10 @@ void Game::OnQuit()
  */
 void Game::DisplayInfo()
 {
-	float elapsedPrintTime = GTE::Time::GetRealTimeSinceStartup() - lastInfoPrintTime;
+	GTE::Real elapsedPrintTime = GTE::Time::GetRealTimeSinceStartup() - lastInfoPrintTime;
 	if(elapsedPrintTime > 1 || displayInfoChanged)
 	{
-		float elapsedFPSTime = GTE::Time::GetRealTimeSinceStartup() - lastFPSRetrieveTime;
+		GTE::Real elapsedFPSTime = GTE::Time::GetRealTimeSinceStartup() - lastFPSRetrieveTime;
 		if(elapsedFPSTime > 1)
 		{
 			lastFPS = GTE::Engine::Instance()->GetGraphicsSystem()->GetCurrentFPS();
@@ -707,7 +707,7 @@ void Game::SignalDisplayInfoChanged()
  */
 void Game::UpdatePlayerHorizontalSpeedAndDirection()
 {
-	float curSmooth = playerSpeedSmoothing * GTE::Time::GetDeltaTime();
+	GTE::Real curSmooth = playerSpeedSmoothing * GTE::Time::GetDeltaTime();
 
 	if(playerState == PlayerState::Roaring ||
 	   playerState == PlayerState::Defend1 ||
@@ -743,8 +743,8 @@ void Game::UpdatePlayerHorizontalSpeedAndDirection()
 	GTE::Vector3 cameraRight;
 	GTE::Vector3::Cross(cameraForward, GTE::Vector3::Up, cameraRight);
 
-	float h = 0;
-	float v = 0;
+	GTE::Real h = 0;
+	GTE::Real v = 0;
 	GTE::InputManager * inputManager = GTE::Engine::Instance()->GetInputManager();
 
 	// get directional input
@@ -792,7 +792,7 @@ void Game::UpdatePlayerHorizontalSpeedAndDirection()
 	// if the player is on the ground, apply movement
 	if(playerIsGrounded)
 	{
-		float targetSpeed = 0;
+		GTE::Real targetSpeed = 0;
 		if(playerIsMoving)
 		{
 			targetSpeed = playerWalkSpeed;
@@ -826,7 +826,7 @@ void Game::UpdatePlayerVerticalSpeed()
 	// has been in the jump state for a sufficient amount of time
 	if(playerIsGrounded && playerState == PlayerState::Jump)
 	{
-		float jumpTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(int)PlayerState::Jump];
+		GTE::Real jumpTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(int)PlayerState::Jump];
 		if(jumpTime > .2)
 		{
 			playerVerticalSpeed = 50;
@@ -948,7 +948,7 @@ void Game::UpdatePlayerAnimation()
  */
 void Game::ManagePlayerState()
 {
-	float currentStateTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(unsigned int)playerState];
+	GTE::Real currentStateTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(GTE::UInt32)playerState];
 	switch(playerType)
 	{
 		case PlayerType::Koopa:
@@ -1077,9 +1077,9 @@ void Game::HandleGeneralInput()
 	}
 
 	// get scene object pointers
-	LavaScene *lavaScene = ((LavaScene*)scenes[(unsigned int)Scenes::LavaScene]);
-	CastleScene *castleScene = ((CastleScene*)scenes[(unsigned int)Scenes::CastleScene]);
-	PoolScene *poolScene = ((PoolScene*)scenes[(unsigned int)Scenes::PoolScene]);
+	LavaScene *lavaScene = ((LavaScene*)scenes[(GTE::UInt32)Scenes::LavaScene]);
+	CastleScene *castleScene = ((CastleScene*)scenes[(GTE::UInt32)Scenes::CastleScene]);
+	PoolScene *poolScene = ((PoolScene*)scenes[(GTE::UInt32)Scenes::PoolScene]);
 	LavaField *lavaField = lavaScene->GetLavaField();
 
 	// toggle lava
@@ -1095,7 +1095,7 @@ void Game::HandleGeneralInput()
 	bool reduceLightIntensity = GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::E);
 	bool toggleLight = GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::Q);
 
-	float intensityBoost = 0;
+	GTE::Real intensityBoost = 0;
 	if(boostLightIntensity)intensityBoost = .05;
 	else if(reduceLightIntensity)intensityBoost = -.05;
 
@@ -1112,7 +1112,7 @@ void Game::HandleGeneralInput()
 			UpdateLight(ambientLightObject, toggleLight, intensityBoost, toggleCastShadows);
 		break;
 		case SceneLighting::Lava:
-			for(unsigned int i =0; i < lavaLightObjects.size(); i++)
+			for(GTE::UInt32 i =0; i < lavaLightObjects.size(); i++)
 			{
 				UpdateLight(lavaLightObjects[i], toggleLight, intensityBoost, toggleCastShadows);
 			}
@@ -1122,11 +1122,11 @@ void Game::HandleGeneralInput()
 		break;
 		case SceneLighting::Point:
 			UpdateLight(lavaSpinningLight, toggleLight, intensityBoost, toggleCastShadows);
-			for(unsigned int i =0; i < castleLights.size(); i++)
+			for(GTE::UInt32 i =0; i < castleLights.size(); i++)
 			{
 				UpdateLight(castleLights[i], toggleLight, intensityBoost, toggleCastShadows);
 			}
-			for(unsigned int i =0; i < reflectingPoolLights.size(); i++)
+			for(GTE::UInt32 i =0; i < reflectingPoolLights.size(); i++)
 			{
 				UpdateLight(reflectingPoolLights[i], toggleLight, intensityBoost, toggleCastShadows);
 			}
@@ -1171,7 +1171,7 @@ void Game::HandleGeneralInput()
  * [intensityChange] - Amount by which light intensity should be adjusted.
  * [toggleCastShadows] - Toggle whether or not shadows are enabled for the light.
  */
-void Game::UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, float intensityChange, bool toggleCastShadows)
+void Game::UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, GTE::Real intensityChange, bool toggleCastShadows)
 {
 	if(sceneObject.IsValid())
 	{
@@ -1179,7 +1179,7 @@ void Game::UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, float 
 
 		if(intensityChange != 0)
 		{
-			float intensity = sceneObject->GetLight()->GetIntensity();
+			GTE::Real intensity = sceneObject->GetLight()->GetIntensity();
 			if(intensity + intensityChange < 0 && intensityChange < 0)intensityChange = -intensity;
 			sceneObject->GetLight()->SetIntensity(intensity + intensityChange);
 		}
@@ -1245,7 +1245,7 @@ void Game::UpdatePlayerFollowCamera()
 
 	// target distance camera should be from the player object. this means the real target position for the
 	// camera will be [desiredFollowDistance] units away from [playerPosCameraMoveTarget]
-	float desiredFollowDistance = 25;
+	GTE::Real desiredFollowDistance = 25;
 
 	// create copy of [cameraToPlayerMove] and scale it a magnitude of [desiredFollowDistance]
 	GTE::Vector3 newCameraToPlayer = cameraToPlayerMove;

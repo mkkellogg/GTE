@@ -1,24 +1,27 @@
 #ifndef _GTE_GTEMATH_H_
 #define _GTE_GTEMATH_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 namespace GTE
 {
 	class GTEMath
 	{
 	public:
 
-		static float InverseSquareRoot(float n);
-		static float QuickInverseSquareRoot(float n);
-		static float SquareRoot(float n);
-		static float QuickSquareRoot(float n);
-		static float Round(float n);
-		static float Cos(float n);
-		static float ACos(float n);
-		static float Sin(float n);
-		static float Abs(float n);
-		static float Min(float a, float b);
-		static float Max(float a, float b);
-		static float Lerp(float a, float b, float t);
+		static Real InverseSquareRoot(Real n);
+		static Real QuickInverseSquareRoot(Real n);
+		static Real SquareRoot(Real n);
+		static Real QuickSquareRoot(Real n);
+		static Real Round(Real n);
+		static Real Cos(Real n);
+		static Real ACos(Real n);
+		static Real Sin(Real n);
+		static Real Abs(Real n);
+		static Real Min(Real a, Real b);
+		static Real Max(Real a, Real b);
+		static Real Lerp(Real a, Real b, Real t);
 	};
 }
 

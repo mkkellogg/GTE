@@ -26,7 +26,7 @@ namespace GTE
 	class SubMesh3DFaces
 	{
 		// number of faces in [faces]
-		unsigned int faceCount;
+		UInt32 faceCount;
 		// face data array
 		SubMesh3DFace * faces;
 
@@ -37,10 +37,10 @@ namespace GTE
 		SubMesh3DFaces();
 		~SubMesh3DFaces();
 
-		unsigned int GetFaceCount() const;
-		bool Init(unsigned int faceCount);
-		SubMesh3DFace * GetFace(unsigned int index);
-		const SubMesh3DFace * GetFaceConst(unsigned int index) const;
+		UInt32 GetFaceCount() const;
+		bool Init(UInt32 faceCount);
+		SubMesh3DFace * GetFace(UInt32 index);
+		const SubMesh3DFace * GetFaceConst(UInt32 index) const;
 	};
 }
 

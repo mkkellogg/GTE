@@ -36,13 +36,13 @@ namespace GTE
 
 		this->count = count;
 
-		data = new float[count * 2];
+		data = new Real[count * 2];
 		ASSERT(data != NULL, "Could not allocate data memory for BaseVector2Array");
 
 		objects = baseFactory->CreateArray(count);
 		ASSERT(objects != NULL, "Could not allocate objects memory for BaseVector2Array");
 
-		float *dataPtr = data;
+		Real *dataPtr = data;
 
 		int index = 0;
 		while (index < count)
@@ -61,9 +61,9 @@ namespace GTE
 		return true;
 	}
 
-	const float * BaseVector2Array::GetDataPtr() const
+	const Real * BaseVector2Array::GetDataPtr() const
 	{
-		return (const float *)data;
+		return (const Real *)data;
 	}
 
 

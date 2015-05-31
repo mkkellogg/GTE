@@ -29,7 +29,7 @@ namespace GTE
 
 	void InputManager::ClearStates()
 	{
-		for (unsigned int i = 0; i < MAX_KEY_INDICES; i++)
+		for (UInt32 i = 0; i < MAX_KEY_INDICES; i++)
 		{
 			onKeyDown[i] = false;
 			keyState[i] = KeyState::Up;
@@ -38,13 +38,13 @@ namespace GTE
 
 	void InputManager::ClearDigitalInput()
 	{
-		for (unsigned int i = 0; i < (unsigned int)DigitalInput::_Last; i++)
+		for (UInt32 i = 0; i < (UInt32)DigitalInput::_Last; i++)
 		{
 			digitalInputState[i] = false;
 		}
 	}
 
-	void InputManager::GetKeyIndex(Key key, unsigned int * indices, unsigned int& indexCount)
+	void InputManager::GetKeyIndex(Key key, UInt32 * indices, UInt32& indexCount)
 	{
 		switch (key)
 		{
@@ -349,25 +349,25 @@ namespace GTE
 		}
 	}
 
-	void InputManager::SetOnKeyDown(unsigned int index, bool value)
+	void InputManager::SetOnKeyDown(UInt32 index, bool value)
 	{
 		if (index >= MAX_KEY_INDICES)return;
 		onKeyDown[index] = value;
 	}
 
-	bool InputManager::GetOnKeyDown(unsigned int index)
+	bool InputManager::GetOnKeyDown(UInt32 index)
 	{
 		if (index >= MAX_KEY_INDICES)return false;
 		return onKeyDown[index];
 	}
 
-	void InputManager::SetKeyState(unsigned int index, KeyState state)
+	void InputManager::SetKeyState(UInt32 index, KeyState state)
 	{
 		if (index >= MAX_KEY_INDICES)return;
 		keyState[index] = state;
 	}
 
-	KeyState InputManager::GetKeyState(unsigned int index)
+	KeyState InputManager::GetKeyState(UInt32 index)
 	{
 		if (index >= MAX_KEY_INDICES)return KeyState::_Invalid;
 		return keyState[index];
@@ -380,7 +380,7 @@ namespace GTE
 
 	bool InputManager::ShouldHandleOnKeyDown(unsigned char key)
 	{
-		unsigned int index = GetKeyIndexFromCharacter(key);
+		UInt32 index = GetKeyIndexFromCharacter(key);
 		if (GetOnKeyDown(index))
 		{
 			SetOnKeyDown(index, false);
@@ -391,14 +391,14 @@ namespace GTE
 
 	bool InputManager::ShouldHandleOnKeyDown(Key key)
 	{
-		unsigned int indices[12];
-		unsigned int indexCount;
+		UInt32 indices[12];
+		UInt32 indexCount;
 		GetKeyIndex(key, indices, indexCount);
 		if (indexCount > 0)
 		{
-			for (unsigned int i = 0; i < indexCount; i++)
+			for (UInt32 i = 0; i < indexCount; i++)
 			{
-				unsigned int index = indices[i];
+				UInt32 index = indices[i];
 				if (GetOnKeyDown(index))
 				{
 					SetOnKeyDown(index, false);
@@ -416,14 +416,14 @@ namespace GTE
 
 	bool InputManager::IsKeyDown(Key key)
 	{
-		unsigned int indices[12];
-		unsigned int indexCount;
+		UInt32 indices[12];
+		UInt32 indexCount;
 		GetKeyIndex(key, indices, indexCount);
 		if (indexCount > 0)
 		{
-			for (unsigned int i = 0; i < indexCount; i++)
+			for (UInt32 i = 0; i < indexCount; i++)
 			{
-				unsigned int index = indices[i];
+				UInt32 index = indices[i];
 				if (GetKeyState(index) == KeyState::Down)return true;
 			}
 		}

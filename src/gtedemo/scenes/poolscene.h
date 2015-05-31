@@ -45,18 +45,18 @@ class PoolScene : public Scene
 	GTE::MaterialRef waterDropMaterial;
 
 	// last time drop was added to pool
-	float lastWaterDropTime;
+	GTE::Real lastWaterDropTime;
 	// last time water simulation advanced
-	float lastWaterSimAdvanceTime;
+	GTE::Real lastWaterSimAdvanceTime;
 	// current height map index
-	unsigned int currentHeightMapIndex;
+	GTE::UInt32 currentHeightMapIndex;
 
 	// water mesh resolution
-	const unsigned int waterMeshResolution = 128;
+	const GTE::UInt32 waterMeshResolution = 128;
 	// water height map resolution
-	const unsigned int waterHeightMapResolution = 128;
+	const GTE::UInt32 waterHeightMapResolution = 128;
 	// water normal map resolution
-	const unsigned int waterNomralMapResolution = 256;
+	const GTE::UInt32 waterNomralMapResolution = 256;
 
 	void UpdateCameras();
 	void UpdateRippleSimulation();

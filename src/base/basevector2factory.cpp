@@ -21,7 +21,7 @@ namespace GTE
 
 	}
 
-	BaseVector2 * BaseVector2Factory::CreatePermAttached(float * target)
+	BaseVector2 * BaseVector2Factory::CreatePermAttached(Real * target)
 	{
 		return new BaseVector2(true, target);
 	}
@@ -32,11 +32,11 @@ namespace GTE
 		return pptr;
 	}
 
-	void BaseVector2Factory::DestroyArray(BaseVector2 ** array, unsigned int size)
+	void BaseVector2Factory::DestroyArray(BaseVector2 ** array, UInt32 size)
 	{
 		NONFATAL_ASSERT(array != NULL, "BaseVector2Factory::DestroyArray -> 'array' is null.", true);
 
-		for (unsigned int i = 0; i < size; i++)
+		for (UInt32 i = 0; i < size; i++)
 		{
 			BaseVector2 * baseObj = array[i];
 			if (baseObj != NULL)

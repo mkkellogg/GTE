@@ -19,8 +19,8 @@ namespace GTE
 		DigitalInput MapSpecialInputToDigitalInput(int key);
 		int MapSpecialInputToKeyIndex(int key);
 		int MapModifierToKeyIndex(int modifier);
-		unsigned int GetKeyIndexForNonCharacterKey(NonCharacterKey key);
-		unsigned int GetKeyIndexFromCharacter(unsigned char key);
+		UInt32 GetKeyIndexForNonCharacterKey(NonCharacterKey key);
+		UInt32 GetKeyIndexFromCharacter(unsigned char key);
 
 	public:
 

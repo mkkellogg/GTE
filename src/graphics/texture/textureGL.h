@@ -11,6 +11,7 @@
 #define _GTE_TEXTURE_GL_H_
 
 #include "graphics/gl_include.h"
+#include "object/enginetypes.h"
 #include "texture.h"
 #include <string>
 

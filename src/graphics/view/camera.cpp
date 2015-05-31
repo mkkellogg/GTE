@@ -41,7 +41,7 @@ namespace GTE
 		renderOrderIndex = 0;
 
 		fov = 65;
-		widthHeightRatio = (float)graphicsAttr.WindowWidth / (float)graphicsAttr.WindowHeight;
+		widthHeightRatio = (Real)graphicsAttr.WindowWidth / (Real)graphicsAttr.WindowHeight;
 
 		clipPlaneCount = 0;
 
@@ -163,24 +163,24 @@ namespace GTE
 		return ssaoMode;
 	}
 
-	void Camera::SetRenderOrderIndex(unsigned int index)
+	void Camera::SetRenderOrderIndex(UInt32 index)
 	{
 		renderOrderIndex = index;
 	}
 
-	unsigned int Camera::GetRenderOrderIndex()
+	UInt32 Camera::GetRenderOrderIndex()
 	{
 		return renderOrderIndex;
 	}
 
 	void Camera::AddClearBuffer(RenderBufferType buffer)
 	{
-		IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)buffer);
+		IntMaskUtil::SetBitForMask(&clearBufferMask, (UInt32)buffer);
 	}
 
 	void Camera::RemoveClearBuffer(RenderBufferType buffer)
 	{
-		IntMaskUtil::ClearBitForMask(&clearBufferMask, (unsigned int)buffer);
+		IntMaskUtil::ClearBitForMask(&clearBufferMask, (UInt32)buffer);
 	}
 
 	IntMask Camera::GetClearBufferMask() const
@@ -234,7 +234,7 @@ namespace GTE
 		else return renderTarget;
 	}
 
-	void Camera::SetWidthHeightRatio(float width, float height)
+	void Camera::SetWidthHeightRatio(Real width, Real height)
 	{
 		this->widthHeightRatio = width / height;
 		UpdateDisplay();
@@ -268,7 +268,7 @@ namespace GTE
 	{
 		Matrix4x4 proj;
 
-		float ratio = widthHeightRatio;
+		Real ratio = widthHeightRatio;
 
 		if (projectionMode == ProjectionMode::Perspective)
 		{
@@ -277,16 +277,16 @@ namespace GTE
 		else
 		{
 			RenderTargetRef renderTarget = GetRenderTarget();
-			float height = renderTarget->GetHeight();
-			float width = renderTarget->GetWidth();
-			float halfWidth = width / 2.0;
-			float halfHeight = height / 2.0;
-			float left = -halfWidth;
-			float right = left + width;
-			float top = halfHeight;
-			float bottom = halfHeight - height;
-			float near = 5;
-			float far = 200;
+			Real height = renderTarget->GetHeight();
+			Real width = renderTarget->GetWidth();
+			Real halfWidth = width / 2.0;
+			Real halfHeight = height / 2.0;
+			Real left = -halfWidth;
+			Real right = left + width;
+			Real top = halfHeight;
+			Real bottom = halfHeight - height;
+			Real near = 5;
+			Real far = 200;
 			Transform::BuildOrthographicProjectionMatrix(proj, top, bottom, left, right, near, far);
 		}
 		projection.SetTo(proj);
@@ -307,7 +307,7 @@ namespace GTE
 		return cullingMask;
 	}
 
-	void Camera::SetFOV(float fov)
+	void Camera::SetFOV(Real fov)
 	{
 		this->fov = fov;
 		UpdateDisplay();
@@ -323,7 +323,7 @@ namespace GTE
 		return skyboxTextureTransform;
 	}
 
-	bool Camera::AddClipPlane(const Vector3& normal, float offset)
+	bool Camera::AddClipPlane(const Vector3& normal, Real offset)
 	{
 		NONFATAL_ASSERT_RTRN(clipPlaneCount < Constants::MaxClipPlanes, "Camera::AddClipPlane -> Maximum clip planes exceeded.", false, true);
 		clipPlanes[clipPlaneCount].Normal = normal;
@@ -332,13 +332,13 @@ namespace GTE
 		return true;
 	}
 
-	const ClipPlane* Camera::GetClipPlane(unsigned int index)
+	const ClipPlane* Camera::GetClipPlane(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < clipPlaneCount, "Camera::GetClipPlane -> 'index' is out of range.", NULL, true);
 		return clipPlanes + index;
 	}
 
-	unsigned int Camera::GetClipPlaneCount() const
+	UInt32 Camera::GetClipPlaneCount() const
 	{
 		return clipPlaneCount;
 	}

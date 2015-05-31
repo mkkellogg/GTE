@@ -50,7 +50,7 @@ namespace GTE
 
 		memset(attributeBuffers, 0, sizeof(VertexAttrBuffer*) * MAX_ATTRIBUTE_BUFFERS);
 
-		for (unsigned int i = 0; i < (unsigned int)StandardAttribute::_Last; i++)
+		for (UInt32 i = 0; i < (UInt32)StandardAttribute::_Last; i++)
 		{
 			attributeBuffers[i] = NULL;
 		}
@@ -83,7 +83,7 @@ namespace GTE
 	 * Specify the index of this sub-renderer's target sub-mesh in the target
 	 * mesh.
 	 */
-	void SubMesh3DRenderer::SetTargetSubMeshIndex(unsigned int index)
+	void SubMesh3DRenderer::SetTargetSubMeshIndex(UInt32 index)
 	{
 		targetSubMeshIndex = index;
 	}
@@ -168,7 +168,7 @@ namespace GTE
 	/*
 	 * Get the time this renderer was last updated with its target sub-mesh.
 	 */
-	float SubMesh3DRenderer::GetTimeStamp() const
+	Real SubMesh3DRenderer::GetTimeStamp() const
 	{
 		return timeStamp;
 	}
@@ -219,7 +219,7 @@ namespace GTE
 		Point3Array * positions = mesh->GetPostions();
 		ASSERT(positions, "SubMesh3DRenderer::BuildShadowVolume -> Mesh contains null positions array.");
 		Point3Array& positionsSource = doPositionTransform == true ? transformedPositions : *positions;
-		float * positionsSrcPtr = const_cast<float*>(positionsSource.GetDataPtr());
+		Real * positionsSrcPtr = const_cast<Real*>(positionsSource.GetDataPtr());
 
 		// if this sub-renderer is utilizing an attribute transformer, we want to use the normals that result
 		// from that transformation to build the shadow volume.
@@ -230,35 +230,35 @@ namespace GTE
 		// dot product result threshold distinguishing front and back facing polygons.
 		// the dot product is calculated between a triangle's normal, and the direction
 		// vector to the light.
-		float backFaceThreshold = 0;
+		Real backFaceThreshold = 0;
 
 		// currentPositionVertexIndex = current number of process shadow volume vertices
-		unsigned int currentPositionVertexIndex = 0;
+		UInt32 currentPositionVertexIndex = 0;
 		// use a raw pointer to the shadow volume position data because it's faster
-		float * svPositionBase = const_cast<float*>(shadowVolumePositions.GetDataPtr());
+		Real * svPositionBase = const_cast<Real*>(shadowVolumePositions.GetDataPtr());
 
 		// structure that describes that relationship of the mesh faces, specifically which faces are adjacent
 		SubMesh3DFaces& faces = mesh->GetFaces();
-		unsigned int faceCount = faces.GetFaceCount();
+		UInt32 faceCount = faces.GetFaceCount();
 
 		// temp working variables
-		float* faceVertex1 = NULL;
-		float* faceVertex2 = NULL;
-		float* faceVertex3 = NULL;
+		Real* faceVertex1 = NULL;
+		Real* faceVertex2 = NULL;
+		Real* faceVertex3 = NULL;
 		Vector3 faceToLightDir = lightPosDir;
-		unsigned int faceVertexIndex = 0;
+		UInt32 faceVertexIndex = 0;
 		Vector3 * faceNormal;
 		SubMesh3DFace * face = NULL;
 		Point3 vertexAvg;
 
 		// temp working variables related to adjacency processing
-		float * edgeVertex1 = NULL;
-		float * edgeVertex2 = NULL;
-		float* adjVertex1 = NULL;
-		float* adjVertex2 = NULL;
-		float* adjVertex3 = NULL;
+		Real * edgeVertex1 = NULL;
+		Real * edgeVertex2 = NULL;
+		Real* adjVertex1 = NULL;
+		Real* adjVertex2 = NULL;
+		Real* adjVertex3 = NULL;
 		Vector3 adjFaceToLightDir;
-		unsigned int adjacentFaceVertexIndex = 0;
+		UInt32 adjacentFaceVertexIndex = 0;
 		int adjacentFaceIndex = -1;
 		Vector3 * adjacentFaceNormal = NULL;
 		SubMesh3DFace * adjacentFace = NULL;
@@ -269,7 +269,7 @@ namespace GTE
 		adjFaceToLightDir = faceToLightDir;
 
 		// loop through each face in [faces]
-		for (unsigned int f = 0; f < faceCount; f++)
+		for (UInt32 f = 0; f < faceCount; f++)
 		{
 			face = faces.GetFace(f);
 			if (face == NULL)continue;
@@ -300,7 +300,7 @@ namespace GTE
 			}
 
 			// calculate dot product between face normal and direction to light
-			float faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
+			Real faceToLightDot = Vector3::Dot(faceToLightDir, *faceNormal);
 
 			if (faceToLightDot > backFaceThreshold) // we have a front facing triangle (facing the light)
 			{
@@ -352,7 +352,7 @@ namespace GTE
 
 			int facesFound = 0;
 			// loop through each edge of the face and examine the adjacent face
-			for (unsigned int ai = 0; ai < 3; ai++)
+			for (UInt32 ai = 0; ai < 3; ai++)
 			{
 				adjacentFaceIndex = face->AdjacentFaceIndex1;
 				edgeVertex1 = faceVertex1;
@@ -371,7 +371,7 @@ namespace GTE
 					edgeVertex2 = faceVertex1;
 				}
 
-				float adjFaceToLightDot = 0;
+				Real adjFaceToLightDot = 0;
 
 				// adjacentFaceIndex >=0 means we found an adjacent face
 				if (adjacentFaceIndex >= 0)
@@ -611,7 +611,7 @@ namespace GTE
 				StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))
 			{
 				Point3Array * positions = mesh->GetPostions();
-				unsigned int positionCount = positions->GetCount();
+				UInt32 positionCount = positions->GetCount();
 				if (positionCount != transformedPositions.GetCount())
 				{
 					if (!transformedPositions.Init(positionCount))
@@ -631,7 +631,7 @@ namespace GTE
 				StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))
 			{
 				Vector3Array * normals = mesh->GetVertexNormals();
-				unsigned int normalCount = normals->GetCount();
+				UInt32 normalCount = normals->GetCount();
 				if (transformedVertexNormals.GetCount() != normalCount)
 				{
 					if (!transformedVertexNormals.Init(normalCount) || !transformedFaceNormals.Init(normalCount))
@@ -651,7 +651,7 @@ namespace GTE
 				StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Tangent))
 			{
 				Vector3Array * tangents = mesh->GetVertexTangents();
-				unsigned int tangentCount = tangents->GetCount();
+				UInt32 tangentCount = tangents->GetCount();
 				if (transformedVertexTangents.GetCount() != tangentCount)
 				{
 					if (!transformedVertexTangents.Init(tangentCount))

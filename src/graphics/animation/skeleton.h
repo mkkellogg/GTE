@@ -39,14 +39,14 @@ namespace GTE
 		friend class EngineObjectManager;
 
 		// number of bones in this skeleton
-		unsigned int boneCount;
+		UInt32 boneCount;
 		// indexed list of all the bones in this skeleton
 		Bone * bones;
 		// map from bone name to index in [bones] for the matching Bone object
-		std::unordered_map<std::string, unsigned int> boneNameMap;
+		std::unordered_map<std::string, UInt32> boneNameMap;
 
 		// map from node name to index in [nodeList] for the mtching SkeletonNode object
-		std::unordered_map<std::string, unsigned int> nodeNameMap;
+		std::unordered_map<std::string, UInt32> nodeNameMap;
 
 		// indexed list of all the nodes in this skeleton
 		std::vector<SkeletonNode *> nodeList;
@@ -54,27 +54,27 @@ namespace GTE
 		// contains transformation hierarchy structure
 		Tree<SkeletonNode*> skeleton;
 
-		Skeleton(unsigned int boneCount);
+		Skeleton(UInt32 boneCount);
 		~Skeleton();
 
 		void Destroy();
 
 	public:
 
-		unsigned int GetBoneCount();
-		unsigned int GetNodeCount();
+		UInt32 GetBoneCount();
+		UInt32 GetNodeCount();
 
 		bool Init();
 		Tree<SkeletonNode*>::TreeNode * CreateRoot(SkeletonNode* node);
 		Tree<SkeletonNode*>::TreeNode * AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode* node);
 
-		void MapBone(std::string& name, unsigned int boneIndex);
+		void MapBone(std::string& name, UInt32 boneIndex);
 		int GetBoneMapping(std::string& name);
-		Bone* GetBone(unsigned int boneIndex);
+		Bone* GetBone(UInt32 boneIndex);
 
-		void MapNode(std::string& name, unsigned int nodeIndex);
+		void MapNode(std::string& name, UInt32 nodeIndex);
 		int GetNodeMapping(std::string& name);
-		SkeletonNode * GetNodeFromList(unsigned int nodeIndex);
+		SkeletonNode * GetNodeFromList(UInt32 nodeIndex);
 		void AddNodeToList(SkeletonNode * node);
 
 		void OverrideBonesFrom(SkeletonRef skeleton, bool takeOffset, bool takeNode);

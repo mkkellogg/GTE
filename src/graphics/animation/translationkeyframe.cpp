@@ -19,7 +19,7 @@ namespace GTE
 	/*
 	 * Parameterized constructor..
 	 */
-	TranslationKeyFrame::TranslationKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Vector3& translation) : KeyFrame(normalizedTime, realTime, realTimeTicks)
+	TranslationKeyFrame::TranslationKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& translation) : KeyFrame(normalizedTime, realTime, realTimeTicks)
 	{
 		this->Translation = translation;
 	}

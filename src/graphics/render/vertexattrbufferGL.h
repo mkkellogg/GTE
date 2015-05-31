@@ -12,6 +12,7 @@
 
 #include "graphics/gl_include.h"
 #include "vertexattrbuffer.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {
@@ -25,7 +26,7 @@ namespace GTE
 		friend class GraphicsGL;
 
 		// raw pointer to the buffer data
-		float * data;
+		Real * data;
 		// is this a VBO?
 		bool dataOnGPU;
 		// OpenGL id for the buffer
@@ -39,16 +40,16 @@ namespace GTE
 		void Destroy();
 		int CalcFullSize() const;
 		int CalcFloatCount() const;
-		void InitData(const float * srcData);
+		void InitData(const Real * srcData);
 
 	public:
 
-		bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, float *srcData);
-		void SetData(const float * srcData);
-		const float * GetDataPtr() const;
+		bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, Real *srcData);
+		void SetData(const Real * srcData);
+		const Real * GetDataPtr() const;
 		bool IsGPUBuffer() const;
 		GLuint GetGPUBufferID();
-		unsigned int GetFullSize() const;
+		UInt32 GetFullSize() const;
 	};
 }
 

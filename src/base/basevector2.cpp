@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	void BaseVector2::Init(float *target, bool permAttach)
+	void BaseVector2::Init(Real *target, bool permAttach)
 	{
 		data = baseData;
 
@@ -47,13 +47,13 @@ namespace GTE
 		Set(0, 0);
 	}
 
-	BaseVector2::BaseVector2(bool permAttached, float * target)
+	BaseVector2::BaseVector2(bool permAttached, Real * target)
 	{
 		Init(target, true);
 		Set(0, 0);
 	}
 
-	BaseVector2::BaseVector2(float x, float y)
+	BaseVector2::BaseVector2(Real x, Real y)
 	{
 		Init(NULL, false);
 		Set(x, y);
@@ -83,7 +83,7 @@ namespace GTE
 		return *this;
 	}
 
-	void BaseVector2::Set(float x, float y)
+	void BaseVector2::Set(Real x, Real y)
 	{
 		data[0] = x;
 		data[1] = y;
@@ -91,15 +91,15 @@ namespace GTE
 
 	void BaseVector2::Get(BaseVector2& baseVector)
 	{
-		memcpy(baseVector.data, data, sizeof(float) * 2);
+		memcpy(baseVector.data, data, sizeof(Real) * 2);
 	}
 
-	float * BaseVector2::GetDataPtr() const
+	Real * BaseVector2::GetDataPtr() const
 	{
 		return data;
 	}
 
-	void BaseVector2::AttachTo(float * data)
+	void BaseVector2::AttachTo(Real * data)
 	{
 		this->data = data;
 		attached = true;

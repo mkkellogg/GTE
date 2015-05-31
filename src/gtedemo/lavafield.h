@@ -17,35 +17,35 @@
 class LavaField
 {
 	// the lava field mesh is divided into subDivisions x subDivisions sub-sections
-	unsigned int subDivisions;
+	GTE::UInt32 subDivisions;
 	// speed at which mesh displacement (lava motion) moves
-	float dispSpeed;
+	GTE::Real dispSpeed;
 	// speed at which lavaTextureA moves
-	float textureASpeed;
+	GTE::Real textureASpeed;
 	// speed at which lavaTextureB moves
-	float textureBSpeed;
+	GTE::Real textureBSpeed;
 	// height factor for lava field displacement
-	float dispHeight;
+	GTE::Real dispHeight;
 	// size of lava displacement tiles, determines how pixels in lava displacement maps
 	// are mapped to the sub-sections of the lava field mesh.
-	float dispTiling;
+	GTE::Real dispTiling;
 
 	// this value is updated based on [dispSpeed] every frame, used to find position in
 	// [displacementA] and [displacementB].
-	float dispOffset;
+	GTE::Real dispOffset;
 	// current offset/position of [lavaTextureA].
-	float textAOffset;
+	GTE::Real textAOffset;
 	// current offset/position of [lavaTextureB].
-	float textBOffset;
+	GTE::Real textBOffset;
 	// SceneObject instance that holds the lava field mesh
 	GTE::SceneObjectRef lavaFieldObject;
 
 	// width/height of both displacementA & displacementB
-	const unsigned int diplacementImageDimensionSize=128;
+	const GTE::UInt32 diplacementImageDimensionSize=128;
 	// width of the lava field mesh in model space
-	float fieldWidth;
+	GTE::Real fieldWidth;
 	// height of the lava field mesh in model space
-	float fieldHeight;
+	GTE::Real fieldHeight;
 
 	// material used to render the lava field mesh
 	GTE::MaterialRef lavaMaterial;
@@ -64,18 +64,18 @@ class LavaField
 
 	public:
 
-	LavaField(unsigned int subDivisions);
+	LavaField(GTE::UInt32 subDivisions);
 	~LavaField();
 
 	bool Init();
 	GTE::SceneObjectRef GetSceneObject();
 	void Update();
 
-	void SetDisplacementSpeed(float speed);
-	void SetDisplacementTileSize(float size);
-	void SetTextureASpeed(float speed);
-	void SetTextureBSpeed(float speed);
-	void SetDisplacementHeight(float height);
+	void SetDisplacementSpeed(GTE::Real speed);
+	void SetDisplacementTileSize(GTE::Real size);
+	void SetTextureASpeed(GTE::Real speed);
+	void SetTextureBSpeed(GTE::Real speed);
+	void SetDisplacementHeight(GTE::Real height);
 };
 
 

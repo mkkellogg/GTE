@@ -35,13 +35,13 @@ namespace GTE
 
 			// the unique vertex index, all vertices that have the same x,y,z values will have
 			// the same UVertexIndex value
-			unsigned int UniqueVertexIndex = 0;
+			UInt32 UniqueVertexIndex = 0;
 			// number of bones to which this vertex is attached
-			unsigned int BoneCount = 0;
+			UInt32 BoneCount = 0;
 			// bones to which this vertex is attached
-			unsigned int BoneIndex[Constants::MaxBonesPerVertex];
+			UInt32 BoneIndex[Constants::MaxBonesPerVertex];
 			// weight of each bone attachment, should add up to 1
-			float Weight[Constants::MaxBonesPerVertex];
+			Real Weight[Constants::MaxBonesPerVertex];
 			// name of the bones, used for rebind to different skeletons
 			std::string Name[Constants::MaxBonesPerVertex];
 
@@ -52,9 +52,9 @@ namespace GTE
 
 				this->BoneCount = desc->BoneCount;
 				this->UniqueVertexIndex = desc->UniqueVertexIndex;
-				memcpy(this->BoneIndex, desc->BoneIndex, sizeof(unsigned int) * Constants::MaxBonesPerVertex);
-				memcpy(this->Weight, desc->Weight, sizeof(float) * Constants::MaxBonesPerVertex);
-				for (unsigned int b = 0; b < Constants::MaxBonesPerVertex; b++)
+				memcpy(this->BoneIndex, desc->BoneIndex, sizeof(UInt32) * Constants::MaxBonesPerVertex);
+				memcpy(this->Weight, desc->Weight, sizeof(Real) * Constants::MaxBonesPerVertex);
+				for (UInt32 b = 0; b < Constants::MaxBonesPerVertex; b++)
 				{
 					Name[b] = desc->Name[b];
 				}
@@ -64,9 +64,9 @@ namespace GTE
 	private:
 
 		// number of unique vertices
-		unsigned int uniqueVertexCount;
+		UInt32 uniqueVertexCount;
 		// total number of vertices
-		unsigned int vertexCount;
+		UInt32 vertexCount;
 		// mapping descriptor for each vertex
 		VertexMappingDescriptor * mappingDescriptors;
 
@@ -74,12 +74,12 @@ namespace GTE
 
 	public:
 
-		VertexBoneMap(unsigned int vertexCount, unsigned int uVertexCount);
+		VertexBoneMap(UInt32 vertexCount, UInt32 uVertexCount);
 		~VertexBoneMap();
 		bool Init();
-		VertexMappingDescriptor* GetDescriptor(unsigned int index);
-		unsigned int GetVertexCount();
-		unsigned int GetUniqueVertexCount();
+		VertexMappingDescriptor* GetDescriptor(UInt32 index);
+		UInt32 GetVertexCount();
+		UInt32 GetUniqueVertexCount();
 		void BindTo(SkeletonRef skeleton);
 		VertexBoneMap * FullClone();
 	};

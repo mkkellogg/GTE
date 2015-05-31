@@ -13,13 +13,13 @@ namespace GTE
 
 	}
 
-	Color4::Color4(bool permAttached, float * target) : BaseVector4(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	Color4::Color4(bool permAttached, Real * target) : BaseVector4(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 	{
 
 
 	}
 
-	Color4::Color4(float r, float g, float b, float a) : BaseVector4(r, g, b, a), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	Color4::Color4(Real r, Real g, Real b, Real a) : BaseVector4(r, g, b, a), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 	{
 
 	}
@@ -54,12 +54,12 @@ namespace GTE
 		return *this;
 	}
 
-	void Color4::Set(float r, float g, float b, float a)
+	void Color4::Set(Real r, Real g, Real b, Real a)
 	{
 		BaseVector4::Set(r, g, b, a);
 	}
 
-	void Color4::AttachTo(float * data)
+	void Color4::AttachTo(Real * data)
 	{
 		BaseVector4::AttachTo(data);
 	}

@@ -22,7 +22,7 @@ namespace GTE
 
 	}
 
-	void Vector3Array::SetData(const float * data, bool includeW)
+	void Vector3Array::SetData(const Real * data, bool includeW)
 	{
 
 	}

@@ -8,7 +8,7 @@ namespace GTE
 	/*
 	* Single constructor, set all member variables.
 	*/
-	RenderTarget::RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
+	RenderTarget::RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		this->hasColorBuffer = hasColor;
 		this->hasDepthBuffer = hasDepth;
@@ -64,12 +64,12 @@ namespace GTE
 		return colorTexture;
 	}
 
-	unsigned int RenderTarget::GetWidth()
+	UInt32 RenderTarget::GetWidth()
 	{
 		return width;
 	}
 
-	unsigned int RenderTarget::GetHeight()
+	UInt32 RenderTarget::GetHeight()
 	{
 		return height;
 	}

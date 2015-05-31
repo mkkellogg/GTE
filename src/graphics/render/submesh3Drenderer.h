@@ -75,14 +75,14 @@ namespace GTE
 		std::vector<VertexAttrBufferBinding> boundShadowVolumeAttributeBuffers;
 
 		// number of vertices for which vertex attributes in [attributeBuffers] are stored
-		unsigned int storedVertexCount;
+		UInt32 storedVertexCount;
 		// mask that describes the different types of attributes stored in [storedAttributes]
 		StandardAttributeSet storedAttributes;
 		// are the vertex attributes stored in GPU-based buffers?
 		bool buffersOnGPU;
 
 		// last time this renderer was updated from its target sub-mesh
-		float timeStamp;
+		Real timeStamp;
 
 		// doAttributeTransform == true means this sub-renderer's attribute transformer should be used to
 		// transform vertex attributes prior to rendering
@@ -118,7 +118,7 @@ namespace GTE
 		bool doBackSetShadowVolume;
 
 		void SetContainerRenderer(Mesh3DRenderer * renderer);
-		void SetTargetSubMeshIndex(unsigned int index);
+		void SetTargetSubMeshIndex(UInt32 index);
 
 		bool InitBuffer(VertexAttrBuffer ** buffer, int vertexCount, int componentCount, int stride);
 		void Destroy();
@@ -150,7 +150,7 @@ namespace GTE
 
 	public:
 
-		float GetTimeStamp() const;
+		Real GetTimeStamp() const;
 
 		void SetUseBadGeometryShadowFix(bool useFix);
 

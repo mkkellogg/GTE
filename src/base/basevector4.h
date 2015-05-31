@@ -10,6 +10,9 @@
 #ifndef _GTE_BASEVECTOR4_H_
 #define _GTE_BASEVECTOR4_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 #define BaseVector4_QuickCopy(source, dest)        \
 {                                          		   \
   *(dest) = *(source);                      	   \
@@ -80,30 +83,30 @@ namespace GTE
 
 	protected:
 
-		void Init(float *target, bool permAttach);
+		void Init(Real *target, bool permAttach);
 
-		float * data;
-		float baseData[4];
+		Real * data;
+		Real baseData[4];
 		bool attached;
 		bool canDetach;
 
 	public:
 
 		BaseVector4();
-		BaseVector4(bool permAttached, float * target);
-		BaseVector4(float x, float y, float z, float w);
+		BaseVector4(bool permAttached, Real * target);
+		BaseVector4(Real x, Real y, Real z, Real w);
 		BaseVector4(const BaseVector4& baseVector);
-		BaseVector4(const float * copyData);
+		BaseVector4(const Real * copyData);
 		virtual ~BaseVector4();
 
 		virtual BaseVector4& operator=(const BaseVector4& source);
 
-		float * GetDataPtr();
-		void Set(float x, float y, float z, float w);
+		Real * GetDataPtr();
+		void Set(Real x, Real y, Real z, Real w);
 		void SetTo(const BaseVector4& baseVector);
 		void Get(BaseVector4& baseVector) const;
 
-		virtual void AttachTo(float * data);
+		virtual void AttachTo(Real * data);
 		virtual void Detach();
 	};
 }

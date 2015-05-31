@@ -16,6 +16,8 @@
 #ifndef _GTE_VERTEX_ATTR_BUFFER_H_
 #define _GTE_VERTEX_ATTR_BUFFER_H_
 
+#include "object/enginetypes.h"
+
 namespace GTE
 {
 	class VertexAttrBuffer
@@ -35,12 +37,12 @@ namespace GTE
 		VertexAttrBuffer();
 		virtual ~VertexAttrBuffer();
 
-		virtual bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, float *srcData) = 0;
-		virtual void SetData(const float * data) = 0;
+		virtual bool Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, Real *srcData) = 0;
+		virtual void SetData(const Real * data) = 0;
 		int GetVertexCount() const;
 		int GetComponentCount() const;
 		int GetStride() const;
-		virtual unsigned int GetFullSize() const = 0;
+		virtual UInt32 GetFullSize() const = 0;
 	};
 }
 

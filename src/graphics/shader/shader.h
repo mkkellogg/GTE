@@ -54,27 +54,27 @@ namespace GTE
 		virtual int GetUniformVarID(const std::string& varName) const = 0;
 		virtual void SendBufferToShader(int varID, VertexAttrBuffer * buffer) = 0;
 
-		virtual void SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture) = 0;
+		virtual void SendUniformToShader(int varID, UInt32 samplerUnitIndex, const TextureRef texture) = 0;
 		virtual void SendUniformToShader(int varID, const Matrix4x4 * mat) = 0;
 		virtual void SendUniformToShader(int varID, const Point3 * point) = 0;
 		virtual void SendUniformToShader(int varID, const Vector3 * vector) = 0;
 		virtual void SendUniformToShader(int varID, const Color4 * color) = 0;
 
-		virtual void SendUniformToShader4v(int varID, const float * data) = 0;
-		virtual void SendUniformToShader3v(int varID, const float * data) = 0;
-		virtual void SendUniformToShader2v(int varID, const float * data) = 0;
-		virtual void SendUniformToShader4(int varID, float x, float y, float z, float w) = 0;
-		virtual void SendUniformToShader3(int varID, float x, float y, float z) = 0;
-		virtual void SendUniformToShader2(int varID, float x, float y) = 0;
-		virtual void SendUniformToShader(int varID, float  data) = 0;
+		virtual void SendUniformToShader4v(int varID, const Real * data) = 0;
+		virtual void SendUniformToShader3v(int varID, const Real * data) = 0;
+		virtual void SendUniformToShader2v(int varID, const Real * data) = 0;
+		virtual void SendUniformToShader4(int varID, Real x, Real y, Real z, Real w) = 0;
+		virtual void SendUniformToShader3(int varID, Real x, Real y, Real z) = 0;
+		virtual void SendUniformToShader2(int varID, Real x, Real y) = 0;
+		virtual void SendUniformToShader(int varID, Real  data) = 0;
 
 		virtual void SendUniformToShader(int varID, int  data) = 0;
 
-		virtual unsigned int GetUniformCount() const = 0;
-		virtual const UniformDescriptor * GetUniformDescriptor(unsigned int index) const = 0;
+		virtual UInt32 GetUniformCount() const = 0;
+		virtual const UniformDescriptor * GetUniformDescriptor(UInt32 index) const = 0;
 
-		virtual unsigned int GetAttributeCount() const = 0;
-		virtual const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const = 0;
+		virtual UInt32 GetAttributeCount() const = 0;
+		virtual const AttributeDescriptor * GetAttributeDescriptor(UInt32 index) const = 0;
 	};
 }
 

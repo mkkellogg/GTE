@@ -64,7 +64,7 @@ namespace GTE
 			PageUp, PageDown, Hone, End, Insert
 		};
 
-		static const unsigned int MAX_KEY_INDICES = 512;
+		static const UInt32 MAX_KEY_INDICES = 512;
 		KeyState keyState[MAX_KEY_INDICES];
 		bool onKeyDown[MAX_KEY_INDICES];
 		bool digitalInputState[(int)DigitalInput::_Last];
@@ -73,13 +73,13 @@ namespace GTE
 		virtual ~InputManager();
 		void ClearStates();
 		void ClearDigitalInput();
-		void SetOnKeyDown(unsigned int index, bool value);
-		bool GetOnKeyDown(unsigned int index);
-		void SetKeyState(unsigned int index, KeyState state);
+		void SetOnKeyDown(UInt32 index, bool value);
+		bool GetOnKeyDown(UInt32 index);
+		void SetKeyState(UInt32 index, KeyState state);
 		void SetDigitalInputState(DigitalInput input, bool state);
-		void GetKeyIndex(Key key, unsigned int * indices, unsigned int& indexCount);
-		virtual unsigned int GetKeyIndexForNonCharacterKey(NonCharacterKey key) = 0;
-		virtual unsigned int GetKeyIndexFromCharacter(unsigned char key) = 0;
+		void GetKeyIndex(Key key, UInt32 * indices, UInt32& indexCount);
+		virtual UInt32 GetKeyIndexForNonCharacterKey(NonCharacterKey key) = 0;
+		virtual UInt32 GetKeyIndexFromCharacter(unsigned char key) = 0;
 
 	public:
 
@@ -90,7 +90,7 @@ namespace GTE
 		bool ShouldHandleOnKeyDown(Key key);
 		bool IsKeyDown(unsigned char key);
 		bool IsKeyDown(Key key);
-		KeyState GetKeyState(unsigned int index);
+		KeyState GetKeyState(UInt32 index);
 		KeyState GetKeyState(unsigned char key);
 		bool GetDigitalInputState(DigitalInput input);
 	};

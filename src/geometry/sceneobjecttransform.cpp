@@ -157,7 +157,7 @@ namespace GTE
 	 * determines if the transformation is relative to world coordinates or the transform's
 	 * local space, which includes the aggregated transform of the scene object's ancestors.
 	 */
-	void SceneObjectTransform::Translate(float x, float y, float z, bool local)
+	void SceneObjectTransform::Translate(Real x, Real y, Real z, bool local)
 	{
 		if (!local)
 		{
@@ -192,7 +192,7 @@ namespace GTE
 	 * local or world space is used. If world space is used, it takes into account the  aggregated transform
 	 * of the scene object's ancestors.
 	 */
-	void SceneObjectTransform::RotateAround(const Point3& point, const Vector3& axis, float angle, bool local)
+	void SceneObjectTransform::RotateAround(const Point3& point, const Vector3& axis, Real angle, bool local)
 	{
 		RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle, local);
 	}
@@ -208,7 +208,7 @@ namespace GTE
 	* If world space is used, it takes into account the  aggregated transform
 	* of the scene object's ancestors.
 	*/
-	void SceneObjectTransform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle, bool local)
+	void SceneObjectTransform::RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, bool local)
 	{
 		if (!local)
 		{
@@ -247,7 +247,7 @@ namespace GTE
 	 * If world space is used, it takes into account the  aggregated transform of the scene
 	 * object's ancestors.
 	 */
-	void SceneObjectTransform::Scale(float x, float y, float z, bool local)
+	void SceneObjectTransform::Scale(Real x, Real y, Real z, bool local)
 	{
 		if (!local)
 		{
@@ -272,7 +272,7 @@ namespace GTE
 	 * local space, otherwise perform in world space. If world space is used, it
 	 * takes into account the  aggregated transform of the scene object's ancestors.
 	 */
-	void SceneObjectTransform::Rotate(const Vector3& vector, float a, bool local)
+	void SceneObjectTransform::Rotate(const Vector3& vector, Real a, bool local)
 	{
 		Rotate(vector.x, vector.y, vector.z, a, local);
 	}
@@ -283,7 +283,7 @@ namespace GTE
 	 * world space is used, it takes into account the  aggregated transform of the scene
 	 * object's ancestors.
 	 */
-	void SceneObjectTransform::Rotate(float x, float y, float z, float a, bool local)
+	void SceneObjectTransform::Rotate(Real x, Real y, Real z, Real a, bool local)
 	{
 		if (!local)
 		{
@@ -328,7 +328,7 @@ namespace GTE
 	/*
 	 * Shortcut to transform [vector] by [matrix]. This transformation occurs in world space.
 	 */
-	void SceneObjectTransform::TransformVector4f(float * vector) const
+	void SceneObjectTransform::TransformVector4f(Real * vector) const
 	{
 		NONFATAL_ASSERT(vector != NULL, "SceneObjectTransform::TransformVector4f -> 'vector' is null.", true);
 

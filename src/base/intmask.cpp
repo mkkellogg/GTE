@@ -9,7 +9,7 @@
 
 namespace GTE
 {
-	IntMask IntMaskUtil::InvertBitsForIndexMask(unsigned short index)
+	IntMask IntMaskUtil::InvertBitsForIndexMask(UInt16 index)
 	{
 		IntMask maskValue = IndexToMaskValue(index);
 		return InvertBits(maskValue);
@@ -35,12 +35,12 @@ namespace GTE
 		return index;
 	}
 
-	IntMask IntMaskUtil::IndexToMaskValue(unsigned short index)
+	IntMask IntMaskUtil::IndexToMaskValue(UInt16 index)
 	{
 		return 0x00000001 << index;
 	}
 
-	void IntMaskUtil::SetBit(IntMask * target, unsigned short index)
+	void IntMaskUtil::SetBit(IntMask * target, UInt16 index)
 	{
 		IntMask maskValue = IndexToMaskValue(index);
 		IntMask uPtr = (IntMask)*target;
@@ -48,7 +48,7 @@ namespace GTE
 		*target = uPtr;
 	}
 
-	void IntMaskUtil::ClearBit(IntMask * target, unsigned short index)
+	void IntMaskUtil::ClearBit(IntMask * target, UInt16 index)
 	{
 		IntMask uPtr = (IntMask)*target;
 		IntMask mask = InvertBitsForIndexMask(index);
@@ -73,7 +73,7 @@ namespace GTE
 		*target = uPtr;
 	}
 
-	bool IntMaskUtil::IsBitSet(IntMask target, unsigned short index)
+	bool IntMaskUtil::IsBitSet(IntMask target, UInt16 index)
 	{
 		IntMask mask = IndexToMaskValue(index);
 		return target & mask;
@@ -106,6 +106,6 @@ namespace GTE
 
 	void IntMaskUtil::SetAll(IntMask * mask)
 	{
-		*mask = (unsigned int)~0;
+		*mask = (UInt32)~0;
 	}
 }

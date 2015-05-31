@@ -2,6 +2,7 @@
 #define _GTE_RENDER_BUFFER_H_
 
 #include "base/intmask.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

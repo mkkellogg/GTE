@@ -90,7 +90,7 @@ namespace GTE
 	/*
 	 * Set this transform's matrix data to [matrixData].
 	 */
-	void Transform::SetTo(const float * matrixData)
+	void Transform::SetTo(const Real * matrixData)
 	{
 		NONFATAL_ASSERT(matrixData != NULL, "Transform::SetTo -> 'matrixData' is null.", true);
 		matrix.SetTo(matrixData);
@@ -146,7 +146,7 @@ namespace GTE
 	 * determines if the transformation is relative to world space or the transform's
 	 * local space.
 	 */
-	void Transform::Translate(float x, float y, float z, bool local)
+	void Transform::Translate(Real x, Real y, Real z, bool local)
 	{
 		if (!local)
 		{
@@ -173,7 +173,7 @@ namespace GTE
 	 * Rotate around a specific point and orientation vector.  The parameter [local] determines whether
 	 * local or world space is used.
 	 */
-	void Transform::RotateAround(const Point3& point, const Vector3& axis, float angle, bool local)
+	void Transform::RotateAround(const Point3& point, const Vector3& axis, Real angle, bool local)
 	{
 		RotateAround(point.x, point.y, point.z, axis.x, axis.y, axis.z, angle, local);
 	}
@@ -189,7 +189,7 @@ namespace GTE
 	* is used to achieved the effect in local space. The parameter [local] determines which of those cases
 	* to use.
 	*/
-	void Transform::RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle, bool local)
+	void Transform::RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, bool local)
 	{
 		if (local)
 		{
@@ -217,7 +217,7 @@ namespace GTE
 	 * Scale this transform by [x], [y], [z]. If [local] is true then the operation is
 	 * performed in local space, otherwise it is performed in world space.
 	 */
-	void Transform::Scale(float x, float y, float z, bool local)
+	void Transform::Scale(Real x, Real y, Real z, bool local)
 	{
 		if (!local)
 		{
@@ -230,7 +230,7 @@ namespace GTE
 	 * Rotate this transform around [vector]. If [local] is true, perform in
 	 * local space, otherwise perform in world space.
 	 */
-	void Transform::Rotate(const Vector3& vector, float a, bool local)
+	void Transform::Rotate(const Vector3& vector, Real a, bool local)
 	{
 		Rotate(vector.x, vector.y, vector.z, a, local);
 	}
@@ -239,7 +239,7 @@ namespace GTE
 	 * Rotate this transform around the vector specified by [x], [y], [z].
 	 * If [local] is true, perform in local space, otherwise perform in world space.
 	 */
-	void Transform::Rotate(float x, float y, float z, float a, bool local)
+	void Transform::Rotate(Real x, Real y, Real z, Real a, bool local)
 	{
 		if (!local)
 		{
@@ -259,22 +259,22 @@ namespace GTE
 	 * [near]  -   Distance from the eye to the near clip plane
 	 * [far]   -   Distance from the eye to the far clip plane
 	 */
-	void Transform::BuildOrthographicProjectionMatrix(Matrix4x4& matrix, float top, float bottom, float left, float right, float near, float far)
+	void Transform::BuildOrthographicProjectionMatrix(Matrix4x4& matrix, Real top, Real bottom, Real left, Real right, Real near, Real far)
 	{
 		matrix.SetIdentity();
 
-		float data[16];
-		memset(data, 0, 16 * sizeof(float));
+		Real data[16];
+		memset(data, 0, 16 * sizeof(Real));
 
-		float r_width = 1.0f / (right - left);
-		float r_height = 1.0f / (top - bottom);
-		float r_depth = 1.0f / (far - near);
-		float x = 2.0f * (r_width);
-		float y = 2.0f * (r_height);
-		float z = -2.0f * (r_depth);
-		float tx = -(right + left) * r_width;
-		float ty = -(top + bottom) * r_height;
-		float tz = -(far + near) * r_depth;
+		Real r_width = 1.0f / (right - left);
+		Real r_height = 1.0f / (top - bottom);
+		Real r_depth = 1.0f / (far - near);
+		Real x = 2.0f * (r_width);
+		Real y = 2.0f * (r_height);
+		Real z = -2.0f * (r_depth);
+		Real tx = -(right + left) * r_width;
+		Real ty = -(top + bottom) * r_height;
+		Real tz = -(far + near) * r_depth;
 		data[0] = x;
 		data[5] = y;
 		data[10] = z;
@@ -304,15 +304,15 @@ namespace GTE
 	 * [nearP]  -   Distance from the eye to the near clip plane
 	 * [farP]   -   Distance from the eye to the far clip plane
 	 */
-	void Transform::BuildPerspectiveProjectionMatrix(Matrix4x4& matrix, float fov, float ratio, float nearP, float farP)
+	void Transform::BuildPerspectiveProjectionMatrix(Matrix4x4& matrix, Real fov, Real ratio, Real nearP, Real farP)
 	{
 		// convert fov to radians
-		float f = 1.0f / tan(fov * Constants::TwoPIOver360 *.5);
+		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 *.5);
 
 		matrix.SetIdentity();
 
-		float data[16];
-		memset(data, 0, 16 * sizeof(float));
+		Real data[16];
+		memset(data, 0, 16 * sizeof(Real));
 
 		data[0] = f / ratio;
 		data[1 * 4 + 1] = f;
@@ -331,15 +331,15 @@ namespace GTE
 	 * [ratio] 	-	Ratio of the viewport's width to height
 	 * [nearP]  -   Distance from the eye to the near clip plane
 	 */
-	void Transform::BuildPerspectiveProjectionMatrixInfiniteFar(Matrix4x4& matrix, float fov, float ratio, float nearP)
+	void Transform::BuildPerspectiveProjectionMatrixInfiniteFar(Matrix4x4& matrix, Real fov, Real ratio, Real nearP)
 	{
 		// convert fov to radians
-		float f = 1.0f / tan(fov * Constants::TwoPIOver360 *.5);
+		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 *.5);
 
 		matrix.SetIdentity();
 
-		float data[16];
-		memset(data, 0, 16 * sizeof(float));
+		Real data[16];
+		memset(data, 0, 16 * sizeof(Real));
 
 		data[0] = f / ratio;
 		data[1 * 4 + 1] = f;
@@ -365,8 +365,8 @@ namespace GTE
 	 * [lookAtY]    -  The Y value of the look at direction
 	 * [lookAtZ]    -  The Z value of the look at direction
 	 */
-	void Transform::BuildLookAtMatrix(Matrix4x4& matrix, float posX, float posY, float posZ,
-		float lookAtX, float lookAtY, float lookAtZ)
+	void Transform::BuildLookAtMatrix(Matrix4x4& matrix, Real posX, Real posY, Real posZ,
+		Real lookAtX, Real lookAtY, Real lookAtZ)
 	{
 		Vector3 vDir(lookAtX - posX, lookAtY - posY, lookAtZ - posZ);
 		Vector3 vUp(0, 1, 0);
@@ -380,7 +380,7 @@ namespace GTE
 		Vector3::Cross(vRight, vDir, vUp);
 		vUp.Normalize();
 
-		float view[16];
+		Real view[16];
 
 		view[0] = vRight.x;
 		view[4] = vRight.y;
@@ -435,7 +435,7 @@ namespace GTE
 	 * Shortcut to transform [vector] by [matrix]. This performs a
 	 * local transformation via post-multiplication.
 	 */
-	void Transform::TransformVector4f(float * vector) const
+	void Transform::TransformVector4f(Real * vector) const
 	{
 		NONFATAL_ASSERT(vector != NULL, "Transform::TransformVector4f -> 'vector' is null.", true);
 		matrix.Transform(vector);

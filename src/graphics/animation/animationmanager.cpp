@@ -51,8 +51,8 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false, true);
 		NONFATAL_ASSERT_RTRN(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false, true);
 
-		unsigned int skeletonNodeCount = skeleton->GetNodeCount();
-		unsigned int channelCount = animation->GetChannelCount();
+		UInt32 skeletonNodeCount = skeleton->GetNodeCount();
+		UInt32 channelCount = animation->GetChannelCount();
 
 		// verify matching node count
 		if (skeletonNodeCount != channelCount)
@@ -64,13 +64,13 @@ namespace GTE
 		}
 
 		// verify each channel in the animation has a matching node in [skeleton]
-		for (unsigned int c = 0; c < channelCount; c++)
+		for (UInt32 c = 0; c < channelCount; c++)
 		{
 			bool foundNodeForChannel = false;
 			const std::string * channelName = animation->GetChannelName(c);
 			if (channelName == NULL)continue;
 
-			for (unsigned int n = 0; n < skeletonNodeCount; n++)
+			for (UInt32 n = 0; n < skeletonNodeCount; n++)
 			{
 				SkeletonNode * node = skeleton->GetNodeFromList(n);
 				if (node->Name == *channelName)
@@ -108,7 +108,7 @@ namespace GTE
 	 */
 	void AnimationManager::Update()
 	{
-		for (std::unordered_map<unsigned int, AnimationPlayerRef>::iterator iter = activePlayers.begin(); iter != activePlayers.end(); ++iter)
+		for (std::unordered_map<UInt32, AnimationPlayerRef>::iterator iter = activePlayers.begin(); iter != activePlayers.end(); ++iter)
 		{
 			AnimationPlayerRef player = iter->second;
 

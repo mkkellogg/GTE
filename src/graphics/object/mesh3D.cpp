@@ -24,7 +24,7 @@ namespace GTE
 	* Single constructor, only parameter [subMeshCount] is the number of
 	* sub-meshes that will be managed by this Mesh3D instance.
 	*/
-	Mesh3D::Mesh3D(unsigned int subMeshCount)
+	Mesh3D::Mesh3D(UInt32 subMeshCount)
 	{
 		if (subMeshCount <= 0)subMeshCount = 1;
 		this->subMeshCount = subMeshCount;
@@ -50,7 +50,7 @@ namespace GTE
 	/*
 	 * Get the number of sub-meshes managed by this instance of Mesh3D.
 	 */
-	unsigned int Mesh3D::GetSubMeshCount() const
+	UInt32 Mesh3D::GetSubMeshCount() const
 	{
 		return subMeshCount;
 	}
@@ -65,7 +65,7 @@ namespace GTE
 		Destroy();
 
 		// push-back (preallocated) [subMeshCount] entries in [subMeshes]
-		for (unsigned int i = 0; i < subMeshCount; i++)
+		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
 			subMeshes.push_back(SubMesh3DRef::Null());
 		}
@@ -84,10 +84,10 @@ namespace GTE
 	void Mesh3D::CalculateSphereOfInfluence()
 	{
 		Point3 average;
-		unsigned int validSubMeshes = 0;
+		UInt32 validSubMeshes = 0;
 
 		// loop through each sub-mesh to calculate average center position
-		for (unsigned int i = 0; i < subMeshCount; i++)
+		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
 			SubMesh3DRef subMesh = subMeshes[i];
 			if (subMesh.IsValid())
@@ -103,21 +103,21 @@ namespace GTE
 		// calculate the average position
 		if (validSubMeshes > 0)
 		{
-			average.x /= (float)validSubMeshes;
-			average.y /= (float)validSubMeshes;
-			average.z /= (float)validSubMeshes;
+			average.x /= (Real)validSubMeshes;
+			average.y /= (Real)validSubMeshes;
+			average.z /= (Real)validSubMeshes;
 		}
 
 		center = average;
 
-		float maxSoiX = 0;
-		float maxSoiY = 0;
-		float maxSoiZ = 0;
+		Real maxSoiX = 0;
+		Real maxSoiY = 0;
+		Real maxSoiZ = 0;
 
 		// loop through each sub-mesh and determine the maximum distance away from
 		// the averaged center it extends along each axis. Store those values
 		// in [maxSoiX], [maxSoiY], and [maxSoiX] respectively.
-		for (unsigned int i = 0; i < subMeshCount; i++)
+		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
 			SubMesh3DRef subMesh = subMeshes[i];
 			if (subMesh.IsValid())
@@ -125,15 +125,15 @@ namespace GTE
 				const Point3 temp = subMesh->GetCenter();
 
 				// calculate the distance from the averaged center to the sub-meshes center
-				float offsetX = GTEMath::Abs(center.x - temp.x);
-				float offsetY = GTEMath::Abs(center.y - temp.y);
-				float offsetZ = GTEMath::Abs(center.z - temp.z);
+				Real offsetX = GTEMath::Abs(center.x - temp.x);
+				Real offsetY = GTEMath::Abs(center.y - temp.y);
+				Real offsetZ = GTEMath::Abs(center.z - temp.z);
 
 				// use the sphere of influence values already calculated for each sub-mesh
 				// and add them to the the center offset
-				float soiX = offsetX + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().x);
-				float soiY = offsetY + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().y);
-				float soiZ = offsetZ + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().z);
+				Real soiX = offsetX + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().x);
+				Real soiY = offsetY + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().y);
+				Real soiZ = offsetZ + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().z);
 
 				// compare to max values and update if necessary
 				if (soiX > maxSoiX)maxSoiX = soiX;
@@ -156,7 +156,7 @@ namespace GTE
 	 */
 	void Mesh3D::Update()
 	{
-		for (unsigned int i = 0; i < subMeshCount; i++)
+		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
 			if (subMeshes[i].IsValid())
 			{
@@ -168,7 +168,7 @@ namespace GTE
 	/*
 	 *Set the sub-mesh at [index] to be [mesh].
 	 */
-	void Mesh3D::SetSubMesh(SubMesh3DRef mesh, unsigned int index)
+	void Mesh3D::SetSubMesh(SubMesh3DRef mesh, UInt32 index)
 	{
 		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3D::SetSubMesh -> 'mesh' is null.", true);
 
@@ -189,7 +189,7 @@ namespace GTE
 	/*
 	 * Get a reference to the sub-mesh at [index].
 	 */
-	SubMesh3DRef Mesh3D::GetSubMesh(unsigned int index)
+	SubMesh3DRef Mesh3D::GetSubMesh(UInt32 index)
 	{
 		if (index < subMeshCount)
 		{

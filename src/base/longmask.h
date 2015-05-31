@@ -1,6 +1,9 @@
 #ifndef _GTE_LONGMASK_H_
 #define _GTE_LONGMASK_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 namespace GTE
 {
 	typedef unsigned long LongMask;
@@ -9,19 +12,19 @@ namespace GTE
 	{
 	public:
 
-		static LongMask InvertBitsForIndexMask(unsigned short index);
+		static LongMask InvertBitsForIndexMask(UInt16 index);
 		static LongMask InvertBits(LongMask mask);
 
 		static LongMask MaskValueToIndex(LongMask maskValue);
-		static LongMask IndexToMaskValue(unsigned short index);
+		static LongMask IndexToMaskValue(UInt16 index);
 
-		static void SetBit(LongMask * target, unsigned short index);
-		static void ClearBit(LongMask * target, unsigned short index);
+		static void SetBit(LongMask * target, UInt16 index);
+		static void ClearBit(LongMask * target, UInt16 index);
 
 		static void SetBitForMask(LongMask * target, LongMask mask);
 		static void ClearBitForMask(LongMask * target, LongMask mask);
 
-		static bool IsBitSet(LongMask target, unsigned short index);
+		static bool IsBitSet(LongMask target, UInt16 index);
 		static bool IsBitSetForMask(LongMask target, LongMask mask);
 
 		static LongMask CreateLongMask();

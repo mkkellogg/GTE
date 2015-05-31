@@ -10,6 +10,8 @@
 #ifndef _GTE_ATTRIBUTE_DESCRIPTOR_H_
 #define _GTE_ATTRIBUTE_DESCRIPTOR_H_
 
+#include "object/enginetypes.h"
+
 namespace GTE
 {
 	//forward declarations
@@ -38,9 +40,9 @@ namespace GTE
 		int Size;
 		bool IsSet;
 		AttributeType Type;
-		unsigned int ShaderVarID;
+		UInt32 ShaderVarID;
 		char Name[128];
-		float * FloatData;
+		Real * FloatData;
 	};
 }
 

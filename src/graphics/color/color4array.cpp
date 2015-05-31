@@ -20,7 +20,7 @@ namespace GTE
 	{
 	}
 
-	void Color4Array::SetData(const float * data, bool includeW)
+	void Color4Array::SetData(const Real * data, bool includeW)
 	{
 
 	}

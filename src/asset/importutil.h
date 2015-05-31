@@ -3,6 +3,7 @@
 
 #include "assimp/scene.h"
 #include "geometry/matrix4x4.h"
+#include "global/global.h"
 #include <string>
 #include <IL/il.h>
 

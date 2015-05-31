@@ -20,25 +20,25 @@ namespace GTE
 
 	protected:
 
-		unsigned int width;
-		unsigned int height;
-		BYTE * imageBytes;
+		UInt32 width;
+		UInt32 height;
+		Byte * imageBytes;
 
-		unsigned int ImageSizeBytes();
+		UInt32 ImageSizeBytes();
 		void Destroy();
 
 	public:
 
-		RawImage(unsigned int width, unsigned int height);
+		RawImage(UInt32 width, UInt32 height);
 		~RawImage();
 
 		bool Init();
-		void SetDataTo(BYTE * data);
-		void SetByte(unsigned int index, BYTE byte);
+		void SetDataTo(Byte * data);
+		void SetByte(UInt32 index, Byte byte);
 
-		BYTE * GetPixels();
-		unsigned int GetWidth();
-		unsigned int GetHeight();
+		Byte * GetPixels();
+		UInt32 GetWidth();
+		UInt32 GetHeight();
 	};
 }
 

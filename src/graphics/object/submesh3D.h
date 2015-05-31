@@ -22,6 +22,8 @@
 #include "geometry/vector/vector3array.h"
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
+#include "global/global.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {
@@ -44,7 +46,7 @@ namespace GTE
 		// the attributes for which this mesh contains data
 		StandardAttributeSet attributeSet;
 		// total number of vertices in this mesh
-		unsigned int totalVertexCount;
+		UInt32 totalVertexCount;
 		// this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
 		int subIndex;
 
@@ -80,10 +82,10 @@ namespace GTE
 		Mesh3D * containerMesh;
 
 		// last time this mesh was modified
-		float timeStamp;
+		Real timeStamp;
 
 		// maps vertices to other equal vertices
-		std::vector<unsigned int>** vertexCrossMap;
+		std::vector<UInt32>** vertexCrossMap;
 		// should face-related data be calculated?
 		bool buildFaces;
 		// should normals be calculated?
@@ -99,15 +101,15 @@ namespace GTE
 		void DestroyVertexCrossMap();
 		bool BuildVertexCrossMap();
 
-		void CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const;
-		void FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
-		int FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, unsigned int vbIndex) const;
+		void CalculateFaceNormal(UInt32 faceIndex, Vector3& result) const;
+		void FindAdjacentFaceIndex(UInt32 faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
+		int FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const;
 		void BuildFaces();
 
 		void CalcSphereOfInfluence();
-		void CalculateNormals(float smoothingThreshhold);
-		void CalculateTangent(unsigned int vertexIndex, unsigned int rightIndex, unsigned int leftIndex, Vector3& result);
-		void CalculateTangents(float smoothingThreshhold);
+		void CalculateNormals(Real smoothingThreshhold);
+		void CalculateTangent(UInt32 vertexIndex, UInt32 rightIndex, UInt32 leftIndex, Vector3& result);
+		void CalculateTangents(Real smoothingThreshhold);
 		void SetContainerMesh(Mesh3D * mesh);
 		void SetSubIndex(int index);
 
@@ -131,14 +133,14 @@ namespace GTE
 		const Vector3& GetSphereOfInfluenceX() const;
 		const Vector3& GetSphereOfInfluenceY() const;
 		const Vector3& GetSphereOfInfluenceZ() const;
-		void SetNormalsSmoothingThreshold(unsigned int threshhold);
+		void SetNormalsSmoothingThreshold(UInt32 threshhold);
 		void Update();
 		void QuickUpdate();
 
-		bool Init(unsigned int totalVertexCount);
-		unsigned int GetTotalVertexCount() const;
+		bool Init(UInt32 totalVertexCount);
+		UInt32 GetTotalVertexCount() const;
 		StandardAttributeSet GetAttributeSet() const;
-		float GetTimeStamp();
+		Real GetTimeStamp();
 
 		Point3Array * GetPostions();
 		Vector3Array * GetVertexNormals();

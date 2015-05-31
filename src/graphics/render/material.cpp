@@ -62,7 +62,7 @@ namespace GTE
 	 */
 	void Material::DestroySetUniforms()
 	{
-		for (unsigned int i = 0; i < setUniforms.size(); i++)
+		for (UInt32 i = 0; i < setUniforms.size(); i++)
 		{
 			UniformDescriptor * desc = setUniforms[i];
 			SAFE_DELETE(desc);
@@ -73,7 +73,7 @@ namespace GTE
 	/*
 	 * Get the size of the data for uniform of type [uniformType].
 	 */
-	unsigned int Material::GetRequiredUniformSize(UniformType uniformType)
+	UInt32 Material::GetRequiredUniformSize(UniformType uniformType)
 	{
 		switch (uniformType)
 		{
@@ -144,8 +144,8 @@ namespace GTE
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::SetupSetVerifiers -> Shader is invalid.", false, true);
 
-		unsigned int attributeCount = shader->GetAttributeCount();
-		unsigned int uniformCount = shader->GetUniformCount();
+		UInt32 attributeCount = shader->GetAttributeCount();
+		UInt32 uniformCount = shader->GetUniformCount();
 
 		attributesSetValues = new int[attributeCount];
 		ASSERT(attributesSetValues != NULL, "Material::SetupSetVerifiers -> Could not allocate attributesSetValues.");
@@ -157,14 +157,14 @@ namespace GTE
 		ResetVerificationState();
 
 		// create map from attribute id/location to index in [attributesSetValues]
-		for (unsigned int i = 0; i < attributeCount; i++)
+		for (UInt32 i = 0; i < attributeCount; i++)
 		{
 			const AttributeDescriptor * desc = shader->GetAttributeDescriptor(i);
 			attributeLocationsToVerificationIndex[desc->ShaderVarID] = i;
 		}
 
 		// create map from uniform id/location to index in [uniformsSetValues]
-		for (unsigned int i = 0; i < uniformCount; i++)
+		for (UInt32 i = 0; i < uniformCount; i++)
 		{
 			const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
 			uniformLocationsToVerificationIndex[desc->ShaderVarID] = i;
@@ -183,8 +183,8 @@ namespace GTE
 
 		DestroySetUniforms();
 
-		unsigned int uniformCount = shader->GetUniformCount();
-		for (unsigned int i = 0; i < uniformCount; i++)
+		UInt32 uniformCount = shader->GetUniformCount();
+		for (UInt32 i = 0; i < uniformCount; i++)
 		{
 			const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
 			UniformDescriptor *newDesc = new UniformDescriptor();
@@ -278,7 +278,7 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::GetUniformIndex -> Shader is invalid.", -1, true);
 
 		int foundIndex = -1;
-		for (unsigned int i = 0; i < setUniforms.size(); i++)
+		for (UInt32 i = 0; i < setUniforms.size(); i++)
 		{
 			if (uniformName == setUniforms[i]->Name)
 			{
@@ -289,9 +289,9 @@ namespace GTE
 		return foundIndex;
 	}
 
-	unsigned int Material::GetSamplerUnitForName(const std::string& name)
+	UInt32 Material::GetSamplerUnitForName(const std::string& name)
 	{
-		unsigned int index = 0;
+		UInt32 index = 0;
 
 		if (textureUniformSamplerUnitIndex.find(name) == textureUniformSamplerUnitIndex.end())
 		{
@@ -485,7 +485,7 @@ namespace GTE
 	 * developer). This method simply takes the value stored for that uniform and sends
 	 * it to the shader.
 	 */
-	void Material::SendSetUniformToShader(unsigned int index)
+	void Material::SendSetUniformToShader(UInt32 index)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendSetUniformToShader -> 'shader' is null.", true);
 
@@ -540,7 +540,7 @@ namespace GTE
 	 */
 	void Material::SendAllSetUniformsToShader()
 	{
-		for (unsigned int i = 0; i < GetSetUniformCount(); i++)
+		for (UInt32 i = 0; i < GetSetUniformCount(); i++)
 		{
 			SendSetUniformToShader(i);
 		}
@@ -594,7 +594,7 @@ namespace GTE
 	 * Find a uniform with the name specified by [shaderVarName] and set its
 	 * value to [val]
 	 */
-	void Material::SetUniform1f(float val, const std::string& varName)
+	void Material::SetUniform1f(Real val, const std::string& varName)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform1f -> 'shader' is null.", true);
 
@@ -613,7 +613,7 @@ namespace GTE
 	 * Find a uniform with the name specified by [shaderVarName] and set its
 	 * value to [val]
 	 */
-	void Material::SetUniform2f(float v1, float v2, const std::string& varName)
+	void Material::SetUniform2f(Real v1, Real v2, const std::string& varName)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform2f -> 'shader' is null.", true);
 
@@ -633,7 +633,7 @@ namespace GTE
 	 * Find a uniform with the name specified by [shaderVarName] and set its
 	 * value to [val]
 	 */
-	void Material::SetUniform4f(float v1, float v2, float v3, float v4, const std::string& varName)
+	void Material::SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform4f -> 'shader' is null.", true);
 
@@ -676,7 +676,7 @@ namespace GTE
 	 * Get the number of set uniforms...this should for the most part be
 	 * equal to the total number of uniforms exposed by this material's shader.
 	 */
-	unsigned int Material::GetSetUniformCount() const
+	UInt32 Material::GetSetUniformCount() const
 	{
 		return setUniforms.size();
 	}
@@ -684,7 +684,7 @@ namespace GTE
 	/*
 	 * Send the number of active clip planes to the material's shader.
 	 */
-	void Material::SendClipPlaneCountToShader(unsigned int count)
+	void Material::SendClipPlaneCountToShader(UInt32 count)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
@@ -700,11 +700,11 @@ namespace GTE
 	 * Send the clip plane specified collectively by [eq1], [eq2], [eq3], and [eq4]
 	 * to this material's shader for clip number [index].
 	 */
-	void Material::SendClipPlaneToShader(unsigned int index, float eq1, float eq2, float eq3, float eq4)
+	void Material::SendClipPlaneToShader(UInt32 index, Real eq1, Real eq2, Real eq3, Real eq4)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
-		int varID = GetStandardUniformBinding((StandardUniform)((unsigned int)StandardUniform::ClipPlane0 + index));
+		int varID = GetStandardUniformBinding((StandardUniform)((UInt32)StandardUniform::ClipPlane0 + index));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader4(varID, eq1, eq2, eq3, eq4);
@@ -851,7 +851,7 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::VerifySetVars -> 'shader' is null.", false, true);
 		if (allSetUniformsandAttributesVerified == true)return true;
 
-		for (unsigned int i = 0; i < shader->GetAttributeCount(); i++)
+		for (UInt32 i = 0; i < shader->GetAttributeCount(); i++)
 		{
 			const AttributeDescriptor * desc = shader->GetAttributeDescriptor(i);
 			if (attributesSetValues[i] != vertexCount)
@@ -865,7 +865,7 @@ namespace GTE
 			}
 		}
 
-		for (unsigned int i = 0; i < shader->GetUniformCount(); i++)
+		for (UInt32 i = 0; i < shader->GetUniformCount(); i++)
 		{
 			const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
 			int requiredSize = GetRequiredUniformSize(desc->Type);

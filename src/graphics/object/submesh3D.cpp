@@ -95,7 +95,7 @@ namespace GTE
 	 * face's first vertex in [positions], the next two will be at [faceIndex] + 1,
 	 * and [faceIndex] + 2.
 	 */
-	void SubMesh3D::CalculateFaceNormal(unsigned int faceIndex, Vector3& result) const
+	void SubMesh3D::CalculateFaceNormal(UInt32 faceIndex, Vector3& result) const
 	{
 		NONFATAL_ASSERT(faceIndex < totalVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> 'faceIndex' is out range.", true);
 
@@ -125,16 +125,16 @@ namespace GTE
 	 * For a given face in the sub-mesh specified by [faceIndex], find up to three adjacent faces, and
 	 * store the index of the adjacency edge's first vertex in [edgeA], [edgeB], and [edgeC].
 	 */
-	void SubMesh3D::FindAdjacentFaceIndex(unsigned int faceIndex, int& edgeA, int& edgeB, int& edgeC) const
+	void SubMesh3D::FindAdjacentFaceIndex(UInt32 faceIndex, int& edgeA, int& edgeB, int& edgeC) const
 	{
 		NONFATAL_ASSERT(faceIndex < faces.GetFaceCount(), "SubMesh3D::FindAdjacentFaceIndex -> 'faceIndex' is out range.", true);
 		const SubMesh3DFace * face = faces.GetFaceConst(faceIndex);
 
 		int faceVertexIndex = face->FirstVertexIndex;
 
-		int aResult = FindCommonFace(faceIndex, (unsigned int)faceVertexIndex, (unsigned int)faceVertexIndex + 1);
-		int bResult = FindCommonFace(faceIndex, (unsigned int)faceVertexIndex + 1, (unsigned int)faceVertexIndex + 2);
-		int cResult = FindCommonFace(faceIndex, (unsigned int)faceVertexIndex + 2, (unsigned int)faceVertexIndex);
+		int aResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex, (UInt32)faceVertexIndex + 1);
+		int bResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex + 1, (UInt32)faceVertexIndex + 2);
+		int cResult = FindCommonFace(faceIndex, (UInt32)faceVertexIndex + 2, (UInt32)faceVertexIndex);
 
 		if (aResult >= 0)edgeA = aResult;
 		if (bResult >= 0)edgeB = bResult;
@@ -145,20 +145,20 @@ namespace GTE
 	 * Find the face to which vertices at [vaIndex] and [vbIndex] in member [positions] both belong, excluding
 	 * the face specified by [excludeFace].
 	 */
-	int SubMesh3D::FindCommonFace(unsigned int excludeFace, unsigned int vaIndex, unsigned int vbIndex) const
+	int SubMesh3D::FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const
 	{
-		std::vector<unsigned int>* indicentVerticesA = vertexCrossMap[vaIndex];
-		std::vector<unsigned int>* indicentVerticesB = vertexCrossMap[vbIndex];
+		std::vector<UInt32>* indicentVerticesA = vertexCrossMap[vaIndex];
+		std::vector<UInt32>* indicentVerticesB = vertexCrossMap[vbIndex];
 
 		NONFATAL_ASSERT_RTRN(indicentVerticesA != NULL, "SubMesh3D::FindCommonFace -> 'indicentVerticesA' is null.", -1, true);
 		NONFATAL_ASSERT_RTRN(indicentVerticesB != NULL, "SubMesh3D::FindCommonFace -> 'indicentVerticesB' is null.", -1, true);
 
-		for (unsigned int a = 0; a < indicentVerticesA->size(); a++)
+		for (UInt32 a = 0; a < indicentVerticesA->size(); a++)
 		{
-			unsigned int aFace = indicentVerticesA->operator [](a) / 3;
-			for (unsigned int b = 0; b < indicentVerticesB->size(); b++)
+			UInt32 aFace = indicentVerticesA->operator [](a) / 3;
+			for (UInt32 b = 0; b < indicentVerticesB->size(); b++)
 			{
-				unsigned int bFace = indicentVerticesB->operator [](b) / 3;
+				UInt32 bFace = indicentVerticesB->operator [](b) / 3;
 
 				if (aFace == bFace && aFace != excludeFace)return aFace;
 			}
@@ -173,10 +173,10 @@ namespace GTE
 	 */
 	void SubMesh3D::BuildFaces()
 	{
-		unsigned int faceCount = faces.GetFaceCount();
+		UInt32 faceCount = faces.GetFaceCount();
 
-		unsigned int vertexIndex = 0;
-		for (unsigned int f = 0; f < faceCount; f++)
+		UInt32 vertexIndex = 0;
+		for (UInt32 f = 0; f < faceCount; f++)
 		{
 			SubMesh3DFace * face = faces.GetFace(f);
 			face->FirstVertexIndex = vertexIndex;
@@ -185,7 +185,7 @@ namespace GTE
 
 		// loop through each face and call FindAdjacentFaceIndex() to find the
 		// adjacent faces
-		for (unsigned int f = 0; f < faceCount; f++)
+		for (UInt32 f = 0; f < faceCount; f++)
 		{
 			SubMesh3DFace * face = faces.GetFace(f);
 			FindAdjacentFaceIndex(f, face->AdjacentFaceIndex1, face->AdjacentFaceIndex2, face->AdjacentFaceIndex3);
@@ -197,12 +197,12 @@ namespace GTE
 	 */
 	void SubMesh3D::CalcSphereOfInfluence()
 	{
-		float maxX, maxY, maxZ, minX, minY, minZ;
+		Real maxX, maxY, maxZ, minX, minY, minZ;
 		maxX = maxY = maxZ = minX = minY = minZ = 0;
 
 		// get the maximum and minimum extents of the mesh
 		// along each axis.
-		for (unsigned int v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			Point3 * point = positions.GetPoint(v);
 			if (point->x > maxX || v == 0)maxX = point->x;
@@ -215,9 +215,9 @@ namespace GTE
 
 		// get the dimensions of the rectangular volume formed by the
 		// maximum extents
-		float width = maxX - minX;
-		float height = maxY - minY;
-		float depth = maxZ - minZ;
+		Real width = maxX - minX;
+		Real height = maxY - minY;
+		Real depth = maxZ - minZ;
 
 		// calculate the mesh's center
 		center.x = width / 2 + minX;
@@ -237,13 +237,13 @@ namespace GTE
 	 * the un-averaged normals is less than [smoothingThreshhold]. [smoothingThreshhold]
 	 * is specified in degrees.
 	 */
-	void SubMesh3D::CalculateNormals(float smoothingThreshhold)
+	void SubMesh3D::CalculateNormals(Real smoothingThreshhold)
 	{
 		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))return;
 
 		// loop through each triangle in this mesh's vertices
 		// and calculate normals for each
-		for (unsigned int v = 0; v < totalVertexCount - 2; v += 3)
+		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
 		{
 			Vector3 normal;
 			CalculateFaceNormal(v, normal);
@@ -263,7 +263,7 @@ namespace GTE
 		// loop through each vertex and lookup the associated list of
 		// normals associated with that vertex, and then calculate the
 		// average normal from that list.
-		for (unsigned int v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			// get existing normal for this vertex
 			Vector3 oNormal;
@@ -271,27 +271,27 @@ namespace GTE
 			oNormal.Normalize();
 
 			// retrieve the list of equal vertices for vertex [v]
-			std::vector<unsigned int>* listPtr = vertexCrossMap[v];
+			std::vector<UInt32>* listPtr = vertexCrossMap[v];
 			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
 
 			Vector3 avg(0, 0, 0);
-			float divisor = 0;
+			Real divisor = 0;
 
-			std::vector<unsigned int>& list = *listPtr;
+			std::vector<UInt32>& list = *listPtr;
 
 			// compute the cosine of the smoothing threshhold angle
-			float cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
+			Real cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
 
-			for (unsigned int i = 0; i < list.size(); i++)
+			for (UInt32 i = 0; i < list.size(); i++)
 			{
-				unsigned int vIndex = list[i];
+				UInt32 vIndex = list[i];
 				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
 				Vector3 current = *currentPtr;
 				current.Normalize();
 
 				// calculate angle between the normal that exists for this vertex,
 				// and the current normal in the list.
-				float dot = Vector3::Dot(current, oNormal);
+				Real dot = Vector3::Dot(current, oNormal);
 
 				if (dot > cosSmoothingThreshhold)
 				{
@@ -312,7 +312,7 @@ namespace GTE
 			}
 			else
 			{
-				float scaleFactor = (float)1.0 / divisor;
+				Real scaleFactor = (Real)1.0 / divisor;
 				avg.Scale(scaleFactor);
 				//avg.Normalize();
 			}
@@ -322,7 +322,7 @@ namespace GTE
 
 		// loop through each vertex and assign the average normal
 		// calculated for that vertex
-		for (unsigned int v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			Vector3 avg = averageNormals[v];
 			// set the normal for this vertex to the averaged normal
@@ -341,7 +341,7 @@ namespace GTE
 	 * v2 is the vertex at [rightIndex] in [positions].
 	 * v1 is the vertex at [leftIndex] in [positions].
 	 */
-	void SubMesh3D::CalculateTangent(unsigned int vertexIndex, unsigned int rightIndex, unsigned int leftIndex, Vector3& result)
+	void SubMesh3D::CalculateTangent(UInt32 vertexIndex, UInt32 rightIndex, UInt32 leftIndex, Vector3& result)
 	{
 		UV2Array * sourceUVs = &uvs0;
 
@@ -358,8 +358,8 @@ namespace GTE
 		Point3::Subtract(*p1, *p0, e1);
 		Point3::Subtract(*p2, *p0, e2);
 
-		float u0, u1, u2;
-		float v0, v1, v2;
+		Real u0, u1, u2;
+		Real v0, v1, v2;
 
 		u0 = uv0->u;
 		u1 = uv1->u;
@@ -369,13 +369,13 @@ namespace GTE
 		v1 = uv1->v;
 		v2 = uv2->v;
 
-		float du1 = u1 - u0;
-		float du2 = u2 - u0;
+		Real du1 = u1 - u0;
+		Real du2 = u2 - u0;
 
-		float dv1 = v1 - v0;
-		float dv2 = v2 - v0;
+		Real dv1 = v1 - v0;
+		Real dv2 = v2 - v0;
 
-		float ood = 1.0 / ((du1 * dv2) - (du2 * dv1));
+		Real ood = 1.0 / ((du1 * dv2) - (du2 * dv1));
 
 		result.Set(dv2*e1.x - dv1*e2.x, dv2*e1.y - dv1*e2.y, dv2*e1.z - dv1*e2.z);
 
@@ -389,13 +389,13 @@ namespace GTE
 	 * the un-averaged normals for the same vertices is less than [smoothingThreshhold].
 	 * [smoothingThreshhold is specified in degrees.
 	 */
-	void SubMesh3D::CalculateTangents(float smoothingThreshhold)
+	void SubMesh3D::CalculateTangents(Real smoothingThreshhold)
 	{
 		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))return;
 
 		// loop through each triangle in this mesh's vertices
 		// and calculate tangents for each
-		for (unsigned int v = 0; v < totalVertexCount - 2; v += 3)
+		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
 		{
 			Vector3 t0, t1, t2;
 
@@ -414,7 +414,7 @@ namespace GTE
 		// loop through each vertex and lookup the associated list of
 		// tangents associated with that vertex, and then calculate the
 		// average tangents from that list.
-		for (unsigned int v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			// get existing normal for this vertex
 			Vector3 oNormal;
@@ -426,27 +426,27 @@ namespace GTE
 			oTangent.Normalize();
 
 			// retrieve the list of equal vertices for vertex [v]
-			std::vector<unsigned int>* listPtr = vertexCrossMap[v];
+			std::vector<UInt32>* listPtr = vertexCrossMap[v];
 			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
 
 			Vector3 avg(0, 0, 0);
-			float divisor = 0;
+			Real divisor = 0;
 
-			std::vector<unsigned int>& list = *listPtr;
+			std::vector<UInt32>& list = *listPtr;
 
 			// compute the cosine of the smoothing threshhold angle
-			float cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
+			Real cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
 
-			for (unsigned int i = 0; i < list.size(); i++)
+			for (UInt32 i = 0; i < list.size(); i++)
 			{
-				unsigned int vIndex = list[i];
+				UInt32 vIndex = list[i];
 				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
 				Vector3 current = *currentPtr;
 				current.Normalize();
 
 				// calculate angle between the normal that exists for this vertex,
 				// and the current normal in the list.
-				float dot = Vector3::Dot(current, oNormal);
+				Real dot = Vector3::Dot(current, oNormal);
 
 				if (dot > cosSmoothingThreshhold)
 				{
@@ -470,7 +470,7 @@ namespace GTE
 			}
 			else
 			{
-				float scaleFactor = (float)1.0 / divisor;
+				Real scaleFactor = (Real)1.0 / divisor;
 				avg.Scale(scaleFactor);
 				//avg.Normalize();
 			}
@@ -480,7 +480,7 @@ namespace GTE
 
 		// loop through each vertex and assign the average tangent
 		// calculated for that vertex
-		for (unsigned int v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			Vector3 avg = averageTangents[v];
 			// set the tangent for this vertex to the averaged tangent
@@ -504,9 +504,9 @@ namespace GTE
 		if (vertexCrossMap != NULL)
 		{
 			std::unordered_map<long, bool> deleted;
-			for (unsigned int i = 0; i < totalVertexCount; i++)
+			for (UInt32 i = 0; i < totalVertexCount; i++)
 			{
-				std::vector<unsigned int>* list = vertexCrossMap[i];
+				std::vector<UInt32>* list = vertexCrossMap[i];
 				if (list != NULL && !deleted[(long)list])
 				{
 					delete list;
@@ -531,21 +531,21 @@ namespace GTE
 
 		// This map is used to link all equal vertices. Many triangles in a mesh can potentially have equal
 		// vertices, so this structure is used to store indices in [positions] for those vertices.
-		std::unordered_map<Point3, std::vector<unsigned int>*, Point3::Point3Hasher, Point3::Point3Eq> vertexGroups;
+		std::unordered_map<Point3, std::vector<UInt32>*, Point3::Point3Hasher, Point3::Point3Eq> vertexGroups;
 
-		vertexCrossMap = new std::vector<unsigned int>*[totalVertexCount];
+		vertexCrossMap = new std::vector<UInt32>*[totalVertexCount];
 		ASSERT(vertexCrossMap != NULL, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.");
 
 		// loop through each vertex in the mesh and add the index in [position] for that vertex to the
 		// appropriate vertex group.
-		for (unsigned int v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			Point3 * point = positions.GetPoint(v);
 			Point3 targetPoint = *point;
 
-			std::vector<unsigned int>*& list = vertexGroups[targetPoint];
+			std::vector<UInt32>*& list = vertexGroups[targetPoint];
 
-			if (list == NULL)list = new std::vector<unsigned int>();
+			if (list == NULL)list = new std::vector<UInt32>();
 
 			// add the normal at index [v] to the vertex group linked to [targetPoint]
 			list->push_back(v);
@@ -678,7 +678,7 @@ namespace GTE
 	/*
 	 * Get the total number of vertices contained in this sub-mesh.
 	 */
-	unsigned int SubMesh3D::GetTotalVertexCount() const
+	UInt32 SubMesh3D::GetTotalVertexCount() const
 	{
 		return totalVertexCount;
 	}
@@ -695,7 +695,7 @@ namespace GTE
 	/*
 	 * Get the time this mesh was last updated (in seconds since startup)
 	 */
-	float SubMesh3D::GetTimeStamp()
+	Real SubMesh3D::GetTimeStamp()
 	{
 		return timeStamp;
 	}
@@ -703,7 +703,7 @@ namespace GTE
 	/*
 	 * Initialize this sub-mesh to contain space for [totalVertexCount] vertices.
 	 */
-	bool SubMesh3D::Init(unsigned int totalVertexCount)
+	bool SubMesh3D::Init(UInt32 totalVertexCount)
 	{
 		this->totalVertexCount = totalVertexCount;
 
@@ -755,7 +755,7 @@ namespace GTE
 			return false;
 		}
 
-		unsigned int faceCount = totalVertexCount / 3;
+		UInt32 faceCount = totalVertexCount / 3;
 		bool facesInitSuccess = faces.Init(faceCount);
 
 		if (!facesInitSuccess)
@@ -773,7 +773,7 @@ namespace GTE
 	 */
 	void SubMesh3D::ReverseAttributeComponentOrder()
 	{
-		for (unsigned int i = 0; i < totalVertexCount; i += 3)
+		for (UInt32 i = 0; i < totalVertexCount; i += 3)
 		{
 			if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Position))
 			{
@@ -849,7 +849,7 @@ namespace GTE
 	{
 		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))
 		{
-			for (unsigned int i = 0; i < totalVertexCount; i++)
+			for (UInt32 i = 0; i < totalVertexCount; i++)
 			{
 				Vector3 * n1 = vertexNormals.GetVector(i);
 				n1->Invert();
@@ -871,7 +871,7 @@ namespace GTE
 	 * Set the threshold angle (in degrees) to be used when calculating averaged
 	 * face normals for smoothed shading.
 	 */
-	void SubMesh3D::SetNormalsSmoothingThreshold(unsigned int threshhold)
+	void SubMesh3D::SetNormalsSmoothingThreshold(UInt32 threshhold)
 	{
 		if (threshhold > 180)threshhold = 180;
 		this->normalsSmoothingThreshold = threshhold;

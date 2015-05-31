@@ -12,6 +12,7 @@
 #define _GTE_SCENEOBJECT_TRANSFORM_H_
 
 #include "object/enginetypes.h"
+#include "global/global.h"
 #include "transform.h"
 #include "matrix4x4.h"
 
@@ -42,18 +43,18 @@ namespace GTE
 		void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
 		void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
 
-		void Translate(float x, float y, float z, bool local);
+		void Translate(Real x, Real y, Real z, bool local);
 		void Translate(Vector3& vector, bool local);
-		void RotateAround(const Point3& point, const Vector3& axis, float angle, bool local);
-		void RotateAround(float px, float py, float pz, float ax, float ay, float az, float angle, bool local);
+		void RotateAround(const Point3& point, const Vector3& axis, Real angle, bool local);
+		void RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, bool local);
 		void Scale(const Vector3& mag, bool local);
-		void Scale(float x, float y, float z, bool local);
-		void Rotate(const Vector3& vector, float a, bool local);
-		void Rotate(float x, float y, float z, float a, bool local);
+		void Scale(Real x, Real y, Real z, bool local);
+		void Rotate(const Vector3& vector, Real a, bool local);
+		void Rotate(Real x, Real y, Real z, Real a, bool local);
 
 		void TransformVector(Vector3& vector) const;
 		void TransformPoint(Point3& point3) const;
-		void TransformVector4f(float * vector) const;
+		void TransformVector4f(Real * vector) const;
 	};
 }
 

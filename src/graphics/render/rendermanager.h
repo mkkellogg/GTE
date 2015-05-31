@@ -18,6 +18,7 @@
 #include <memory>
 #include <stack>
 #include "object/engineobject.h"
+#include "object/enginetypes.h"
 #include "object/objectpairkey.h"
 #include "util/datastack.h"
 #include "graphics/view/camera.h"
@@ -98,13 +99,13 @@ namespace GTE
 		DataStack<Matrix4x4> sceneProcessingStack;
 
 		// number of meshes found in the scene during ProcessScene()
-		unsigned int sceneMeshCount;
+		UInt32 sceneMeshCount;
 		// number of lights found in the scene during ProcessScene()
-		unsigned int lightCount;
+		UInt32 lightCount;
 		// number of ambient lights found in the scene during  ProcessScene()
-		unsigned int ambientLightCount;
+		UInt32 ambientLightCount;
 		// number of cameras found in the scene during  ProcessScene()
-		unsigned int cameraCount;
+		UInt32 cameraCount;
 
 		// list of meshes found in the scene during ProcessScene()
 		SceneObjectRef sceneMeshObjects[MAX_SCENE_MESHES];
@@ -129,7 +130,7 @@ namespace GTE
 		void PreProcessScene(SceneObject& parent, Transform& aggregateTransform);
 		void PreRenderScene();
 
-		void RenderSceneForCamera(unsigned int cameraIndex);
+		void RenderSceneForCamera(UInt32 cameraIndex);
 		void ForwardRenderSceneForCamera(Camera& camera);
 		void ForwardRenderSceneForCameraAndCurrentRenderTarget(Camera& camera, const Transform& viewTransform, const Transform& viewInverse);
 		void ForwardRenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& modelPreTransform,
@@ -148,7 +149,7 @@ namespace GTE
 			std::function<bool(SceneObjectRef)> filterFunction);
 		bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 		void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
-			const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, float xScale, float yScale) const;
+			const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
 		void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 			const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void BuildSceneShadowVolumes();
@@ -167,7 +168,7 @@ namespace GTE
 
 		void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
 		void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
-		unsigned int RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
+		UInt32 RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
 
 		void ActivateMaterial(MaterialRef material);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection);

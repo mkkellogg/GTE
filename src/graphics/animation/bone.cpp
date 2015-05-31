@@ -20,7 +20,7 @@ namespace GTE
 	/*
 	 * Parameterized constructor only with [name] parameter.
 	 */
-	Bone::Bone(const std::string& name) : Bone(name, (unsigned int)-1)
+	Bone::Bone(const std::string& name) : Bone(name, (UInt32)-1)
 	{
 
 	}
@@ -28,7 +28,7 @@ namespace GTE
 	/*
 	 * Fully parameterized constructor.
 	 */
-	Bone::Bone(const std::string& name, unsigned int id)
+	Bone::Bone(const std::string& name, UInt32 id)
 	{
 		this->Name = name;
 		this->ID = id;

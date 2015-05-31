@@ -26,7 +26,7 @@ namespace GTE
 
 	void Texture::DestroyImageData()
 	{
-		for (unsigned int i = 0; i < imageData.size(); i++)
+		for (UInt32 i = 0; i < imageData.size(); i++)
 		{
 			RawImage * raw = imageData[i];
 			if (raw != NULL)
@@ -47,7 +47,7 @@ namespace GTE
 		this->imageData.push_back(imageData);
 	}
 
-	RawImage * Texture::GetImageData(unsigned int index)
+	RawImage * Texture::GetImageData(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < imageData.size(), "Texture::GetImageData -> 'index' is out of range.", NULL, true);
 		return imageData[index];

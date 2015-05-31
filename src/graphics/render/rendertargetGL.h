@@ -12,6 +12,7 @@
 #define _GTE_RENDER_TARGET_GL_H_
 
 #include "graphics/gl_include.h"
+#include "object/enginetypes.h"
 #include "rendertarget.h"
 #include "base/intmask.h"
 
@@ -28,7 +29,7 @@ namespace GTE
 		GLuint fboID;
 
 		RenderTargetGL(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-			const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+			const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
 		~RenderTargetGL();
 
 		void Destroy();

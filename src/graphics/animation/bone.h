@@ -28,14 +28,14 @@ namespace GTE
 
 		Bone();
 		Bone(const std::string& name);
-		Bone(const std::string& name, unsigned int id);
+		Bone(const std::string& name, UInt32 id);
 		~Bone();
 
 		// the bone's (unique) name. Used for linking this Bone object
 		// to its corresponding node in a Skeleton or scene object hierarchy.
 		std::string Name;
 		// this bone's unique ID
-		unsigned int ID;
+		UInt32 ID;
 		// this matrix converts the bone (and attached vertices) to bone space
 		Matrix4x4 OffsetMatrix;
 		Matrix4x4 TempFullMatrix;

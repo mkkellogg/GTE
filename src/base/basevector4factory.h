@@ -1,6 +1,9 @@
 #ifndef _GTE_BASEVECTOR4_FACTORY_H_
 #define _GTE_BASEVECTOR4_FACTORY_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 namespace GTE
 {
 	// forward declarations
@@ -13,9 +16,9 @@ namespace GTE
 		BaseVector4Factory();
 		virtual ~BaseVector4Factory();
 
-		virtual BaseVector4 * CreatePermAttached(float * target);
+		virtual BaseVector4 * CreatePermAttached(Real * target);
 		virtual BaseVector4** CreateArray(int count);
-		virtual void DestroyArray(BaseVector4 ** array, unsigned int size);
+		virtual void DestroyArray(BaseVector4 ** array, UInt32 size);
 	};
 }
 

@@ -73,7 +73,7 @@ namespace GTE
 		FaceCullingMode faceCullingMode;
 
 		// number of currently active clip planes
-		unsigned int activeClipPlanes;
+		UInt32 activeClipPlanes;
 
 		// is the graphics system initialized?
 		bool initialized;
@@ -87,8 +87,8 @@ namespace GTE
 		~GraphicsGL();
 
 		// local version of OpenGL
-		unsigned int openGLVersion;
-		unsigned int openGLMinorVersion;
+		UInt32 openGLVersion;
+		UInt32 openGLMinorVersion;
 
 		void PreProcessScene();
 		bool Start();
@@ -113,20 +113,20 @@ namespace GTE
 		void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
 		Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes);
 		Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes);
-		Texture * CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes);
-		Texture * CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
-									BYTE * backData, unsigned int backw, unsigned int backh,
-									BYTE * topData, unsigned int tw, unsigned int th,
-									BYTE * bottomData, unsigned int botw, unsigned int both,
-									BYTE * leftData, unsigned int lw, unsigned int lh,
-									BYTE * rightData, unsigned int rw, unsigned int rh);
+		Texture * CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, const TextureAttributes&  attributes);
+		Texture * CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
+									Byte * backData, UInt32 backw, UInt32 backh,
+									Byte * topData, UInt32 tw, UInt32 th,
+									Byte * bottomData, UInt32 botw, UInt32 both,
+									Byte * leftData, UInt32 lw, UInt32 lh,
+									Byte * rightData, UInt32 rw, UInt32 rh);
 		Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 									RawImage * bottomData, RawImage * leftData, RawImage * rightData);
 		Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 									const std::string& bottom, const std::string& left, const std::string& right);
 		void DestroyTexture(Texture * texture);
 		RenderTarget * CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-										  const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+										  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
 		void DestroyRenderTarget(RenderTarget * target);
 
 		RenderTargetRef GetDefaultRenderTarget();
@@ -151,7 +151,7 @@ namespace GTE
 		void EnterRenderMode(RenderMode renderMode);
 
 		bool Init(const GraphicsAttributes& attributes);
-		unsigned int GetOpenGLVersion();
+		UInt32 GetOpenGLVersion();
 
 		bool ActivateRenderTarget(RenderTargetRef target);
 		RenderTargetRef GetCurrrentRenderTarget();
@@ -159,14 +159,14 @@ namespace GTE
 		bool RestoreDefaultRenderTarget();
 		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest);
 
-		void SetTextureData(TextureRef texture, BYTE * data);
-		void SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side);
+		void SetTextureData(TextureRef texture, Byte * data);
+		void SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side);
 		void RebuildMipMaps(TextureRef texture);
 
 		bool AddClipPlane();
 		void DeactiveAllClipPlanes();
 
-		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate);
+		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, bool validate);
 	};
 }
 

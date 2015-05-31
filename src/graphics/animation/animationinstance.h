@@ -14,6 +14,7 @@
 
 #include "object/enginetypes.h"
 #include "animationplayer.h"
+#include "global/global.h"
 #include <vector>
 #include <string>
 
@@ -37,11 +38,11 @@ namespace GTE
 		public:
 
 			// index of the current translation key for the node
-			unsigned int TranslationKeyIndex;
+			UInt32 TranslationKeyIndex;
 			// index of the current scale key for the node
-			unsigned int ScaleKeyIndex;
+			UInt32 ScaleKeyIndex;
 			// index of the current rotation key for the node
-			unsigned int RotationKeyIndex;
+			UInt32 RotationKeyIndex;
 
 			FrameState()
 			{
@@ -68,34 +69,34 @@ namespace GTE
 		// the Animation for which this is an instance
 		AnimationRef SourceAnimation;
 		// used to make animation play faster or slow than default. default = 1.
-		float SpeedFactor;
+		Real SpeedFactor;
 
 		// number of states in [FrameStates]. This number should equal the number of nodes in [target].
 		// it should also be equal to the number of KeyFrameSet objects in [SourceAnimation].
-		unsigned int StateCount;
+		UInt32 StateCount;
 		// array of FrameState objects, one for each node in [target] and is indexed in the same way.
 		// E.g. The FrameState at index 5 corresponds to the SkeletonNode returned by target->GetNode(5);
 		FrameState * FrameStates;
 
 		// duration of this instance in seconds
-		float Duration;
+		Real Duration;
 		// current progress (in seconds) of this instance
-		float Progress;
+		Real Progress;
 
 		// duration of this instance in ticks
-		float DurationTicks;
+		Real DurationTicks;
 		// current progress (in ticks) of this instance
-		float ProgressTicks;
+		Real ProgressTicks;
 
 		// we can have the animation start with progress > 0
-		float StartOffset;
+		Real StartOffset;
 		// equivalent of [StartOffset] in ticks
-		float StartOffsetTicks;
+		Real StartOffsetTicks;
 
 		// we can have the animation end earlier than [Duration]
-		float EarlyEnd;
+		Real EarlyEnd;
 		// equivalent of [EarlyEnd] in ticks
-		float EarlyEndTicks;
+		Real EarlyEndTicks;
 
 		// is the animation playing?
 		bool Playing;
@@ -111,7 +112,7 @@ namespace GTE
 
 		void Destroy();
 
-		void SetSpeed(float speedFactor);
+		void SetSpeed(Real speedFactor);
 		void Play();
 		void Stop();
 		void Pause();
@@ -121,8 +122,8 @@ namespace GTE
 		bool Init();
 		void Reset();
 
-		FrameState * GetFrameState(unsigned int stateIndex);
-		int GetChannelMappingForTargetNode(unsigned int nodeIndex);
+		FrameState * GetFrameState(UInt32 stateIndex);
+		int GetChannelMappingForTargetNode(UInt32 nodeIndex);
 	};
 
 }

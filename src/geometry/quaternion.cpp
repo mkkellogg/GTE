@@ -20,7 +20,7 @@ namespace GTE
 		mData[3] = 1;
 	}
 
-	Quaternion::Quaternion(const Vector3& v, float w)
+	Quaternion::Quaternion(const Vector3& v, Real w)
 	{
 		mData[0] = v.x;
 		mData[1] = v.y;
@@ -30,14 +30,14 @@ namespace GTE
 
 	Quaternion::Quaternion(const BaseVector4& v)
 	{
-		float * data = const_cast<BaseVector4 *>(&v)->GetDataPtr();
+		Real * data = const_cast<BaseVector4 *>(&v)->GetDataPtr();
 		mData[0] = data[0];
 		mData[1] = data[1];
 		mData[2] = data[2];
 		mData[3] = data[3];
 	}
 
-	Quaternion::Quaternion(const float* array)
+	Quaternion::Quaternion(const Real* array)
 	{
 		/*if (!array)
 		 {
@@ -49,7 +49,7 @@ namespace GTE
 		}
 	}
 
-	Quaternion::Quaternion(float x, float y, float z, float w)
+	Quaternion::Quaternion(Real x, Real y, Real z, Real w)
 	{
 		mData[0] = x;
 		mData[1] = y;
@@ -57,7 +57,7 @@ namespace GTE
 		mData[3] = w;
 	}
 
-	void Quaternion::Set(float x, float y, float z, float w)
+	void Quaternion::Set(Real x, Real y, Real z, Real w)
 	{
 		mData[0] = x;
 		mData[1] = y;
@@ -71,19 +71,19 @@ namespace GTE
 	}
 
 
-	float Quaternion::x() const
+	Real Quaternion::x() const
 	{
 		return mData[0];
 	}
-	float Quaternion::y() const
+	Real Quaternion::y() const
 	{
 		return mData[1];
 	}
-	float Quaternion::z() const
+	Real Quaternion::z() const
 	{
 		return mData[2];
 	}
-	float Quaternion::w() const
+	Real Quaternion::w() const
 	{
 		return real();
 	}
@@ -100,12 +100,12 @@ namespace GTE
 		mData[2] = c.z;
 	}
 
-	float Quaternion::real() const
+	Real Quaternion::real() const
 	{
 		return mData[3];
 	}
 
-	void Quaternion::real(float r)
+	void Quaternion::real(Real r)
 	{
 		mData[3] = r;
 	}
@@ -177,7 +177,7 @@ namespace GTE
 	 * of this quaternion.
 	 * @return The quaternion (*this) * s.
 	 */
-	Quaternion Quaternion::operator*(float s) const
+	Quaternion Quaternion::operator*(Real s) const
 	{
 		Vector3 comp = complex();
 		comp.x *= s;
@@ -216,7 +216,7 @@ namespace GTE
 	 * of this quaternion.
 	 * @return The quaternion (*this) / s.
 	 */
-	Quaternion Quaternion::operator/(float s) const
+	Quaternion Quaternion::operator/(Real s) const
 	{
 		if (s == 0)
 			Debug::PrintMessage("Dividing quaternion by 0.\n");
@@ -240,7 +240,7 @@ namespace GTE
 	 */
 	Matrix4x4 Quaternion::matrix() const
 	{
-		float m[16] = { w(), -z(), y(), x(), z(), w(), -x(), y(), -y(), x(), w(), z(), -x(), -y(), -z(), w() };
+		Real m[16] = { w(), -z(), y(), x(), z(), w(), -x(), y(), -y(), x(), w(), z(), -x(), -y(), -z(), w() };
 
 		return Matrix4x4(m);
 	}
@@ -259,7 +259,7 @@ namespace GTE
 	 */
 	Matrix4x4 Quaternion::rightMatrix() const
 	{
-		float m[16] = { +w(), -z(), y(), -x(), +z(), w(), -x(), -y(), -y(), x(), w(), -z(), +x(), y(), z(), w() };
+		Real m[16] = { +w(), -z(), y(), -x(), +z(), w(), -x(), -y(), -y(), x(), w(), -z(), +x(), y(), z(), w() };
 		return Matrix4x4(m);
 	}
 
@@ -272,7 +272,7 @@ namespace GTE
 
 	void Quaternion::normalize()
 	{
-		float normFactor = norm();
+		Real normFactor = norm();
 		mData[0] /= normFactor;
 		mData[1] /= normFactor;
 		mData[2] /= normFactor;
@@ -283,7 +283,7 @@ namespace GTE
 	 * @brief Returns the norm ("magnitude") of the quaternion.
 	 * @return The 2-norm of [ w(), x(), y(), z() ]<sup>T</sup>.
 	 */
-	float Quaternion::norm() const
+	Real Quaternion::norm() const
 	{
 		return GTEMath::SquareRoot(mData[0] * mData[0] + mData[1] * mData[1] + mData[2] * mData[2] + mData[3] * mData[3]);
 	}
@@ -298,7 +298,7 @@ namespace GTE
 	 */
 	Matrix4x4 Quaternion::rotationMatrix() const
 	{
-		/*float m[16] =
+		/*Real m[16] =
 		{
 		1-2*y()*y()-2*z()*z(), 2*x()*y() - 2*z()*w(), 2*x()*z() + 2*y()*w(),0,
 		2*x()*y() + 2*z()*w(), 1-2*x()*x()-2*z()*z(), 2*y()*z() - 2*x()*w(),0,
@@ -306,7 +306,7 @@ namespace GTE
 		0,0,0,1
 		};*/
 
-		float m[16] =
+		Real m[16] =
 		{
 			1 - 2 * y()*y() - 2 * z()*z(), 2 * x()*y() + 2 * z()*w(), 2 * x()*z() - 2 * y()*w(), 0,
 			2 * x()*y() - 2 * z()*w(), 1 - 2 * x()*x() - 2 * z()*z(), 2 * y()*z() + 2 * x()*w(), 0,
@@ -322,10 +322,10 @@ namespace GTE
 	 */
 	void Quaternion::FromMatrix(const Matrix4x4& matrix)
 	{
-		float trace = matrix.A0 + matrix.B1 + matrix.C2;
-		float root;
+		Real trace = matrix.A0 + matrix.B1 + matrix.C2;
+		Real root;
 
-		const float * data = matrix.GetDataPtr();
+		const Real * data = matrix.GetDataPtr();
 
 		if (trace > 0.0)
 		{
@@ -338,17 +338,17 @@ namespace GTE
 		}
 		else
 		{
-			static unsigned int iNext[3] = { 1, 2, 0 };
-			unsigned int i = 0;
+			static UInt32 iNext[3] = { 1, 2, 0 };
+			UInt32 i = 0;
 			if (matrix.B1 > matrix.A0)
 				i = 1;
 			if (matrix.C2 > data[i * 4 + i])
 				i = 2;
-			unsigned int j = iNext[i];
-			unsigned int k = iNext[j];
+			UInt32 j = iNext[i];
+			UInt32 k = iNext[j];
 
 			root = GTEMath::SquareRoot(data[i * 4 + i] - data[j * 4 + j] - data[k * 4 + k] + 1.0f);
-			float * apkQuat[3] = { mData, mData + 1, mData + 2 };
+			Real * apkQuat[3] = { mData, mData + 1, mData + 2 };
 			*apkQuat[i] = 0.5f*root;
 			root = 0.5f / root;
 
@@ -362,15 +362,15 @@ namespace GTE
 		}
 	}
 
-	void Quaternion::FromAngleAxis(const float rfAngle, const Vector3& rkAxis)
+	void Quaternion::FromAngleAxis(const Real rfAngle, const Vector3& rkAxis)
 	{
 		// assert:  axis[] is unit length
 		//
 		// The quaternion representing the rotation is
 		//   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
 
-		float fHalfAngle(0.5*rfAngle);
-		float fSin = GTEMath::Sin(fHalfAngle);
+		Real fHalfAngle(0.5*rfAngle);
+		Real fSin = GTEMath::Sin(fHalfAngle);
 		mData[3] = GTEMath::Cos(fHalfAngle);
 		mData[0] = fSin*rkAxis.x;
 		mData[1] = fSin*rkAxis.y;
@@ -382,7 +382,7 @@ namespace GTE
 	 */
 	/*TVector3 scaledAxis(void) const
 	 {
-	 float w[3];
+	 Real w[3];
 	 HeliMath::scaled_axis_from_quaternion(w, mData);
 	 return TVector3(w);
 	 }*/
@@ -392,10 +392,10 @@ namespace GTE
 	 */
 	/*void scaledAxis(const TVector3& w)
 	 {
-	 float theta = w.norm();
+	 Real theta = w.norm();
 	 if (theta > 0.0001)
 	 {
-	 float s = sin(theta / 2.0);
+	 Real s = sin(theta / 2.0);
 	 TVector3 W(w / theta * s);
 	 mData[0] = W[0];
 	 mData[1] = W[1];
@@ -429,12 +429,12 @@ namespace GTE
 	 */
 	void Quaternion::euler(const Vector3& euler)
 	{
-		float c1 = GTEMath::Cos(euler.z * 0.5 * Constants::DegreesToRads);
-		float c2 = GTEMath::Cos(euler.y * 0.5 * Constants::DegreesToRads);
-		float c3 = GTEMath::Cos(euler.x * 0.5 * Constants::DegreesToRads);
-		float s1 = GTEMath::Sin(euler.z * 0.5 * Constants::DegreesToRads);
-		float s2 = GTEMath::Sin(euler.y * 0.5 * Constants::DegreesToRads);
-		float s3 = GTEMath::Sin(euler.x * 0.5 * Constants::DegreesToRads);
+		Real c1 = GTEMath::Cos(euler.z * 0.5 * Constants::DegreesToRads);
+		Real c2 = GTEMath::Cos(euler.y * 0.5 * Constants::DegreesToRads);
+		Real c3 = GTEMath::Cos(euler.x * 0.5 * Constants::DegreesToRads);
+		Real s1 = GTEMath::Sin(euler.z * 0.5 * Constants::DegreesToRads);
+		Real s2 = GTEMath::Sin(euler.y * 0.5 * Constants::DegreesToRads);
+		Real s3 = GTEMath::Sin(euler.x * 0.5 * Constants::DegreesToRads);
 
 		mData[0] = c1 * c2 * s3 - s1 * s2 * c3;
 		mData[1] = c1 * s2 * c3 + s1 * c2 * s3;
@@ -449,9 +449,9 @@ namespace GTE
 	Vector3 Quaternion::euler(void) const
 	{
 		Vector3 euler;
-		const static float PI_OVER_2 = Constants::PI * 0.5;
-		const static float EPSILON = 1e-10;
-		float sqw, sqx, sqy, sqz;
+		const static Real PI_OVER_2 = Constants::PI * 0.5;
+		const static Real EPSILON = 1e-10;
+		Real sqw, sqx, sqy, sqz;
 
 		// quick conversion to Euler angles to give tilt to user
 		sqw = mData[3] * mData[3];
@@ -491,9 +491,9 @@ namespace GTE
 	 TVector3 ztt(0,0,1);
 	 TVector3 zbt = this->rotatedVector(ztt);
 	 TVector3 axis_xy = ztt.cross(zbt);
-	 float axis_norm = axis_xy.norm();
+	 Real axis_norm = axis_xy.norm();
 
-	 float axis_theta = acos(HeliMath::saturate(zbt[2], -1,+1));
+	 Real axis_theta = acos(HeliMath::saturate(zbt[2], -1,+1));
 	 if (axis_norm > 0.00001) {
 	 axis_xy = axis_xy * (axis_theta/axis_norm); // limit is *1
 	 }
@@ -505,17 +505,17 @@ namespace GTE
 	/**
 	 * @brief Returns the quaternion slerped between this and q1 by fraction 0 <= t <= 1.
 	 */
-	Quaternion Quaternion::slerp(const Quaternion& q1, float t)
+	Quaternion Quaternion::slerp(const Quaternion& q1, Real t)
 	{
 		return slerp(*this, q1, t);
 	}
 
-	Quaternion Quaternion::slerp(const Quaternion &qa, const Quaternion &qb, float t)
+	Quaternion Quaternion::slerp(const Quaternion &qa, const Quaternion &qb, Real t)
 	{
 		/*  // quaternion to return
 		  Quaternion qm;
 		  // Calculate angle between them.
-		  float cosHalfTheta = qa.w() * qb.w() + qa.x() * qb.x() + qa.y() * qb.y() + qa.z() * qb.z();
+		  Real cosHalfTheta = qa.w() * qb.w() + qa.x() * qb.x() + qa.y() * qb.y() + qa.z() * qb.z();
 		  // if qa=qb or qa=-qb then theta = 0 and we can return qa
 		  if (abs(cosHalfTheta) >= 1.0)
 		  {
@@ -526,20 +526,20 @@ namespace GTE
 		  return qm;
 		  }
 		  // Calculate temporary values.
-		  float halfTheta = acos(cosHalfTheta);
-		  float sinHalfTheta = sqrt(1.0 - cosHalfTheta * cosHalfTheta);
+		  Real halfTheta = acos(cosHalfTheta);
+		  Real sinHalfTheta = sqrt(1.0 - cosHalfTheta * cosHalfTheta);
 		  // if theta = 180 degrees then result is not fully defined
 		  // we could rotate around any axis normal to qa or qb
 		  if (fabs(sinHalfTheta) < 0.001)
-		  { // fabs is floating point absolute
+		  { // fabs is Realing point absolute
 		  qm.mData[3] = (qa.w() * 0.5 + qb.w() * 0.5);
 		  qm.mData[0] = (qa.x() * 0.5 + qb.x() * 0.5);
 		  qm.mData[1] = (qa.y() * 0.5 + qb.y() * 0.5);
 		  qm.mData[2] = (qa.z() * 0.5 + qb.z() * 0.5);
 		  return qm;
 		  }
-		  float ratioA = sin((1 - t) * halfTheta) / sinHalfTheta;
-		  float ratioB = sin(t * halfTheta) / sinHalfTheta;
+		  Real ratioA = sin((1 - t) * halfTheta) / sinHalfTheta;
+		  Real ratioB = sin(t * halfTheta) / sinHalfTheta;
 		  //calculate Quaternion.
 		  qm.mData[3] = (qa.w() * ratioA + qb.w() * ratioB);
 		  qm.mData[0] = (qa.x() * ratioA + qb.x() * ratioB);
@@ -548,10 +548,10 @@ namespace GTE
 		  return qm;*/
 
 		// calc cosine theta
-		float cosom = qa.x() * qb.x() + qa.y() * qb.y() + qa.z() * qb.z() + qa.w() * qb.w();
+		Real cosom = qa.x() * qb.x() + qa.y() * qb.y() + qa.z() * qb.z() + qa.w() * qb.w();
 		// adjust signs (if necessary)
 		Quaternion end = qb;
-		if (cosom < static_cast<float>(0.0))
+		if (cosom < static_cast<Real>(0.0))
 		{
 			cosom = -cosom;
 			end.mData[0] = -end.x(); // Reverse all signs
@@ -560,47 +560,47 @@ namespace GTE
 			end.mData[3] = -end.w();
 		}
 		// Calculate coefficients
-		float sclp, sclq;
-		if ((static_cast<float>(1.0) - cosom) > static_cast<float>(0.0001)) // 0.0001 -> some epsillon
+		Real sclp, sclq;
+		if ((static_cast<Real>(1.0) - cosom) > static_cast<Real>(0.0001)) // 0.0001 -> some epsillon
 		{
 			// Standard case (slerp)
-			float omega, sinom;
+			Real omega, sinom;
 			omega = std::acos(cosom); // extract theta from dot product's cos theta
 			sinom = std::sin(omega);
-			sclp = std::sin((static_cast<float>(1.0) - t) * omega) / sinom;
+			sclp = std::sin((static_cast<Real>(1.0) - t) * omega) / sinom;
 			sclq = std::sin(t * omega) / sinom;
 		}
 		else
 		{
 			// Very close, do linear interp (because it's faster)
-			sclp = static_cast<float>(1.0) - t;
+			sclp = static_cast<Real>(1.0) - t;
 			sclq = t;
 		}
 
 		Quaternion qOut;
 
-		float x = sclp * qa.x() + sclq * end.x();
-		float y = sclp * qa.y() + sclq * end.y();
-		float z = sclp * qa.z() + sclq * end.z();
-		float w = sclp * qa.w() + sclq * end.w();
+		Real x = sclp * qa.x() + sclq * end.x();
+		Real y = sclp * qa.y() + sclq * end.y();
+		Real z = sclp * qa.z() + sclq * end.z();
+		Real w = sclp * qa.w() + sclq * end.w();
 
 		qOut.Set(x, y, z, w);
 		return qOut;
 	}
 
 	/// Returns quaternion that is slerped by fraction 't' between q0 and q1.
-	/*Quaternion Quaternion::slerp(const Quaternion& q0, const Quaternion& q1, float t)
+	/*Quaternion Quaternion::slerp(const Quaternion& q0, const Quaternion& q1, Real t)
 	 {
-	 float omega = acos(HeliMath::saturate(q0.mData[0]*q1.mData[0] +
+	 Real omega = acos(HeliMath::saturate(q0.mData[0]*q1.mData[0] +
 	 q0.mData[1]*q1.mData[1] +
 	 q0.mData[2]*q1.mData[2] +
 	 q0.mData[3]*q1.mData[3], -1,1));
 	 if (fabs(omega) < 1e-10) {
 	 omega = 1e-10;
 	 }
-	 float som = sin(omega);
-	 float st0 = sin((1-t) * omega) / som;
-	 float st1 = sin(t * omega) / som;
+	 Real som = sin(omega);
+	 Real st0 = sin((1-t) * omega) / som;
+	 Real st1 = sin(t * omega) / som;
 
 	 return Quaternion(q0.mData[0]*st0 + q1.mData[0]*st1,
 	 q0.mData[1]*st0 + q1.mData[1]*st1,
@@ -613,12 +613,12 @@ namespace GTE
 	 *
 	 * Array is in order x,y,z,w.
 	 */
-	float* Quaternion::row(uint32_t i)
+	Real* Quaternion::row(uint32_t i)
 	{
 		return mData + i;
 	}
 	// Const version of the above.
-	const float* Quaternion::row(uint32_t i) const
+	const Real* Quaternion::row(uint32_t i) const
 	{
 		return mData + i;
 	}
@@ -641,7 +641,7 @@ namespace GTE
 		v0.Normalize();
 		v1.Normalize();
 
-		float d = Vector3::Dot(v0, v1);
+		Real d = Vector3::Dot(v0, v1);
 
 		// If dot == 1, vectors are the same
 		if (d >= 1.0f)
@@ -673,8 +673,8 @@ namespace GTE
 		}
 		else
 		{
-			float s = GTEMath::SquareRoot((1 + d) * 2);
-			float invs = 1 / s;
+			Real s = GTEMath::SquareRoot((1 + d) * 2);
+			Real invs = 1 / s;
 
 			Vector3 c;
 			Vector3::Cross(v0, v1, c);
@@ -689,6 +689,6 @@ namespace GTE
 	/**
 	 * @brief Global operator allowing left-multiply by scalar.
 	 */
-	Quaternion operator*(float s, const Quaternion& q);
+	Quaternion operator*(Real s, const Quaternion& q);
 }
 

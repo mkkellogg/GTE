@@ -65,7 +65,7 @@ namespace GTE
 	{
 		for (unsigned i = 0; i < 4; i++)
 		{
-			for (unsigned int j = 0; j < 4; j++)
+			for (UInt32 j = 0; j < 4; j++)
 			{
 				if (j>0)printf(",");
 				printf("%f", matrix.GetDataPtr()[i * 4 + j]);
@@ -74,8 +74,8 @@ namespace GTE
 		}
 	}
 
-	Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height,
-		unsigned int subDivisionsPerWidth, unsigned int subDivisionsPerHeight,
+	Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, Real width, Real height,
+		UInt32 subDivisionsPerWidth, UInt32 subDivisionsPerHeight,
 		bool calculateNormals, bool calculateTangents, bool buildFaces)
 	{
 		if (width <= 0 || height <= 0)
@@ -92,10 +92,10 @@ namespace GTE
 		}
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 
-		unsigned int subSquaresPerWidth = subDivisionsPerWidth;
-		unsigned int subSquaresPerHeight = subDivisionsPerHeight;
-		unsigned int totalSubSquares = subSquaresPerWidth * subSquaresPerHeight;
-		unsigned int totalVertices = totalSubSquares * 6;
+		UInt32 subSquaresPerWidth = subDivisionsPerWidth;
+		UInt32 subSquaresPerHeight = subDivisionsPerHeight;
+		UInt32 totalSubSquares = subSquaresPerWidth * subSquaresPerHeight;
+		UInt32 totalVertices = totalSubSquares * 6;
 
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 		SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
@@ -107,29 +107,29 @@ namespace GTE
 		Point3Array * points = subMesh->GetPostions();
 		UV2Array *uvs = NULL;
 
-		float halfWidth = width / 2.0;
-		float halfHeight = height / 2.0;
+		Real halfWidth = width / 2.0;
+		Real halfHeight = height / 2.0;
 
-		float initialWidth = -halfWidth;
-		float initialHeight = halfHeight;
+		Real initialWidth = -halfWidth;
+		Real initialHeight = halfHeight;
 
-		float currentWidth = initialWidth;
-		float currentHeight = initialHeight;
+		Real currentWidth = initialWidth;
+		Real currentHeight = initialHeight;
 
-		float subSquareWidth = width / (float)subSquaresPerWidth;
-		float subSquareHeight = height / (float)subSquaresPerWidth;
+		Real subSquareWidth = width / (Real)subSquaresPerWidth;
+		Real subSquareHeight = height / (Real)subSquaresPerWidth;
 
-		float uvWidth = 1.0;
-		float uvHeight = 1.0;
+		Real uvWidth = 1.0;
+		Real uvHeight = 1.0;
 
-		float subSquareUVWidth = uvWidth / (float)subSquaresPerWidth;
-		float subSquareUVHeight = uvHeight / (float)subSquaresPerHeight;
+		Real subSquareUVWidth = uvWidth / (Real)subSquaresPerWidth;
+		Real subSquareUVHeight = uvHeight / (Real)subSquaresPerHeight;
 
-		unsigned int vertexIndex = 0;
+		UInt32 vertexIndex = 0;
 
-		for (unsigned int heightSquare = 0; heightSquare < subSquaresPerHeight; heightSquare++)
+		for (UInt32 heightSquare = 0; heightSquare < subSquaresPerHeight; heightSquare++)
 		{
-			for (unsigned int widthSquare = 0; widthSquare < subSquaresPerWidth; widthSquare++)
+			for (UInt32 widthSquare = 0; widthSquare < subSquaresPerWidth; widthSquare++)
 			{
 				points->GetPoint(vertexIndex)->Set(currentWidth, currentHeight, 0);
 				points->GetPoint(vertexIndex + 1)->Set(currentWidth + subSquareWidth, currentHeight, 0);
@@ -139,12 +139,12 @@ namespace GTE
 				points->GetPoint(vertexIndex + 4)->Set(currentWidth + subSquareWidth, currentHeight - subSquareHeight, 0);
 				points->GetPoint(vertexIndex + 5)->Set(currentWidth, currentHeight - subSquareHeight, 0);
 
-				float uvX = (currentWidth + halfWidth) / width;
-				float uvY = ((currentHeight + halfHeight) / height);
+				Real uvX = (currentWidth + halfWidth) / width;
+				Real uvY = ((currentHeight + halfHeight) / height);
 
 				if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0) || StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))
 				{
-					for (unsigned int i = 0; i < 2; i++)
+					for (UInt32 i = 0; i < 2; i++)
 					{
 						if (i == 0)
 						{
@@ -349,7 +349,7 @@ namespace GTE
 
 		if (doCCW)
 		{
-			for (unsigned int i = 0; i < 36; i += 3)
+			for (UInt32 i = 0; i < 36; i += 3)
 			{
 				Point3 * p1 = points->GetPoint(i);
 				Point3  p1r = *p1;

@@ -18,7 +18,7 @@ namespace GTE
 
 	}
 
-	unsigned int LayerManager::AddLayer(const std::string& name)
+	UInt32 LayerManager::AddLayer(const std::string& name)
 	{
 		if (currentLayerIndex >= MAX_LAYERS)return -1;
 
@@ -38,7 +38,7 @@ namespace GTE
 		{
 			return -1;
 		}
-		std::map<std::string, unsigned int>& mapPtr = const_cast<std::map<std::string, unsigned int>&>(layerIndexes);
+		std::map<std::string, UInt32>& mapPtr = const_cast<std::map<std::string, UInt32>&>(layerIndexes);
 		return mapPtr[name];
 	}
 
@@ -48,7 +48,7 @@ namespace GTE
 		return GetLayerMask(layerIndex);
 	}
 
-	IntMask LayerManager::GetLayerMask(unsigned int layerIndex) const
+	IntMask LayerManager::GetLayerMask(UInt32 layerIndex) const
 	{
 		IntMask mask = IntMaskUtil::CreateIntMask();
 		if (layerIndex < 31)
@@ -58,7 +58,7 @@ namespace GTE
 		return mask;
 	}
 
-	IntMask LayerManager::RemoveLayerFromMask(IntMask mask, unsigned int layerIndex)
+	IntMask LayerManager::RemoveLayerFromMask(IntMask mask, UInt32 layerIndex)
 	{
 		IntMaskUtil::ClearBit(&mask, layerIndex);
 		return mask;
@@ -81,7 +81,7 @@ namespace GTE
 		return IntMaskUtil::CreateIntMask();
 	}
 
-	bool LayerManager::ContainsLayer(IntMask mask, unsigned int layerIndex)
+	bool LayerManager::ContainsLayer(IntMask mask, UInt32 layerIndex)
 	{
 		return IntMaskUtil::IsBitSetForMask(mask, layerIndex);
 	}

@@ -11,6 +11,7 @@
 #ifndef _GTE_IMAGE_LOADER_H_
 #define _GTE_IMAGE_LOADER_H_
 
+#include "object/enginetypes.h"
 #include <IL/il.h>
 #include <string>
 
@@ -32,7 +33,7 @@ namespace GTE
 	public:
 
 		static RawImage * LoadImageU(const std::string& fullPath);
-		static RawImage * GetRawImageFromILData(ILubyte * data, unsigned int width, unsigned int height);
+		static RawImage * GetRawImageFromILData(ILubyte * data, UInt32 width, UInt32 height);
 		static void DestroyRawImage(RawImage * image);
 		static std::string GetFileExtension(const std::string& filePath);
 	};

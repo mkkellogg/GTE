@@ -2,6 +2,7 @@
 #define _GTE_COLOR4_H_
 
 #include "base/basevector4.h"
+#include "global/global.h"
 
 namespace GTE
 {
@@ -11,24 +12,24 @@ namespace GTE
 
 	public:
 
-		float &r;
-		float &g;
-		float &b;
-		float &a;
+		Real &r;
+		Real &g;
+		Real &b;
+		Real &a;
 
 		Color4();
-		Color4(bool permAttached, float * target);
-		Color4(float r, float g, float b, float a);
+		Color4(bool permAttached, Real * target);
+		Color4(Real r, Real g, Real b, Real a);
 		Color4(const Color4& point);
-		Color4(const float * data);
+		Color4(const Real * data);
 		~Color4();
 
 		Color4 & operator= (const Color4 & source);
 		BaseVector4 & operator= (const BaseVector4 & source);
 
-		void Set(float r, float g, float b, float a);
+		void Set(Real r, Real g, Real b, Real a);
 
-		void AttachTo(float * data);
+		void AttachTo(Real * data);
 		void Detach();
 	};
 }

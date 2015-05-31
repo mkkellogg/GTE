@@ -50,13 +50,13 @@ namespace GTE
 
 	std::string FileSystemIX::FixupPathForLocalFilesystem(const std::string& path) const
 	{
-		const unsigned int size = path.size() + 1;
+		const UInt32 size = path.size() + 1;
 		char *chars = new char[size];
 		ASSERT(chars != NULL, " FileSystemIX::FixupPath -> Could not allocate character array.");
 
 		strcpy(chars, path.c_str());
 
-		for (unsigned int i = 0; i < path.size(); i++)
+		for (UInt32 i = 0; i < path.size(); i++)
 		{
 			if (chars[i] == '\\')chars[i] = '/';
 		}

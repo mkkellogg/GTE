@@ -23,7 +23,7 @@ namespace GTE
 
 	}
 
-	BaseVector4 * Vector3Factory::CreatePermAttached(float * target)
+	BaseVector4 * Vector3Factory::CreatePermAttached(Real * target)
 	{
 		return new Vector3(true, target);
 	}

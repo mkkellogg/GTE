@@ -95,7 +95,7 @@ namespace GTE
 		SceneObjectRef CreateSceneObject();
 		void DestroySceneObject(SceneObjectRef sceneObject);
 
-		Mesh3DRef CreateMesh3D(unsigned int subMeshCount);
+		Mesh3DRef CreateMesh3D(UInt32 subMeshCount);
 		void DestroyMesh3D(Mesh3DRef mesh);
 		Mesh3DFilterRef CreateMesh3DFilter();
 		void DestroyMesh3DFilter(Mesh3DFilterRef filter);
@@ -109,11 +109,11 @@ namespace GTE
 		SubMesh3DRendererRef CreateSubMesh3DRenderer();
 		void DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer);
 
-		SkeletonRef CreateSkeleton(unsigned int boneCount);
+		SkeletonRef CreateSkeleton(UInt32 boneCount);
 		SkeletonRef CloneSkeleton(SkeletonRef source);
 		void DestroySkeleton(SkeletonRef skeleton);
 
-		AnimationRef CreateAnimation(float duration, float ticksPerSecond);
+		AnimationRef CreateAnimation(Real duration, Real ticksPerSecond);
 		void DestroyAnimation(AnimationRef animation);
 		AnimationInstanceRef CreateAnimationInstance(SkeletonRef target, AnimationRef animation);
 		void DestroyAnimationInstance(AnimationInstanceRef instance);
@@ -124,13 +124,13 @@ namespace GTE
 		void DestroyShader(ShaderRef shader);
 		TextureRef CreateTexture(const std::string& sourcePath, TextureAttributes attributes);
 		TextureRef CreateTexture(RawImage * imageData, TextureAttributes attributes);
-		TextureRef CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, TextureAttributes attributes);
-		TextureRef CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
-			BYTE * backData, unsigned int backw, unsigned int backh,
-			BYTE * topData, unsigned int tw, unsigned int th,
-			BYTE * bottomData, unsigned int botw, unsigned int both,
-			BYTE * leftData, unsigned int lw, unsigned int lh,
-			BYTE * rightData, unsigned int rw, unsigned int rh);
+		TextureRef CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, TextureAttributes attributes);
+		TextureRef CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
+			Byte * backData, UInt32 backw, UInt32 backh,
+			Byte * topData, UInt32 tw, UInt32 th,
+			Byte * bottomData, UInt32 botw, UInt32 both,
+			Byte * leftData, UInt32 lw, UInt32 lh,
+			Byte * rightData, UInt32 rw, UInt32 rh);
 		TextureRef CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 			const std::string& bottom, const std::string& left, const std::string& right);
 		TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
@@ -138,7 +138,7 @@ namespace GTE
 		void DestroyTexture(TextureRef texture);
 		RenderTargetRef CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
 			const TextureAttributes& colorTextureAttributes,
-			unsigned int width, unsigned int height);
+			UInt32 width, UInt32 height);
 		void DestroyRenderTarget(RenderTargetRef target);
 
 		MaterialRef CreateMaterial(const std::string& name, ShaderRef shader);

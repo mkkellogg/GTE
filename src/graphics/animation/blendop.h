@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include "object/enginetypes.h"
+#include "global/global.h"
 
 namespace GTE
 {
@@ -27,14 +28,14 @@ namespace GTE
 
 	protected:
 
-		float duration;
-		float progress;
+		Real duration;
+		Real progress;
 		bool complete;
 		bool started;
 
-		std::vector<float> initialWeights;
+		std::vector<Real> initialWeights;
 
-		BlendOp(float duration);
+		BlendOp(Real duration);
 		virtual ~BlendOp();
 		void SetComplete(bool complete);
 		void SetStarted(bool started);
@@ -42,15 +43,15 @@ namespace GTE
 	public:
 
 		void Reset();
-		bool Init(std::vector<float>& initialWeights);
-		virtual void Update(std::vector<float>& weights);
+		bool Init(std::vector<Real>& initialWeights);
+		virtual void Update(std::vector<Real>& weights);
 		virtual void OnStart() = 0;
 		virtual void OnComplete() = 0;
 		virtual void OnStoppedEarly() = 0;
 		bool HasCompleted();
 		bool HasStarted();
-		float GetNormalizedProgress();
-		float GetProgress();
+		Real GetNormalizedProgress();
+		Real GetProgress();
 
 	};
 }

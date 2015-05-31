@@ -18,6 +18,7 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
 #include "geometry/matrix4x4.h"
+#include "global/global.h"
 #include <vector>
 
 namespace GTE
@@ -36,39 +37,39 @@ namespace GTE
 
 		// store the number of KeyFrameSet objects that have been allocated, which
 		// is also the length of [channelNames]
-		unsigned int channelCount;
+		UInt32 channelCount;
 
 		// the duration of this animation in  device/clock independent ticks
-		float durationTicks;
+		Real durationTicks;
 		// map the ticks duration to actual time
-		float ticksPerSecond;
+		Real ticksPerSecond;
 
 		// we can have the animation start with progress > 0
-		float startOffsetTicks;
+		Real startOffsetTicks;
 
 		// we can have the animation end earlier than [durationTicks]
-		float earlyEndTicks;
+		Real earlyEndTicks;
 
-		Animation(float durationTicks, float ticksPerSecond);
-		Animation(float durationTicks, float ticksPerSecond, float startOffsetTicks, float earlyEndTicks);
+		Animation(Real durationTicks, Real ticksPerSecond);
+		Animation(Real durationTicks, Real ticksPerSecond, Real startOffsetTicks, Real earlyEndTicks);
 		~Animation();
 		void Destroy();
-		bool Init(unsigned int channelCount);
+		bool Init(UInt32 channelCount);
 
 	public:
 
-		void ClipEnds(float startOffsetTicks, float earlyEndTicks);
-		unsigned int GetChannelCount();
-		KeyFrameSet * GetKeyFrameSet(unsigned int nodeIndex);
-		const std::string * GetChannelName(unsigned int index);
-		void SetChannelName(unsigned int index, const std::string& name);
-		float GetTicksPerSecond() const;
-		float GetDurationTicks() const;
-		float GetStartOffsetTicks() const;
-		float GetEarlyEndTicks() const;
-		float GetDuration() const;
-		float GetStartOffset() const;
-		float GetEarlyEnd() const;
+		void ClipEnds(Real startOffsetTicks, Real earlyEndTicks);
+		UInt32 GetChannelCount();
+		KeyFrameSet * GetKeyFrameSet(UInt32 nodeIndex);
+		const std::string * GetChannelName(UInt32 index);
+		void SetChannelName(UInt32 index, const std::string& name);
+		Real GetTicksPerSecond() const;
+		Real GetDurationTicks() const;
+		Real GetStartOffsetTicks() const;
+		Real GetEarlyEndTicks() const;
+		Real GetDuration() const;
+		Real GetStartOffset() const;
+		Real GetEarlyEnd() const;
 	};
 }
 

@@ -89,8 +89,8 @@ namespace GTE
 
 		void AddChild(SceneObjectRef child);
 		void RemoveChild(SceneObjectRef child);
-		unsigned int GetChildrenCount() const;
-		SceneObjectRef GetChildAt(unsigned int index) const;
+		UInt32 GetChildrenCount() const;
+		SceneObjectRef GetChildAt(UInt32 index) const;
 		SceneObjectRef GetParent();
 
 		// TODO: optimize this hashing function (implement correctly)

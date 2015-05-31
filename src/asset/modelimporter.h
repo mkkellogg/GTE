@@ -19,6 +19,7 @@
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
 #include "base/longmask.h"
+#include "global/global.h"
 
 #include <memory>
 #include <string>
@@ -113,21 +114,21 @@ namespace GTE
 		void InitImporter();
 		const aiScene * LoadAIScene(const std::string& filePath, bool preserveFBXPivots);
 
-		void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, float scale, SceneObjectRef parent,
+		void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, Real scale, SceneObjectRef parent,
 			std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton,
 			std::vector<SceneObjectRef>& createdSceneObjects, bool castShadows, bool receiveShadows) const;
-		SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale, bool castShadows, bool receiveShadows) const;
+		SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, bool castShadows, bool receiveShadows) const;
 		bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
 		TextureRef LoadAITexture(aiMaterial& material, aiTextureType textureType, const std::string& modelPath) const;
 		bool SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, const TextureType textureType, TextureRef texture,
-			unsigned int meshIndex, MaterialImportDescriptor& materialImportDesc) const;
+			UInt32 meshIndex, MaterialImportDescriptor& materialImportDesc) const;
 		static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
-		SubMesh3DRef ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const;
+		SubMesh3DRef ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const;
 		void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, bool reverseVertexOrder) const;
 
 		SkeletonRef LoadSkeleton(const aiScene& scene) const;
 		VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, bool reverseVertexOrder) const;
-		void AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex) const;
+		void AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const;
 		void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
 		unsigned CountBones(const aiScene& scene) const;
 		bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
@@ -150,7 +151,7 @@ namespace GTE
 
 	public:
 
-		SceneObjectRef LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots);
+		SceneObjectRef LoadModelDirect(const std::string& modelPath, Real importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots);
 		AnimationRef LoadAnimation(const std::string& filePath, bool addLoopPadding, bool preserveFBXPivots);
 
 	};

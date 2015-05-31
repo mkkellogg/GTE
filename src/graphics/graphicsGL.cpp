@@ -99,7 +99,7 @@ namespace GTE
 		// set up GLFW antialiasing
 		if (GraphicsAttributes::IsMSAA(attributes.AAMethod))
 		{
-			unsigned int msaaSamples = GraphicsAttributes::GetMSAASamples(attributes.AAMethod);
+			UInt32 msaaSamples = GraphicsAttributes::GetMSAASamples(attributes.AAMethod);
 			if (msaaSamples > 0)glfwWindowHint(GLFW_SAMPLES, msaaSamples);
 		}
 
@@ -304,16 +304,16 @@ namespace GTE
 	void GraphicsGL::ClearRenderBuffers(IntMask bufferMask)
 	{
 		GLbitfield glClearMask = 0;
-		if (IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Color))
+		if (IntMaskUtil::IsBitSetForMask(bufferMask, (UInt32)RenderBufferType::Color))
 		{
 			glClearMask |= GL_COLOR_BUFFER_BIT;
 		}
-		if (IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Depth))
+		if (IntMaskUtil::IsBitSetForMask(bufferMask, (UInt32)RenderBufferType::Depth))
 		{
 			SetDepthBufferReadOnly(false);
 			glClearMask |= GL_DEPTH_BUFFER_BIT;
 		}
-		if (IntMaskUtil::IsBitSetForMask(bufferMask, (unsigned int)RenderBufferType::Stencil))
+		if (IntMaskUtil::IsBitSetForMask(bufferMask, (UInt32)RenderBufferType::Stencil))
 		{
 			glClearMask |= GL_STENCIL_BUFFER_BIT;
 		}
@@ -505,7 +505,7 @@ namespace GTE
 	 * [attributes] - The properties of the texture to be created (format, filtering method, etc...)
 	 *
 	 */
-	Texture * GraphicsGL::CreateTexture(unsigned int width, unsigned int height, BYTE * pixelData, const TextureAttributes&  attributes)
+	Texture * GraphicsGL::CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, const TextureAttributes&  attributes)
 	{
 		glEnable(GL_TEXTURE_2D);
 		GLuint tex;
@@ -656,12 +656,12 @@ namespace GTE
 	 * [rightData] - Pixel data for the right side of the cube.
 	 * [rw], [rh] - Width and height (respectively) of the right image.
 	 */
-	Texture * GraphicsGL::CreateCubeTexture(BYTE * frontData, unsigned int fw, unsigned int fh,
-		BYTE * backData, unsigned int backw, unsigned int backh,
-		BYTE * topData, unsigned int tw, unsigned int th,
-		BYTE * bottomData, unsigned int botw, unsigned int both,
-		BYTE * leftData, unsigned int lw, unsigned int lh,
-		BYTE * rightData, unsigned int rw, unsigned int rh)
+	Texture * GraphicsGL::CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
+		Byte * backData, UInt32 backw, UInt32 backh,
+		Byte * topData, UInt32 tw, UInt32 th,
+		Byte * bottomData, UInt32 botw, UInt32 both,
+		Byte * leftData, UInt32 lw, UInt32 lh,
+		Byte * rightData, UInt32 rw, UInt32 rh)
 	{
 		GLvoid * frontPixels = frontData != NULL ? frontData : (GLvoid*)0;
 		GLvoid * backPixels = backData != NULL ? backData : (GLvoid*)0;
@@ -705,12 +705,12 @@ namespace GTE
 		ASSERT(texture != NULL, "GraphicsGL::CreateCubeTexture -> Unable to allocate TextureGL object.");
 
 		std::vector<RawImage *> imageDatas;
-		BYTE * datas[] = { frontData, backData, topData, bottomData, leftData, rightData };
-		unsigned int widths[] = { fw, backw, tw, botw, lw, rw };
-		unsigned int heights[] = { fh, backh, th, both, lh, rh };
+		Byte * datas[] = { frontData, backData, topData, bottomData, leftData, rightData };
+		UInt32 widths[] = { fw, backw, tw, botw, lw, rw };
+		UInt32 heights[] = { fh, backh, th, both, lh, rh };
 
 		// allocate RawImage object for each side of cube
-		for (unsigned int i = 0; i < 6; i++)
+		for (UInt32 i = 0; i < 6; i++)
 		{
 			RawImage  * imageData = new RawImage(widths[i], heights[i]);
 			ASSERT(imageData != NULL, "GraphicsGL::CreateCubeTexture -> Unable to allocate RawImage object.");
@@ -721,7 +721,7 @@ namespace GTE
 		}
 
 		// assign RawImage object for each side of cube
-		for (unsigned int i = 0; i < 6; i++)
+		for (UInt32 i = 0; i < 6; i++)
 		{
 			texture->AddImageData(imageDatas[i]);
 		}
@@ -829,7 +829,7 @@ namespace GTE
 	 * [height] - Width of both the color and depth render textures.
 	 */
 	RenderTarget * GraphicsGL::CreateRenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer,
-		const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height)
+		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		RenderTargetGL * buffer;
 		buffer = new RenderTargetGL(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
@@ -973,7 +973,7 @@ namespace GTE
 	 */
 	void GraphicsGL::EnterRenderMode(RenderMode renderMode)
 	{
-		unsigned int clearBufferMask = 0;
+		UInt32 clearBufferMask = 0;
 
 		switch (renderMode)
 		{
@@ -991,7 +991,7 @@ namespace GTE
 			glEnable(GL_DEPTH_CLAMP);
 
 			clearBufferMask = 0;
-			IntMaskUtil::SetBitForMask(&clearBufferMask, (unsigned int)RenderBufferType::Stencil);
+			IntMaskUtil::SetBitForMask(&clearBufferMask, (UInt32)RenderBufferType::Stencil);
 			Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearBufferMask);
 			SetStencilBufferEnabled(true);
 			SetStencilTestEnabled(true);
@@ -1072,7 +1072,7 @@ namespace GTE
 	/*
 	 * Get the version of OpenGL installed on this system.
 	 */
-	unsigned int GraphicsGL::GetOpenGLVersion()
+	UInt32 GraphicsGL::GetOpenGLVersion()
 	{
 		return openGLVersion;
 	}
@@ -1242,7 +1242,7 @@ namespace GTE
 
 			GLenum target = GetGLCubeTarget(side);
 
-			unsigned int sideIndex = (unsigned int)side;
+			UInt32 sideIndex = (UInt32)side;
 			RawImage * imageData = texGL->GetImageData(sideIndex);
 			ASSERT(imageData, "GraphicsGL::ActivateCubeRenderTargetSide -> Unable to get image data for specified side.");
 
@@ -1299,7 +1299,7 @@ namespace GTE
 	/*
 	 * Set the contents of [texture] be that of [data].
 	 */
-	void GraphicsGL::SetTextureData(TextureRef texture, BYTE * data)
+	void GraphicsGL::SetTextureData(TextureRef texture, Byte * data)
 	{
 		SetTextureData(texture, data, CubeTextureSide::Front);
 	}
@@ -1308,7 +1308,7 @@ namespace GTE
 	 * Set the contents of [texture] be that of [data]. If it is a cube texture, update
 	 * the side specified by [side].
 	 */
-	void GraphicsGL::SetTextureData(TextureRef texture, BYTE * data, CubeTextureSide side)
+	void GraphicsGL::SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side)
 	{
 		NONFATAL_ASSERT(texture.IsValid(), "GraphicsGL::SetTextureData -> 'texture' is not valid.", true);
 
@@ -1319,7 +1319,7 @@ namespace GTE
 		if (attributes.IsCube)
 		{
 			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
-			RawImage * imageData = texture->GetImageData((unsigned int)side);
+			RawImage * imageData = texture->GetImageData((UInt32)side);
 			glTexImage2D(GetGLCubeTarget(side), 0, GetGLTextureFormat(attributes.Format), imageData->GetWidth(), imageData->GetHeight(), 0,
 				GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), data);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -1372,7 +1372,7 @@ namespace GTE
 	 */
 	void GraphicsGL::DeactiveAllClipPlanes()
 	{
-		for (unsigned int i = 0; i < activeClipPlanes; i++)
+		for (UInt32 i = 0; i < activeClipPlanes; i++)
 		{
 			glDisable(GL_CLIP_PLANE0 + i);
 		}
@@ -1387,12 +1387,12 @@ namespace GTE
 	 * [vertexCount] - Number of vertices being sent to the GPU.
 	 * [validate] - Specifies whether or not to validate the shader variables that have been set prior to rendering.
 	 */
-	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, unsigned int vertexCount, bool validate)
+	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, bool validate)
 	{
 		MaterialRef currentMaterial = GetActiveMaterial();
 
 		VertexAttrBufferBinding binding;
-		for (unsigned int b = 0; b < boundBuffers.size(); b++)
+		for (UInt32 b = 0; b < boundBuffers.size(); b++)
 		{
 			binding = boundBuffers[b];
 			if (binding.Attribute != StandardAttribute::_None)

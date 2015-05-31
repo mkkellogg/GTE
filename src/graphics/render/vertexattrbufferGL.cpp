@@ -29,7 +29,7 @@ namespace GTE
 	}
 
 	/*
-	 * Calculate the number of floating-point entries in the buffer.
+	 * Calculate the number of Realing-point entries in the buffer.
 	 */
 	int VertexAttrBufferGL::CalcFloatCount() const
 	{
@@ -41,7 +41,7 @@ namespace GTE
 	 */
 	int VertexAttrBufferGL::CalcFullSize() const
 	{
-		return CalcFloatCount() * sizeof(float);
+		return CalcFloatCount() * sizeof(Real);
 	}
 
 	/*
@@ -54,7 +54,7 @@ namespace GTE
 	 * [dataOnGPU] - Make this a VBO.
 	 * [srcData] - Data to be copied into the buffer after initialization.
 	 */
-	bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, float *srcData)
+	bool VertexAttrBufferGL::Init(int vertexCount, int componentCount, int stride, bool dataOnGPU, Real *srcData)
 	{
 		// if this buffer has already be initialized we need to destroy it and start fresh
 		Destroy();
@@ -66,7 +66,7 @@ namespace GTE
 		// calculate number of bytes in the buffer
 		int fullDataSize = CalcFullSize();
 
-		data = new float[CalcFloatCount()];
+		data = new Real[CalcFloatCount()];
 		ASSERT(data != NULL, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.");
 
 		// zero out the buffer
@@ -92,7 +92,7 @@ namespace GTE
 		return true;
 	}
 
-	void VertexAttrBufferGL::InitData(const float * srcData)
+	void VertexAttrBufferGL::InitData(const Real * srcData)
 	{
 		int fullDataSize = CalcFullSize();
 		memcpy(data, srcData, fullDataSize);
@@ -109,7 +109,7 @@ namespace GTE
 	/*
 	 * Copy the data stored in [srcData] into the buffer.
 	 */
-	void VertexAttrBufferGL::SetData(const float * srcData)
+	void VertexAttrBufferGL::SetData(const Real * srcData)
 	{
 		int fullDataSize = CalcFullSize();
 
@@ -125,7 +125,7 @@ namespace GTE
 
 			/*	glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
 				glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
-				float* ptr = (float*)glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+				Real* ptr = (Real*)glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 				if (ptr)
 				{
 				memcpy(ptr, srcData, fullDataSize);
@@ -158,9 +158,9 @@ namespace GTE
 	 * Get a pointer to the raw buffer data. This is only a CPU-side pointer;
 	 * if the buffer is a VBO, this will NOT be a pointer to the GPU memory.
 	 */
-	const float * VertexAttrBufferGL::GetDataPtr() const
+	const Real * VertexAttrBufferGL::GetDataPtr() const
 	{
-		return (const float *)data;
+		return (const Real *)data;
 	}
 
 	/*
@@ -182,7 +182,7 @@ namespace GTE
 	/*
 	 * Public accessor to the full size (in bytes) of the buffer.
 	 */
-	unsigned int VertexAttrBufferGL::GetFullSize() const
+	UInt32 VertexAttrBufferGL::GetFullSize() const
 	{
 		return CalcFullSize();
 	}

@@ -13,6 +13,7 @@
 
 #include "blendop.h"
 #include "object/enginetypes.h"
+#include "global/global.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -27,12 +28,12 @@ namespace GTE
 	{
 		friend class AnimationPlayer;
 
-		unsigned int targetIndex;
+		UInt32 targetIndex;
 		std::function<void(CrossFadeBlendOp*)> startCallback;
 		std::function<void(CrossFadeBlendOp*)> completeCallback;
 		std::function<void(CrossFadeBlendOp*)> stoppedEarlyCallback;
 
-		CrossFadeBlendOp(float duration, unsigned int targetIndex);
+		CrossFadeBlendOp(Real duration, UInt32 targetIndex);
 
 	protected:
 
@@ -40,14 +41,14 @@ namespace GTE
 
 	public:
 
-		void Update(std::vector<float>& weights);
+		void Update(std::vector<Real>& weights);
 		void OnStart();
 		void OnComplete();
 		void OnStoppedEarly();
 		void SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback);
 		void SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback);
 		void SetOnStoppedEarlyCallback(std::function<void(CrossFadeBlendOp*)> callback);
-		unsigned int GetTargetIndex();
+		UInt32 GetTargetIndex();
 	};
 }
 

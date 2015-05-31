@@ -19,7 +19,7 @@ namespace GTE
 	/*
 	 * Parameterized constructor.
 	 */
-	ScaleKeyFrame::ScaleKeyFrame(float normalizedTime, float realTime, float realTimeTicks, const Vector3& scale) : KeyFrame(normalizedTime, realTime, realTimeTicks)
+	ScaleKeyFrame::ScaleKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& scale) : KeyFrame(normalizedTime, realTime, realTimeTicks)
 	{
 		this->Scale = scale;
 	}

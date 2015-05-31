@@ -35,7 +35,7 @@ namespace GTE
 	SkinnedMesh3DRenderer::~SkinnedMesh3DRenderer()
 	{
 		// loop through each VertexBoneMap and delete
-		for (unsigned int i = 0; i < vertexBoneMaps.size(); i++)
+		for (UInt32 i = 0; i < vertexBoneMaps.size(); i++)
 		{
 			VertexBoneMap * map = vertexBoneMaps[i];
 			SAFE_DELETE(map);
@@ -79,7 +79,7 @@ namespace GTE
 			Mesh3DRenderer::InitializeForMesh(mesh);
 
 			// loop through each sub-mesh in the target mesh
-			for (unsigned int i = 0; i < mesh->GetSubMeshCount(); i++)
+			for (UInt32 i = 0; i < mesh->GetSubMeshCount(); i++)
 			{
 				int vertexBoneMapIndex = -1;
 				SubMesh3DRendererRef subRenderer = this->GetSubRenderer(i);
@@ -135,7 +135,7 @@ namespace GTE
 	/*
 	 * Retrieve the VertexBoneMap object stored at [index] in [vertexBoneMaps].
 	 */
-	VertexBoneMap * SkinnedMesh3DRenderer::GetVertexBoneMap(unsigned int index)
+	VertexBoneMap * SkinnedMesh3DRenderer::GetVertexBoneMap(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < vertexBoneMaps.size(), "Mesh3D::GetVertexBoneMap -> 'index' is out of range.", NULL, true);
 
@@ -149,7 +149,7 @@ namespace GTE
 	 *
 	 * Setting vertexBoneMapIndex to -1 effectively turns off skinning for the specified sub-mesh
 	 */
-	void SkinnedMesh3DRenderer::MapSubMeshToVertexBoneMap(unsigned int subMeshIndex, int vertexBoneMapIndex)
+	void SkinnedMesh3DRenderer::MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, int vertexBoneMapIndex)
 	{
 		subMeshIndexMap[subMeshIndex] = vertexBoneMapIndex;
 	}

@@ -133,7 +133,7 @@ namespace GTE
 		ASSERT(fullScreenQuad.IsValid(), "RenderManager::InitFullScreenQuad -> Unable to create full screen quad.");
 
 		// transform full-screen quad to: X: [0..1], Y: [0..1]
-		for (unsigned int i = 0; i < fullScreenQuad->GetSubMesh(0)->GetPostions()->GetCount(); i++)
+		for (UInt32 i = 0; i < fullScreenQuad->GetSubMesh(0)->GetPostions()->GetCount(); i++)
 		{
 			Point3 * p = fullScreenQuad->GetSubMesh(0)->GetPostions()->GetPoint(i);
 			p->x += 0.5;
@@ -172,7 +172,7 @@ namespace GTE
 	 */
 	void RenderManager::ClearBuffersForCamera(const Camera& camera) const
 	{
-		unsigned int clearBufferMask = camera.GetClearBufferMask();
+		UInt32 clearBufferMask = camera.GetClearBufferMask();
 		Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearBufferMask);
 	}
 
@@ -246,7 +246,7 @@ namespace GTE
 	/*
 	 * Get the number of entries stored on the transform stack.
 	 */
-	unsigned int RenderManager::RenderDepth(const DataStack<Matrix4x4>& transformStack) const
+	UInt32 RenderManager::RenderDepth(const DataStack<Matrix4x4>& transformStack) const
 	{
 		return transformStack.GetEntryCount();
 	}
@@ -259,7 +259,7 @@ namespace GTE
 	void RenderManager::RenderScene()
 	{
 		// render the scene from the perspective of each camera found in ProcessScene()
-		for (unsigned int i = 0; i < cameraCount; i++)
+		for (UInt32 i = 0; i < cameraCount; i++)
 		{
 			RenderSceneForCamera(i);
 		}
@@ -314,8 +314,8 @@ namespace GTE
 		if (clearBuffers)
 		{
 			IntMask clearMask = IntMaskUtil::CreateIntMask();
-			IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Color);
-			IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Depth);
+			IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Color);
+			IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Depth);
 			graphics->ClearRenderBuffers(clearMask);
 		}
 
@@ -327,7 +327,7 @@ namespace GTE
 		else renderer->AddMaterial(material);
 
 		// render the full screen quad mesh
-		for (unsigned int i = 0; i < fullScreenQuad->GetSubMeshCount(); i++)
+		for (UInt32 i = 0; i < fullScreenQuad->GetSubMeshCount(); i++)
 		{
 			renderer->GetSubRenderer(i)->Render();
 		}
@@ -388,7 +388,7 @@ namespace GTE
 		// enforce max recursion depth
 		if (RenderDepth(sceneProcessingStack) >= Constants::MaxObjectRecursionDepth - 1)return;
 
-		for (unsigned int i = 0; i < parent.GetChildrenCount(); i++)
+		for (UInt32 i = 0; i < parent.GetChildrenCount(); i++)
 		{
 			SceneObjectRef child = parent.GetChildAt(i);
 
@@ -414,11 +414,11 @@ namespace GTE
 					// add a scene camera from which to render the scene
 					// always make sure to respect the render order index of the camera,
 					// the array is sort in ascending order
-					for (unsigned int i = 0; i <= cameraCount; i++)
+					for (UInt32 i = 0; i <= cameraCount; i++)
 					{
 						if (i == cameraCount || sceneCameras[i]->GetCamera()->GetRenderOrderIndex() > camera->GetRenderOrderIndex())
 						{
-							for (unsigned int ii = cameraCount; ii > i; ii--)
+							for (UInt32 ii = cameraCount; ii > i; ii--)
 								sceneCameras[ii] = sceneCameras[ii - 1];
 
 							sceneCameras[i] = child;
@@ -496,7 +496,7 @@ namespace GTE
 		Transform modelInverse;
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-		for (unsigned int s = 0; s < sceneMeshCount; s++)
+		for (UInt32 s = 0; s < sceneMeshCount; s++)
 		{
 			SceneObjectRef childRef = sceneMeshObjects[s];
 
@@ -514,7 +514,7 @@ namespace GTE
 			if (meshRenderer.IsValid())
 			{
 				// for each sub-renderer, call the PreRender() method
-				for (unsigned int r = 0; r < meshRenderer->GetSubRendererCount(); r++)
+				for (UInt32 r = 0; r < meshRenderer->GetSubRendererCount(); r++)
 				{
 					SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
 					if (subRenderer.IsValid())
@@ -527,7 +527,7 @@ namespace GTE
 			if (skinnedMeshRenderer.IsValid())
 			{
 				// for each sub-renderer, call the PreRender() method
-				for (unsigned int r = 0; r < skinnedMeshRenderer->GetSubRendererCount(); r++)
+				for (UInt32 r = 0; r < skinnedMeshRenderer->GetSubRendererCount(); r++)
 				{
 					SubMesh3DRendererRef subRenderer = skinnedMeshRenderer->GetSubRenderer(r);
 					if (subRenderer.IsValid())
@@ -543,7 +543,7 @@ namespace GTE
 	 * Render the entire scene from the perspective of a single camera. Uses [cameraIndex]
 	 * as an index into the array of cameras [sceneCameras] that has been found by processing the scene.
 	 */
-	void RenderManager::RenderSceneForCamera(unsigned int cameraIndex)
+	void RenderManager::RenderSceneForCamera(UInt32 cameraIndex)
 	{
 		NONFATAL_ASSERT(cameraIndex < cameraCount, "RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds", true);
 
@@ -677,7 +677,7 @@ namespace GTE
 		bool renderedAmbient = false;
 
 		// loop through each ambient light and render the scene for that light
-		for (unsigned int l = 0; l < ambientLightCount; l++)
+		for (UInt32 l = 0; l < ambientLightCount; l++)
 		{
 			SceneObjectRef lightObject = sceneAmbientLights[l];
 			ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light's scene object is not valid.");
@@ -701,7 +701,7 @@ namespace GTE
 		}
 
 		// loop through each regular light and render scene for that light
-		for (unsigned int l = 0; l < lightCount; l++)
+		for (UInt32 l = 0; l < lightCount; l++)
 		{
 			SceneObjectRef lightObject = sceneLights[l];
 			ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light's scene object is not valid.");
@@ -785,7 +785,7 @@ namespace GTE
 			}
 
 			// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-			for (unsigned int s = 0; s < sceneMeshCount; s++)
+			for (UInt32 s = 0; s < sceneMeshCount; s++)
 			{
 				SceneObjectRef childRef = sceneMeshObjects[s];
 
@@ -923,8 +923,8 @@ namespace GTE
 
 		// clear the relevant buffers in the off-screen render target
 		IntMask clearMask = IntMaskUtil::CreateIntMask();
-		if (depthRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Color);
-		if (depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (unsigned int)RenderBufferType::Depth);
+		if (depthRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Color);
+		if (depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Depth);
 		Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearMask);
 
 		// render the depth values for the scene to the off-screen color texture
@@ -1001,7 +1001,7 @@ namespace GTE
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-		for (unsigned int s = 0; s < sceneMeshCount; s++)
+		for (UInt32 s = 0; s < sceneMeshCount; s++)
 		{
 			SceneObjectRef childRef = sceneMeshObjects[s];
 
@@ -1072,7 +1072,7 @@ namespace GTE
 			NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(), "RenderManager::ForwardRenderSceneObject -> Sub mesh count does not match sub renderer count!.", true);
 			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "RenderManager::ForwardRenderSceneObject -> Renderer has no materials.", true);
 
-			unsigned int materialIndex = 0;
+			UInt32 materialIndex = 0;
 			bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
 
 			model.SetTo(sceneObject.GetAggregateTransform());
@@ -1086,7 +1086,7 @@ namespace GTE
 			modelViewProjection.PreTransformBy(camera.GetProjectionTransform());
 
 			// loop through each sub-renderer and render its mesh(es)
-			for (unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
+			for (UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
 			{
 				MaterialRef currentMaterial;
 
@@ -1228,7 +1228,7 @@ namespace GTE
 			modelInverse.TransformVector(modelLocalLightDir);
 
 			// loop through each sub-renderer and render the shadow volume for its sub-mesh
-			for (unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
+			for (UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
 			{
 				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -1240,7 +1240,7 @@ namespace GTE
 				NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
 
 				// build special MVP transform for rendering shadow volumes
-				float scaleFactor = subRenderer->GetUseBackSetShadowVolume() ? .99 : 1;
+				Real scaleFactor = subRenderer->GetUseBackSetShadowVolume() ? .99 : 1;
 				BuildShadowVolumeMVPTransform(light, subMesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
 
 				// activate the material, which will switch the GPU's active shader to
@@ -1290,7 +1290,7 @@ namespace GTE
 	void RenderManager::BuildSceneShadowVolumes()
 	{
 		// loop through each light in [sceneLights]
-		for (unsigned int l = 0; l < lightCount; l++)
+		for (UInt32 l = 0; l < lightCount; l++)
 		{
 			SceneObjectRef lightObject = sceneLights[l];
 			NONFATAL_ASSERT(lightObject.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light's scene object is not valid.", true);
@@ -1329,7 +1329,7 @@ namespace GTE
 		lightFullTransform.TransformVector(lightDirection);
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-		for (unsigned int s = 0; s < sceneMeshCount; s++)
+		for (UInt32 s = 0; s < sceneMeshCount; s++)
 		{
 			SceneObjectRef childRef = sceneMeshObjects[s];
 
@@ -1395,7 +1395,7 @@ namespace GTE
 			modelInverse.TransformVector(modelLocalLightDir);
 
 			// loop through each sub-renderer and render the shadow volume for its sub-mesh
-			for (unsigned int i = 0; i < renderer->GetSubRendererCount(); i++)
+			for (UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
 			{
 				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
 				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
@@ -1519,7 +1519,7 @@ namespace GTE
 	 */
 	void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos,
 		const Vector3& modelLocalLightDir, const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform,
-		float xScale, float yScale) const
+		Real xScale, Real yScale) const
 	{
 		Transform modelView;
 		Transform model;
@@ -1760,13 +1760,13 @@ namespace GTE
 		fullTransform.TransformVector(soiZ);
 
 		// get length of each transformed vector
-		float xMag = soiX.QuickMagnitude();
-		float yMag = soiY.QuickMagnitude();
-		float zMag = soiZ.QuickMagnitude();
+		Real xMag = soiX.QuickMagnitude();
+		Real yMag = soiY.QuickMagnitude();
+		Real zMag = soiZ.QuickMagnitude();
 
 		// find maximum distance, which will be used as the radius for
 		// the sphere of influence
-		float meshMag = xMag;
+		Real meshMag = xMag;
 		if (yMag > meshMag)meshMag = yMag;
 		if (zMag > meshMag)meshMag = zMag;
 

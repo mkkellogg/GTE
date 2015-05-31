@@ -16,7 +16,7 @@ namespace GTE
 	/*
 	* Only constructor, parameterized.
 	*/
-	VertexBoneMap::VertexBoneMap(unsigned int vertexCount, unsigned int uVertexCount)
+	VertexBoneMap::VertexBoneMap(UInt32 vertexCount, UInt32 uVertexCount)
 	{
 		this->vertexCount = vertexCount;
 		this->uniqueVertexCount = uVertexCount;
@@ -61,7 +61,7 @@ namespace GTE
 	/*
 	 * Get VertexMappingDescriptor for vertex (non-unique) at [index]
 	 */
-	VertexBoneMap::VertexMappingDescriptor* VertexBoneMap::GetDescriptor(unsigned int index)
+	VertexBoneMap::VertexMappingDescriptor* VertexBoneMap::GetDescriptor(UInt32 index)
 	{
 		if (index >= vertexCount)
 		{
@@ -75,7 +75,7 @@ namespace GTE
 	/*
 	 * Get total number of vertices that are mapped.
 	 */
-	unsigned int VertexBoneMap::GetVertexCount()
+	UInt32 VertexBoneMap::GetVertexCount()
 	{
 		return vertexCount;
 	}
@@ -83,7 +83,7 @@ namespace GTE
 	/*
 	 * Get number of unique vertices that are mapped.
 	 */
-	unsigned int VertexBoneMap::GetUniqueVertexCount()
+	UInt32 VertexBoneMap::GetUniqueVertexCount()
 	{
 		return uniqueVertexCount;
 	}
@@ -95,10 +95,10 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(skeleton.IsValid(), "VertexBoneMap::BindTo -> 'skeleton' is not valid.", true);
 
-		for (unsigned int v = 0; v < vertexCount; v++)
+		for (UInt32 v = 0; v < vertexCount; v++)
 		{
 			VertexBoneMap::VertexMappingDescriptor * desc = GetDescriptor(v);
-			for (unsigned int b = 0; b < desc->BoneCount; b++)
+			for (UInt32 b = 0; b < desc->BoneCount; b++)
 			{
 				int boneIndex = skeleton->GetBoneMapping(desc->Name[b]);
 				desc->BoneIndex[b] = boneIndex;
@@ -125,7 +125,7 @@ namespace GTE
 		}
 
 		// copy over VertexMappingDescriptors one-by-one
-		for (unsigned int v = 0; v < vertexCount; v++)
+		for (UInt32 v = 0; v < vertexCount; v++)
 		{
 			clone->GetDescriptor(v)->SetTo(GetDescriptor(v));
 		}

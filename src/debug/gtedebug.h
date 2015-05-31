@@ -1,6 +1,7 @@
 #ifndef _GTE_DEBUG_H_
 #define _GTE_DEBUG_H_
 
+#include "global/global.h"
 #include <string>
 
 namespace GTE

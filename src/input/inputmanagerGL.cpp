@@ -226,7 +226,7 @@ namespace GTE
 	}
 
 
-	unsigned int InputManagerGL::GetKeyIndexForNonCharacterKey(NonCharacterKey key)
+	UInt32 InputManagerGL::GetKeyIndexForNonCharacterKey(NonCharacterKey key)
 	{
 		switch (key)
 		{
@@ -310,8 +310,8 @@ namespace GTE
 		return 0;
 	}
 
-	unsigned int InputManagerGL::GetKeyIndexFromCharacter(unsigned char key)
+	UInt32 InputManagerGL::GetKeyIndexFromCharacter(unsigned char key)
 	{
-		return (unsigned int)key;
+		return (UInt32)key;
 	}
 }

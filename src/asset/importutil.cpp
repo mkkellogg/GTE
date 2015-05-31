@@ -19,7 +19,7 @@ namespace GTE
 {
 	void ImportUtil::ConvertAssimpMatrix(const aiMatrix4x4& source, Matrix4x4& dest)
 	{
-		float data[16];
+		Real data[16];
 
 		data[0] = source.a1;
 		data[1] = source.b1;

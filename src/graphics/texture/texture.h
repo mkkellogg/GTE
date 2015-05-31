@@ -12,6 +12,7 @@
 
 #include "textureattr.h"
 #include "object/engineobject.h"
+#include "object/enginetypes.h"
 #include <string>
 
 namespace GTE
@@ -39,7 +40,7 @@ namespace GTE
 	public:
 
 		TextureAttributes GetAttributes();
-		RawImage * GetImageData(unsigned int index);
+		RawImage * GetImageData(UInt32 index);
 	};
 }
 

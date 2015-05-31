@@ -85,8 +85,8 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(Target.IsValid(), "AnimationInstance::Init -> Animation target is invalid.", false, true);
 		NONFATAL_ASSERT_RTRN(SourceAnimation.IsValid(), "AnimationInstance::Init -> Animation is invalid.", false, true);
 
-		unsigned int nodeCount = Target->GetNodeCount();
-		unsigned int channelCount = SourceAnimation->GetChannelCount();
+		UInt32 nodeCount = Target->GetNodeCount();
+		UInt32 channelCount = SourceAnimation->GetChannelCount();
 
 		if (nodeCount <= 0)return true;
 
@@ -103,14 +103,14 @@ namespace GTE
 
 		StateCount = nodeCount;
 
-		for (unsigned int n = 0; n < nodeCount; n++)
+		for (UInt32 n = 0; n < nodeCount; n++)
 		{
 			SkeletonNode * node = Target->GetNodeFromList(n);
 			int foundIndex = -1;
 
 			if (node != NULL)
 			{
-				for (unsigned int c = 0; c < channelCount; c++)
+				for (UInt32 c = 0; c < channelCount; c++)
 				{
 					const std::string * channelName = SourceAnimation->GetChannelName(c);
 					if (channelName == NULL)continue;
@@ -146,7 +146,7 @@ namespace GTE
 	 */
 	void AnimationInstance::Reset()
 	{
-		for (unsigned int s = 0; s < StateCount; s++)
+		for (UInt32 s = 0; s < StateCount; s++)
 		{
 			FrameStates[s].Reset();
 		}
@@ -158,7 +158,7 @@ namespace GTE
 	/*
 	 * Retrieve the FrameState for a single node in [Target] via its index.
 	 */
-	AnimationInstance::FrameState * AnimationInstance::GetFrameState(unsigned int stateIndex)
+	AnimationInstance::FrameState * AnimationInstance::GetFrameState(UInt32 stateIndex)
 	{
 		if (stateIndex >= StateCount)
 		{
@@ -169,7 +169,7 @@ namespace GTE
 		return FrameStates + stateIndex;
 	}
 
-	int AnimationInstance::GetChannelMappingForTargetNode(unsigned int nodeIndex)
+	int AnimationInstance::GetChannelMappingForTargetNode(UInt32 nodeIndex)
 	{
 		NONFATAL_ASSERT_RTRN(Target.IsValid(), "AnimationInstance::GetChannelMappingForTargetNode -> target skeleton is not valid.", -1, true);
 		NONFATAL_ASSERT_RTRN(nodeIndex < Target->GetNodeCount(), "AnimationInstance::GetChannelMappingForTargetNode -> nodeIndex is out of range.", -1, true);
@@ -177,7 +177,7 @@ namespace GTE
 		return NodeToChannelMap[nodeIndex];
 	}
 
-	void AnimationInstance::SetSpeed(float speedFactor)
+	void AnimationInstance::SetSpeed(Real speedFactor)
 	{
 		this->SpeedFactor = speedFactor;
 	}

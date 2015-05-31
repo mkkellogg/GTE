@@ -14,7 +14,7 @@ namespace GTE
 	/*
 * Simple constructor, calls the main constructor with [startOffsetTicks] = 0 && [earlyEndTicks] = [durationTicks]
 */
-	Animation::Animation(float durationTicks, float ticksPerSecond) : Animation(durationTicks, ticksPerSecond, 0, durationTicks)
+	Animation::Animation(Real durationTicks, Real ticksPerSecond) : Animation(durationTicks, ticksPerSecond, 0, durationTicks)
 	{
 
 	}
@@ -22,7 +22,7 @@ namespace GTE
 	/*
 	 * Main constructor - initializes all member variables of this animation.
 	 */
-	Animation::Animation(float durationTicks, float ticksPerSecond, float startOffsetTicks, float earlyEndTicks)
+	Animation::Animation(Real durationTicks, Real ticksPerSecond, Real startOffsetTicks, Real earlyEndTicks)
 	{
 		//force ticksPerSecond > 0
 		if (ticksPerSecond <= 0)ticksPerSecond = 1;
@@ -74,7 +74,7 @@ namespace GTE
 	/*
 	 * Initialize this animation. This method will allocate [keyFrameSetCount]] key frame sets.
 	 */
-	bool Animation::Init(unsigned int channelCount)
+	bool Animation::Init(UInt32 channelCount)
 	{
 		Destroy();
 
@@ -93,7 +93,7 @@ namespace GTE
 	 * Clip the beginning [startOffset] seconds from the animation, and the end
 	 * [earlyEnd] seconds from the animation.
 	 */
-	void Animation::ClipEnds(float startOffset, float earlyEnd)
+	void Animation::ClipEnds(Real startOffset, Real earlyEnd)
 	{
 		this->startOffsetTicks = startOffset * ticksPerSecond;
 		this->earlyEndTicks = earlyEnd * ticksPerSecond;
@@ -105,7 +105,7 @@ namespace GTE
 	/*
 	 * Return the number of KeyFrameSet objects in [keyFrames].
 	 */
-	unsigned int Animation::GetChannelCount()
+	UInt32 Animation::GetChannelCount()
 	{
 		return channelCount;
 	}
@@ -113,19 +113,19 @@ namespace GTE
 	/*
 	 * Retrieve the KeyFrameSet corresponding to a particular node in [target].
 	 */
-	KeyFrameSet * Animation::GetKeyFrameSet(unsigned int nodeIndex)
+	KeyFrameSet * Animation::GetKeyFrameSet(UInt32 nodeIndex)
 	{
 		NONFATAL_ASSERT_RTRN(nodeIndex < channelCount, "Animation::GetKeyFrameSet -> Node index is out of range.", NULL, true);
 		return keyFrames + nodeIndex;
 	}
 
-	const std::string * Animation::GetChannelName(unsigned int index)
+	const std::string * Animation::GetChannelName(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < channelCount, "Animation::GetChannelName -> 'index' is out of range.", NULL, true);
 		return channelNames + index;
 	}
 
-	void Animation::SetChannelName(unsigned int index, const std::string& name)
+	void Animation::SetChannelName(UInt32 index, const std::string& name)
 	{
 		NONFATAL_ASSERT(index < channelCount, "Animation::SetChannelName -> 'index' is out of range.", true);
 		channelNames[index] = name;
@@ -134,7 +134,7 @@ namespace GTE
 	/*
 	 * Get the duration of this animation in ticks.
 	 */
-	float Animation::GetDurationTicks() const
+	Real Animation::GetDurationTicks() const
 	{
 		return durationTicks;
 	}
@@ -142,7 +142,7 @@ namespace GTE
 	/*
 	 * Get the mapping of duration ticks to seconds.
 	 */
-	float Animation::GetTicksPerSecond() const
+	Real Animation::GetTicksPerSecond() const
 	{
 		return ticksPerSecond;
 	}
@@ -150,7 +150,7 @@ namespace GTE
 	/*
 	 * Get the start offset of this animation in ticks.
 	 */
-	float Animation::GetStartOffsetTicks() const
+	Real Animation::GetStartOffsetTicks() const
 	{
 		return startOffsetTicks;
 	}
@@ -158,7 +158,7 @@ namespace GTE
 	/*
 	 * Get the point where this animation ends relative to its full duration in ticks.
 	 */
-	float Animation::GetEarlyEndTicks() const
+	Real Animation::GetEarlyEndTicks() const
 	{
 		return earlyEndTicks;
 	}
@@ -166,7 +166,7 @@ namespace GTE
 	/*
 	 * Get the duration of this animation in seconds.
 	 */
-	float Animation::GetDuration() const
+	Real Animation::GetDuration() const
 	{
 		return durationTicks / ticksPerSecond;
 	}
@@ -174,7 +174,7 @@ namespace GTE
 	/*
 	 * Get the start offset of this animation in seconds.
 	 */
-	float Animation::GetStartOffset() const
+	Real Animation::GetStartOffset() const
 	{
 		return startOffsetTicks / ticksPerSecond;
 	}
@@ -182,7 +182,7 @@ namespace GTE
 	/*
 	 * Get the point where this animation ends relative to its full duration in seconds.
 	 */
-	float Animation::GetEarlyEnd() const
+	Real Animation::GetEarlyEnd() const
 	{
 		return earlyEndTicks / ticksPerSecond;
 	}

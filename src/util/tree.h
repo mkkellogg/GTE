@@ -5,6 +5,7 @@
 #include <vector>
 #include <stack>
 #include <string>
+#include "object/enginetypes.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
 
@@ -34,13 +35,13 @@ namespace GTE
 
 			}
 
-			TreeNode* GetChild(unsigned int index)
+			TreeNode* GetChild(UInt32 index)
 			{
 				if (index >= GetChildCount())return NULL;
 				return children[index];
 			}
 
-			unsigned int GetChildCount()
+			UInt32 GetChildCount()
 			{
 				return children.size();
 			}
@@ -136,7 +137,7 @@ namespace GTE
 		void InternalTraverse()
 		{
 			std::stack<TreeNode *> iterationStack;
-			std::stack<unsigned int> childIndexStack;
+			std::stack<UInt32> childIndexStack;
 			if (root != NULL)
 			{
 				iterationStack.push(root);
@@ -145,7 +146,7 @@ namespace GTE
 				while (iterationStack.size() > 0)
 				{
 					TreeNode * current = iterationStack.top();
-					unsigned int childIndex = childIndexStack.top();
+					UInt32 childIndex = childIndexStack.top();
 
 					if (childIndex < current->children.size())
 					{

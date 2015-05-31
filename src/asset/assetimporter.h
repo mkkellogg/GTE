@@ -3,6 +3,7 @@
 
 #include "object/engineobjectmanager.h"
 #include "object/enginetypes.h"
+#include "global/global.h"
 #include <string>
 
 namespace GTE
@@ -20,7 +21,7 @@ namespace GTE
 	{
 		ShaderSourceLoader * shaderSourceLoader;
 
-		bool boolProperties[(unsigned int)AssetImporterBoolProperty::_Count];
+		bool boolProperties[(UInt32)AssetImporterBoolProperty::_Count];
 
 	public:
 
@@ -28,7 +29,7 @@ namespace GTE
 		~AssetImporter();
 
 		SceneObjectRef LoadModelDirect(const std::string& filePath) const;
-		SceneObjectRef LoadModelDirect(const std::string& filePath, float importScale, bool castShadows, bool receiveShadows) const;
+		SceneObjectRef LoadModelDirect(const std::string& filePath, Real importScale, bool castShadows, bool receiveShadows) const;
 		AnimationRef LoadAnimation(const std::string& filePath, bool addLoopPadding) const;
 		void LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource);
 

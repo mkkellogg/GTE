@@ -37,8 +37,8 @@ namespace GTE
 		static std::string TrimRight(const std::string& str);
 		static std::string Trim(const std::string& str);
 		static void PrintMatrix(const Matrix4x4& matrix);
-		static Mesh3DRef CreateRectangularMesh(StandardAttributeSet meshAttributes, float width, float height,
-			unsigned int subDivisionsWidth, unsigned int subDivisionsHeight,
+		static Mesh3DRef CreateRectangularMesh(StandardAttributeSet meshAttributes, Real width, Real height,
+			UInt32 subDivisionsWidth, UInt32 subDivisionsHeight,
 			bool calculateNormals, bool calculateTangents, bool buildFaces);
 		static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes, bool doCCW);
 		static Mesh3DRef CreateCubeMesh(StandardAttributeSet meshAttributes);

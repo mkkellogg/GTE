@@ -20,7 +20,7 @@ namespace GTE
 	/*
 	 * Parameterized constructor.
 	 */
-	KeyFrame::KeyFrame(float normalizedTime, float realTime, float realTimeTicks)
+	KeyFrame::KeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks)
 	{
 		this->NormalizedTime = normalizedTime;
 		this->RealTime = realTime;

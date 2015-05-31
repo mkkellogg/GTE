@@ -102,7 +102,7 @@ namespace GTE
 	{
 		if (attributes != NULL)
 		{
-			for (unsigned int i = 0; i < attributeCount; i++)
+			for (UInt32 i = 0; i < attributeCount; i++)
 			{
 				if (attributes[i] != NULL)
 				{
@@ -116,7 +116,7 @@ namespace GTE
 
 		if (uniforms != NULL)
 		{
-			for (unsigned int i = 0; i < uniformCount; i++)
+			for (UInt32 i = 0; i < uniformCount; i++)
 			{
 				if (uniforms[i] != NULL)
 				{
@@ -321,7 +321,7 @@ namespace GTE
 			// initialize UniformDescriptor array
 			memset(uniforms, 0, sizeof(UniformDescriptor*)*totalUniforms);
 
-			unsigned int samplerUnitIndex = 0;
+			UInt32 samplerUnitIndex = 0;
 			// loop through each uniform and query OpenGL for information
 			// about that uniform
 			for (int i = 0; i < totalUniforms; i++)
@@ -480,7 +480,7 @@ namespace GTE
 		VertexAttrBufferGL * bufferGL = dynamic_cast<VertexAttrBufferGL *>(buffer);
 		ASSERT(bufferGL != NULL, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
 
-		const float * data = bufferGL->GetDataPtr();
+		const Real * data = bufferGL->GetDataPtr();
 		int componentCount = bufferGL->GetComponentCount();
 		int stride = bufferGL->GetStride();
 
@@ -505,14 +505,14 @@ namespace GTE
 	 * [varID] - shader var ID/location of the uniform for which the value is to be set.
 	 * [texture] - Holds sampler data to be sent
 	 */
-	void ShaderGL::SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture)
+	void ShaderGL::SendUniformToShader(int varID, UInt32 samplerUnitIndex, const TextureRef texture)
 	{
-		ASSERT(texture.IsValid(), "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> 'texture' is null.");
+		ASSERT(texture.IsValid(), "ShaderGL::SendUniformToShader(UInt32, Texture *) -> 'texture' is null.");
 
 		Texture* texturePtr = ((TextureRef)texture).GetPtr();
 		TextureGL * texGL = dynamic_cast<TextureGL *>(texturePtr);
 
-		ASSERT(texGL != NULL, "ShaderGL::SendUniformToShader(unsigned int, Texture *) -> texture is not TextureGL !!");
+		ASSERT(texGL != NULL, "ShaderGL::SendUniformToShader(UInt32, Texture *) -> texture is not TextureGL !!");
 
 		GLenum textureUnit;
 
@@ -584,7 +584,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader4v(int varID, const float * data)
+	void ShaderGL::SendUniformToShader4v(int varID, const Real * data)
 	{
 		glUniform4fv(varID, 1, data);
 	}
@@ -595,7 +595,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader3v(int varID, const float * data)
+	void ShaderGL::SendUniformToShader3v(int varID, const Real * data)
 	{
 		glUniform3fv(varID, 1, data);
 	}
@@ -606,7 +606,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader2v(int varID, const float * data)
+	void ShaderGL::SendUniformToShader2v(int varID, const Real * data)
 	{
 		glUniform2fv(varID, 1, data);
 	}
@@ -617,7 +617,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader4(int varID, float x, float y, float z, float w)
+	void ShaderGL::SendUniformToShader4(int varID, Real x, Real y, Real z, Real w)
 	{
 		glUniform4f(varID, x, y, z, w);
 	}
@@ -628,7 +628,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader3(int varID, float x, float y, float z)
+	void ShaderGL::SendUniformToShader3(int varID, Real x, Real y, Real z)
 	{
 		glUniform3f(varID, x, y, z);
 	}
@@ -639,18 +639,18 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader2(int varID, float x, float y)
+	void ShaderGL::SendUniformToShader2(int varID, Real x, Real y)
 	{
 		glUniform2f(varID, x, y);
 	}
 
 	/*
-	 * Set the value for a single float uniform.
+	 * Set the value for a single Real uniform.
 	 *
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Uniform data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader(int varID, float  data)
+	void ShaderGL::SendUniformToShader(int varID, Real  data)
 	{
 		glUniform1f(varID, data);
 	}
@@ -669,7 +669,7 @@ namespace GTE
 	/*
 	 * Get number of uniforms exposed by this shader
 	 */
-	unsigned int ShaderGL::GetUniformCount() const
+	UInt32 ShaderGL::GetUniformCount() const
 	{
 		return uniformCount;
 	}
@@ -682,7 +682,7 @@ namespace GTE
 	 * A variable ID/location is the unique identifier assigned to a uniform by OpengL.
 	 * The field [ShaderVarID] in UniformDescriptor holds that value.
 	 */
-	const UniformDescriptor * ShaderGL::GetUniformDescriptor(unsigned int index) const
+	const UniformDescriptor * ShaderGL::GetUniformDescriptor(UInt32 index) const
 	{
 		if (index < uniformCount)
 		{
@@ -695,7 +695,7 @@ namespace GTE
 	/*
 	 * Get number of attributes exposed by this shader
 	 */
-	unsigned int ShaderGL::GetAttributeCount() const
+	UInt32 ShaderGL::GetAttributeCount() const
 	{
 		return attributeCount;
 	}
@@ -708,7 +708,7 @@ namespace GTE
 	 * A shader variable ID/location is the unique identifier assigned to an attribute by OpengL.
 	 * The field [ShaderVarID] in AttributeDescriptor holds that value.
 	 */
-	const AttributeDescriptor * ShaderGL::GetAttributeDescriptor(unsigned int index) const
+	const AttributeDescriptor * ShaderGL::GetAttributeDescriptor(UInt32 index) const
 	{
 		if (index < attributeCount)
 		{

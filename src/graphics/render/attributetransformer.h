@@ -11,6 +11,7 @@
 #define _GTE_ATTRIBUTE_TRANSFORMER_H
 
 #include "graphics/stdattributes.h"
+#include "object/enginetypes.h"
 #include "geometry/matrix4x4.h"
 
 namespace GTE

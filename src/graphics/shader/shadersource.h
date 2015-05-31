@@ -1,6 +1,7 @@
 #ifndef _GTE_SHADER_SOURCE_H_
 #define _GTE_SHADER_SOURCE_H_
 
+#include "object/enginetypes.h"
 #include <string>
 
 namespace GTE

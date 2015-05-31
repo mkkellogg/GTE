@@ -1,27 +1,30 @@
 #ifndef _GTE_INTMASK_H_
 #define _GTE_INTMASK_H_
 
+#include "object/enginetypes.h"
+#include "global/global.h"
+
 namespace GTE
 {
-	typedef unsigned int IntMask;
+	typedef UInt32 IntMask;
 
 	class IntMaskUtil
 	{
 	public:
 
-		static IntMask InvertBitsForIndexMask(unsigned short index);
+		static IntMask InvertBitsForIndexMask(UInt16 index);
 		static IntMask InvertBits(IntMask index);
 
 		static IntMask MaskValueToIndex(IntMask maskValue);
-		static IntMask IndexToMaskValue(unsigned short index);
+		static IntMask IndexToMaskValue(UInt16 index);
 
-		static void SetBit(IntMask * target, unsigned short index);
-		static void ClearBit(IntMask * target, unsigned short index);
+		static void SetBit(IntMask * target, UInt16 index);
+		static void ClearBit(IntMask * target, UInt16 index);
 
 		static void SetBitForMask(IntMask * target, IntMask mask);
 		static void ClearBitForMask(IntMask * target, IntMask mask);
 
-		static bool IsBitSet(IntMask target, unsigned short index);
+		static bool IsBitSet(IntMask target, UInt16 index);
 		static bool IsBitSetForMask(IntMask target, IntMask mask);
 
 		static IntMask CreateIntMask();

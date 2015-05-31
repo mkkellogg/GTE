@@ -23,6 +23,7 @@
 #define _GTE_SHADER_GL_H_
 
 #include "graphics/gl_include.h"
+#include "object/enginetypes.h"
 #include "shader.h"
 #include <string>
 
@@ -54,10 +55,10 @@ namespace GTE
 		GLuint fragmentShaderID;
 
 		// number of attributes exposed by this shader
-		unsigned int attributeCount;
+		UInt32 attributeCount;
 
 		// number of uniforms exposed by this shader
-		unsigned int uniformCount;
+		UInt32 uniformCount;
 
 		// descriptors for this shader's attributes
 		AttributeDescriptor ** attributes;
@@ -91,27 +92,27 @@ namespace GTE
 
 		void SendBufferToShader(int varID, VertexAttrBuffer * buffer);
 
-		void SendUniformToShader(int varID, unsigned int samplerUnitIndex, const TextureRef texture);
+		void SendUniformToShader(int varID, UInt32 samplerUnitIndex, const TextureRef texture);
 		void SendUniformToShader(int varID, const Matrix4x4 * mat);
 		void SendUniformToShader(int varID, const Point3 * point);
 		void SendUniformToShader(int varID, const Vector3 * vector);
 		void SendUniformToShader(int varID, const Color4 * color);
 
-		void SendUniformToShader4v(int varID, const float * data);
-		void SendUniformToShader3v(int varID, const float * data);
-		void SendUniformToShader2v(int varID, const float * data);
-		void SendUniformToShader4(int varID, float x, float y, float z, float w);
-		void SendUniformToShader3(int varID, float x, float y, float z);
-		void SendUniformToShader2(int varID, float x, float y);
-		void SendUniformToShader(int varID, float  data);
+		void SendUniformToShader4v(int varID, const Real * data);
+		void SendUniformToShader3v(int varID, const Real * data);
+		void SendUniformToShader2v(int varID, const Real * data);
+		void SendUniformToShader4(int varID, Real x, Real y, Real z, Real w);
+		void SendUniformToShader3(int varID, Real x, Real y, Real z);
+		void SendUniformToShader2(int varID, Real x, Real y);
+		void SendUniformToShader(int varID, Real  data);
 
 		void SendUniformToShader(int varID, int  data);
 
-		unsigned int GetUniformCount() const;
-		const UniformDescriptor * GetUniformDescriptor(unsigned int index) const;
+		UInt32 GetUniformCount() const;
+		const UniformDescriptor * GetUniformDescriptor(UInt32 index) const;
 
-		unsigned int GetAttributeCount() const;
-		const AttributeDescriptor * GetAttributeDescriptor(unsigned int index) const;
+		UInt32 GetAttributeCount() const;
+		const AttributeDescriptor * GetAttributeDescriptor(UInt32 index) const;
 	};
 }
 

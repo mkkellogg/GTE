@@ -64,10 +64,10 @@ class Game
 	// layer mask for player object
 	GTE::IntMask playerObjectLayerMask;
 
-	static const unsigned int MaxPlayerStates = 32;
+	static const GTE::UInt32 MaxPlayerStates = 32;
 
 	// time at which a state was most recently activated
-	float stateActivationTime[MaxPlayerStates];
+	GTE::Real stateActivationTime[MaxPlayerStates];
 
 	// player's current state
 	PlayerState playerState;
@@ -92,15 +92,15 @@ class Game
 	GTE::AnimationPlayerRef animationPlayer;
 
 	// number of frames rendered;
-	unsigned int frameCount;
+	GTE::UInt32 frameCount;
 	// should we print out the graphics engine FPS?
 	bool printFPS;
 	// last time FPS was retrieved from the graphics engine
-	float lastFPSRetrieveTime;
+	GTE::Real lastFPSRetrieveTime;
 	// last fps value retrieved from the graphics engine
-	float lastFPS;
+	GTE::Real lastFPS;
 	// last time info was printed
-	float lastInfoPrintTime;
+	GTE::Real lastInfoPrintTime;
 
 	// lighting type that currently can be modified by the user
 	SceneLighting selectedLighting;
@@ -123,20 +123,20 @@ class Game
 	// are we transitioning between scenes?
 	bool sceneTransitioning;
 	// when did the current scene transition start?
-	float sceneTransitionStartTime;
+	GTE::Real sceneTransitionStartTime;
 	// scene we are transitioning from
 	Scenes sceneTransitionSrc;
 	// scene we are transitioning to
 	Scenes sceneTransitionDest;
 
 	// movement variables
-	float playerWalkSpeed;
-	float playerRunSpeed;
-	float playerRotateSpeed;
-	float playerSpeedSmoothing;
-	float playerHorizontalSpeed;
-	float playerBaseY;
-	float playerVerticalSpeed;
+	GTE::Real playerWalkSpeed;
+	GTE::Real playerRunSpeed;
+	GTE::Real playerRotateSpeed;
+	GTE::Real playerSpeedSmoothing;
+	GTE::Real playerHorizontalSpeed;
+	GTE::Real playerBaseY;
+	GTE::Real playerVerticalSpeed;
 	bool playerIsMoving;
 	bool playerIsGrounded;
 
@@ -175,7 +175,7 @@ class Game
 	void ActivatePlayerState(PlayerState state);
 	void ManagePlayerState();
 	void HandleGeneralInput();
-	void UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, float intensityChange, bool toggleCastShadows);
+	void UpdateLight(GTE::SceneObjectRef sceneObject, bool toggleLight, GTE::Real intensityChange, bool toggleCastShadows);
 
 	void DisplayInfo();
 	void SignalDisplayInfoChanged();

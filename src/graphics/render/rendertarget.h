@@ -33,9 +33,9 @@ namespace GTE
 		// enable stencil buffer for render (but not as a render target)
 		bool enableStencilBuffer;
 		// width of this render target
-		unsigned int width;
+		UInt32 width;
 		// height of this render target
-		unsigned int height;
+		UInt32 height;
 		// texture to which color rendering will occur
 		TextureRef colorTexture;
 		// texture to which depth rendering will occur
@@ -43,7 +43,7 @@ namespace GTE
 		// texture attributes of [colorTexture]
 		TextureAttributes colorTextureAttributes;
 
-		RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, unsigned int width, unsigned int height);
+		RenderTarget(bool hasColor, bool hasDepth, bool enableStencilBuffer, const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
 		virtual ~RenderTarget();
 
 	public:
@@ -52,8 +52,8 @@ namespace GTE
 		bool HasBuffer(RenderBufferType bufferType) const;
 		TextureRef GetDepthTexture();
 		TextureRef GetColorTexture();
-		unsigned int GetWidth();
-		unsigned int GetHeight();
+		UInt32 GetWidth();
+		UInt32 GetHeight();
 	};
 }
 

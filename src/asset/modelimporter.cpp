@@ -146,7 +146,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, bool pre
  * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
  * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
  */
-SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, float importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots)
+SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, Real importScale, bool castShadows, bool receiveShadows, bool preserveFBXPivots)
 {
 	FileSystem * fileSystem = FileSystem::Instance();
 	std::string fixedModelPath = fileSystem->FixupPathForLocalFilesystem(modelPath);
@@ -177,7 +177,7 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, floa
  * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
  * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
  */
-SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, float importScale, bool castShadows, bool receiveShadows) const
+SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, bool castShadows, bool receiveShadows) const
 {
 	// get a pointer to the Engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -224,7 +224,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	// loop through each instance of SceneObject that was created in the call to RecursiveProcessModelScene()
 	// and for each instance that contains a SkinnedMesh3DRenderer instance, clone the Skeleton instance
 	// created earlier in the call to LoadSkeleton() and assign the cloned skeleton to that renderer.
-	for(unsigned int s = 0; s < createdSceneObjects.size(); s++)
+	for(UInt32 s = 0; s < createdSceneObjects.size(); s++)
 	{
 		// does the SceneObject instance have a SkinnedMesh3DRenderer ?
 		SkinnedMesh3DRendererRef renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
@@ -273,7 +273,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
  */
 void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 											   const aiNode& node,
-											   float scale,
+											   Real scale,
 											   SceneObjectRef parent,
 											   std::vector<MaterialImportDescriptor>& materialImportDescriptors,
 											   SkeletonRef skeleton,
@@ -300,7 +300,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	SkinnedMesh3DRendererRef skinnedMeshRenderer;
 	Mesh3DRendererRef meshRenderer;
 
-	std::vector<unsigned int> boneCounts;
+	std::vector<UInt32> boneCounts;
 
 	// are there any meshes in the model/scene?
 	if(node.mNumMeshes > 0)
@@ -308,9 +308,9 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		// loop through each mesh on this node and check for any bones.
 		// if there is a mesh with bones, then we will create a SkinnedMesh3DRenderer
 		// for all the meshes on this node.
-		for (unsigned int n=0; n < node.mNumMeshes; n++)
+		for (UInt32 n=0; n < node.mNumMeshes; n++)
 		{
-			unsigned int sceneMeshIndex = node.mMeshes[n];
+			UInt32 sceneMeshIndex = node.mMeshes[n];
 			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
 			boneCounts.push_back(mesh->mNumBones);
 			if(mesh->mNumBones > 0)requiresSkinnedRenderer = true && hasSkeleton;
@@ -335,7 +335,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			// set the vertex bone map for each sub renderer to "none" (-1)
 			// this means skinning for a given sub-mesh will be turned off until
 			// a valid VertexBoneMap instance is set for it
-			for (unsigned int n=0; n < node.mNumMeshes; n++)
+			for (UInt32 n=0; n < node.mNumMeshes; n++)
 			{
 				skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n,-1);
 			}
@@ -349,10 +349,10 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 		// loop through each Assimp mesh attached to the current Assimp node and
 		// create a SubMesh3D instance for it
-		for (unsigned int n=0; n < node.mNumMeshes; n++)
+		for (UInt32 n=0; n < node.mNumMeshes; n++)
 		{
 			// get the index of the sub-mesh in the master list of meshes
-			unsigned int sceneMeshIndex = node.mMeshes[n];
+			UInt32 sceneMeshIndex = node.mMeshes[n];
 
 			// get a pointer to the Assimp mesh
 			const aiMesh* mesh = scene.mMeshes[sceneMeshIndex];
@@ -391,7 +391,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		if(requiresSkinnedRenderer)
 		{
 			// for each mesh that has bones, activate the vertex bone map for the corresponding sub-renderer
-			for (unsigned int n=0; n < node.mNumMeshes; n++)
+			for (UInt32 n=0; n < node.mNumMeshes; n++)
 			{
 				if(boneCounts[n] > 0)skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, node.mMeshes[n]);
 			}
@@ -443,7 +443,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 		}
 	}
 
-	for(unsigned int i=0; i <node.mNumChildren; i++)
+	for(UInt32 i=0; i <node.mNumChildren; i++)
 	{
 		const aiNode *childNode = node.mChildren[i];
 		if(childNode != NULL)RecursiveProcessModelScene(scene, *childNode, scale, sceneObject, materialImportDescriptors, skeleton, createdSceneObjects, castShadows, receiveShadows);
@@ -458,11 +458,11 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
  * [materialImportDescriptor] - Descriptor for the mesh's material.
  * [invert] - If true it means the mesh has an inverted scale transformation to deal with
  */
-SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const
+SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, bool invert) const
 {
 	NONFATAL_ASSERT_RTRN(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DRef::Null(), true);
 
-	unsigned int vertexCount = 0;
+	UInt32 vertexCount = 0;
 	aiMesh & mesh = *scene.mMeshes[meshIndex];
 
 	// get the vertex count for the mesh
@@ -515,7 +515,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(unsigned int meshIndex, const aiSc
 
 	// loop through each face in the mesh and copy relevant vertex attributes
 	// into the newly created Mesh3D object
-	for (unsigned int faceIndex = 0; faceIndex < mesh.mNumFaces; faceIndex++)
+	for (UInt32 faceIndex = 0; faceIndex < mesh.mNumFaces; faceIndex++)
 	{
 		const aiFace* face = mesh.mFaces + faceIndex;
 
@@ -602,7 +602,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 	// loop through each scene material and extract relevant textures and
 	// other properties and create a MaterialDescriptor object that will hold those
 	// properties and all corresponding Material objects
-	for (unsigned int m=0; m < scene.mNumMaterials; m++)
+	for (UInt32 m=0; m < scene.mNumMaterials; m++)
 	{
 		aiString aiTexturePath;
 
@@ -639,7 +639,7 @@ bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 		//
 		// The [materialImportDescriptor] structure describes the unique per-mesh properties we need to be
 		// concerned about when creating unique instances of a material for a mesh.
-		for(unsigned int i = 0; i < scene.mNumMeshes; i++)
+		for(UInt32 i = 0; i < scene.mNumMeshes; i++)
 		{
 			if(materialImportDescriptor.UsedByMesh(i))
 			{
@@ -777,10 +777,10 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
  * [materialImportDesc].
  */
 bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, TextureType textureType, const TextureRef texture,
-		 	 	 	 	 	 	 	 	 	 	 	 	 unsigned int meshIndex, MaterialImportDescriptor& materialImportDesc) const
+		 	 	 	 	 	 	 	 	 	 	 	 	 UInt32 meshIndex, MaterialImportDescriptor& materialImportDesc) const
 {
 	// get the Assimp material key for textures of type [textureType]
-	unsigned int aiTextureKey = ConvertTextureTypeToAITextureKey(textureType);
+	UInt32 aiTextureKey = ConvertTextureTypeToAITextureKey(textureType);
 
 	// get the name of the shader uniform that handles textures of [textureType]
 	std::string textureName = GetBuiltinVariableNameForTextureType(textureType);
@@ -814,41 +814,41 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 {
 	LongMask flags = LongMaskUtil::CreateLongMask();
 	aiString path;
-	aiColor4t<float> color;
+	aiColor4t<Real> color;
 
 	// automatically give normals to all materials & meshes (if a mesh doesn't have them by
 	// default, they will be calculated)
-	LongMaskUtil::SetBit(&flags, (short)ShaderMaterialCharacteristic::VertexNormals);
+	LongMaskUtil::SetBit(&flags, (Int16)ShaderMaterialCharacteristic::VertexNormals);
 
 	// check for a diffuse texture
 	if(AI_SUCCESS == mtl->GetTexture(aiTextureType_DIFFUSE, 0, &path))
 	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialCharacteristic::DiffuseTextured);
+		LongMaskUtil::SetBit(&flags, (Int16)ShaderMaterialCharacteristic::DiffuseTextured);
 	}
 
 	/*if(AI_SUCCESS == mtl->GetTexture(aiTextureType_SPECULAR, 0, &path))
 	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::SpecularTextured);
+		LongMaskUtil::SetBit(&flags, (Int16)ShaderMaterialProperty::SpecularTextured);
 	}
 
 	if(AI_SUCCESS == mtl->GetTexture(aiTextureType_NORMALS, 0, &path))
 	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::Bumped);
+		LongMaskUtil::SetBit(&flags, (Int16)ShaderMaterialProperty::Bumped);
 	}
 
 	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &color))
 	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::DiffuseColored);
+		LongMaskUtil::SetBit(&flags, (Int16)ShaderMaterialProperty::DiffuseColored);
 	}
 
 	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &color))
 	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::SpecularColored);
+		LongMaskUtil::SetBit(&flags, (Int16)ShaderMaterialProperty::SpecularColored);
 	}
 
 	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &color))
 	{
-		LongMaskUtil::SetBit(&flags, (short)ShaderMaterialProperty::EmissiveColored);
+		LongMaskUtil::SetBit(&flags, (Int16)ShaderMaterialProperty::EmissiveColored);
 	}*/
 
 	// Even though multiple meshes may share an Assimp material, that doesn't necessarily
@@ -860,7 +860,7 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	// This loop runs through each Assimp mesh that uses [mtl] and determines the unique
 	// material properties of that mesh to form a final LongMask value that holds the
 	// active ShaderMaterialCharacteristic values for that mesh.
-	for(unsigned int i = 0; i < scene.mNumMeshes; i++)
+	for(UInt32 i = 0; i < scene.mNumMeshes; i++)
 	{
 		// copy the existing set of ShaderMaterialCharacteristic values
 		LongMask meshFlags = flags;
@@ -873,7 +873,7 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 			// for now only support one set of vertex colors, and look at index 0 for it
 			if(mesh->HasVertexColors(0))
 			{
-				LongMaskUtil::SetBit(&meshFlags, (short)ShaderMaterialCharacteristic::VertexColors);
+				LongMaskUtil::SetBit(&meshFlags, (Int16)ShaderMaterialCharacteristic::VertexColors);
 				materialImportDesc.meshSpecificProperties[i].vertexColorsIndex = 0;
 			}
 			// set mesh specific ShaderMaterialCharacteristic values
@@ -884,7 +884,7 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 
 void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, bool reverseVertexOrder) const
 {
-	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	for(UInt32 m = 0; m < scene.mNumMeshes; m++)
 	{
 		aiMesh * cMesh = scene.mMeshes[m];
 		if( cMesh != NULL && cMesh->mNumBones > 0)
@@ -916,7 +916,7 @@ void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, Skeleton
 
 SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 {
-	unsigned int boneCount = CountBones(scene);
+	UInt32 boneCount = CountBones(scene);
 	if(boneCount <=0 )
 	{
 		return SkeletonRef::Null();
@@ -934,8 +934,8 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 		return SkeletonRef::Null();
 	}
 
-	unsigned int boneIndex = 0;
-	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	UInt32 boneIndex = 0;
+	for(UInt32 m = 0; m < scene.mNumMeshes; m++)
 	{
 		aiMesh * cMesh = scene.mMeshes[m];
 		if( cMesh != NULL && cMesh->mNumBones > 0)
@@ -973,7 +973,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	}
 
 	unsigned fullIndex=0;
-	for(unsigned int f = 0; f < mesh.mNumFaces; f++)
+	for(UInt32 f = 0; f < mesh.mNumFaces; f++)
 	{
 		aiFace& face = mesh.mFaces[f];
 
@@ -991,7 +991,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 		// then we iterate in normal forward order
 		for( int i = start; i != end; i+=inc)
 		{
-			unsigned int vertexIndex = face.mIndices[i];
+			UInt32 vertexIndex = face.mIndices[i];
 			fullBoneMap->GetDescriptor(fullIndex)->SetTo(indexBoneMap.GetDescriptor(vertexIndex));
 			fullIndex++;
 		}
@@ -1000,11 +1000,11 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	return fullBoneMap;
 }
 
-void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, unsigned int& currentBoneIndex) const
+void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const
 {
 	NONFATAL_ASSERT(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.", true);
 
-	for(unsigned int b = 0; b < mesh.mNumBones; b++)
+	for(UInt32 b = 0; b < mesh.mNumBones; b++)
 	{
 		aiBone * cBone = mesh.mBones[b];
 		if(cBone != NULL)
@@ -1038,20 +1038,20 @@ void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, c
 {
 	NONFATAL_ASSERT(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.", true);
 
-	for(unsigned int b = 0; b < mesh.mNumBones; b++)
+	for(UInt32 b = 0; b < mesh.mNumBones; b++)
 	{
 		aiBone * cBone = mesh.mBones[b];
 		if(cBone != NULL)
 		{
 			std::string boneName = std::string(cBone->mName.C_Str());
-			unsigned int boneIndex = skeleton->GetBoneMapping(boneName);
+			UInt32 boneIndex = skeleton->GetBoneMapping(boneName);
 
-			for(unsigned int w = 0; w < cBone->mNumWeights; w++)
+			for(UInt32 w = 0; w < cBone->mNumWeights; w++)
 			{
 				aiVertexWeight& weightDesc = cBone->mWeights[w];
 
-				unsigned int vertexID = weightDesc.mVertexId;
-				float weight = weightDesc.mWeight;
+				UInt32 vertexID = weightDesc.mVertexId;
+				Real weight = weightDesc.mWeight;
 
 				VertexBoneMap::VertexMappingDescriptor * desc = vertexIndexBoneMap.GetDescriptor(vertexID);
 				if(desc != NULL && desc->BoneCount < Constants::MaxBonesPerVertex)
@@ -1069,14 +1069,14 @@ void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, c
 
 unsigned ModelImporter::CountBones(const aiScene& scene) const
 {
-	unsigned int boneCount = 0;
-	std::unordered_map<std::string, unsigned int> boneCountMap;
-	for(unsigned int m = 0; m < scene.mNumMeshes; m++)
+	UInt32 boneCount = 0;
+	std::unordered_map<std::string, UInt32> boneCountMap;
+	for(UInt32 m = 0; m < scene.mNumMeshes; m++)
 	{
 		aiMesh * cMesh = scene.mMeshes[m];
 		if( cMesh != NULL && cMesh->mNumBones > 0)
 		{
-			for(unsigned int b = 0; b < cMesh->mNumBones; b++)
+			for(UInt32 b = 0; b < cMesh->mNumBones; b++)
 			{
 				std::string boneName(cMesh->mBones[b]->mName.C_Str());
 				if(boneCountMap.find(boneName) == boneCountMap.end())
@@ -1150,18 +1150,18 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 	NONFATAL_ASSERT_RTRN(objectManager != NULL,"ModelImporter::LoadAnimation -> EngineObjectManager instance is NULL.", AnimationRef::Null(), true);
 
-	float ticksPerSecond = (float)animation.mTicksPerSecond;
+	Real ticksPerSecond = (Real)animation.mTicksPerSecond;
 
 	// adding little extra time to the animation allows for the interpolation between the last
 	// and the first frame, which smoothes out looping animations
 	// TODO: figure out a better way to do this, possibly a setting for smoothing looped animations
-	float loopPadding = ticksPerSecond * .05;
-	float durationTicks = (float)animation.mDuration;
+	Real loopPadding = ticksPerSecond * .05;
+	Real durationTicks = (Real)animation.mDuration;
 
 	if(addLoopPadding) durationTicks += loopPadding;
 
 	NONFATAL_ASSERT_RTRN(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> Ticks per second is 0.", AnimationRef::Null(), true);
-	//float duration = durationTicks / ticksPerSecond;
+	//Real duration = durationTicks / ticksPerSecond;
 
 	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond);
 	NONFATAL_ASSERT_RTRN(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null(), false);
@@ -1174,7 +1174,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 		return AnimationRef::Null();
 	}
 
-	for(unsigned int n = 0; n < animation.mNumChannels; n++)
+	for(UInt32 n = 0; n < animation.mNumChannels; n++)
 	{
 		aiNodeAnim * nodeAnim = animation.mChannels[n];
 		std::string nodeName(nodeAnim->mNodeName.C_Str());
@@ -1196,39 +1196,39 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, bool addLoopP
 
 			keyFrameSet->Used = true;
 
-			for(unsigned int t = 0; t < nodeAnim->mNumPositionKeys; t++)
+			for(UInt32 t = 0; t < nodeAnim->mNumPositionKeys; t++)
 			{
 				aiVectorKey& vectorKey = *(nodeAnim->mPositionKeys + t);
 
 				TranslationKeyFrame keyFrame;
-				keyFrame.NormalizedTime = (float)vectorKey.mTime / durationTicks;
-				keyFrame.RealTime = (float)vectorKey.mTime / ticksPerSecond;
-				keyFrame.RealTimeTicks = (float)vectorKey.mTime;
+				keyFrame.NormalizedTime = (Real)vectorKey.mTime / durationTicks;
+				keyFrame.RealTime = (Real)vectorKey.mTime / ticksPerSecond;
+				keyFrame.RealTimeTicks = (Real)vectorKey.mTime;
 				keyFrame.Translation.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
 				keyFrameSet->TranslationKeyFrames.push_back(keyFrame);
 			}
 
-			for(unsigned int s = 0; s < nodeAnim->mNumScalingKeys; s++)
+			for(UInt32 s = 0; s < nodeAnim->mNumScalingKeys; s++)
 			{
 
 				aiVectorKey& vectorKey = *(nodeAnim->mScalingKeys + s);
 
 				ScaleKeyFrame keyFrame;
-				keyFrame.NormalizedTime = (float)vectorKey.mTime / durationTicks;
-				keyFrame.RealTime = (float)vectorKey.mTime / ticksPerSecond;
-				keyFrame.RealTimeTicks = (float)vectorKey.mTime;
+				keyFrame.NormalizedTime = (Real)vectorKey.mTime / durationTicks;
+				keyFrame.RealTime = (Real)vectorKey.mTime / ticksPerSecond;
+				keyFrame.RealTimeTicks = (Real)vectorKey.mTime;
 				keyFrame.Scale.Set(vectorKey.mValue.x,vectorKey.mValue.y,vectorKey.mValue.z);
 				keyFrameSet->ScaleKeyFrames.push_back(keyFrame);
 			}
 
-			for(unsigned int r = 0; r < nodeAnim->mNumRotationKeys; r++)
+			for(UInt32 r = 0; r < nodeAnim->mNumRotationKeys; r++)
 			{
 				aiQuatKey& quatKey = *(nodeAnim->mRotationKeys + r);
 
 				RotationKeyFrame keyFrame;
-				keyFrame.NormalizedTime = (float)quatKey.mTime / durationTicks;
-				keyFrame.RealTime = (float)quatKey.mTime / ticksPerSecond;
-				keyFrame.RealTimeTicks = (float)quatKey.mTime;
+				keyFrame.NormalizedTime = (Real)quatKey.mTime / durationTicks;
+				keyFrame.RealTime = (Real)quatKey.mTime / ticksPerSecond;
+				keyFrame.RealTimeTicks = (Real)quatKey.mTime;
 				keyFrame.Rotation.Set(quatKey.mValue.x,quatKey.mValue.y,quatKey.mValue.z,quatKey.mValue.w );
 				keyFrameSet->RotationKeyFrames.push_back(keyFrame);
 			}
@@ -1273,7 +1273,7 @@ void ModelImporter::PreOrderTraverseScene(const aiScene& scene, const aiNode& no
 	bool doContinue = callback(node);
 	if(!doContinue)return;
 
-	for(unsigned int i = 0; i < node.mNumChildren; i++)
+	for(UInt32 i = 0; i < node.mNumChildren; i++)
 	{
 		aiNode* childNode = node.mChildren[i];
 		if(childNode != NULL)
@@ -1408,7 +1408,7 @@ int ModelImporter::ConvertTextureTypeToAITextureKey(TextureType textureType)
  */
 bool ModelImporter::HasOddReflections(Matrix4x4& mat)
 {
-	float determinant = mat.CalculateDeterminant();
+	Real determinant = mat.CalculateDeterminant();
 	if (determinant < 0.0)return true;
 	return false;
 }
