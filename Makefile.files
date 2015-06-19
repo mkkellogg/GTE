@@ -1,0 +1,542 @@
+COMPILE= $(CC) $(CFLAGS)
+
+# ==================================
+# GTE Demo
+# ==================================
+
+GTEDEMOSRC= src/gtedemo
+GTEDEMOSRCS= $(GTEDEMOSRC)/gtedemo.cpp $(GTEDEMOSRC)/game.cpp $(GTEDEMOSRC)/gameutil.cpp $(GTEDEMOSRC)/lavafield.cpp $(GTEDEMOSRC)/scene.cpp $(GTEDEMOSRC)/scenes/lavascene.cpp $(GTEDEMOSRC)/scenes/castlescene.cpp $(GTEDEMOSRC)/scenes/poolscene.cpp
+GTEDEMOOBJ= $(OUTPUTDIR)/gtedemo.o $(OUTPUTDIR)/game.o $(OUTPUTDIR)/gameutil.o $(OUTPUTDIR)/lavafield.o $(OUTPUTDIR)/scene.o $(OUTPUTDIR)/lavascene.o $(OUTPUTDIR)/castlescene.o $(OUTPUTDIR)/poolscene.o
+
+gtedemo: $(GTEDEMOOBJ)
+
+$(OUTPUTDIR)/gtedemo.o: $(GTEDEMOSRC)/gtedemo.cpp $(GTEDEMOSRC)/gtedemo.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/gtedemo.o -c $(GTEDEMOSRC)/gtedemo.cpp
+
+$(OUTPUTDIR)/game.o: $(GTEDEMOSRC)/game.cpp $(GTEDEMOSRC)/game.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/game.o -c $(GTEDEMOSRC)/game.cpp
+
+$(OUTPUTDIR)/gameutil.o: $(GTEDEMOSRC)/gameutil.cpp $(GTEDEMOSRC)/gameutil.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/gameutil.o -c $(GTEDEMOSRC)/gameutil.cpp
+	
+$(OUTPUTDIR)/lavafield.o: $(GTEDEMOSRC)/lavafield.cpp $(GTEDEMOSRC)/lavafield.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/lavafield.o -c $(GTEDEMOSRC)/lavafield.cpp
+	
+$(OUTPUTDIR)/scene.o: $(GTEDEMOSRC)/scene.cpp $(GTEDEMOSRC)/scene.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/scene.o -c $(GTEDEMOSRC)/scene.cpp
+
+$(OUTPUTDIR)/lavascene.o: $(GTEDEMOSRC)/scenes/lavascene.cpp $(GTEDEMOSRC)/scenes/lavascene.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/lavascene.o -c $(GTEDEMOSRC)/scenes/lavascene.cpp
+	
+$(OUTPUTDIR)/castlescene.o: $(GTEDEMOSRC)/scenes/castlescene.cpp $(GTEDEMOSRC)/scenes/castlescene.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/castlescene.o -c $(GTEDEMOSRC)/scenes/castlescene.cpp
+	
+$(OUTPUTDIR)/poolscene.o: $(GTEDEMOSRC)/scenes/poolscene.cpp $(GTEDEMOSRC)/scenes/poolscene.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/poolscene.o -c $(GTEDEMOSRC)/scenes/poolscene.cpp
+
+
+
+# ==================================
+# Global
+# ==================================	
+
+GLOBALSRC= src/global
+GLOBALSRCS= $(GLOBALSRC)/constants.cpp
+GLOBALOBJ = $(OUTPUTDIR)/constants.o
+
+global: $(GLOBALOBJ)
+
+$(OUTPUTDIR)/constants.o: $(GLOBALSRC)/constants.cpp $(GLOBALSRC)/constants.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/constants.o -c $(GLOBALSRC)/constants.cpp 
+	
+
+# ==================================
+# Error
+# ==================================	
+
+ERRORSRC= src/error
+ERRORSRCS= $(ERRORSRC)/errormanager.cpp
+ERROROBJ= $(OUTPUTDIR)/errormanager.o
+
+error: $(ERROROBJ)
+
+$(OUTPUTDIR)/errormanager.o: $(ERRORSRC)/errormanager.cpp $(ERRORSRC)/errormanager.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/errormanager.o -c $(ERRORSRC)/errormanager.cpp 
+	
+
+# ==================================
+# FileSystem
+# ==================================	
+
+FILESYSTEMSRC= src/filesys
+FILESYSTEMSRCS= $(FILESYSTEMSRC)/filesystem.cpp $(FILESYSTEMSRC)/filesystemIX.cpp
+FILESYSTEMOBJ= $(OUTPUTDIR)/filesystem.o $(OUTPUTDIR)/filesystemIX.o
+
+filesystem: $(FILESYSTEMOBJ)
+
+$(OUTPUTDIR)/filesystem.o: $(FILESYSTEMSRC)/filesystem.cpp $(FILESYSTEMSRC)/filesystem.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/filesystem.o -c $(FILESYSTEMSRC)/filesystem.cpp 
+	
+$(OUTPUTDIR)/filesystemIX.o: $(FILESYSTEMSRC)/filesystemIX.cpp $(FILESYSTEMSRC)/filesystemIX.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/filesystemIX.o -c $(FILESYSTEMSRC)/filesystemIX.cpp 
+
+	
+# ==================================
+# Input
+# ==================================	
+
+INPUTSRC= src/input
+INPUTSRCS= $(INPUTSRC)/inputmanager.cpp $(INPUTSRC)/inputmanagerGL.cpp
+INPUTOBJ= $(OUTPUTDIR)/inputmanager.o $(OUTPUTDIR)/inputmanagerGL.o
+
+inputmanager: $(INPUTOBJ)
+
+$(OUTPUTDIR)/inputmanager.o: $(INPUTSRC)/inputmanager.cpp $(INPUTSRC)/inputmanager.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/inputmanager.o -c $(INPUTSRC)/inputmanager.cpp 
+	
+$(OUTPUTDIR)/inputmanagerGL.o: $(INPUTSRC)/inputmanagerGL.cpp $(INPUTSRC)/inputmanagerGL.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/inputmanagerGL.o -c $(INPUTSRC)/inputmanagerGL.cpp 
+	
+	
+# ==================================
+# Engine
+# ==================================	
+
+ENGINESRC= src
+ENGINESRCS= $(ENGINESRC)/engine.cpp
+ENGINEOBJ = $(OUTPUTDIR)/engine.o
+
+engine: $(ENGINEOBJ)
+
+$(OUTPUTDIR)/engine.o: $(ENGINESRC)/engine.cpp $(ENGINESRC)/engine.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/engine.o -c $(ENGINESRC)/engine.cpp 
+	
+	
+# ==================================
+# EngineObjects
+# ==================================
+
+ENGINEOBJECTSRC= src/object
+ENGINEOBJECTSRCS= $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOBJECTSRC)/engineobject.cpp $(ENGINEOBJECTSRC)/sceneobject.cpp $(ENGINEOBJECTSRC)/shaderorganizer.cpp $(ENGINEOBJECTSRC)/objectpairkey.cpp $(ENGINEOBJECTSRC)/layermanager.cpp
+ENGINEOBJECTOBJ= $(OUTPUTDIR)/sceneobjectcomponent.o $(OUTPUTDIR)/engineobjectmanager.o $(OUTPUTDIR)/engineobject.o $(OUTPUTDIR)/sceneobject.o $(OUTPUTDIR)/shaderorganizer.o $(OUTPUTDIR)/objectpairkey.o $(OUTPUTDIR)/layermanager.o
+
+engineobjects: $(ENGINEOBJECTOBJ)
+	
+$(OUTPUTDIR)/shaderorganizer.o: $(ENGINEOBJECTSRC)/shaderorganizer.cpp $(ENGINEOBJECTSRC)/shaderorganizer.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/shaderorganizer.o -c $(ENGINEOBJECTSRC)/shaderorganizer.cpp
+	
+$(OUTPUTDIR)/sceneobjectcomponent.o: $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp $(ENGINEOBJECTSRC)/sceneobjectcomponent.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/sceneobjectcomponent.o -c $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp
+	
+$(OUTPUTDIR)/sceneobject.o: $(ENGINEOBJECTSRC)/sceneobject.cpp $(ENGINEOBJECTSRC)/sceneobject.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/sceneobject.o -c $(ENGINEOBJECTSRC)/sceneobject.cpp
+	
+$(OUTPUTDIR)/engineobject.o: $(ENGINEOBJECTSRC)/engineobject.cpp $(ENGINEOBJECTSRC)/engineobject.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/engineobject.o -c $(ENGINEOBJECTSRC)/engineobject.cpp
+	
+$(OUTPUTDIR)/engineobjectmanager.o: $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOBJECTSRC)/engineobjectmanager.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/engineobjectmanager.o -c $(ENGINEOBJECTSRC)/engineobjectmanager.cpp
+	
+$(OUTPUTDIR)/objectpairkey.o: $(ENGINEOBJECTSRC)/objectpairkey.cpp $(ENGINEOBJECTSRC)/objectpairkey.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/objectpairkey.o -c $(ENGINEOBJECTSRC)/objectpairkey.cpp
+	
+$(OUTPUTDIR)/layermanager.o: $(ENGINEOBJECTSRC)/layermanager.cpp $(ENGINEOBJECTSRC)/layermanager.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/layermanager.o -c $(ENGINEOBJECTSRC)/layermanager.cpp
+	
+	
+# ==================================
+# Asset
+# ==================================
+
+ASSETSRC= src/asset
+ASSETOBJS= $(ASSETSRC)/assetimporter.cpp $(ASSETSRC)/importutil.cpp $(ASSETSRC)/modelimporter.cpp $(ASSETSRC)/modelimporter.cpp $(ASSETSRC)/shadersourceloader.cpp $(ASSETSRC)/shadersourceloaderGL.cpp
+ASSETOBJ= $(OUTPUTDIR)/assetimporter.o $(OUTPUTDIR)/importutil.o $(OUTPUTDIR)/modelimporter.o $(OUTPUTDIR)/shadersourceloader.o $(OUTPUTDIR)/shadersourceloaderGL.o
+
+asset: $(ASSETOBJ)
+	
+$(OUTPUTDIR)/assetimporter.o: $(ASSETSRC)/assetimporter.cpp $(ASSETSRC)/assetimporter.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/assetimporter.o -c $(ASSETSRC)/assetimporter.cpp
+	
+$(OUTPUTDIR)/modelimporter.o: $(ASSETSRC)/modelimporter.cpp $(ASSETSRC)/modelimporter.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/modelimporter.o -c $(ASSETSRC)/modelimporter.cpp
+
+$(OUTPUTDIR)/shadersourceloader.o: $(ASSETSRC)/shadersourceloader.cpp $(ASSETSRC)/shadersourceloader.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/shadersourceloader.o -c $(ASSETSRC)/shadersourceloader.cpp
+	
+$(OUTPUTDIR)/shadersourceloaderGL.o: $(ASSETSRC)/shadersourceloaderGL.cpp $(ASSETSRC)/shadersourceloaderGL.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/shadersourceloaderGL.o -c $(ASSETSRC)/shadersourceloaderGL.cpp
+	
+$(OUTPUTDIR)/importutil.o: $(ASSETSRC)/importutil.cpp $(ASSETSRC)/importutil.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/importutil.o -c $(ASSETSRC)/importutil.cpp
+	
+		
+# ==================================
+# Image processing
+# ==================================	
+
+IMAGESRC= src/graphics/image
+IMAGESRCS= $(IMAGESRC)/rawimage.cpp $(IMAGESRC)/imageloader.cpp
+IMAGEOBJ= $(OUTPUTDIR)/rawimage.o $(OUTPUTDIR)/imageloader.o
+
+image: $(IMAGEOBJ)
+	
+$(OUTPUTDIR)/rawimage.o: $(IMAGESRC)/rawimage.cpp $(IMAGESRC)/rawimage.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/rawimage.o -c $(IMAGESRC)/rawimage.cpp 
+	
+$(OUTPUTDIR)/imageloader.o: $(IMAGESRC)/imageloader.cpp $(IMAGESRC)/imageloader.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/imageloader.o -c $(IMAGESRC)/imageloader.cpp 
+	
+	
+# ==================================
+# Graphics
+# ==================================
+
+GRAPHICSSRC= src/graphics
+GRAPHICSSRCS= $(GRAPHICSSRC)/graphics.cpp $(GRAPHICSSRC)/color/color4.cpp $(GRAPHICSSRC)/color/color4factory.cpp $(GRAPHICSSRC)/color/color4array.cpp $(GRAPHICSSRC)/uv/uv2.cpp $(GRAPHICSSRC)/uv/uv2factory.cpp $(GRAPHICSSRC)/uv/uv2array.cpp $(GRAPHICSSRC)/stdattributes.cpp $(GRAPHICSSRC)/stduniforms.cpp $(GRAPHICSSRC)/screendesc.cpp $(GRAPHICSSRC)/graphicsGL.cpp 
+LIGHTSRC= $(GRAPHICSSRC)/light
+LIGHTSRCS= $(LIGHTSRC)/light.cpp
+TEXTURESRC= $(GRAPHICSSRC)/texture
+TEXTURESRCS= $(TEXTURESRC)/texture.cpp $(TEXTURESRC)/textureattr.cpp $(TEXTURESRC)/textureGL.cpp
+VIEWSYSSRC= $(GRAPHICSSRC)/view
+VIEWSYSSRCS= $(VIEWSYSSRC)/camera.cpp
+
+GRAPHICSOBJ= $(OUTPUTDIR)/graphics.o $(OUTPUTDIR)/color4.o $(OUTPUTDIR)/color4factory.o $(OUTPUTDIR)/color4array.o $(OUTPUTDIR)/uv2.o $(OUTPUTDIR)/uv2factory.o $(OUTPUTDIR)/uv2array.o $(OUTPUTDIR)/stdattributes.o $(OUTPUTDIR)/stduniforms.o $(OUTPUTDIR)/screendesc.o $(OUTPUTDIR)/graphicsGL.o
+LIGHTOBJ= $(OUTPUTDIR)/light.o
+TEXTUREOBJ= $(OUTPUTDIR)/texture.o $(OUTPUTDIR)/textureattr.o  $(OUTPUTDIR)/textureGL.o
+VIEWSYSOBJ= $(OUTPUTDIR)/camera.o
+
+graphics: $(GRAPHICSOBJ) $(LIGHTOBJ) $(TEXTUREOBJ) $(OPENGLOBJ) $(VIEWSYSOBJ) render graphicsobject shader
+
+$(OUTPUTDIR)/graphics.o: $(GRAPHICSSRC)/graphics.cpp  $(GRAPHICSSRC)/graphics.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/graphics.o -c $(GRAPHICSSRC)/graphics.cpp
+
+$(OUTPUTDIR)/graphicsGL.o: $(GRAPHICSSRC)/graphicsGL.cpp  $(GRAPHICSSRC)/graphicsGL.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/graphicsGL.o -c $(GRAPHICSSRC)/graphicsGL.cpp
+	
+$(OUTPUTDIR)/screendesc.o: $(GRAPHICSSRC)/screendesc.cpp  $(GRAPHICSSRC)/screendesc.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/screendesc.o -c $(GRAPHICSSRC)/screendesc.cpp
+	
+$(OUTPUTDIR)/camera.o: $(GRAPHICSSRC)/view/camera.cpp  $(GRAPHICSSRC)/view/camera.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/camera.o -c $(GRAPHICSSRC)/view/camera.cpp
+
+$(OUTPUTDIR)/light.o: $(LIGHTSRC)/light.cpp $(LIGHTSRC)/light.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/light.o -c $(LIGHTSRC)/light.cpp
+	
+$(OUTPUTDIR)/texture.o: $(TEXTURESRC)/texture.cpp $(TEXTURESRC)/texture.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/texture.o -c $(TEXTURESRC)/texture.cpp
+	
+$(OUTPUTDIR)/textureattr.o: $(TEXTURESRC)/textureattr.cpp $(TEXTURESRC)/textureattr.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/textureattr.o -c $(TEXTURESRC)/textureattr.cpp
+	
+$(OUTPUTDIR)/textureGL.o: $(TEXTURESRC)/textureGL.cpp $(TEXTURESRC)/textureGL.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/textureGL.o -c $(TEXTURESRC)/textureGL.cpp
+
+$(OUTPUTDIR)/color4.o: $(GRAPHICSSRC)/color/color4.cpp $(GRAPHICSSRC)/color/color4.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/color4.o -c $(GRAPHICSSRC)/color/color4.cpp
+
+$(OUTPUTDIR)/color4factory.o: $(GRAPHICSSRC)/color/color4factory.cpp $(GRAPHICSSRC)/color/color4factory.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/color4factory.o -c $(GRAPHICSSRC)/color/color4factory.cpp
+
+$(OUTPUTDIR)/color4array.o: $(GRAPHICSSRC)/color/color4array.cpp $(GRAPHICSSRC)/color/color4array.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/color4array.o -c $(GRAPHICSSRC)/color/color4array.cpp
+	
+$(OUTPUTDIR)/uv2.o: $(GRAPHICSSRC)/uv/uv2.cpp $(GRAPHICSSRC)/uv/uv2.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/uv2.o -c $(GRAPHICSSRC)/uv/uv2.cpp
+	
+$(OUTPUTDIR)/uv2factory.o: $(GRAPHICSSRC)/uv/uv2factory.cpp $(GRAPHICSSRC)/uv/uv2factory.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/uv2factory.o -c $(GRAPHICSSRC)/uv/uv2factory.cpp
+	
+$(OUTPUTDIR)/uv2array.o: $(GRAPHICSSRC)/uv/uv2array.cpp $(GRAPHICSSRC)/uv/uv2array.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/uv2array.o -c $(GRAPHICSSRC)/uv/uv2array.cpp
+
+$(OUTPUTDIR)/stdattributes.o: $(GRAPHICSSRC)/stdattributes.cpp $(GRAPHICSSRC)/stdattributes.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/stdattributes.o -c $(GRAPHICSSRC)/stdattributes.cpp
+	
+$(OUTPUTDIR)/stduniforms.o: $(GRAPHICSSRC)/stduniforms.cpp $(GRAPHICSSRC)/stduniforms.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/stduniforms.o -c $(GRAPHICSSRC)/stduniforms.cpp
+	
+
+# ==================================
+# Animation
+# ==================================	
+
+ANIMATIONSRC= src/graphics/animation
+ANIMATIONSRCS= $(ANIMATIONSRC)/skeleton.cpp $(ANIMATIONSRC)/vertexbonemap.cpp $(ANIMATIONSRC)/skeletonnode.cpp $(ANIMATIONSRC)/bone.cpp $(ANIMATIONSRC)/sceneobjectskeletonnode.cpp $(ANIMATIONSRC)/keyframeset.cpp $(ANIMATIONSRC)/keyframe.cpp $(ANIMATIONSRC)/translationkeyframe.cpp $(ANIMATIONSRC)/scalekeyframe.cpp $(ANIMATIONSRC)/rotationkeyframe.cpp $(ANIMATIONSRC)/animation.cpp $(ANIMATIONSRC)/animationmanager.cpp $(ANIMATIONSRC)/animationinstance.cpp $(ANIMATIONSRC)/animationplayer.cpp $(ANIMATIONSRC)/blendop.cpp $(ANIMATIONSRC)/crossfadeblendop.cpp
+ANIMATIONOBJ= $(OUTPUTDIR)/skeleton.o $(OUTPUTDIR)/vertexbonemap.o $(OUTPUTDIR)/skeletonnode.o $(OUTPUTDIR)/bone.o $(OUTPUTDIR)/sceneobjectskeletonnode.o $(OUTPUTDIR)/keyframeset.o $(OUTPUTDIR)/keyframe.o $(OUTPUTDIR)/translationkeyframe.o $(OUTPUTDIR)/scalekeyframe.o $(OUTPUTDIR)/rotationkeyframe.o $(OUTPUTDIR)/animation.o $(OUTPUTDIR)/animationmanager.o $(OUTPUTDIR)/animationinstance.o $(OUTPUTDIR)/animationplayer.o $(OUTPUTDIR)/blendop.o $(OUTPUTDIR)/crossfadeblendop.o
+
+animation: $(ANIMATIONOBJ)
+
+$(OUTPUTDIR)/skeleton.o: $(ANIMATIONSRC)/skeleton.cpp $(ANIMATIONSRC)/skeleton.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/skeleton.o -c $(ANIMATIONSRC)/skeleton.cpp 
+	
+$(OUTPUTDIR)/skeletonnode.o: $(ANIMATIONSRC)/skeletonnode.cpp $(ANIMATIONSRC)/skeletonnode.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/skeletonnode.o -c $(ANIMATIONSRC)/skeletonnode.cpp 
+	
+$(OUTPUTDIR)/bone.o: $(ANIMATIONSRC)/bone.cpp $(ANIMATIONSRC)/bone.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/bone.o -c $(ANIMATIONSRC)/bone.cpp
+	
+$(OUTPUTDIR)/sceneobjectskeletonnode.o: $(ANIMATIONSRC)/sceneobjectskeletonnode.cpp $(ANIMATIONSRC)/sceneobjectskeletonnode.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/sceneobjectskeletonnode.o -c $(ANIMATIONSRC)/sceneobjectskeletonnode.cpp 
+		
+ $(OUTPUTDIR)/vertexbonemap.o: $(ANIMATIONSRC)/vertexbonemap.cpp $(ANIMATIONSRC)/vertexbonemap.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/vertexbonemap.o -c $(ANIMATIONSRC)/vertexbonemap.cpp
+	
+ $(OUTPUTDIR)/keyframeset.o: $(ANIMATIONSRC)/keyframeset.cpp $(ANIMATIONSRC)/keyframeset.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/keyframeset.o -c $(ANIMATIONSRC)/keyframeset.cpp
+	
+ $(OUTPUTDIR)/keyframe.o: $(ANIMATIONSRC)/keyframe.cpp $(ANIMATIONSRC)/keyframe.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/keyframe.o -c $(ANIMATIONSRC)/keyframe.cpp
+	
+ $(OUTPUTDIR)/translationkeyframe.o: $(ANIMATIONSRC)/translationkeyframe.cpp $(ANIMATIONSRC)/translationkeyframe.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/translationkeyframe.o -c $(ANIMATIONSRC)/translationkeyframe.cpp
+	
+ $(OUTPUTDIR)/scalekeyframe.o: $(ANIMATIONSRC)/scalekeyframe.cpp $(ANIMATIONSRC)/scalekeyframe.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/scalekeyframe.o -c $(ANIMATIONSRC)/scalekeyframe.cpp
+	
+ $(OUTPUTDIR)/rotationkeyframe.o: $(ANIMATIONSRC)/rotationkeyframe.cpp $(ANIMATIONSRC)/rotationkeyframe.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/rotationkeyframe.o -c $(ANIMATIONSRC)/rotationkeyframe.cpp
+	
+ $(OUTPUTDIR)/animation.o: $(ANIMATIONSRC)/animation.cpp $(ANIMATIONSRC)/animation.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/animation.o -c $(ANIMATIONSRC)/animation.cpp
+
+ $(OUTPUTDIR)/animationmanager.o: $(ANIMATIONSRC)/animationmanager.cpp $(ANIMATIONSRC)/animationmanager.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/animationmanager.o -c $(ANIMATIONSRC)/animationmanager.cpp	
+
+$(OUTPUTDIR)/animationplayer.o: $(ANIMATIONSRC)/animationplayer.cpp $(ANIMATIONSRC)/animationplayer.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/animationplayer.o -c $(ANIMATIONSRC)/animationplayer.cpp	
+	
+$(OUTPUTDIR)/animationinstance.o: $(ANIMATIONSRC)/animationinstance.cpp $(ANIMATIONSRC)/animationinstance.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/animationinstance.o -c $(ANIMATIONSRC)/animationinstance.cpp	
+	
+$(OUTPUTDIR)/blendop.o: $(ANIMATIONSRC)/blendop.cpp $(ANIMATIONSRC)/blendop.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/blendop.o -c $(ANIMATIONSRC)/blendop.cpp
+	
+$(OUTPUTDIR)/crossfadeblendop.o: $(ANIMATIONSRC)/crossfadeblendop.cpp $(ANIMATIONSRC)/crossfadeblendop.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/crossfadeblendop.o -c $(ANIMATIONSRC)/crossfadeblendop.cpp
+	
+	
+# ==================================
+# Shader
+# ==================================	
+
+SHADERSRC= $(GRAPHICSSRC)/shader
+SHADERSRCS= $(SHADERSRC)/shadersource.cpp $(SHADERSRC)/shader.cpp $(SHADERSRC)/uniformdesc.cpp $(SHADERSRC)/attributedesc.cpp $(SHADERSRC)/shaderGL.cpp
+SHADEROBJ= $(OUTPUTDIR)/shadersource.o $(OUTPUTDIR)/shader.o $(OUTPUTDIR)/uniformdesc.o $(OUTPUTDIR)/attributedesc.o $(OUTPUTDIR)/shaderGL.o
+
+shader: $(SHADEROBJ)
+
+$(OUTPUTDIR)/shadersource.o: $(SHADERSRC)/shadersource.cpp  $(SHADERSRC)/shadersource.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/shadersource.o -c $(SHADERSRC)/shadersource.cpp
+	
+$(OUTPUTDIR)/shader.o: $(SHADERSRC)/shader.cpp $(SHADERSRC)/shader.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/shader.o -c $(SHADERSRC)/shader.cpp
+		
+$(OUTPUTDIR)/shaderGL.o: $(SHADERSRC)/shaderGL.cpp $(SHADERSRC)/shaderGL.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/shaderGL.o -c $(SHADERSRC)/shaderGL.cpp
+	
+$(OUTPUTDIR)/uniformdesc.o: $(SHADERSRC)/uniformdesc.cpp $(SHADERSRC)/uniformdesc.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/uniformdesc.o -c $(SHADERSRC)/uniformdesc.cpp
+	
+$(OUTPUTDIR)/attributedesc.o: $(SHADERSRC)/attributedesc.cpp $(SHADERSRC)/attributedesc.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/attributedesc.o -c $(SHADERSRC)/attributedesc.cpp
+
+	
+# ==================================
+# Render
+# ==================================
+
+RENDERSRC= src/graphics/render
+RENDERSRCS= $(RENDERSRC)/mesh3Drenderer.cpp $(RENDERSRC)/skinnedmesh3Drenderer.cpp $(RENDERSRC)/submesh3Drenderer.cpp $(RENDERSRC)/attributetransformer.cpp $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp $(RENDERSRC)/rendertarget.cpp $(RENDERSRC)/vertexattrbuffer.cpp $(RENDERSRC)/material.cpp $(RENDERSRC)/rendermanager.cpp $(RENDERSRC)/vertexattrbufferGL.cpp $(RENDERSRC)/rendertargetGL.cpp
+RENDEROBJ= $(OUTPUTDIR)/mesh3Drenderer.o $(OUTPUTDIR)/skinnedmesh3Drenderer.o $(OUTPUTDIR)/submesh3Drenderer.o $(OUTPUTDIR)/attributetransformer.o $(OUTPUTDIR)/skinnedmesh3Dattrtransformer.o $(OUTPUTDIR)/rendertarget.o  $(OUTPUTDIR)/vertexattrbuffer.o $(OUTPUTDIR)/material.o $(OUTPUTDIR)/rendermanager.o  $(OUTPUTDIR)/vertexattrbufferGL.o $(OUTPUTDIR)/rendertargetGL.o
+
+render: $(RENDEROBJ)
+
+$(OUTPUTDIR)/rendermanager.o: $(RENDERSRC)/rendermanager.cpp $(RENDERSRC)/rendermanager.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/rendermanager.o -c $(RENDERSRC)/rendermanager.cpp
+	
+$(OUTPUTDIR)/mesh3Drenderer.o: $(RENDERSRC)/mesh3Drenderer.cpp $(RENDERSRC)/mesh3Drenderer.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/mesh3Drenderer.o -c $(RENDERSRC)/mesh3Drenderer.cpp
+	
+$(OUTPUTDIR)/skinnedmesh3Drenderer.o: $(RENDERSRC)/skinnedmesh3Drenderer.cpp $(RENDERSRC)/skinnedmesh3Drenderer.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/skinnedmesh3Drenderer.o -c $(RENDERSRC)/skinnedmesh3Drenderer.cpp
+	
+$(OUTPUTDIR)/submesh3Drenderer.o: $(RENDERSRC)/submesh3Drenderer.cpp $(RENDERSRC)/submesh3Drenderer.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/submesh3Drenderer.o -c $(RENDERSRC)/submesh3Drenderer.cpp
+	
+$(OUTPUTDIR)/material.o: $(RENDERSRC)/material.cpp $(RENDERSRC)/material.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/material.o -c $(RENDERSRC)/material.cpp
+	
+$(OUTPUTDIR)/vertexattrbufferGL.o:  $(RENDERSRC)/vertexattrbufferGL.cpp  $(RENDERSRC)/vertexattrbufferGL.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/vertexattrbufferGL.o -c $(RENDERSRC)/vertexattrbufferGL.cpp
+	
+$(OUTPUTDIR)/rendertarget.o: $(RENDERSRC)/rendertarget.cpp  $(RENDERSRC)/rendertarget.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/rendertarget.o -c $(RENDERSRC)/rendertarget.cpp
+
+$(OUTPUTDIR)/rendertargetGL.o: $(RENDERSRC)/rendertargetGL.cpp  $(RENDERSRC)/rendertargetGL.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/rendertargetGL.o -c $(RENDERSRC)/rendertargetGL.cpp
+		
+$(OUTPUTDIR)/vertexattrbuffer.o:  $(RENDERSRC)/vertexattrbuffer.cpp  $(RENDERSRC)/vertexattrbuffer.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/vertexattrbuffer.o -c $(RENDERSRC)/vertexattrbuffer.cpp
+	
+$(OUTPUTDIR)/attributetransformer.o: $(RENDERSRC)/attributetransformer.cpp $(RENDERSRC)/attributetransformer.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/attributetransformer.o -c $(RENDERSRC)/attributetransformer.cpp
+	
+$(OUTPUTDIR)/skinnedmesh3Dattrtransformer.o: $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp $(RENDERSRC)/skinnedmesh3Dattrtransformer.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/skinnedmesh3Dattrtransformer.o -c $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp
+	
+	
+# ==================================
+# GraphicsObject
+# ==================================
+
+GRAPHICSOBJECTSRC= $(GRAPHICSSRC)/object
+GRAPHICSOBJECTSRCS= $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3Dfaces.cpp $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp $(GRAPHICSOBJECTSRC)/mesh3Dfilter.cpp
+GRAPHICSOBJECTOBJ= $(OUTPUTDIR)/mesh3D.o $(OUTPUTDIR)/submesh3D.o $(OUTPUTDIR)/submesh3Dfaces.o $(OUTPUTDIR)/submesh3Dface.o $(OUTPUTDIR)/mesh3Dfilter.o
+
+graphicsobject: $(GRAPHICSOBJECTOBJ)
+	
+$(OUTPUTDIR)/mesh3D.o: $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/mesh3D.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/mesh3D.o -c $(GRAPHICSOBJECTSRC)/mesh3D.cpp
+	
+$(OUTPUTDIR)/mesh3Dfilter.o: $(GRAPHICSOBJECTSRC)/mesh3Dfilter.cpp $(GRAPHICSOBJECTSRC)/mesh3Dfilter.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/mesh3Dfilter.o -c $(GRAPHICSOBJECTSRC)/mesh3Dfilter.cpp
+	
+$(OUTPUTDIR)/submesh3D.o: $(GRAPHICSOBJECTSRC)/submesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3D.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/submesh3D.o -c $(GRAPHICSOBJECTSRC)/submesh3D.cpp
+
+$(OUTPUTDIR)/submesh3Dfaces.o: $(GRAPHICSOBJECTSRC)/submesh3Dfaces.cpp $(GRAPHICSOBJECTSRC)/submesh3Dfaces.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/submesh3Dfaces.o -c $(GRAPHICSOBJECTSRC)/submesh3Dfaces.cpp	
+
+$(OUTPUTDIR)/submesh3Dface.o: $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp $(GRAPHICSOBJECTSRC)/submesh3Dface.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/submesh3Dface.o -c $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp	
+	
+	
+# ==================================
+# Debug
+# ==================================	
+
+DEBUGSRC= src/debug
+DEBUGSRCS= $(DEBUGSRC)/gtedebug.cpp
+DEBUGOBJ= $(OUTPUTDIR)/gtedebug.o 
+
+debug: $(DEBUGOBJ)
+
+$(OUTPUTDIR)/gtedebug.o: $(DEBUGSRC)/gtedebug.cpp $(DEBUGSRC)/gtedebug.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/gtedebug.o -c  $(DEBUGSRC)/gtedebug.cpp 
+
+
+# ==================================
+# Geometry
+# ==================================
+
+GEOMETRYSRC= src/geometry
+GEOMETRYSRCS= $(GEOMETRYSRC)/matrix4x4.cpp $(GEOMETRYSRC)/quaternion.cpp $(GEOMETRYSRC)/point/point3.cpp $(GEOMETRYSRC)/vector/vector3.cpp $(GEOMETRYSRC)/vector/vector3factory.cpp $(GEOMETRYSRC)/point/point3factory.cpp $(GEOMETRYSRC)/vector/vector3array.cpp $(GEOMETRYSRC)/point/point3array.cpp $(GEOMETRYSRC)/transform.cpp $(GEOMETRYSRC)/scenobjecttransform.cpp
+GEOMETRYOBJ= $(OUTPUTDIR)/matrix4x4.o $(OUTPUTDIR)/quaternion.o $(OUTPUTDIR)/point3.o $(OUTPUTDIR)/vector3.o $(OUTPUTDIR)/vector3factory.o $(OUTPUTDIR)/point3factory.o $(OUTPUTDIR)/vector3array.o $(OUTPUTDIR)/point3array.o $(OUTPUTDIR)/transform.o $(OUTPUTDIR)/sceneobjecttransform.o
+
+geometry: $(GEOMETRYOBJ)
+	
+$(OUTPUTDIR)/transform.o: $(GEOMETRYSRC)/transform.cpp $(GEOMETRYSRC)/transform.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/transform.o -c $(GEOMETRYSRC)/transform.cpp
+	
+$(OUTPUTDIR)/sceneobjecttransform.o: $(GEOMETRYSRC)/sceneobjecttransform.cpp $(GEOMETRYSRC)/sceneobjecttransform.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/sceneobjecttransform.o -c $(GEOMETRYSRC)/sceneobjecttransform.cpp
+	
+$(OUTPUTDIR)/vector3.o: $(GEOMETRYSRC)/vector/vector3.cpp $(GEOMETRYSRC)/vector/vector3.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/vector3.o -c $(GEOMETRYSRC)/vector/vector3.cpp
+	
+$(OUTPUTDIR)/vector3factory.o: $(GEOMETRYSRC)/vector/vector3factory.cpp $(GEOMETRYSRC)/vector/vector3factory.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/vector3factory.o -c $(GEOMETRYSRC)/vector/vector3factory.cpp
+	
+$(OUTPUTDIR)/vector3array.o: $(GEOMETRYSRC)/vector/vector3array.cpp $(GEOMETRYSRC)/vector/vector3array.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/vector3array.o -c $(GEOMETRYSRC)/vector/vector3array.cpp
+
+$(OUTPUTDIR)/point3.o: $(GEOMETRYSRC)/point/point3.cpp $(GEOMETRYSRC)/point/point3.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/point3.o -c $(GEOMETRYSRC)/point/point3.cpp
+
+$(OUTPUTDIR)/point3factory.o: $(GEOMETRYSRC)/point/point3factory.cpp $(GEOMETRYSRC)/point/point3factory.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/point3factory.o -c $(GEOMETRYSRC)/point/point3factory.cpp
+	
+$(OUTPUTDIR)/point3array.o: $(GEOMETRYSRC)/point/point3array.cpp $(GEOMETRYSRC)/point/point3array.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/point3array.o -c $(GEOMETRYSRC)/point/point3array.cpp
+	
+$(OUTPUTDIR)/matrix4x4.o: $(GEOMETRYSRC)/matrix4x4.cpp $(GEOMETRYSRC)/matrix4x4.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/matrix4x4.o -c $(GEOMETRYSRC)/matrix4x4.cpp
+	
+$(OUTPUTDIR)/quaternion.o: $(GEOMETRYSRC)/quaternion.cpp $(GEOMETRYSRC)/quaternion.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/quaternion.o -c $(GEOMETRYSRC)/quaternion.cpp
+
+
+# ==================================
+# Base
+# ==================================
+
+BASESRC= src/base
+BASESRCS= $(BASESRC)/basevector4.cpp $(BASESRC)/basevector2.cpp $(BASESRC)/basevector2factory.cpp $(BASESRC)/basevector4factory.cpp $(BASESRC)/basevector2array.cpp $(BASESRC)/basevector4array.cpp $(BASESRC)/intmask.cpp $(BASESRC)/longmask.cpp
+BASEOBJ= $(OUTPUTDIR)/basevector4.o $(OUTPUTDIR)/basevector2.o $(OUTPUTDIR)/basevector2factory.o $(OUTPUTDIR)/basevector4factory.o $(OUTPUTDIR)/basevector2array.o $(OUTPUTDIR)/basevector4array.o $(OUTPUTDIR)/intmask.o $(OUTPUTDIR)/longmask.o
+
+base: $(BASEOBJ)
+
+$(OUTPUTDIR)/intmask.o: $(BASESRC)/intmask.cpp $(BASESRC)/intmask.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/intmask.o -c $(BASESRC)/intmask.cpp
+	
+$(OUTPUTDIR)/longmask.o: $(BASESRC)/longmask.cpp $(BASESRC)/longmask.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/longmask.o -c $(BASESRC)/longmask.cpp
+	
+$(OUTPUTDIR)/basevector4.o: $(BASESRC)/basevector4.cpp $(BASESRC)/basevector4.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/basevector4.o -c $(BASESRC)/basevector4.cpp
+
+$(OUTPUTDIR)/basevector4array.o: $(BASESRC)/basevector4array.cpp $(BASESRC)/basevector4array.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/basevector4array.o -c $(BASESRC)/basevector4array.cpp
+	
+$(OUTPUTDIR)/basevector4factory.o: $(BASESRC)/basevector4factory.cpp $(BASESRC)/basevector4factory.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/basevector4factory.o -c $(BASESRC)/basevector4factory.cpp
+	
+$(OUTPUTDIR)/basevector2.o: $(BASESRC)/basevector2.cpp $(BASESRC)/basevector2.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/basevector2.o -c $(BASESRC)/basevector2.cpp
+	
+$(OUTPUTDIR)/basevector2factory.o: $(BASESRC)/basevector2factory.cpp $(BASESRC)/basevector2factory.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/basevector2factory.o -c $(BASESRC)/basevector2factory.cpp
+
+$(OUTPUTDIR)/basevector2array.o: $(BASESRC)/basevector2array.cpp $(BASESRC)/basevector2array.h 
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/basevector2array.o -c $(BASESRC)/basevector2array.cpp
+	
+	
+# ==================================
+# Util
+# ==================================	
+
+UTILSRC= src/util
+UTILSRCS= $(UTILSRC)/datastack.cpp $(UTILSRC)/engineutility.cpp $(UTILSRC)/time.cpp
+UTILOBJ= $(OUTPUTDIR)/datastack.o $(OUTPUTDIR)/engineutility.o $(OUTPUTDIR)/time.o
+
+util: $(UTILOBJ)
+
+$(OUTPUTDIR)/datastack.o: $(UTILSRC)/datastack.cpp $(UTILSRC)/datastack.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/datastack.o -c $(UTILSRC)/datastack.cpp 
+
+$(OUTPUTDIR)/engineutility.o: $(UTILSRC)/engineutility.cpp $(UTILSRC)/engineutility.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/engineutility.o -c $(UTILSRC)/engineutility.cpp 
+	
+$(OUTPUTDIR)/time.o: $(UTILSRC)/time.cpp $(UTILSRC)/time.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/time.o -c $(UTILSRC)/time.cpp 
+
+# ==================================
+# Math
+# ==================================
+
+GTEMATHSRC= src/gtemath
+GTEMATHSRCS= $(GTEMATHSRC)/gtemath.cpp
+GTEMATHOBJ= $(OUTPUTDIR)/gtemath.o
+
+gtemath: $(GTEMATHOBJ)
+
+$(OUTPUTDIR)/gtemath.o: $(GTEMATHSRC)/gtemath.cpp $(GTEMATHSRC)/gtemath.h
+	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/gtemath.o -c $(GTEMATHSRC)/gtemath.cpp
+
+# ==================================
+# MAIN
+# ==================================
+
+ALLSRCS= $(ENGINESRCS) $(BASESRCS) $(UTILSRCS) $(GTEDEMOSRCS) $(GTEMATHSRCS) $(GEOMETRYSRCS) $(GRAPHICSOBJECTSRCS) $(DEBUGSRCS) $(GRAPHICSSRCS) $(ANIMATIONSRCS) $(LIGHTSRCS) $(IMAGESRCS) $(VIEWSYSSRCS) $(RENDERSRCS) $(SHADERSRCS) $(TEXTURESRCS) $(GLOBALSRCS) $(ENGINEOBJECTSRCS) $(ASSETSRCS) $(FILESYSTEMSRCS) $(INPUTSRCS) $(ERRORSRCS)
+
+OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEDEMOOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(GRAPHICSOBJ) $(ANIMATIONOBJ) $(LIGHTOBJ) $(IMAGEOBJ) $(VIEWSYSOBJ) $(RENDEROBJ) $(SHADEROBJ) $(TEXTUREOBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)

@@ -1,6 +1,7 @@
 bin/
 lib/
 obj/
+output/
 .cproject
 .project
 ldlibs.sh
