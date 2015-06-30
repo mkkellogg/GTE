@@ -13,7 +13,7 @@ namespace GTE
 	public:
 
 		Point3Array();
-		virtual ~Point3Array();
+		~Point3Array() override;
 
 		void SetData(const Real * data, Bool includeW);
 		Point3 * GetPoint(Int32 index);

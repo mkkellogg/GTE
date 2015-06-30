@@ -129,7 +129,7 @@ namespace GTE
 		SkeletonRef LoadSkeleton(const aiScene& scene) const;
 		VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, Bool reverseVertexOrder) const;
 		void AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const;
-		void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
+		void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRefConst skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
 		unsigned CountBones(const aiScene& scene) const;
 		Bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
 		AnimationRef LoadAnimation(aiAnimation& animation, Bool addLoopPadding) const;

@@ -334,7 +334,7 @@ namespace GTE
 	void Transform::BuildPerspectiveProjectionMatrixInfiniteFar(Matrix4x4& matrix, Real fov, Real ratio, Real nearP)
 	{
 		// convert fov to radians
-		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 *.5);
+		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 * .5f);
 
 		matrix.SetIdentity();
 

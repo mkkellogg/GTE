@@ -76,12 +76,12 @@ namespace GTE
 		void CheckWeights();
 		void ApplyActiveAnimations();
 		void UpdateAnimationsProgress();
-		void UpdateAnimationInstanceProgress(AnimationInstanceRef instance);
-		void CalculateInterpolatedValues(AnimationInstanceRef instance, UInt32 channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-		void CalculateInterpolatedTranslation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
-		void CalculateInterpolatedScale(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
-		void CalculateInterpolatedRotation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
-		Bool CalculateInterpolation(AnimationInstanceRef instance, const KeyFrameSet& keyFrameSet, UInt32& lastIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const;
+		void UpdateAnimationInstanceProgress(AnimationInstanceRef instance) const;
+		void CalculateInterpolatedValues(AnimationInstanceRefConst instance, UInt32 channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+		void CalculateInterpolatedTranslation(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
+		void CalculateInterpolatedScale(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
+		void CalculateInterpolatedRotation(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
+		Bool CalculateInterpolation(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, UInt32& lastIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const;
 		Real GetKeyFrameTime(TransformationCompnent transformationComponent, Int32 frameIndex, const KeyFrameSet& keyFrameSet) const;
 
 		void SetSpeed(UInt32 animationIndex, Real speedFactor);
@@ -92,16 +92,15 @@ namespace GTE
 
 	public:
 
-		void AddAnimation(AnimationRef animation);
-		void SetSpeed(AnimationRef animation, Real speedFactor);
-		void Play(AnimationRef animation);
-		void Stop(AnimationRef animation);
-		void Pause(AnimationRef animation);
-		void Resume(AnimationRef animation);
-		void CrossFade(AnimationRef target, Real duration);
-		void CrossFade(AnimationRef target, Real duration, Bool queued);
-
-		void SetPlaybackMode(AnimationRef target, PlaybackMode playbackMode);
+		void AddAnimation(AnimationRefConst animation);
+		void SetSpeed(AnimationRefConst animation, Real speedFactor);
+		void Play(AnimationRefConst animation);
+		void Stop(AnimationRefConst animation);
+		void Pause(AnimationRefConst animation);
+		void Resume(AnimationRefConst animation);
+		void CrossFade(AnimationRefConst target, Real duration);
+		void CrossFade(AnimationRefConst target, Real duration, Bool queued);
+		void SetPlaybackMode(AnimationRefConst target, PlaybackMode playbackMode);
 	};
 }
 

@@ -44,11 +44,11 @@ namespace GTE
 
 	public:
 
-		Bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, Real *srcData);
+		Bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, const Real *srcData);
 		void SetData(const Real * srcData);
 		const Real * GetDataPtr() const;
 		Bool IsGPUBuffer() const;
-		GLuint GetGPUBufferID();
+		GLuint GetGPUBufferID() const;
 		UInt32 GetFullSize() const;
 	};
 }

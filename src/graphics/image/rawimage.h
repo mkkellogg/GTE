@@ -37,8 +37,8 @@ namespace GTE
 		void SetByte(UInt32 index, Byte byte);
 
 		Byte * GetPixels();
-		UInt32 GetWidth();
-		UInt32 GetHeight();
+		UInt32 GetWidth() const;
+		UInt32 GetHeight() const;
 	};
 }
 

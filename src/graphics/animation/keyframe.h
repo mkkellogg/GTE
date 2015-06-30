@@ -29,7 +29,7 @@ namespace GTE
 
 		KeyFrame();
 		KeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks);
-		~KeyFrame();
+		virtual ~KeyFrame();
 	};
 }
 

@@ -90,6 +90,11 @@ namespace GTE
 		return transform;
 	}
 
+	const SceneObjectTransform& SceneObject::GetConstTransform() const
+	{
+		return transform;
+	}
+
 	void SceneObject::SetAggregateTransform(Transform& transform)
 	{
 		processingTransform.SetTo(transform);
@@ -300,7 +305,7 @@ namespace GTE
 		}
 	}
 
-	SceneObjectRef SceneObject::GetParent()
+	SceneObjectRef SceneObject::GetParent() const
 	{
 		return parent;
 	}

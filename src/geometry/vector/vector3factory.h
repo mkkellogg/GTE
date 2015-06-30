@@ -17,10 +17,10 @@ namespace GTE
 		static Vector3Factory * Instance();
 
 		Vector3Factory();
-		virtual ~Vector3Factory();
+		~Vector3Factory() override;
 
-		BaseVector4 * CreatePermAttached(Real * target);
-		BaseVector4 ** CreateArray(Int32 count);
+		BaseVector4 * CreatePermAttached(Real * target) override;
+		BaseVector4 ** CreateArray(Int32 count) override;
 	};
 }
 

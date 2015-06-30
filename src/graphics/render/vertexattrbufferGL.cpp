@@ -54,7 +54,7 @@ namespace GTE
 	 * [dataOnGPU] - Make this a VBO.
 	 * [srcData] - Data to be copied into the buffer after initialization.
 	 */
-	Bool VertexAttrBufferGL::Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, Real *srcData)
+	Bool VertexAttrBufferGL::Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, const Real *srcData)
 	{
 		// if this buffer has already be initialized we need to destroy it and start fresh
 		Destroy();
@@ -174,7 +174,7 @@ namespace GTE
 	/*
 	 *  Get the OpenGL id of the VBO.
 	 */
-	GLuint VertexAttrBufferGL::GetGPUBufferID()
+	GLuint VertexAttrBufferGL::GetGPUBufferID() const
 	{
 		return gpuBufferID;
 	}

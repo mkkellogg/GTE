@@ -13,7 +13,7 @@ namespace GTE
 	public:
 
 		Vector3Array();
-		virtual ~Vector3Array();
+		~Vector3Array() override;
 
 		void SetData(const Real * data, Bool includeW);
 		Vector3 * GetVector(Int32 index);

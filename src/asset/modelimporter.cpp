@@ -1034,7 +1034,7 @@ void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const ai
 	}
 }
 
-void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRef skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const
+void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRefConst skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const
 {
 	NONFATAL_ASSERT(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.", true);
 

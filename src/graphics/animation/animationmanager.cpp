@@ -46,7 +46,7 @@ namespace GTE
 	 * [skeleton. This match-up is accomplished by matching the name of the channel to the name
 	 * of the skeleton node.
 	 */
-	Bool AnimationManager::IsCompatible(SkeletonRef skeleton, AnimationRef animation) const
+	Bool AnimationManager::IsCompatible(SkeletonRefConst skeleton, AnimationRefConst animation) const
 	{
 		NONFATAL_ASSERT_RTRN(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false, true);
 		NONFATAL_ASSERT_RTRN(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false, true);
@@ -72,7 +72,8 @@ namespace GTE
 
 			for (UInt32 n = 0; n < skeletonNodeCount; n++)
 			{
-				SkeletonNode * node = skeleton->GetNodeFromList(n);
+				Skeleton * skeletonPtr = const_cast<Skeleton *>(skeleton.GetConstPtr());
+				SkeletonNode * node = skeletonPtr->GetNodeFromList(n);
 				if (node->Name == *channelName)
 				{
 					foundNodeForChannel = true;
@@ -95,12 +96,14 @@ namespace GTE
 	/*
 	 * Determine if the Skeleton object belonging to [meshRenderer] is compatible with target Skeleton of [animation].
 	 */
-	Bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRef meshRenderer, AnimationRef animation) const
+	Bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRefConst meshRenderer, AnimationRefConst animation) const
 	{
 		NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false, true);
-		NONFATAL_ASSERT_RTRN(meshRenderer->GetSkeleton().IsValid(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false, true);
 
-		return IsCompatible(meshRenderer->GetSkeleton(), animation);
+		SkinnedMesh3DRenderer * rendererPtr = const_cast<SkinnedMesh3DRenderer *>(meshRenderer.GetConstPtr());
+		NONFATAL_ASSERT_RTRN(rendererPtr->GetSkeleton().IsValid(), "AnimationManager::IsCompatible -> Mesh skeleton is not valid.", false, true);
+
+		return IsCompatible(rendererPtr->GetSkeleton(), animation);
 	}
 
 	/*
@@ -147,10 +150,12 @@ namespace GTE
 	 * Check active players to see if any are playing animations for the skeleton belonging to [renderer].
 	 * If not, create one and assign it to [target].
 	 */
-	AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRef renderer)
+	AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRefConst renderer)
 	{
 		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Mesh renderer is not valid.", AnimationPlayerRef::Null(), true);
-		return RetrieveOrCreateAnimationPlayer(renderer->GetSkeleton());
+
+		SkinnedMesh3DRenderer * rendererPtr = const_cast<SkinnedMesh3DRenderer *>(renderer.GetConstPtr());
+		return RetrieveOrCreateAnimationPlayer(rendererPtr->GetSkeleton());
 	}
 }
 

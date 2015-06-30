@@ -189,7 +189,7 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 	lavaField = new LavaField(30);
 	lavaField->Init();
 	lavaField->SetDisplacementSpeed(.05f);
-	lavaField->SetTextureASpeed(.015f);
+	lavaField->SetTextureASpeed(.010f);
 	lavaField->SetTextureBSpeed(.035f);
 	lavaField->SetDisplacementHeight(6);
 	lavaField->SetDisplacementTileSize(3);

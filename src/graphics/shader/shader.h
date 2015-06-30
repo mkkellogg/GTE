@@ -49,10 +49,10 @@ namespace GTE
 		Shader(const ShaderSource& shaderSource);
 		virtual ~Shader();
 		virtual Bool Load() = 0;
-		virtual Bool IsLoaded() = 0;
+		virtual Bool IsLoaded() const = 0;
 		virtual Int32 GetAttributeVarID(const std::string& varName) const = 0;
 		virtual Int32 GetUniformVarID(const std::string& varName) const = 0;
-		virtual void SendBufferToShader(Int32 varID, VertexAttrBuffer * buffer) = 0;
+		virtual void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer) = 0;
 
 		virtual void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureRef texture) = 0;
 		virtual void SendUniformToShader(Int32 varID, const Matrix4x4 * mat) = 0;

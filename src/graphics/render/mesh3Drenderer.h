@@ -60,11 +60,11 @@ namespace GTE
 		void AddMaterial(MaterialRef material);
 
 		virtual void InitializeForMesh();
-		void InitializeForMesh(Mesh3DRef mesh);
+		void InitializeForMesh(Mesh3DRefConst mesh);
 		void UpdateFromSubMesh(UInt32 index);
 
 		virtual Mesh3DRef GetTargetMesh();
-		SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer);
+		SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererRefConst subRenderer);
 		virtual SubMesh3DRef GetSubMesh(UInt32 index);
 		SubMesh3DRendererRef GetSubRenderer(UInt32 index);
 		UInt32 GetSubRendererCount() const;

@@ -39,7 +39,7 @@ namespace GTE
 
 	public:
 
-		TextureAttributes GetAttributes();
+		TextureAttributes GetAttributes() const;
 		RawImage * GetImageData(UInt32 index);
 	};
 }

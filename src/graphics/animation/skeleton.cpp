@@ -62,7 +62,7 @@ namespace GTE
 	/*
 	 * Get the number of bones in this skeleton.
 	 */
-	UInt32 Skeleton::GetBoneCount()
+	UInt32 Skeleton::GetBoneCount() const
 	{
 		return boneCount;
 	}
@@ -70,9 +70,9 @@ namespace GTE
 	/*
 	 * Get the number of nodes in this skeleton.
 	 */
-	UInt32 Skeleton::GetNodeCount()
+	UInt32 Skeleton::GetNodeCount() const
 	{
-		return nodeList.size();
+		return (UInt32)nodeList.size();
 	}
 
 	/*
@@ -118,7 +118,7 @@ namespace GTE
 	/*
 	 * Set the mapping from a bone name to its index in [boneNameMap]
 	 */
-	void Skeleton::MapBone(std::string& name, UInt32 boneIndex)
+	void Skeleton::MapBone(const std::string& name, UInt32 boneIndex)
 	{
 		boneNameMap[name] = boneIndex;
 	}
@@ -127,7 +127,7 @@ namespace GTE
 	 * Get the index in [boneNameMap] to which [name] corresponds. If no valid mapping
 	 * is found, -1 is returned.
 	 */
-	Int32 Skeleton::GetBoneMapping(std::string& name)
+	Int32 Skeleton::GetBoneMapping(const std::string& name) const
 	{
 		std::unordered_map<std::string, UInt32>::const_iterator result = boneNameMap.find(name);
 		if (result != boneNameMap.end())
@@ -160,7 +160,7 @@ namespace GTE
 	 * Get the index in [nodeName] to which [name] corresponds. If no valid mapping
 	 * is found, -1 is returned.
 	 */
-	Int32 Skeleton::GetNodeMapping(std::string& name)
+	Int32 Skeleton::GetNodeMapping(const std::string& name) const
 	{
 		std::unordered_map<std::string, UInt32>::const_iterator result = nodeNameMap.find(name);
 		if (result != nodeNameMap.end())
@@ -196,20 +196,20 @@ namespace GTE
 	/*
 	 * Replace the bones in this skeleton with matching bones from [skeleton].
 	 */
-	void Skeleton::OverrideBonesFrom(SkeletonRef skeleton, Bool takeOffset, Bool takeNode)
+	void Skeleton::OverrideBonesFrom(SkeletonRefConst skeleton, Bool takeOffset, Bool takeNode)
 	{
 		NONFATAL_ASSERT(skeleton.IsValid(), "Skeleton::OverrideBonesFrom -> 'skeleton' is not valid.", true);
-		OverrideBonesFrom(skeleton.GetPtr(), takeOffset, takeNode);
+		OverrideBonesFrom(skeleton.GetConstPtr(), takeOffset, takeNode);
 	}
 
 	/*
 	 * Replace the bones in this skeleton with matching bones from [skeleton].
 	 */
-	void Skeleton::OverrideBonesFrom(Skeleton * skeleton, Bool takeOffset, Bool takeNode)
+	void Skeleton::OverrideBonesFrom(const Skeleton * skeleton, Bool takeOffset, Bool takeNode)
 	{
 		for (UInt32 n = 0; n < skeleton->GetBoneCount(); n++)
 		{
-			Bone * newBone = skeleton->GetBone(n);
+			Bone * newBone = const_cast<Skeleton *>(skeleton)->GetBone(n);
 			for (UInt32 c = 0; c < GetBoneCount(); c++)
 			{
 				Bone * currentBone = GetBone(c);

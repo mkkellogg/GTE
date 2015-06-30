@@ -64,12 +64,12 @@ namespace GTE
 		return colorTexture;
 	}
 
-	UInt32 RenderTarget::GetWidth()
+	UInt32 RenderTarget::GetWidth() const
 	{
 		return width;
 	}
 
-	UInt32 RenderTarget::GetHeight()
+	UInt32 RenderTarget::GetHeight() const
 	{
 		return height;
 	}

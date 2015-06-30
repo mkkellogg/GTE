@@ -190,8 +190,8 @@ namespace GTE
 	 *
 	 * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch11.html
 	 *
-	 * However, in order to reduce Z-fighting artifacts with mesh polygons that face the light, this
-	 * method uses a modified approach: Light-facing polygons are ignored completely. The front cap of the shadow volume
+	 * If [backFacesFrontCap] is true, in order to reduce Z-fighting artifacts with mesh polygons that face the light, this
+	 * method will use a modified approach: Light-facing polygons are ignored completely. The front cap of the shadow volume
 	 * is actually made up of the back-facing polygons (polygons facing away from the light). This still
 	 * produces the correct effect with out the front-facing Z-fighting issues.
 	 *
@@ -206,7 +206,7 @@ namespace GTE
 	 * this algorithm generates a shadow volume for each back-facing triangle individually. This results in much more
 	 * complex shadow volume geometry that incurs a significant performance penalty, but it will fix artifacts from really bad meshes.
 	 */
-	void SubMesh3DRenderer::BuildShadowVolume(Vector3& lightPosDir, Bool directional, Bool backFacesFrontCap)
+	void SubMesh3DRenderer::BuildShadowVolume(const Vector3& lightPosDir, Bool directional, Bool backFacesFrontCap)
 	{
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> Mesh is invalid.");
@@ -252,8 +252,8 @@ namespace GTE
 		Point3 vertexAvg;
 
 		// temp working variables related to adjacency processing
-		Real * edgeVertex1 = NULL;
-		Real * edgeVertex2 = NULL;
+		Real* edgeVertex1 = NULL;
+		Real* edgeVertex2 = NULL;
 		Real* adjVertex1 = NULL;
 		Real* adjVertex2 = NULL;
 		Real* adjVertex3 = NULL;
@@ -572,12 +572,7 @@ namespace GTE
 		Bool shadowVolumeInitSuccess = true;
 		shadowVolumeInitSuccess = shadowVolumePositions.Init(storedVertexCount * 8);
 		shadowVolumeInitSuccess &= InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 8, 4, 0);
-		if (!shadowVolumeInitSuccess)
-		{
-			Debug::PrintError("SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
-			DestroyBuffers();
-			return false;
-		}
+		ASSERT(shadowVolumeInitSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
 
 		boundShadowVolumeAttributeBuffers.clear();
 		VertexAttrBufferBinding shadowVolumePositionBinding(attributeBuffers[(Int32)StandardAttribute::ShadowPosition], StandardAttribute::ShadowPosition, -1);
@@ -614,14 +609,9 @@ namespace GTE
 				UInt32 positionCount = positions->GetCount();
 				if (positionCount != transformedPositions.GetCount())
 				{
-					if (!transformedPositions.Init(positionCount))
-					{
-						doAttributeTransform = false;
-						doPositionTransform = false;
-						doNormalTransform = false;
-						Debug::PrintError("SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed positions array.");
-						return false;
-					}
+					Bool initSuccess = transformedPositions.Init(positionCount);
+					ASSERT(initSuccess == true, "SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed positions array.");
+
 				}
 
 				doPositionTransform = true;
@@ -634,14 +624,9 @@ namespace GTE
 				UInt32 normalCount = normals->GetCount();
 				if (transformedVertexNormals.GetCount() != normalCount)
 				{
-					if (!transformedVertexNormals.Init(normalCount) || !transformedFaceNormals.Init(normalCount))
-					{
-						doAttributeTransform = false;
-						doPositionTransform = false;
-						doNormalTransform = false;
-						Debug::PrintError("SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed normals array.");
-						return false;
-					}
+					Bool initSuccess = transformedVertexNormals.Init(normalCount);
+					if (initSuccess == true)initSuccess = initSuccess && transformedFaceNormals.Init(normalCount);
+					ASSERT(initSuccess == true, "SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed normals array.");
 				}
 
 				doNormalTransform = true;
@@ -654,14 +639,8 @@ namespace GTE
 				UInt32 tangentCount = tangents->GetCount();
 				if (transformedVertexTangents.GetCount() != tangentCount)
 				{
-					if (!transformedVertexTangents.Init(tangentCount))
-					{
-						doAttributeTransform = false;
-						doPositionTransform = false;
-						doNormalTransform = false;
-						Debug::PrintError("SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed tangents array.");
-						return false;
-					}
+					Bool initSuccess = transformedVertexTangents.Init(tangentCount);
+					ASSERT(initSuccess == true, "SubMesh3DRenderer::UpdateAttributeTransformerData -> Unable to init transformed tangents array.");
 				}
 
 				doTangentTransform = true;
@@ -884,7 +863,7 @@ namespace GTE
 	 * attribute transformer is not being used, then this value will be the same as the target
 	 * sub-mesh's existing center.
 	 */
-	const Point3* SubMesh3DRenderer::GetFinalCenter()
+	const Point3* SubMesh3DRenderer::GetFinalCenter() const
 	{
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::Render -> Could not find matching sub mesh for sub renderer.");
@@ -964,7 +943,7 @@ namespace GTE
 	/*
 	 * Access [doBackSetShadowVolume] member boolean.
 	 */
-	Bool SubMesh3DRenderer::GetUseBackSetShadowVolume()
+	Bool SubMesh3DRenderer::GetUseBackSetShadowVolume() const
 	{
 		return doBackSetShadowVolume;
 	}

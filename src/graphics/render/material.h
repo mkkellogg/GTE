@@ -157,7 +157,7 @@ namespace GTE
 
 		void ResetVerificationState();
 
-		ShaderRef GetShader() const;
+		ShaderRef GetShader() ;
 
 		StandardAttributeSet GetStandardAttributes() const;
 		void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
@@ -172,7 +172,7 @@ namespace GTE
 		void SetUniform1f(Real val, const std::string& varName);
 		void SetUniform2f(Real v1, Real v2, const std::string& varName);
 		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName);
-		void SetColor(Color4 val, const std::string& varName);
+		void SetColor(const Color4& val, const std::string& varName);
 		UInt32 GetSetUniformCount() const;
 
 		void SendClipPlaneCountToShader(UInt32 count);

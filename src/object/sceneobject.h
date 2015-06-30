@@ -70,6 +70,7 @@ namespace GTE
 		IntMask GetLayerMask() const;
 
 		SceneObjectTransform& GetTransform();
+		const SceneObjectTransform& GetConstTransform() const;
 		const Transform& GetAggregateTransform() const;
 
 		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
@@ -91,7 +92,7 @@ namespace GTE
 		void RemoveChild(SceneObjectRef child);
 		UInt32 GetChildrenCount() const;
 		SceneObjectRef GetChildAt(UInt32 index) const;
-		SceneObjectRef GetParent();
+		SceneObjectRef GetParent() const;
 
 		// TODO: optimize this hashing function (implement correctly)
 		typedef struct

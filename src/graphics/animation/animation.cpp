@@ -105,7 +105,7 @@ namespace GTE
 	/*
 	 * Return the number of KeyFrameSet objects in [keyFrames].
 	 */
-	UInt32 Animation::GetChannelCount()
+	UInt32 Animation::GetChannelCount() const
 	{
 		return channelCount;
 	}
@@ -119,7 +119,7 @@ namespace GTE
 		return keyFrames + nodeIndex;
 	}
 
-	const std::string * Animation::GetChannelName(UInt32 index)
+	const std::string * Animation::GetChannelName(UInt32 index) const
 	{
 		NONFATAL_ASSERT_RTRN(index < channelCount, "Animation::GetChannelName -> 'index' is out of range.", NULL, true);
 		return channelNames + index;

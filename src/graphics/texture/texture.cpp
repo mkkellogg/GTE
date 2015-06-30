@@ -37,7 +37,7 @@ namespace GTE
 		imageData.clear();
 	}
 
-	TextureAttributes Texture::GetAttributes()
+	TextureAttributes Texture::GetAttributes() const
 	{
 		return attributes;
 	}

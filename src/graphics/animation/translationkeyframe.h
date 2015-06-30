@@ -27,7 +27,7 @@ namespace GTE
 
 		TranslationKeyFrame();
 		TranslationKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& translation);
-		~TranslationKeyFrame();
+		~TranslationKeyFrame() override;
 	};
 }
 

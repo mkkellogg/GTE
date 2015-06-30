@@ -99,7 +99,7 @@ namespace GTE
 		BaseVector4(const Real * copyData);
 		virtual ~BaseVector4();
 
-		virtual BaseVector4& operator=(const BaseVector4& source);
+		BaseVector4& operator=(const BaseVector4& source);
 
 		Real * GetDataPtr();
 		void Set(Real x, Real y, Real z, Real w);

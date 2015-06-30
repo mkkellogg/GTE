@@ -71,6 +71,7 @@ namespace GTE
 		VertexMappingDescriptor * mappingDescriptors;
 
 		void Destroy();
+		VertexBoneMap * FullClone();
 
 	public:
 
@@ -78,10 +79,9 @@ namespace GTE
 		~VertexBoneMap();
 		Bool Init();
 		VertexMappingDescriptor* GetDescriptor(UInt32 index);
-		UInt32 GetVertexCount();
-		UInt32 GetUniqueVertexCount();
-		void BindTo(SkeletonRef skeleton);
-		VertexBoneMap * FullClone();
+		UInt32 GetVertexCount() const;
+		UInt32 GetUniqueVertexCount() const;
+		void BindTo(SkeletonRefConst skeleton);
 	};
 }
 

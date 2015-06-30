@@ -75,7 +75,7 @@ namespace GTE
 	/*
 	 * Get total number of vertices that are mapped.
 	 */
-	UInt32 VertexBoneMap::GetVertexCount()
+	UInt32 VertexBoneMap::GetVertexCount() const
 	{
 		return vertexCount;
 	}
@@ -83,7 +83,7 @@ namespace GTE
 	/*
 	 * Get number of unique vertices that are mapped.
 	 */
-	UInt32 VertexBoneMap::GetUniqueVertexCount()
+	UInt32 VertexBoneMap::GetUniqueVertexCount() const
 	{
 		return uniqueVertexCount;
 	}
@@ -91,7 +91,7 @@ namespace GTE
 	/*
 	 * Update the bone indices in this map to match that of [skeleton]
 	 */
-	void VertexBoneMap::BindTo(SkeletonRef skeleton)
+	void VertexBoneMap::BindTo(SkeletonRefConst skeleton)
 	{
 		NONFATAL_ASSERT(skeleton.IsValid(), "VertexBoneMap::BindTo -> 'skeleton' is not valid.", true);
 

@@ -49,8 +49,8 @@ namespace GTE
 	typedef int Int32;
 	typedef unsigned int UInt32;
 
-	typedef long Int64;
-	typedef unsigned long UInt64;
+	typedef long long Int64;
+	typedef unsigned long long UInt64;
 
 #endif
 
@@ -79,72 +79,55 @@ namespace GTE
 	class AnimationPlayer;
 	class RenderTarget;
 
-	template <typename T> class EngineObjectRef
+	template <typename T> class EngineObjectRef : public std::shared_ptr<T>
 	{
 		friend class EngineObjectManager;
 
-		std::shared_ptr<T> sharedPtr;
-
 	public:
 
-		EngineObjectRef() : sharedPtr(NULL) {}
-		EngineObjectRef(const EngineObjectRef<T>& ref) : sharedPtr(ref.sharedPtr){}
-		EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : sharedPtr(ptr, deleter)
-		{
-			
-		}
+		EngineObjectRef() : shared_ptr(NULL) {}
+		EngineObjectRef(const EngineObjectRef<T>& ref) : shared_ptr(ref){}
+		EngineObjectRef(const std::shared_ptr<T>& ref) : shared_ptr(ref){}
+		EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : shared_ptr(ptr, deleter){}
 
-		EngineObjectRef<T>& operator=(const EngineObjectRef<T>& other)
-		{
-			if (&other == this)return *this;
-			sharedPtr = other.sharedPtr;
-			return *this;
-		}
-
-		T& operator*()
-		{
-			return sharedPtr.operator*();
-		}
-
-		const T& operator*() const
-		{
-			return sharedPtr.operator*();
-		}
-
-		T* operator->()
-		{
-			return sharedPtr.operator->();
-		}
-
-		const T* operator->() const
-		{
-			return sharedPtr.operator->();
+		operator EngineObjectRef<const T>() const 
+		{ 
+			return EngineObjectRef<const T>(std::shared_ptr<T>(*this));
 		}
 
 		T* GetPtr()
 		{
-			return sharedPtr.get();
+			return get();
 		}
 
 		T& GetRef()
 		{
-			return *sharedPtr;
+			return std::shared_ptr<T>::operator*();
 		}
 
-		Bool operator==(const EngineObjectRef<T> & other) const
+		const T* GetConstPtr() const
 		{
-			return sharedPtr == other.sharedPtr;
+			return get();
+		}
+
+		const T& GetConstRef() const
+		{
+			return std::shared_ptr<T>::operator*();
+		}
+
+		Bool operator==(const EngineObjectRef<T>& other) const
+		{
+			return GetConstPtr() == other.GetConstPtr();
 		}
 
 		Bool IsValid() const
 		{
-			if (sharedPtr)return true;
-			return false;
+			return std::shared_ptr<T>::operator bool();
 		}
 
 		void ForceDelete()
 		{
-			sharedPtr.reset();
+			reset();
 		}
 
 		static EngineObjectRef<T> Null()
@@ -171,6 +154,25 @@ namespace GTE
 	typedef EngineObjectRef<AnimationInstance> AnimationInstanceRef;
 	typedef EngineObjectRef<AnimationPlayer> AnimationPlayerRef;
 	typedef EngineObjectRef<RenderTarget> RenderTargetRef;
+
+	typedef EngineObjectRef<const Shader> ShaderRefConst;
+	typedef EngineObjectRef<const SubMesh3DRenderer> SubMesh3DRendererRefConst;
+	typedef EngineObjectRef<const SubMesh3D> SubMesh3DRefConst;
+	typedef EngineObjectRef<const Mesh3DRenderer> Mesh3DRendererRefConst;
+	typedef EngineObjectRef<const SkinnedMesh3DRenderer> SkinnedMesh3DRendererRefConst;
+	typedef EngineObjectRef<const Mesh3D> Mesh3DRefConst;
+	typedef EngineObjectRef<const Mesh3DFilter> Mesh3DFilterRefConst;
+	typedef EngineObjectRef<const Camera> CameraRefConst;
+	typedef EngineObjectRef<const Light> LightRefConst;
+	typedef EngineObjectRef<const SceneObject> SceneObjectRefConst;
+	typedef EngineObjectRef<const Material> MaterialRefConst;
+	typedef EngineObjectRef<const Texture> TextureRefConst;
+	typedef EngineObjectRef<const Shader> ShaderRefConst;
+	typedef EngineObjectRef<const Skeleton> SkeletonRefConst;
+	typedef EngineObjectRef<const Animation> AnimationRefConst;
+	typedef EngineObjectRef<const AnimationInstance> AnimationInstanceRefConst;
+	typedef EngineObjectRef<const AnimationPlayer> AnimationPlayerRefConst;
+	typedef EngineObjectRef<const RenderTarget> RenderTargetRefConst;
 
 	typedef std::shared_ptr<Transform> TransformRef;
 }

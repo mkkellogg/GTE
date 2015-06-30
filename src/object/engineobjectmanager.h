@@ -115,7 +115,7 @@ namespace GTE
 
 		AnimationRef CreateAnimation(Real duration, Real ticksPerSecond);
 		void DestroyAnimation(AnimationRef animation);
-		AnimationInstanceRef CreateAnimationInstance(SkeletonRef target, AnimationRef animation);
+		AnimationInstanceRef CreateAnimationInstance(SkeletonRef target, AnimationRefConst animation);
 		void DestroyAnimationInstance(AnimationInstanceRef instance);
 		AnimationPlayerRef CreateAnimationPlayer(SkeletonRef target);
 		void DestroyAnimationPlayer(AnimationPlayerRef player);

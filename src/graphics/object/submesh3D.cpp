@@ -106,9 +106,7 @@ namespace GTE
 		const Point3 *pb = positions.GetPointConst(faceIndex + 1);
 		const Point3 *pc = positions.GetPointConst(faceIndex + 2);
 
-		NONFATAL_ASSERT(pa != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
-		NONFATAL_ASSERT(pb != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
-		NONFATAL_ASSERT(pc != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
+		NONFATAL_ASSERT(pa != NULL && pb != NULL && pc != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
 
 		// form 2 vectors based on triangle's vertices
 		Point3::Subtract(*pb, *pa, b);
@@ -119,6 +117,264 @@ namespace GTE
 		c.Normalize();
 
 		result.Set(c.x, c.y, c.z);
+	}
+
+	/*
+	* Calculate vertex normals using the two incident edges to calculate the
+	* cross product. For all triangles that share a given vertex,the method will
+	* calculate the average normal for that vertex as long as the angle between
+	* the un-averaged normals is less than [smoothingThreshhold]. [smoothingThreshhold]
+	* is specified in degrees.
+	*/
+	void SubMesh3D::CalculateNormals(Real smoothingThreshhold)
+	{
+		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))return;
+
+		// loop through each triangle in this mesh's vertices
+		// and calculate normals for each
+		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
+		{
+			Vector3 normal;
+			CalculateFaceNormal(v, normal);
+
+			vertexNormals.GetVector(v)->Set(normal.x, normal.y, normal.z);
+			vertexNormals.GetVector(v + 1)->Set(normal.x, normal.y, normal.z);
+			vertexNormals.GetVector(v + 2)->Set(normal.x, normal.y, normal.z);
+
+			faceNormals.GetVector(v)->Set(normal.x, normal.y, normal.z);
+			faceNormals.GetVector(v + 1)->Set(normal.x, normal.y, normal.z);
+			faceNormals.GetVector(v + 2)->Set(normal.x, normal.y, normal.z);
+		}
+
+		// This vector is used to store the calculated average normal for all equal vertices
+		std::vector<Vector3> averageNormals;
+
+		// loop through each vertex and lookup the associated list of
+		// normals associated with that vertex, and then calculate the
+		// average normal from that list.
+		for (UInt32 v = 0; v < totalVertexCount; v++)
+		{
+			// get existing normal for this vertex
+			Vector3 oNormal;
+			oNormal = *(faceNormals.GetVector(v));
+			oNormal.Normalize();
+
+			// retrieve the list of equal vertices for vertex [v]
+			std::vector<UInt32>* listPtr = vertexCrossMap[v];
+			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
+
+			Vector3 avg(0, 0, 0);
+			Real divisor = 0;
+
+			std::vector<UInt32>& list = *listPtr;
+
+			// compute the cosine of the smoothing threshhold angle
+			Real cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
+
+			for (UInt32 i = 0; i < list.size(); i++)
+			{
+				UInt32 vIndex = list[i];
+				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
+				Vector3 current = *currentPtr;
+				current.Normalize();
+
+				// calculate angle between the normal that exists for this vertex,
+				// and the current normal in the list.
+				Real dot = Vector3::Dot(current, oNormal);
+
+				if (dot > cosSmoothingThreshhold)
+				{
+					avg.x += current.x;
+					avg.y += current.y;
+					avg.z += current.z;
+					divisor++;
+				}
+			}
+
+			// if divisor <= 1, then no valid normals were found to include in the average,
+			// so just use the existing one
+			if (divisor <= 1)
+			{
+				avg.x = oNormal.x;
+				avg.y = oNormal.y;
+				avg.z = oNormal.z;
+			}
+			else
+			{
+				Real scaleFactor = (Real)1.0 / divisor;
+				avg.Scale(scaleFactor);
+				//avg.Normalize();
+			}
+
+			averageNormals.push_back(avg);
+		}
+
+		// loop through each vertex and assign the average normal
+		// calculated for that vertex
+		for (UInt32 v = 0; v < totalVertexCount; v++)
+		{
+			Vector3 avg = averageNormals[v];
+			// set the normal for this vertex to the averaged normal
+			vertexNormals.GetVector(v)->Set(avg.x, avg.y, avg.z);
+		}
+
+		if (invertNormals)InvertNormals();
+	}
+
+	/*
+	* Calculate the tangent for the vertex at [vertexIndex] in member [positions].
+	*
+	* The two edges used in the calculation (e1 and e2) are formed from the three vertices: v0, v1, v2.
+	*
+	* v0 is the vertex at [vertexIndex] in [positions].
+	* v2 is the vertex at [rightIndex] in [positions].
+	* v1 is the vertex at [leftIndex] in [positions].
+	*/
+	void SubMesh3D::CalculateTangent(UInt32 vertexIndex, UInt32 rightIndex, UInt32 leftIndex, Vector3& result)
+	{
+		UV2Array * sourceUVs = &uvs0;
+
+		UV2 * uv0 = sourceUVs->GetCoordinate(vertexIndex);
+		UV2 * uv2 = sourceUVs->GetCoordinate(rightIndex);
+		UV2 * uv1 = sourceUVs->GetCoordinate(leftIndex);
+
+		Vector3 e1, e2;
+
+		Point3 * p0 = positions.GetPoint(vertexIndex);
+		Point3 * p2 = positions.GetPoint(rightIndex);
+		Point3 * p1 = positions.GetPoint(leftIndex);
+
+		Point3::Subtract(*p1, *p0, e1);
+		Point3::Subtract(*p2, *p0, e2);
+
+		Real u0, u1, u2;
+		Real v0, v1, v2;
+
+		u0 = uv0->u;
+		u1 = uv1->u;
+		u2 = uv2->u;
+
+		v0 = uv0->v;
+		v1 = uv1->v;
+		v2 = uv2->v;
+
+		Real du1 = u1 - u0;
+		Real du2 = u2 - u0;
+
+		Real dv1 = v1 - v0;
+		Real dv2 = v2 - v0;
+
+		Real ood = 1.0f / ((du1 * dv2) - (du2 * dv1));
+
+		result.Set(dv2*e1.x - dv1*e2.x, dv2*e1.y - dv1*e2.y, dv2*e1.z - dv1*e2.z);
+
+		result.Scale(ood);
+	}
+
+	/*
+	* Calculate vertex tangents using the two incident edges of a given vertex.
+	* For all triangles that share a given vertex,the method will
+	* calculate the average tangent for that vertex as long as the angle between
+	* the un-averaged normals for the same vertices is less than [smoothingThreshhold].
+	* [smoothingThreshhold is specified in degrees.
+	*/
+	void SubMesh3D::CalculateTangents(Real smoothingThreshhold)
+	{
+		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))return;
+
+		// loop through each triangle in this mesh's vertices
+		// and calculate tangents for each
+		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
+		{
+			Vector3 t0, t1, t2;
+
+			CalculateTangent(v, v + 2, v + 1, t0);
+			CalculateTangent(v + 1, v, v + 2, t1);
+			CalculateTangent(v + 2, v + 1, v, t2);
+
+			vertexTangents.GetVector(v)->SetTo(t0);
+			vertexTangents.GetVector(v + 1)->SetTo(t1);
+			vertexTangents.GetVector(v + 2)->SetTo(t2);
+		}
+
+		// This vector is used to store the calculated average tangent for all equal vertices
+		std::vector<Vector3> averageTangents;
+
+		// loop through each vertex and lookup the associated list of
+		// tangents associated with that vertex, and then calculate the
+		// average tangents from that list.
+		for (UInt32 v = 0; v < totalVertexCount; v++)
+		{
+			// get existing normal for this vertex
+			Vector3 oNormal;
+			oNormal = *(faceNormals.GetVector(v));
+			oNormal.Normalize();
+
+			Vector3 oTangent;
+			oTangent = *(vertexTangents.GetVector(v));
+			oTangent.Normalize();
+
+			// retrieve the list of equal vertices for vertex [v]
+			std::vector<UInt32>* listPtr = vertexCrossMap[v];
+			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
+
+			Vector3 avg(0, 0, 0);
+			Real divisor = 0;
+
+			std::vector<UInt32>& list = *listPtr;
+
+			// compute the cosine of the smoothing threshhold angle
+			Real cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
+
+			for (UInt32 i = 0; i < list.size(); i++)
+			{
+				UInt32 vIndex = list[i];
+				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
+				Vector3 current = *currentPtr;
+				current.Normalize();
+
+				// calculate angle between the normal that exists for this vertex,
+				// and the current normal in the list.
+				Real dot = Vector3::Dot(current, oNormal);
+
+				if (dot > cosSmoothingThreshhold)
+				{
+					Vector3 * tanPtr = vertexTangents.GetVector(vIndex);
+					Vector3 tangent = *tanPtr;
+
+					avg.x += tangent.x;
+					avg.y += tangent.y;
+					avg.z += tangent.z;
+					divisor++;
+				}
+			}
+
+			// if divisor < 1, then no extra tangents were found to include in the average,
+			// so just use the original one
+			if (divisor <= 1)
+			{
+				avg.x = oTangent.x;
+				avg.y = oTangent.y;
+				avg.z = oTangent.z;
+			}
+			else
+			{
+				Real scaleFactor = (Real)1.0 / divisor;
+				avg.Scale(scaleFactor);
+				//avg.Normalize();
+			}
+
+			averageTangents.push_back(avg);
+		}
+
+		// loop through each vertex and assign the average tangent
+		// calculated for that vertex
+		for (UInt32 v = 0; v < totalVertexCount; v++)
+		{
+			Vector3 avg = averageTangents[v];
+			// set the tangent for this vertex to the averaged tangent
+			vertexTangents.GetVector(v)->Set(avg.x, avg.y, avg.z);
+		}
 	}
 
 	/*
@@ -231,264 +487,6 @@ namespace GTE
 	}
 
 	/*
-	 * Calculate vertex normals using the two incident edges to calculate the
-	 * cross product. For all triangles that share a given vertex,the method will
-	 * calculate the average normal for that vertex as long as the angle between
-	 * the un-averaged normals is less than [smoothingThreshhold]. [smoothingThreshhold]
-	 * is specified in degrees.
-	 */
-	void SubMesh3D::CalculateNormals(Real smoothingThreshhold)
-	{
-		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))return;
-
-		// loop through each triangle in this mesh's vertices
-		// and calculate normals for each
-		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
-		{
-			Vector3 normal;
-			CalculateFaceNormal(v, normal);
-
-			vertexNormals.GetVector(v)->Set(normal.x, normal.y, normal.z);
-			vertexNormals.GetVector(v + 1)->Set(normal.x, normal.y, normal.z);
-			vertexNormals.GetVector(v + 2)->Set(normal.x, normal.y, normal.z);
-
-			faceNormals.GetVector(v)->Set(normal.x, normal.y, normal.z);
-			faceNormals.GetVector(v + 1)->Set(normal.x, normal.y, normal.z);
-			faceNormals.GetVector(v + 2)->Set(normal.x, normal.y, normal.z);
-		}
-
-		// This vector is used to store the calculated average normal for all equal vertices
-		std::vector<Vector3> averageNormals;
-
-		// loop through each vertex and lookup the associated list of
-		// normals associated with that vertex, and then calculate the
-		// average normal from that list.
-		for (UInt32 v = 0; v < totalVertexCount; v++)
-		{
-			// get existing normal for this vertex
-			Vector3 oNormal;
-			oNormal = *(faceNormals.GetVector(v));
-			oNormal.Normalize();
-
-			// retrieve the list of equal vertices for vertex [v]
-			std::vector<UInt32>* listPtr = vertexCrossMap[v];
-			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
-
-			Vector3 avg(0, 0, 0);
-			Real divisor = 0;
-
-			std::vector<UInt32>& list = *listPtr;
-
-			// compute the cosine of the smoothing threshhold angle
-			Real cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
-
-			for (UInt32 i = 0; i < list.size(); i++)
-			{
-				UInt32 vIndex = list[i];
-				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
-				Vector3 current = *currentPtr;
-				current.Normalize();
-
-				// calculate angle between the normal that exists for this vertex,
-				// and the current normal in the list.
-				Real dot = Vector3::Dot(current, oNormal);
-
-				if (dot > cosSmoothingThreshhold)
-				{
-					avg.x += current.x;
-					avg.y += current.y;
-					avg.z += current.z;
-					divisor++;
-				}
-			}
-
-			// if divisor < 1, then no valid normals were found to include in the average,
-			// so just use the existing one
-			if (divisor <= 1)
-			{
-				avg.x = oNormal.x;
-				avg.y = oNormal.y;
-				avg.z = oNormal.z;
-			}
-			else
-			{
-				Real scaleFactor = (Real)1.0 / divisor;
-				avg.Scale(scaleFactor);
-				//avg.Normalize();
-			}
-
-			averageNormals.push_back(avg);
-		}
-
-		// loop through each vertex and assign the average normal
-		// calculated for that vertex
-		for (UInt32 v = 0; v < totalVertexCount; v++)
-		{
-			Vector3 avg = averageNormals[v];
-			// set the normal for this vertex to the averaged normal
-			vertexNormals.GetVector(v)->Set(avg.x, avg.y, avg.z);
-		}
-
-		if (invertNormals)InvertNormals();
-	}
-
-	/*
-	 * Calculate the tangent for the vertex at [vertexIndex] in member [positions].
-	 *
-	 * The two edges used in the calculation (e1 and e2) are formed from the three vertices: v0, v1, v2.
-	 *
-	 * v0 is the vertex at [vertexIndex] in [positions].
-	 * v2 is the vertex at [rightIndex] in [positions].
-	 * v1 is the vertex at [leftIndex] in [positions].
-	 */
-	void SubMesh3D::CalculateTangent(UInt32 vertexIndex, UInt32 rightIndex, UInt32 leftIndex, Vector3& result)
-	{
-		UV2Array * sourceUVs = &uvs0;
-
-		UV2 * uv0 = sourceUVs->GetCoordinate(vertexIndex);
-		UV2 * uv2 = sourceUVs->GetCoordinate(rightIndex);
-		UV2 * uv1 = sourceUVs->GetCoordinate(leftIndex);
-
-		Vector3 e1, e2;
-
-		Point3 * p0 = positions.GetPoint(vertexIndex);
-		Point3 * p2 = positions.GetPoint(rightIndex);
-		Point3 * p1 = positions.GetPoint(leftIndex);
-
-		Point3::Subtract(*p1, *p0, e1);
-		Point3::Subtract(*p2, *p0, e2);
-
-		Real u0, u1, u2;
-		Real v0, v1, v2;
-
-		u0 = uv0->u;
-		u1 = uv1->u;
-		u2 = uv2->u;
-
-		v0 = uv0->v;
-		v1 = uv1->v;
-		v2 = uv2->v;
-
-		Real du1 = u1 - u0;
-		Real du2 = u2 - u0;
-
-		Real dv1 = v1 - v0;
-		Real dv2 = v2 - v0;
-
-		Real ood = 1.0f / ((du1 * dv2) - (du2 * dv1));
-
-		result.Set(dv2*e1.x - dv1*e2.x, dv2*e1.y - dv1*e2.y, dv2*e1.z - dv1*e2.z);
-
-		result.Scale(ood);
-	}
-
-	/*
-	 * Calculate vertex tangents using the two incident edges of a given vertex.
-	 * For all triangles that share a given vertex,the method will
-	 * calculate the average tangent for that vertex as long as the angle between
-	 * the un-averaged normals for the same vertices is less than [smoothingThreshhold].
-	 * [smoothingThreshhold is specified in degrees.
-	 */
-	void SubMesh3D::CalculateTangents(Real smoothingThreshhold)
-	{
-		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))return;
-
-		// loop through each triangle in this mesh's vertices
-		// and calculate tangents for each
-		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
-		{
-			Vector3 t0, t1, t2;
-
-			CalculateTangent(v, v + 2, v + 1, t0);
-			CalculateTangent(v + 1, v, v + 2, t1);
-			CalculateTangent(v + 2, v + 1, v, t2);
-
-			vertexTangents.GetVector(v)->SetTo(t0);
-			vertexTangents.GetVector(v + 1)->SetTo(t1);
-			vertexTangents.GetVector(v + 2)->SetTo(t2);
-		}
-
-		// This vector is used to store the calculated average tangent for all equal vertices
-		std::vector<Vector3> averageTangents;
-
-		// loop through each vertex and lookup the associated list of
-		// tangents associated with that vertex, and then calculate the
-		// average tangents from that list.
-		for (UInt32 v = 0; v < totalVertexCount; v++)
-		{
-			// get existing normal for this vertex
-			Vector3 oNormal;
-			oNormal = *(faceNormals.GetVector(v));
-			oNormal.Normalize();
-
-			Vector3 oTangent;
-			oTangent = *(vertexTangents.GetVector(v));
-			oTangent.Normalize();
-
-			// retrieve the list of equal vertices for vertex [v]
-			std::vector<UInt32>* listPtr = vertexCrossMap[v];
-			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
-
-			Vector3 avg(0, 0, 0);
-			Real divisor = 0;
-
-			std::vector<UInt32>& list = *listPtr;
-
-			// compute the cosine of the smoothing threshhold angle
-			Real cosSmoothingThreshhold = (GTEMath::Cos(Constants::DegreesToRads * smoothingThreshhold));
-
-			for (UInt32 i = 0; i < list.size(); i++)
-			{
-				UInt32 vIndex = list[i];
-				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
-				Vector3 current = *currentPtr;
-				current.Normalize();
-
-				// calculate angle between the normal that exists for this vertex,
-				// and the current normal in the list.
-				Real dot = Vector3::Dot(current, oNormal);
-
-				if (dot > cosSmoothingThreshhold)
-				{
-					Vector3 * tanPtr = vertexTangents.GetVector(vIndex);
-					Vector3 tangent = *tanPtr;
-
-					avg.x += tangent.x;
-					avg.y += tangent.y;
-					avg.z += tangent.z;
-					divisor++;
-				}
-			}
-
-			// if divisor < 1, then no extra tangents were found to include in the average,
-			// so just use the original one
-			if (divisor <= 1)
-			{
-				avg.x = oTangent.x;
-				avg.y = oTangent.y;
-				avg.z = oTangent.z;
-			}
-			else
-			{
-				Real scaleFactor = (Real)1.0 / divisor;
-				avg.Scale(scaleFactor);
-				//avg.Normalize();
-			}
-
-			averageTangents.push_back(avg);
-		}
-
-		// loop through each vertex and assign the average tangent
-		// calculated for that vertex
-		for (UInt32 v = 0; v < totalVertexCount; v++)
-		{
-			Vector3 avg = averageTangents[v];
-			// set the tangent for this vertex to the averaged tangent
-			vertexTangents.GetVector(v)->Set(avg.x, avg.y, avg.z);
-		}
-	}
-
-	/*
 	 * Deallocate all memory used by this sub-mesh.
 	 */
 	void SubMesh3D::Destroy()
@@ -560,7 +558,7 @@ namespace GTE
 		this->isDirty = isDirty;
 	}
 
-	Bool SubMesh3D::IsDirty()
+	Bool SubMesh3D::IsDirty() const
 	{
 		return isDirty;
 	}
@@ -695,7 +693,7 @@ namespace GTE
 	/*
 	 * Get the time this mesh was last updated (in seconds since startup)
 	 */
-	Real SubMesh3D::GetTimeStamp()
+	Real SubMesh3D::GetTimeStamp() const
 	{
 		return timeStamp;
 	}

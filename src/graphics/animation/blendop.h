@@ -37,21 +37,22 @@ namespace GTE
 
 		BlendOp(Real duration);
 		virtual ~BlendOp();
+
 		void SetComplete(Bool complete);
 		void SetStarted(Bool started);
 
 	public:
 
 		void Reset();
-		Bool Init(std::vector<Real>& initialWeights);
+		Bool Init(const std::vector<Real>& initialWeights);
 		virtual void Update(std::vector<Real>& weights);
 		virtual void OnStart() = 0;
 		virtual void OnComplete() = 0;
 		virtual void OnStoppedEarly() = 0;
-		Bool HasCompleted();
-		Bool HasStarted();
-		Real GetNormalizedProgress();
-		Real GetProgress();
+		Bool HasCompleted() const;
+		Bool HasStarted() const;
+		Real GetNormalizedProgress() const;
+		Real GetProgress() const;
 
 	};
 }

@@ -175,26 +175,12 @@ namespace GTE
 		SetFaceCullingEnabled(true);
 		SetFaceCullingMode(FaceCullingMode::Back);
 
-		// get depth information for the default color buffer
-		glGetIntegerv(GL_RED_BITS, &redBits);
-		glGetIntegerv(GL_GREEN_BITS, &greenBits);
-		glGetIntegerv(GL_BLUE_BITS, &blueBits);
-		glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
-		// printf("color buffer Bits: %d, %d, %d, %d\n", redBits, greenBits, blueBits, alphaBits);
-
-		// get depth information for the default depth buffer
-		glGetIntegerv(GL_DEPTH_BITS, &depthBufferBits);
-		//printf("depth buffer bits: %d\n", depthBufferBits);
-
-		// get depth information for the default stencil buffer
-		glGetIntegerv(GL_STENCIL_BITS, &stencilBufferBits);
-		// printf("stencil buffer bits: %d\n", stencilBufferBits);
-
 		defaultRenderTarget = Graphics::SetupDefaultRenderTarget();
 		ASSERT(defaultRenderTarget.IsValid(), "GraphicsGL::Init -> Unable to create default render target.");
-
 		ActivateRenderTarget(defaultRenderTarget);
 
+		// For now all VBOs are contained under a single default VAO.
+		// TODO: Fix this and use VAOs properly!
 		GLuint vertex_array;
 		glGenVertexArrays(1, &vertex_array);
 		glBindVertexArray(vertex_array);
@@ -242,14 +228,6 @@ namespace GTE
 	}
 
 	/*
-	 * For now, this method does nothing.
-	 */
-	void GraphicsGL::PreProcessScene()
-	{
-
-	}
-
-	/*
 	 * Update is called once per frame from the Engine class.
 	 */
 	void GraphicsGL::Update()
@@ -260,9 +238,9 @@ namespace GTE
 	/*
 	 * RenderScene is called once per frame from the Engine class.
 	 */
-	void GraphicsGL::RenderScene()
+	void GraphicsGL::PostRender()
 	{
-		Graphics::RenderScene();
+		Graphics::PostRender();
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -301,7 +279,7 @@ namespace GTE
 	/*
 	 * Clear the buffers specified in [bufferMask] for the currently bound framebuffer.
 	 */
-	void GraphicsGL::ClearRenderBuffers(IntMask bufferMask)
+	void GraphicsGL::ClearRenderBuffers(IntMask bufferMask) const
 	{
 		GLbitfield glClearMask = 0;
 		if (IntMaskUtil::IsBitSetForMask(bufferMask, (UInt32)RenderBufferType::Color))
@@ -310,7 +288,6 @@ namespace GTE
 		}
 		if (IntMaskUtil::IsBitSetForMask(bufferMask, (UInt32)RenderBufferType::Depth))
 		{
-			SetDepthBufferReadOnly(false);
 			glClearMask |= GL_DEPTH_BUFFER_BIT;
 		}
 		if (IntMaskUtil::IsBitSetForMask(bufferMask, (UInt32)RenderBufferType::Stencil))
@@ -339,7 +316,7 @@ namespace GTE
 	/*
 	 * Get the current face culling mode.
 	 */
-	FaceCullingMode GraphicsGL::GetFaceCullingMode()
+	FaceCullingMode GraphicsGL::GetFaceCullingMode() const
 	{
 		return faceCullingMode;
 	}
@@ -892,7 +869,7 @@ namespace GTE
 	/*
 	 * Map BlendingProperty elements to OpenGL blending values.
 	 */
-	GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property)
+	GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property) const
 	{
 		switch (property)
 		{
@@ -938,7 +915,7 @@ namespace GTE
 				ShaderRef currentShader = this->activeMaterial->GetShader();
 				if (currentShader.IsValid())
 				{
-					ShaderGL * currentShaderGL = dynamic_cast<ShaderGL *>(currentShader.GetPtr());
+					const ShaderGL * currentShaderGL = dynamic_cast<const ShaderGL *>(currentShader.GetConstPtr());
 					if (currentShaderGL != NULL)
 					{
 						// get the shader ID
@@ -947,13 +924,13 @@ namespace GTE
 				}
 			}
 
-			// call base method
-			Graphics::ActivateMaterial(material);
+			activeMaterial = material;
+			material->ResetVerificationState();
 
 			ShaderRef shader = material->GetShader();
 			NONFATAL_ASSERT(shader.IsValid(), "GraphicsGL::ActivateMaterial -> 'shader' is null.", true);
 
-			ShaderGL * shaderGL = dynamic_cast<ShaderGL *>(shader.GetPtr());
+			const ShaderGL * shaderGL = dynamic_cast<const ShaderGL *>(shader.GetConstPtr());
 			ASSERT(shaderGL != NULL, "GraphicsGL::ActivateMaterial -> Material's shader is not ShaderGL !!");
 
 			// only active the new shader if it is different from the currently active one
@@ -963,6 +940,14 @@ namespace GTE
 				glUseProgram(shaderGL->GetProgramID());
 			}
 		}
+	}
+
+	/*
+	* Get the material that is currently being used for rendering.
+	*/
+	MaterialRef GraphicsGL::GetActiveMaterial()
+	{
+		return activeMaterial;
 	}
 
 	/*
@@ -1072,7 +1057,7 @@ namespace GTE
 	/*
 	 * Get the version of OpenGL installed on this system.
 	 */
-	UInt32 GraphicsGL::GetOpenGLVersion()
+	UInt32 GraphicsGL::GetOpenGLVersion() const
 	{
 		return openGLVersion;
 	}
@@ -1081,7 +1066,7 @@ namespace GTE
 	 * Get the OpenGL constant for texture cube side that corresponds
 	 * to [side].
 	 */
-	GLenum GraphicsGL::GetGLCubeTarget(CubeTextureSide side)
+	GLenum GraphicsGL::GetGLCubeTarget(CubeTextureSide side) const
 	{
 		GLenum target;
 		switch (side)
@@ -1112,7 +1097,7 @@ namespace GTE
 	/*
 	 * Get the OpenGL texture format that corresponds to [format].
 	 */
-	GLenum GraphicsGL::GetGLTextureFormat(TextureFormat format)
+	GLenum GraphicsGL::GetGLTextureFormat(TextureFormat format) const
 	{
 		switch (format)
 		{
@@ -1138,7 +1123,7 @@ namespace GTE
 	/*
 	 * Get the OpenGL pixel format that corresponds to [format].
 	 */
-	GLenum GraphicsGL::GetGLPixelFormat(TextureFormat format)
+	GLenum GraphicsGL::GetGLPixelFormat(TextureFormat format) const
 	{
 		switch (format)
 		{
@@ -1164,7 +1149,7 @@ namespace GTE
 	/*
 	 * Get the OpenGL pixel type that corresponds to [format].
 	 */
-	GLenum GraphicsGL::GetGLPixelType(TextureFormat format)
+	GLenum GraphicsGL::GetGLPixelType(TextureFormat format) const
 	{
 		switch (format)
 		{
@@ -1184,6 +1169,27 @@ namespace GTE
 		}
 
 		return GL_UNSIGNED_BYTE;
+	}
+
+	/*
+	* Record the depth of the currently attached buffers.
+	*/
+	void GraphicsGL::GetCurrentBufferBits()
+	{
+		// get depth information for the default color buffer
+		glGetIntegerv(GL_RED_BITS, &redBits);
+		glGetIntegerv(GL_GREEN_BITS, &greenBits);
+		glGetIntegerv(GL_BLUE_BITS, &blueBits);
+		glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
+		// printf("color buffer Bits: %d, %d, %d, %d\n", redBits, greenBits, blueBits, alphaBits);
+
+		// get depth information for the default depth buffer
+		glGetIntegerv(GL_DEPTH_BITS, &depthBufferBits);
+		//printf("depth buffer bits: %d\n", depthBufferBits);
+
+		// get depth information for the default stencil buffer
+		glGetIntegerv(GL_STENCIL_BITS, &stencilBufferBits);
+		// printf("stencil buffer bits: %d\n", stencilBufferBits);
 	}
 
 	/*
@@ -1209,6 +1215,8 @@ namespace GTE
 
 		currentRenderTarget = target;
 
+		GetCurrentBufferBits();
+
 		return true;
 	}
 
@@ -1230,12 +1238,9 @@ namespace GTE
 			RenderTargetGL * currentTargetGL = dynamic_cast<RenderTargetGL *>(currentRenderTarget.GetPtr());
 			ASSERT(currentTargetGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.");
 
-			if (!currentTargetGL->GetColorTexture()->GetAttributes().IsCube)
-			{
-				std::string msg = "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not cubed.";
-				Engine::Instance()->GetErrorManager()->SetAndReportError(GraphicsError::InvalidRenderTarget, msg);
-				return false;
-			}
+			NONFATAL_ASSERT_RTRN(currentTargetGL->GetColorTexture()->GetAttributes().IsCube, 
+							     "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not cubed.", 
+								 GraphicsError::InvalidRenderTarget, false, true);
 
 			TextureGL * texGL = dynamic_cast<TextureGL*>(currentTargetGL->GetColorTexture().GetPtr());
 			ASSERT(texGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.");
@@ -1266,12 +1271,12 @@ namespace GTE
 	/*
 	 * Copy the contents of one render target to another.
 	 */
-	void GraphicsGL::CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest)
+	void GraphicsGL::CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const
 	{
 		GLuint currentFB = 0;
 		if (currentRenderTarget.IsValid())
 		{
-			RenderTargetGL * currentGL = dynamic_cast<RenderTargetGL*>(currentRenderTarget.GetPtr());
+			const RenderTargetGL * currentGL = dynamic_cast<const RenderTargetGL*>(currentRenderTarget.GetConstPtr());
 			if (currentGL != NULL)
 			{
 				currentFB = currentGL->GetFBOID();
@@ -1284,7 +1289,7 @@ namespace GTE
 		RenderTargetGL * srcGL = dynamic_cast<RenderTargetGL*>(src.GetPtr());
 		ASSERT(srcGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Source is not a valid OpenGL render target.");
 
-		RenderTargetGL * destGL = dynamic_cast<RenderTargetGL*>(dest.GetPtr());
+		const RenderTargetGL * destGL = dynamic_cast<const RenderTargetGL*>(dest.GetConstPtr());
 		ASSERT(destGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Destination is not a valid OpenGL render target.");
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, srcGL->GetFBOID());
@@ -1299,7 +1304,7 @@ namespace GTE
 	/*
 	 * Set the contents of [texture] be that of [data].
 	 */
-	void GraphicsGL::SetTextureData(TextureRef texture, Byte * data)
+	void GraphicsGL::SetTextureData(TextureRef texture, const Byte * data) const
 	{
 		SetTextureData(texture, data, CubeTextureSide::Front);
 	}
@@ -1308,7 +1313,7 @@ namespace GTE
 	 * Set the contents of [texture] be that of [data]. If it is a cube texture, update
 	 * the side specified by [side].
 	 */
-	void GraphicsGL::SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side)
+	void GraphicsGL::SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const
 	{
 		NONFATAL_ASSERT(texture.IsValid(), "GraphicsGL::SetTextureData -> 'texture' is not valid.", true);
 
@@ -1339,7 +1344,7 @@ namespace GTE
 	/*
 	 * Force a rebuild of the mip-maps for [texture].
 	 */
-	void GraphicsGL::RebuildMipMaps(TextureRef texture)
+	void GraphicsGL::RebuildMipMaps(TextureRef texture) const
 	{
 		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
 		ASSERT(texGL != NULL, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");

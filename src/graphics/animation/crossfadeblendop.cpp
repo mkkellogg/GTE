@@ -92,7 +92,7 @@ namespace GTE
 	/*
 	 * Get the target animation index for this cross fade operation.
 	 */
-	UInt32 CrossFadeBlendOp::GetTargetIndex()
+	UInt32 CrossFadeBlendOp::GetTargetIndex() const
 	{
 		return targetIndex;
 	}

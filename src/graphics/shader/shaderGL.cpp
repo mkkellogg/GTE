@@ -223,7 +223,7 @@ namespace GTE
 	/*
 	 * Are the vertex and fragment shaders successfully loaded, compiled, and linked?
 	 */
-	Bool ShaderGL::IsLoaded()
+	Bool ShaderGL::IsLoaded() const
 	{
 		return ready;
 	}
@@ -462,7 +462,7 @@ namespace GTE
 	/*
 	 * Get the OpengGL program ID for this shader
 	 */
-	GLuint ShaderGL::GetProgramID()
+	GLuint ShaderGL::GetProgramID() const
 	{
 		return programID;
 	}
@@ -473,11 +473,11 @@ namespace GTE
 	 * [varID] - shader var ID/location of the attribute for which the value is to be set.
 	 * [buffer] - attribute data to be sent
 	 */
-	void ShaderGL::SendBufferToShader(Int32 varID, VertexAttrBuffer * buffer)
+	void ShaderGL::SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer)
 	{
 		if (varID < 0)return;
 
-		VertexAttrBufferGL * bufferGL = dynamic_cast<VertexAttrBufferGL *>(buffer);
+		const VertexAttrBufferGL * bufferGL = dynamic_cast<const VertexAttrBufferGL *>(buffer);
 		ASSERT(bufferGL != NULL, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
 
 		const Real * data = bufferGL->GetDataPtr();

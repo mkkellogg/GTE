@@ -37,18 +37,18 @@ namespace GTE
 
 	protected:
 
-		~CrossFadeBlendOp();
+		~CrossFadeBlendOp()  override;
 
 	public:
 
-		void Update(std::vector<Real>& weights);
-		void OnStart();
-		void OnComplete();
-		void OnStoppedEarly();
+		void Update(std::vector<Real>& weights) override;
+		void OnStart() override;
+		void OnComplete() override;
+		void OnStoppedEarly() override;
 		void SetOnStartCallback(std::function<void(CrossFadeBlendOp*)> callback);
 		void SetOnCompleteCallback(std::function<void(CrossFadeBlendOp*)> callback);
 		void SetOnStoppedEarlyCallback(std::function<void(CrossFadeBlendOp*)> callback);
-		UInt32 GetTargetIndex();
+		UInt32 GetTargetIndex() const;
 	};
 }
 

@@ -59,9 +59,9 @@ namespace GTE
 	public:
 
 		void ClipEnds(Real startOffsetTicks, Real earlyEndTicks);
-		UInt32 GetChannelCount();
+		UInt32 GetChannelCount() const;
 		KeyFrameSet * GetKeyFrameSet(UInt32 nodeIndex);
-		const std::string * GetChannelName(UInt32 index);
+		const std::string * GetChannelName(UInt32 index) const;
 		void SetChannelName(UInt32 index, const std::string& name);
 		Real GetTicksPerSecond() const;
 		Real GetDurationTicks() const;

@@ -37,7 +37,7 @@ namespace GTE
 	public:
 
 		Bool Init();
-		GLuint GetFBOID();
+		GLuint GetFBOID() const;
 	};
 }
 

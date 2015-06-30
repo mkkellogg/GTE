@@ -49,6 +49,8 @@ namespace GTE
 
 	protected:
 
+		// the material that is currently being used for rendering
+		MaterialRef activeMaterial;
 		// is OpenGL blending enabled?
 		Bool blendingEnabled;
 		// is OpenGL depth buffer enabled?
@@ -63,25 +65,23 @@ namespace GTE
 		Bool stencilTestEnabled;
 		// is face culling enabled in OpenGL?
 		Bool faceCullingEnabled;
+		// which faces will be culled during rendering?
+		FaceCullingMode faceCullingMode;
+		// number of currently active clip planes
+		UInt32 activeClipPlanes;
+		// RenderTarget objects that encapsulates the OpenGL default framebuffer
+		RenderTargetRef defaultRenderTarget;
+		// currently bound render target;
+		RenderTargetRef currentRenderTarget;
 		// number of bits per channel in the OpenGL color buffer
 		Int32 redBits, greenBits, blueBits, alphaBits;
 		// bit depth of the OpenGL depth buffer
 		Int32 depthBufferBits;
 		// bit depth of the OpenGL stencil buffer
 		Int32 stencilBufferBits;
-		// which faces will be culled during rendering?
-		FaceCullingMode faceCullingMode;
-
-		// number of currently active clip planes
-		UInt32 activeClipPlanes;
 
 		// is the graphics system initialized?
 		Bool initialized;
-
-		// RenderTarget objects that encapsulates the OpenGL default framebuffer
-		RenderTargetRef defaultRenderTarget;
-		// currently bound render target;
-		RenderTargetRef currentRenderTarget;
 
 		GraphicsGL();
 		~GraphicsGL();
@@ -90,83 +90,86 @@ namespace GTE
 		UInt32 openGLVersion;
 		UInt32 openGLMinorVersion;
 
-		void PreProcessScene();
-		Bool Start();
-		void End();
-		void Update();
-		void RenderScene();
+		Bool Start() override;
+		void End() override;
+		void Update() override;
+		void PostRender() override;
 
-		RenderTarget * CreateDefaultRenderTarget();
+		RenderTarget * CreateDefaultRenderTarget() override;
 
-		GLenum GetGLCubeTarget(CubeTextureSide side);
-		GLenum GetGLTextureFormat(TextureFormat format);
-		GLenum GetGLPixelFormat(TextureFormat format);
-		GLenum GetGLPixelType(TextureFormat format);
+		GLenum GetGLCubeTarget(CubeTextureSide side) const;
+		GLenum GetGLTextureFormat(TextureFormat format) const;
+		GLenum GetGLPixelFormat(TextureFormat format) const;
+		GLenum GetGLPixelType(TextureFormat format) const;
+
+		void GetCurrentBufferBits();
 
 	public:
 
 		GLFWwindow* GetGLFWWindow();
 
-		Shader * CreateShader(const ShaderSource& shaderSource);
-		void DestroyShader(Shader * shader);
-		VertexAttrBuffer * CreateVertexAttributeBuffer();
-		void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer);
-		Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes);
-		Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes);
-		Texture * CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, const TextureAttributes&  attributes);
+		Shader * CreateShader(const ShaderSource& shaderSource) override;
+		void DestroyShader(Shader * shader) override;
+		VertexAttrBuffer * CreateVertexAttributeBuffer() override;
+		void DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer) override;
+		Texture * CreateTexture(const std::string& sourcePath, const TextureAttributes&  attributes) override;
+		Texture * CreateTexture(RawImage * imageData, const TextureAttributes&  attributes) override;
+		Texture * CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, const TextureAttributes&  attributes) override;
 		Texture * CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
 									Byte * backData, UInt32 backw, UInt32 backh,
 									Byte * topData, UInt32 tw, UInt32 th,
 									Byte * bottomData, UInt32 botw, UInt32 both,
 									Byte * leftData, UInt32 lw, UInt32 lh,
-									Byte * rightData, UInt32 rw, UInt32 rh);
+									Byte * rightData, UInt32 rw, UInt32 rh) override;
 		Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
-									RawImage * bottomData, RawImage * leftData, RawImage * rightData);
+									RawImage * bottomData, RawImage * leftData, RawImage * rightData) override;
 		Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-									const std::string& bottom, const std::string& left, const std::string& right);
-		void DestroyTexture(Texture * texture);
+									const std::string& bottom, const std::string& left, const std::string& right) override;
+		void DestroyTexture(Texture * texture) override;
 		RenderTarget * CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
-										  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height);
-		void DestroyRenderTarget(RenderTarget * target);
+										  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) override;
+		void DestroyRenderTarget(RenderTarget * target) override;
 
-		RenderTargetRef GetDefaultRenderTarget();
-		void ClearRenderBuffers(IntMask bufferMask);
+		RenderTargetRef GetDefaultRenderTarget() override;
+		void ClearRenderBuffers(IntMask bufferMask) const override;
 
-		void SetFaceCullingMode(FaceCullingMode mode);
-		FaceCullingMode GetFaceCullingMode();
-		void SetFaceCullingEnabled(Bool enabled);
+		void SetFaceCullingMode(FaceCullingMode mode) override;
+		FaceCullingMode GetFaceCullingMode() const override;
+		void SetFaceCullingEnabled(Bool enabled) override;
 
-		void SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a);
-		void SetDepthBufferEnabled(Bool enabled);
-		void SetDepthBufferReadOnly(Bool readOnly);
-		void SetDepthBufferFunction(DepthBufferFunction function);
-		void SetStencilBufferEnabled(Bool enabled);
-		void SetStencilTestEnabled(Bool enabled);
+		void SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a) override;
+		void SetDepthBufferEnabled(Bool enabled) override;
+		void SetDepthBufferReadOnly(Bool readOnly) override;
+		void SetDepthBufferFunction(DepthBufferFunction function) override;
+		void SetStencilBufferEnabled(Bool enabled) override;
+		void SetStencilTestEnabled(Bool enabled) override;
 
-		void SetBlendingEnabled(Bool enabled);
-		void SetBlendingFunction(BlendingProperty source, BlendingProperty dest);
-		GLenum GetGLBlendProperty(BlendingProperty property);
-		void ActivateMaterial(MaterialRef material);
+		void SetBlendingEnabled(Bool enabled) override;
+		void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) override;
+		GLenum GetGLBlendProperty(BlendingProperty property) const;
 
-		void EnterRenderMode(RenderMode renderMode);
+		void ActivateMaterial(MaterialRef material) override;
+		MaterialRef GetActiveMaterial() override;
 
-		Bool Init(const GraphicsAttributes& attributes);
-		UInt32 GetOpenGLVersion();
+		void EnterRenderMode(RenderMode renderMode) override;
 
-		Bool ActivateRenderTarget(RenderTargetRef target);
-		RenderTargetRef GetCurrrentRenderTarget();
-		Bool ActivateCubeRenderTargetSide(CubeTextureSide side);
-		Bool RestoreDefaultRenderTarget();
-		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest);
+		Bool Init(const GraphicsAttributes& attributes) override;
+		UInt32 GetOpenGLVersion() const;
 
-		void SetTextureData(TextureRef texture, Byte * data);
-		void SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side);
-		void RebuildMipMaps(TextureRef texture);
+		Bool ActivateRenderTarget(RenderTargetRef target) override;
+		RenderTargetRef GetCurrrentRenderTarget() override;
+		Bool ActivateCubeRenderTargetSide(CubeTextureSide side) override;
+		Bool RestoreDefaultRenderTarget() override;
+		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const override;
 
-		Bool AddClipPlane();
-		void DeactiveAllClipPlanes();
+		void SetTextureData(TextureRef texture, const Byte * data) const override;
+		void SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const override;
+		void RebuildMipMaps(TextureRef texture) const override;
 
-		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate);
+		Bool AddClipPlane() override;
+		void DeactiveAllClipPlanes() override;
+
+		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate) override;
 	};
 }
 

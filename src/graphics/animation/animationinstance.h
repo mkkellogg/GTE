@@ -67,7 +67,7 @@ namespace GTE
 		// the target of this instance
 		SkeletonRef Target;
 		// the Animation for which this is an instance
-		AnimationRef SourceAnimation;
+		AnimationRefConst SourceAnimation;
 		// used to make animation play faster or slow than default. default = 1.
 		Real SpeedFactor;
 
@@ -107,7 +107,7 @@ namespace GTE
 		// what should happen when playback reaches the end of the clip?
 		PlaybackMode PlayBackMode;
 
-		AnimationInstance(SkeletonRef target, AnimationRef animation);
+		AnimationInstance(SkeletonRef target, AnimationRefConst animation);
 		~AnimationInstance();
 
 		void Destroy();
@@ -123,7 +123,7 @@ namespace GTE
 		void Reset();
 
 		FrameState * GetFrameState(UInt32 stateIndex);
-		Int32 GetChannelMappingForTargetNode(UInt32 nodeIndex);
+		Int32 GetChannelMappingForTargetNode(UInt32 nodeIndex) const;
 	};
 
 }

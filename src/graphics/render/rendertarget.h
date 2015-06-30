@@ -52,8 +52,8 @@ namespace GTE
 		Bool HasBuffer(RenderBufferType bufferType) const;
 		TextureRef GetDepthTexture();
 		TextureRef GetColorTexture();
-		UInt32 GetWidth();
-		UInt32 GetHeight();
+		UInt32 GetWidth() const;
+		UInt32 GetHeight() const;
 	};
 }
 

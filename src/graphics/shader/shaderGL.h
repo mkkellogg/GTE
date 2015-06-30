@@ -85,12 +85,12 @@ namespace GTE
 	public:
 
 		Bool Load();
-		Bool IsLoaded();
+		Bool IsLoaded() const;
 		Int32 GetAttributeVarID(const std::string& varName) const;
 		Int32 GetUniformVarID(const std::string& varName) const;
-		GLuint GetProgramID();
+		GLuint GetProgramID() const;
 
-		void SendBufferToShader(Int32 varID, VertexAttrBuffer * buffer);
+		void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer);
 
 		void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureRef texture);
 		void SendUniformToShader(Int32 varID, const Matrix4x4 * mat);

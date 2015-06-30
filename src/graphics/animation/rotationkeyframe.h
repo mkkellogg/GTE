@@ -27,7 +27,7 @@ namespace GTE
 
 		RotationKeyFrame();
 		RotationKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Quaternion& rotation);
-		~RotationKeyFrame();
+		~RotationKeyFrame() override;
 	};
 }
 

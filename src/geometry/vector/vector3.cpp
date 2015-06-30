@@ -66,16 +66,6 @@ namespace GTE
 	}
 
 	/*
-	 * Over-ridden assignment operator from BaseVector4
-	 */
-	BaseVector4& Vector3::operator= (const BaseVector4& source)
-	{
-		if (this == &source)return *this;
-		BaseVector4::operator=(source);
-		return *this;
-	}
-
-	/*
 	 * Comparison operator
 	 */
 	Bool Vector3::operator==(const Vector3 & source) const
@@ -262,25 +252,6 @@ namespace GTE
 	}
 
 	/*
-	 * TODO: This does NOT currently work...fix!
-	 *
-	 * Update the element accessor variables to point to the current backing storage. This is
-	 * usually called when the vector is attached to new backing storage.
-	 */
-	void Vector3::UpdateComponentPointers()
-	{
-		return;
-
-		Real ** rPtr;
-		rPtr = (Real **)&x;
-		*rPtr = data;
-		rPtr = (Real **)&y;
-		*rPtr = data + 1;
-		rPtr = (Real **)&z;
-		*rPtr = data + 2;
-	}
-
-	/*
 	 * Calculate the dot product: [a] dot [b]
 	 */
 	Real Vector3::Dot(const Vector3& a, const Vector3& b)
@@ -298,7 +269,6 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(data != NULL, "Vector3::AttachTo -> 'data' is null.", true);
 		BaseVector4::AttachTo(data);
-		UpdateComponentPointers();
 	}
 
 	/*
@@ -307,7 +277,6 @@ namespace GTE
 	void Vector3::Detach()
 	{
 		BaseVector4::Detach();
-		UpdateComponentPointers();
 	}
 
 	/*

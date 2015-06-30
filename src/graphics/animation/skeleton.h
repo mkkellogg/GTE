@@ -58,29 +58,28 @@ namespace GTE
 		~Skeleton();
 
 		void Destroy();
+		Skeleton * FullClone();
 
 	public:
 
-		UInt32 GetBoneCount();
-		UInt32 GetNodeCount();
+		UInt32 GetBoneCount() const;
+		UInt32 GetNodeCount() const;
 
 		Bool Init();
 		Tree<SkeletonNode*>::TreeNode * CreateRoot(SkeletonNode* node);
 		Tree<SkeletonNode*>::TreeNode * AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode* node);
 
-		void MapBone(std::string& name, UInt32 boneIndex);
-		Int32 GetBoneMapping(std::string& name);
+		void MapBone(const std::string& name, UInt32 boneIndex);
+		Int32 GetBoneMapping(const std::string& name) const;
 		Bone* GetBone(UInt32 boneIndex);
 
 		void MapNode(std::string& name, UInt32 nodeIndex);
-		Int32 GetNodeMapping(std::string& name);
+		Int32 GetNodeMapping(const std::string& name) const;
 		SkeletonNode * GetNodeFromList(UInt32 nodeIndex);
 		void AddNodeToList(SkeletonNode * node);
 
-		void OverrideBonesFrom(SkeletonRef skeleton, Bool takeOffset, Bool takeNode);
-		void OverrideBonesFrom(Skeleton * skeleton, Bool takeOffset, Bool takeNode);
-
-		Skeleton * FullClone();
+		void OverrideBonesFrom(SkeletonRefConst skeleton, Bool takeOffset, Bool takeNode);
+		void OverrideBonesFrom(const Skeleton * skeleton, Bool takeOffset, Bool takeNode);
 	};
 }
 

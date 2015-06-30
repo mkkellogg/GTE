@@ -154,14 +154,14 @@ namespace GTE
 
 		void SetUseBadGeometryShadowFix(Bool useFix);
 
-		void BuildShadowVolume(Vector3& lightPosDir, Bool directional, Bool backFacesFrontCap);
+		void BuildShadowVolume(const Vector3& lightPosDir, Bool directional, Bool backFacesFrontCap);
 		void UpdateFromMesh();
 
 		void SetAttributeTransformer(AttributeTransformer * attributeTransformer);
 		AttributeTransformer * GetAttributeTransformer();
 		Bool DoesAttributeTransform() const;
 
-		const Point3* GetFinalCenter();
+		const Point3* GetFinalCenter() const;
 
 		void PreRender(const Matrix4x4& modelView, const Matrix4x4& modelViewInverse);
 
@@ -170,7 +170,7 @@ namespace GTE
 		void RenderShadowVolume(const Point3Array * shadowVolumePositions);
 
 		void SetUseBackSetShadowVolume(Bool use);
-		Bool GetUseBackSetShadowVolume();
+		Bool GetUseBackSetShadowVolume() const;
 	};
 }
 

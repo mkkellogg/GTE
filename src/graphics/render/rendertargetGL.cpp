@@ -42,28 +42,16 @@ namespace GTE
 		if (colorTexture.IsValid())
 		{
 			TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
-			if (texGL != NULL)
-			{
-				objectManager->DestroyTexture(colorTexture);
-			}
-			else
-			{
-				Debug::PrintError("RenderTargetGL::Destroy -> Unable to cast color texture to TextureGL.");
-			}
+			ASSERT(texGL != NULL, "RenderTargetGL::Destroy -> Unable to cast color texture to TextureGL.");
+			objectManager->DestroyTexture(colorTexture);
 		}
 
 		// destroy the depth texture attachment
 		if (depthTexture.IsValid())
 		{
 			TextureGL * texGL = dynamic_cast<TextureGL*>(depthTexture.GetPtr());
-			if (texGL != NULL)
-			{
-				objectManager->DestroyTexture(depthTexture);
-			}
-			else
-			{
-				Debug::PrintError("RenderTargetGL::Destroy -> Unable to cast depth texture to TextureGL.");
-			}
+			ASSERT(texGL != NULL, "RenderTargetGL::Destroy -> Unable to cast depth texture to TextureGL.");
+			objectManager->DestroyTexture(depthTexture);
 		}
 
 		// destroy the FBO
@@ -153,19 +141,13 @@ namespace GTE
 
 			GLuint depthStencilRenderBufferID;
 			glGenRenderbuffers(1, &depthStencilRenderBufferID);
-			if (depthStencilRenderBufferID == 0)
-			{
-				Debug::PrintError("RenderTargetGL::Init -> Unable to create depth/stencil render buffer.");
-				Destroy();
-				return false;
-			}
+			ASSERT(depthStencilRenderBufferID != 0, "RenderTargetGL::Init -> Unable to create depth/stencil render buffer.");
 
 			glBindRenderbuffer(GL_RENDERBUFFER, depthStencilRenderBufferID);
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 
 			//Attach stencil buffer to FBO
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilRenderBufferID);
-
 		}
 
 		UInt32 status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -179,7 +161,7 @@ namespace GTE
 	/*
 	 * Get the OpenGL FBO ID.
 	 */
-	GLuint RenderTargetGL::GetFBOID()
+	GLuint RenderTargetGL::GetFBOID() const
 	{
 		return fboID;
 	}

@@ -413,14 +413,10 @@ namespace GTE
 		for (Int32 i = 0; i < BINDINGS_ARRAY_MAX_LENGTH; i++)standardUniformBindings[i] = -1;
 	}
 
-	// =====================================================
-	//  Public methods
-	// =====================================================
-
 	/*
 	 * Get a pointer to the shader to which this material is connected.
 	 */
-	ShaderRef Material::GetShader() const
+	ShaderRef Material::GetShader() 
 	{
 		return shader;
 	}
@@ -654,7 +650,7 @@ namespace GTE
 	/* Find a uniform with the name specified by [shaderVarName] and set its
 	* value to [val]
 	*/
-	void Material::SetColor(Color4 val, const std::string& varName)
+	void Material::SetColor(const Color4& val, const std::string& varName)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetColor -> 'shader' is null.", true);
 

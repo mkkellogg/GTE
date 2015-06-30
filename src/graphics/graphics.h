@@ -66,12 +66,9 @@ namespace GTE
 
 	protected:
 
-		// the material that is currently being used for rendering
-		MaterialRef activeMaterial;
 		// descriptor that describes the properties with which the graphics
 		// system was initialized
 		GraphicsAttributes attributes;
-
 		// length of current span over which FPS is calculated
 		Real currentFPSSpanTime;
 		// number of frames in rendered in current FPS calculation span
@@ -85,8 +82,7 @@ namespace GTE
 		virtual Bool Start();
 		virtual void End();
 		virtual void Update();
-		virtual void PreProcessScene();
-		virtual void RenderScene();
+		virtual void PostRender();
 
 		void UpdateFPS();
 
@@ -119,12 +115,12 @@ namespace GTE
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 		virtual RenderTargetRef GetDefaultRenderTarget() = 0;
 
-		Real GetCurrentFPS();
+		Real GetCurrentFPS() const;
 
-		virtual void ClearRenderBuffers(UInt32 bufferMask) = 0;
+		virtual void ClearRenderBuffers(UInt32 bufferMask) const = 0;
 
 		virtual void SetFaceCullingMode(FaceCullingMode mode) = 0;
-		virtual FaceCullingMode GetFaceCullingMode() = 0;
+		virtual FaceCullingMode GetFaceCullingMode() const = 0;
 
 		virtual void SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a) = 0;
 
@@ -140,8 +136,8 @@ namespace GTE
 		virtual void SetBlendingEnabled(Bool enabled) = 0;
 		virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
 
-		virtual void ActivateMaterial(MaterialRef material);
-		MaterialRef GetActiveMaterial() const;
+		virtual void ActivateMaterial(MaterialRef material) = 0;
+		virtual MaterialRef GetActiveMaterial() = 0;
 
 		virtual const GraphicsAttributes& GetAttributes() const;
 
@@ -151,11 +147,11 @@ namespace GTE
 		virtual RenderTargetRef GetCurrrentRenderTarget() = 0;
 		virtual Bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
 		virtual Bool RestoreDefaultRenderTarget() = 0;
-		virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRef dest) = 0;
+		virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const = 0;
 
-		virtual void SetTextureData(TextureRef texture, Byte * data) = 0;
-		virtual void SetTextureData(TextureRef texture, Byte * data, CubeTextureSide side) = 0;
-		virtual void RebuildMipMaps(TextureRef texture) = 0;
+		virtual void SetTextureData(TextureRef texture, const Byte * data) const = 0;
+		virtual void SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const = 0;
+		virtual void RebuildMipMaps(TextureRef texture) const = 0;
 
 		virtual Bool AddClipPlane() = 0;
 		virtual void DeactiveAllClipPlanes() = 0;

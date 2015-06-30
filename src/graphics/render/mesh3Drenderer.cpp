@@ -124,7 +124,7 @@ namespace GTE
 	/*
 	 * Update this renderer and prepare it for rendering of the sub-meshes contained in [mesh].
 	 */
-	void Mesh3DRenderer::InitializeForMesh(Mesh3DRef mesh)
+	void Mesh3DRenderer::InitializeForMesh(Mesh3DRefConst mesh)
 	{
 		EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 		UInt32 subMeshCount = mesh->GetSubMeshCount();
@@ -191,7 +191,7 @@ namespace GTE
 	 * Get the sub-mesh contained in the target mesh for this renderer that corresponds to [subRenderer]. This will be
 	 * the SubMesh3D instance that [subRenderer] is responsible for rendering.
 	 */
-	SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRef subRenderer)
+	SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRefConst subRenderer)
 	{
 		NONFATAL_ASSERT_RTRN(subRenderer.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'subRenderer' is null.", SubMesh3DRef::Null(), true);
 		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'sceneObject' is null.", SubMesh3DRef::Null(), true);

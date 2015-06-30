@@ -60,12 +60,12 @@ namespace GTE
 		return imageBytes;
 	}
 
-	UInt32 RawImage::GetWidth()
+	UInt32 RawImage::GetWidth() const
 	{
 		return width;
 	}
 
-	UInt32 RawImage::GetHeight()
+	UInt32 RawImage::GetHeight() const
 	{
 		return height;
 	}

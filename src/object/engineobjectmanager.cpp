@@ -380,7 +380,7 @@ namespace GTE
 		delete animation;
 	}
 
-	AnimationInstanceRef EngineObjectManager::CreateAnimationInstance(SkeletonRef target, AnimationRef animation)
+	AnimationInstanceRef EngineObjectManager::CreateAnimationInstance(SkeletonRef target, AnimationRefConst animation)
 	{
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'target' is invalid.", AnimationInstanceRef::Null(), true);
 		NONFATAL_ASSERT_RTRN(animation.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'animation' is invalid.", AnimationInstanceRef::Null(), true);

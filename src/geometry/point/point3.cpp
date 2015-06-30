@@ -98,7 +98,6 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(data != NULL, "Point3::AttachTo -> 'data' is null.", true);
 		BaseVector4::AttachTo(data);
-		UpdateComponentPointers();
 	}
 
 	/*
@@ -107,46 +106,12 @@ namespace GTE
 	void Point3::Detach()
 	{
 		BaseVector4::Detach();
-		UpdateComponentPointers();
-	}
-
-	/*
-	 * TODO: This does NOT currently work...fix!
-	 *
-	 * Update the element accessor variables to point to the current backing storage. This is
-	 * usually called when the point is attached to new backing storage.
-	 */
-	void Point3::UpdateComponentPointers()
-	{
-		return;
-
-		Real *xp = (((Real*)&x));
-		Real *yp = (((Real*)&y));
-		Real *zp = (((Real*)&z));
-
-		//xp[0] = data;
-		//yp[0] = data+1;
-		//zp[0] = data+2;
-
-		memcpy(xp, &data, sizeof(Real *));
-		memcpy(yp, &data+1, sizeof(Real *));
-		memcpy(zp, &data+2, sizeof(Real *));
 	}
 
 	/*
 	 * Assignment operator
 	 */
 	Point3& Point3::operator= (const Point3& source)
-	{
-		if(this == &source)return *this;
-		BaseVector4::operator=(source);
-		return *this;
-	}
-
-	/*
-	 * Over-ridden assignment operator from BaseVector4
-	 */
-	BaseVector4& Point3::operator= (const BaseVector4& source)
 	{
 		if(this == &source)return *this;
 		BaseVector4::operator=(source);

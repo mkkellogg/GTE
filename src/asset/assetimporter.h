@@ -33,7 +33,7 @@ namespace GTE
 		AnimationRef LoadAnimation(const std::string& filePath, Bool addLoopPadding) const;
 		void LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource);
 
-		void SetBoolProperty(AssetImporterBoolProperty, Bool value);
+		void SetBoolProperty(AssetImporterBoolProperty prop, Bool value);
 		Bool GetBoolProperty(AssetImporterBoolProperty prop) const;
 	};
 }

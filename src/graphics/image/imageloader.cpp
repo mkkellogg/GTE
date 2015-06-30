@@ -79,7 +79,7 @@ namespace GTE
 		return rawImage;
 	}
 
-	RawImage * ImageLoader::GetRawImageFromILData(ILubyte * data, UInt32 width, UInt32 height)
+	RawImage * ImageLoader::GetRawImageFromILData(const ILubyte * data, UInt32 width, UInt32 height)
 	{
 		NONFATAL_ASSERT_RTRN(data != NULL, "ImportUtil::GetRawImageFromILData -> 'data' is null.", NULL, true);
 

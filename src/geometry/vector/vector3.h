@@ -18,8 +18,6 @@ namespace GTE
 	{
 	protected:
 
-		void UpdateComponentPointers();
-
 	public:
 
 		static const Vector3 Zero;
@@ -38,10 +36,9 @@ namespace GTE
 		Vector3(Real x, Real y, Real z);
 		Vector3(const Vector3& vector);
 		Vector3(const Real * data);
-		~Vector3();
+		~Vector3() override;
 
 		Vector3& operator=(const Vector3 & source);
-		BaseVector4 & operator= (const BaseVector4 & source);
 		Bool operator==(const Vector3 & source) const;
 		Bool operator==(const Vector3 & source);
 		static Bool AreStrictlyEqual(const Vector3* a, const Vector3* b);
@@ -69,8 +66,8 @@ namespace GTE
 
 		Bool IsZeroLength() const;
 
-		void AttachTo(Real * data);
-		void Detach();
+		void AttachTo(Real * data) override;
+		void Detach() override;
 	};
 }
 

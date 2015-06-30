@@ -160,10 +160,10 @@ namespace GTE
 		animationManager->Update();
 		inputManager->Update();
 		if (callbacks != NULL)callbacks->OnUpdate();
-		graphicsSystem->PreProcessScene();
 		renderManager->PreProcessScene();
 		if (callbacks != NULL)callbacks->OnPreRender();
-		graphicsSystem->RenderScene();
+		renderManager->RenderScene();
+		graphicsSystem->PostRender();
 
 		Time::Update();
 	}

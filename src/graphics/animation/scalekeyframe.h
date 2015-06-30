@@ -27,7 +27,7 @@ namespace GTE
 
 		ScaleKeyFrame();
 		ScaleKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& scale);
-		~ScaleKeyFrame();
+		~ScaleKeyFrame() override;
 	};
 
 }

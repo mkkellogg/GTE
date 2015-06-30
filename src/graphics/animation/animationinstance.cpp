@@ -16,7 +16,7 @@ namespace GTE
 	/*
 	* Single constructor that initializes member variables.
 	*/
-	AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRef animation)
+	AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRefConst animation)
 	{
 		this->Target = target;
 		this->SourceAnimation = animation;
@@ -169,7 +169,7 @@ namespace GTE
 		return FrameStates + stateIndex;
 	}
 
-	Int32 AnimationInstance::GetChannelMappingForTargetNode(UInt32 nodeIndex)
+	Int32 AnimationInstance::GetChannelMappingForTargetNode(UInt32 nodeIndex) const
 	{
 		NONFATAL_ASSERT_RTRN(Target.IsValid(), "AnimationInstance::GetChannelMappingForTargetNode -> target skeleton is not valid.", -1, true);
 		NONFATAL_ASSERT_RTRN(nodeIndex < Target->GetNodeCount(), "AnimationInstance::GetChannelMappingForTargetNode -> nodeIndex is out of range.", -1, true);

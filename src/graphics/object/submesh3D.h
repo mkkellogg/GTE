@@ -102,14 +102,15 @@ namespace GTE
 		Bool BuildVertexCrossMap();
 
 		void CalculateFaceNormal(UInt32 faceIndex, Vector3& result) const;
+		void CalculateNormals(Real smoothingThreshhold);
+		void CalculateTangent(UInt32 vertexIndex, UInt32 rightIndex, UInt32 leftIndex, Vector3& result);
+		void CalculateTangents(Real smoothingThreshhold);
 		void FindAdjacentFaceIndex(UInt32 faceIndex, int& edgeA, int& edgeB, int& edgeC) const;
 		Int32 FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const;
 		void BuildFaces();
 
 		void CalcSphereOfInfluence();
-		void CalculateNormals(Real smoothingThreshhold);
-		void CalculateTangent(UInt32 vertexIndex, UInt32 rightIndex, UInt32 leftIndex, Vector3& result);
-		void CalculateTangents(Real smoothingThreshhold);
+
 		void SetContainerMesh(Mesh3D * mesh);
 		void SetSubIndex(Int32 index);
 
@@ -120,7 +121,7 @@ namespace GTE
 	public:
 
 		void SetDirty(Bool isDirty);
-		Bool IsDirty();
+		Bool IsDirty() const;
 
 		void SetCalculateNormals(Bool calculate);
 		void SetCalculateTangents(Bool calculate);
@@ -140,7 +141,7 @@ namespace GTE
 		Bool Init(UInt32 totalVertexCount);
 		UInt32 GetTotalVertexCount() const;
 		StandardAttributeSet GetAttributeSet() const;
-		Real GetTimeStamp();
+		Real GetTimeStamp() const;
 
 		Point3Array * GetPostions();
 		Vector3Array * GetVertexNormals();
