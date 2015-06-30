@@ -85,10 +85,10 @@ namespace GTE
 
 	public:
 
-		EngineObjectRef() : shared_ptr(NULL) {}
-		EngineObjectRef(const EngineObjectRef<T>& ref) : shared_ptr(ref){}
-		EngineObjectRef(const std::shared_ptr<T>& ref) : shared_ptr(ref){}
-		EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : shared_ptr(ptr, deleter){}
+		EngineObjectRef() : std::shared_ptr<T>(NULL) {}
+		EngineObjectRef(const EngineObjectRef<T>& ref) : std::shared_ptr<T>(ref){}
+		EngineObjectRef(const std::shared_ptr<T>& ref) : std::shared_ptr<T>(ref){}
+		EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : std::shared_ptr<T>(ptr, deleter){}
 
 		operator EngineObjectRef<const T>() const 
 		{ 
@@ -97,7 +97,7 @@ namespace GTE
 
 		T* GetPtr()
 		{
-			return get();
+			return std::shared_ptr<T>::get();
 		}
 
 		T& GetRef()
@@ -107,7 +107,7 @@ namespace GTE
 
 		const T* GetConstPtr() const
 		{
-			return get();
+			return std::shared_ptr<T>::get();
 		}
 
 		const T& GetConstRef() const
@@ -127,7 +127,7 @@ namespace GTE
 
 		void ForceDelete()
 		{
-			reset();
+			return std::shared_ptr<T>::reset();
 		}
 
 		static EngineObjectRef<T> Null()
