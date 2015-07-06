@@ -355,6 +355,7 @@ void LavaScene::SetupExtra(GTE::AssetImporter& importer)
 	material->SetTexture(normalmap, "NORMALMAP");
 	material->SetUniform1f(1.0f, "USCALE");
 	material->SetUniform1f(1.0f, "VSCALE");
+	material->SetUniform1f(1.0f, "SPECULAR_FACTOR");
 
 	// set the cube mesh attributes
 	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();

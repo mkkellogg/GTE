@@ -113,9 +113,6 @@ namespace GTE
 		// do some extra processing that will fix shadow volume artifacts that arise when mesh geometry is bad,
 		// this incurs a performance penalty because it results in a shadow volume with many more triangles
 		Bool useBadGeometryShadowFix;
-		// use an alternate shadow volume technique where the front caps are made up
-		// up the back-facing triangles
-		Bool doBackSetShadowVolume;
 
 		void SetContainerRenderer(Mesh3DRenderer * renderer);
 		void SetTargetSubMeshIndex(UInt32 index);
@@ -168,9 +165,6 @@ namespace GTE
 		void Render();
 		void RenderShadowVolume();
 		void RenderShadowVolume(const Point3Array * shadowVolumePositions);
-
-		void SetUseBackSetShadowVolume(Bool use);
-		Bool GetUseBackSetShadowVolume() const;
 	};
 }
 

@@ -10,6 +10,7 @@ in vec3 COLOR;
 in vec2 UVTEXTURE0;
 in vec4 NORMAL;
 in vec4 TANGENT;
+in vec4 FACENORMAL;
 
 uniform float LIGHT_ATTENUATION;
 uniform vec4 LIGHT_DIRECTION;
@@ -23,14 +24,17 @@ uniform float VSCALE;
 out vec3 vColor;
 out vec2 vUVTexture0;
 out vec3 vNormal;
+out vec3 vFaceNormal;
 out vec3 vTangent;
 out vec4 vPosition;
  
 void main()
 {
+	mat4 invTransM = inverse(transpose(MODEL_MATRIX));
    	vColor = COLOR;
    	vUVTexture0 = vec2(UVTEXTURE0.s * USCALE, UVTEXTURE0.t * VSCALE);
-   	vNormal = vec3(MODEL_MATRIX * NORMAL);
+   	vNormal = vec3(invTransM * NORMAL);
+	vFaceNormal = vec3(invTransM * FACENORMAL);
    	vTangent = vec3(MODEL_MATRIX * TANGENT);
    	vPosition = MODEL_MATRIX * POSITION;
     gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION ;

@@ -124,22 +124,10 @@ void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root)
 {
 	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
 	{
-		GTE::SkinnedMesh3DRendererRef skinnedRenderer = current->GetSkinnedMesh3DRenderer();
-		if(skinnedRenderer.IsValid())
+		GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
+		if (filter.IsValid())
 		{
-			for(GTE::UInt32 i = 0; i < skinnedRenderer->GetSubRendererCount(); i++)
-			{
-				skinnedRenderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
-			}
-		}
-
-		GTE::Mesh3DRendererRef renderer = current->GetMesh3DRenderer();
-		if(renderer.IsValid())
-		{
-			for(GTE::UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
-			{
-				renderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
-			}
+			filter->SetUseBackSetShadowVolume(false);
 		}
 	});
 }

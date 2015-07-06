@@ -28,6 +28,8 @@ namespace GTE
 	{
 		castShadows = false;
 		receiveShadows = false;
+		useCustomShadowVolumeOffset = false;
+		shadowVolumeOffset = 0.0f;
 	}
 
 	/*
@@ -89,6 +91,54 @@ namespace GTE
 	Bool Mesh3DFilter::GetReceiveShadows() const
 	{
 		return receiveShadows;
+	}
+
+	/*
+	* Specify whether or not a custom shadow volume offset be used when rendering the shadow for [mesh]?
+	*/
+	void Mesh3DFilter::SetUseCustomShadowVolumeOffset(Bool useCustomShadowVolumeOffset)
+	{
+		this->useCustomShadowVolumeOffset = useCustomShadowVolumeOffset;
+	}
+
+	/*
+	* Should a custom shadow volume offset be used when rendering the shadow for [mesh]?
+	*/
+	Bool Mesh3DFilter::GetUseCustomShadowVolumeOffset() const
+	{
+		return useCustomShadowVolumeOffset;
+	}
+
+	/*
+	* Set the custom shadow volume offset.
+	*/
+	void Mesh3DFilter::SetCustomShadowVolumeOffset(Real shadowVolumeOffset)
+	{
+		this->shadowVolumeOffset = shadowVolumeOffset;
+	}
+
+	/*
+	* Get the custom shadow volume offset.
+	*/
+	Real Mesh3DFilter::GetCustomShadowVolumeOffset() const
+	{
+		return shadowVolumeOffset;
+	}
+
+	/*
+	* Set the [doBackSetShadowVolume] member boolean.
+	*/
+	void Mesh3DFilter::SetUseBackSetShadowVolume(Bool use)
+	{
+		doBackSetShadowVolume = use;
+	}
+
+	/*
+	* Access [doBackSetShadowVolume] member boolean.
+	*/
+	Bool Mesh3DFilter::GetUseBackSetShadowVolume() const
+	{
+		return doBackSetShadowVolume;
 	}
 }
 

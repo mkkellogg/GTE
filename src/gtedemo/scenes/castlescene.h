@@ -19,6 +19,8 @@ class CastleScene : public Scene
 	std::vector<GTE::SceneObjectRef> pointLights;
 	// global directional light
 	GTE::SceneObjectRef directionalLightObject;
+	// moving light A
+	GTE::SceneObjectRef movingLightA;
 
 	public:
 

@@ -66,7 +66,6 @@ namespace GTE
 		doNormalTransform = false;
 		doTangentTransform = false;
 		useBadGeometryShadowFix = false;
-		doBackSetShadowVolume = true;
 
 		timeStamp = 0;
 	}
@@ -930,21 +929,5 @@ namespace GTE
 			// render shadow volume
 			Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundShadowVolumeAttributeBuffers, shadowVolumePositions->GetCount(), false);
 		}
-	}
-
-	/*
-	 * Set the [doBackSetShadowVolume] member boolean.
-	 */
-	void SubMesh3DRenderer::SetUseBackSetShadowVolume(Bool use)
-	{
-		doBackSetShadowVolume = use;
-	}
-
-	/*
-	 * Access [doBackSetShadowVolume] member boolean.
-	 */
-	Bool SubMesh3DRenderer::GetUseBackSetShadowVolume() const
-	{
-		return doBackSetShadowVolume;
 	}
 }

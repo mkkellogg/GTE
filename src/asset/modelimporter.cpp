@@ -483,9 +483,10 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 		diffuseTextureUVIndex = materialImportDescriptor.meshSpecificProperties[meshIndex].uvMapping[TextureType::Diffuse];
 	}
 
-	// add normals regardless of whether the mesh has them or not. if the mesh does not
+	// add normals & tangents regardless of whether the mesh has them or not. if the mesh does not
 	// have them, they can be calculated
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
+	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Tangent);
 	StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
 
 	// if the Assimp mesh's material specifies vertex colors, add vertex colors

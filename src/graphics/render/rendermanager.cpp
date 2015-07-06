@@ -1209,8 +1209,10 @@ namespace GTE
 		if (renderer != NULL)
 		{
 			Mesh3DRef mesh = renderer->GetTargetMesh();
-
+			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
+			
 			NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
+			NONFATAL_ASSERT(filter.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
 			NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(), "RenderManager::RenderShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
 			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "RenderManager::RenderShadowVolumesForSceneObject -> Renderer has no materials.", true);
 
@@ -1240,16 +1242,25 @@ namespace GTE
 				NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
 
 				// build special MVP transform for rendering shadow volumes
-				Real scaleFactor = subRenderer->GetUseBackSetShadowVolume() ? .99f : 1;
+				Real scaleFactor = filter->GetUseBackSetShadowVolume() ? .99f : 1;
 				BuildShadowVolumeMVPTransform(light, subMesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
 
 				// activate the material, which will switch the GPU's active shader to
 				// the one associated with the material
 				ActivateMaterial(shadowVolumeMaterial);
 
-				// set the epsilon offset for the shadow volume shader
-				if (subRenderer->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.00002f, "EPSILON");
-				else shadowVolumeMaterial->SetUniform1f(.2f, "EPSILON");
+				Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
+				if (filter.IsValid() && filter->GetUseCustomShadowVolumeOffset())
+				{
+					// set the epsilon offset for the shadow volume shader based on custom value
+					shadowVolumeMaterial->SetUniform1f(filter->GetCustomShadowVolumeOffset(), "EPSILON");
+				}
+				else
+				{
+					// set the epsilon offset for the shadow volume shader based on type of shadow volume
+					if (filter->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.00002f, "EPSILON");
+					else shadowVolumeMaterial->SetUniform1f(.2f, "EPSILON");
+				}
 
 				// send uniforms set for the shadow volume material to its shader
 				SendActiveMaterialUniformsToShader();
@@ -1377,8 +1388,10 @@ namespace GTE
 		if (renderer != NULL)
 		{
 			Mesh3DRef mesh = renderer->GetTargetMesh();
+			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
 
 			NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
+			NONFATAL_ASSERT(filter.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
 			NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(), "RenderManager::BuildShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
 			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "RenderManager::BuildShadowVolumesForSceneObject -> Renderer has no materials.", true);
 
@@ -1445,8 +1458,7 @@ namespace GTE
 				if (!cached || dynamic) // always rebuild dynamic shadow volumes
 				{
 					// calculate shadow volume geometry
-					if (subRenderer->GetUseBackSetShadowVolume())subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, true);
-					else subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, false);
+					subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, filter->GetUseBackSetShadowVolume());
 
 					// cache shadow volume for later rendering
 					CacheShadowVolume(cacheKey, subRenderer->GetShadowVolumePositions());

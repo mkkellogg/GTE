@@ -23,6 +23,7 @@
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
+#include "graphics/object/mesh3Dfilter.h"
 #include "graphics/render/material.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
@@ -93,6 +94,7 @@ Game::Game()
 	frameCount = 0;
 
 	sceneTransitioning = false;
+	directionalLightOn = true;
 }
 
 /*
@@ -541,13 +543,10 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 			// set all meshes to use standard shadow volume
 			GameUtil::ProcessSceneObjects(playerObject, [=](GTE::SceneObjectRef current)
 			{
-				GTE::SkinnedMesh3DRendererRef renderer = current->GetSkinnedMesh3DRenderer();
-				if(renderer.IsValid())
+				GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
+				if (filter.IsValid())
 				{
-					for(GTE::UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
-					{
-						renderer->GetSubRenderer(i)->SetUseBackSetShadowVolume(false);
-					}
+					filter->SetUseBackSetShadowVolume(false);
 				}
 			});
 
@@ -1118,7 +1117,12 @@ void Game::HandleGeneralInput()
 			}
 		break;
 		case SceneLighting::Directional:
-			UpdateLight(directionalLightObject, toggleLight, intensityBoost, toggleCastShadows);
+			// prevent toggle of directional light in castle scene
+			if (currentScene != Scenes::CastleScene)
+			{
+				UpdateLight(directionalLightObject, toggleLight, intensityBoost, toggleCastShadows);
+				directionalLightOn = directionalLightObject->IsActive();
+			}
 		break;
 		case SceneLighting::Point:
 			UpdateLight(lavaSpinningLight, toggleLight, intensityBoost, toggleCastShadows);
@@ -1148,18 +1152,22 @@ void Game::HandleGeneralInput()
 	// change to lava scene
 	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::One))
 	{
+		directionalLightObject->SetActive(directionalLightOn);
 		TransitionToScene(Scenes::LavaScene);
 	}
 
 	// change to castle scene
 	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Two))
 	{
+		// force directional light to be off in the castle scene
+		directionalLightObject->SetActive(false);
 		TransitionToScene(Scenes::CastleScene);
 	}
 
 	// change to pool scene
 	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Three))
 	{
+		directionalLightObject->SetActive(directionalLightOn);
 		TransitionToScene(Scenes::PoolScene);
 	}
 }

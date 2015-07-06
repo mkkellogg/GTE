@@ -33,6 +33,14 @@ namespace GTE
 		Bool castShadows;
 		// should this mesh receive shadows?
 		Bool receiveShadows;
+		// use custom shadow volume offset
+		Bool useCustomShadowVolumeOffset;
+		// custom shadow volume offset
+		Real shadowVolumeOffset;
+		// use an alternate shadow volume technique where the front caps are made up
+		// up the back-facing triangles
+		Bool doBackSetShadowVolume;
+
 
 		Mesh3DFilter();
 		~Mesh3DFilter();
@@ -46,6 +54,12 @@ namespace GTE
 		Bool GetCastShadows() const;
 		void SetReceiveShadows(Bool receiveShadows);
 		Bool GetReceiveShadows() const;
+		void SetUseCustomShadowVolumeOffset(Bool useCustomShadowVolumeOffset);
+		Bool GetUseCustomShadowVolumeOffset() const;
+		void SetCustomShadowVolumeOffset(Real shadowVolumeOffset);
+		Real GetCustomShadowVolumeOffset() const;
+		void SetUseBackSetShadowVolume(Bool use);
+		Bool GetUseBackSetShadowVolume() const;
 	};
 }
 

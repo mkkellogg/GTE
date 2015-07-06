@@ -351,6 +351,7 @@ namespace GTE
 
 			// if divisor < 1, then no extra tangents were found to include in the average,
 			// so just use the original one
+
 			if (divisor <= 1)
 			{
 				avg.x = oTangent.x;

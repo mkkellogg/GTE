@@ -104,6 +104,8 @@ class Game
 
 	// lighting type that currently can be modified by the user
 	SceneLighting selectedLighting;
+	// is the directional light set to 'on' by the user?
+	GTE::Bool directionalLightOn;
 
 	class SceneTransition
 	{
