@@ -153,6 +153,7 @@ GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialR
 {
 	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
 }
+
 /*
  * Given an instance of Mesh3D [mesh] and and instance of Material [material], create an instance of SceneObject that
  * contains [mesh] and renders it using [material]. Scale the scene object's transform by [sx], [sy], [sz] in world

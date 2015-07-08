@@ -215,6 +215,7 @@ namespace GTE
 		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			Vector3 avg = averageNormals[v];
+			avg.Normalize();
 			// set the normal for this vertex to the averaged normal
 			vertexNormals.GetVector(v)->Set(avg.x, avg.y, avg.z);
 		}
@@ -374,6 +375,7 @@ namespace GTE
 		for (UInt32 v = 0; v < totalVertexCount; v++)
 		{
 			Vector3 avg = averageTangents[v];
+			avg.Normalize();
 			// set the tangent for this vertex to the averaged tangent
 			vertexTangents.GetVector(v)->Set(avg.x, avg.y, avg.z);
 		}

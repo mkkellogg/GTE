@@ -272,7 +272,7 @@ void Game::SwitchToScene(Scenes scene)
 	}
 
 	scenes[(GTE::UInt32)currentScene]->GetSceneRoot()->SetActive(true);
-
+	
 	//Engine::Instance()->GetRenderManager()->ClearCaches();
 }
 
@@ -295,6 +295,17 @@ void Game::TransitionToScene(Scenes scene)
 		currentScene = scene;
 		scenes[(GTE::UInt32)scene]->OnActivate();
 		SignalDisplayInfoChanged();
+
+		switch (scene)
+		{
+			case Scenes::CastleScene:
+				// force directional light to be off in castle scene
+				directionalLightObject->SetActive(false);
+				break;
+			default:
+				directionalLightObject->SetActive(directionalLightOn);
+				break;
+		}
 	}
 }
 
@@ -1152,22 +1163,18 @@ void Game::HandleGeneralInput()
 	// change to lava scene
 	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::One))
 	{
-		directionalLightObject->SetActive(directionalLightOn);
 		TransitionToScene(Scenes::LavaScene);
 	}
 
 	// change to castle scene
 	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Two))
 	{
-		// force directional light to be off in the castle scene
-		directionalLightObject->SetActive(false);
 		TransitionToScene(Scenes::CastleScene);
 	}
 
 	// change to pool scene
 	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Three))
 	{
-		directionalLightObject->SetActive(directionalLightOn);
 		TransitionToScene(Scenes::PoolScene);
 	}
 }

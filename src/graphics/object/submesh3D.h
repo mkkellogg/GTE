@@ -98,7 +98,7 @@ namespace GTE
 		SubMesh3D();
 		SubMesh3D(StandardAttributeSet attributes);
 		virtual ~SubMesh3D();
-
+		
 		void Destroy();
 		void DestroyVertexCrossMap();
 		Bool BuildVertexCrossMap();

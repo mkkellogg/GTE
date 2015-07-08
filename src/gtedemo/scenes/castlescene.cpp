@@ -201,7 +201,6 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	tower2Mesh->GetSubMesh(0)->SetDirty(true);
 	tower2Mesh->Update();
 	towerRenderer->SetMaterial(0, castleNormalMaterial);
-	GTE::MaterialRef towerMaterial = castleNormalMaterial; 
 
 	// place initial castle tower in scene
 	modelSceneObject->SetActive(true);
@@ -209,15 +208,15 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	modelSceneObject->GetTransform().Translate(65,-10,-15,false);
 
 	// re-use the castle tower mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.03f, 1,0,0, -90, 89,-10,-15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 89, -10, -15, true, true, true);
 	towerMeshFilter = modelSceneObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.03f, 1,0,0, -90, 65,-10,6, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 65, -10, 6, true, true, true);
 	towerMeshFilter = modelSceneObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.03f, 1,0,0, -90, 89,-10,6, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 89, -10, 6, true, true, true);
 	towerMeshFilter = modelSceneObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 	sceneRoot->AddChild(modelSceneObject);
@@ -254,6 +253,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	archwayMesh->GetSubMesh(0)->SetDirty(true);
 	archwayMesh->Update();
 	archwayRenderer->SetMaterial(0, castleNormalMaterial);
+	modelSceneObject->SetActive(false);
 	
 	// load and place castle entrance arch-way right side
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Right_02.fbx");
@@ -279,6 +279,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	archwayMesh->GetSubMesh(0)->SetDirty(true);
 	archwayMesh->Update();
 	archwayRenderer->SetMaterial(0, castleNormalMaterial);
+	modelSceneObject->SetActive(false);
 
 	
 	//========================================================
@@ -306,28 +307,46 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	wallBlockMesh->GetSubMesh(0)->SetDirty(true);
 	wallBlockMesh->Update();
 	wallBlockRenderer->SetMaterial(0, castleNormalMaterial);
-	GTE::MaterialRef wallBlockMaterial = castleNormalMaterial; 
 		
-	// place initial castle wall in scene
+	// place initial castle wall in scene (on right side)
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.06f,.05f,.04f, false);
 	modelSceneObject->GetTransform().Translate(70,-10,6.5f,false);
+	modelSceneObject->GetTransform().Rotate(0, 1, 0, 180, true);
 
-	// re-use the castle wall mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 78,-10,6.5f, true,true,true);
+	// right side
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, 6.5f, true, true, true,false);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 86,-10,6.5f, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, 6.5f, true, true, true,false);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 70,-10,-15.5f, true,true,true);
+
+	// extra right side
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 70, -10, 10.0f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 78,-10, -15.5f, true,true,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, 10.0f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .06f,.04f,.05f, 1,0,0, -90, 86,-10, -15.5f, true,true,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, 10.0f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
-	//modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04,.067,.05, 1,0,0, -90, 90,-10, -9.25, true,true,true);
-	//sceneRoot->AddChild(modelSceneObject);
-	//modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, wallBlockMaterial, .04f,.067f,.05f, 1,0,0, -90, 90,-10, .25f, true,true,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
+
+	// left side
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 70, -10, -15.5f, true, true, true,false);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, -15.5f, true, true, true,false);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, -15.5f, true, true, true,false);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
+
+	// front and back
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04, .067, .05, 1, 0, 0, -90, 64.7, -10, -9.25, true, true, true,false);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 90, -10, .25f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
 }
@@ -475,10 +494,10 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	// place initial barrel in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.8f,.8f,.8f, false);
-	modelSceneObject->GetTransform().Translate(82,-10,10.5f, false);
+	modelSceneObject->GetTransform().Translate(82,-10,14.5f, false);
 
 	// re-use the barrel mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .8f,.8f,.8f, 1,0,0, -90, 70,-10,10.5f, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .8f,.8f,.8f, 1,0,0, -90, 70,-10,14.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject = GameUtil::AddMeshToScene(barrelMesh, barrelMaterial, .9f,.9f,.9f, 0,1,0, 90, 92,-8.3f,1.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
@@ -512,7 +531,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GTE::TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
 
 
-	// create the floor's material using the "basic" built-in shader
+	// create the floor's material using the "basic_normal" built-in shader
 	GTE::ShaderSource basicShaderSource;
 	importer.LoadBuiltInShaderSource("basic_normal", basicShaderSource);
 	GTE::MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
@@ -544,7 +563,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	cubeSceneObject->SetMesh3DRenderer(renderer);
 
 	// scale the floor and move to its position in the scene
-	cubeSceneObject->GetTransform().Scale(10, 1.5f, 10, false);
+	cubeSceneObject->GetTransform().Scale(12, 1.5f, 10, false);
 	cubeSceneObject->GetTransform().Translate(78, -11.4f, -4, false);
 }
 
@@ -623,7 +642,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	lanternLight->SetType(GTE::LightType::Point);
 	lanternObject->SetLight(lanternLight);
 	lanternObject->GetTransform().Scale(.2f,.2f,.2f, true);
-	lanternObject->GetTransform().Translate(77.4f, -5, 10.7f, false);
+	lanternObject->GetTransform().Translate(77.4f, -5, 14.7f, false);
 	filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);
