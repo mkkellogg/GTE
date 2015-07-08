@@ -54,6 +54,7 @@ namespace GTE
 		containerMesh = NULL;
 		subIndex = -1;
 		invertNormals = false;
+		invertTangents = false;
 
 		vertexCrossMap = NULL;
 
@@ -376,6 +377,8 @@ namespace GTE
 			// set the tangent for this vertex to the averaged tangent
 			vertexTangents.GetVector(v)->Set(avg.x, avg.y, avg.z);
 		}
+
+		if(invertTangents)InvertTangents();
 	}
 
 	/*
@@ -842,6 +845,14 @@ namespace GTE
 	}
 
 	/*
+	 * Indicate whether or not mesh tangents should be inverted when they are calculated.
+	 */
+	void SubMesh3D::SetInvertTangents(Bool invert)
+	{
+		invertTangents = invert;
+	}
+
+	/*
 	 * Reverse the direction of all normals on this mesh
 	 */
 	void SubMesh3D::InvertNormals()
@@ -853,6 +864,21 @@ namespace GTE
 				Vector3 * n1 = vertexNormals.GetVector(i);
 				n1->Invert();
 				n1 = faceNormals.GetVector(i);
+				n1->Invert();
+			}
+		}
+	}
+
+	/*
+	 * Reverse the direction of all tangents on this mesh
+	 */
+	void SubMesh3D::InvertTangents()
+	{
+		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))
+		{
+			for (UInt32 i = 0; i < totalVertexCount; i++)
+			{
+				Vector3 * n1 = vertexTangents.GetVector(i);
 				n1->Invert();
 			}
 		}

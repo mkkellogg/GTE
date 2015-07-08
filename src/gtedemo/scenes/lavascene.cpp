@@ -284,6 +284,12 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaIslandObjectsLayerMask);
 
+	// extract mesh & material from mushroom house model
+	GTE::SceneObjectRef mushroomHouseMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef mushroomHouseMesh = mushroomHouseMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef mushroomHouseMeshRenderer = mushroomHouseMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DFilterRef mushroomHouseMeshFilter = mushroomHouseMeshObject->GetMesh3DFilter();
+
 	// place mushroom house in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.09f,.09f,.09f, false);

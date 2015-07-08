@@ -148,6 +148,11 @@ void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, GTE::Bool cast
 	});
 }
 
+GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
+{
+	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
+}
 /*
  * Given an instance of Mesh3D [mesh] and and instance of Material [material], create an instance of SceneObject that
  * contains [mesh] and renders it using [material]. Scale the scene object's transform by [sx], [sy], [sz] in world
@@ -156,13 +161,14 @@ void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, GTE::Bool cast
  *
  * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
  */
-GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra,
-									GTE::Real tx, GTE::Real ty, GTE::Real tz, GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
+GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume)
 {
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 	GTE::SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();
 	meshSceneObject->SetActive(true);
 	GTE::Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
+	meshFilter->SetUseBackSetShadowVolume(useBackSetShadowVolume);
 	meshFilter->SetMesh3D(mesh);
 	meshFilter->SetCastShadows(castShadows);
 	meshFilter->SetReceiveShadows(receiveShadows);

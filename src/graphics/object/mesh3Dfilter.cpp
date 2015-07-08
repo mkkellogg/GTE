@@ -30,6 +30,7 @@ namespace GTE
 		receiveShadows = false;
 		useCustomShadowVolumeOffset = false;
 		shadowVolumeOffset = 0.0f;
+		doBackSetShadowVolume = true;
 	}
 
 	/*

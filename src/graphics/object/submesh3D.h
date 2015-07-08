@@ -69,6 +69,8 @@ namespace GTE
 		Int32 normalsSmoothingThreshold;
 		// invert normals every time they are calculated
 		Bool invertNormals;
+		// invert tangents every time they are calculated
+		Bool invertTangents;
 		// local center position for sub-mesh.
 		Point3 center;
 		// radius of the sphere of influence along the X-axis
@@ -116,6 +118,7 @@ namespace GTE
 
 		void ReverseAttributeComponentOrder();
 		void InvertNormals();
+		void InvertTangents();
 		void UpdateTimeStamp();
 
 	public:
@@ -152,6 +155,7 @@ namespace GTE
 		UV2Array * GetUVs1();
 
 		void SetInvertNormals(Bool invert);
+		void SetInvertTangents(Bool invert);
 	};
 }
 
