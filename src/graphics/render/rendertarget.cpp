@@ -16,6 +16,9 @@ namespace GTE
 		this->width = width;
 		this->height = height;
 		this->colorTextureAttributes = colorTextureAttributes;
+
+		depthBufferIsTexture = false;
+		colorBufferIsTexture = false;
 	}
 
 
@@ -72,6 +75,16 @@ namespace GTE
 	UInt32 RenderTarget::GetHeight() const
 	{
 		return height;
+	}
+
+	Bool RenderTarget::IsColorBufferTexture() const
+	{
+		return colorBufferIsTexture;
+	}
+
+	Bool RenderTarget::IsDepthBufferTexture() const
+	{
+		return depthBufferIsTexture;
 	}
 }
 

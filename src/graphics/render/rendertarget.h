@@ -30,6 +30,10 @@ namespace GTE
 		Bool hasColorBuffer;
 		// does this render target support depth rendering?
 		Bool hasDepthBuffer;
+		// is the color buffer a texture?
+		Bool colorBufferIsTexture;
+		// is the depth buffer a texture?
+		Bool depthBufferIsTexture;
 		// enable stencil buffer for render (but not as a render target)
 		Bool enableStencilBuffer;
 		// width of this render target
@@ -54,6 +58,8 @@ namespace GTE
 		TextureRef GetColorTexture();
 		UInt32 GetWidth() const;
 		UInt32 GetHeight() const;
+		Bool IsColorBufferTexture() const;
+		Bool IsDepthBufferTexture() const;
 	};
 }
 

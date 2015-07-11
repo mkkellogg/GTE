@@ -114,6 +114,8 @@ namespace GTE
 			}
 			else
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
+
+			colorBufferIsTexture = true;
 		}
 
 		// generate a depth texture attachment
@@ -131,6 +133,8 @@ namespace GTE
 			ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.");
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
+
+			depthBufferIsTexture = true;
 		}
 		else if (hasDepthBuffer && enableStencilBuffer)
 		{
@@ -148,6 +152,8 @@ namespace GTE
 
 			//Attach stencil buffer to FBO
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilRenderBufferID);
+
+			depthBufferIsTexture = false;
 		}
 
 		UInt32 status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
