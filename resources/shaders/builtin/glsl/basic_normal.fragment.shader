@@ -14,7 +14,6 @@ uniform float SPECULAR_FACTOR;
 vec4 texColor;
 vec4 outputF;
 
-in vec3 vColor;
 in vec2 vUVTexture0;
 in vec3 vNormal;
 in vec3 vFaceNormal;

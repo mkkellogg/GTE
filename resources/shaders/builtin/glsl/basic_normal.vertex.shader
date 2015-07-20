@@ -21,7 +21,6 @@ uniform vec4 CLIP_PLANE0;
 uniform float USCALE;
 uniform float VSCALE;
 
-out vec3 vColor;
 out vec2 vUVTexture0;
 out vec3 vNormal;
 out vec3 vFaceNormal;
@@ -30,13 +29,12 @@ out vec4 vPosition;
  
 void main()
 {
-	mat4 invTransM = inverse(transpose(MODEL_MATRIX));
-   	vColor = COLOR;
-   	vUVTexture0 = vec2(UVTEXTURE0.s * USCALE, UVTEXTURE0.t * VSCALE);
-   	vNormal = vec3(invTransM * NORMAL);
-	vFaceNormal = vec3(invTransM * FACENORMAL);
-   	vTangent = vec3(MODEL_MATRIX * TANGENT);
-   	vPosition = MODEL_MATRIX * POSITION;
+	  mat4 invTransM = inverse(transpose(MODEL_MATRIX));
+    vUVTexture0 = vec2(UVTEXTURE0.s * USCALE, UVTEXTURE0.t * VSCALE);
+    vNormal = vec3(invTransM * NORMAL);
+	  vFaceNormal = vec3(invTransM * FACENORMAL);
+    vTangent = vec3(MODEL_MATRIX * TANGENT);
+    vPosition = MODEL_MATRIX * POSITION;
     gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION ;
     
     if(CLIP_PLANE_COUNT > 0)
