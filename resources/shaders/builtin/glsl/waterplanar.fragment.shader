@@ -22,7 +22,6 @@ void main()
 {	
 	vec2 texCoords = vec2(oPos.x * 0.5 + 0.5, 0.5 - oPos.z * 0.5);
 	vec3 LocalNormal = normalize(texture(WATER_NORMAL_MAP, texCoords.st).rgb);
-	//vec3 Direction = normalize(position.xyz - CAMERA_POSITION.xyz);
 	vec3 Normal = vec3(MODEL_MATRIX * vec4(LocalNormal, 0));
 	float h = texture(WATER_HEIGHT_MAP, texCoords.st).g;
 
@@ -41,10 +40,7 @@ void main()
 	float refractedYCoord = projectedReflectPos.y;
 	
 	vec4 reflectedColor = texture(REFLECTED_TEXTURE, vec2(reflectedXCoord,reflectedYCoord));
-	//reflectedColor = vec4( normalize(texture(WATER_HEIGHT_MAP, texCoords).rgb) ,1);
-	
 	vec4 currentColor = texture(SCREEN_BUFFER_TEXTURE, vec2(refractedXCoord, refractedYCoord));
-	//currentColor = vec4( texture(WATER_HEIGHT_MAP, texCoords).rgb ,1);
 	
 	out_color = ((currentColor * REFRACTED_COLOR_FACTOR) + (reflectedColor * REFLECTED_COLOR_FACTOR));
 }

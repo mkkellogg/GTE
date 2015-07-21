@@ -670,6 +670,9 @@ namespace GTE
 		// modelPreTransform is pre-multiplied with the transform of each rendered scene object & light
 		Transform modelPreTransform = camera.GetUniformWorldSceneObjectTransform();
 
+		// TODO: Once front/back culling settings are part of  a material, this will have to change. In that case
+		// reverse culling will mean to reverse whatever the material specifies. For now since by default all
+		// objects have back-faces culled, we can reverse that in a single place by siwtching to fron-face culling.
 		if (camera.GetReverseCulling())Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Front);
 		else Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Back);
 

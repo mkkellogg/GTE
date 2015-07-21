@@ -12,7 +12,6 @@ uniform sampler2D WATER_NORMAL_MAP;
 out vec4 position;
 out vec4 oPos;
 
- 
 void main()
 {
 	vec2 texCoords = vec2(POSITION.x * 0.5 + 0.5, 0.5 - POSITION.z * 0.5);

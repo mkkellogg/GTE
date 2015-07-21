@@ -105,8 +105,10 @@ void PoolScene::UpdateCameras()
 	GTE::Transform waterSurfaceInverseTransform = waterSurfaceTransform;
 	waterSurfaceInverseTransform.Invert();
 
-	// build the transform that will reflect the scene about the water's surface,
-	// which is the XZ plane in the object's local space.
+	// build the transform that will reflect the scene about the water's surface
+	// NOTE: Since these are pre-transformations the implicit assumption is that
+	// in the reflection plane's local space the scale is uniformly 1, and the reflection plane 
+	// is parallel to the XZ plane
 	GTE::Transform reflectionTransform;
 	reflectionTransform.PreTransformBy(waterSurfaceInverseTransform);
 	reflectionTransform.Scale(1,-1,1, false);
@@ -474,7 +476,18 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
 	waterReflectionCamera->SetCullingMask(cameraMask);
 
-	// set up camera that will render water reflection
+	GTE::SceneObjectRef waterReflectionCameraObject = objectManager->CreateSceneObject();
+	waterReflectionCameraObject->SetCamera(waterReflectionCamera);
+	sceneRoot->AddChild(waterReflectionCameraObject);
+	waterReflectionCamera->AddClipPlane(GTE::Vector3(0, -1, 0), -7);
+
+
+	//========================================================
+	//
+	// Set up camera that will render water's surface
+	//
+	//========================================================
+
 	waterSurfaceCamera = objectManager->CreateCamera();
 	waterSurfaceCamera->SetSSAOEnabled(false);
 	// ensure [waterSurfaceCamera] renders after [mainCamera]
@@ -483,11 +496,6 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	// restrict [waterSurfaceCamera] to rendering only the water's surface
 	cameraMask = objectManager->GetLayerManager().GetLayerMask(reflectiveLayerIndex);
 	waterSurfaceCamera->SetCullingMask(cameraMask);
-
-	GTE::SceneObjectRef waterReflectionCameraObject = objectManager->CreateSceneObject();
-	waterReflectionCameraObject->SetCamera(waterReflectionCamera);
-	sceneRoot->AddChild(waterReflectionCameraObject);
-	waterReflectionCamera->AddClipPlane(GTE::Vector3(0,-1,0), -7);
 
 	GTE::SceneObjectRef waterSurfaceCameraObject = objectManager->CreateSceneObject();
 	waterSurfaceCameraObject->SetCamera(waterSurfaceCamera);
