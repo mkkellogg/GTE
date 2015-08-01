@@ -106,8 +106,8 @@ namespace GTE
 		void SetTo(const BaseVector4& baseVector);
 		void Get(BaseVector4& baseVector) const;
 
-		virtual void AttachTo(Real * data);
-		virtual void Detach();
+		void AttachTo(Real * data);
+		void Detach();
 	};
 }
 

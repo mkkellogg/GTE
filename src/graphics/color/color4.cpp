@@ -58,15 +58,4 @@ namespace GTE
 	{
 		BaseVector4::Set(r, g, b, a);
 	}
-
-	void Color4::AttachTo(Real * data)
-	{
-		BaseVector4::AttachTo(data);
-	}
-
-
-	void Color4::Detach()
-	{
-		BaseVector4::Detach();
-	}
 }

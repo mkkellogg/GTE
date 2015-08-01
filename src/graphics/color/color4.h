@@ -28,9 +28,6 @@ namespace GTE
 		BaseVector4 & operator= (const BaseVector4 & source);
 
 		void Set(Real r, Real g, Real b, Real a);
-
-		void AttachTo(Real * data);
-		void Detach();
 	};
 }
 

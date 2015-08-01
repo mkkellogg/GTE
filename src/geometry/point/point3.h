@@ -52,8 +52,6 @@ namespace GTE
 		static Bool AreStrictlyEqual(const Point3* a, const Point3* b);
 		void Set(Real x, Real y, Real z);
 
-		void AttachTo(Real * data) override;
-		void Detach() override;
 
 		// TODO: optimize this hashing function (implement correctly)
 		typedef struct

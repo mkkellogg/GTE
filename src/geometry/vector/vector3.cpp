@@ -263,23 +263,6 @@ namespace GTE
 	}
 
 	/*
-	 * Attach to new backing storage in [data]
-	 */
-	void Vector3::AttachTo(Real * data)
-	{
-		NONFATAL_ASSERT(data != NULL, "Vector3::AttachTo -> 'data' is null.", true);
-		BaseVector4::AttachTo(data);
-	}
-
-	/*
-	 * Detach from existing backing storage
-	 */
-	void Vector3::Detach()
-	{
-		BaseVector4::Detach();
-	}
-
-	/*
 	 * Rotate [a] towards [b] by [theta] degrees.
 	 */
 	Bool Vector3::RotateTowards(const Vector3& from, const Vector3& to, Real theta, Vector3& result)

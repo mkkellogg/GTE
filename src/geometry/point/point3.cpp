@@ -92,23 +92,6 @@ namespace GTE
 	}
 
 	/*
-	 * Attach to new backing storage in [data]
-	 */
-	void Point3::AttachTo(Real * data)
-	{
-		NONFATAL_ASSERT(data != NULL, "Point3::AttachTo -> 'data' is null.", true);
-		BaseVector4::AttachTo(data);
-	}
-
-	/*
-	 * Detach from existing backing storage
-	 */
-	void Point3::Detach()
-	{
-		BaseVector4::Detach();
-	}
-
-	/*
 	 * Assignment operator
 	 */
 	Point3& Point3::operator= (const Point3& source)

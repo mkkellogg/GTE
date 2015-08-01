@@ -36,11 +36,12 @@ namespace GTE
 				return currentIndex < (Int32)targetArray.count - 1;
 			}
 
-			void Next()
+			Bool MoveNext()
 			{
-				if (currentIndex >= (Int32)targetArray.count - 1)return;
+				if (!HasNext())return false;
 				currentIndex++;
 				targetVector.AttachTo(targetArray.data + (currentIndex * 4));
+				return true;
 			}
 		};
 

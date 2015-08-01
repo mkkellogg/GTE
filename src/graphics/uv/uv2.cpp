@@ -53,16 +53,6 @@ namespace GTE
 		BaseVector2::operator=(source);
 		return *this;
 	}
-
-	void UV2::AttachTo(Real * data)
-	{
-		BaseVector2::AttachTo(data);
-	}
-
-	void UV2::Detach()
-	{
-		BaseVector2::Detach();
-	}
 }
 
 
