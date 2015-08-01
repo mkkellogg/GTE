@@ -13,9 +13,9 @@ namespace GTE
 	/*
 * Initialize - Store [x], [y], [z], and [w] as the base data.
 *
-* If [target] is not NULL, then use it as the storage array.
+* If [target] is not nullptr, then use it as the storage array.
 *
-* If [permAttach] is true, then [target] cannot be NULL, as it will be used as the permanent
+* If [permAttach] is true, then [target] cannot be nullptr, as it will be used as the permanent
 * backing storage array. If [permAttach] is false, then this base vector can attach and
 * re-attach to various different backing storage arrays.
 */
@@ -23,7 +23,7 @@ namespace GTE
 	{
 		data = baseData;
 
-		if (target == NULL && permAttach == true)
+		if (target == nullptr && permAttach == true)
 		{
 			Debug::PrintWarning("BaseVector4::Init -> 'permAttach' is true, but 'target' is null!");
 			permAttach = false;
@@ -39,7 +39,7 @@ namespace GTE
 			canDetach = true;
 		}
 
-		if (target != NULL)
+		if (target != nullptr)
 		{
 			data = target;
 			attached = true;
@@ -55,7 +55,7 @@ namespace GTE
 	 */
 	BaseVector4::BaseVector4()
 	{
-		Init(NULL, false);
+		Init(nullptr, false);
 		Set(0, 0, 0, 0);
 	}
 
@@ -72,7 +72,7 @@ namespace GTE
 	 */
 	BaseVector4::BaseVector4(Real x, Real y, Real z, Real w)
 	{
-		Init(NULL, false);
+		Init(nullptr, false);
 		Set(x, y, z, w);
 	}
 
@@ -81,7 +81,7 @@ namespace GTE
 	 */
 	BaseVector4::BaseVector4(const BaseVector4& baseVector)
 	{
-		Init(NULL, false);
+		Init(nullptr, false);
 		Set(baseVector.data[0], baseVector.data[1], baseVector.data[2], baseVector.data[3]);
 	}
 
@@ -90,7 +90,7 @@ namespace GTE
 	 */
 	BaseVector4::~BaseVector4()
 	{
-		if (!attached)data = NULL;
+		if (!attached)data = nullptr;
 	}
 
 	/*

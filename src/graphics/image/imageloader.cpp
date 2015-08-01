@@ -32,14 +32,14 @@ namespace GTE
 	RawImage * ImageLoader::LoadImageU(const std::string& fullPath)
 	{
 		Bool initializeSuccess = Initialize();
-		NONFATAL_ASSERT_RTRN(initializeSuccess, "ImageLoader::LoadImage -> Error occurred while initializing image loader.", NULL, false);
+		NONFATAL_ASSERT_RTRN(initializeSuccess, "ImageLoader::LoadImage -> Error occurred while initializing image loader.", nullptr, false);
 
 		std::string extension = GetFileExtension(fullPath);
 
 		ILuint imageIds[1];
 		ilGenImages(1, imageIds); //Generation of numTextures image names
 		ilBindImage(imageIds[0]); // Binding of DevIL image name
-		RawImage * rawImage = NULL;
+		RawImage * rawImage = nullptr;
 
 		ILboolean success = ilLoadImage(fullPath.c_str());
 
@@ -53,7 +53,7 @@ namespace GTE
 				// Error occurred
 				Engine::Instance()->GetErrorManager()->SetAndReportError(ImageLoaderError::GeneralLoadError, "ImageLoader::LoadImage -> Couldn't convert image");
 				ilDeleteImages(1, imageIds);
-				return NULL;
+				return nullptr;
 			}
 
 			rawImage = GetRawImageFromILData(ilGetData(), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT));
@@ -71,7 +71,7 @@ namespace GTE
 
 			Engine::Instance()->GetErrorManager()->SetAndReportError(ImageLoaderError::GeneralLoadError, msg);
 			ilDeleteImages(1, imageIds);
-			return NULL;
+			return nullptr;
 		}
 
 		// Because we have already copied image data into texture data we can release memory used by image.
@@ -81,17 +81,17 @@ namespace GTE
 
 	RawImage * ImageLoader::GetRawImageFromILData(const ILubyte * data, UInt32 width, UInt32 height)
 	{
-		NONFATAL_ASSERT_RTRN(data != NULL, "ImportUtil::GetRawImageFromILData -> 'data' is null.", NULL, true);
+		NONFATAL_ASSERT_RTRN(data != nullptr, "ImportUtil::GetRawImageFromILData -> 'data' is null.", nullptr, true);
 
-		RawImage * rawImage = new RawImage(width, height);
-		ASSERT(rawImage != NULL, "ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.");
+		RawImage * rawImage = new(std::nothrow) RawImage(width, height);
+		ASSERT(rawImage != nullptr, "ImportUtil::GetRawImageFromILData -> Could not allocate RawImage.");
 
 		Bool initSuccess = rawImage->Init();
 		if (!initSuccess)
 		{
 			Debug::PrintError("ImportUtil::GetRawImageFromILData -> Could not init RawImage.");
 			delete rawImage;
-			return NULL;
+			return nullptr;
 		}
 
 		for (UInt32 i = 0; i < width * height * 4; i++)
@@ -104,7 +104,7 @@ namespace GTE
 
 	void ImageLoader::DestroyRawImage(RawImage * image)
 	{
-		NONFATAL_ASSERT(image != NULL, "ImageLoader::DestroyRawImage -> 'image' is null.", true);
+		NONFATAL_ASSERT(image != nullptr, "ImageLoader::DestroyRawImage -> 'image' is null.", true);
 		delete image;
 	}
 

@@ -30,8 +30,8 @@ namespace GTE
 
 	BaseVector4 ** Color4Factory::CreateArray(Int32 count)
 	{
-		BaseVector4** pptr = (BaseVector4**)new Color4*[count];
-		ASSERT(pptr != NULL, "Color4Factory::CreateArray -> Unable to allocate array");
+		BaseVector4** pptr = (BaseVector4**)new(std::nothrow) Color4*[count];
+		ASSERT(pptr != nullptr, "Color4Factory::CreateArray -> Unable to allocate array");
 
 		memset(pptr, (Int32)NULL, sizeof(Color4*) * count);
 
@@ -40,9 +40,9 @@ namespace GTE
 
 	Color4Factory * Color4Factory::GetInstance()
 	{
-		if (instance == NULL)
+		if (instance == nullptr)
 		{
-			instance = new Color4Factory();
+			instance = new(std::nothrow) Color4Factory();
 		}
 
 		return instance;

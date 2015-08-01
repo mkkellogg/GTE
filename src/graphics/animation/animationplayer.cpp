@@ -58,12 +58,12 @@ namespace GTE
 
 	/*
 	 * Get the currently active blend operation, if there is one. If there isn't one,
-	 * return NULL;
+	 * return null;
 	 */
 	BlendOp * AnimationPlayer::GetCurrentBlendOp()
 	{
 		if (activeBlendOperations.size() > 0)return activeBlendOperations.front();
-		return NULL;
+		return nullptr;
 	}
 
 	/*
@@ -98,7 +98,7 @@ namespace GTE
 		{
 			// retrieve (but don't remove) blending operation at head of queue
 			BlendOp * op = activeBlendOperations.front();
-			if (op == NULL)
+			if (op == nullptr)
 			{
 				Debug::PrintWarning("AnimationPlayer::UpdateBlending -> Null operation found in queue.");
 				activeBlendOperations.pop();
@@ -304,7 +304,7 @@ namespace GTE
 					// get the local transform of the target of this node and apply
 					// [matrix], which contains the interpolated scale, rotation, and translation
 					Transform * localTransform = targetNode->GetLocalTransform();
-					if (localTransform != NULL)localTransform->SetTo(matrix);
+					if (localTransform != nullptr)localTransform->SetTo(matrix);
 				}
 			}
 		}
@@ -319,10 +319,10 @@ namespace GTE
 	{
 		Animation * animationPtr = const_cast<Animation *>(instance->SourceAnimation.GetConstPtr());
 		KeyFrameSet * frameSet = animationPtr->GetKeyFrameSet(channel);
-		NONFATAL_ASSERT(frameSet != NULL, "AnimationPlayer::CalculateInterpolatedValues -> 'frameSet' is null.", false);
+		NONFATAL_ASSERT(frameSet != nullptr, "AnimationPlayer::CalculateInterpolatedValues -> 'frameSet' is null.", false);
 
 		// make sure it's an active KeyFrameSet
-		if (frameSet != NULL && frameSet->Used)
+		if (frameSet != nullptr && frameSet->Used)
 		{
 			// for each of translation, scale, and rotation, find the two respective key frames between which
 			// instance->Progress lies, and interpolate between them based on instance->Progress.
@@ -507,8 +507,8 @@ namespace GTE
 		// loop through each key frame
 		for (UInt32 f = 0; f < frameCount; f++)
 		{
-			KeyFrame * previousFrame = NULL;
-			KeyFrame * nextFrame = NULL;
+			KeyFrame * previousFrame = nullptr;
+			KeyFrame * nextFrame = nullptr;
 
 			// get the correct time stamp for this frame, which depends on [component]
 			Real keyRealTime = GetKeyFrameTime(component, f, keyFrameSet);
@@ -610,7 +610,7 @@ namespace GTE
 	void AnimationPlayer::AddAnimation(AnimationRefConst animation)
 	{
 		AnimationManager * animationManager = Engine::Instance()->GetAnimationManager();
-		ASSERT(animationManager != NULL, "AnimationPlayer::CreateAnimationInstance -> Animation manager is null.");
+		ASSERT(animationManager != nullptr, "AnimationPlayer::CreateAnimationInstance -> Animation manager is null.");
 
 		NONFATAL_ASSERT(animation.IsValid(), "AnimationPlayer::CreateAnimationInstance -> 'animation' is invalid.", true);
 
@@ -623,7 +623,7 @@ namespace GTE
 		if (animationIndexMap.find(animation->GetObjectID()) == animationIndexMap.end())
 		{
 			EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-			ASSERT(objectManager != NULL, "AnimationPlayer::CreateAnimationInstance -> Engine object manager is null.");
+			ASSERT(objectManager != nullptr, "AnimationPlayer::CreateAnimationInstance -> Engine object manager is null.");
 
 			AnimationInstanceRef instance = objectManager->CreateAnimationInstance(target, animation);
 			NONFATAL_ASSERT(instance.IsValid(), " AnimationPlayer::CreateAnimationInstance -> Unable to create animation instance.", false);
@@ -826,8 +826,8 @@ namespace GTE
 			// if a crossfade operation is currently active with the same target, then do nothing
 			if (crossFadeTargets[targetIndex] == 1)return;
 
-			CrossFadeBlendOp * blendOp = new CrossFadeBlendOp(duration, targetIndex);
-			ASSERT(blendOp != NULL, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
+			CrossFadeBlendOp * blendOp = new(std::nothrow) CrossFadeBlendOp(duration, targetIndex);
+			ASSERT(blendOp != nullptr, "AnimationPlayer::CrossFade -> Unable to allocate new CrossFadeBlendOp object.");
 
 			Bool initSuccess = blendOp->Init(animationWeights);
 			if (!initSuccess)

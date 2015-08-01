@@ -45,14 +45,14 @@ namespace GTE
 	 */
 	SubMesh3DRenderer::SubMesh3DRenderer(Bool buffersOnGPU, AttributeTransformer * attributeTransformer)
 	{
-		this->containerRenderer = NULL;
+		this->containerRenderer = nullptr;
 		this->targetSubMeshIndex = -1;
 
 		memset(attributeBuffers, 0, sizeof(VertexAttrBuffer*) * MAX_ATTRIBUTE_BUFFERS);
 
 		for (UInt32 i = 0; i < (UInt32)StandardAttribute::_Last; i++)
 		{
-			attributeBuffers[i] = NULL;
+			attributeBuffers[i] = nullptr;
 		}
 
 		storedVertexCount = 0;
@@ -61,7 +61,7 @@ namespace GTE
 		this->buffersOnGPU = buffersOnGPU;
 		this->attributeTransformer = attributeTransformer;
 
-		doAttributeTransform = attributeTransformer == NULL ? false : true;
+		doAttributeTransform = attributeTransformer == nullptr ? false : true;
 		doPositionTransform = false;
 		doNormalTransform = false;
 		doTangentTransform = false;
@@ -92,7 +92,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetContainerRenderer(Mesh3DRenderer * renderer)
 	{
-		NONFATAL_ASSERT(renderer != NULL, "SubMesh3DRenderer::SetContainerRenderer -> 'renderer' is null.", true);
+		NONFATAL_ASSERT(renderer != nullptr, "SubMesh3DRenderer::SetContainerRenderer -> 'renderer' is null.", true);
 		this->containerRenderer = renderer;
 	}
 
@@ -121,15 +121,15 @@ namespace GTE
 	}
 
 	/*
-	 * Destroy a single vertex attribute buffer and set its pointer to NULL.
+	 * Destroy a single vertex attribute buffer and set its pointer to nullptr.
 	 */
 	void SubMesh3DRenderer::DestroyBuffer(VertexAttrBuffer ** buffer)
 	{
-		if ((*buffer) != NULL)
+		if ((*buffer) != nullptr)
 		{
 			Engine::Instance()->GetGraphicsSystem()->DestroyVertexAttributeBuffer(*buffer);
 		}
-		*buffer = NULL;
+		*buffer = nullptr;
 	}
 
 	/*
@@ -137,16 +137,16 @@ namespace GTE
 	 */
 	Bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride)
 	{
-		NONFATAL_ASSERT_RTRN(buffer != NULL, "SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false, true);
+		NONFATAL_ASSERT_RTRN(buffer != nullptr, "SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false, true);
 
 		// if the buffer has already been created, destroy it first.
 		DestroyBuffer(buffer);
 
 		// create the vertex attribute buffer
 		*buffer = Engine::Instance()->GetGraphicsSystem()->CreateVertexAttributeBuffer();
-		ASSERT(*buffer != NULL, "SubMesh3DRenderer::InitBuffer -> Graphics::CreateVertexAttrBuffer() returned null.");
+		ASSERT(*buffer != nullptr, "SubMesh3DRenderer::InitBuffer -> Graphics::CreateVertexAttrBuffer() returned null.");
 		// initialize the vertex attribute buffer
-		(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, NULL);
+		(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, nullptr);
 
 		return true;
 	}
@@ -241,26 +241,26 @@ namespace GTE
 		UInt32 faceCount = faces.GetFaceCount();
 
 		// temp working variables
-		Real* faceVertex1 = NULL;
-		Real* faceVertex2 = NULL;
-		Real* faceVertex3 = NULL;
+		Real* faceVertex1 = nullptr;
+		Real* faceVertex2 = nullptr;
+		Real* faceVertex3 = nullptr;
 		Vector3 faceToLightDir = lightPosDir;
 		UInt32 faceVertexIndex = 0;
 		Vector3 * faceNormal;
-		SubMesh3DFace * face = NULL;
+		SubMesh3DFace * face = nullptr;
 		Point3 vertexAvg;
 
 		// temp working variables related to adjacency processing
-		Real* edgeVertex1 = NULL;
-		Real* edgeVertex2 = NULL;
-		Real* adjVertex1 = NULL;
-		Real* adjVertex2 = NULL;
-		Real* adjVertex3 = NULL;
+		Real* edgeVertex1 = nullptr;
+		Real* edgeVertex2 = nullptr;
+		Real* adjVertex1 = nullptr;
+		Real* adjVertex2 = nullptr;
+		Real* adjVertex3 = nullptr;
 		Vector3 adjFaceToLightDir;
 		UInt32 adjacentFaceVertexIndex = 0;
 		Int32 adjacentFaceIndex = -1;
-		Vector3 * adjacentFaceNormal = NULL;
-		SubMesh3DFace * adjacentFace = NULL;
+		Vector3 * adjacentFaceNormal = nullptr;
+		SubMesh3DFace * adjacentFace = nullptr;
 
 		// treat as directional light for now
 		faceToLightDir.Normalize();
@@ -271,7 +271,7 @@ namespace GTE
 		for (UInt32 f = 0; f < faceCount; f++)
 		{
 			face = faces.GetFace(f);
-			if (face == NULL)continue;
+			if (face == nullptr)continue;
 
 			// face->FirstVertexIndex is the index of the face's first vertex in [positions] & [normals]
 			faceVertexIndex = face->FirstVertexIndex;
@@ -378,7 +378,7 @@ namespace GTE
 					// adjacentFaceIndex will be the index in [faces] of the adjacent face
 					facesFound++;
 					adjacentFace = faces.GetFace(adjacentFaceIndex);
-					if (adjacentFace != NULL)
+					if (adjacentFace != nullptr)
 					{
 						// adjacentFaceVertexIndex is the index of the adjacent face's first vertex in [positions] & [normals]
 						adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
@@ -535,7 +535,7 @@ namespace GTE
 	{
 		// if vertex attribute buffers are already created, destroy them
 		DestroyBuffers();
-		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not find matching sub mesh for sub renderer.");
@@ -654,7 +654,7 @@ namespace GTE
 	*/
 	Bool SubMesh3DRenderer::ShouldUpdateFromMesh()
 	{
-		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::ShouldUpdateFromMesh -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::ShouldUpdateFromMesh -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::ShouldUpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
@@ -668,7 +668,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::CopyMeshData()
 	{
-		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::CopyMeshData -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::CopyMeshData -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
@@ -689,7 +689,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::UpdateTimeStamp()
 	{
-		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::UpdateTimeStamp -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UpdateTimeStamp -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateTimeStamp -> Could not find matching sub mesh for sub renderer.");
@@ -711,7 +711,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::UpdateFromMesh()
 	{
-		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::UpdateFromMesh -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UpdateFromMesh -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
@@ -749,7 +749,7 @@ namespace GTE
 
 		lastUsedMaterial = material;
 
-		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::UseMaterial -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UseMaterial -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.");
@@ -781,7 +781,7 @@ namespace GTE
 	void SubMesh3DRenderer::SetAttributeTransformer(AttributeTransformer * attributeTransformer)
 	{
 		this->attributeTransformer = attributeTransformer;
-		if (attributeTransformer == NULL)
+		if (attributeTransformer == nullptr)
 		{
 			this->doAttributeTransform = false;
 		}
@@ -818,7 +818,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::PreRender(const Matrix4x4& model, const Matrix4x4& modelInverse)
 	{
-		ASSERT(containerRenderer != NULL, "SubMesh3DRenderer::PreRender -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::PreRender -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::PreRender -> Could not find matching sub mesh for sub renderer.");
@@ -833,10 +833,10 @@ namespace GTE
 			Vector3Array * faceNormals = mesh->GetFaceNormals();
 			Vector3Array * vertexTangents = mesh->GetVertexTangents();
 
-			ASSERT(positions != NULL && vertexNormals != NULL, "SubMesh3DRenderer::PreRender -> Mesh contains null positions or normals.");
-			ASSERT(vertexNormals != NULL, "SubMesh3DRenderer::PreRender -> Mesh contains null vertex normals.");
-			ASSERT(faceNormals != NULL, "SubMesh3DRenderer::PreRender -> Mesh contains null face normals.");
-			ASSERT(vertexTangents != NULL, "SubMesh3DRenderer::PreRender -> Mesh contains null vertex tangents.");
+			ASSERT(positions != nullptr && vertexNormals != nullptr, "SubMesh3DRenderer::PreRender -> Mesh contains null positions or normals.");
+			ASSERT(vertexNormals != nullptr, "SubMesh3DRenderer::PreRender -> Mesh contains null vertex normals.");
+			ASSERT(faceNormals != nullptr, "SubMesh3DRenderer::PreRender -> Mesh contains null face normals.");
+			ASSERT(vertexTangents != nullptr, "SubMesh3DRenderer::PreRender -> Mesh contains null vertex tangents.");
 
 			// invoke the attribute transformer
 			attributeTransformer->TransformAttributes(*positions, transformedPositions,
@@ -888,7 +888,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::Render()
 	{
-		ASSERT(containerRenderer != NULL, "SubMesh3DRendererGL::Render -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRendererGL::Render -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
@@ -906,7 +906,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::RenderShadowVolume()
 	{
-		ASSERT(containerRenderer != NULL, "SubMesh3DRendererGL::RenderShadowVolume -> Container renderer is null.");
+		ASSERT(containerRenderer != nullptr, "SubMesh3DRendererGL::RenderShadowVolume -> Container renderer is null.");
 
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
@@ -919,7 +919,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::RenderShadowVolume(const Point3Array * shadowVolumePositions)
 	{
-		ASSERT(shadowVolumePositions != NULL, "SubMesh3DRendererGL::RenderShadowVolume -> 'shadowVolumePositions' is null.");
+		ASSERT(shadowVolumePositions != nullptr, "SubMesh3DRendererGL::RenderShadowVolume -> 'shadowVolumePositions' is null.");
 
 		if (shadowVolumePositions->GetCount() > 0)
 		{

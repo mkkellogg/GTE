@@ -34,10 +34,10 @@ GTE::Bool LavaField::InitMeshAndMaterial()
 {
 	// load first displacement image
 	displacementA = GTE::ImageLoader::LoadImageU("resources/textures/lava/displacementA.png");
-	ASSERT(displacementA != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture A.");
+	ASSERT(displacementA != nullptr, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture A.");
 	// load second displacement image
 	displacementB = GTE::ImageLoader::LoadImageU("resources/textures/lava/displacementB.png");
-	ASSERT(displacementB != NULL, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture B.");
+	ASSERT(displacementB != nullptr, "LavaField::InitMeshAndMaterial -> Unable to load displacement texture B.");
 
 	// make lava field 1x1 in model space
 	fieldWidth = 1;
@@ -159,8 +159,8 @@ LavaField::LavaField(GTE::UInt32 subDivisions)
 	textureASpeed = 0;
 	textureBSpeed = 0;
 
-	displacementA = NULL;
-	displacementB = NULL;
+	displacementA = nullptr;
+	displacementB = nullptr;
 
 	fieldWidth = 0;
 	fieldHeight = 0;

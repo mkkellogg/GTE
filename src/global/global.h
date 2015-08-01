@@ -7,9 +7,9 @@
 
 #define SAFE_DELETE(ptr)                   \
 {                                          \
-  if((ptr) != NULL){                       \
+  if((ptr) != nullptr){                       \
   	delete (ptr);					       \
-    (ptr) = NULL;						   \
+    (ptr) = nullptr;						   \
   }										   \
   else                                     \
   {                                        \
@@ -18,9 +18,9 @@
 
 #define SAFE_DELETE_DEBUG(ptr, msg)               \
 {                                                 \
-  if((ptr) != NULL){                              \
+  if((ptr) != nullptr){                              \
   	delete (ptr);					              \
-    (ptr) = NULL;						          \
+    (ptr) = nullptr;						          \
   }										          \
   else									          \
   {										          \

@@ -14,7 +14,7 @@ namespace GTE
 	{
 		data = baseData;
 
-		if (target == NULL && permAttach == true)
+		if (target == nullptr && permAttach == true)
 		{
 			Debug::PrintWarning("BaseVector4::Init -> 'permAttach' is true, but 'target' is null!");
 			permAttach = false;
@@ -30,7 +30,7 @@ namespace GTE
 			canDetach = true;
 		}
 
-		if (target != NULL)
+		if (target != nullptr)
 		{
 			data = target;
 			attached = true;
@@ -43,7 +43,7 @@ namespace GTE
 
 	BaseVector2::BaseVector2()
 	{
-		Init(NULL, false);
+		Init(nullptr, false);
 		Set(0, 0);
 	}
 
@@ -55,19 +55,19 @@ namespace GTE
 
 	BaseVector2::BaseVector2(Real x, Real y)
 	{
-		Init(NULL, false);
+		Init(nullptr, false);
 		Set(x, y);
 	}
 
 	BaseVector2::BaseVector2(const BaseVector2& baseVector)
 	{
-		Init(NULL, false);
+		Init(nullptr, false);
 		Set(baseVector.data[0], baseVector.data[1]);
 	}
 
 	BaseVector2::~BaseVector2()
 	{
-		if (!attached)data = NULL;
+		if (!attached)data = nullptr;
 	}
 
 	BaseVector2 & BaseVector2::operator= (const BaseVector2 & source)

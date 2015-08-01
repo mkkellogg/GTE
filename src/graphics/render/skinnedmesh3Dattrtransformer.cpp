@@ -31,14 +31,14 @@ namespace GTE
 		vertexBoneMapIndex = -1;
 		currentCacheSize = -1;
 
-		boneTransformed = NULL;
-		savedTransforms = NULL;
-		identicalNormalFlags = NULL;
-		identicalTangentFlags = NULL;
+		boneTransformed = nullptr;
+		savedTransforms = nullptr;
+		identicalNormalFlags = nullptr;
+		identicalTangentFlags = nullptr;
 
-		cacheFlags = NULL;
+		cacheFlags = nullptr;
 
-		renderer = NULL;
+		renderer = nullptr;
 	}
 
 	/*
@@ -50,14 +50,14 @@ namespace GTE
 		vertexBoneMapIndex = -1;
 		currentCacheSize = -1;
 
-		boneTransformed = NULL;
-		savedTransforms = NULL;
-		identicalNormalFlags = NULL;
-		identicalTangentFlags = NULL;
+		boneTransformed = nullptr;
+		savedTransforms = nullptr;
+		identicalNormalFlags = nullptr;
+		identicalTangentFlags = nullptr;
 
-		cacheFlags = NULL;
+		cacheFlags = nullptr;
 
-		renderer = NULL;
+		renderer = nullptr;
 	}
 
 	/*
@@ -93,12 +93,12 @@ namespace GTE
 	 */
 	Bool SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray()
 	{
-		if (renderer != NULL && renderer->GetSkeleton().IsValid())
+		if (renderer != nullptr && renderer->GetSkeleton().IsValid())
 		{
 			SkeletonRef skeleton = renderer->GetSkeleton();
 			boneCount = skeleton->GetBoneCount();
-			boneTransformed = new UChar[boneCount];
-			ASSERT(boneTransformed != NULL, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray -> Unable to allocate flags array.");
+			boneTransformed = new(std::nothrow) UChar[boneCount];
+			ASSERT(boneTransformed != nullptr, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray -> Unable to allocate flags array.");
 			return true;
 		}
 
@@ -110,7 +110,7 @@ namespace GTE
 	 */
 	void SkinnedMesh3DAttributeTransformer::ClearTransformedBoneFlagsArray()
 	{
-		if (renderer != NULL && renderer->GetSkeleton().IsValid())
+		if (renderer != nullptr && renderer->GetSkeleton().IsValid())
 		{
 			SkeletonRef skeleton = renderer->GetSkeleton();
 			memset(boneTransformed, 0, sizeof(UChar) * skeleton->GetBoneCount());
@@ -140,10 +140,10 @@ namespace GTE
 		}
 		else if (target == CacheType::Transform)
 		{
-			if (savedTransforms != NULL)
+			if (savedTransforms != nullptr)
 			{
 				delete[] savedTransforms;
-				savedTransforms = NULL;
+				savedTransforms = nullptr;
 			}
 		}
 	}
@@ -154,11 +154,11 @@ namespace GTE
 	 */
 	Bool SkinnedMesh3DAttributeTransformer::CreateCache(CacheType target)
 	{
-		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> Renderer is null.");
+		ASSERT(renderer != nullptr, "SkinnedMesh3DAttributeTransformer::CreateCache -> Renderer is null.");
 
 		// retrieve this instance's vertex bone map
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != nullptr, "SkinnedMesh3DAttributeTransformer::CreateCache -> No valid vertex bone map found for sub mesh.");
 
 		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
@@ -198,8 +198,8 @@ namespace GTE
 		}
 		else if (target == CacheType::Transform)
 		{
-			savedTransforms = new Matrix4x4[count];
-			ASSERT(savedTransforms != NULL, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not saved transform array.");
+			savedTransforms = new(std::nothrow) Matrix4x4[count];
+			ASSERT(savedTransforms != nullptr, "SkinnedMesh3DAttributeTransformer::CreateCache -> Could not saved transform array.");
 
 			return true;
 		}
@@ -220,11 +220,11 @@ namespace GTE
 	 */
 	void SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags(UChar value)
 	{
-		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> Renderer is NULL.");
+		ASSERT(renderer != nullptr, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> Renderer is null.");
 
 		// retrieve this instance's vertex bone map
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != nullptr, "SkinnedMesh3DAttributeTransformer::SetAllTransformCacheFlags -> No valid vertex bone map found for sub mesh.");
 
 		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
@@ -245,19 +245,19 @@ namespace GTE
 	 */
 	Bool SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags()
 	{
-		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> 'renderer' is null.");
+		ASSERT(renderer != nullptr, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> 'renderer' is null.");
 
 		// retrieve this instance's vertex bone map
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != nullptr, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> No valid vertex bone map found for sub mesh.");
 
 		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
-		identicalNormalFlags = new UChar[count];
-		ASSERT(identicalNormalFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> Unable to allocate identical normal flags array.");
+		identicalNormalFlags = new(std::nothrow) UChar[count];
+		ASSERT(identicalNormalFlags != nullptr, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> Unable to allocate identical normal flags array.");
 
-		identicalTangentFlags = new UChar[count];
-		ASSERT(identicalTangentFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> Unable to allocate identical tangent flags array.");
+		identicalTangentFlags = new(std::nothrow) UChar[count];
+		ASSERT(identicalTangentFlags != nullptr, "SkinnedMesh3DAttributeTransformer::CreateIdenticalNormalsTangentsFlags -> Unable to allocate identical tangent flags array.");
 
 		return true;
 	}
@@ -267,11 +267,11 @@ namespace GTE
 	 */
 	void SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsTangentsFlags()
 	{
-		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags -> 'renderer' is null.");
+		ASSERT(renderer != nullptr, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsFlags -> 'renderer' is null.");
 
 		// retrieve this instance's vertex bone map
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsTangentsFlags -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != nullptr, "SkinnedMesh3DAttributeTransformer::ClearIdenticalNormalsTangentsFlags -> No valid vertex bone map found for sub mesh.");
 
 		UInt32 count = vertexBoneMap->GetUniqueVertexCount();
 
@@ -298,11 +298,11 @@ namespace GTE
 	 */
 	Bool SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents(Vector3Array& fullList, Bool forNormals)
 	{
-		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> renderer is NULL.");
+		ASSERT(renderer != nullptr, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormals -> renderer is null.");
 
 		// retrieve this instance's vertex bone map
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != nullptr, "SkinnedMesh3DAttributeTransformer::FindIdenticalNormalsOrTangents -> No valid vertex bone map found for sub mesh.");
 
 		UInt32 uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 		ASSERT(fullList.GetCount() == vertexBoneMap->GetVertexCount(),
@@ -326,7 +326,7 @@ namespace GTE
 		for (UInt32 i = 0; i < fullListSize; i++)
 		{
 			desc = vertexBoneMap->GetDescriptor(i);
-			if (desc == NULL)continue;
+			if (desc == nullptr)continue;
 
 			if (!seenVectors[desc->UniqueVertexIndex])
 			{
@@ -360,16 +360,16 @@ namespace GTE
 	 */
 	Bool SkinnedMesh3DAttributeTransformer::CreateCaches()
 	{
-		ASSERT(renderer != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> 'renderer' is null.");
+		ASSERT(renderer != nullptr, "SkinnedMesh3DAttributeTransformer::CreateCaches -> 'renderer' is null.");
 
 		// retrieve this instance's vertex bone map
 		VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-		ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> No valid vertex bone map found for sub mesh.");
+		ASSERT(vertexBoneMap != nullptr, "SkinnedMesh3DAttributeTransformer::CreateCaches -> No valid vertex bone map found for sub mesh.");
 
 		UInt32 uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
 
-		cacheFlags = new UChar[uniqueVertexCount];
-		ASSERT(cacheFlags != NULL, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to allocate cacheFlags flags array.");
+		cacheFlags = new(std::nothrow) UChar[uniqueVertexCount];
+		ASSERT(cacheFlags != nullptr, "SkinnedMesh3DAttributeTransformer::CreateCaches -> Unable to allocate cacheFlags flags array.");
 
 		DestroyCache(CacheType::Position);
 		Bool createSuccess = CreateCache(CacheType::Position);
@@ -440,7 +440,7 @@ namespace GTE
 		Bool transformPositions, Bool transformNormals, Bool transformTangents)
 	{
 		// make sure the target skeleton is valid and has a VertexBoneMap object for this instance
-		if (renderer != NULL && vertexBoneMapIndex >= 0)
+		if (renderer != nullptr && vertexBoneMapIndex >= 0)
 		{
 			// copy existing positions to output array and the perform transformations
 			// directly on output array
@@ -469,7 +469,7 @@ namespace GTE
 
 			// retrieve this instance's vertex bone map
 			VertexBoneMap * vertexBoneMap = renderer->GetVertexBoneMap(vertexBoneMapIndex);
-			ASSERT(vertexBoneMap != NULL, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> No valid vertex bone map found for sub mesh.");
+			ASSERT(vertexBoneMap != nullptr, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> No valid vertex bone map found for sub mesh.");
 
 			// get the number of unique vertices in the vertex bone map
 			UInt32 uniqueVertexCount = vertexBoneMap->GetUniqueVertexCount();
@@ -515,10 +515,10 @@ namespace GTE
 			Real* transformedVertexNormalsPtrBase = const_cast<Real*>(transformedVertexNormals.GetDataPtr());
 			Real* transformedFaceNormalsPtrBase = const_cast<Real*>(transformedFaceNormals.GetDataPtr());
 			Real* transformedVertexTangentsPtrBase = const_cast<Real*>(transformedVertexTangents.GetDataPtr());
-			Real* transformedPositionsPtr = NULL;
-			Real* transformedVertexNormalsPtr = NULL;
-			Real* transformedFaceNormalsPtr = NULL;
-			Real* transformedVertexTangentsPtr = NULL;
+			Real* transformedPositionsPtr = nullptr;
+			Real* transformedVertexNormalsPtr = nullptr;
+			Real* transformedFaceNormalsPtr = nullptr;
+			Real* transformedVertexTangentsPtr = nullptr;
 
 			Real * positionsOutBase = const_cast<Real*>(positionsOut.GetDataPtr());
 			Real * vertexNormalsOutBase = const_cast<Real*>(vertexNormalsOut.GetDataPtr());

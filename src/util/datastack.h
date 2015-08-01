@@ -16,10 +16,10 @@ namespace GTE
 
 		void Destroy()
 		{
-			if (data != NULL)
+			if (data != nullptr)
 			{
 				delete[] data;
-				data = NULL;
+				data = nullptr;
 			}
 		}
 
@@ -30,8 +30,8 @@ namespace GTE
 			this->maxEntryCount = 256;
 			this->elementsPerEntry = 1;
 			entries = 0;
-			data = NULL;
-			stackPointer = NULL;
+			data = nullptr;
+			stackPointer = nullptr;
 		}
 
 		DataStack(Int32 maxEntryCount, Int32 elementsPerEntry)
@@ -39,8 +39,8 @@ namespace GTE
 			this->maxEntryCount = maxEntryCount;
 			this->elementsPerEntry = elementsPerEntry;
 			entries = 0;
-			data = NULL;
-			stackPointer = NULL;
+			data = nullptr;
+			stackPointer = nullptr;
 		}
 
 		~DataStack()
@@ -52,8 +52,8 @@ namespace GTE
 		{
 			Destroy();
 
-			data = new T[maxEntryCount * elementsPerEntry];
-			if (data == NULL)
+			data = new(std::nothrow) T[maxEntryCount * elementsPerEntry];
+			if (data == nullptr)
 			{
 				return false;
 			}
@@ -65,7 +65,7 @@ namespace GTE
 
 		void Push(const T * entryData)
 		{
-			if (data != NULL && stackPointer != NULL && entries < maxEntryCount)
+			if (data != nullptr && stackPointer != nullptr && entries < maxEntryCount)
 			{
 				memcpy(stackPointer, entryData, elementsPerEntry * sizeof(T));
 				stackPointer += elementsPerEntry;
@@ -80,14 +80,14 @@ namespace GTE
 		 */
 		T * Pop()
 		{
-			if (data != NULL && stackPointer != NULL && entries > 0)
+			if (data != nullptr && stackPointer != nullptr && entries > 0)
 			{
 				stackPointer -= elementsPerEntry;
 				entries--;
 				return stackPointer;
 			}
 
-			return NULL;
+			return nullptr;
 		}
 
 		Int32 GetMaxEntryCount() const

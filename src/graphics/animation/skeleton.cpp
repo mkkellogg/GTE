@@ -21,7 +21,7 @@ namespace GTE
 	Skeleton::Skeleton(UInt32 boneCount)
 	{
 		this->boneCount = boneCount;
-		bones = NULL;
+		bones = nullptr;
 	}
 	/*
 	 * Destructor.
@@ -38,10 +38,10 @@ namespace GTE
 	void Skeleton::Destroy()
 	{
 		// delete all Bone objects
-		if (bones != NULL)
+		if (bones != nullptr)
 		{
 			delete[] bones;
-			bones = NULL;
+			bones = nullptr;
 		}
 		boneNameMap.clear();
 
@@ -49,10 +49,10 @@ namespace GTE
 		// using a visitor to invoke the callback below, which performsm the delete.
 		skeleton.SetTraversalCallback([](Tree<SkeletonNode *>::TreeNode * node) -> Bool
 		{
-			if (node != NULL && node->Data != NULL)
+			if (node != nullptr && node->Data != nullptr)
 			{
 				delete node->Data;
-				node->Data = NULL;
+				node->Data = nullptr;
 			}
 			return true;
 		});
@@ -84,8 +84,8 @@ namespace GTE
 		// destroy existing data (if there is any)
 		Destroy();
 
-		bones = new Bone[boneCount];
-		ASSERT(bones != NULL, "Skeleton::Init -> Could not allocate bone array.");
+		bones = new(std::nothrow) Bone[boneCount];
+		ASSERT(bones != nullptr, "Skeleton::Init -> Could not allocate bone array.");
 
 		return true;
 	}
@@ -97,7 +97,7 @@ namespace GTE
 	 */
 	Tree<SkeletonNode*>::TreeNode *  Skeleton::CreateRoot(SkeletonNode * node)
 	{
-		if (skeleton.GetRoot() == NULL)
+		if (skeleton.GetRoot() == nullptr)
 		{
 			skeleton.AddRoot(node);
 		}
@@ -109,7 +109,7 @@ namespace GTE
 	 */
 	Tree<SkeletonNode*>::TreeNode *  Skeleton::AddChild(Tree<SkeletonNode*>::TreeNode * parent, SkeletonNode * node)
 	{
-		NONFATAL_ASSERT_RTRN(parent != NULL, "Skeleton::AddChild -> 'parent' is null.", NULL, true);
+		NONFATAL_ASSERT_RTRN(parent != nullptr, "Skeleton::AddChild -> 'parent' is null.", nullptr, true);
 		Tree<SkeletonNode*>::TreeNode * childNode = parent->AddChild(node);
 
 		return childNode;
@@ -143,7 +143,7 @@ namespace GTE
 	 */
 	Bone* Skeleton::GetBone(UInt32 boneIndex)
 	{
-		NONFATAL_ASSERT_RTRN(boneIndex < boneCount, "Skeleton::GetBone -> 'boneIndex' is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(boneIndex < boneCount, "Skeleton::GetBone -> 'boneIndex' is out of range.", nullptr, true);
 
 		return bones + boneIndex;
 	}
@@ -179,7 +179,7 @@ namespace GTE
 		if (nodeIndex >= GetNodeCount())
 		{
 			Debug::PrintError("Skeleton::GetNodeFromList -> Index is out of range.");
-			return NULL;
+			return nullptr;
 		}
 
 		return nodeList[nodeIndex];
@@ -213,7 +213,7 @@ namespace GTE
 			for (UInt32 c = 0; c < GetBoneCount(); c++)
 			{
 				Bone * currentBone = GetBone(c);
-				if (currentBone != NULL && newBone != NULL && newBone->Name == currentBone->Name)
+				if (currentBone != nullptr && newBone != nullptr && newBone->Name == currentBone->Name)
 				{
 					if (takeOffset)currentBone->OffsetMatrix = newBone->OffsetMatrix;
 					if (takeNode)currentBone->Node = newBone->Node;
@@ -229,15 +229,15 @@ namespace GTE
 	Skeleton * Skeleton::FullClone()
 	{
 		// allocate new Skeleton object
-		Skeleton * newSkeleton = new Skeleton(boneCount);
-		ASSERT(newSkeleton != NULL, "Skeleton::FullClone -> could not allocate skeleton.");
+		Skeleton * newSkeleton = new(std::nothrow) Skeleton(boneCount);
+		ASSERT(newSkeleton != nullptr, "Skeleton::FullClone -> could not allocate skeleton.");
 
 		// initialize new skeleton
 		Bool initSuccess = newSkeleton->Init();
 		if (!initSuccess)
 		{
 			delete newSkeleton;
-			return NULL;
+			return nullptr;
 		}
 
 		// copy over all the bones from this skeleton
@@ -252,29 +252,29 @@ namespace GTE
 		// get the TreeNode object that contains the root node of the existing skeleton
 		Tree<SkeletonNode *>::TreeNode * rootTreeNode = skeleton.GetRoot();
 
-		if (rootTreeNode != NULL)
+		if (rootTreeNode != nullptr)
 		{
-			SkeletonNode * rootClone = NULL;
+			SkeletonNode * rootClone = nullptr;
 
 			// create a clone of the root SkeletonNode
-			if (rootTreeNode->Data != NULL)
+			if (rootTreeNode->Data != nullptr)
 			{
 				rootClone = rootTreeNode->Data->FullClone();
-				if (rootClone == NULL)
+				if (rootClone == nullptr)
 				{
 					Debug::PrintError("Skeleton::FullClone -> Could not clone root node.");
 					delete newSkeleton;
-					return NULL;
+					return nullptr;
 				}
 			}
 
 			// create new root TreeNode and set its Data to the new root SkeletonNode
 			Tree<SkeletonNode *>::TreeNode * newRoot = newSkeleton->CreateRoot(rootClone);
-			if (newRoot == NULL)
+			if (newRoot == nullptr)
 			{
 				Debug::PrintError("Skeleton::FullClone -> Could not create root node.");
 				delete newSkeleton;
-				return NULL;
+				return nullptr;
 			}
 
 			// map from TreeNode objects in the existing skeleton to their counterparts in the new skeleton
@@ -292,8 +292,8 @@ namespace GTE
 			// set yet, so there will be no hierarchy information available.
 			skeleton.SetTraversalCallback([&allocateTreeSuccess, &newNodeMap](Tree<SkeletonNode *>::TreeNode * node) -> Bool
 			{
-				Tree<SkeletonNode *>::TreeNode * newNode = new Tree<SkeletonNode *>::TreeNode();
-				if (newNode == NULL)
+				Tree<SkeletonNode *>::TreeNode * newNode = new(std::nothrow) Tree<SkeletonNode *>::TreeNode();
+				if (newNode == nullptr)
 				{
 					Debug::PrintError("Skeleton::FullClone -> Could not allocate new node.");
 					allocateTreeSuccess = false;
@@ -310,7 +310,7 @@ namespace GTE
 			{
 				Debug::PrintError("Skeleton::FullClone -> Could not allocate new nodes for skeleton clone.");
 				delete newSkeleton;
-				return NULL;
+				return nullptr;
 			}
 
 			// copy over the node name map
@@ -328,12 +328,12 @@ namespace GTE
 			// (2) attach the cloned TreeNode in the new skeleton to its appropriate parent TreeNode in the new skeleton.
 			skeleton.SetTraversalCallback([&cloneTreeSuccess, &newNodeMap, newSkeleton, thisSkeleton](Tree<SkeletonNode *>::TreeNode * node) -> Bool
 			{
-				SkeletonNode * clonedSkeletonNode = NULL;
-				if (node != NULL && node->Data != NULL)
+				SkeletonNode * clonedSkeletonNode = nullptr;
+				if (node != nullptr && node->Data != nullptr)
 				{
 					// clone the SkeletonNode
 					clonedSkeletonNode = node->Data->FullClone();
-					if (clonedSkeletonNode == NULL)
+					if (clonedSkeletonNode == nullptr)
 					{
 						Debug::PrintError("Skeleton::FullClone -> Could not clone node in skeletal tree.");
 						cloneTreeSuccess = false;
@@ -353,7 +353,7 @@ namespace GTE
 				Tree<SkeletonNode *>::TreeNode * existingParent = clonedTreeNode->GetParent();
 
 				// find counterpart of existing parent in the new skeleton, and add the cloned TreeNode as a child
-				if (existingParent != NULL)
+				if (existingParent != nullptr)
 				{
 					Tree<SkeletonNode *>::TreeNode * clonedParentNode = newNodeMap[existingParent];
 					clonedParentNode->AddChild(clonedTreeNode);
@@ -376,7 +376,7 @@ namespace GTE
 			{
 				Debug::PrintError("Skeleton::FullClone -> Could not clone skeletal tree.");
 				delete newSkeleton;
-				return NULL;
+				return nullptr;
 			}
 		}
 

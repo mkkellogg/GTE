@@ -132,7 +132,7 @@ namespace GTE
 	 */
 	Bool Point3::AreEqual(const Point3* a, const Point3* b)
 	{
-		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Point3::AreEqual -> Null point passed.", false, true);
+		NONFATAL_ASSERT_RTRN(a != nullptr && b != nullptr, "Point3::AreEqual -> Null point passed.", false, true);
 
 		Real epsilon = .0005f;
 		return GTEMath::Abs(a->x - b->x) < epsilon && GTEMath::Abs(a->y - b->y) < epsilon && GTEMath::Abs(a->z - b->z) < epsilon;
@@ -143,7 +143,7 @@ namespace GTE
 	 */
 	Bool Point3::AreStrictlyEqual(const Point3* a, const Point3* b)
 	{
-		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Point3::AreStrictlyEqual -> Null point passed.", false, true);
+		NONFATAL_ASSERT_RTRN(a != nullptr && b != nullptr, "Point3::AreStrictlyEqual -> Null point passed.", false, true);
 
 		return a->x == b->x && a->y == b->y && a->z == b->z;
 	}

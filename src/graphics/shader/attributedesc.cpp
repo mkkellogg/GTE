@@ -11,7 +11,7 @@ namespace GTE
 	AttributeDescriptor::AttributeDescriptor()
 	{
 		ShaderVarID = -1;
-		FloatData = NULL;
+		FloatData = nullptr;
 		Size = -1;
 		IsSet = false;
 		Type = AttributeType::Unknown;

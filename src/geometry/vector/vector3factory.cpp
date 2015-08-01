@@ -30,8 +30,8 @@ namespace GTE
 
 	BaseVector4 ** Vector3Factory::CreateArray(Int32 count)
 	{
-		BaseVector4** pptr = (BaseVector4**)new Vector3*[count];
-		ASSERT(pptr != NULL, "Vector3Factory::CreateArray -> Could not allocate new array.");
+		BaseVector4** pptr = (BaseVector4**)new(std::nothrow) Vector3*[count];
+		ASSERT(pptr != nullptr, "Vector3Factory::CreateArray -> Could not allocate new array.");
 
 		memset(pptr, (Int32)NULL, sizeof(Vector3*) * count);
 
@@ -40,9 +40,9 @@ namespace GTE
 
 	Vector3Factory * Vector3Factory::Instance()
 	{
-		if (instance == NULL)
+		if (instance == nullptr)
 		{
-			instance = new Vector3Factory();
+			instance = new(std::nothrow)  Vector3Factory();
 		}
 
 		return instance;

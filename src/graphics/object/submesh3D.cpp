@@ -51,12 +51,12 @@ namespace GTE
 		totalVertexCount = 0;
 		normalsSmoothingThreshold = 90;
 
-		containerMesh = NULL;
+		containerMesh = nullptr;
 		subIndex = -1;
 		invertNormals = false;
 		invertTangents = false;
 
-		vertexCrossMap = NULL;
+		vertexCrossMap = nullptr;
 
 		buildFaces = true;
 		calculateNormals = true;
@@ -107,7 +107,7 @@ namespace GTE
 		const Point3 *pb = positions.GetPointConst(faceIndex + 1);
 		const Point3 *pc = positions.GetPointConst(faceIndex + 2);
 
-		NONFATAL_ASSERT(pa != NULL && pb != NULL && pc != NULL, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
+		NONFATAL_ASSERT(pa != nullptr && pb != nullptr && pc != nullptr, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
 
 		// form 2 vectors based on triangle's vertices
 		Point3::Subtract(*pb, *pa, b);
@@ -162,7 +162,7 @@ namespace GTE
 
 			// retrieve the list of equal vertices for vertex [v]
 			std::vector<UInt32>* listPtr = vertexCrossMap[v];
-			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
+			NONFATAL_ASSERT(listPtr != nullptr, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
 
 			Vector3 avg(0, 0, 0);
 			Real divisor = 0;
@@ -318,7 +318,7 @@ namespace GTE
 
 			// retrieve the list of equal vertices for vertex [v]
 			std::vector<UInt32>* listPtr = vertexCrossMap[v];
-			NONFATAL_ASSERT(listPtr != NULL, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
+			NONFATAL_ASSERT(listPtr != nullptr, "SubMesh3D::CalculateNormals -> Null pointer to vertex group list.", true);
 
 			Vector3 avg(0, 0, 0);
 			Real divisor = 0;
@@ -412,8 +412,8 @@ namespace GTE
 		std::vector<UInt32>* indicentVerticesA = vertexCrossMap[vaIndex];
 		std::vector<UInt32>* indicentVerticesB = vertexCrossMap[vbIndex];
 
-		NONFATAL_ASSERT_RTRN(indicentVerticesA != NULL, "SubMesh3D::FindCommonFace -> 'indicentVerticesA' is null.", -1, true);
-		NONFATAL_ASSERT_RTRN(indicentVerticesB != NULL, "SubMesh3D::FindCommonFace -> 'indicentVerticesB' is null.", -1, true);
+		NONFATAL_ASSERT_RTRN(indicentVerticesA != nullptr, "SubMesh3D::FindCommonFace -> 'indicentVerticesA' is null.", -1, true);
+		NONFATAL_ASSERT_RTRN(indicentVerticesB != nullptr, "SubMesh3D::FindCommonFace -> 'indicentVerticesB' is null.", -1, true);
 
 		for (UInt32 a = 0; a < indicentVerticesA->size(); a++)
 		{
@@ -505,13 +505,13 @@ namespace GTE
 	 */
 	void SubMesh3D::DestroyVertexCrossMap()
 	{
-		if (vertexCrossMap != NULL)
+		if (vertexCrossMap != nullptr)
 		{
 			std::unordered_map<long, Bool> deleted;
 			for (UInt32 i = 0; i < totalVertexCount; i++)
 			{
 				std::vector<UInt32>* list = vertexCrossMap[i];
-				if (list != NULL && !deleted[(long)list])
+				if (list != nullptr && !deleted[(long)list])
 				{
 					delete list;
 					deleted[(long)list] = true;
@@ -519,7 +519,7 @@ namespace GTE
 			}
 
 			delete vertexCrossMap;
-			vertexCrossMap = NULL;
+			vertexCrossMap = nullptr;
 		}
 	}
 
@@ -537,8 +537,8 @@ namespace GTE
 		// vertices, so this structure is used to store indices in [positions] for those vertices.
 		std::unordered_map<Point3, std::vector<UInt32>*, Point3::Point3Hasher, Point3::Point3Eq> vertexGroups;
 
-		vertexCrossMap = new std::vector<UInt32>*[totalVertexCount];
-		ASSERT(vertexCrossMap != NULL, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.");
+		vertexCrossMap = new(std::nothrow) std::vector<UInt32>*[totalVertexCount];
+		ASSERT(vertexCrossMap != nullptr, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.");
 
 		// loop through each vertex in the mesh and add the index in [position] for that vertex to the
 		// appropriate vertex group.
@@ -549,7 +549,7 @@ namespace GTE
 
 			std::vector<UInt32>*& list = vertexGroups[targetPoint];
 
-			if (list == NULL)list = new std::vector<UInt32>();
+			if (list == nullptr)list = new(std::nothrow) std::vector<UInt32>();
 
 			// add the normal at index [v] to the vertex group linked to [targetPoint]
 			list->push_back(v);
@@ -661,7 +661,7 @@ namespace GTE
 		if (calculateTangents)CalculateTangents((GTE::Real)normalsSmoothingThreshold);
 		if (buildFaces)BuildFaces();
 
-		if (containerMesh != NULL)
+		if (containerMesh != nullptr)
 		{
 			containerMesh->CalculateSphereOfInfluence();
 		}

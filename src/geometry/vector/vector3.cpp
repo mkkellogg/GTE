@@ -346,13 +346,15 @@ namespace GTE
 	}
 
 	/*
-	 *  Returns true if this vector is zero length.
+	 *  Returns true if this vector is zero length. In this case we're actually testing whether or
+	 *  not the length is greater than a small epsilon.
 	 */
 
 	Bool Vector3::IsZeroLength() const
 	{
+		Real epsilon = 1e-06;
 		Real sqlen = (x * x) + (y * y) + (z * z);
-		return (sqlen < (1e-06 * 1e-06));
+		return (sqlen < (epsilon * epsilon));
 	}
 
 

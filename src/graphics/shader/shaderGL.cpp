@@ -42,8 +42,8 @@ namespace GTE
 		attributeCount = 0;
 		uniformCount = 0;
 
-		attributes = NULL;
-		uniforms = NULL;
+		attributes = nullptr;
+		uniforms = nullptr;
 	}
 
 	/*
@@ -100,33 +100,33 @@ namespace GTE
 	 */
 	void ShaderGL::DestroyUniformAndAttributeInfo()
 	{
-		if (attributes != NULL)
+		if (attributes != nullptr)
 		{
 			for (UInt32 i = 0; i < attributeCount; i++)
 			{
-				if (attributes[i] != NULL)
+				if (attributes[i] != nullptr)
 				{
 					delete attributes[i];
-					attributes[i] = NULL;
+					attributes[i] = nullptr;
 				}
 			}
 			delete attributes;
 		}
-		attributes = NULL;
+		attributes = nullptr;
 
-		if (uniforms != NULL)
+		if (uniforms != nullptr)
 		{
 			for (UInt32 i = 0; i < uniformCount; i++)
 			{
-				if (uniforms[i] != NULL)
+				if (uniforms[i] != nullptr)
 				{
 					delete uniforms[i];
-					uniforms[i] = NULL;
+					uniforms[i] = nullptr;
 				}
 			}
 			delete uniforms;
 		}
-		uniforms = NULL;
+		uniforms = nullptr;
 	}
 
 	/*
@@ -166,8 +166,8 @@ namespace GTE
 		const Char * fragmentSourceString = shaderSource.GetFragmentSourceString().c_str();
 
 		// point OpenGL to the source for each shader
-		glShaderSource(vertexShaderID, 1, &vertexSourceString, NULL);
-		glShaderSource(fragmentShaderID, 1, &fragmentSourceString, NULL);
+		glShaderSource(vertexShaderID, 1, &vertexSourceString, nullptr);
+		glShaderSource(fragmentShaderID, 1, &fragmentSourceString, nullptr);
 
 		// compile vertex shader
 		glCompileShader(vertexShaderID);
@@ -206,7 +206,7 @@ namespace GTE
 		{
 			Debug::PrintError("Error linking program: ");
 			Char * info = GetProgramLog(programID);
-			Debug::PrintError(info != NULL ? info : "(no error info provided).");
+			Debug::PrintError(info != nullptr ? info : "(no error info provided).");
 			return false;
 		}
 
@@ -246,7 +246,7 @@ namespace GTE
 			else if (shaderType == ShaderType::Fragment)
 				Debug::PrintError("Error compiling fragment shader: ");
 			Char * info = GetShaderLog(shaderID);
-			Debug::PrintError(info != NULL ? info : "(no error info provided).");
+			Debug::PrintError(info != nullptr ? info : "(no error info provided).");
 			return false;
 		}
 
@@ -275,7 +275,7 @@ namespace GTE
 			return infoLog;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	/*
@@ -300,7 +300,7 @@ namespace GTE
 			return infoLog;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	/*
@@ -315,8 +315,8 @@ namespace GTE
 		if (totalUniforms > 0)
 		{
 			// allocate array for UniformDescriptor objects
-			uniforms = new UniformDescriptor*[totalUniforms];
-			ASSERT(uniforms != NULL, "Unable to allocate shader uniform descriptors.");
+			uniforms = new(std::nothrow)  UniformDescriptor*[totalUniforms];
+			ASSERT(uniforms != nullptr, "Unable to allocate shader uniform descriptors.");
 
 			// initialize UniformDescriptor array
 			memset(uniforms, 0, sizeof(UniformDescriptor*)*totalUniforms);
@@ -334,7 +334,7 @@ namespace GTE
 				glGetActiveUniform(programID, GLuint(i), 125, &nameLen, &size, &type, name);
 				GLuint loc = glGetUniformLocation(programID, name);
 
-				UniformDescriptor * desc = new UniformDescriptor();
+				UniformDescriptor * desc = new(std::nothrow)  UniformDescriptor();
 				uniforms[i] = desc;
 
 				desc->ShaderVarID = loc;
@@ -387,8 +387,8 @@ namespace GTE
 		if (totalAttributes > 0)
 		{
 			// allocate array for AttributeDescriptor objects
-			attributes = new AttributeDescriptor*[totalAttributes];
-			ASSERT(attributes != NULL, "Unable to allocate shader attribute descriptors.");
+			attributes = new(std::nothrow)  AttributeDescriptor*[totalAttributes];
+			ASSERT(attributes != nullptr, "Unable to allocate shader attribute descriptors.");
 
 			// initialize AttributeDescriptor array
 			memset(attributes, 0, sizeof(AttributeDescriptor*)*totalAttributes);
@@ -405,7 +405,7 @@ namespace GTE
 				glGetActiveAttrib(programID, GLuint(i), 125, &nameLen, &size, &type, name);
 				GLuint loc = glGetAttribLocation(programID, name);
 
-				AttributeDescriptor * desc = new AttributeDescriptor();
+				AttributeDescriptor * desc = new(std::nothrow)  AttributeDescriptor();
 				attributes[i] = desc;
 
 				desc->ShaderVarID = loc;
@@ -478,7 +478,7 @@ namespace GTE
 		if (varID < 0)return;
 
 		const VertexAttrBufferGL * bufferGL = dynamic_cast<const VertexAttrBufferGL *>(buffer);
-		ASSERT(bufferGL != NULL, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
+		ASSERT(bufferGL != nullptr, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
 
 		const Real * data = bufferGL->GetDataPtr();
 		Int32 componentCount = bufferGL->GetComponentCount();
@@ -512,7 +512,7 @@ namespace GTE
 		Texture* texturePtr = ((TextureRef)texture).GetPtr();
 		TextureGL * texGL = dynamic_cast<TextureGL *>(texturePtr);
 
-		ASSERT(texGL != NULL, "ShaderGL::SendUniformToShader(UInt32, Texture *) -> texture is not TextureGL !!");
+		ASSERT(texGL != nullptr, "ShaderGL::SendUniformToShader(UInt32, Texture *) -> texture is not TextureGL !!");
 
 		GLenum textureUnit;
 
@@ -689,7 +689,7 @@ namespace GTE
 			return (const UniformDescriptor *)uniforms[index];
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	/*
@@ -715,6 +715,6 @@ namespace GTE
 			const AttributeDescriptor * desc = (const AttributeDescriptor *)attributes[index];
 			return desc;
 		}
-		return NULL;
+		return nullptr;
 	}
 }

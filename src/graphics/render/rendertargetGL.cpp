@@ -42,7 +42,7 @@ namespace GTE
 		if (colorTexture.IsValid())
 		{
 			TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
-			ASSERT(texGL != NULL, "RenderTargetGL::Destroy -> Unable to cast color texture to TextureGL.");
+			ASSERT(texGL != nullptr, "RenderTargetGL::Destroy -> Unable to cast color texture to TextureGL.");
 			objectManager->DestroyTexture(colorTexture);
 		}
 
@@ -50,7 +50,7 @@ namespace GTE
 		if (depthTexture.IsValid())
 		{
 			TextureGL * texGL = dynamic_cast<TextureGL*>(depthTexture.GetPtr());
-			ASSERT(texGL != NULL, "RenderTargetGL::Destroy -> Unable to cast depth texture to TextureGL.");
+			ASSERT(texGL != nullptr, "RenderTargetGL::Destroy -> Unable to cast depth texture to TextureGL.");
 			objectManager->DestroyTexture(depthTexture);
 		}
 
@@ -85,22 +85,22 @@ namespace GTE
 			if (attributes.IsCube)
 			{
 				// create a cube texture for this render target
-				colorTexture = objectManager->CreateCubeTexture(NULL, width, height,
-					NULL, width, height,
-					NULL, width, height,
-					NULL, width, height,
-					NULL, width, height,
-					NULL, width, height);
+				colorTexture = objectManager->CreateCubeTexture(nullptr, width, height,
+					nullptr, width, height,
+					nullptr, width, height,
+					nullptr, width, height,
+					nullptr, width, height,
+					nullptr, width, height);
 			}
 			else
 			{
 				// create a 2D texture for this render target
-				colorTexture = objectManager->CreateTexture(width, height, NULL, attributes);
+				colorTexture = objectManager->CreateTexture(width, height, nullptr, attributes);
 			}
 			NONFATAL_ASSERT_RTRN(colorTexture.IsValid(), "RenderTargetGL::Init -> Unable to create color texture.", false, true);
 
 			TextureGL * texGL = dynamic_cast<TextureGL*>(colorTexture.GetPtr());
-			ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast color texture to TextureGL.");
+			ASSERT(texGL != nullptr, "RenderTargetGL::Init -> Unable to cast color texture to TextureGL.");
 
 			if (attributes.IsCube)
 			{
@@ -126,11 +126,11 @@ namespace GTE
 			attributes.WrapMode = TextureWrap::Clamp;
 			attributes.IsDepthTexture = true;
 
-			depthTexture = objectManager->CreateTexture(width, height, NULL, attributes);
+			depthTexture = objectManager->CreateTexture(width, height, nullptr, attributes);
 			NONFATAL_ASSERT_RTRN(depthTexture.IsValid(), "RenderTargetGL::Init -> Unable to create depth texture.", false, true);
 
 			TextureGL * texGL = dynamic_cast<TextureGL*>(depthTexture.GetPtr());
-			ASSERT(texGL != NULL, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.");
+			ASSERT(texGL != nullptr, "RenderTargetGL::Init -> Unable to cast depth texture to TextureGL.");
 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texGL->GetTextureID(), 0);
 

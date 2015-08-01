@@ -27,13 +27,13 @@ namespace GTE
 		//force ticksPerSecond > 0
 		if (ticksPerSecond <= 0)ticksPerSecond = 1;
 
-		keyFrames = NULL;
+		keyFrames = nullptr;
 		this->durationTicks = durationTicks;
 		this->ticksPerSecond = ticksPerSecond;
 		this->startOffsetTicks = startOffsetTicks;
 		this->earlyEndTicks = earlyEndTicks;
 		channelCount = 0;
-		channelNames = NULL;
+		channelNames = nullptr;
 
 		if (this->durationTicks < 0)this->durationTicks = 0;
 		if (this->startOffsetTicks < 0)this->startOffsetTicks = 0;
@@ -56,16 +56,16 @@ namespace GTE
 	 */
 	void Animation::Destroy()
 	{
-		if (keyFrames != NULL)
+		if (keyFrames != nullptr)
 		{
 			delete[] keyFrames;
-			keyFrames = NULL;
+			keyFrames = nullptr;
 		}
 
-		if (channelNames != NULL)
+		if (channelNames != nullptr)
 		{
 			delete[] channelNames;
-			channelNames = NULL;
+			channelNames = nullptr;
 		}
 
 		channelCount = 0;
@@ -80,11 +80,11 @@ namespace GTE
 
 		this->channelCount = channelCount;
 
-		keyFrames = new KeyFrameSet[channelCount];
-		ASSERT(keyFrames != NULL, "Animation::Init -> Could not allocate key frame set array.");
+		keyFrames = new(std::nothrow) KeyFrameSet[channelCount];
+		ASSERT(keyFrames != nullptr, "Animation::Init -> Could not allocate key frame set array.");
 
-		channelNames = new std::string[channelCount];
-		ASSERT(channelNames != NULL, "Animation::Init -> Could not allocate channel name set array.");
+		channelNames = new(std::nothrow) std::string[channelCount];
+		ASSERT(channelNames != nullptr, "Animation::Init -> Could not allocate channel name set array.");
 
 		return true;
 	}
@@ -115,13 +115,13 @@ namespace GTE
 	 */
 	KeyFrameSet * Animation::GetKeyFrameSet(UInt32 nodeIndex)
 	{
-		NONFATAL_ASSERT_RTRN(nodeIndex < channelCount, "Animation::GetKeyFrameSet -> Node index is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(nodeIndex < channelCount, "Animation::GetKeyFrameSet -> Node index is out of range.", nullptr, true);
 		return keyFrames + nodeIndex;
 	}
 
 	const std::string * Animation::GetChannelName(UInt32 index) const
 	{
-		NONFATAL_ASSERT_RTRN(index < channelCount, "Animation::GetChannelName -> 'index' is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(index < channelCount, "Animation::GetChannelName -> 'index' is out of range.", nullptr, true);
 		return channelNames + index;
 	}
 

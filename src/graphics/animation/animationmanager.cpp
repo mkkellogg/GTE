@@ -68,7 +68,7 @@ namespace GTE
 		{
 			Bool foundNodeForChannel = false;
 			const std::string * channelName = animation->GetChannelName(c);
-			if (channelName == NULL)continue;
+			if (channelName == nullptr)continue;
 
 			for (UInt32 n = 0; n < skeletonNodeCount; n++)
 			{
@@ -131,7 +131,7 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerRef::Null(), true);
 
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-		ASSERT(objectManager != NULL, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is NULL.");
+		ASSERT(objectManager != nullptr, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is null.");
 
 		if (activePlayers.find(target->GetObjectID()) == activePlayers.end())
 		{

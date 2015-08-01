@@ -20,7 +20,7 @@ namespace GTE
 	{
 		this->vertexCount = vertexCount;
 		this->uniqueVertexCount = uVertexCount;
-		mappingDescriptors = NULL;
+		mappingDescriptors = nullptr;
 	}
 
 	/*
@@ -36,11 +36,11 @@ namespace GTE
 	 */
 	void VertexBoneMap::Destroy()
 	{
-		// delete [mappingDescriptors] and set to NULL
-		if (mappingDescriptors != NULL)
+		// delete [mappingDescriptors] and set to nullptr
+		if (mappingDescriptors != nullptr)
 		{
 			delete[] mappingDescriptors;
-			mappingDescriptors = NULL;
+			mappingDescriptors = nullptr;
 		}
 	}
 
@@ -52,8 +52,8 @@ namespace GTE
 		// destroy existing data, if it exists
 		Destroy();
 
-		mappingDescriptors = new VertexMappingDescriptor[vertexCount];
-		ASSERT(mappingDescriptors != NULL, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.");
+		mappingDescriptors = new(std::nothrow) VertexMappingDescriptor[vertexCount];
+		ASSERT(mappingDescriptors != nullptr, "VertexBoneMap::Init -> unable to allocate vertex mapping descriptors master array.");
 
 		return true;
 	}
@@ -66,7 +66,7 @@ namespace GTE
 		if (index >= vertexCount)
 		{
 			Debug::PrintError("VertexBoneMap::GetDescriptor -> Index out of range.");
-			return NULL;
+			return nullptr;
 		}
 
 		return mappingDescriptors + index;
@@ -112,8 +112,8 @@ namespace GTE
 	VertexBoneMap * VertexBoneMap::FullClone()
 	{
 		// allocate new VertexBoneMap objects
-		VertexBoneMap * clone = new VertexBoneMap(vertexCount, uniqueVertexCount);
-		ASSERT(clone != NULL, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.");
+		VertexBoneMap * clone = new(std::nothrow) VertexBoneMap(vertexCount, uniqueVertexCount);
+		ASSERT(clone != nullptr, "VertexBoneMap::FullClone -> Could not allocate vertex bone map.");
 
 		// initialize the new map
 		Bool initSuccess = clone->Init();
@@ -121,7 +121,7 @@ namespace GTE
 		{
 			Debug::PrintError("VertexBoneMap::FullClone -> Could not initialize vertex bone map.");
 			delete clone;
-			return NULL;
+			return nullptr;
 		}
 
 		// copy over VertexMappingDescriptors one-by-one

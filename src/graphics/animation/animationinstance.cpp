@@ -22,9 +22,9 @@ namespace GTE
 		this->SourceAnimation = animation;
 
 		StateCount = 0;
-		FrameStates = NULL;
+		FrameStates = nullptr;
 
-		NodeToChannelMap = NULL;
+		NodeToChannelMap = nullptr;
 
 		Duration = 0;
 		Progress = 0;
@@ -58,16 +58,16 @@ namespace GTE
 	 */
 	void AnimationInstance::Destroy()
 	{
-		if (FrameStates != NULL)
+		if (FrameStates != nullptr)
 		{
 			delete[] FrameStates;
-			FrameStates = NULL;
+			FrameStates = nullptr;
 		}
 
-		if (NodeToChannelMap != NULL)
+		if (NodeToChannelMap != nullptr)
 		{
 			delete[] NodeToChannelMap;
-			NodeToChannelMap = NULL;
+			NodeToChannelMap = nullptr;
 		}
 
 		StateCount = 0;
@@ -90,11 +90,11 @@ namespace GTE
 
 		if (nodeCount <= 0)return true;
 
-		FrameStates = new FrameState[nodeCount];
-		ASSERT(FrameStates != NULL, "AnimationInstance::Init -> Unable to allocate FrameState array.");
+		FrameStates = new(std::nothrow) FrameState[nodeCount];
+		ASSERT(FrameStates != nullptr, "AnimationInstance::Init -> Unable to allocate FrameState array.");
 
-		NodeToChannelMap = new int[nodeCount];
-		if (NodeToChannelMap == NULL)
+		NodeToChannelMap = new(std::nothrow) int[nodeCount];
+		if (NodeToChannelMap == nullptr)
 		{
 			Debug::PrintError("AnimationInstance::Init -> Unable to allocate NodeToChannelMap array.");
 			Destroy();
@@ -108,12 +108,12 @@ namespace GTE
 			SkeletonNode * node = Target->GetNodeFromList(n);
 			Int32 foundIndex = -1;
 
-			if (node != NULL)
+			if (node != nullptr)
 			{
 				for (UInt32 c = 0; c < channelCount; c++)
 				{
 					const std::string * channelName = SourceAnimation->GetChannelName(c);
-					if (channelName == NULL)continue;
+					if (channelName == nullptr)continue;
 
 					if (node->Name == *channelName)
 					{
@@ -163,7 +163,7 @@ namespace GTE
 		if (stateIndex >= StateCount)
 		{
 			Debug::PrintError("AnimationInstance::GetFrameState -> State index is out of bounds.");
-			return NULL;
+			return nullptr;
 		}
 
 		return FrameStates + stateIndex;

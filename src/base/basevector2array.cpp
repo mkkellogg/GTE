@@ -12,7 +12,7 @@
 
 namespace GTE
 {
-	BaseVector2Array::BaseVector2Array(BaseVector2Factory * factory) : count(0), data(NULL), objects(NULL), baseFactory(factory)
+	BaseVector2Array::BaseVector2Array(BaseVector2Factory * factory) : count(0), data(nullptr), objects(nullptr), baseFactory(factory)
 	{
 
 	}
@@ -24,8 +24,8 @@ namespace GTE
 
 	void BaseVector2Array::Destroy()
 	{
-		if (objects != NULL)baseFactory->DestroyArray(objects, count);
-		objects = NULL;
+		if (objects != nullptr)baseFactory->DestroyArray(objects, count);
+		objects = nullptr;
 
 		SAFE_DELETE(data);
 	}
@@ -36,11 +36,11 @@ namespace GTE
 
 		this->count = count;
 
-		data = new Real[count * 2];
-		ASSERT(data != NULL, "Could not allocate data memory for BaseVector2Array");
+		data = new(std::nothrow) Real[count * 2];
+		ASSERT(data != nullptr, "Could not allocate data memory for BaseVector2Array");
 
 		objects = baseFactory->CreateArray(count);
-		ASSERT(objects != NULL, "Could not allocate objects memory for BaseVector2Array");
+		ASSERT(objects != nullptr, "Could not allocate objects memory for BaseVector2Array");
 
 		Real *dataPtr = data;
 
@@ -49,7 +49,7 @@ namespace GTE
 		{
 			BaseVector2 * currentObject = (BaseVector2*)baseFactory->CreatePermAttached(dataPtr);
 
-			ASSERT(currentObject != NULL, "Could not allocate BaseVector2 for BaseVector2Array");
+			ASSERT(currentObject != nullptr, "Could not allocate BaseVector2 for BaseVector2Array");
 
 			objects[index] = currentObject;
 			currentObject->Set(0, 0);

@@ -18,7 +18,8 @@ namespace GTE
 	{
 		// TODO: Make this choose the correct implementation based on platform.
 		// For now we go with OpenGL by default
-		shaderSourceLoader = new ShaderSourceLoaderGL();
+		shaderSourceLoader = new(std::nothrow) ShaderSourceLoaderGL();
+		ASSERT(shaderSourceLoader != nullptr, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is NULL.");
 
 		for (UInt32 i = 0; i < (UInt32)AssetImporterBoolProperty::_Count; i++)
 		{
@@ -50,7 +51,7 @@ namespace GTE
 
 	void AssetImporter::LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource)
 	{
-		ASSERT(shaderSourceLoader != NULL, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is NULL.");
+		ASSERT(shaderSourceLoader != nullptr, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is null.");
 		shaderSourceLoader->LoadShaderSouce(name, shaderSource);
 	}
 

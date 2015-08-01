@@ -576,8 +576,8 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	ASSERT(waterNormals.IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water normals map.");
 
 	GTE::UInt32 mapSize = waterHeightMapResolution * waterHeightMapResolution * 4;
-	GTE::Real * heightData = new GTE::Real[mapSize];
-	ASSERT(heightData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water height map.");
+	GTE::Real * heightData = new(std::nothrow) GTE::Real[mapSize];
+	ASSERT(heightData != nullptr, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water height map.");
 
 	// create water height map initialization data
 	for(GTE::UInt32 i = 0; i < mapSize; i += 4)
@@ -589,8 +589,8 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	}
 
 	mapSize = waterNomralMapResolution * waterNomralMapResolution * 4;
-	GTE::Real * normalData = new GTE::Real[mapSize];
-	ASSERT(normalData != NULL, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water normal map.");
+	GTE::Real * normalData = new(std::nothrow) GTE::Real[mapSize];
+	ASSERT(normalData != nullptr, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water normal map.");
 
 	// create water normal map initialization data
 	for(GTE::UInt32 i = 0; i < mapSize; i += 4)

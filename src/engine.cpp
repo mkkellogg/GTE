@@ -20,20 +20,20 @@
 namespace GTE
 {
 	// set singleton instance to NULL by default
-	Engine * Engine::theInstance = NULL;
+	Engine * Engine::theInstance = nullptr;
 
 	/*
 	 * Default constructor
 	 */
 	Engine::Engine()
 	{
-		engineObjectManager = NULL;
-		graphicsSystem = NULL;
-		renderManager = NULL;
-		animationManager = NULL;
-		inputManager = NULL;
-		errorManager = NULL;
-		callbacks = NULL;
+		engineObjectManager = nullptr;
+		graphicsSystem = nullptr;
+		renderManager = nullptr;
+		animationManager = nullptr;
+		inputManager = nullptr;
+		errorManager = nullptr;
+		callbacks = nullptr;
 
 		initialized = false;
 		firstFrameEntered = false;
@@ -63,9 +63,9 @@ namespace GTE
 	Engine * Engine::Instance()
 	{
 		//TODO: make thread-safe & add double checked locking
-		if (theInstance == NULL)
+		if (theInstance == nullptr)
 		{
-			theInstance = new Engine();
+			theInstance = new(std::nothrow) Engine();
 		}
 
 		return theInstance;
@@ -86,25 +86,25 @@ namespace GTE
 	{
 		// The error manager must be initialized before any other engine component so that errors
 		// during initialization of those components can be reported
-		errorManager = new ErrorManager();
-		ASSERT(errorManager != NULL, "Engine::Init -> Unable to create error manager.");
+		errorManager = new(std::nothrow) ErrorManager();
+		ASSERT(errorManager != nullptr, "Engine::Init -> Unable to create error manager.");
 
-		engineObjectManager = new EngineObjectManager();
-		ASSERT(engineObjectManager != NULL, "Engine::Init -> Unable to create engine object manager.");
+		engineObjectManager = new(std::nothrow) EngineObjectManager();
+		ASSERT(engineObjectManager != nullptr, "Engine::Init -> Unable to create engine object manager.");
 
 		Bool engineObjectManagerInitSuccess = engineObjectManager->Init();
 		ASSERT(engineObjectManagerInitSuccess == true, "Engine::Init -> Unable to initialize engine object manager.");
 
 		// TODO: add switch to detect correct type for platform
 		// for now, only support OpenGL
-		graphicsSystem = new GraphicsGL();
-		ASSERT(graphicsSystem != NULL, "Engine::Init -> Unable to allocate graphics engine.");
+		graphicsSystem = new(std::nothrow) GraphicsGL();
+		ASSERT(graphicsSystem != nullptr, "Engine::Init -> Unable to allocate graphics engine.");
 
 		Bool graphicsInitSuccess = graphicsSystem->Init(graphicsAttributes);
 		ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.");
 
-		renderManager = new RenderManager();
-		ASSERT(renderManager != NULL, "Engine::Init -> Unable to allocate render manager");
+		renderManager = new(std::nothrow) RenderManager();
+		ASSERT(renderManager != nullptr, "Engine::Init -> Unable to allocate render manager");
 
 		Bool renderInitSuccess = renderManager->Init();
 		ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager");
@@ -114,13 +114,13 @@ namespace GTE
 		Bool initShadersSuccess = engineObjectManager->InitBuiltinShaders();
 		ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initiliaze built-in shaders");
 
-		animationManager = new AnimationManager();
-		ASSERT(animationManager != NULL, "Engine::Init -> Unable to create animation manager.");
+		animationManager = new(std::nothrow) AnimationManager();
+		ASSERT(animationManager != nullptr, "Engine::Init -> Unable to create animation manager.");
 
 		// TODO: add switch to detect correct type for platform
 		// for now, only support OpenGL
-		inputManager = new InputManagerGL();
-		ASSERT(inputManager != NULL, "Engine::Init -> Unable to create input manager.");
+		inputManager = new(std::nothrow) InputManagerGL();
+		ASSERT(inputManager != nullptr, "Engine::Init -> Unable to create input manager.");
 
 		Bool inputInitSuccess = inputManager->Init();
 		ASSERT(inputInitSuccess, "Engine::Init -> Unable to initialize input manager.");
@@ -139,7 +139,7 @@ namespace GTE
 	Bool Engine::Init(EngineCallbacks * callbacks, const GraphicsAttributes& graphicsAtrributes)
 	{
 		Engine * engine = Engine::Instance();
-		ASSERT(engine != NULL, "Engine::Init -> Unable retrieve Engine instance.");
+		ASSERT(engine != nullptr, "Engine::Init -> Unable retrieve Engine instance.");
 
 		return engine->_Init(callbacks, graphicsAtrributes);
 	}
@@ -151,7 +151,7 @@ namespace GTE
 	{
 		if (!firstFrameEntered)
 		{
-			if (callbacks != NULL)callbacks->OnInit();
+			if (callbacks != nullptr)callbacks->OnInit();
 			Time::Update();
 			firstFrameEntered = true;
 		}
@@ -159,9 +159,9 @@ namespace GTE
 		graphicsSystem->Update();
 		animationManager->Update();
 		inputManager->Update();
-		if (callbacks != NULL)callbacks->OnUpdate();
+		if (callbacks != nullptr)callbacks->OnUpdate();
 		renderManager->PreProcessScene();
-		if (callbacks != NULL)callbacks->OnPreRender();
+		if (callbacks != nullptr)callbacks->OnPreRender();
 		renderManager->RenderScene();
 		graphicsSystem->PostRender();
 
@@ -173,7 +173,7 @@ namespace GTE
 	 */
 	void Engine::Quit()
 	{
-		if (callbacks != NULL)callbacks->OnQuit();
+		if (callbacks != nullptr)callbacks->OnQuit();
 	}
 
 	/*
@@ -184,7 +184,7 @@ namespace GTE
 	void Engine::Start()
 	{
 		Engine * engine = Engine::Instance();
-		ASSERT(engine != NULL, "Engine::Start retrieve Engine instance.");
+		ASSERT(engine != nullptr, "Engine::Start retrieve Engine instance.");
 
 		NONFATAL_ASSERT(engine->IsInitialized(), "Engine::Start -> Engine instance is not initialized.", true);
 
@@ -197,7 +197,7 @@ namespace GTE
 	 */
 	void Engine::_Start()
 	{
-		if (graphicsSystem != NULL)graphicsSystem->Start();
+		if (graphicsSystem != nullptr)graphicsSystem->Start();
 		Quit();
 	}
 
@@ -208,10 +208,10 @@ namespace GTE
 	void Engine::ShutDown()
 	{
 		Engine * engine = Engine::Instance();
-		ASSERT(engine != NULL, "Engine::ShutDown -> Unable retrieve Engine instance.");
+		ASSERT(engine != nullptr, "Engine::ShutDown -> Unable retrieve Engine instance.");
 
 		SAFE_DELETE(theInstance);
-		theInstance = NULL;
+		theInstance = nullptr;
 	}
 
 	/*

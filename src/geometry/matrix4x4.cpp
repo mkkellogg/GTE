@@ -59,14 +59,14 @@ namespace GTE
 	{
 		Init();
 
-		if (sourceData != NULL)
+		if (sourceData != nullptr)
 		{
 			memcpy(data, sourceData, sizeof(Real) * DATA_SIZE);
 		}
 		else
 		{
 			SetIdentity();
-			Debug::PrintWarning("Matrix4x4::Matrix4x4(Real *) -> NULL data passed.");
+			Debug::PrintWarning("Matrix4x4::Matrix4x4(Real *) -> Null data passed.");
 		}
 	}
 
@@ -108,7 +108,7 @@ namespace GTE
 	 */
 	void Matrix4x4::SetTo(const Real * sourceData)
 	{
-		NONFATAL_ASSERT(sourceData != NULL, "Matrix4x4::SetTo -> 'srcData' is null", true);
+		NONFATAL_ASSERT(sourceData != nullptr, "Matrix4x4::SetTo -> 'srcData' is null", true);
 		memcpy(data, sourceData, sizeof(Real) * DATA_SIZE);
 	}
 
@@ -374,7 +374,7 @@ namespace GTE
 	 */
 	void Matrix4x4::Transform(Real * vector4f) const
 	{
-		NONFATAL_ASSERT(vector4f != NULL, "Matrix4x4::Transform(Real *) -> 'vector4f' is null.", true);
+		NONFATAL_ASSERT(vector4f != nullptr, "Matrix4x4::Transform(Real *) -> 'vector4f' is null.", true);
 
 		Real temp[DIM_SIZE];
 		MultiplyMV(this->data, vector4f, temp);
@@ -434,9 +434,9 @@ namespace GTE
 	 */
 	void Matrix4x4::MultiplyMV(const Real * lhsMat, const Real * rhsVec, Real * out)
 	{
-		NONFATAL_ASSERT(lhsMat != NULL, "Matrix4x4::MultiplyMV -> 'lhsMat' is null.", true);
-		NONFATAL_ASSERT(rhsVec != NULL, "Matrix4x4::MultiplyMV -> 'rhsVec' is null.", true);
-		NONFATAL_ASSERT(out != NULL, "Matrix4x4::MultiplyMV -> 'out' is null.", true);
+		NONFATAL_ASSERT(lhsMat != nullptr, "Matrix4x4::MultiplyMV -> 'lhsMat' is null.", true);
+		NONFATAL_ASSERT(rhsVec != nullptr, "Matrix4x4::MultiplyMV -> 'rhsVec' is null.", true);
+		NONFATAL_ASSERT(out != nullptr, "Matrix4x4::MultiplyMV -> 'out' is null.", true);
 
 		Mx4transform(rhsVec[0], rhsVec[1], rhsVec[2], rhsVec[3], lhsMat, out);
 	}
@@ -447,8 +447,8 @@ namespace GTE
 	 */
 	void Matrix4x4::Mx4transform(Real x, Real y, Real z, Real w, const Real* matrix, Real* pDest)
 	{
-		NONFATAL_ASSERT(matrix != NULL, "Matrix4x4::Mx4transform -> 'lhsMat' is null.", true);
-		NONFATAL_ASSERT(pDest != NULL, "Matrix4x4::Mx4transform -> 'pDest' is null.", true);
+		NONFATAL_ASSERT(matrix != nullptr, "Matrix4x4::Mx4transform -> 'lhsMat' is null.", true);
+		NONFATAL_ASSERT(pDest != nullptr, "Matrix4x4::Mx4transform -> 'pDest' is null.", true);
 
 		pDest[0] = matrix[0 + DIM_SIZE * 0] * x + matrix[0 + DIM_SIZE * 1] * y + matrix[0 + DIM_SIZE * 2] * z + matrix[0 + DIM_SIZE * 3] * w;
 		pDest[1] = matrix[1 + DIM_SIZE * 0] * x + matrix[1 + DIM_SIZE * 1] * y + matrix[1 + DIM_SIZE * 2] * z + matrix[1 + DIM_SIZE * 3] * w;
@@ -509,8 +509,8 @@ namespace GTE
 	 */
 	void Matrix4x4::Transpose(const Real* source, Real *dest)
 	{
-		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Transpose -> 'source' is null.", true);
-		NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Transpose -> 'dest' is null.", true);
+		NONFATAL_ASSERT(source != nullptr, "Matrix4x4::Transpose -> 'source' is null.", true);
+		NONFATAL_ASSERT(dest != nullptr, "Matrix4x4::Transpose -> 'dest' is null.", true);
 
 		for (Int32 i = 0; i < DIM_SIZE; i++)
 		{
@@ -561,8 +561,8 @@ namespace GTE
 		// result in a non-affine matrix
 		Bool isAffine = Matrix4x4::IsAffine(source);
 
-		NONFATAL_ASSERT_RTRN(source != NULL, "Matrix4x4::Invert -> 'source' is null.", false, true);
-		NONFATAL_ASSERT_RTRN(dest != NULL, "Matrix4x4::Invert -> 'dest' is null.", false, true);
+		NONFATAL_ASSERT_RTRN(source != nullptr, "Matrix4x4::Invert -> 'source' is null.", false, true);
+		NONFATAL_ASSERT_RTRN(dest != nullptr, "Matrix4x4::Invert -> 'dest' is null.", false, true);
 
 		// array of transpose source matrix
 		Real src[DATA_SIZE];
@@ -680,7 +680,7 @@ namespace GTE
 	 */
 	void Matrix4x4::SetIdentity(Real * target)
 	{
-		NONFATAL_ASSERT(target != NULL, "Matrix4x4::SetIdentity -> 'target' is null.", true);
+		NONFATAL_ASSERT(target != nullptr, "Matrix4x4::SetIdentity -> 'target' is null.", true);
 
 		for (Int32 i = 0; i < DATA_SIZE; i++)
 		{
@@ -763,8 +763,8 @@ namespace GTE
 	 */
 	void Matrix4x4::Scale(const Real * source, Real * dest, Real x, Real y, Real z)
 	{
-		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Scale -> 'source' is null.", true);
-		NONFATAL_ASSERT(dest != NULL, "Matrix4x4::Scale -> 'dest' is null.", true);
+		NONFATAL_ASSERT(source != nullptr, "Matrix4x4::Scale -> 'source' is null.", true);
+		NONFATAL_ASSERT(dest != nullptr, "Matrix4x4::Scale -> 'dest' is null.", true);
 
 		for (Int32 i = 0; i < DIM_SIZE; i++)
 		{
@@ -855,7 +855,7 @@ namespace GTE
 	 */
 	void Matrix4x4::Translate(const Real * source, Real * dest, Real x, Real y, Real z)
 	{
-		NONFATAL_ASSERT(source != NULL, "Matrix4x4::Translate -> 'source' is null.", true);
+		NONFATAL_ASSERT(source != nullptr, "Matrix4x4::Translate -> 'source' is null.", true);
 
 		if (source != dest)
 		{
@@ -974,7 +974,7 @@ namespace GTE
 	 */
 	void Matrix4x4::SetRotate(Real * rm, Real x, Real y, Real z, Real a)
 	{
-		NONFATAL_ASSERT(rm != NULL, "Matrix4x4::SetRotate -> 'rm' is null.", true);
+		NONFATAL_ASSERT(rm != nullptr, "Matrix4x4::SetRotate -> 'rm' is null.", true);
 
 		rm[3] = 0;
 		rm[7] = 0;
@@ -1044,7 +1044,7 @@ namespace GTE
 	 */
 	void Matrix4x4::SetRotateEuler(Real * rm, Real x, Real y, Real z)
 	{
-		NONFATAL_ASSERT(rm != NULL, "Matrix4x4::SetRotateEuler -> 'rm' is null.", true);
+		NONFATAL_ASSERT(rm != nullptr, "Matrix4x4::SetRotateEuler -> 'rm' is null.", true);
 
 		x *= Constants::DegreesToRads;
 		y *= Constants::DegreesToRads;
