@@ -148,8 +148,7 @@ namespace GTE
 			MaterialRef material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
 			std::function<Bool(SceneObjectRef)> filterFunction);
 		Bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
-		void BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos, const Vector3& modelLocalLightDir,
-			const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
+		void BuildShadowVolumeMVPTransform(const Transform& modelTransform,  const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
 		void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 			const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void BuildSceneShadowVolumes();

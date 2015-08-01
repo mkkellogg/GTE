@@ -1245,8 +1245,8 @@ namespace GTE
 				NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
 
 				// build special MVP transform for rendering shadow volumes
-				Real scaleFactor = filter->GetUseBackSetShadowVolume() ? .99f : 1;
-				BuildShadowVolumeMVPTransform(light, subMesh->GetCenter(), model, modelLocalLightPos, modelLocalLightDir, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
+				Real scaleFactor = filter->GetUseBackSetShadowVolume() ? .99f : .99f;
+				BuildShadowVolumeMVPTransform(model, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
 
 				// activate the material, which will switch the GPU's active shader to
 				// the one associated with the material
@@ -1513,71 +1513,26 @@ namespace GTE
 	 * Build the model-view-projection matrix that is used when rendering shadow volumes.
 	 * It is a special matrix that 'narrows' the base shadow volume to avoid Z-fighting artifacts.
 	 *
-	 * For a given mesh & light, this method gets a vector from the mesh's center [meshCenter] to the light's
-	 * position [modelLocalLightPos], and uses that the vector to form a rotation matrix to align that vector
-	 * with the Z-axis.
-	 *
-	 * Multiplying the mesh geometry by this rotation matrix and then scaling X & Y ever so slightly has the
-	 * effect of 'narrowing' the shadow volume around the mesh-to-light vector. This mitigates artifacts where
+	 * Multiplying the mesh geometry by this rotation matrix and then scaling X & Y ever so slightly has an
+	 * effect similar to 'narrowing' the shadow volume around the mesh-to-light vector. This mitigates artifacts where
 	 * the shadow volume's sides are very close to and parallel to mesh polygons and Z-fighting occurs.
 	 *
-	 * [light] - The light for which the shadow volume is being created.
-	 * [meshCenter] - The center of the mesh that is casting the shadow.
 	 * [modelTransform] - The transform from model space to world space.
-	 * [modelLocalLightPos] - The position of [light] in the mesh's local space.
-	 * [modelLocalLightDir] - The direction of [light] in the mesh's local space.
 	 * [camera] - The camera for which the scene is being rendered.
 	 * [viewTransformInverse] - The inverse of the view transform.
 	 * [outTransform] - The output model-view-projection Transform.
 	 * [xScale] - factor by which to scale the shadow volume along the x-axis.
 	 * [yScale] - factor by which to scale the shadow volume along the y-axis.
 	 */
-	void RenderManager::BuildShadowVolumeMVPTransform(const Light& light, const Point3& meshCenter, const Transform& modelTransform, const Point3& modelLocalLightPos,
-		const Vector3& modelLocalLightDir, const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform,
-		Real xScale, Real yScale) const
+	void RenderManager::BuildShadowVolumeMVPTransform(const Transform& modelTransform, const Camera& camera, const Transform& viewTransformInverse,
+													  Transform& outTransform, Real xScale, Real yScale) const
 	{
 		Transform modelView;
-		Transform model;
-
-		// copy the mesh's local-to-world transform into [model]
-		model.SetTo(modelTransform);
-
 		Transform shadowVolumeViewTransform;
-		Vector3 lightToMesh;
-		Point3 origin;
 
-		// calculate the vector from the mesh's center to the light's position
-		// in model local space
-		if (light.GetType() == LightType::Directional)
-		{
-			// if light is directional, the mesh-to-light vector will
-			// simply be the inverse of the light's direction
-			lightToMesh = modelLocalLightDir;
-		}
-		else
-		{
-			Point3::Subtract(meshCenter, modelLocalLightPos, lightToMesh);
-		}
-		lightToMesh.Normalize();
-		// make vector go from mesh to the light
-		lightToMesh.Invert();
-
-		// the axis we want to align with (Z-axis)
-		Vector3 defaultLightDir(0, 0, 1);
-
-		// get the rotation quaternion from the default direction to the vector that
-		// goes from the mesh's center to the light's position
-		Quaternion rot = Quaternion::getRotation(defaultLightDir, lightToMesh);
-		Matrix4x4 rotMatrix = rot.rotationMatrix();
-		Matrix4x4 rotMatrixInverse = rotMatrix;
-		rotMatrixInverse.Invert();
-		shadowVolumeViewTransform.TransformBy(rotMatrixInverse);
 		shadowVolumeViewTransform.Scale(xScale, yScale, 1.00, true);
-		shadowVolumeViewTransform.TransformBy(rotMatrix);
-
-		// form MVP transform
 		modelView.SetTo(shadowVolumeViewTransform);
-		modelView.PreTransformBy(model);
+		modelView.PreTransformBy(modelTransform);
 		modelView.PreTransformBy(viewTransformInverse);
 		outTransform.SetTo(modelView);
 		outTransform.PreTransformBy(camera.GetProjectionTransform());
