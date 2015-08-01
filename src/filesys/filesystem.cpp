@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	FileSystem * FileSystem::theInstance = NULL;
+	FileSystem * FileSystem::theInstance = nullptr;
 
 	FileSystem::FileSystem()
 	{
@@ -25,7 +25,7 @@ namespace GTE
 	FileSystem * FileSystem::Instance()
 	{
 		//TODO: make thread safe and add double checked locking
-		if (theInstance == NULL)
+		if (theInstance == nullptr)
 		{
 
 #ifdef _WIN32

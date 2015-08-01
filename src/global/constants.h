@@ -16,10 +16,11 @@ namespace GTE
 		static const Real TwoPIOver360;
 		static const Real RadsToDegrees;
 		static const Real DegreesToRads;
-		static const UInt32 MaxObjectRecursionDepth = 512;
-		static const UInt32 MaxBonesPerVertex = 4;
 		static const std::string BuiltinShaderPath;
 		static const std::string BuiltinShaderPathOpenGL;
+
+		static const UInt32 MaxObjectRecursionDepth = 512;
+		static const UInt32 MaxBonesPerVertex = 4;
 		static const UInt32 MaxClipPlanes = 1;
 	};
 }

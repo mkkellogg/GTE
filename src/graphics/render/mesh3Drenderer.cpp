@@ -116,7 +116,7 @@ namespace GTE
 		NONFATAL_ASSERT(sceneObject.IsValid(), "Mesh3DRenderer::UpdateFromMesh -> 'sceneObject' is null.", true);
 
 		Mesh3DRef mesh = GetTargetMesh();
-		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3DRenderer::UpdateFromMesh -> mesh is NULL.", true);
+		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3DRenderer::UpdateFromMesh -> mesh is null.", true);
 
 		InitializeForMesh(mesh);
 	}

@@ -334,7 +334,7 @@ namespace GTE
 
 	const ClipPlane* Camera::GetClipPlane(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < clipPlaneCount, "Camera::GetClipPlane -> 'index' is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(index < clipPlaneCount, "Camera::GetClipPlane -> 'index' is out of range.", nullptr, true);
 		return clipPlanes + index;
 	}
 

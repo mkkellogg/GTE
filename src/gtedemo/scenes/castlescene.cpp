@@ -343,7 +343,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
 
 	// front and back
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04, .067, .05, 1, 0, 0, -90, 64.7, -10, -9.25, true, true, true,false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 64.7f, -10, -9.25f, true, true, true,false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
 	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 90, -10, .25f, true, true, true, false);

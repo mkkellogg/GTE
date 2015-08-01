@@ -16,7 +16,7 @@ namespace GTE
 	SubMesh3DFaces::SubMesh3DFaces()
 	{
 		faceCount = 0;
-		faces = NULL;
+		faces = nullptr;
 	}
 
 	/*
@@ -33,10 +33,10 @@ namespace GTE
 	 */
 	void SubMesh3DFaces::Destroy()
 	{
-		if (faces != NULL)
+		if (faces != nullptr)
 		{
 			delete[] faces;
-			faces = NULL;
+			faces = nullptr;
 		}
 	}
 
@@ -56,9 +56,9 @@ namespace GTE
 		Destroy();
 
 		this->faceCount = faceCount;
-		faces = new SubMesh3DFace[faceCount];
+		faces = new(std::nothrow) SubMesh3DFace[faceCount];
 
-		ASSERT(faces != NULL, "SubMesh3DFaces::Init -> Could not allocate faces array.");
+		ASSERT(faces != nullptr, "SubMesh3DFaces::Init -> Could not allocate faces array.");
 
 		return true;
 	}
@@ -68,7 +68,7 @@ namespace GTE
 	 */
 	SubMesh3DFace * SubMesh3DFaces::GetFace(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFace -> 'index' is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFace -> 'index' is out of range.", nullptr, true);
 		return faces + index;
 	}
 
@@ -78,7 +78,7 @@ namespace GTE
 	 */
 	const SubMesh3DFace * SubMesh3DFaces::GetFaceConst(UInt32 index) const
 	{
-		NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFaceConst -> 'index' is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(index < faceCount, "SubMesh3DFaces::GetFaceConst -> 'index' is out of range.", nullptr, true);
 		return (const SubMesh3DFace *)(faces + index);
 	}
 }

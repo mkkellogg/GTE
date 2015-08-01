@@ -12,7 +12,7 @@
 
 namespace GTE
 {
-	BaseVector4Array::BaseVector4Array(BaseVector4Factory * factory) : reservedCount(0), count(0), data(NULL), objects(NULL), baseFactory(factory)
+	BaseVector4Array::BaseVector4Array(BaseVector4Factory * factory) : reservedCount(0), count(0), data(nullptr), objects(nullptr), baseFactory(factory)
 	{
 
 	}
@@ -24,8 +24,8 @@ namespace GTE
 
 	void BaseVector4Array::Destroy()
 	{
-		if (objects != NULL)baseFactory->DestroyArray(objects, reservedCount);
-		objects = NULL;
+		if (objects != nullptr)baseFactory->DestroyArray(objects, reservedCount);
+		objects = nullptr;
 
 		SAFE_DELETE(data);
 	}
@@ -37,11 +37,11 @@ namespace GTE
 		this->reservedCount = reservedCount;
 		this->count = reservedCount;
 
-		data = new Real[reservedCount * 4];
-		ASSERT(data != NULL, "Could not allocate data memory for BaseVector4Array");
+		data = new(std::nothrow) Real[reservedCount * 4];
+		ASSERT(data != nullptr, "Could not allocate data memory for BaseVector4Array");
 
 		objects = baseFactory->CreateArray(reservedCount);
-		ASSERT(objects != NULL, "Could not allocate objects memory for BaseVector4Array");
+		ASSERT(objects != nullptr, "Could not allocate objects memory for BaseVector4Array");
 
 		Real *dataPtr = data;
 
@@ -49,7 +49,7 @@ namespace GTE
 		while (index < reservedCount)
 		{
 			BaseVector4 * currentObject = (BaseVector4*)baseFactory->CreatePermAttached(dataPtr);
-			ASSERT(currentObject != NULL, "Could not allocate BaseVector4 for BaseVector4Array");
+			ASSERT(currentObject != nullptr, "Could not allocate BaseVector4 for BaseVector4Array");
 
 			objects[index] = currentObject;
 			currentObject->Set(0, 0, 0, 0);
@@ -63,7 +63,7 @@ namespace GTE
 
 	BaseVector4 * BaseVector4Array::GetBaseVector(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", nullptr, true);
 
 		return objects[index];
 	}
@@ -90,7 +90,7 @@ namespace GTE
 
 	Bool BaseVector4Array::CopyTo(BaseVector4Array * dest) const
 	{
-		NONFATAL_ASSERT_RTRN(dest != NULL, " BaseVector4Array::CopyTo -> 'dest' is null.", false, true);
+		NONFATAL_ASSERT_RTRN(dest != nullptr, " BaseVector4Array::CopyTo -> 'dest' is null.", false, true);
 
 		if (dest->GetCount() != count)
 		{

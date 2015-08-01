@@ -14,7 +14,7 @@ namespace GTE
 	{
 		this->width = width;
 		this->height = height;
-		imageBytes = NULL;
+		imageBytes = nullptr;
 	}
 
 	RawImage::~RawImage()
@@ -34,17 +34,17 @@ namespace GTE
 
 	Bool RawImage::Init()
 	{
-		imageBytes = new Byte[ImageSizeBytes()];
-		ASSERT(imageBytes != NULL, "RawImage::Init -> Unable to allocate image bytes.");
+		imageBytes = new(std::nothrow) Byte[ImageSizeBytes()];
+		ASSERT(imageBytes != nullptr, "RawImage::Init -> Unable to allocate image bytes.");
 
 		return true;
 	}
 
 	void RawImage::SetDataTo(Byte * data)
 	{
-		NONFATAL_ASSERT(data != NULL, "RawImage::SetDataTo -> 'data' is null.", true);
+		NONFATAL_ASSERT(data != nullptr, "RawImage::SetDataTo -> 'data' is null.", true);
 
-		if (imageBytes != NULL)
+		if (imageBytes != nullptr)
 		{
 			memcpy(imageBytes, data, ImageSizeBytes());
 		}

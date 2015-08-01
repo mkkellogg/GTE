@@ -14,7 +14,7 @@ namespace GTE
 		ShaderVarID = -1;
 		Size = -1;
 		Type = UniformType::Float;
-		ExtendedFloatData = NULL;
+		ExtendedFloatData = nullptr;
 		IsSet = false;
 		memset(BasicFloatData, 0, sizeof(Real) * 4);
 	}

@@ -350,7 +350,7 @@ namespace GTE
 		Transform cameraModelView;
 
 		SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
-		ASSERT(sceneRoot.IsValid(), "RenderManager::PreProcessScene -> 'sceneRoot' is NULL.");
+		ASSERT(sceneRoot.IsValid(), "RenderManager::PreProcessScene -> 'sceneRoot' is null.");
 
 		// gather information about the cameras, lights, and renderable meshes in the scene
 		PreProcessScene(sceneRoot.GetRef(), cameraModelView);
@@ -555,7 +555,7 @@ namespace GTE
 		Camera& camera = cameraRef.GetRef();
 
 		SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
-		ASSERT(sceneRoot.IsValid(), "RenderManager::RenderSceneFromCamera -> sceneRoot is NULL.");
+		ASSERT(sceneRoot.IsValid(), "RenderManager::RenderSceneFromCamera -> sceneRoot is null.");
 
 		// currently we use forward rendering
 		ForwardRenderSceneForCamera(camera);
@@ -891,7 +891,7 @@ namespace GTE
 			camera.GetSkyboxTransform().CopyMatrix(textureTrans);
 			skyboxMaterial->SetMatrix4x4(textureTrans, "TEXTURETRANSFORM_MATRIX");
 
-			LightingDescriptor lightingDescriptor(NULL, NULL, NULL, true);
+			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, true);
 			ForwardRenderSceneObject(skyboxObject.GetRef(), lightingDescriptor, Transform(), viewTransform, viewTransformInverse, camera,
 				MaterialRef::Null(), true, true, FowardBlendingFilter::Never);
 			skyboxObject->SetActive(false);
@@ -1028,7 +1028,7 @@ namespace GTE
 			Transform full;
 			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
 
-			LightingDescriptor lightingDescriptor(NULL, NULL, NULL, true);
+			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, true);
 			ForwardRenderSceneObject(*child, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter);
 		}
 	}
@@ -1050,7 +1050,7 @@ namespace GTE
 		const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
 		Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
-		Mesh3DRenderer * renderer = NULL;
+		Mesh3DRenderer * renderer = nullptr;
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
@@ -1067,7 +1067,7 @@ namespace GTE
 			renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
 		}
 
-		if (renderer != NULL)
+		if (renderer != nullptr)
 		{
 			Mesh3DRef mesh = renderer->GetTargetMesh();
 
@@ -1193,7 +1193,7 @@ namespace GTE
 	void RenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 		const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera)
 	{
-		Mesh3DRenderer * renderer = NULL;
+		Mesh3DRenderer * renderer = nullptr;
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
@@ -1209,7 +1209,7 @@ namespace GTE
 			renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
 		}
 
-		if (renderer != NULL)
+		if (renderer != nullptr)
 		{
 			Mesh3DRef mesh = renderer->GetTargetMesh();
 			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
@@ -1286,11 +1286,11 @@ namespace GTE
 				cacheKey.ObjectAID = subRenderer->GetObjectID();
 				cacheKey.ObjectBID = light.GetObjectID();
 
-				const Point3Array * cachedShadowVolume = NULL;
+				const Point3Array * cachedShadowVolume = nullptr;
 				cachedShadowVolume = GetCachedShadowVolume(cacheKey);
 
 				// render the shadow volume if it is valid
-				if (cachedShadowVolume != NULL)
+				if (cachedShadowVolume != nullptr)
 				{
 					subRenderer->RenderShadowVolume(cachedShadowVolume);
 				}
@@ -1372,7 +1372,7 @@ namespace GTE
 	 */
 	void RenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection)
 	{
-		Mesh3DRenderer * renderer = NULL;
+		Mesh3DRenderer * renderer = nullptr;
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
@@ -1388,7 +1388,7 @@ namespace GTE
 			renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
 		}
 
-		if (renderer != NULL)
+		if (renderer != nullptr)
 		{
 			Mesh3DRef mesh = renderer->GetTargetMesh();
 			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
@@ -1453,7 +1453,7 @@ namespace GTE
 				const Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
 
 				// check if this shadow volume is already cached
-				if (cachedShadowVolume != NULL)
+				if (cachedShadowVolume != nullptr)
 				{
 					cached = true;
 				}
@@ -1479,7 +1479,7 @@ namespace GTE
 	{
 		if (!sceneObject.IsValid())
 		{
-			Debug::PrintWarning("RenderManager::ValidateSceneObjectForRendering -> NULL scene object encountered.");
+			Debug::PrintWarning("RenderManager::ValidateSceneObjectForRendering -> Null scene object encountered.");
 			return false;
 		}
 
@@ -1487,7 +1487,7 @@ namespace GTE
 
 		if (!object->IsActive())return false;
 
-		Mesh3DRenderer * renderer = NULL;
+		Mesh3DRenderer * renderer = nullptr;
 
 		// check if current SceneObject has a mesh & renderer
 		if (object->GetMesh3DRenderer().IsValid())renderer = object->GetMesh3DRenderer().GetPtr();
@@ -1543,10 +1543,10 @@ namespace GTE
 	 */
 	void RenderManager::CacheShadowVolume(const ObjectPairKey& key, const Point3Array * shadowVolume)
 	{
-		NONFATAL_ASSERT(shadowVolume != NULL, "RenderManager::CacheShadowVolume -> Shadow volume is null.", true);
+		NONFATAL_ASSERT(shadowVolume != nullptr, "RenderManager::CacheShadowVolume -> Shadow volume is null.", true);
 
 		Bool needsInit = false;
-		Point3Array * target = NULL;
+		Point3Array * target = nullptr;
 
 		if (!HasCachedShadowVolume(key))
 		{
@@ -1564,8 +1564,8 @@ namespace GTE
 
 		if (needsInit)
 		{
-			target = new Point3Array();
-			ASSERT(target != NULL, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
+			target = new(std::nothrow) Point3Array();
+			ASSERT(target != nullptr, "RenderManager::CacheShadowVolume -> Unable to allocate shadow volume copy.");
 
 			Bool initSuccess = target->Init(shadowVolume->GetReservedCount());
 			ASSERT(initSuccess, "RenderManager::CacheShadowVolume -> Unable to initialize shadow volume copy.");
@@ -1587,7 +1587,7 @@ namespace GTE
 		{
 			Point3Array* shadowVolume = shadowVolumeCache[key];
 			shadowVolumeCache.erase(key);
-			if (shadowVolume != NULL)
+			if (shadowVolume != nullptr)
 			{
 				delete shadowVolume;
 			}
@@ -1618,7 +1618,7 @@ namespace GTE
 			return shadowVolume;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	/*
@@ -1816,7 +1816,7 @@ namespace GTE
 
 			const ClipPlane* clipPlane0 = const_cast<Camera&>(camera).GetClipPlane(0);
 
-			if (clipPlane0 != NULL)
+			if (clipPlane0 != nullptr)
 			{
 				activeMaterial->SendClipPlaneToShader(0, clipPlane0->Normal.x, clipPlane0->Normal.y, clipPlane0->Normal.z, clipPlane0->Offset);
 			}

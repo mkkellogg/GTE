@@ -17,7 +17,7 @@ namespace GTE
 	*/
 	Transform * Transform::CreateIdentityTransform()
 	{
-		return new Transform();
+		return new(std::nothrow) Transform();
 	}
 
 	/*
@@ -33,7 +33,7 @@ namespace GTE
 	 */
 	Transform::Transform(const Transform * transform) : Transform()
 	{
-		NONFATAL_ASSERT(transform != NULL, "Transform::copy constructor -> 'transform' is null.", true);
+		NONFATAL_ASSERT(transform != nullptr, "Transform::copy constructor -> 'transform' is null.", true);
 		transform->CopyMatrix(matrix);
 	}
 
@@ -92,7 +92,7 @@ namespace GTE
 	 */
 	void Transform::SetTo(const Real * matrixData)
 	{
-		NONFATAL_ASSERT(matrixData != NULL, "Transform::SetTo -> 'matrixData' is null.", true);
+		NONFATAL_ASSERT(matrixData != nullptr, "Transform::SetTo -> 'matrixData' is null.", true);
 		matrix.SetTo(matrixData);
 	}
 
@@ -437,7 +437,7 @@ namespace GTE
 	 */
 	void Transform::TransformVector4f(Real * vector) const
 	{
-		NONFATAL_ASSERT(vector != NULL, "Transform::TransformVector4f -> 'vector' is null.", true);
+		NONFATAL_ASSERT(vector != nullptr, "Transform::TransformVector4f -> 'vector' is null.", true);
 		matrix.Transform(vector);
 	}
 }

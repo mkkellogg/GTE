@@ -39,7 +39,7 @@ namespace GTE
 		{
 			VertexBoneMap * map = vertexBoneMaps[i];
 			SAFE_DELETE(map);
-			vertexBoneMaps[i] = NULL;
+			vertexBoneMaps[i] = nullptr;
 		}
 		vertexBoneMaps.clear();
 	}
@@ -91,7 +91,7 @@ namespace GTE
 
 					// only create  SkinnedMesh3DAttributeTransformer for the sub-mesh at [i]
 					// if has not already been done
-					if (subRenderer->GetAttributeTransformer() == NULL)
+					if (subRenderer->GetAttributeTransformer() == nullptr)
 					{
 						// setup the attribute transformer to transform normals, positions, and tangents
 						StandardAttributeSet attributes = StandardAttributes::CreateAttributeSet();
@@ -99,22 +99,22 @@ namespace GTE
 						StandardAttributes::AddAttribute(&attributes, StandardAttribute::Normal);
 						StandardAttributes::AddAttribute(&attributes, StandardAttribute::Tangent);
 
-						SkinnedMesh3DAttributeTransformer *attributeTransformer = new SkinnedMesh3DAttributeTransformer(attributes);
-						ASSERT(attributeTransformer != NULL, "SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
+						SkinnedMesh3DAttributeTransformer *attributeTransformer = new(std::nothrow) SkinnedMesh3DAttributeTransformer(attributes);
+						ASSERT(attributeTransformer != nullptr, "SkinnedMesh3DRenderer::UpdateFromMesh -> Could not allocate attribute transformer.");
 
 						subRenderer->SetAttributeTransformer(attributeTransformer);
 					}
 				}
-				else // since no vertex bone map exists for this sub-mesh, set the attribute transformer to NULL
+				else // since no vertex bone map exists for this sub-mesh, set the attribute transformer to null
 				{
-					subRenderer->SetAttributeTransformer(NULL);
+					subRenderer->SetAttributeTransformer(nullptr);
 				}
 
 				// update the attribute transformer
-				if (subRenderer->GetAttributeTransformer() != NULL)
+				if (subRenderer->GetAttributeTransformer() != nullptr)
 				{
 					SkinnedMesh3DAttributeTransformer * attrTransformer = dynamic_cast<SkinnedMesh3DAttributeTransformer*>(subRenderer->GetAttributeTransformer());
-					if (attrTransformer != NULL)
+					if (attrTransformer != nullptr)
 					{
 						attrTransformer->SetRenderer(this);
 						attrTransformer->SetVertexBoneMapIndex(vertexBoneMapIndex);
@@ -137,7 +137,7 @@ namespace GTE
 	 */
 	VertexBoneMap * SkinnedMesh3DRenderer::GetVertexBoneMap(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < vertexBoneMaps.size(), "Mesh3D::GetVertexBoneMap -> 'index' is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(index < vertexBoneMaps.size(), "Mesh3D::GetVertexBoneMap -> 'index' is out of range.", nullptr, true);
 
 		return vertexBoneMaps[index];
 	}

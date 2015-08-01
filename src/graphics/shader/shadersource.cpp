@@ -78,7 +78,7 @@ namespace GTE
 		if (sourceType != ShaderSourceType::File)return true;
 		Char * vTemp = ReadShaderSource(vertexSourcePath.c_str());
 		Char * fTemp = ReadShaderSource(fragmentSourcePath.c_str());
-		loaded = vTemp != NULL && fTemp != NULL ? true : false;
+		loaded = vTemp != nullptr && fTemp != nullptr ? true : false;
 		if (loaded)
 		{
 			vertexSourceString = std::string(vTemp);
@@ -86,7 +86,7 @@ namespace GTE
 		}
 		else
 		{
-			if (vTemp == NULL)
+			if (vTemp == nullptr)
 			{
 				std::string errMsg = std::string("Could not load vertex shader: ") + vertexSourcePath;
 				Engine::Instance()->GetErrorManager()->SetAndReportError(ShaderSourceError::LoadError, errMsg);
@@ -122,11 +122,11 @@ namespace GTE
 	Char * ShaderSource::ReadShaderSource(const Char *fn)
 	{
 		FILE *fp;
-		Char *content = NULL;
+		Char *content = nullptr;
 
 		Int32 count = 0;
 
-		if (fn != NULL)
+		if (fn != nullptr)
 		{
 			fp = fopen(fn, "rt");
 
@@ -138,7 +138,8 @@ namespace GTE
 
 				if (count > 0)
 				{
-					content = new Char[count + 1];
+					content = new(std::nothrow) Char[count + 1];
+					ASSERT(content != nullptr, " ShaderSource::ReadShaderSource -> Unable to allocate content.");
 					count = fread(content, sizeof(Char), count, fp);
 					content[count] = '\0';
 				}

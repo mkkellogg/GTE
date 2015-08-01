@@ -32,7 +32,7 @@ namespace GTE
 	 */
 	const Transform * SceneObjectSkeletonNode::GetFullTransform() const
 	{
-		NONFATAL_ASSERT_RTRN(Target.IsValid(), "SceneObjectSkeletonNode::GetFullTransform -> Node does not have a valid target.", NULL, true);
+		NONFATAL_ASSERT_RTRN(Target.IsValid(), "SceneObjectSkeletonNode::GetFullTransform -> Node does not have a valid target.", nullptr, true);
 
 		const Transform& ref = Target->GetAggregateTransform();
 		return &ref;
@@ -43,7 +43,7 @@ namespace GTE
 	 */
 	Transform * SceneObjectSkeletonNode::GetLocalTransform()
 	{
-		NONFATAL_ASSERT_RTRN(Target.IsValid(), "SceneObjectSkeletonNode::GetLocalTransform -> Node does not have a valid target.", NULL, true);
+		NONFATAL_ASSERT_RTRN(Target.IsValid(), "SceneObjectSkeletonNode::GetLocalTransform -> Node does not have a valid target.", nullptr, true);
 
 		Transform& ref = Target->GetTransform();
 		return &ref;
@@ -62,8 +62,8 @@ namespace GTE
 	 */
 	SkeletonNode * SceneObjectSkeletonNode::FullClone() const
 	{
-		SkeletonNode * newNode = new SceneObjectSkeletonNode(Target, BoneIndex, Name);
-		ASSERT(newNode != NULL, "SceneObjectSkeletonNode::FullClone -> Could not allocate new node.");
+		SkeletonNode * newNode = new(std::nothrow) SceneObjectSkeletonNode(Target, BoneIndex, Name);
+		ASSERT(newNode != nullptr, "SceneObjectSkeletonNode::FullClone -> Could not allocate new node.");
 
 		newNode->InitialTransform = this->InitialTransform;
 		newNode->InitialTranslation = this->InitialTranslation;

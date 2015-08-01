@@ -12,7 +12,7 @@ namespace GTE
 	*/
 	Bone::Bone()
 	{
-		Node = NULL;
+		Node = nullptr;
 		this->Name = std::string("");
 		this->ID = -1;
 	}
@@ -32,7 +32,7 @@ namespace GTE
 	{
 		this->Name = name;
 		this->ID = id;
-		Node = NULL;
+		Node = nullptr;
 	}
 
 	/*

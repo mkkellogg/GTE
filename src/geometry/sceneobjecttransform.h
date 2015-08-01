@@ -41,7 +41,7 @@ namespace GTE
 		static void GetWorldTransform(Transform& transform, const SceneObject * sceneObject, Bool includeSelf, Bool invert);
 
 		void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-		void SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale);
+		void SetLocalComponents(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
 
 		void Translate(Real x, Real y, Real z, Bool local) override;
 		void Translate(Vector3& vector, Bool local);

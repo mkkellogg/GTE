@@ -30,8 +30,8 @@ namespace GTE
 
 	BaseVector2** UV2Factory::CreateArray(Int32 count)
 	{
-		BaseVector2** pptr = (BaseVector2**)new UV2*[count];
-		ASSERT(pptr != NULL, "UV2Factory::CreateArray -> Could not allocate array.");
+		BaseVector2** pptr = (BaseVector2**)new(std::nothrow)  UV2*[count];
+		ASSERT(pptr != nullptr, "UV2Factory::CreateArray -> Could not allocate array.");
 
 		memset(pptr, (Int32)NULL, sizeof(UV2*) * count);
 
@@ -40,9 +40,9 @@ namespace GTE
 
 	UV2Factory * UV2Factory::GetInstance()
 	{
-		if (instance == NULL)
+		if (instance == nullptr)
 		{
-			instance = new UV2Factory();
+			instance = new(std::nothrow)  UV2Factory();
 		}
 
 		return instance;

@@ -69,7 +69,7 @@ namespace GTE
 		openGLMinorVersion = 0;
 		openGLVersion = 0;
 
-		window = NULL;
+		window = nullptr;
 	}
 
 	/*
@@ -109,13 +109,13 @@ namespace GTE
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 		// create a windowed mode window and its OpenGL context 
-		window = glfwCreateWindow(attributes.WindowWidth, attributes.WindowHeight, attributes.WindowTitle.c_str(), NULL, NULL);
+		window = glfwCreateWindow(attributes.WindowWidth, attributes.WindowHeight, attributes.WindowTitle.c_str(), nullptr, nullptr);
 
 		//GLFWvidmode vm;
 		//glfwGetDesktopMode(&amp;vm);
 		//window = glfwOpenWindow(attributes.WindowWidth, attributes.WindowHeight,vm.RedBits, vm.GreenBits, vm.BlueBits, 0, 0, 0, GLFW_WINDOW)
 
-		if (window == NULL)
+		if (window == nullptr)
 		{
 			Debug::PrintError("Unable to create GLFW window.");
 			glfwTerminate();
@@ -252,8 +252,8 @@ namespace GTE
 	 */
 	Shader * GraphicsGL::CreateShader(const ShaderSource& shaderSource)
 	{
-		Shader * shader = new ShaderGL(shaderSource);
-		ASSERT(shader != NULL, "GraphicsGL::CreateShader -> Unable to allocate new shader.");
+		Shader * shader = new(std::nothrow) ShaderGL(shaderSource);
+		ASSERT(shader != nullptr, "GraphicsGL::CreateShader -> Unable to allocate new shader.");
 
 		// load, compile, and link the shader into a complete OpenGL shader program
 		Bool loadSuccess = shader->Load();
@@ -262,7 +262,7 @@ namespace GTE
 			std::string msg = "GraphicsGL::CreateShader -> could not load shader: ";
 			msg += std::string(shaderSource.GetName());
 			Engine::Instance()->GetErrorManager()->SetAndReportError(ErrorCode::GENERAL_FATAL, msg);
-			return NULL;
+			return nullptr;
 		}
 		return shader;
 	}
@@ -272,7 +272,7 @@ namespace GTE
 	 */
 	void GraphicsGL::DestroyShader(Shader * shader)
 	{
-		NONFATAL_ASSERT(shader != NULL, "GraphicsGL::DestroyShader -> 'shader' is null.", true);
+		NONFATAL_ASSERT(shader != nullptr, "GraphicsGL::DestroyShader -> 'shader' is null.", true);
 		delete shader;
 	}
 
@@ -461,7 +461,7 @@ namespace GTE
 	 */
 	VertexAttrBuffer * GraphicsGL::CreateVertexAttributeBuffer()
 	{
-		return new VertexAttrBufferGL();
+		return new(std::nothrow) VertexAttrBufferGL();
 	}
 
 	/*
@@ -469,7 +469,7 @@ namespace GTE
 	 */
 	void GraphicsGL::DestroyVertexAttributeBuffer(VertexAttrBuffer * buffer)
 	{
-		NONFATAL_ASSERT(buffer != NULL, "GraphicsGL::DestroyVertexAttributeBuffer -> 'buffer' is null", true);
+		NONFATAL_ASSERT(buffer != nullptr, "GraphicsGL::DestroyVertexAttributeBuffer -> 'buffer' is null", true);
 		delete buffer;
 	}
 
@@ -545,7 +545,7 @@ namespace GTE
 		else
 		{
 			GLvoid *pixels = pixelData;
-			if (pixelData == NULL)pixels = (GLvoid*)0;
+			if (pixelData == nullptr)pixels = (GLvoid*)0;
 
 			// we only generate mip-maps if bi-linear or tri-linear filtering is used
 			if (attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear)
@@ -567,15 +567,15 @@ namespace GTE
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		TextureGL * texture = new TextureGL(attributes, tex);
-		ASSERT(texture != NULL, "GraphicsGL::CreateTexture -> Unable to allocate TextureGL object.");
+		TextureGL * texture = new(std::nothrow) TextureGL(attributes, tex);
+		ASSERT(texture != nullptr, "GraphicsGL::CreateTexture -> Unable to allocate TextureGL object.");
 
 		// assign a RawImage object to the texture
-		RawImage  * imageData = new RawImage(width, height);
-		ASSERT(imageData != NULL, "GraphicsGL::CreateTexture -> Unable to allocate raw image data.");
+		RawImage  * imageData = new(std::nothrow) RawImage(width, height);
+		ASSERT(imageData != nullptr, "GraphicsGL::CreateTexture -> Unable to allocate raw image data.");
 		ASSERT(imageData->Init(), "GraphicsGL::CreateTexture -> Unable to initialize raw image data.");
 
-		if (pixelData != NULL)imageData->SetDataTo(pixelData);
+		if (pixelData != nullptr)imageData->SetDataTo(pixelData);
 		texture->AddImageData(imageData);
 
 		return texture;
@@ -589,7 +589,7 @@ namespace GTE
 	 */
 	Texture * GraphicsGL::CreateTexture(RawImage * imageData, const TextureAttributes&  attributes)
 	{
-		NONFATAL_ASSERT_RTRN(imageData != NULL, "GraphicsGL::CreateTexture -> 'imageData' is null", NULL, true);
+		NONFATAL_ASSERT_RTRN(imageData != nullptr, "GraphicsGL::CreateTexture -> 'imageData' is null", nullptr, true);
 
 		Texture * texture = CreateTexture(imageData->GetWidth(), imageData->GetHeight(), imageData->GetPixels(), attributes);
 		return texture;
@@ -605,14 +605,14 @@ namespace GTE
 	{
 		RawImage * raw = ImageLoader::LoadImageU(sourcePath);
 
-		if (raw == NULL)
+		if (raw == nullptr)
 		{
 			Engine::Instance()->GetErrorManager()->AddAndReportError(ErrorCode::GENERAL_NONFATAL, "GraphicsGL::CreateTexture -> could not load texture image.");
-			return NULL;
+			return nullptr;
 		}
 
 		TextureGL * tex = (TextureGL*)CreateTexture(raw, attributes);
-		NONFATAL_ASSERT_RTRN(tex != NULL, "GraphicsGL::CreateTexture -> Unable to create texture.", NULL, false);
+		NONFATAL_ASSERT_RTRN(tex != nullptr, "GraphicsGL::CreateTexture -> Unable to create texture.", nullptr, false);
 
 		return tex;
 	}
@@ -640,12 +640,12 @@ namespace GTE
 		Byte * leftData, UInt32 lw, UInt32 lh,
 		Byte * rightData, UInt32 rw, UInt32 rh)
 	{
-		GLvoid * frontPixels = frontData != NULL ? frontData : (GLvoid*)0;
-		GLvoid * backPixels = backData != NULL ? backData : (GLvoid*)0;
-		GLvoid * topPixels = topData != NULL ? topData : (GLvoid*)0;
-		GLvoid * bottomPixels = bottomData != NULL ? bottomData : (GLvoid*)0;
-		GLvoid * leftPixels = leftData != NULL ? leftData : (GLvoid*)0;
-		GLvoid * rightPixels = rightData != NULL ? rightData : (GLvoid*)0;
+		GLvoid * frontPixels = frontData != nullptr ? frontData : (GLvoid*)0;
+		GLvoid * backPixels = backData != nullptr ? backData : (GLvoid*)0;
+		GLvoid * topPixels = topData != nullptr ? topData : (GLvoid*)0;
+		GLvoid * bottomPixels = bottomData != nullptr ? bottomData : (GLvoid*)0;
+		GLvoid * leftPixels = leftData != nullptr ? leftData : (GLvoid*)0;
+		GLvoid * rightPixels = rightData != nullptr ? rightData : (GLvoid*)0;
 
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
@@ -678,8 +678,8 @@ namespace GTE
 		attributes.IsCube = true;
 		attributes.MipMapLevel = 0;
 
-		TextureGL * texture = new TextureGL(attributes, tex);
-		ASSERT(texture != NULL, "GraphicsGL::CreateCubeTexture -> Unable to allocate TextureGL object.");
+		TextureGL * texture = new(std::nothrow) TextureGL(attributes, tex);
+		ASSERT(texture != nullptr, "GraphicsGL::CreateCubeTexture -> Unable to allocate TextureGL object.");
 
 		std::vector<RawImage *> imageDatas;
 		Byte * datas[] = { frontData, backData, topData, bottomData, leftData, rightData };
@@ -689,11 +689,11 @@ namespace GTE
 		// allocate RawImage object for each side of cube
 		for (UInt32 i = 0; i < 6; i++)
 		{
-			RawImage  * imageData = new RawImage(widths[i], heights[i]);
-			ASSERT(imageData != NULL, "GraphicsGL::CreateCubeTexture -> Unable to allocate RawImage object.");
+			RawImage  * imageData = new(std::nothrow) RawImage(widths[i], heights[i]);
+			ASSERT(imageData != nullptr, "GraphicsGL::CreateCubeTexture -> Unable to allocate RawImage object.");
 			ASSERT(imageData->Init(), "GraphicsGL::CreateCubeTexture -> Unable to initialize RawImage object.");
 
-			if (datas[i] != NULL)imageData->SetDataTo(datas[i]);
+			if (datas[i] != nullptr)imageData->SetDataTo(datas[i]);
 			imageDatas.push_back(imageData);
 		}
 
@@ -719,12 +719,12 @@ namespace GTE
 	Texture * GraphicsGL::CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 		RawImage * bottomData, RawImage * leftData, RawImage * rightData)
 	{
-		NONFATAL_ASSERT_RTRN(frontData != NULL, "GraphicsGL::CreateCubeTexture -> Front image is null.", NULL, true);
-		NONFATAL_ASSERT_RTRN(backData != NULL, "GraphicsGL::CreateCubeTexture -> Back image is null.", NULL, true);
-		NONFATAL_ASSERT_RTRN(topData != NULL, "GraphicsGL::CreateCubeTexture -> Top image is null.", NULL, true);
-		NONFATAL_ASSERT_RTRN(bottomData != NULL, "GraphicsGL::CreateCubeTexture -> Bottom image is null.", NULL, true);
-		NONFATAL_ASSERT_RTRN(leftData != NULL, "GraphicsGL::CreateCubeTexture -> Left image is null.", NULL, true);
-		NONFATAL_ASSERT_RTRN(rightData != NULL, "GraphicsGL::CreateCubeTexture -> Right image is null.", NULL, true);
+		NONFATAL_ASSERT_RTRN(frontData != nullptr, "GraphicsGL::CreateCubeTexture -> Front image is null.", nullptr, true);
+		NONFATAL_ASSERT_RTRN(backData != nullptr, "GraphicsGL::CreateCubeTexture -> Back image is null.", nullptr, true);
+		NONFATAL_ASSERT_RTRN(topData != nullptr, "GraphicsGL::CreateCubeTexture -> Top image is null.", nullptr, true);
+		NONFATAL_ASSERT_RTRN(bottomData != nullptr, "GraphicsGL::CreateCubeTexture -> Bottom image is null.", nullptr, true);
+		NONFATAL_ASSERT_RTRN(leftData != nullptr, "GraphicsGL::CreateCubeTexture -> Left image is null.", nullptr, true);
+		NONFATAL_ASSERT_RTRN(rightData != nullptr, "GraphicsGL::CreateCubeTexture -> Right image is null.", nullptr, true);
 
 		Texture * texture = CreateCubeTexture(frontData->GetPixels(), frontData->GetWidth(), frontData->GetHeight(),
 			backData->GetPixels(), backData->GetWidth(), backData->GetHeight(),
@@ -734,7 +734,7 @@ namespace GTE
 			rightData->GetPixels(), rightData->GetWidth(), rightData->GetHeight());
 
 		TextureGL * textureGL = dynamic_cast<TextureGL *>(texture);
-		ASSERT(textureGL != NULL, "GraphicsGL::CreateCubeTexture -> Unable to cast to TextureGL.");
+		ASSERT(textureGL != nullptr, "GraphicsGL::CreateCubeTexture -> Unable to cast to TextureGL.");
 
 		return texture;
 	}
@@ -759,20 +759,20 @@ namespace GTE
 		RawImage * rawLeft = ImageLoader::LoadImageU(left);
 		RawImage * rawRight = ImageLoader::LoadImageU(right);
 
-		TextureGL * tex = NULL;
+		TextureGL * tex = nullptr;
 
-		if (rawFront == NULL || rawBack == NULL || rawTop == NULL ||
-			rawBottom == NULL || rawLeft == NULL || rawRight == NULL)
+		if (rawFront == nullptr || rawBack == nullptr || rawTop == nullptr ||
+			rawBottom == nullptr || rawLeft == nullptr || rawRight == nullptr)
 		{
 			Engine::Instance()->GetErrorManager()->AddAndReportError(ErrorCode::GENERAL_NONFATAL, "GraphicsGL::CreateCubeTexture -> Unable to load cube map texture.");
-			return NULL;
+			return nullptr;
 		}
 
 		std::vector<RawImage*> imageData;
 		std::vector<std::string> sourcePaths;
 
 		tex = (TextureGL*)CreateCubeTexture(rawFront, rawBack, rawTop, rawBottom, rawLeft, rawRight);
-		NONFATAL_ASSERT_RTRN(tex != NULL, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", NULL, false);
+		NONFATAL_ASSERT_RTRN(tex != nullptr, "GraphicsGL::CreateCubeTexture -> Unable to create texture.", nullptr, false);
 
 		return tex;
 	}
@@ -782,10 +782,10 @@ namespace GTE
 	 */
 	void GraphicsGL::DestroyTexture(Texture * texture)
 	{
-		NONFATAL_ASSERT(texture != NULL, "GraphicsGL::DestroyTexture -> 'texture' is null", true);
+		NONFATAL_ASSERT(texture != nullptr, "GraphicsGL::DestroyTexture -> 'texture' is null", true);
 
 		TextureGL * texGL = dynamic_cast<TextureGL*>(texture);
-		ASSERT(texGL != NULL, "GraphicsGL::DestroyTexture -> 'texture' is not OpenGL compatible.");
+		ASSERT(texGL != nullptr, "GraphicsGL::DestroyTexture -> 'texture' is not OpenGL compatible.");
 
 		GLuint textureID = texGL->GetTextureID();
 		if (glIsTexture(textureID))
@@ -809,16 +809,16 @@ namespace GTE
 		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		RenderTargetGL * buffer;
-		buffer = new RenderTargetGL(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
-		ASSERT(buffer != NULL, "GraphicsGL::CreateRenderTarget -> Unable to allocate render target.");
+		buffer = new(std::nothrow) RenderTargetGL(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
+		ASSERT(buffer != nullptr, "GraphicsGL::CreateRenderTarget -> Unable to allocate render target.");
 		return buffer;
 	}
 
 	RenderTarget * GraphicsGL::CreateDefaultRenderTarget()
 	{
 		TextureAttributes colorAttributes;
-		RenderTargetGL * defaultTarget = new RenderTargetGL(false, false, false, colorAttributes, this->attributes.WindowWidth, this->attributes.WindowHeight);
-		ASSERT(defaultTarget != NULL, "GraphicsGL::CreateDefaultRenderTarget -> Unable to allocate default render target");
+		RenderTargetGL * defaultTarget = new(std::nothrow) RenderTargetGL(false, false, false, colorAttributes, this->attributes.WindowWidth, this->attributes.WindowHeight);
+		ASSERT(defaultTarget != nullptr, "GraphicsGL::CreateDefaultRenderTarget -> Unable to allocate default render target");
 
 		return defaultTarget;
 	}
@@ -828,10 +828,10 @@ namespace GTE
 	 */
 	void GraphicsGL::DestroyRenderTarget(RenderTarget * target)
 	{
-		NONFATAL_ASSERT(target != NULL, "GraphicsGL::DestroyRenderTarget -> 'target' is null", true);
+		NONFATAL_ASSERT(target != nullptr, "GraphicsGL::DestroyRenderTarget -> 'target' is null", true);
 
 		RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL*>(target);
-		if (targetGL != NULL)
+		if (targetGL != nullptr)
 		{
 			delete targetGL;
 		}
@@ -916,7 +916,7 @@ namespace GTE
 				if (currentShader.IsValid())
 				{
 					const ShaderGL * currentShaderGL = dynamic_cast<const ShaderGL *>(currentShader.GetConstPtr());
-					if (currentShaderGL != NULL)
+					if (currentShaderGL != nullptr)
 					{
 						// get the shader ID
 						oldActiveProgramID = currentShaderGL->GetProgramID();
@@ -931,7 +931,7 @@ namespace GTE
 			NONFATAL_ASSERT(shader.IsValid(), "GraphicsGL::ActivateMaterial -> 'shader' is null.", true);
 
 			const ShaderGL * shaderGL = dynamic_cast<const ShaderGL *>(shader.GetConstPtr());
-			ASSERT(shaderGL != NULL, "GraphicsGL::ActivateMaterial -> Material's shader is not ShaderGL !!");
+			ASSERT(shaderGL != nullptr, "GraphicsGL::ActivateMaterial -> Material's shader is not ShaderGL !!");
 
 			// only active the new shader if it is different from the currently active one
 			if (oldActiveProgramID != shaderGL->GetProgramID())
@@ -1200,7 +1200,7 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> 'target' is not valid.", false, true);
 
 		RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target.GetPtr());
-		ASSERT(targetGL != NULL, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.");
+		ASSERT(targetGL != nullptr, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.");
 
 		if (currentRenderTarget.IsValid())
 		{
@@ -1236,14 +1236,14 @@ namespace GTE
 		if (currentRenderTarget.IsValid())
 		{
 			RenderTargetGL * currentTargetGL = dynamic_cast<RenderTargetGL *>(currentRenderTarget.GetPtr());
-			ASSERT(currentTargetGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.");
+			ASSERT(currentTargetGL != nullptr, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not a valid OpenGL render target.");
 
 			NONFATAL_ASSERT_RTRN(currentTargetGL->GetColorTexture()->GetAttributes().IsCube, 
 							     "GraphicsGL::ActivateCubeRenderTargetSide -> Render target is not cubed.", 
 								 GraphicsError::InvalidRenderTarget, false, true);
 
 			TextureGL * texGL = dynamic_cast<TextureGL*>(currentTargetGL->GetColorTexture().GetPtr());
-			ASSERT(texGL != NULL, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.");
+			ASSERT(texGL != nullptr, "GraphicsGL::ActivateCubeRenderTargetSide -> Render target texture is not a valid OpenGL texture.");
 
 			GLenum target = GetGLCubeTarget(side);
 
@@ -1277,7 +1277,7 @@ namespace GTE
 		if (currentRenderTarget.IsValid())
 		{
 			const RenderTargetGL * currentGL = dynamic_cast<const RenderTargetGL*>(currentRenderTarget.GetConstPtr());
-			if (currentGL != NULL)
+			if (currentGL != nullptr)
 			{
 				currentFB = currentGL->GetFBOID();
 			}
@@ -1287,10 +1287,10 @@ namespace GTE
 		NONFATAL_ASSERT(dest.IsValid(), "GraphicsGL::CopyBetweenRenderTargets -> Destination is not valid", true);
 
 		RenderTargetGL * srcGL = dynamic_cast<RenderTargetGL*>(src.GetPtr());
-		ASSERT(srcGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Source is not a valid OpenGL render target.");
+		ASSERT(srcGL != nullptr, "GraphicsGL::CopyBetweenRenderTargets -> Source is not a valid OpenGL render target.");
 
 		const RenderTargetGL * destGL = dynamic_cast<const RenderTargetGL*>(dest.GetConstPtr());
-		ASSERT(destGL != NULL, "GraphicsGL::CopyBetweenRenderTargets -> Destination is not a valid OpenGL render target.");
+		ASSERT(destGL != nullptr, "GraphicsGL::CopyBetweenRenderTargets -> Destination is not a valid OpenGL render target.");
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, srcGL->GetFBOID());
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destGL->GetFBOID());
@@ -1318,7 +1318,7 @@ namespace GTE
 		NONFATAL_ASSERT(texture.IsValid(), "GraphicsGL::SetTextureData -> 'texture' is not valid.", true);
 
 		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
-		ASSERT(texGL != NULL, "GraphicsGL::SetTextureData -> Texture is not a valid OpenGL texture.");
+		ASSERT(texGL != nullptr, "GraphicsGL::SetTextureData -> Texture is not a valid OpenGL texture.");
 
 		const TextureAttributes attributes = texture->GetAttributes();
 		if (attributes.IsCube)
@@ -1347,7 +1347,7 @@ namespace GTE
 	void GraphicsGL::RebuildMipMaps(TextureRef texture) const
 	{
 		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
-		ASSERT(texGL != NULL, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");
+		ASSERT(texGL != nullptr, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");
 
 		const TextureAttributes attributes = texture->GetAttributes();
 		if (openGLVersion >= 3 && (attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear))

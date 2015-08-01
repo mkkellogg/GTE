@@ -15,7 +15,7 @@ namespace GTE
 	/*
 	 * Single constructor.
 	 */
-	VertexAttrBufferGL::VertexAttrBufferGL() : VertexAttrBuffer(), data(NULL), dataOnGPU(false), gpuBufferID(0)
+	VertexAttrBufferGL::VertexAttrBufferGL() : VertexAttrBuffer(), data(nullptr), dataOnGPU(false), gpuBufferID(0)
 	{
 
 	}
@@ -66,11 +66,11 @@ namespace GTE
 		// calculate number of bytes in the buffer
 		Int32 fullDataSize = CalcFullSize();
 
-		data = new Real[CalcFloatCount()];
-		ASSERT(data != NULL, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.");
+		data = new(std::nothrow) Real[CalcFloatCount()];
+		ASSERT(data != nullptr, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.");
 
 		// zero out the buffer
-		if (srcData == NULL)
+		if (srcData == nullptr)
 		{
 			memset(data, 0, fullDataSize);
 		}
@@ -87,7 +87,7 @@ namespace GTE
 			else this->dataOnGPU = false;
 		}
 
-		if (srcData != NULL)InitData(srcData);
+		if (srcData != nullptr)InitData(srcData);
 
 		return true;
 	}
@@ -100,7 +100,7 @@ namespace GTE
 		if (dataOnGPU)
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
-			glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, fullDataSize, nullptr, GL_DYNAMIC_DRAW);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, fullDataSize, srcData);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
@@ -116,7 +116,7 @@ namespace GTE
 		if (dataOnGPU)
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
-			glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, fullDataSize, nullptr, GL_DYNAMIC_DRAW);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, fullDataSize, srcData);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -124,7 +124,7 @@ namespace GTE
 			// VBOs. empirically this has shown to be slower.
 
 			/*	glBindBuffer(GL_ARRAY_BUFFER, gpuBufferID);
-				glBufferData(GL_ARRAY_BUFFER, fullDataSize, NULL, GL_DYNAMIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, fullDataSize, nullptr, GL_DYNAMIC_DRAW);
 				Real* ptr = (Real*)glMapBufferARB(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 				if (ptr)
 				{
@@ -147,10 +147,10 @@ namespace GTE
 			gpuBufferID = 0;
 		}
 
-		if (data != NULL)
+		if (data != nullptr)
 		{
 			delete data;
-			data = NULL;
+			data = nullptr;
 		}
 	}
 

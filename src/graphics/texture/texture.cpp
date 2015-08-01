@@ -29,7 +29,7 @@ namespace GTE
 		for (UInt32 i = 0; i < imageData.size(); i++)
 		{
 			RawImage * raw = imageData[i];
-			if (raw != NULL)
+			if (raw != nullptr)
 			{
 				ImageLoader::DestroyRawImage(raw);
 			}
@@ -49,7 +49,7 @@ namespace GTE
 
 	RawImage * Texture::GetImageData(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < imageData.size(), "Texture::GetImageData -> 'index' is out of range.", NULL, true);
+		NONFATAL_ASSERT_RTRN(index < imageData.size(), "Texture::GetImageData -> 'index' is out of range.", nullptr, true);
 		return imageData[index];
 	}
 }

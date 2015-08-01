@@ -50,7 +50,7 @@ namespace GTE
 	/*
 	 * Build matrix from base components: [translation], [rotation], and [scaling].
 	 */
-	void SceneObjectTransform::SetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale)
+	void SceneObjectTransform::SetLocalComponents(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
 	{
 		matrix.BuildFromComponents(translation, rotation, scale);
 	}
@@ -83,7 +83,7 @@ namespace GTE
 	 */
 	void SceneObjectTransform::GetWorldTransform(Transform& transform, const SceneObject * sceneObject, Bool includeSelf, Bool invert) 
 	{
-		NONFATAL_ASSERT(sceneObject != NULL, "SceneObjectTransform::GetWorldTransform() -> 'sceneObject' is null.", true);
+		NONFATAL_ASSERT(sceneObject != nullptr, "SceneObjectTransform::GetWorldTransform() -> 'sceneObject' is null.", true);
 
 		Transform full;
 		if (includeSelf)full.SetTo(sceneObject->GetConstTransform());
@@ -330,7 +330,7 @@ namespace GTE
 	 */
 	void SceneObjectTransform::TransformVector4f(Real * vector) const
 	{
-		NONFATAL_ASSERT(vector != NULL, "SceneObjectTransform::TransformVector4f -> 'vector' is null.", true);
+		NONFATAL_ASSERT(vector != nullptr, "SceneObjectTransform::TransformVector4f -> 'vector' is null.", true);
 
 		Transform full;
 		GetInheritedTransform(full, false);

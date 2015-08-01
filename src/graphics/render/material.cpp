@@ -37,10 +37,10 @@ namespace GTE
 		allSetUniformsandAttributesVerified = false;
 
 		attributesSetAndVerified = false;
-		attributesSetValues = NULL;
+		attributesSetValues = nullptr;
 
 		uniformsSetAndVerified = false;
-		uniformsSetValues = NULL;
+		uniformsSetValues = nullptr;
 
 		selfLit = false;
 
@@ -147,11 +147,11 @@ namespace GTE
 		UInt32 attributeCount = shader->GetAttributeCount();
 		UInt32 uniformCount = shader->GetUniformCount();
 
-		attributesSetValues = new int[attributeCount];
-		ASSERT(attributesSetValues != NULL, "Material::SetupSetVerifiers -> Could not allocate attributesSetValues.");
+		attributesSetValues = new(std::nothrow) int[attributeCount];
+		ASSERT(attributesSetValues != nullptr, "Material::SetupSetVerifiers -> Could not allocate attributesSetValues.");
 
-		uniformsSetValues = new int[uniformCount];
-		ASSERT(uniformsSetValues != NULL, "Material::SetupSetVerifiers -> Could not allocate uniformsSetValues.");
+		uniformsSetValues = new(std::nothrow) int[uniformCount];
+		ASSERT(uniformsSetValues != nullptr, "Material::SetupSetVerifiers -> Could not allocate uniformsSetValues.");
 
 		// initialize all the values in [attributesSetValues] and [uniformsSetValues] to 0
 		ResetVerificationState();
@@ -187,9 +187,9 @@ namespace GTE
 		for (UInt32 i = 0; i < uniformCount; i++)
 		{
 			const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
-			UniformDescriptor *newDesc = new UniformDescriptor();
+			UniformDescriptor *newDesc = new(std::nothrow) UniformDescriptor();
 
-			if (newDesc == NULL)
+			if (newDesc == nullptr)
 			{
 				DestroySetUniforms();
 				Debug::PrintError("Material::SetupSetUniforms -> could not allocate UniformDescriptor");
@@ -236,8 +236,8 @@ namespace GTE
 	 */
 	void Material::ResetVerificationState()
 	{
-		if (attributesSetValues != NULL && shader.IsValid())memset(attributesSetValues, 0, sizeof(Int32) * shader->GetAttributeCount());
-		if (uniformsSetValues != NULL && shader.IsValid())memset(uniformsSetValues, 0, sizeof(Int32) * shader->GetUniformCount());
+		if (attributesSetValues != nullptr && shader.IsValid())memset(attributesSetValues, 0, sizeof(Int32) * shader->GetAttributeCount());
+		if (uniformsSetValues != nullptr && shader.IsValid())memset(uniformsSetValues, 0, sizeof(Int32) * shader->GetUniformCount());
 		allSetUniformsandAttributesVerified = false;
 	}
 
@@ -437,7 +437,7 @@ namespace GTE
 	 */
 	void Material::SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer)
 	{
-		NONFATAL_ASSERT(buffer != NULL, "Material::SendStandardAttributeBufferToShader -> 'buffer' is null.", true);
+		NONFATAL_ASSERT(buffer != nullptr, "Material::SendStandardAttributeBufferToShader -> 'buffer' is null.", true);
 
 		Int32 varID = GetStandardAttributeBinding(attr);
 		if (varID >= 0)
@@ -456,7 +456,7 @@ namespace GTE
 	 */
 	void Material::SendAttributeBufferToShader(Int32 varID, VertexAttrBuffer *buffer)
 	{
-		NONFATAL_ASSERT(buffer != NULL, "Material::SendAttributeBufferToShader -> 'buffer' is null.", true);
+		NONFATAL_ASSERT(buffer != nullptr, "Material::SendAttributeBufferToShader -> 'buffer' is null.", true);
 		NONFATAL_ASSERT(varID >= 0, "Material::SendAttributeBufferToShader -> 'varID' cannot be less than 0.", true);
 
 		if (varID >= 0)
@@ -488,7 +488,7 @@ namespace GTE
 		if (index < setUniforms.size())
 		{
 			UniformDescriptor * desc = setUniforms[index];
-			NONFATAL_ASSERT(desc != NULL, "Material::SendSetUniformToShader -> Uniform descriptor is null.", true);
+			NONFATAL_ASSERT(desc != nullptr, "Material::SendSetUniformToShader -> Uniform descriptor is null.", true);
 
 			if (desc->IsSet)
 			{
@@ -779,8 +779,8 @@ namespace GTE
 	void Material::SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendLightToShader -> 'shader' is null.", true);
-		NONFATAL_ASSERT(light != NULL, "Material::SendLightToShader -> 'light' is null.", true);
-		NONFATAL_ASSERT(position != NULL, "Material::SendLightToShader -> 'position' is null.", true);
+		NONFATAL_ASSERT(light != nullptr, "Material::SendLightToShader -> 'light' is null.", true);
+		NONFATAL_ASSERT(position != nullptr, "Material::SendLightToShader -> 'position' is null.", true);
 
 		Int32 varID = GetStandardUniformBinding(StandardUniform::LightType);
 		if (varID >= 0)
@@ -799,7 +799,7 @@ namespace GTE
 		varID = GetStandardUniformBinding(StandardUniform::LightDirection);
 		if (varID >= 0)
 		{
-			if (altDirection != NULL)shader->SendUniformToShader(varID, altDirection);
+			if (altDirection != nullptr)shader->SendUniformToShader(varID, altDirection);
 			else shader->SendUniformToShader(varID, light->GetDirectionPtr());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
