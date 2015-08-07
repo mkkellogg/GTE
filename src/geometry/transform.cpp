@@ -11,6 +11,7 @@
 #include "point/point3.h"
 #include "util/datastack.h"
 #include "object/enginetypes.h"
+#include "engine.h"
 
 namespace GTE
 {

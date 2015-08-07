@@ -8,6 +8,7 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "util/time.h"
+#include "engine.h"
 #include <memory>
 
 namespace GTE

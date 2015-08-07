@@ -22,6 +22,7 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "base/basevector4.h"
+#include "engine.h"
 #include <string>
 
 namespace GTE

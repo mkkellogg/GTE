@@ -9,6 +9,7 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "geometry/vector/vector3.h"
+#include "engine.h"
 
 namespace GTE
 {

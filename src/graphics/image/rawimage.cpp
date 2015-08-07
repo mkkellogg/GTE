@@ -9,6 +9,7 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "object/enginetypes.h"
+#include "engine.h"
 
 namespace GTE
 {

@@ -29,9 +29,10 @@
 #include "gtemath/gtemath.h"
 #include "global/global.h"
 #include "global/assert.h"
+#include "global/constants.h"
 #include "util/time.h"
 #include "debug/gtedebug.h"
-#include "global/constants.h"
+#include "engine.h"
 
 namespace GTE
 {

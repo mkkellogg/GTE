@@ -13,6 +13,7 @@
 #include "vector/vector3.h"
 #include "point/point3.h"
 #include "util/datastack.h"
+#include "engine.h"
 
 namespace GTE
 {

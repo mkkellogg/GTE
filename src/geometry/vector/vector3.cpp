@@ -11,6 +11,7 @@
 #include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
+#include "engine.h"
 
 namespace GTE
 {

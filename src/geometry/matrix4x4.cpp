@@ -32,6 +32,7 @@
 #include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
+#include "engine.h"
 
 #define I(_i, _j) ((_j)+ DIM_SIZE*(_i))
 #define PI 3.14159265
