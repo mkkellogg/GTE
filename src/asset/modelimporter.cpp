@@ -65,6 +65,7 @@
 
 namespace GTE
 {
+
 /**
  * Default constructor.
  */

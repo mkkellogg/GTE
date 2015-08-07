@@ -152,9 +152,9 @@ void Game::SetupScenes(GTE::AssetImporter& importer)
  */
 void Game::SetupScene(GTE::AssetImporter& importer, Scenes scene)
 {
-	LavaScene * lavaScene = NULL;
-	CastleScene * castleScene = NULL;
-	PoolScene * poolScene = NULL;
+	LavaScene * lavaScene = nullptr;
+	CastleScene * castleScene = nullptr;
+	PoolScene * poolScene = nullptr;
 
 	switch(scene)
 	{

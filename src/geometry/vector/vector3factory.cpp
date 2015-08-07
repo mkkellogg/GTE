@@ -42,7 +42,7 @@ namespace GTE
 	{
 		if (instance == nullptr)
 		{
-			instance = new(std::nothrow)  Vector3Factory();
+			instance = new(std::nothrow) Vector3Factory();
 		}
 
 		return instance;

@@ -89,7 +89,7 @@ namespace GTE
 	 */
 	Bool Vector3::AreStrictlyEqual(const Vector3* a, const Vector3* b)
 	{
-		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> Null vector passed.", false, true);
+		NONFATAL_ASSERT_RTRN(a != nullptr && b != nullptr, "Vector3::AreStrictlyEqual -> Null vector passed.", false, true);
 
 		return a->x == b->x && a->y == b->y && a->z == b->z;
 	}
@@ -314,7 +314,7 @@ namespace GTE
 		if (newVector.Magnitude() < .001)
 		{
 			// are these vectors really close? if so, just set [result] to [to]
-			if (dot > .99999)
+			if (dot > .99999f)
 			{
 				result = toCopy;
 				return true;

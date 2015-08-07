@@ -20,7 +20,7 @@ namespace GTE
 */
 	SceneObjectTransform::SceneObjectTransform() : Transform()
 	{
-		sceneObject = NULL;
+		sceneObject = nullptr;
 	}
 
 	/*

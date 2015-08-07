@@ -19,7 +19,7 @@ namespace GTE
 		{
 			friend class Tree;
 			std::vector<TreeNode *> children;
-			TreeNode * parent = NULL;
+			TreeNode * parent = nullptr;
 
 		public:
 
@@ -37,7 +37,7 @@ namespace GTE
 
 			TreeNode* GetChild(UInt32 index)
 			{
-				if (index >= GetChildCount())return NULL;
+				if (index >= GetChildCount())return nullptr;
 				return children[index];
 			}
 
@@ -49,7 +49,7 @@ namespace GTE
 			TreeNode* AddChild(T data)
 			{
 				TreeNode * newNode = new TreeNode(data);
-				ASSERT(newNode != NULL, "Tree::AddChild -> Could not allocate new node");
+				ASSERT(newNode != nullptr, "Tree::AddChild -> Could not allocate new node");
 				newNode->parent = this;
 				children.push_back(newNode);
 				return newNode;
@@ -81,7 +81,7 @@ namespace GTE
 
 		Tree()
 		{
-			root = NULL;
+			root = nullptr;
 			fullTraversal = false;
 		}
 
@@ -100,7 +100,7 @@ namespace GTE
 			if (!root)
 			{
 				TreeNode * newNode = new TreeNode(data);
-				ASSERT(newNode != NULL, "Tree::AddChild -> Could not allocate new node");
+				ASSERT(newNode != nullptr, "Tree::AddChild -> Could not allocate new node");
 
 				root = newNode;
 			}
@@ -115,7 +115,7 @@ namespace GTE
 
 		void Traverse()
 		{
-			if (traversalCallback && root != NULL)
+			if (traversalCallback && root != nullptr)
 			{
 				fullTraversal = false;
 				InternalTraverse();
@@ -126,7 +126,7 @@ namespace GTE
 
 		void FullTraverse()
 		{
-			if (root != NULL && fullTraversalCallback)
+			if (root != nullptr && fullTraversalCallback)
 			{
 				fullTraversal = true;
 				InternalTraverse();
@@ -138,7 +138,7 @@ namespace GTE
 		{
 			std::stack<TreeNode *> iterationStack;
 			std::stack<UInt32> childIndexStack;
-			if (root != NULL)
+			if (root != nullptr)
 			{
 				iterationStack.push(root);
 				childIndexStack.push(0);
@@ -162,7 +162,7 @@ namespace GTE
 						}
 						else
 						{
-							Debug::PrintWarning("Tree::InternalTraverse -> NULL node encountered.");
+							Debug::PrintWarning("Tree::InternalTraverse -> Null node encountered.");
 						}
 					}
 					else

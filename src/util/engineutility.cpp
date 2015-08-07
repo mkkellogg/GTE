@@ -105,7 +105,7 @@ namespace GTE
 		mesh->Init();
 
 		Point3Array * points = subMesh->GetPostions();
-		UV2Array *uvs = NULL;
+		UV2Array *uvs = nullptr;
 
 		Real halfWidth = width / 2.0f;
 		Real halfHeight = height / 2.0f;
@@ -208,7 +208,7 @@ namespace GTE
 		mesh->SetSubMesh(subMesh, 0);
 
 		Point3Array * points = subMesh->GetPostions();
-		UV2Array *uvs = NULL;
+		UV2Array *uvs = nullptr;
 
 		// --- Cube vertices -------
 		// cube front, triangle 1

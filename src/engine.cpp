@@ -19,7 +19,7 @@
 
 namespace GTE
 {
-	// set singleton instance to NULL by default
+	// set singleton instance to null by default
 	Engine * Engine::theInstance = nullptr;
 
 	/*
@@ -112,7 +112,7 @@ namespace GTE
 		// This portion of the initialization of the engine object manager must be called
 		// after the graphics engine is initialized
 		Bool initShadersSuccess = engineObjectManager->InitBuiltinShaders();
-		ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initiliaze built-in shaders");
+		ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initialize built-in shaders");
 
 		animationManager = new(std::nothrow) AnimationManager();
 		ASSERT(animationManager != nullptr, "Engine::Init -> Unable to create animation manager.");
@@ -211,7 +211,6 @@ namespace GTE
 		ASSERT(engine != nullptr, "Engine::ShutDown -> Unable retrieve Engine instance.");
 
 		SAFE_DELETE(theInstance);
-		theInstance = nullptr;
 	}
 
 	/*

@@ -85,7 +85,7 @@ namespace GTE
 
 	public:
 
-		EngineObjectRef() : std::shared_ptr<T>(NULL) {}
+		EngineObjectRef() : std::shared_ptr<T>(nullptr) {}
 		EngineObjectRef(const EngineObjectRef<T>& ref) : std::shared_ptr<T>(ref){}
 		EngineObjectRef(const std::shared_ptr<T>& ref) : std::shared_ptr<T>(ref){}
 		EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : std::shared_ptr<T>(ptr, deleter){}

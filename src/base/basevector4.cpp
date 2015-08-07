@@ -13,9 +13,9 @@ namespace GTE
 	/*
 * Initialize - Store [x], [y], [z], and [w] as the base data.
 *
-* If [target] is not nullptr, then use it as the storage array.
+* If [target] is not null, then use it as the storage array.
 *
-* If [permAttach] is true, then [target] cannot be nullptr, as it will be used as the permanent
+* If [permAttach] is true, then [target] cannot be null, as it will be used as the permanent
 * backing storage array. If [permAttach] is false, then this base vector can attach and
 * re-attach to various different backing storage arrays.
 */

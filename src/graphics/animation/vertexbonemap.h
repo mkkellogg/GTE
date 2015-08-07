@@ -48,7 +48,7 @@ namespace GTE
 			// make this VertexMappingDexcriptor object identical to [desc].
 			void SetTo(VertexMappingDescriptor* desc)
 			{
-				ASSERT(desc != NULL, "VertexMappingDescriptor::SetTo -> 'desc' is null.");
+				ASSERT(desc != nullptr, "VertexMappingDescriptor::SetTo -> 'desc' is null.");
 
 				this->BoneCount = desc->BoneCount;
 				this->UniqueVertexIndex = desc->UniqueVertexIndex;
