@@ -11,6 +11,8 @@
 #include "filesystemIX.h"
 #include "util/engineutility.h"
 #include "global/global.h"
+#include "global/assert.h"
+#include "engine.h"
 
 namespace GTE
 {

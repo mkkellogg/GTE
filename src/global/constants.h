@@ -3,6 +3,7 @@
 
 #include <string>
 #include "global/global.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {
@@ -22,6 +23,8 @@ namespace GTE
 		static const UInt32 MaxObjectRecursionDepth = 512;
 		static const UInt32 MaxBonesPerVertex = 4;
 		static const UInt32 MaxClipPlanes = 1;
+
+		static const Real RealToDoubleRatio;
 	};
 }
 

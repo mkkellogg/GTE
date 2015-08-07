@@ -9,16 +9,18 @@
 #include "graphics/graphics.h"
 #include "graphics/graphicsGL.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "util/time.h"
 #include "debug/gtedebug.h"
+#include "engine.h"
 
 namespace GTE
 {
-	InputManagerGL * _thisPtr = NULL;
+	InputManagerGL * _thisPtr = nullptr;
 
 	void _keyboardFunc(GLFWwindow* window, Int32 key, Int32 scancode, Int32 action, Int32 mods)
 	{
-		if (_thisPtr != NULL)
+		if (_thisPtr != nullptr)
 		{
 			if (action == GLFW_PRESS || action == GLFW_REPEAT)_thisPtr->KeyboardFunction(key, scancode, mods);
 			else _thisPtr->KeyboardFunctionUp(key, scancode, mods);
@@ -40,7 +42,7 @@ namespace GTE
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		GraphicsGL * graphicsGL = dynamic_cast<GraphicsGL*>(graphics);
 
-		ASSERT(graphicsGL != NULL, "InputManagerGL::Init -> Unable to cast to GraphicsGL.");
+		ASSERT(graphicsGL != nullptr, "InputManagerGL::Init -> Unable to cast to GraphicsGL.");
 
 		GLFWwindow* window = graphicsGL->GetGLFWWindow();
 		glfwSetKeyCallback(window, _keyboardFunc);

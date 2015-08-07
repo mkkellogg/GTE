@@ -5,6 +5,7 @@
 #include "crossfadeblendop.h"
 #include <string>
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "util/time.h"
 #include <memory>

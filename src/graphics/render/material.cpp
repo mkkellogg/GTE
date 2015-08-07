@@ -20,6 +20,7 @@
 #include "graphics/light/light.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "base/basevector4.h"
 #include <string>
 

@@ -58,4 +58,23 @@ namespace GTE
 	{
 		BaseVector4::Set(r, g, b, a);
 	}
+
+
+	/*
+	* Override BaseVector4::AttachTo() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references r, g, b, & a would point to invalid locations.
+	*/
+	void Color4::AttachTo(Real * data)
+	{
+
+	}
+
+	/*
+	* Override BaseVector4::Detach() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references r, g, b, & a would point to invalid locations.
+	*/
+	void Color4::Detach()
+	{
+
+	}
 }

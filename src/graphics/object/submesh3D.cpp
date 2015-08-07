@@ -28,6 +28,7 @@
 #include "geometry/vector/vector3array.h"
 #include "gtemath/gtemath.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "util/time.h"
 #include "debug/gtedebug.h"
 #include "global/constants.h"

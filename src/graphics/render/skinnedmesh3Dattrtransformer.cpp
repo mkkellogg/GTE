@@ -18,6 +18,7 @@
 #include "geometry/vector/vector3array.h"
 #include "geometry/vector/vector3.h"
 #include "object/sceneobject.h"
+#include "global/assert.h"
 #include "util/time.h"
 
 namespace GTE

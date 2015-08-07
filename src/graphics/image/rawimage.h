@@ -11,6 +11,7 @@
 #define _GTE_RAWIMAGE_H_
 
 #include "global/global.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

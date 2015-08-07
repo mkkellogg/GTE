@@ -6,7 +6,9 @@
 
 #include "rawimage.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

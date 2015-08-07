@@ -9,6 +9,7 @@
 #include "textureGL.h"
 #include "textureattr.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 
 namespace GTE

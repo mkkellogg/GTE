@@ -39,6 +39,7 @@
 #include "util/time.h"
 #include "util/engineutility.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
@@ -52,7 +53,7 @@ const std::string LavaScene::LavaIslandObjectsLayer = "LavaIslandObjects";
  */
 LavaScene::LavaScene() : Scene()
 {
-	lavaField = NULL;
+	lavaField = nullptr;
 
 	// initialize layer masks
 	lavaWallLayerMask = 0;
@@ -186,7 +187,9 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 	//
 	//========================================================
 
-	lavaField = new LavaField(30);
+	lavaField = new(std::nothrow) LavaField(30);
+	ASSERT(lavaField != nullptr, "Could not allocate lava field!\n");
+
 	lavaField->Init();
 	lavaField->SetDisplacementSpeed(.05f);
 	lavaField->SetTextureASpeed(.010f);

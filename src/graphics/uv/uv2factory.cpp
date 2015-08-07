@@ -8,6 +8,7 @@
 #include "uv2.h"
 #include "base/basevector2.h"
 #include "global/global.h"
+#include "global/assert.h"
 
 namespace GTE
 {

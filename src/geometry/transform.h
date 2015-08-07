@@ -12,6 +12,7 @@
 
 #include "matrix4x4.h"
 #include "global/global.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

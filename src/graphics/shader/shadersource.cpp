@@ -7,6 +7,8 @@
  
 #include "shadersource.h"
 #include "global/global.h"
+#include "global/assert.h"
+#include "engine.h"
 
 namespace GTE
 {

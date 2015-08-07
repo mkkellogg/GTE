@@ -13,6 +13,7 @@
 #include "geometry/matrix4x4.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "graphics/image/rawimage.h"
 
 namespace GTE

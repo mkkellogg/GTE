@@ -50,7 +50,7 @@ namespace GTE
 		VertexAttrBufferBinding()
 		{
 			Attribute = StandardAttribute::_None;
-			Buffer = NULL;
+			Buffer = nullptr;
 			AltBinding = -1;
 		}
 

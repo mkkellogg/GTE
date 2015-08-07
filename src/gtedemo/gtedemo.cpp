@@ -15,7 +15,7 @@
  */
 class CustomEngineCallbacks : public GTE::EngineCallbacks
 {
-	Game * game = NULL;
+	Game * game = nullptr;
 
 	public:
 

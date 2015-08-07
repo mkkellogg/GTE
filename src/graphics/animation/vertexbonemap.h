@@ -16,6 +16,7 @@
 #include "object/enginetypes.h"
 #include "geometry/matrix4x4.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "global/constants.h"
 
@@ -48,7 +49,7 @@ namespace GTE
 			// make this VertexMappingDexcriptor object identical to [desc].
 			void SetTo(VertexMappingDescriptor* desc)
 			{
-				ASSERT(desc != NULL, "VertexMappingDescriptor::SetTo -> 'desc' is null.");
+				ASSERT(desc != nullptr, "VertexMappingDescriptor::SetTo -> 'desc' is null.");
 
 				this->BoneCount = desc->BoneCount;
 				this->UniqueVertexIndex = desc->UniqueVertexIndex;

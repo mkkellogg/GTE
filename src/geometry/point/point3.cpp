@@ -7,6 +7,7 @@
 #include "point3.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "geometry/vector/vector3.h"
 
 namespace GTE
@@ -154,5 +155,23 @@ namespace GTE
 	void Point3::Set(Real x, Real y, Real z)
 	{
 		BaseVector4::Set(x,y,z,1);
+	}
+
+	/*
+	* Override BaseVector4::AttachTo() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references x, y, & z would point to invalid locations.
+	*/
+	void Point3::AttachTo(Real * data)
+	{
+
+	}
+
+	/*
+	* Override BaseVector4::Detach() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references x, y, & z would point to invalid locations.
+	*/
+	void Point3::Detach()
+	{
+
 	}
 }

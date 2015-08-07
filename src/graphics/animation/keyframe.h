@@ -13,6 +13,7 @@
 #define _GTE_KEYFRAME_H_
 
 #include "global/global.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

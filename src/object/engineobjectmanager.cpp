@@ -34,6 +34,7 @@
 #include "util/engineutility.h"
 #include "filesys/filesystem.h"
 #include "global/constants.h"
+#include "global/assert.h"
 #include <string>
 
 namespace GTE
@@ -138,8 +139,8 @@ namespace GTE
 
 	SceneObjectRef EngineObjectManager::CreateSceneObject()
 	{
-		SceneObject *sceneObject = new SceneObject();
-		ASSERT(sceneObject != NULL, "EngineObjectManager::CreateSceneObject -> could not allocate new scene object.");
+		SceneObject *sceneObject = new(std::nothrow) SceneObject();
+		ASSERT(sceneObject != nullptr, "EngineObjectManager::CreateSceneObject -> could not allocate new scene object.");
 		sceneObject->SetObjectID(GetNextObjectID());
 
 		SceneObjectRef ref(sceneObject, [=](SceneObject * sceneObject)
@@ -164,7 +165,7 @@ namespace GTE
 
 	void EngineObjectManager::DeleteSceneObject(SceneObject * sceneObject)
 	{
-		ASSERT(sceneObject != NULL, "EngineObjectManager::DeleteSceneObject -> sceneObject is NULL.");
+		ASSERT(sceneObject != nullptr, "EngineObjectManager::DeleteSceneObject -> sceneObject is null.");
 		delete sceneObject;
 	}
 
@@ -175,8 +176,8 @@ namespace GTE
 
 	Mesh3DRef EngineObjectManager::CreateMesh3D(UInt32 subMeshCount)
 	{
-		Mesh3D * mesh = new Mesh3D(subMeshCount);
-		ASSERT(mesh != NULL, "EngineObjectManager::CreateMesh3D -> Could not allocate new Mesh3D object.");
+		Mesh3D * mesh = new(std::nothrow) Mesh3D(subMeshCount);
+		ASSERT(mesh != nullptr, "EngineObjectManager::CreateMesh3D -> Could not allocate new Mesh3D object.");
 		mesh->SetObjectID(GetNextObjectID());
 
 		return Mesh3DRef(mesh, [=](Mesh3D * mesh)
@@ -192,14 +193,14 @@ namespace GTE
 
 	void EngineObjectManager::DeleteMesh3D(Mesh3D * mesh)
 	{
-		ASSERT(mesh != NULL, "EngineObjectManager::DeleteMesh -> 'mesh' is null.");
+		ASSERT(mesh != nullptr, "EngineObjectManager::DeleteMesh -> 'mesh' is null.");
 		delete mesh;
 	}
 
 	Mesh3DFilterRef EngineObjectManager::CreateMesh3DFilter()
 	{
-		Mesh3DFilter * filter = new Mesh3DFilter();
-		ASSERT(filter != NULL, "EngineObjectManager::CreateMesh3DFilter -> Could not allocate new Mesh3DFilter object.");
+		Mesh3DFilter * filter = new(std::nothrow) Mesh3DFilter();
+		ASSERT(filter != nullptr, "EngineObjectManager::CreateMesh3DFilter -> Could not allocate new Mesh3DFilter object.");
 		filter->SetObjectID(GetNextObjectID());
 
 		return Mesh3DFilterRef(filter, [=](Mesh3DFilter * filter)
@@ -215,14 +216,14 @@ namespace GTE
 
 	void EngineObjectManager::DeleteMesh3DFilter(Mesh3DFilter * filter)
 	{
-		ASSERT(filter != NULL, "EngineObjectManager::DeleteMesh3DFilter -> 'filter' is NULL.");
+		ASSERT(filter != nullptr, "EngineObjectManager::DeleteMesh3DFilter -> 'filter' is null.");
 		delete filter;
 	}
 
 	Mesh3DRendererRef EngineObjectManager::CreateMesh3DRenderer()
 	{
-		Mesh3DRenderer * renderer = new Mesh3DRenderer();
-		ASSERT(renderer != NULL, "EngineObjectManager::CreateMesh3DRenderer -> Could not allocate new Mesh3DRenderer object.");
+		Mesh3DRenderer * renderer = new(std::nothrow) Mesh3DRenderer();
+		ASSERT(renderer != nullptr, "EngineObjectManager::CreateMesh3DRenderer -> Could not allocate new Mesh3DRenderer object.");
 		renderer->SetObjectID(GetNextObjectID());
 
 		return Mesh3DRendererRef(renderer, [=](Mesh3DRenderer * renderer)
@@ -238,14 +239,14 @@ namespace GTE
 
 	void EngineObjectManager::DeleteMesh3DRenderer(Mesh3DRenderer * renderer)
 	{
-		ASSERT(renderer != NULL, "EngineObjectManager::DeleteMesh3DRenderer -> 'renderer' is null.");
+		ASSERT(renderer != nullptr, "EngineObjectManager::DeleteMesh3DRenderer -> 'renderer' is null.");
 		delete renderer;
 	}
 
 	SkinnedMesh3DRendererRef EngineObjectManager::CreateSkinnedMesh3DRenderer()
 	{
-		SkinnedMesh3DRenderer * renderer = new SkinnedMesh3DRenderer();
-		ASSERT(renderer != NULL, "EngineObjectManager::CreateSkinnedMesh3DRenderer -> Could not allocate new SkinnedMesh3DRenderer object.");
+		SkinnedMesh3DRenderer * renderer = new(std::nothrow) SkinnedMesh3DRenderer();
+		ASSERT(renderer != nullptr, "EngineObjectManager::CreateSkinnedMesh3DRenderer -> Could not allocate new SkinnedMesh3DRenderer object.");
 		renderer->SetObjectID(GetNextObjectID());
 
 		return SkinnedMesh3DRendererRef(renderer, [=](SkinnedMesh3DRenderer * renderer)
@@ -261,14 +262,14 @@ namespace GTE
 
 	void EngineObjectManager::DeleteSkinnedMesh3DRenderer(SkinnedMesh3DRenderer * renderer)
 	{
-		ASSERT(renderer != NULL, "EngineObjectManager::DeleteSkinnedMesh3DRenderer -> 'renderer' is null.");
+		ASSERT(renderer != nullptr, "EngineObjectManager::DeleteSkinnedMesh3DRenderer -> 'renderer' is null.");
 		delete renderer;
 	}
 
 	SubMesh3DRef EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
 	{
-		SubMesh3D * mesh = new SubMesh3D(attributes);
-		ASSERT(mesh != NULL, "EngineObjectManager::CreateSubMesh3D -> could not allocate new SubMesh3D object.");
+		SubMesh3D * mesh = new(std::nothrow) SubMesh3D(attributes);
+		ASSERT(mesh != nullptr, "EngineObjectManager::CreateSubMesh3D -> could not allocate new SubMesh3D object.");
 		mesh->SetObjectID(GetNextObjectID());
 
 		return SubMesh3DRef(mesh, [=](SubMesh3D * mesh)
@@ -285,13 +286,13 @@ namespace GTE
 
 	void EngineObjectManager::DeleteSubMesh3D(SubMesh3D * mesh)
 	{
-		ASSERT(mesh != NULL, "EngineObjectManager::DeleteSubMesh3D -> 'mesh' is null.");
+		ASSERT(mesh != nullptr, "EngineObjectManager::DeleteSubMesh3D -> 'mesh' is null.");
 		delete mesh;
 	}
 
 	SubMesh3DRendererRef  EngineObjectManager::CreateSubMesh3DRenderer()
 	{
-		return CreateSubMesh3DRenderer(NULL);
+		return CreateSubMesh3DRenderer(nullptr);
 	}
 
 	SubMesh3DRendererRef EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
@@ -299,9 +300,9 @@ namespace GTE
 		// TODO: for now we force vertex attribute buffers to be on GPU
 		// in the constructor for SubMesh3DRenderer, need to think
 		// of a better way to do this.
-		SubMesh3DRenderer * renderer = new SubMesh3DRenderer(true, attrTransformer);
+		SubMesh3DRenderer * renderer = new(std::nothrow) SubMesh3DRenderer(true, attrTransformer);
 
-		ASSERT(renderer != NULL, "EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not allocate new SubMesh3DRenderer object.");
+		ASSERT(renderer != nullptr, "EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not allocate new SubMesh3DRenderer object.");
 		renderer->SetObjectID(GetNextObjectID());
 
 		return SubMesh3DRendererRef(renderer, [=](SubMesh3DRenderer * renderer)
@@ -318,14 +319,14 @@ namespace GTE
 
 	void EngineObjectManager::DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer)
 	{
-		ASSERT(renderer != NULL, "EngineObjectManager::DeleteSubMesh3DRenderer -> 'renderer' is null.");
+		ASSERT(renderer != nullptr, "EngineObjectManager::DeleteSubMesh3DRenderer -> 'renderer' is null.");
 		delete renderer;
 	}
 
 	SkeletonRef EngineObjectManager::CreateSkeleton(UInt32 boneCount)
 	{
-		Skeleton * skeleton = new Skeleton(boneCount);
-		ASSERT(skeleton != NULL, "EngineObjectManager::CreateSkeleton -> Could not allocate new skeleton.");
+		Skeleton * skeleton = new(std::nothrow) Skeleton(boneCount);
+		ASSERT(skeleton != nullptr, "EngineObjectManager::CreateSkeleton -> Could not allocate new skeleton.");
 
 		return SkeletonRef(skeleton, [=](Skeleton * skeleton)
 		{
@@ -338,7 +339,7 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(source.IsValid(), "EngineObjectManager::CloneSkeleton -> 'source' is invalid.", SkeletonRef::Null(), true);
 
 		Skeleton * skeleton = source->FullClone();
-		NONFATAL_ASSERT_RTRN(skeleton != NULL, "EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(skeleton != nullptr, "EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonRef::Null(), true);
 
 		return SkeletonRef(skeleton, [=](Skeleton * skeleton)
 		{
@@ -353,14 +354,14 @@ namespace GTE
 
 	void EngineObjectManager::DeleteSkeleton(Skeleton * target)
 	{
-		ASSERT(target != NULL, "EngineObjectManager::DeleteSkeleton -> 'skeleton' is null.");
+		ASSERT(target != nullptr, "EngineObjectManager::DeleteSkeleton -> 'skeleton' is null.");
 		delete target;
 	}
 
 	AnimationRef EngineObjectManager::CreateAnimation(Real duration, Real ticksPerSecond)
 	{
-		Animation * animation = new Animation(duration, ticksPerSecond);
-		ASSERT(animation != NULL, "EngineObjectManager::CreateAnimation -> Could not allocate new Animation object.");
+		Animation * animation = new(std::nothrow) Animation(duration, ticksPerSecond);
+		ASSERT(animation != nullptr, "EngineObjectManager::CreateAnimation -> Could not allocate new Animation object.");
 		animation->SetObjectID(GetNextObjectID());
 
 		return AnimationRef(animation, [=](Animation * animation)
@@ -376,7 +377,7 @@ namespace GTE
 
 	void EngineObjectManager::DeleteAnimation(Animation * animation)
 	{
-		ASSERT(animation != NULL, "EngineObjectManager::CreateAnimation -> 'animation' is null.");
+		ASSERT(animation != nullptr, "EngineObjectManager::CreateAnimation -> 'animation' is null.");
 		delete animation;
 	}
 
@@ -385,8 +386,8 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'target' is invalid.", AnimationInstanceRef::Null(), true);
 		NONFATAL_ASSERT_RTRN(animation.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'animation' is invalid.", AnimationInstanceRef::Null(), true);
 
-		AnimationInstance * instance = new AnimationInstance(target, animation);
-		ASSERT(instance != NULL, "EngineObjectManager::CreateAnimationInstance -> Could not allocate new AnimationInstance object.");
+		AnimationInstance * instance = new(std::nothrow) AnimationInstance(target, animation);
+		ASSERT(instance != nullptr, "EngineObjectManager::CreateAnimationInstance -> Could not allocate new AnimationInstance object.");
 
 		return AnimationInstanceRef(instance, [=](AnimationInstance * instance)
 		{
@@ -401,7 +402,7 @@ namespace GTE
 
 	void EngineObjectManager::DeleteAnimationInstance(AnimationInstance * instance)
 	{
-		ASSERT(instance != NULL, "EngineObjectManager::DeleteAnimationInstance -> 'instance' is null.");
+		ASSERT(instance != nullptr, "EngineObjectManager::DeleteAnimationInstance -> 'instance' is null.");
 		delete instance;
 	}
 
@@ -409,8 +410,8 @@ namespace GTE
 	{
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "EngineObjectManager::CreateAnimationPlayer -> 'target' is invalid.", AnimationPlayerRef::Null(), true);
 
-		AnimationPlayer * player = new AnimationPlayer(target);
-		ASSERT(player != NULL, "EngineObjectManager::CreateAnimationPlayer -> Could not allocate new AnimationPlayer object.");
+		AnimationPlayer * player = new(std::nothrow) AnimationPlayer(target);
+		ASSERT(player != nullptr, "EngineObjectManager::CreateAnimationPlayer -> Could not allocate new AnimationPlayer object.");
 
 		return AnimationPlayerRef(player, [=](AnimationPlayer * player)
 		{
@@ -425,17 +426,17 @@ namespace GTE
 
 	void EngineObjectManager::DeleteAnimationPlayer(AnimationPlayer * player)
 	{
-		ASSERT(player != NULL, "EngineObjectManager::DeleteAnimationPlayer -> 'player' is null.");
+		ASSERT(player != nullptr, "EngineObjectManager::DeleteAnimationPlayer -> 'player' is null.");
 		delete player;
 	}
 
 	ShaderRef EngineObjectManager::CreateShader(const ShaderSource& shaderSource)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::CreateShader -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateShader -> Graphics system is null.");
 
 		Shader * shader = graphics->CreateShader(shaderSource);
-		NONFATAL_ASSERT_RTRN(shader != NULL, "EngineObjectManager::CreateShader -> Could not create new Shader object.", ShaderRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(shader != nullptr, "EngineObjectManager::CreateShader -> Could not create new Shader object.", ShaderRef::Null(), false);
 		shader->SetObjectID(GetNextObjectID());
 
 		return ShaderRef(shader, [=](Shader * shader)
@@ -452,9 +453,9 @@ namespace GTE
 	void EngineObjectManager::DeleteShader(Shader * shader)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::DeleteShader -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::DeleteShader -> Graphics system is null.");
 
-		ASSERT(shader != NULL, "EngineObjectManager::DeleteShader -> 'shader' is null.");
+		ASSERT(shader != nullptr, "EngineObjectManager::DeleteShader -> 'shader' is null.");
 		graphics->DestroyShader(shader);
 	}
 
@@ -463,7 +464,7 @@ namespace GTE
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		Texture * texture = graphics->CreateTexture(sourcePath, attributes);
 
-		if (texture == NULL)
+		if (texture == nullptr)
 		{
 			Debug::PrintError("EngineObjectManager::CreateTexture -> could not create new Texture object.");
 			return TextureRef::Null();
@@ -480,10 +481,10 @@ namespace GTE
 	TextureRef EngineObjectManager::CreateTexture(RawImage * imageData, TextureAttributes attributes)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::CreateTexture -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateTexture(imageData, attributes);
-		NONFATAL_ASSERT_RTRN(texture != NULL, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureRef::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
 		return TextureRef(texture, [=](Texture * texture)
@@ -495,10 +496,10 @@ namespace GTE
 	TextureRef EngineObjectManager::CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, TextureAttributes attributes)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::CreateTexture -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateTexture(width, height, pixelData, attributes);
-		NONFATAL_ASSERT_RTRN(texture != NULL, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureRef::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
 		return TextureRef(texture, [=](Texture * texture)
@@ -515,7 +516,7 @@ namespace GTE
 		Byte * rightData, UInt32 rw, UInt32 rh)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateCubeTexture(frontData, fw, fh,
 			backData, backw, backh,
@@ -524,7 +525,7 @@ namespace GTE
 			leftData, lw, lh,
 			rightData, rw, rh);
 
-		NONFATAL_ASSERT_RTRN(texture != NULL, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureRef::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
 		return TextureRef(texture, [=](Texture * texture)
@@ -537,10 +538,10 @@ namespace GTE
 		const std::string& bottom, const std::string& left, const std::string& right)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateCubeTexture(front, back, top, bottom, left, right);
-		NONFATAL_ASSERT_RTRN(texture != NULL, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureRef::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
 		return TextureRef(texture, [=](Texture * texture)
@@ -553,10 +554,10 @@ namespace GTE
 		RawImage * bottomData, RawImage * leftData, RawImage * rightData)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateCubeTexture(frontData, backData, topData, bottomData, leftData, rightData);
-		NONFATAL_ASSERT_RTRN(texture != NULL, "EngineObjectManager::CreateCubeTexture -> Could create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could create new Texture object.", TextureRef::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
 		return TextureRef(texture, [=](Texture * texture)
@@ -572,10 +573,10 @@ namespace GTE
 
 	void EngineObjectManager::DeleteTexture(Texture * texture)
 	{
-		ASSERT(texture != NULL, "EngineObjectManager::DeleteTexture -> 'texture' is null.");
+		ASSERT(texture != nullptr, "EngineObjectManager::DeleteTexture -> 'texture' is null.");
 
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::DeleteTexture -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::DeleteTexture -> Graphics system is null.");
 
 		graphics->DestroyTexture(texture);
 	}
@@ -584,10 +585,10 @@ namespace GTE
 		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::CreateRenderTarget -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateRenderTarget -> Graphics system is null.");
 
 		RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
-		NONFATAL_ASSERT_RTRN(target != NULL, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(target != nullptr, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null(), false);
 
 		Bool success = target->Init();
 		NONFATAL_ASSERT_RTRN(success == true, "EngineObjectManager::CreateRenderBuffer -> Could not initialize RenderTarget object.", RenderTargetRef::Null(), false);
@@ -600,7 +601,7 @@ namespace GTE
 
 	RenderTargetRef EngineObjectManager::WrapRenderTarget(RenderTarget * target)
 	{
-		ASSERT(target != NULL, "EngineObjectManager::WrapRenderTarget -> 'target' is null.");
+		ASSERT(target != nullptr, "EngineObjectManager::WrapRenderTarget -> 'target' is null.");
 
 		return RenderTargetRef(target, [=](RenderTarget * target)
 		{
@@ -615,18 +616,18 @@ namespace GTE
 
 	void EngineObjectManager::DeleteRenderTarget(RenderTarget * target)
 	{
-		ASSERT(target != NULL, "EngineObjectManager::DeleteRenderBuffer -> 'target' is null.");
+		ASSERT(target != nullptr, "EngineObjectManager::DeleteRenderBuffer -> 'target' is null.");
 
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != NULL, "EngineObjectManager::DeleteRenderTarget -> Graphics system is null.");
+		ASSERT(graphics != nullptr, "EngineObjectManager::DeleteRenderTarget -> Graphics system is null.");
 
 		graphics->DestroyRenderTarget(target);
 	}
 
 	MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, ShaderRef shader)
 	{
-		Material * m = new Material(name);
-		ASSERT(m != NULL, "EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> Unable to allocate material.");
+		Material * m = new(std::nothrow) Material(name);
+		ASSERT(m != nullptr, "EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> Unable to allocate material.");
 
 		Bool initSuccess = m->Init(shader);
 		if (!initSuccess)
@@ -648,7 +649,7 @@ namespace GTE
 		ShaderRef shader = CreateShader(shaderSource);
 		if (!shader.IsValid())return MaterialRef::Null();
 
-		Material * m = new Material(name);
+		Material * m = new(std::nothrow) Material(name);
 		Bool initSuccess = m->Init(shader);
 
 		if (!initSuccess)
@@ -672,7 +673,7 @@ namespace GTE
 
 	void EngineObjectManager::DeleteMaterial(Material * material)
 	{
-		ASSERT(material != NULL, "EngineObjectManager::DeleteMaterial -> 'material' is null.");
+		ASSERT(material != nullptr, "EngineObjectManager::DeleteMaterial -> 'material' is null.");
 		ShaderRef shader = material->GetShader();
 
 		ASSERT(shader.IsValid(), "EngineObjectManager::DeleteMaterial -> 'shader' is null.");
@@ -683,8 +684,8 @@ namespace GTE
 
 	CameraRef EngineObjectManager::CreateCamera()
 	{
-		Camera * camera = new Camera();
-		ASSERT(camera != NULL, "EngineObjectManager::CreateCamera -> Could not allocate new Camera object.");
+		Camera * camera = new(std::nothrow) Camera();
+		ASSERT(camera != nullptr, "EngineObjectManager::CreateCamera -> Could not allocate new Camera object.");
 		camera->SetObjectID(GetNextObjectID());
 
 		LayerManager& layerManager = GetLayerManager();
@@ -704,14 +705,14 @@ namespace GTE
 
 	void EngineObjectManager::DeleteCamera(Camera * camera)
 	{
-		ASSERT(camera != NULL, "EngineObjectManager::DeleteCamera -> 'camera' is null.");
+		ASSERT(camera != nullptr, "EngineObjectManager::DeleteCamera -> 'camera' is null.");
 		delete camera;
 	}
 
 	LightRef EngineObjectManager::CreateLight()
 	{
-		Light * light = new Light();
-		ASSERT(light != NULL, "EngineObjectManager::CreateLight -> Could not create new Light object.");
+		Light * light = new(std::nothrow) Light();
+		ASSERT(light != nullptr, "EngineObjectManager::CreateLight -> Could not create new Light object.");
 
 		light->SetObjectID(GetNextObjectID());
 		light->SetCullingMask(layerManager.GetLayerMask(DefaultLayer));
@@ -729,7 +730,7 @@ namespace GTE
 
 	void EngineObjectManager::DeleteLight(Light * light)
 	{
-		ASSERT(light != NULL, "EngineObjectManager::DeleteLight -> 'light' is null.");
+		ASSERT(light != nullptr, "EngineObjectManager::DeleteLight -> 'light' is null.");
 		delete light;
 	}
 }

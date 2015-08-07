@@ -6,6 +6,7 @@
 
 #include "inputmanager.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "util/time.h"
 #include "debug/gtedebug.h"
 

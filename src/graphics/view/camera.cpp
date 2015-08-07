@@ -17,6 +17,7 @@
 #include "graphics/object/submesh3D.h"
 #include "base/intmask.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "geometry/transform.h"
 #include "geometry/matrix4x4.h"

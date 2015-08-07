@@ -29,6 +29,7 @@
 #include "point/point3.h"
 #include "vector/vector3.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 

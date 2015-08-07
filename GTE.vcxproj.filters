@@ -671,5 +671,8 @@
     <ClInclude Include="src\filesys\filesystemWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\global\assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

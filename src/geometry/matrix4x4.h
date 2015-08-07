@@ -26,6 +26,7 @@
 #define _MATRIX_H_
 
 #include "global/global.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

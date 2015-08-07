@@ -20,6 +20,7 @@
 #include "graphics/color/color4.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "uniformdesc.h"
 #include "attributedesc.h"
 #include <string>
@@ -542,7 +543,11 @@ namespace GTE
 	 */
 	void ShaderGL::SendUniformToShader(Int32 varID, const Matrix4x4 * mat)
 	{
+#ifdef _GTE_Real_DoublePrecision
+		glUniformMatrix4dv(varID, 1, GL_FALSE, mat->GetDataPtr());
+#else
 		glUniformMatrix4fv(varID, 1, GL_FALSE, mat->GetDataPtr());
+#endif
 	}
 
 	/*
@@ -586,7 +591,12 @@ namespace GTE
 	 */
 	void ShaderGL::SendUniformToShader4v(Int32 varID, const Real * data)
 	{
+
+#ifdef _GTE_Real_DoublePrecision
+		glUniform4dv(varID, 1, data);
+#else
 		glUniform4fv(varID, 1, data);
+#endif
 	}
 
 	/*
@@ -597,7 +607,11 @@ namespace GTE
 	 */
 	void ShaderGL::SendUniformToShader3v(Int32 varID, const Real * data)
 	{
+#ifdef _GTE_Real_DoublePrecision
+		glUniform3dv(varID, 1, data);
+#else
 		glUniform3fv(varID, 1, data);
+#endif
 	}
 
 	/*
@@ -608,7 +622,11 @@ namespace GTE
 	 */
 	void ShaderGL::SendUniformToShader2v(Int32 varID, const Real * data)
 	{
+#ifdef _GTE_Real_DoublePrecision
+		glUniform2dv(varID, 1, data);
+#else
 		glUniform2fv(varID, 1, data);
+#endif
 	}
 
 	/*

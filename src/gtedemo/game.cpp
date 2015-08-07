@@ -43,6 +43,7 @@
 #include "util/time.h"
 #include "util/engineutility.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
@@ -152,24 +153,27 @@ void Game::SetupScenes(GTE::AssetImporter& importer)
  */
 void Game::SetupScene(GTE::AssetImporter& importer, Scenes scene)
 {
-	LavaScene * lavaScene = NULL;
-	CastleScene * castleScene = NULL;
-	PoolScene * poolScene = NULL;
+	LavaScene * lavaScene = nullptr;
+	CastleScene * castleScene = nullptr;
+	PoolScene * poolScene = nullptr;
 
 	switch(scene)
 	{
 		case Scenes::LavaScene:
-			lavaScene = new LavaScene();
+			lavaScene = new(std::nothrow) LavaScene();
+			ASSERT(lavaScene != nullptr, "Game::SetupScene -> Unable to allocate Lava scene.");
 			scenes[(GTE::UInt32)Scenes::LavaScene] = lavaScene;
 			lavaScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 		case Scenes::CastleScene:
-			castleScene = new CastleScene();
+			castleScene = new(std::nothrow) CastleScene();
+			ASSERT(castleScene != nullptr, "Game::SetupScene -> Unable to allocate Castle scene.");
 			scenes[(GTE::UInt32)Scenes::CastleScene] = castleScene;
 			castleScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 		case Scenes::PoolScene:
-			poolScene = new PoolScene();
+			poolScene = new(std::nothrow) PoolScene();
+			ASSERT(poolScene != nullptr, "Game::SetupScene -> Unable to allocate Pool scene.");
 			poolScene->SetMainCamera(cameraObject->GetCamera());
 			scenes[(GTE::UInt32)Scenes::PoolScene] = poolScene;
 			poolScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);

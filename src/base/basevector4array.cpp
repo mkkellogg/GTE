@@ -8,6 +8,7 @@
 #include "basevector4.h"
 #include "basevector4factory.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 
 namespace GTE

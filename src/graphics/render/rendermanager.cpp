@@ -34,6 +34,7 @@
 #include "util/time.h"
 #include "util/engineutility.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "debug/gtedebug.h"
 

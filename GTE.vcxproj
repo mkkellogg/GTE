@@ -279,6 +279,7 @@
     <ClInclude Include="src\geometry\vector\vector3.h" />
     <ClInclude Include="src\geometry\vector\vector3array.h" />
     <ClInclude Include="src\geometry\vector\vector3factory.h" />
+    <ClInclude Include="src\global\assert.h" />
     <ClInclude Include="src\global\constants.h" />
     <ClInclude Include="src\global\global.h" />
     <ClInclude Include="src\graphics\animation\animation.h" />

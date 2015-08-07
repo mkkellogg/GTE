@@ -38,6 +38,7 @@
 #include "util/time.h"
 #include "util/engineutility.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"

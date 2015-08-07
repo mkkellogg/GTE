@@ -8,6 +8,7 @@
 #include "graphics/animation/animation.h"
 #include "graphics/animation/skeleton.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 #include <string>
 

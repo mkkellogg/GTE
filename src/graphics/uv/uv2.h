@@ -24,6 +24,9 @@ namespace GTE
 
 		UV2 & operator= (const UV2 & source);
 		BaseVector2& operator= (const BaseVector2& source);
+
+		virtual void AttachTo(Real * data);
+		virtual void Detach();
 	};
 }
 

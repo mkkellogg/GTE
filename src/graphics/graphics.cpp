@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "graphics.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "graphicsGL.h"
 #include "shader/shader.h"
 #include "render/material.h"

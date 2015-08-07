@@ -8,8 +8,11 @@
 #include "textureattr.h"
 #include "graphics/image/rawimage.h"
 #include "graphics/image/imageloader.h"
+#include "object/enginetypes.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
+#include "engine.h"
 #include <string>
 
 namespace GTE

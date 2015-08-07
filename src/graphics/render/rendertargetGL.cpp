@@ -4,10 +4,12 @@
 #include "object/engineobjectmanager.h"
 #include "base/intmask.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "graphics/graphics.h"
 #include "graphics/texture/texture.h"
 #include "graphics/texture/textureGL.h"
+#include "engine.h"
 
 namespace GTE
 {

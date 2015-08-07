@@ -8,6 +8,7 @@
 #include "vector3.h"
 #include "base/basevector4.h"
 #include "global/global.h"
+#include "global/assert.h"
 
 namespace GTE
 {
@@ -42,7 +43,7 @@ namespace GTE
 	{
 		if (instance == nullptr)
 		{
-			instance = new(std::nothrow)  Vector3Factory();
+			instance = new(std::nothrow) Vector3Factory();
 		}
 
 		return instance;

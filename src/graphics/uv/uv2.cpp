@@ -53,6 +53,26 @@ namespace GTE
 		BaseVector2::operator=(source);
 		return *this;
 	}
+
+
+
+	/*
+	* Override BaseVector2::AttachTo() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references u & v would point to invalid locations.
+	*/
+	void UV2::AttachTo(Real * data)
+	{
+
+	}
+
+	/*
+	* Override BaseVector2::Detach() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references u & v would point to invalid locations.
+	*/
+	void UV2::Detach()
+	{
+
+	}
 }
 
 

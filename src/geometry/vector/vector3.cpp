@@ -8,6 +8,7 @@
 #include "gtemath/gtemath.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 
@@ -89,7 +90,7 @@ namespace GTE
 	 */
 	Bool Vector3::AreStrictlyEqual(const Vector3* a, const Vector3* b)
 	{
-		NONFATAL_ASSERT_RTRN(a != NULL && b != NULL, "Vector3::AreStrictlyEqual -> Null vector passed.", false, true);
+		NONFATAL_ASSERT_RTRN(a != nullptr && b != nullptr, "Vector3::AreStrictlyEqual -> Null vector passed.", false, true);
 
 		return a->x == b->x && a->y == b->y && a->z == b->z;
 	}
@@ -314,7 +315,7 @@ namespace GTE
 		if (newVector.Magnitude() < .001)
 		{
 			// are these vectors really close? if so, just set [result] to [to]
-			if (dot > .99999)
+			if (dot > .99999f)
 			{
 				result = toCopy;
 				return true;
@@ -357,6 +358,23 @@ namespace GTE
 		return (sqlen < (epsilon * epsilon));
 	}
 
+	/*
+	* Override BaseVector4::AttachTo() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references x, y, & z would point to invalid locations.
+	*/
+	void Vector3::AttachTo(Real * data)
+	{
+
+	}
+
+	/*
+	* Override BaseVector4::Detach() and force it to DO NOTHING. If we allowed the backing storage
+	* to change then the references x, y, & z would point to invalid locations.
+	*/
+	void Vector3::Detach()
+	{
+
+	}
 
 	/*
 	public static void avgVectors(Vector3 a, Vector3 b, Vector3 avg)

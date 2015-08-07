@@ -9,6 +9,7 @@
 #include "graphics/shader/shadersource.h"
 #include "filesys/filesystem.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 
 namespace GTE

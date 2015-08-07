@@ -6,6 +6,9 @@
 
 namespace GTE
 {
+
+//#define _GTE_Real_DoublePrecision
+
 #ifdef _WIN32
 
 	typedef bool Bool;
@@ -15,7 +18,12 @@ namespace GTE
 	typedef char Char;
 
 	typedef double RealDouble;
+
+#ifdef _GTE_Real_DoublePrecision
+	typedef double Real;
+#else
 	typedef float Real;
+#endif
 
 	typedef __int8 Int8;
 	typedef unsigned __int8 UInt8;
@@ -38,7 +46,12 @@ namespace GTE
 	typedef char Char;
 
 	typedef double RealDouble;
+
+#ifdef _GTE_Real_DoublePrecision
+	typedef double Real;
+#else
 	typedef float Real;
+#endif
 
 	typedef char Int8;
 	typedef unsigned char UInt8;
@@ -85,7 +98,7 @@ namespace GTE
 
 	public:
 
-		EngineObjectRef() : std::shared_ptr<T>(NULL) {}
+		EngineObjectRef() : std::shared_ptr<T>(nullptr) {}
 		EngineObjectRef(const EngineObjectRef<T>& ref) : std::shared_ptr<T>(ref){}
 		EngineObjectRef(const std::shared_ptr<T>& ref) : std::shared_ptr<T>(ref){}
 		EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : std::shared_ptr<T>(ptr, deleter){}

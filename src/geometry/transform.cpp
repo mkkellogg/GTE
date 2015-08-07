@@ -5,10 +5,12 @@
 #include "matrix4x4.h"
 #include "debug/gtedebug.h"
 #include "global/constants.h"
+#include "global/assert.h"
 #include "global/global.h"
 #include "vector/vector3.h"
 #include "point/point3.h"
 #include "util/datastack.h"
+#include "object/enginetypes.h"
 
 namespace GTE
 {

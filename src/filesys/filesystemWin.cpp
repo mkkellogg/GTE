@@ -11,6 +11,7 @@
 #include "filesystemWin.h"
 #include "util/engineutility.h"
 #include "global/global.h"
+#include "global/assert.h"
 
 namespace GTE
 {
@@ -52,7 +53,7 @@ namespace GTE
 	{
 		const UInt32 size = (UInt32)path.size() + 1;
 		Char *chars = new Char[size];
-		ASSERT(chars != NULL, " FileSystemIX::FixupPath -> Could not allocate path array.");
+		ASSERT(chars != nullptr, " FileSystemIX::FixupPath -> Could not allocate path array.");
 
 		strcpy(chars, path.c_str());
 

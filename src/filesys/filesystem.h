@@ -12,6 +12,7 @@
 #define _GTE_FILE_SYSTEM_H_
 
 #include "global/global.h"
+#include "object/enginetypes.h"
 #include <string>
 
 namespace GTE

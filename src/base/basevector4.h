@@ -11,69 +11,74 @@
 #define _GTE_BASEVECTOR4_H_
 
 #include "object/enginetypes.h"
+#include "global/constants.h"
 #include "global/global.h"
 
-#define BaseVector4_QuickCopy(source, dest)        \
-{                                          		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;						   		   		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;							   		   	   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;							   		   	   \
-  *(dest) = *(source);                      	   \
-  (source)-=3;					       		   	   \
-  (dest)-=3;							   		   \
+#ifdef _GTE_Real_DoublePrecision
+#define BaseVector4_QuickCopy(source, dest)									\
+{																			\
+	*(dest) = *(source);(source)++;(dest)++;   	   							\
+	*(dest) = *(source);(source)++;(dest)++;								\
+	*(dest) = *(source);(source)++;(dest)++;	   							\
+	*(dest) = *(source);(source)-=3;(dest)-=3;	   							\
 }
+#else
+#define BaseVector4_QuickCopy(source, dest)														\
+{																								\
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) -= 2;	\
+}
+#endif
 
-#define BaseVector4_QuickCopy_IncDest(source, dest)\
-{                                          		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;						   		   		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;							   		   	   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;							   		   	   \
-  *(dest) = *(source);                      	   \
-  (source)-=3;					       		   	   \
-  (dest)++;							   		   	   \
+#ifdef _GTE_Real_DoublePrecision
+#define BaseVector4_QuickCopy_IncDest(source, dest)							\
+{																			\
+	*(dest) = *(source);(source)++;(dest)++;   	   							\
+	*(dest) = *(source);(source)++;(dest)++;								\
+	*(dest) = *(source);(source)++;(dest)++;	   							\
+	*(dest) = *(source);(source)-=3;(dest)++;								\
 }
+#else
+#define BaseVector4_QuickCopy_IncDest(source, dest)												\
+{																								\
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) += 2;	\
+}
+#endif
 
-#define BaseVector4_QuickCopy_ZeroW(source, dest)  \
-{                                          		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;						   		   		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;							   		   	   \
-  *(dest) = *(source);                      	   \
-  (source)-=2;					       		   	   \
-  (dest)++;					   		   		       \
-  *(dest) = 0;                      	   		   \
-  (dest)-=3;						   		   	   \
+#ifdef _GTE_Real_DoublePrecision
+#define BaseVector4_QuickCopy_ZeroW(source, dest)							\
+{																			\
+	*(dest) = *(source);(source)++;(dest)++;   	   							\
+	*(dest) = *(source);(source)++;(dest)++;								\
+	*(dest) = *(source);(source)++;(dest)++;	   							\
+	*(dest) = 0;(source)-=3;(dest)-=3;			 							\
 }
+#else
+#define BaseVector4_QuickCopy_ZeroW(source, dest)												\
+{																								\
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) ++;   \
+	  *((GTE::Real *)(dest)) = 0;(dest) -=3;													\
+}
+#endif
 
-#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)\
-{                                          		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;						   		   		   \
-  *(dest) = *(source);                      	   \
-  (source)++;					       		   	   \
-  (dest)++;							   		   	   \
-  *(dest) = *(source);                      	   \
-  (source)-=2;					       		   	   \
-  (dest)++;					   		   		       \
-  *(dest) = 0;                      	   		   \
-  (dest)++;					   		   		       \
+#ifdef _GTE_Real_DoublePrecision
+#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)					\
+{																			\
+	*(dest) = *(source);(source)++;(dest)++;   	   							\
+	*(dest) = *(source);(source)++;(dest)++;								\
+	*(dest) = *(source);(source)++;(dest)++;	   							\
+	*(dest) = 0;(source)-=3;(dest)++;			 							\
 }
+#else
+#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)										\
+{																								\
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) ++;	\
+	  *((GTE::Real *)(dest)) = 0;(dest) ++;														\
+}
+#endif
 
 namespace GTE
 {
@@ -106,8 +111,8 @@ namespace GTE
 		void SetTo(const BaseVector4& baseVector);
 		void Get(BaseVector4& baseVector) const;
 
-		void AttachTo(Real * data);
-		void Detach();
+		virtual void AttachTo(Real * data);
+		virtual void Detach();
 	};
 }
 

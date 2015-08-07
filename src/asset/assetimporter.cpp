@@ -10,6 +10,7 @@
 #include "object/enginetypes.h"
 #include "modelimporter.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 
 namespace GTE
@@ -19,7 +20,7 @@ namespace GTE
 		// TODO: Make this choose the correct implementation based on platform.
 		// For now we go with OpenGL by default
 		shaderSourceLoader = new(std::nothrow) ShaderSourceLoaderGL();
-		ASSERT(shaderSourceLoader != nullptr, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is NULL.");
+		ASSERT(shaderSourceLoader != nullptr, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is null.");
 
 		for (UInt32 i = 0; i < (UInt32)AssetImporterBoolProperty::_Count; i++)
 		{

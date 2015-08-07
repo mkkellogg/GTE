@@ -20,6 +20,7 @@
 #include "graphics/animation/crossfadeblendop.h"
 #include "graphics/animation/blendop.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "debug/gtedebug.h"
 #include "util/time.h"

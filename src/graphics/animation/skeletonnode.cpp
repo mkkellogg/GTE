@@ -9,6 +9,7 @@
 #include "bone.h"
 #include "util/tree.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 
 namespace GTE

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "keyframe.h"
+#include "object/enginetypes.h"
 #include <string>
 
 namespace GTE

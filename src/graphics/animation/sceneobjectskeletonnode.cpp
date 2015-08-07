@@ -5,6 +5,7 @@
 #include "object/sceneobject.h"
 #include "sceneobjectskeletonnode.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 #include <string>
 

@@ -8,6 +8,7 @@
 #include "graphics/gl_include.h"
 #include "vertexattrbufferGL.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 
 namespace GTE

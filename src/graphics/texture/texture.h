@@ -13,6 +13,7 @@
 #include "textureattr.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
+#include <vector>
 #include <string>
 
 namespace GTE

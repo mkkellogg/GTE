@@ -9,6 +9,7 @@
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/submesh3D.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 
 namespace GTE

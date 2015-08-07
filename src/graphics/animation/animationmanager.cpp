@@ -16,6 +16,7 @@
 #include "graphics/animation/skeleton.h"
 #include "graphics/animation/bone.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "global/constants.h"
 #include "util/time.h"
 #include "debug/gtedebug.h"

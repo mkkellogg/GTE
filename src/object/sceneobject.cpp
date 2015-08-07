@@ -22,6 +22,7 @@
 #include "graphics/render/rendermanager.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
 

@@ -59,12 +59,14 @@
 #include "base/longmask.h"
 #include "util/time.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "error/errormanager.h"
 #include "util/engineutility.h"
 
 namespace GTE
 {
+
 /**
  * Default constructor.
  */

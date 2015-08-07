@@ -11,6 +11,7 @@
 #define _GTE_FILE_SYSTEM_WIN_H_
 
 #include "filesystem.h"
+#include "object/enginetypes.h"
 #include <string>
 
 namespace GTE

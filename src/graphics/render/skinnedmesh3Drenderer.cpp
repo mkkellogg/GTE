@@ -17,6 +17,7 @@
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/skinnedmesh3Dattrtransformer.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
 
 namespace GTE

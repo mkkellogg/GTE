@@ -9,6 +9,7 @@
 #include "debug/gtedebug.h"
 #include "global/constants.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "vector/vector3.h"
 #include "point/point3.h"
 #include "util/datastack.h"
@@ -20,7 +21,7 @@ namespace GTE
 */
 	SceneObjectTransform::SceneObjectTransform() : Transform()
 	{
-		sceneObject = NULL;
+		sceneObject = nullptr;
 	}
 
 	/*

@@ -33,6 +33,7 @@
 #include "object/engineobjectmanager.h"
 #include "geometry/transform.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "util/time.h"
 
 namespace GTE

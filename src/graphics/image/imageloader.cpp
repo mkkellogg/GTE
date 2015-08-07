@@ -7,7 +7,9 @@
 #include "imageloader.h"
 #include "rawimage.h"
 #include "global/global.h"
+#include "global/assert.h"
 #include "debug/gtedebug.h"
+#include "engine.h"
 #include <IL/il.h>
 
 namespace GTE

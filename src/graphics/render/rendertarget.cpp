@@ -2,6 +2,7 @@
 #include "rendertarget.h"
 #include "base/intmask.h"
 #include "global/global.h"
+#include "global/assert.h"
 
 namespace GTE
 {

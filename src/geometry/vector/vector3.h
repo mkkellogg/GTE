@@ -65,6 +65,9 @@ namespace GTE
 		static Real AngleBetween(const Vector3 * a, const Vector3 * b, const Vector3 * refRightNormal);
 
 		Bool IsZeroLength() const;
+
+		virtual void AttachTo(Real * data);
+		virtual void Detach();
 	};
 }
 
