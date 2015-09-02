@@ -38,6 +38,8 @@ namespace GTE
 
 		ssaoMode = SSAORenderMode::Standard;
 		ssaoEnabled = false;
+		ambientPassEnabled = true;
+		depthPassEnabled = true;
 
 		renderOrderIndex = 0;
 
@@ -162,6 +164,26 @@ namespace GTE
 	SSAORenderMode Camera::GetSSAORenderMode()
 	{
 		return ssaoMode;
+	}
+
+	void Camera::SetAmbientPassEnabled(Bool enabled)
+	{
+		ambientPassEnabled = enabled;
+	}
+
+	Bool Camera::IsAmbientPassEnabled()
+	{
+		return ambientPassEnabled;
+	}
+
+	void Camera::SetDepthPassEnabled(Bool enabled)
+	{
+		depthPassEnabled = enabled;
+	}
+
+	Bool Camera::IsDepthPassEnabled()
+	{
+		return depthPassEnabled;
 	}
 
 	void Camera::SetRenderOrderIndex(UInt32 index)

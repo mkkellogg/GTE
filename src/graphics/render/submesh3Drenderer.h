@@ -81,8 +81,8 @@ namespace GTE
 		// are the vertex attributes stored in GPU-based buffers?
 		Bool buffersOnGPU;
 
-		// last time this renderer was updated from its target sub-mesh
-		Real timeStamp;
+		// number of times this renderer has been updated from its mesh
+		UInt32 updateCount;
 
 		// doAttributeTransform == true means this sub-renderer's attribute transformer should be used to
 		// transform vertex attributes prior to rendering
@@ -143,11 +143,11 @@ namespace GTE
 
 		Bool ShouldUpdateFromMesh();
 		void CopyMeshData();
-		void UpdateTimeStamp();
+		void UpdateUpdateCount();
 
 	public:
 
-		Real GetTimeStamp() const;
+		UInt32 GetUpdateCount() const;
 
 		void SetUseBadGeometryShadowFix(Bool useFix);
 

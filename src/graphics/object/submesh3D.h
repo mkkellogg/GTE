@@ -84,7 +84,7 @@ namespace GTE
 		Mesh3D * containerMesh;
 
 		// last time this mesh was modified
-		Real timeStamp;
+		UInt32 updateCount;
 
 		// maps vertices to other equal vertices
 		std::vector<UInt32>** vertexCrossMap;
@@ -119,12 +119,9 @@ namespace GTE
 		void ReverseAttributeComponentOrder();
 		void InvertNormals();
 		void InvertTangents();
-		void UpdateTimeStamp();
+		void UpdateUpdateCount();
 
 	public:
-
-		void SetDirty(Bool isDirty);
-		Bool IsDirty() const;
 
 		void SetCalculateNormals(Bool calculate);
 		void SetCalculateTangents(Bool calculate);
@@ -144,7 +141,7 @@ namespace GTE
 		Bool Init(UInt32 totalVertexCount);
 		UInt32 GetTotalVertexCount() const;
 		StandardAttributeSet GetAttributeSet() const;
-		Real GetTimeStamp() const;
+		UInt32 GetUpdateCount() const;
 
 		Point3Array * GetPostions();
 		Vector3Array * GetVertexNormals();

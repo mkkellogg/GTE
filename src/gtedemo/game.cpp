@@ -599,6 +599,10 @@ void Game::InitializePlayerPosition()
 
 	playerObject->GetTransform().GetLocalComponents(currentTranslation, currentRotation, currentScale);
 	playerBaseY = currentTranslation.y;
+
+	currentTranslation.x = -5;
+	currentTranslation.z = 15;
+	playerObject->GetTransform().SetLocalComponents(currentTranslation, currentRotation, currentScale);
 }
 
 /*

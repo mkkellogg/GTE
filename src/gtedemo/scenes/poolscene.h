@@ -35,8 +35,6 @@ class PoolScene : public Scene
 	GTE::MaterialRef waterMaterial;
 	// height maps for water surface
 	GTE::RenderTargetRef waterHeights[2];
-	// normal maps for water surface
-	GTE::RenderTargetRef waterNormals;
 	// material for rendering the height maps
 	GTE::MaterialRef waterHeightsMaterial;
 	// material for rendering the normal map
@@ -52,11 +50,11 @@ class PoolScene : public Scene
 	GTE::UInt32 currentHeightMapIndex;
 
 	// water mesh resolution
-	const GTE::UInt32 waterMeshResolution = 128;
+	const GTE::UInt32 waterMeshResolution = 256;
 	// water height map resolution
-	const GTE::UInt32 waterHeightMapResolution = 128;
-	// water normal map resolution
-	const GTE::UInt32 waterNomralMapResolution = 256;
+	const GTE::UInt32 waterHeightMapResolution = 256;
+
+	const GTE::Real simFrameTime = 1.0f / 60.0f;
 
 	void UpdateCameras();
 	void UpdateRippleSimulation();

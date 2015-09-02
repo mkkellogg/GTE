@@ -199,7 +199,6 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	tower2Mesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
 	tower2Mesh->GetSubMesh(0)->SetCalculateNormals(true);
 	tower2Mesh->GetSubMesh(0)->SetCalculateTangents(true);
-	tower2Mesh->GetSubMesh(0)->SetDirty(true);
 	tower2Mesh->Update();
 	towerRenderer->SetMaterial(0, castleNormalMaterial);
 
@@ -251,7 +250,6 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	archwayMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
 	archwayMesh->GetSubMesh(0)->SetCalculateNormals(true);
 	archwayMesh->GetSubMesh(0)->SetCalculateTangents(true);
-	archwayMesh->GetSubMesh(0)->SetDirty(true);
 	archwayMesh->Update();
 	archwayRenderer->SetMaterial(0, castleNormalMaterial);
 	modelSceneObject->SetActive(false);
@@ -277,7 +275,6 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	archwayMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
 	archwayMesh->GetSubMesh(0)->SetCalculateNormals(true);
 	archwayMesh->GetSubMesh(0)->SetCalculateTangents(true);
-	archwayMesh->GetSubMesh(0)->SetDirty(true);
 	archwayMesh->Update();
 	archwayRenderer->SetMaterial(0, castleNormalMaterial);
 	modelSceneObject->SetActive(false);
@@ -305,7 +302,6 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	wallBlockMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
 	wallBlockMesh->GetSubMesh(0)->SetCalculateNormals(true);
 	wallBlockMesh->GetSubMesh(0)->SetCalculateTangents(true);
-	wallBlockMesh->GetSubMesh(0)->SetDirty(true);
 	wallBlockMesh->Update();
 	wallBlockRenderer->SetMaterial(0, castleNormalMaterial);
 		

@@ -132,11 +132,10 @@ void PoolScene::UpdateRippleSimulation()
 	GTE::Graphics* graphics = GTE::Engine::Instance()->GetGraphicsSystem();
 
 	// calculate the time difference between ripple simulation frames
-	GTE::Real frameTime  = 1.0f/60.0f;
 	GTE::Real simAdvanceTimeDiff = GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
 
 	// make sure the ripple simulation runs at a max of 60 iterations per second
-	if(simAdvanceTimeDiff > frameTime)
+	if (simAdvanceTimeDiff > simFrameTime)
 	{
 		GTE::RenderManager * renderManager = GTE::Engine::Instance()->GetRenderManager();
 		GTE::UInt32 renderHeightMap = 0;
@@ -145,21 +144,21 @@ void PoolScene::UpdateRippleSimulation()
 		if (GTE::Time::GetRealTimeSinceStartup() - lastWaterDropTime > .6)
 		{
 			// calculate drop position and drop size
-			GTE::Real dropRadius = 4.0f / (GTE::Real)waterHeightMapResolution * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
-			GTE::Real x = 2.0f * (GTE::Real)rand() / (GTE::Real)RAND_MAX - 1.0f;
-			GTE::Real y = 1.0f - 2.0f * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
+			GTE::Real dropRadius = 8.0f / (GTE::Real)waterHeightMapResolution * ((((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 0.7f) + 0.3f);
+			GTE::Real x = 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX - .8f;
+			GTE::Real y = .8f - 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
 
-			// set variable values in [waterDropMaterial]
-			waterDropMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
+			// set variable values in [waterDropMaterial]			
 			waterDropMaterial->SetUniform1f(dropRadius, "DROP_RADIUS");
-			waterDropMaterial->SetUniform2f(x * 0.5f + 0.5f, 0.5f - y * 0.5f, "DROP_POSITION");
-			renderHeightMap = (currentHeightMapIndex + 1) % 2;
+			waterDropMaterial->SetUniform2f(x * 0.5f + 0.5f, 0.5f - y * 0.5f, "DROP_POSITION");		
 
 			// render water drop to water height map
+			waterDropMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
+			renderHeightMap = (currentHeightMapIndex + 1) % 2;
 			renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterDropMaterial, false);
 			graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
-
 			++currentHeightMapIndex %= 2;
+
 			lastWaterDropTime = GTE::Time::GetRealTimeSinceStartup();
 		}
 
@@ -171,9 +170,11 @@ void PoolScene::UpdateRippleSimulation()
 		++currentHeightMapIndex %= 2;
 
 		// update water normal map
-		waterNormalsMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
-		renderManager->RenderFullScreenQuad(waterNormals, waterNormalsMaterial, false);
-		graphics->RebuildMipMaps(waterNormals->GetColorTexture());
+		waterNormalsMaterial->SetTexture(waterHeights[currentHeightMapIndex]->GetColorTexture(), "WATER_HEIGHT_MAP");
+		renderHeightMap = (currentHeightMapIndex + 1) % 2;
+		renderManager->RenderFullScreenQuad(waterHeights[renderHeightMap], waterNormalsMaterial, false);
+		graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
+		++currentHeightMapIndex %= 2;
 
 		GTE::Transform mainCameraTransform;
 		GTE::SceneObjectTransform::GetWorldTransform(mainCameraTransform, mainCamera->GetSceneObject(), true, false);
@@ -181,7 +182,6 @@ void PoolScene::UpdateRippleSimulation()
 		GTE::Point3 cameraPos;
 		mainCameraTransform.TransformPoint(cameraPos);
 		waterMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
-		//waterMaterial->SetUniform4f(cameraPos.x, cameraPos.y, cameraPos.z, 1, "CAMERA_POSITION");
 
 		if(pointLights[0]->IsActive())
 		{
@@ -194,9 +194,9 @@ void PoolScene::UpdateRippleSimulation()
 			waterMaterial->SetUniform1f(.2f, "REFRACTED_COLOR_FACTOR");
 		}
 
-		while (GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime > frameTime)
+		while (GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime > simFrameTime)
 		{
-			lastWaterSimAdvanceTime += frameTime;
+			lastWaterSimAdvanceTime += simFrameTime;
 		}
 	}
 }
@@ -317,6 +317,68 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, towerMaterial, .04f,.04f,.015f, 1,0,0, -90, -16.5f,-10,31.5f, true,true,true);
 	sceneRoot->AddChild(modelSceneObject);
+	
+
+	// load single stone model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/StoneAlone1.fbx");
+	ASSERT(modelSceneObject.IsValid(), "Could not load single stone model!\n");
+	sceneRoot->AddChild(modelSceneObject);
+	GameUtil::SetAllObjectsStatic(modelSceneObject);
+
+	// extract mesh & material from castle tower model
+	GTE::SceneObjectRef singleStoneMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef singleStoneMesh = singleStoneMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef singleStoneRenderer = singleStoneMeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef singleStoneMaterial = singleStoneRenderer->GetMaterial(0);
+
+	// place initial single stone in scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Scale(.05f, .025f, .10f, false);
+	modelSceneObject->GetTransform().Translate(2.5f, -6.5, 13.2f, false);
+	
+	// re-use the single stone mesh & material for multiple instances
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .05f, .10f, .025f, 1, 0, 0, -90, 2.5f, -6.5, 18.2f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .05f, .10f, .025f, 1, 0, 0, -90, 2.5f, -6.5, 23.2f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .05f, .10f, .025f, 1, 0, 0, -90, 2.5f, -6.5, 28.2f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .05f, .10f, .025f, 1, 0, 0, -90, -15.0f, -6.5, 13.2f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .05f, .10f, .025f, 1, 0, 0, -90, -15.0f, -6.5, 18.2f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .05f, .10f, .025f, 1, 0, 0, -90, -15.0f, -6.5, 23.2f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .05f, .10f, .025f, 1, 0, 0, -90, -15.0f, -6.5, 28.2f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .11f, .065f, .025f, 1, 0, 0, -90, -1.0f, -6.5, 11.7f, true, true, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .11f, .065f, .025f, 1, 0, 0, -90, -6.5f, -6.5, 11.7f, true, true, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .11f, .065f, .025f, 1, 0, 0, -90, -12.0f, -6.5, 11.7f, true, true, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
+	sceneRoot->AddChild(modelSceneObject);
+
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .11f, .065f, .025f, 1, 0, 0, -90, -1.0f, -6.5, 30.2f, true, true, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .11f, .065f, .025f, 1, 0, 0, -90, -6.5f, -6.5, 30.2f, true, true, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject = GameUtil::AddMeshToScene(singleStoneMesh, singleStoneMaterial, .11f, .065f, .025f, 1, 0, 0, -90, -12.0f, -6.5, 30.2f, true, true, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
+	sceneRoot->AddChild(modelSceneObject);
+
+	singleStoneMesh->GetSubMesh(0)->SetCalculateNormals(true);
+	singleStoneMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
+	singleStoneMesh->Update();
+
+
+
 
 	// load castle wall model for pool walls
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
@@ -491,6 +553,8 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 
 	waterSurfaceCamera = objectManager->CreateCamera();
 	waterSurfaceCamera->SetSSAOEnabled(false);
+	waterSurfaceCamera->SetAmbientPassEnabled(false);
+	waterSurfaceCamera->SetDepthPassEnabled(false);
 	// ensure [waterSurfaceCamera] renders after [mainCamera]
 	waterSurfaceCamera->SetRenderOrderIndex(10);
 
@@ -501,7 +565,6 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	GTE::SceneObjectRef waterSurfaceCameraObject = objectManager->CreateSceneObject();
 	waterSurfaceCameraObject->SetCamera(waterSurfaceCamera);
 	sceneRoot->AddChild(waterSurfaceCameraObject);
-
 
 	//========================================================
 	//
@@ -534,7 +597,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	waterMeshRenderer->AddMaterial(waterMaterial);
 	waterSurfaceSceneObject->SetMesh3DRenderer(waterMeshRenderer);
 
-	// apply rotation of 90 degrees around positive x-axis to water mesh
+	// apply rotation of -90 degrees around positive x-axis to water mesh
 	GTE::Transform rot90;
 	rot90.Rotate(1,0,0,-90, true);
 	for(GTE::UInt32 i =0; i <  waterMesh->GetSubMesh(0)->GetPostions()->GetCount();i++)
@@ -571,10 +634,8 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 
 	waterHeights[0] = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterHeightMapResolution,waterHeightMapResolution);
 	waterHeights[1] = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterHeightMapResolution,waterHeightMapResolution);
-	waterNormals = objectManager->CreateRenderTarget(true,false,false,renderTargetColorAttributes,waterNomralMapResolution,waterNomralMapResolution);
 
 	ASSERT(waterHeights[0].IsValid() && waterHeights[1].IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water height map.");
-	ASSERT(waterNormals.IsValid(), "PoolScene::SetupWaterSurface -> Could not create render target for water normals map.");
 
 	GTE::UInt32 mapSize = waterHeightMapResolution * waterHeightMapResolution * 4;
 	GTE::Real * heightData = new(std::nothrow) GTE::Real[mapSize];
@@ -589,28 +650,11 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 		heightData[i+3] = 0;
 	}
 
-	mapSize = waterNomralMapResolution * waterNomralMapResolution * 4;
-	GTE::Real * normalData = new(std::nothrow) GTE::Real[mapSize];
-	ASSERT(normalData != nullptr, "PoolScene::SetupWaterSurface -> Could not allocate initialization data for water normal map.");
-
-	// create water normal map initialization data
-	for(GTE::UInt32 i = 0; i < mapSize; i += 4)
-	{
-		normalData[i] = 0;
-		normalData[i+1] = 0;
-		normalData[i+2] = 1;
-		normalData[i+3] = 1;
-	}
-
 	// initialize water height maps
 	graphics->SetTextureData(waterHeights[0]->GetColorTexture(), (GTE::Byte *)heightData);
 	graphics->SetTextureData(waterHeights[1]->GetColorTexture(), (GTE::Byte *)heightData);
 
-	// initialize water normal maps
-	graphics->SetTextureData(waterNormals->GetColorTexture(), (GTE::Byte *)normalData);
-
 	delete heightData;
-	delete normalData;
 
 	// create material for adding water drops to height maps
 	GTE::ShaderSource waterDropShaderSource;
@@ -632,13 +676,11 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	importer.LoadBuiltInShaderSource("waternormals", waterNormalsShaderSource);
 	waterNormalsMaterial = objectManager->CreateMaterial("WaterNormalsMaterial", waterNormalsShaderSource);
 	waterNormalsMaterial->SetSelfLit(true);
-	waterNormalsMaterial->SetUniform1f(1.0f / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
-	waterNormalsMaterial->SetUniform1f(2.0f / (GTE::Real)waterNomralMapResolution * 2.0f, "PIXEL_DISTANCEX2");
+	waterNormalsMaterial->SetUniform1f(1.0f / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
 	waterNormalsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 	// set appropriate sampler uniforms for water surface shader
 	waterMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
-	waterMaterial->SetTexture(waterNormals->GetColorTexture(), "WATER_NORMAL_MAP");
 	//waterMaterial->SetUniform1f(1.0 / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
 	waterMaterial->SetUniform1f(.8f, "REFLECTED_COLOR_FACTOR");
 	waterMaterial->SetUniform1f(.2f, "REFRACTED_COLOR_FACTOR");

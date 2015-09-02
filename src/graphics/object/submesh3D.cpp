@@ -64,8 +64,7 @@ namespace GTE
 		calculateNormals = true;
 		calculateTangents = true;
 
-		SetDirty(true);
-		UpdateTimeStamp();
+		UpdateUpdateCount();
 	}
 
 	/*
@@ -561,16 +560,6 @@ namespace GTE
 		return true;
 	}
 
-	void SubMesh3D::SetDirty(Bool isDirty)
-	{
-		this->isDirty = isDirty;
-	}
-
-	Bool SubMesh3D::IsDirty() const
-	{
-		return isDirty;
-	}
-
 	/*
 	 * Tell this mesh whether or not to calculate its own normals.
 	 */
@@ -668,8 +657,7 @@ namespace GTE
 			containerMesh->CalculateSphereOfInfluence();
 		}
 
-		SetDirty(true);
-		UpdateTimeStamp();
+		UpdateUpdateCount();
 	}
 
 	/*
@@ -678,8 +666,7 @@ namespace GTE
 	 */
 	void SubMesh3D::QuickUpdate()
 	{
-		SetDirty(true);
-		UpdateTimeStamp();
+		UpdateUpdateCount();
 	}
 	/*
 	 * Get the total number of vertices contained in this sub-mesh.
@@ -701,9 +688,9 @@ namespace GTE
 	/*
 	 * Get the time this mesh was last updated (in seconds since startup)
 	 */
-	Real SubMesh3D::GetTimeStamp() const
+	UInt32 SubMesh3D::GetUpdateCount() const
 	{
-		return timeStamp;
+		return updateCount;
 	}
 
 	/*
@@ -891,9 +878,9 @@ namespace GTE
 	/*
 	 * Update the time this mesh was last modified.
 	 */
-	void SubMesh3D::UpdateTimeStamp()
+	void SubMesh3D::UpdateUpdateCount()
 	{
-		timeStamp = Time::GetRealTimeSinceStartup();
+		updateCount++;
 	}
 
 	/*

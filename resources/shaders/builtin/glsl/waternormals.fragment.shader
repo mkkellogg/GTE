@@ -14,15 +14,13 @@ invariant out_color;
 invariant vUVTexture0;
 
 void main()
-{   
-    float y[4];
-
-    y[0] = texture(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(PIXEL_DISTANCE, 0.0)).g;
-    y[1] = texture(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(0.0, PIXEL_DISTANCE)).g;
-    y[2] = texture(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(PIXEL_DISTANCE, 0.0)).g;
-    y[3] = texture(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(0.0, PIXEL_DISTANCE)).g;
-
-    vec3 Normal = normalize(vec3(y[2] - y[0], PIXEL_DISTANCEX2, y[1] - y[3]));
-
-    out_color = vec4(Normal, 1.0);
+{  
+    vec4 data = texture2D(WATER_HEIGHT_MAP, vUVTexture0.st);
+      
+    /* update the normal */
+    vec3 dx = vec3(PIXEL_DISTANCE, texture2D(WATER_HEIGHT_MAP, vec2(vUVTexture0.s + PIXEL_DISTANCE, vUVTexture0.t)).r - data.r, 0.0);
+    vec3 dy = vec3(0.0, texture2D(WATER_HEIGHT_MAP, vec2(vUVTexture0.s, vUVTexture0.t + PIXEL_DISTANCE)).r - data.r, PIXEL_DISTANCE);
+    data.ba = normalize(cross(dy, dx)).xz;
+      
+    out_color = data;
 }

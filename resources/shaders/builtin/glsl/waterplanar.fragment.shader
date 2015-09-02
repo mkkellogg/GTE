@@ -6,26 +6,25 @@ uniform mat4 MODEL_MATRIX;
 
 uniform sampler2D REFLECTED_TEXTURE;
 uniform sampler2D WATER_HEIGHT_MAP;
-uniform sampler2D WATER_NORMAL_MAP;
 uniform sampler2D SCREEN_BUFFER_TEXTURE;
 //uniform vec4 LIGHT_POSITION;
 //uniform vec4 CAMERA_POSITION;
 uniform float REFLECTED_COLOR_FACTOR;
 uniform float REFRACTED_COLOR_FACTOR;
 
-in vec4 position;
 in vec4 oPos;
-
+in vec4 position;
 out vec4 out_color;
         
 void main()
 {	
 	vec2 texCoords = vec2(oPos.x * 0.5 + 0.5, 0.5 - oPos.z * 0.5);
-	vec3 LocalNormal = normalize(texture(WATER_NORMAL_MAP, texCoords.st).rgb);
-	vec3 Normal = vec3(MODEL_MATRIX * vec4(LocalNormal, 0));
-	float h = texture(WATER_HEIGHT_MAP, texCoords.st).g;
+	vec4 info = texture(WATER_HEIGHT_MAP, texCoords.st);
+	float h = texture(WATER_HEIGHT_MAP, texCoords.st).r;
 
- 	vec4 reflectOffset = vec4(LocalNormal.x, 0 , LocalNormal.z, 0) * .45 * (h / .002);
+	vec3 normal =  vec3(info.b, sqrt(1.0 - dot(info.ba, info.ba)), info.a);
+
+	vec4 reflectOffset = vec4(normal.x, 0,  normal.z ,0) * h;
    	reflectOffset = oPos + reflectOffset;
 	vec4 projectedReflectPos = MODELVIEWPROJECTION_MATRIX *  reflectOffset;
 	projectedReflectPos.x /= projectedReflectPos.w;

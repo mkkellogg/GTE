@@ -673,7 +673,7 @@ namespace GTE
 
 		// TODO: Once front/back culling settings are part of  a material, this will have to change. In that case
 		// reverse culling will mean to reverse whatever the material specifies. For now since by default all
-		// objects have back-faces culled, we can reverse that in a single place by siwtching to fron-face culling.
+		// objects have back-faces culled, we can reverse that in a single place by switching to fron-face culling.
 		if (camera.GetReverseCulling())Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Front);
 		else Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Back);
 
@@ -681,22 +681,28 @@ namespace GTE
 		Bool renderedAmbient = false;
 
 		// loop through each ambient light and render the scene for that light
-		for (UInt32 l = 0; l < ambientLightCount; l++)
+		if (camera.IsAmbientPassEnabled())
 		{
-			SceneObjectRef lightObject = sceneAmbientLights[l];
-			ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light's scene object is not valid.");
+			for (UInt32 l = 0; l < ambientLightCount; l++)
+			{
+				SceneObjectRef lightObject = sceneAmbientLights[l];
+				ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light's scene object is not valid.");
 
-			LightRef lightRef = lightObject->GetLight();
-			ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light is not valid.");
+				LightRef lightRef = lightObject->GetLight();
+				ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light is not valid.");
 
-			// render all objects in the scene that have non self-lit materials
-			ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewTransform, viewInverse, camera);
-			renderedAmbient = true;
+				// render all objects in the scene that have non self-lit materials
+				ForwardRenderSceneForLight(lightRef.GetRef(), lightObject->GetAggregateTransform(), modelPreTransform, viewTransform, viewInverse, camera);
+				renderedAmbient = true;
+			}
 		}
 
-		// if no ambient lights were rendered, then we need to fill the depth buffer with the scene to allow
+		// we need to fill the depth buffer with the scene to allow
 		// for proper shadow volume rendering and depth-buffer culling
-		ForwardRenderDepthBuffer(modelPreTransform, viewTransform, viewInverse, camera);
+		if (camera.IsDepthPassEnabled())
+		{
+			ForwardRenderDepthBuffer(modelPreTransform, viewTransform, viewInverse, camera);
+		}
 
 		// perform the standard screen-space ambient occlusion pass
 		if (renderedAmbient && camera.IsSSAOEnabled() && camera.GetSSAORenderMode() == SSAORenderMode::Standard)

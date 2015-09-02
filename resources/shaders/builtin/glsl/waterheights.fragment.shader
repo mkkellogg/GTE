@@ -13,41 +13,30 @@ out vec4 out_color;
 invariant out_color;
 invariant vUVTexture0;
 
-float getForce(vec2 coords, vec2 sourceForce)
-{
-	float force = texture(WATER_HEIGHT_MAP, coords.st).g - sourceForce.g;
-	return force;
-}
-
 void main()
 {
-	vec4 full = texture(WATER_HEIGHT_MAP, vUVTexture0.st);
-    vec2 vh = full.rg;
-
-    float force = 0.0;
-
-    force += 0.707107 * getForce(vUVTexture0.st - vec2(PIXEL_DISTANCE, PIXEL_DISTANCE), vh);
-    force += getForce(vUVTexture0.st - vec2(0.0, PIXEL_DISTANCE), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(0.0, PIXEL_DISTANCE)).g - vh.g;
-    force += 0.707107 * getForce( vUVTexture0.st + vec2(PIXEL_DISTANCE, -PIXEL_DISTANCE), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(PIXEL_DISTANCE, -PIXEL_DISTANCE)).g - vh.g);
-
-    force += getForce(vUVTexture0.st - vec2(PIXEL_DISTANCE, 0.0), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - vec2(PIXEL_DISTANCE, 0.0)).g - vh.g;
-    force += getForce(vUVTexture0.st + vec2(PIXEL_DISTANCE, 0.0), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(PIXEL_DISTANCE, 0.0)).g - vh.g;
-
-    force += 0.707107 * getForce(vUVTexture0.st + vec2(-PIXEL_DISTANCE, PIXEL_DISTANCE), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(-PIXEL_DISTANCE, PIXEL_DISTANCE)).g - vh.g);
-    force += getForce(vUVTexture0.st + vec2(0.0, PIXEL_DISTANCE), vh); //texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(0.0, PIXEL_DISTANCE)).g - vh.g;
-    force += 0.707107 * getForce(vUVTexture0.st + vec2(PIXEL_DISTANCE, PIXEL_DISTANCE), vh); //(texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + vec2(PIXEL_DISTANCE, PIXEL_DISTANCE)).g - vh.g);
-
-    force *= .065;
-
-	float oldForce = vh.g; 
-    vh.r += force;
-    vh.g += vh.r;
-    vh.g *= .99;
-  //  vh.r *= .99;
+      vec4 data = texture2D(WATER_HEIGHT_MAP,  vUVTexture0.st);
+      
+      /* calculate average neighbor height */
+      vec2 dx = vec2(PIXEL_DISTANCE, 0.0);
+      vec2 dy = vec2(0.0, PIXEL_DISTANCE);
+      float average = (
+        texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - dx).r +
+        texture2D(WATER_HEIGHT_MAP, vUVTexture0.st - dy).r +
+        texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + dx).r +
+        texture2D(WATER_HEIGHT_MAP, vUVTexture0.st + dy).r
+      ) * 0.25;
+      
+      /* change the velocity to move toward the average */
+      data.g += (average - data.r) * 2.0;
+      
+      /* attenuate the velocity a little so waves do not last forever */
+      data.g *= 0.965;
+      
+      /* move the vertex along the velocity */
+      data.r += data.g;
     
-    vec4 result = vec4(vh, 0, 0.0);
-
-    out_color = result;
+	  out_color = data;
 }
 
 

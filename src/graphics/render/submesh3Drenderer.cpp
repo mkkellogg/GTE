@@ -69,7 +69,7 @@ namespace GTE
 		doTangentTransform = false;
 		useBadGeometryShadowFix = false;
 
-		timeStamp = 0;
+		updateCount = 0;
 	}
 
 	/*
@@ -167,11 +167,11 @@ namespace GTE
 	}
 
 	/*
-	 * Get the time this renderer was last updated with its target sub-mesh.
+	 * Get the number of times this renderer has been updated with its target sub-mesh.
 	 */
-	Real SubMesh3DRenderer::GetTimeStamp() const
+	UInt32 SubMesh3DRenderer::GetUpdateCount() const
 	{
-		return timeStamp;
+		return updateCount;
 	}
 
 	/*
@@ -661,7 +661,7 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::ShouldUpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
-		if (mesh->GetTimeStamp() > GetTimeStamp() || mesh->IsDirty())return true;
+		if (mesh->GetUpdateCount() != GetUpdateCount())return true;
 		return false;
 	}
 
@@ -689,7 +689,7 @@ namespace GTE
 	/*
 	 * Update the time this renderer was last updated with its target sub-mesh.
 	 */
-	void SubMesh3DRenderer::UpdateTimeStamp()
+	void SubMesh3DRenderer::UpdateUpdateCount()
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UpdateTimeStamp -> Container renderer is null.");
 
@@ -698,7 +698,7 @@ namespace GTE
 
 		// make sure the time stamp equals the target mesh's timestamp exactly,
 		// not the current time
-		timeStamp = mesh->GetTimeStamp();
+		updateCount = mesh->GetUpdateCount();
 	}
 
 	/*
@@ -735,8 +735,7 @@ namespace GTE
 		// copy over the data from the target sub-mesh
 		CopyMeshData();
 
-		UpdateTimeStamp();
-		mesh->SetDirty(false);
+		UpdateUpdateCount();
 	}
 
 	/*
