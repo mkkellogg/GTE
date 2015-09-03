@@ -4,7 +4,6 @@ precision highp float;
 
 uniform sampler2D WATER_HEIGHT_MAP;
 uniform float PIXEL_DISTANCE;
-uniform float PIXEL_DISTANCEX2;
 
 in vec2 vUVTexture0;
 
@@ -17,7 +16,6 @@ void main()
 {  
     vec4 data = texture2D(WATER_HEIGHT_MAP, vUVTexture0.st);
       
-    /* update the normal */
     vec3 dx = vec3(PIXEL_DISTANCE, texture2D(WATER_HEIGHT_MAP, vec2(vUVTexture0.s + PIXEL_DISTANCE, vUVTexture0.t)).r - data.r, 0.0);
     vec3 dy = vec3(0.0, texture2D(WATER_HEIGHT_MAP, vec2(vUVTexture0.s, vUVTexture0.t + PIXEL_DISTANCE)).r - data.r, PIXEL_DISTANCE);
     data.ba = normalize(cross(dy, dx)).xz;

@@ -55,6 +55,7 @@ class PoolScene : public Scene
 	const GTE::UInt32 waterHeightMapResolution = 256;
 
 	const GTE::Real simFrameTime = 1.0f / 60.0f;
+	const GTE::Real waterDropFrequency = .85;
 
 	void UpdateCameras();
 	void UpdateRippleSimulation();

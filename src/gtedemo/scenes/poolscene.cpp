@@ -141,15 +141,18 @@ void PoolScene::UpdateRippleSimulation()
 		GTE::UInt32 renderHeightMap = 0;
 
 		// add water drop if enough time has passed since the last drop
-		if (GTE::Time::GetRealTimeSinceStartup() - lastWaterDropTime > .6)
+		if (GTE::Time::GetRealTimeSinceStartup() - lastWaterDropTime > waterDropFrequency)
 		{
 			// calculate drop position and drop size
 			GTE::Real dropRadius = 8.0f / (GTE::Real)waterHeightMapResolution * ((((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 0.7f) + 0.3f);
 			GTE::Real x = 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX - .8f;
 			GTE::Real y = .8f - 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
 
+			GTE::Real dropStrength = 2.3f;
+
 			// set variable values in [waterDropMaterial]			
 			waterDropMaterial->SetUniform1f(dropRadius, "DROP_RADIUS");
+			waterDropMaterial->SetUniform1f(dropStrength, "DROP_STRENGTH");
 			waterDropMaterial->SetUniform2f(x * 0.5f + 0.5f, 0.5f - y * 0.5f, "DROP_POSITION");		
 
 			// render water drop to water height map
@@ -684,6 +687,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	//waterMaterial->SetUniform1f(1.0 / (GTE::Real)waterNomralMapResolution, "PIXEL_DISTANCE");
 	waterMaterial->SetUniform1f(.8f, "REFLECTED_COLOR_FACTOR");
 	waterMaterial->SetUniform1f(.2f, "REFRACTED_COLOR_FACTOR");
+	waterMaterial->SetUniform1f(1.0f / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
 }
 
 /*

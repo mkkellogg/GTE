@@ -11,20 +11,34 @@ uniform sampler2D SCREEN_BUFFER_TEXTURE;
 //uniform vec4 CAMERA_POSITION;
 uniform float REFLECTED_COLOR_FACTOR;
 uniform float REFRACTED_COLOR_FACTOR;
+uniform float PIXEL_DISTANCE;
 
 in vec4 oPos;
 in vec4 position;
 out vec4 out_color;
+
+vec3 getAverageNormal(vec2 coord)
+{
+	vec4 main = texture(WATER_HEIGHT_MAP, coord.st);
+	vec4 yh = texture(WATER_HEIGHT_MAP, vec2(coord.s, coord.t + PIXEL_DISTANCE));
+	vec4 yl = texture(WATER_HEIGHT_MAP, vec2(coord.s, coord.t - PIXEL_DISTANCE));
+	vec4 xl = texture(WATER_HEIGHT_MAP, vec2(coord.s - PIXEL_DISTANCE, coord.t));
+	vec4 xh = texture(WATER_HEIGHT_MAP, vec2(coord.s + PIXEL_DISTANCE, coord.t));
+
+	vec4 total =(main + main + yh + yl + xh + xl) / 6;
+	vec3 result = vec3(total.b, sqrt(1.0 - dot(total.ba, total.ba)), total.a);
+
+	return result;
+}
         
 void main()
 {	
 	vec2 texCoords = vec2(oPos.x * 0.5 + 0.5, 0.5 - oPos.z * 0.5);
-	vec4 info = texture(WATER_HEIGHT_MAP, texCoords.st);
 	float h = texture(WATER_HEIGHT_MAP, texCoords.st).r;
 
-	vec3 normal =  vec3(info.b, sqrt(1.0 - dot(info.ba, info.ba)), info.a);
+	vec3 normal = getAverageNormal(texCoords.st);
 
-	vec4 reflectOffset = vec4(normal.x, 0,  normal.z ,0) * h;
+	vec4 reflectOffset = vec4(normal.x, 0,  normal.z ,0) * pow(h,1);
    	reflectOffset = oPos + reflectOffset;
 	vec4 projectedReflectPos = MODELVIEWPROJECTION_MATRIX *  reflectOffset;
 	projectedReflectPos.x /= projectedReflectPos.w;
