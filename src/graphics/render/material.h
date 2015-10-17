@@ -179,6 +179,7 @@ namespace GTE
 		void SendClipPlaneToShader(UInt32 index, Real eq1, Real eq2, Real eq3, Real eq4);
 		void SendModelMatrixToShader(const Matrix4x4 * mat);
 		void SendModelViewMatrixToShader(const Matrix4x4 * mat);
+		void SendViewMatrixToShader(const Matrix4x4 * mat);
 		void SendProjectionMatrixToShader(const Matrix4x4 * mat);
 		void SendMVPMatrixToShader(const Matrix4x4 * mat);
 		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);

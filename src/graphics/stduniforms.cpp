@@ -10,10 +10,13 @@
 
 namespace GTE
 {
-	const Char* const StandardUniforms::uniformNames[] = { "MODEL_MATRIX",
+	const Char* const StandardUniforms::uniformNames[] = 
+	{   
+		"MODEL_MATRIX",
 		"MODELVIEW_MATRIX",
 		"MODELVIEWPROJECTION_MATRIX",
 		"PROJECTION_MATRIX",
+		"VIEW_MATRIX",
 		"EYE_POSITION",
 		"LIGHT_POSITION",
 		"LIGHT_DIRECTION",
@@ -27,7 +30,8 @@ namespace GTE
 		"NORMALMAP",
 		"DO_SHADOW_VOLUME_RENDER",
 		"CLIP_PLANE_COUNT",
-		"CLIP_PLANE0" };
+		"CLIP_PLANE0" 
+	};
 
 	const Char * StandardUniforms::GetUniformName(StandardUniform uniform)
 	{

@@ -170,7 +170,7 @@ namespace GTE
 		UInt32 RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
 
 		void ActivateMaterial(MaterialRef material);
-		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection);
+		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);
 		void SendModelViewProjectionToShader(const Transform& modelViewProjection);
 		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);
 		void SendActiveMaterialUniformsToShader() const;

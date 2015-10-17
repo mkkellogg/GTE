@@ -1155,6 +1155,12 @@ void Game::HandleGeneralInput()
 		break;
 	}
 
+	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::SpaceBar))
+	{
+		poolScene->TriggerRippleDrop();
+	}
+
+
 	// toggle skybox
 	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::S))
 	{

@@ -1139,7 +1139,7 @@ namespace GTE
 						currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, lightingDescriptor.LightDirection);
 					}
 					// pass concatenated modelViewTransform and projection transforms to shader
-					SendTransformUniformsToShader(model, modelView, camera.GetProjectionTransform(), modelViewProjection);
+					SendTransformUniformsToShader(model, modelView, viewTransformInverse, camera.GetProjectionTransform(), modelViewProjection);
 
 					Point3 viewOrigin;
 					viewTransform.TransformPoint(viewOrigin);
@@ -1774,7 +1774,7 @@ namespace GTE
 	 * Send the ModelView matrix in [modelView] and Projection matrix in [projection] to the active shader.
 	 * The binding information stored in the active material holds the shader variable locations for these matrices.
 	 */
-	void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& projection, const Transform& modelViewProjection)
+	void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection)
 	{
 		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendTransformUniformsToShader -> Active material is null.");
@@ -1784,6 +1784,7 @@ namespace GTE
 
 		activeMaterial->SendModelMatrixToShader(&model.matrix);
 		activeMaterial->SendModelViewMatrixToShader(&modelView.matrix);
+		activeMaterial->SendViewMatrixToShader(&view.matrix);
 		activeMaterial->SendProjectionMatrixToShader(&projection.matrix);
 		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.matrix);
 	}

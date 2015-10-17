@@ -55,7 +55,10 @@ class PoolScene : public Scene
 	const GTE::UInt32 waterHeightMapResolution = 256;
 
 	const GTE::Real simFrameTime = 1.0f / 60.0f;
-	const GTE::Real waterDropFrequency = .85;
+	const GTE::Real waterDropFrequency = 3;
+
+	// should we add a drop?
+	bool shouldTripperDrop;
 
 	void UpdateCameras();
 	void UpdateRippleSimulation();
@@ -76,6 +79,8 @@ class PoolScene : public Scene
 	void SetupPlants(GTE::AssetImporter& importer);
 	void SetupWaterSurface(GTE::AssetImporter& importer);
 	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject);
+
+	void TriggerRippleDrop();
 
 	std::vector<GTE::SceneObjectRef>& GetPointLights();
 };

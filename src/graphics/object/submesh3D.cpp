@@ -508,14 +508,14 @@ namespace GTE
 	{
 		if (vertexCrossMap != nullptr)
 		{
-			std::unordered_map<long, Bool> deleted;
+			std::unordered_map<std::vector<UInt32>*, Bool> deleted;
 			for (UInt32 i = 0; i < totalVertexCount; i++)
 			{
 				std::vector<UInt32>* list = vertexCrossMap[i];
-				if (list != nullptr && !deleted[(long)list])
+				if (list != nullptr && !deleted[list])
 				{
 					delete list;
-					deleted[(long)list] = true;
+					deleted[list] = true;
 				}
 			}
 

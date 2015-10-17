@@ -48,6 +48,7 @@
 PoolScene::PoolScene() : Scene()
 {
 	currentHeightMapIndex = 0;
+	shouldTripperDrop = false;
 	lastWaterDropTime = GTE::Time::GetRealTimeSinceStartup();
 	lastWaterSimAdvanceTime = GTE::Time::GetRealTimeSinceStartup();
 }
@@ -125,6 +126,14 @@ void PoolScene::UpdateCameras()
 }
 
 /*
+* Trigger addition of drop to ripple simulation
+*/
+void PoolScene::TriggerRippleDrop()
+{
+	shouldTripperDrop = true;
+}
+
+/*
  * Advance the ripple simulation by one frame (if enough time has elapsed).
  */
 void PoolScene::UpdateRippleSimulation()
@@ -141,14 +150,27 @@ void PoolScene::UpdateRippleSimulation()
 		GTE::UInt32 renderHeightMap = 0;
 
 		// add water drop if enough time has passed since the last drop
-		if (GTE::Time::GetRealTimeSinceStartup() - lastWaterDropTime > waterDropFrequency)
+		if (GTE::Time::GetRealTimeSinceStartup() - lastWaterDropTime > waterDropFrequency || shouldTripperDrop)
 		{
+			shouldTripperDrop = false;
 			// calculate drop position and drop size
 			GTE::Real dropRadius = 8.0f / (GTE::Real)waterHeightMapResolution * ((((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 0.7f) + 0.3f);
 			GTE::Real x = 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX - .8f;
 			GTE::Real y = .8f - 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
 
 			GTE::Real dropStrength = 2.3f;
+
+			dropStrength = (((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 1.0f) + 0.5f;
+			dropRadius = dropStrength / 35.0;
+
+			//dropStrength = 0.8f;
+			//dropRadius = .05f;
+
+		//	dropStrength = 2.0f;
+			//dropRadius = .05f;
+
+			dropStrength = 0.4f;
+			dropRadius = .04f;
 
 			// set variable values in [waterDropMaterial]			
 			waterDropMaterial->SetUniform1f(dropRadius, "DROP_RADIUS");
@@ -184,6 +206,7 @@ void PoolScene::UpdateRippleSimulation()
 
 		GTE::Point3 cameraPos;
 		mainCameraTransform.TransformPoint(cameraPos);
+		//waterMaterial->SetUniform4f(cameraPos.x, cameraPos.y, cameraPos.z, 1.0f, "CAMERA_POSITION");
 		waterMaterial->SetTexture(waterHeights[renderHeightMap]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 		if(pointLights[0]->IsActive())
@@ -583,6 +606,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	// create mesh for water's surface
 	GTE::StandardAttributeSet meshAttributes = GTE::StandardAttributes::CreateAttributeSet();
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Position);
+	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture0);
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture1);
 	GTE::Mesh3DRef waterMesh = GTE::EngineUtility::CreateRectangularMesh(meshAttributes, 2, 2, waterMeshResolution, waterMeshResolution, false, false, false);
@@ -688,6 +712,12 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	waterMaterial->SetUniform1f(.8f, "REFLECTED_COLOR_FACTOR");
 	waterMaterial->SetUniform1f(.2f, "REFRACTED_COLOR_FACTOR");
 	waterMaterial->SetUniform1f(1.0f / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
+
+	GTE::Transform mainCameraTransform;
+	GTE::SceneObjectTransform::GetWorldTransform(mainCameraTransform, mainCamera->GetSceneObject(), true, false);
+	GTE::Point3 cameraPos;
+	mainCameraTransform.TransformPoint(cameraPos);
+	//waterMaterial->SetUniform4f(cameraPos.x, cameraPos.y, cameraPos.z, 1.0f, "CAMERA_POSITION");
 }
 
 /*

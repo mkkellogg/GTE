@@ -6,6 +6,7 @@ output/
 .project
 ldlibs.sh
 .settings/
+.vs/
 resources/models/
 resources/textures/
 .DS_Store

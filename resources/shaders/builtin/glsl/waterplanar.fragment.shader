@@ -3,6 +3,8 @@
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 uniform mat4 MODEL_MATRIX;
+uniform mat4 PROJECTION_MATRIX;
+uniform mat4 VIEW_MATRIX;
 
 uniform sampler2D REFLECTED_TEXTURE;
 uniform sampler2D WATER_HEIGHT_MAP;
@@ -15,6 +17,7 @@ uniform float PIXEL_DISTANCE;
 
 in vec4 oPos;
 in vec4 position;
+in vec4 oWorldNormal;
 out vec4 out_color;
 
 vec3 getAverageNormal(vec2 coord)
@@ -32,13 +35,18 @@ vec3 getAverageNormal(vec2 coord)
 }
         
 void main()
-{	
+{
 	vec2 texCoords = vec2(oPos.x * 0.5 + 0.5, 0.5 - oPos.z * 0.5);
 	float h = texture(WATER_HEIGHT_MAP, texCoords.st).r;
 
-	vec3 normal = getAverageNormal(texCoords.st);
+	vec3 avgNormal = getAverageNormal(texCoords.st);
+	vec3 avgNormalWorld = mat3(MODEL_MATRIX) * avgNormal;
 
-	vec4 reflectOffset = vec4(normal.x, 0,  normal.z ,0) * pow(h,1);
+	float effectFactor = .2;
+
+	avgNormal = normalize((avgNormal + vec3(0, 1, 0)) / 2.0);
+
+	vec4 reflectOffset = vec4(avgNormal.x, 0, avgNormal.z, 0) * effectFactor;
    	reflectOffset = oPos + reflectOffset;
 	vec4 projectedReflectPos = MODELVIEWPROJECTION_MATRIX *  reflectOffset;
 	projectedReflectPos.x /= projectedReflectPos.w;

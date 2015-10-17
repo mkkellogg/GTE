@@ -18,11 +18,14 @@ invariant vUVTexture0;
 
 void main()
 {
+	float dropStrength = DROP_STRENGTH;
+	float dropRadius = DROP_RADIUS;
+
     vec4 data = texture2D(WATER_HEIGHT_MAP, vUVTexture0.st);
      
-    float drop = max(0.0, 1.0 - length(DROP_POSITION - vUVTexture0.st) / DROP_RADIUS);
+    float drop = max(0.0, 1.0 - length(DROP_POSITION - vUVTexture0.st) / dropRadius);
     drop = 0.5 - cos(drop * PI) * 0.5;
-    data.r += drop * DROP_STRENGTH;
+    data.r += drop * dropStrength;
       
     out_color = data;
 }
