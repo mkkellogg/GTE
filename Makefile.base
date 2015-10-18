@@ -10,7 +10,7 @@ clean:
 	rm -f bin/gte
 	rm -rf bin/resources
 
-all: $(OUTPUTDIR) bin depend gtedemo engine graphics animation debug geometry gtemath base global engineobjects asset util image filesystem inputmanager error
+all: $(OUTPUTDIR) bin depend $(OBJECTFILES)
 	$(CC)  $(OBJECTFILES) -o bin/gtedemo $(LIBS)  
 	rm -rf bin/resources
 	cp -r resources bin/
