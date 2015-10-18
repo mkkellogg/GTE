@@ -4,21 +4,35 @@ define srcFilesToObjFiles
 $(subst .cpp,.o,$(1:$(2)/%=$(3)/%))
 endef
 
+define objFilesToSrcFiles
+$(subst .o,.cpp,$(1)/$(2:$(3)/%=%))	
+endef
+
+define toFullPath
+$(patsubst %,$(1)/%,$(2))
+endef
+
 # ==================================
 # GTE Demo
 # ==================================
 
-GTEDEMOSRC= src/gtedemo
-GTEDEMOSRCS= $(GTEDEMOSRC)/gtedemo.cpp $(GTEDEMOSRC)/game.cpp $(GTEDEMOSRC)/gameutil.cpp $(GTEDEMOSRC)/lavafield.cpp $(GTEDEMOSRC)/scene.cpp $(GTEDEMOSRC)/scenes/lavascene.cpp $(GTEDEMOSRC)/scenes/castlescene.cpp $(GTEDEMOSRC)/scenes/poolscene.cpp
-GTEDEMOBASEOBJ= $(OUTPUTDIR)/gtedemo.o $(OUTPUTDIR)/game.o $(OUTPUTDIR)/gameutil.o $(OUTPUTDIR)/lavafield.o $(OUTPUTDIR)/scene.o 
-GTEDEMOSCENEOBJ = $(OUTPUTDIR)/lavascene.o $(OUTPUTDIR)/castlescene.o $(OUTPUTDIR)/poolscene.o
+GTEDEMOBASESRC= src/gtedemo
+GTEDEMOBASESRCS= $(call toFullPath,$(GTEDEMOBASESRC),gtedemo.cpp game.cpp gameutil.cpp lavafield.cpp scene.cpp) 
 
-GTEDEMOOBJ= $(GTEDEMOBASEOBJ) $(GTEDEMOSCENEOBJ)
+GTEDEMOSCENESRC= src/gtedemo/scenes
+GTEDEMOSCENESRCS= $(call toFullPath,$(GTEDEMOSCENESRC),lavascene.cpp castlescene.cpp poolscene.cpp) 
+
+ALLGTEDEMOSRCS= $(GTEDEMOBASESRCS) $(GTEDEMOSCENESRCS)
+
+GTEDEMOBASEOBJ= $(call srcFilesToObjFiles,$(GTEDEMOBASESRCS),$(GTEDEMOBASESRC),$(OUTPUTDIR))
+GTEDEMOSCENEOBJ= $(call srcFilesToObjFiles,$(GTEDEMOSCENESRCS),$(GTEDEMOSCENESRC),$(OUTPUTDIR))
+
+ALLGTEDEMOOBJ= $(GTEDEMOBASEOBJ) $(GTEDEMOSCENEOBJ)
 
 $(GTEDEMOBASEOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(GTEDEMOSRC)/$(@:$(OUTPUTDIR)/%=%))	
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(GTEDEMOBASESRC),$@,$(OUTPUTDIR)) 
 $(GTEDEMOSCENEOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(GTEDEMOSRC)/scenes/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(GTEDEMOSCENESRC),$@,$(OUTPUTDIR))
 	
 
 # ==================================
@@ -29,8 +43,8 @@ GLOBALSRC= src/global
 GLOBALSRCS= $(GLOBALSRC)/constants.cpp
 GLOBALOBJ = $(OUTPUTDIR)/constants.o
 
-$(OUTPUTDIR)/constants.o: $(GLOBALSRC)/constants.cpp $(GLOBALSRC)/constants.h
-	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/constants.o -c $(GLOBALSRC)/constants.cpp 
+$(GLOBALOBJ): 
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(GLOBALSRC),$@,$(OUTPUTDIR)) 
 	
 
 # ==================================
@@ -41,8 +55,8 @@ ERRORSRC= src/error
 ERRORSRCS= $(ERRORSRC)/errormanager.cpp
 ERROROBJ= $(OUTPUTDIR)/errormanager.o
 
-$(OUTPUTDIR)/errormanager.o: $(ERRORSRC)/errormanager.cpp $(ERRORSRC)/errormanager.h
-	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/errormanager.o -c $(ERRORSRC)/errormanager.cpp 
+$(ERROROBJ): 
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ERRORSRC),$@,$(OUTPUTDIR))  
 	
 
 # ==================================
@@ -50,11 +64,11 @@ $(OUTPUTDIR)/errormanager.o: $(ERRORSRC)/errormanager.cpp $(ERRORSRC)/errormanag
 # ==================================	
 
 FILESYSTEMSRC= src/filesys
-FILESYSTEMSRCS= $(FILESYSTEMSRC)/filesystem.cpp $(FILESYSTEMSRC)/filesystemIX.cpp
-FILESYSTEMOBJ= $(OUTPUTDIR)/filesystem.o $(OUTPUTDIR)/filesystemIX.o
+FILESYSTEMSRCS= $(call toFullPath,$(FILESYSTEMSRC),filesystem.cpp filesystemIX.cpp)
+FILESYSTEMOBJ= $(call srcFilesToObjFiles,$(FILESYSTEMSRCS),$(FILESYSTEMSRC),$(OUTPUTDIR))
 
 $(FILESYSTEMOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(FILESYSTEMSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(FILESYSTEMSRC),$@,$(OUTPUTDIR)) 
 
 	
 # ==================================
@@ -62,11 +76,11 @@ $(FILESYSTEMOBJ):
 # ==================================	
 
 INPUTSRC= src/input
-INPUTSRCS= $(INPUTSRC)/inputmanager.cpp $(INPUTSRC)/inputmanagerGL.cpp
-INPUTOBJ= $(OUTPUTDIR)/inputmanager.o $(OUTPUTDIR)/inputmanagerGL.o
+INPUTSRCS= $(call toFullPath,$(INPUTSRC),inputmanager.cpp inputmanagerGL.cpp)
+INPUTOBJ= $(call srcFilesToObjFiles,$(INPUTSRCS),$(INPUTSRC),$(OUTPUTDIR))
 	
 $(INPUTOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(INPUTSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(INPUTSRC),$@,$(OUTPUTDIR)) 
 	
 # ==================================
 # Engine
@@ -76,8 +90,8 @@ ENGINESRC= src
 ENGINESRCS= $(ENGINESRC)/engine.cpp
 ENGINEOBJ = $(OUTPUTDIR)/engine.o
 
-$(OUTPUTDIR)/engine.o: $(ENGINESRC)/engine.cpp $(ENGINESRC)/engine.h
-	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/engine.o -c $(ENGINESRC)/engine.cpp 
+$(ENGINEOBJ): 
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ENGINESRC),$@,$(OUTPUTDIR)) 
 	
 	
 # ==================================
@@ -85,11 +99,11 @@ $(OUTPUTDIR)/engine.o: $(ENGINESRC)/engine.cpp $(ENGINESRC)/engine.h
 # ==================================
 
 ENGINEOBJECTSRC= src/object
-ENGINEOBJECTSRCS= $(ENGINEOBJECTSRC)/sceneobjectcomponent.cpp $(ENGINEOBJECTSRC)/engineobjectmanager.cpp $(ENGINEOBJECTSRC)/engineobject.cpp $(ENGINEOBJECTSRC)/sceneobject.cpp $(ENGINEOBJECTSRC)/shaderorganizer.cpp $(ENGINEOBJECTSRC)/objectpairkey.cpp $(ENGINEOBJECTSRC)/layermanager.cpp
-ENGINEOBJECTOBJ= $(OUTPUTDIR)/sceneobjectcomponent.o $(OUTPUTDIR)/engineobjectmanager.o $(OUTPUTDIR)/engineobject.o $(OUTPUTDIR)/sceneobject.o $(OUTPUTDIR)/shaderorganizer.o $(OUTPUTDIR)/objectpairkey.o $(OUTPUTDIR)/layermanager.o
+ENGINEOBJECTSRCS= $(call toFullPath,$(ENGINEOBJECTSRC),sceneobjectcomponent.cpp engineobjectmanager.cpp engineobject.cpp sceneobject.cpp shaderorganizer.cpp objectpairkey.cpp layermanager.cpp)
+ENGINEOBJECTOBJ= $(call srcFilesToObjFiles,$(ENGINEOBJECTSRCS),$(ENGINEOBJECTSRC),$(OUTPUTDIR))
 		
 $(ENGINEOBJECTOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(ENGINEOBJECTSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ENGINEOBJECTSRC),$@,$(OUTPUTDIR)) 
 	
 	
 # ==================================
@@ -97,11 +111,11 @@ $(ENGINEOBJECTOBJ):
 # ==================================
 
 ASSETSRC= src/asset
-ASSETOBJS= $(ASSETSRC)/assetimporter.cpp $(ASSETSRC)/importutil.cpp $(ASSETSRC)/modelimporter.cpp $(ASSETSRC)/modelimporter.cpp $(ASSETSRC)/shadersourceloader.cpp $(ASSETSRC)/shadersourceloaderGL.cpp
-ASSETOBJ= $(OUTPUTDIR)/assetimporter.o $(OUTPUTDIR)/importutil.o $(OUTPUTDIR)/modelimporter.o $(OUTPUTDIR)/shadersourceloader.o $(OUTPUTDIR)/shadersourceloaderGL.o
+ASSETSRCS= $(call toFullPath,$(ASSETSRC),assetimporter.cpp importutil.cpp modelimporter.cpp shadersourceloader.cpp shadersourceloaderGL.cpp)
+ASSETOBJ= $(call srcFilesToObjFiles,$(ASSETSRCS),$(ASSETSRC),$(OUTPUTDIR))
 	
 $(ASSETOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(ASSETSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ASSETSRC),$@,$(OUTPUTDIR)) 
 	
 		
 # ==================================
@@ -109,11 +123,11 @@ $(ASSETOBJ):
 # ==================================	
 
 IMAGESRC= src/graphics/image
-IMAGESRCS= $(IMAGESRC)/rawimage.cpp $(IMAGESRC)/imageloader.cpp
-IMAGEOBJ= $(OUTPUTDIR)/rawimage.o $(OUTPUTDIR)/imageloader.o
+IMAGESRCS= $(call toFullPath,$(IMAGESRC),rawimage.cpp imageloader.cpp)
+IMAGEOBJ= $(call srcFilesToObjFiles,$(IMAGESRCS),$(IMAGESRC),$(OUTPUTDIR))
 	
 $(IMAGEOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(IMAGESRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(IMAGESRC),$@,$(OUTPUTDIR)) 
 	
 	
 # ==================================
@@ -127,42 +141,41 @@ VIEWSYSSRC= $(BASEGRAPHICSSRC)/view
 COLORSRC= $(BASEGRAPHICSSRC)/color
 UVSRC= $(BASEGRAPHICSSRC)/uv
 
-LIGHTSRCS= $(LIGHTSRC)/light.cpp
-TEXTURESRCS= $(TEXTURESRC)/texture.cpp $(TEXTURESRC)/textureattr.cpp $(TEXTURESRC)/textureGL.cpp
-VIEWSYSSRCS= $(VIEWSYSSRC)/camera.cpp
-COLORSRCS= $(COLORSRC)/color4.cpp $(COLORSRC)/color4factory.cpp $(COLORSRC)/color4array.cpp
-UVSRCS= $(UVSRC)/uv2.cpp $(UVSRC)/uv2factory.cpp $(UVSRC)/uv2array.cpp
-BASEGRAPHICSSRCS= $(BASEGRAPHICSSRC)/graphics.cpp $(BASEGRAPHICSSRC)/stdattributes.cpp $(BASEGRAPHICSSRC)/stduniforms.cpp $(BASEGRAPHICSSRC)/screendesc.cpp $(BASEGRAPHICSSRC)/graphicsGL.cpp 
+LIGHTSRCS= $(call toFullPath,$(LIGHTSRC),light.cpp)
+TEXTURESRCS= $(call toFullPath,$(TEXTURESRC),texture.cpp textureattr.cpp textureGL.cpp)
+VIEWSYSSRCS= $(call toFullPath,$(VIEWSYSSRC),camera.cpp)
+COLORSRCS= $(call toFullPath,$(COLORSRC),color4.cpp color4factory.cpp color4array.cpp)
+UVSRCS= $(call toFullPath,$(UVSRC),uv2.cpp uv2factory.cpp uv2array.cpp)
+BASEGRAPHICSSRCS= $(call toFullPath,$(BASEGRAPHICSSRC),graphics.cpp stdattributes.cpp stduniforms.cpp screendesc.cpp graphicsGL.cpp)
 
 ALLGRAPHICSSRCS= $(BASEGRAPHICSSRCS) $(LIGHTSRCS) $(TEXTURESRCS) $(VIEWSYSSRCS) $(COLORSRCS) $(UVSRCS) 
 
-#  BASEGRAPHICSOBJ= $(call srcFilesToObjFiles,$(BASEGRAPHICSSRCS),$(BASEGRAPHICSSRC),$(OUTPUTDIR))
-BASEGRAPHICSOBJ= $(OUTPUTDIR)/graphics.o $(OUTPUTDIR)/stdattributes.o $(OUTPUTDIR)/stduniforms.o $(OUTPUTDIR)/screendesc.o $(OUTPUTDIR)/graphicsGL.o
-COLOROBJ= $(OUTPUTDIR)/color4.o $(OUTPUTDIR)/color4factory.o $(OUTPUTDIR)/color4array.o
-LIGHTOBJ= $(OUTPUTDIR)/light.o
-TEXTUREOBJ= $(OUTPUTDIR)/texture.o $(OUTPUTDIR)/textureattr.o  $(OUTPUTDIR)/textureGL.o
-VIEWSYSOBJ= $(OUTPUTDIR)/camera.o
-UVOBJ= $(OUTPUTDIR)/uv2.o $(OUTPUTDIR)/uv2factory.o $(OUTPUTDIR)/uv2array.o
+BASEGRAPHICSOBJ= $(call srcFilesToObjFiles,$(BASEGRAPHICSSRCS),$(BASEGRAPHICSSRC),$(OUTPUTDIR))
+COLOROBJ= $(call srcFilesToObjFiles,$(COLORSRCS),$(COLORSRC),$(OUTPUTDIR))
+LIGHTOBJ= $(call srcFilesToObjFiles,$(LIGHTSRCS),$(LIGHTSRC),$(OUTPUTDIR))
+TEXTUREOBJ= $(call srcFilesToObjFiles,$(TEXTURESRCS),$(TEXTURESRC),$(OUTPUTDIR))
+VIEWSYSOBJ= $(call srcFilesToObjFiles,$(VIEWSYSSRCS),$(VIEWSYSSRC),$(OUTPUTDIR))
+UVOBJ= $(call srcFilesToObjFiles,$(UVSRCS),$(UVSRC),$(OUTPUTDIR))
 
 ALLGRAPHICSOBJ = $(BASEGRAPHICSOBJ) $(COLOROBJ) $(LIGHTOBJ) $(TEXTUREOBJ) $(VIEWSYSOBJ) $(UVOBJ)
 
 $(BASEGRAPHICSOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(BASEGRAPHICSSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(BASEGRAPHICSSRC),$@,$(OUTPUTDIR)) 
 	
 $(LIGHTOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(LIGHTSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(LIGHTSRC),$@,$(OUTPUTDIR)) 
 	
 $(TEXTUREOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(TEXTURESRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(TEXTURESRC),$@,$(OUTPUTDIR)) 
 	
 $(VIEWSYSOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(VIEWSYSSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(VIEWSYSSRC),$@,$(OUTPUTDIR)) 
 	
 $(COLOROBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(COLORSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(COLORSRC),$@,$(OUTPUTDIR)) 
 	
 $(UVOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(UVSRC)/$(@:$(OUTPUTDIR)/%=%))	
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(UVSRC),$@,$(OUTPUTDIR)) 
 
 	
 
@@ -171,11 +184,11 @@ $(UVOBJ):
 # ==================================	
 
 ANIMATIONSRC= src/graphics/animation
-ANIMATIONSRCS= $(ANIMATIONSRC)/skeleton.cpp $(ANIMATIONSRC)/vertexbonemap.cpp $(ANIMATIONSRC)/skeletonnode.cpp $(ANIMATIONSRC)/bone.cpp $(ANIMATIONSRC)/sceneobjectskeletonnode.cpp $(ANIMATIONSRC)/keyframeset.cpp $(ANIMATIONSRC)/keyframe.cpp $(ANIMATIONSRC)/translationkeyframe.cpp $(ANIMATIONSRC)/scalekeyframe.cpp $(ANIMATIONSRC)/rotationkeyframe.cpp $(ANIMATIONSRC)/animation.cpp $(ANIMATIONSRC)/animationmanager.cpp $(ANIMATIONSRC)/animationinstance.cpp $(ANIMATIONSRC)/animationplayer.cpp $(ANIMATIONSRC)/blendop.cpp $(ANIMATIONSRC)/crossfadeblendop.cpp
-ANIMATIONOBJ= $(OUTPUTDIR)/skeleton.o $(OUTPUTDIR)/vertexbonemap.o $(OUTPUTDIR)/skeletonnode.o $(OUTPUTDIR)/bone.o $(OUTPUTDIR)/sceneobjectskeletonnode.o $(OUTPUTDIR)/keyframeset.o $(OUTPUTDIR)/keyframe.o $(OUTPUTDIR)/translationkeyframe.o $(OUTPUTDIR)/scalekeyframe.o $(OUTPUTDIR)/rotationkeyframe.o $(OUTPUTDIR)/animation.o $(OUTPUTDIR)/animationmanager.o $(OUTPUTDIR)/animationinstance.o $(OUTPUTDIR)/animationplayer.o $(OUTPUTDIR)/blendop.o $(OUTPUTDIR)/crossfadeblendop.o
+ANIMATIONSRCS= $(call toFullPath,$(ANIMATIONSRC),skeleton.cpp vertexbonemap.cpp skeletonnode.cpp bone.cpp sceneobjectskeletonnode.cpp keyframeset.cpp keyframe.cpp translationkeyframe.cpp scalekeyframe.cpp rotationkeyframe.cpp animation.cpp animationmanager.cpp animationinstance.cpp animationplayer.cpp blendop.cpp crossfadeblendop.cpp)
+ANIMATIONOBJ= $(call srcFilesToObjFiles,$(ANIMATIONSRCS),$(ANIMATIONSRC),$(OUTPUTDIR))
 
 $(ANIMATIONOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(ANIMATIONSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ANIMATIONSRC),$@,$(OUTPUTDIR))
 	
 	
 # ==================================
@@ -183,11 +196,11 @@ $(ANIMATIONOBJ):
 # ==================================	
 
 SHADERSRC= src/graphics/shader
-SHADERSRCS= $(SHADERSRC)/shadersource.cpp $(SHADERSRC)/shader.cpp $(SHADERSRC)/uniformdesc.cpp $(SHADERSRC)/attributedesc.cpp $(SHADERSRC)/shaderGL.cpp
-SHADEROBJ= $(OUTPUTDIR)/shadersource.o $(OUTPUTDIR)/shader.o $(OUTPUTDIR)/uniformdesc.o $(OUTPUTDIR)/attributedesc.o $(OUTPUTDIR)/shaderGL.o
+SHADERSRCS= $(call toFullPath,$(SHADERSRC),shadersource.cpp shader.cpp uniformdesc.cpp attributedesc.cpp shaderGL.cpp)
+SHADEROBJ= $(call srcFilesToObjFiles,$(SHADERSRCS),$(SHADERSRC),$(OUTPUTDIR))
 	
 $(SHADEROBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(SHADERSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(SHADERSRC),$@,$(OUTPUTDIR))
 
 	
 # ==================================
@@ -195,11 +208,11 @@ $(SHADEROBJ):
 # ==================================
 
 RENDERSRC= src/graphics/render
-RENDERSRCS= $(RENDERSRC)/mesh3Drenderer.cpp $(RENDERSRC)/skinnedmesh3Drenderer.cpp $(RENDERSRC)/submesh3Drenderer.cpp $(RENDERSRC)/attributetransformer.cpp $(RENDERSRC)/skinnedmesh3Dattrtransformer.cpp $(RENDERSRC)/rendertarget.cpp $(RENDERSRC)/vertexattrbuffer.cpp $(RENDERSRC)/material.cpp $(RENDERSRC)/rendermanager.cpp $(RENDERSRC)/vertexattrbufferGL.cpp $(RENDERSRC)/rendertargetGL.cpp
-RENDEROBJ= $(OUTPUTDIR)/mesh3Drenderer.o $(OUTPUTDIR)/skinnedmesh3Drenderer.o $(OUTPUTDIR)/submesh3Drenderer.o $(OUTPUTDIR)/attributetransformer.o $(OUTPUTDIR)/skinnedmesh3Dattrtransformer.o $(OUTPUTDIR)/rendertarget.o  $(OUTPUTDIR)/vertexattrbuffer.o $(OUTPUTDIR)/material.o $(OUTPUTDIR)/rendermanager.o  $(OUTPUTDIR)/vertexattrbufferGL.o $(OUTPUTDIR)/rendertargetGL.o
+RENDERSRCS= $(call toFullPath,$(RENDERSRC),mesh3Drenderer.cpp skinnedmesh3Drenderer.cpp submesh3Drenderer.cpp attributetransformer.cpp skinnedmesh3Dattrtransformer.cpp rendertarget.cpp vertexattrbuffer.cpp material.cpp rendermanager.cpp vertexattrbufferGL.cpp rendertargetGL.cpp)
+RENDEROBJ= $(call srcFilesToObjFiles,$(RENDERSRCS),$(RENDERSRC),$(OUTPUTDIR))
 
 $(RENDEROBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(RENDERSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(RENDERSRC),$@,$(OUTPUTDIR))
 	
 	
 # ==================================
@@ -207,11 +220,11 @@ $(RENDEROBJ):
 # ==================================
 
 GRAPHICSOBJECTSRC= src/graphics/object
-GRAPHICSOBJECTSRCS= $(GRAPHICSOBJECTSRC)/mesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3D.cpp $(GRAPHICSOBJECTSRC)/submesh3Dfaces.cpp $(GRAPHICSOBJECTSRC)/submesh3Dface.cpp $(GRAPHICSOBJECTSRC)/mesh3Dfilter.cpp
-GRAPHICSOBJECTOBJ= $(OUTPUTDIR)/mesh3D.o $(OUTPUTDIR)/submesh3D.o $(OUTPUTDIR)/submesh3Dfaces.o $(OUTPUTDIR)/submesh3Dface.o $(OUTPUTDIR)/mesh3Dfilter.o
+GRAPHICSOBJECTSRCS= $(call toFullPath,$(GRAPHICSOBJECTSRC),mesh3D.cpp submesh3D.cpp submesh3Dfaces.cpp submesh3Dface.cpp mesh3Dfilter.cpp)
+GRAPHICSOBJECTOBJ= $(call srcFilesToObjFiles,$(GRAPHICSOBJECTSRCS),$(GRAPHICSOBJECTSRC),$(OUTPUTDIR))
 	
 $(GRAPHICSOBJECTOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(GRAPHICSOBJECTSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(GRAPHICSOBJECTSRC),$@,$(OUTPUTDIR))
 	
 	
 # ==================================
@@ -222,28 +235,36 @@ DEBUGSRC= src/debug
 DEBUGSRCS= $(DEBUGSRC)/gtedebug.cpp
 DEBUGOBJ= $(OUTPUTDIR)/gtedebug.o 
 
-$(OUTPUTDIR)/gtedebug.o: $(DEBUGSRC)/gtedebug.cpp $(DEBUGSRC)/gtedebug.h
-	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/gtedebug.o -c  $(DEBUGSRC)/gtedebug.cpp 
+$(DEBUGOBJ): 
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(DEBUGSRC),$@,$(OUTPUTDIR))
 
 
 # ==================================
 # Geometry
 # ==================================
 
-GEOMETRYSRC= src/geometry
-GEOMETRYSRCS= $(GEOMETRYSRC)/matrix4x4.cpp $(GEOMETRYSRC)/quaternion.cpp $(GEOMETRYSRC)/point/point3.cpp $(GEOMETRYSRC)/vector/vector3.cpp $(GEOMETRYSRC)/vector/vector3factory.cpp $(GEOMETRYSRC)/point/point3factory.cpp $(GEOMETRYSRC)/vector/vector3array.cpp $(GEOMETRYSRC)/point/point3array.cpp $(GEOMETRYSRC)/transform.cpp $(GEOMETRYSRC)/scenobjecttransform.cpp
+GEOMETRYBASESRC= src/geometry
+POINTSRC= $(GEOMETRYBASESRC)/point
+VECTORSRC= $(GEOMETRYBASESRC)/vector
 
-POINTOBJ= $(OUTPUTDIR)/point3.o $(OUTPUTDIR)/point3factory.o $(OUTPUTDIR)/point3array.o
-VECTOROBJ= $(OUTPUTDIR)/vector3.o $(OUTPUTDIR)/vector3factory.o $(OUTPUTDIR)/vector3array.o
-BASEGEOMETRYOBJ= $(OUTPUTDIR)/matrix4x4.o $(OUTPUTDIR)/quaternion.o  $(OUTPUTDIR)/transform.o $(OUTPUTDIR)/sceneobjecttransform.o 
-GEOMETRYOBJ= $(BASEGEOMETRYOBJ) $(POINTOBJ) $(VECTOROBJ)
+GEOMETRYBASESRCS= $(call toFullPath,$(GEOMETRYBASESRC),matrix4x4.cpp quaternion.cpp transform.cpp sceneobjecttransform.cpp)
+POINTSRCS= $(call toFullPath,$(POINTSRC),point3.cpp point3factory.cpp point3array.cpp) 
+VECTORSRCS= $(call toFullPath,$(VECTORSRC),vector3.cpp vector3factory.cpp vector3array.cpp)
+
+ALLGEOMETRYSRCS= $(GEOMETRYBASESRCS) $(POINTSRCS) $(VECTORSRCS)
+
+POINTOBJ= $(call srcFilesToObjFiles,$(POINTSRCS),$(POINTSRC),$(OUTPUTDIR))
+VECTOROBJ= $(call srcFilesToObjFiles,$(VECTORSRCS),$(VECTORSRC),$(OUTPUTDIR))
+BASEGEOMETRYOBJ= $(call srcFilesToObjFiles,$(GEOMETRYBASESRCS),$(GEOMETRYBASESRC),$(OUTPUTDIR))
+
+ALLGEOMETRYOBJ= $(BASEGEOMETRYOBJ) $(POINTOBJ) $(VECTOROBJ)
 	
 $(POINTOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(GEOMETRYSRC)/point/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(POINTSRC),$@,$(OUTPUTDIR))
 $(VECTOROBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(GEOMETRYSRC)/vector/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(VECTORSRC),$@,$(OUTPUTDIR))
 $(BASEGEOMETRYOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(GEOMETRYSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(GEOMETRYBASESRC),$@,$(OUTPUTDIR))
 
 
 # ==================================
@@ -251,11 +272,11 @@ $(BASEGEOMETRYOBJ):
 # ==================================
 
 BASESRC= src/base
-BASESRCS= $(BASESRC)/basevector4.cpp $(BASESRC)/basevector2.cpp $(BASESRC)/basevector2factory.cpp $(BASESRC)/basevector4factory.cpp $(BASESRC)/basevector2array.cpp $(BASESRC)/basevector4array.cpp $(BASESRC)/intmask.cpp $(BASESRC)/longmask.cpp
-BASEOBJ= $(OUTPUTDIR)/basevector4.o $(OUTPUTDIR)/basevector2.o $(OUTPUTDIR)/basevector2factory.o $(OUTPUTDIR)/basevector4factory.o $(OUTPUTDIR)/basevector2array.o $(OUTPUTDIR)/basevector4array.o $(OUTPUTDIR)/intmask.o $(OUTPUTDIR)/longmask.o
+BASESRCS= $(call toFullPath,$(BASESRC),basevector4.cpp basevector2.cpp basevector2factory.cpp basevector4factory.cpp basevector2array.cpp basevector4array.cpp intmask.cpp longmask.cpp)
+BASEOBJ= $(call srcFilesToObjFiles,$(BASESRCS),$(BASESRC),$(OUTPUTDIR))
 
 $(BASEOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(BASESRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(BASESRC),$@,$(OUTPUTDIR))
 	
 	
 # ==================================
@@ -263,11 +284,12 @@ $(BASEOBJ):
 # ==================================	
 
 UTILSRC= src/util
-UTILSRCS= $(UTILSRC)/datastack.cpp $(UTILSRC)/engineutility.cpp $(UTILSRC)/time.cpp
-UTILOBJ= $(OUTPUTDIR)/datastack.o $(OUTPUTDIR)/engineutility.o $(OUTPUTDIR)/time.o
+UTILSRCS= $(call toFullPath,$(UTILSRC),datastack.cpp engineutility.cpp time.cpp)
+UTILOBJ= $(call srcFilesToObjFiles,$(UTILSRCS),$(UTILSRC),$(OUTPUTDIR))
 
 $(UTILOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(subst .o,.cpp, $(UTILSRC)/$(@:$(OUTPUTDIR)/%=%))
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(UTILSRC),$@,$(OUTPUTDIR))
+
 
 # ==================================
 # Math
@@ -277,13 +299,14 @@ GTEMATHSRC= src/gtemath
 GTEMATHSRCS= $(GTEMATHSRC)/gtemath.cpp
 GTEMATHOBJ= $(OUTPUTDIR)/gtemath.o
 
-$(OUTPUTDIR)/gtemath.o: $(GTEMATHSRC)/gtemath.cpp $(GTEMATHSRC)/gtemath.h
-	$(CC) $(CFLAGS) -o $(OUTPUTDIR)/gtemath.o -c $(GTEMATHSRC)/gtemath.cpp
+$(GTEMATHOBJ): 
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(GTEMATHSRC),$@,$(OUTPUTDIR))
+
 
 # ==================================
-# MAIN
+# ALL
 # ==================================
 
-ALLSRCS= $(ENGINESRCS) $(BASESRCS) $(UTILSRCS) $(GTEDEMOSRCS) $(GTEMATHSRCS) $(GEOMETRYSRCS) $(GRAPHICSOBJECTSRCS) $(DEBUGSRCS) $(ALLGRAPHICSSRCS) $(ANIMATIONSRCS) $(IMAGESRCS) $(RENDERSRCS) $(SHADERSRCS) $(GLOBALSRCS) $(ENGINEOBJECTSRCS) $(ASSETSRCS) $(FILESYSTEMSRCS) $(INPUTSRCS) $(ERRORSRCS)
+ALLSRCS= $(ENGINESRCS) $(BASESRCS) $(UTILSRCS) $(ALLGTEDEMOSRCS) $(GTEMATHSRCS) $(ALLGEOMETRYSRCS) $(GRAPHICSOBJECTSRCS) $(DEBUGSRCS) $(ALLGRAPHICSSRCS) $(ANIMATIONSRCS) $(IMAGESRCS) $(RENDERSRCS) $(SHADERSRCS) $(GLOBALSRCS) $(ENGINEOBJECTSRCS) $(ASSETSRCS) $(FILESYSTEMSRCS) $(INPUTSRCS) $(ERRORSRCS)
 
-OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(GTEDEMOOBJ) $(GTEMATHOBJ) $(GEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(ALLGRAPHICSOBJ) $(ANIMATIONOBJ) $(IMAGEOBJ) $(RENDEROBJ) $(SHADEROBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)
+OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(ALLGTEDEMOOBJ) $(GTEMATHOBJ) $(ALLGEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(ALLGRAPHICSOBJ) $(ANIMATIONOBJ) $(IMAGEOBJ) $(RENDEROBJ) $(SHADEROBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)
