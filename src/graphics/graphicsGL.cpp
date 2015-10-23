@@ -1270,6 +1270,56 @@ namespace GTE
 	}
 
 	/*
+	 * Determine whether or not the color buffer in [src] can be blitted onto the
+	 * color buffer in [dest] via glBlitFrameBuffer.
+	 */
+	Bool GraphicsGL::CanBlitColorBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const
+	{
+		TextureFormat srcFormat = src->colorTextureAttributes.Format;
+		TextureFormat destFormat = dest->colorTextureAttributes.Format;
+
+		if(!dest->hasColorBuffer)return false;
+		if(srcFormat == destFormat)return true;
+
+		// special case for default render target
+		if(src->GetFBOID() == 0 )
+		{
+			if(destFormat == TextureFormat::RGBA8)return true;
+		}
+		else if(src->hasColorBuffer && dest->hasColorBuffer)
+		{
+			if(srcFormat == TextureFormat::RGBA8 && destFormat == TextureFormat::RGBA8)return true;
+		}
+
+		return false;
+	}
+
+	/*
+	 * Determine whether or not the depth buffer in [src] can be blitted onto the
+	 * depth buffer in [dest] via glBlitFrameBuffer.
+	 */
+	Bool GraphicsGL::CanBlitDepthBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const
+	{
+		bool srcDepthIsTexture = src->depthBufferIsTexture;
+		bool destDepthIsTexture = dest->depthBufferIsTexture;
+
+		// special case for default render target
+		if(src->GetFBOID() == 0 )
+		{
+			if(depthBufferEnabled && dest->hasDepthBuffer && !destDepthIsTexture)return true;
+			return false;
+		}
+		else
+		{
+			if(!src->hasDepthBuffer || !dest->hasDepthBuffer)return false;
+			if(srcDepthIsTexture != destDepthIsTexture)return false;
+			return true;
+		}
+
+		return false;
+	}
+
+	/*
 	 * Copy the contents of one render target to another.
 	 */
 	void GraphicsGL::CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const
@@ -1296,8 +1346,17 @@ namespace GTE
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, srcGL->GetFBOID());
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destGL->GetFBOID());
 
-		glBlitFramebuffer(0, 0, src->GetWidth(), src->GetHeight(),
-			0, 0, dest->GetWidth(), dest->GetHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		if(CanBlitColorBuffers(srcGL, destGL))
+		{
+			glBlitFramebuffer(0, 0, src->GetWidth(), src->GetHeight(),
+					0, 0, dest->GetWidth(), dest->GetHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		}
+
+		if(CanBlitDepthBuffers(srcGL, destGL))
+		{
+			glBlitFramebuffer(0, 0, src->GetWidth(), src->GetHeight(),
+								0, 0, dest->GetWidth(), dest->GetHeight(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, currentFB);
 	}

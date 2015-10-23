@@ -38,6 +38,7 @@ namespace GTE
 	class TextureAttributes;
 	class AttributeTransformer;
 	class RenderTarget;
+	class RenderTargetGL;
 	class RawImage;
 
 	class GraphicsGL : public Graphics
@@ -160,6 +161,8 @@ namespace GTE
 		RenderTargetRef GetCurrrentRenderTarget() override;
 		Bool ActivateCubeRenderTargetSide(CubeTextureSide side) override;
 		Bool RestoreDefaultRenderTarget() override;
+		Bool CanBlitColorBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
+		Bool CanBlitDepthBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
 		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const override;
 
 		void SetTextureData(TextureRef texture, const Byte * data) const override;

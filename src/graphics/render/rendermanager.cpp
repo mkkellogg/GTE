@@ -937,10 +937,11 @@ namespace GTE
 		if (depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Depth);
 		Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearMask);
 
-		// render the depth values for the scene to the off-screen color texture
-		ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse,
-			camera, depthValueMaterial, false, true, FowardBlendingFilter::Never);
-
+		// render the depth values for the scene to the off-screen color texture (filter out non-static objects)
+		ForwardRenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never, [=](SceneObjectRef sceneObject)
+		{
+			return !sceneObject->IsStatic();
+		});
 		// restore previous render target
 		PopRenderTarget();
 
