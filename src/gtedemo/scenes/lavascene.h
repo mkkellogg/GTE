@@ -21,21 +21,21 @@ class LavaScene : public Scene
 
 	// layer name for lava pool wall
 	static const std::string LavaWallLayer;
-	// layer name for lava pool island
-	static const std::string LavaIslandLayer;
 	// layer name for lava pool island objects
 	static const std::string LavaIslandObjectsLayer;
 	// layer mask for lava wall layer
-	GTE::IntMask lavaWallLayerMask;
-	// layer mask for lava island layer
-	GTE::IntMask lavaIslandLayerMask;
+	GTE::IntMask lavaPlanarLayerMask;
 	// layer mask for lava island layer objects
 	GTE::IntMask lavaIslandObjectsLayerMask;
+	// layer mask for player
+	GTE::IntMask playerObjectLayerMask;
 
 	// SceneObject that contains the spinning point light in the scene
 	GTE::SceneObjectRef spinningPointLightObject;
 	// scene lava
 	LavaField * lavaField;
+	// material for geometry near lavafield
+	GTE::MaterialRef planarLitMaterial;
 	// container lava lights
 	std::vector<GTE::SceneObjectRef> lavaLightObjects;
 	// The single cube in the scene
@@ -52,6 +52,7 @@ class LavaScene : public Scene
 	void OnActivate();
 	void Update();
 	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject);
+	void SetPlayerObjectLayerMask(GTE::IntMask playerObjectLayerMask);
 
 	void SetupTerrain(GTE::AssetImporter& importer);
 	void SetupStructures(GTE::AssetImporter& importer);

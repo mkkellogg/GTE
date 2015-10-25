@@ -712,6 +712,22 @@ namespace GTE
 
 	/*
 	 * Send the 4x4 matrix data in [mat] to this material's shader via the
+	 * standard uniform ModelMatrixInverseTranspose.
+	 */
+	void Material::SendModelMatrixInverseTransposeToShader(const Matrix4x4 * mat)
+	{
+		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelMatrixInverseTransposeToShader -> 'shader' is null.", true);
+
+		Int32 varID = GetStandardUniformBinding(StandardUniform::ModelMatrixInverseTranspose);
+		if (varID >= 0)
+		{
+			shader->SendUniformToShader(varID, mat);
+			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Matrix4x4));
+		}
+	}
+
+	/*
+	 * Send the 4x4 matrix data in [mat] to this material's shader via the
 	 * standard uniform ModelMatrix.
 	 */
 	void Material::SendModelMatrixToShader(const Matrix4x4 * mat)

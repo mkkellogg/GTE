@@ -1469,7 +1469,7 @@ namespace GTE
 				if (!cached || dynamic) // always rebuild dynamic shadow volumes
 				{
 					// calculate shadow volume geometry
-					subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional, filter->GetUseBackSetShadowVolume());
+					subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional || light.GetType() == LightType::Planar, filter->GetUseBackSetShadowVolume());
 
 					// cache shadow volume for later rendering
 					CacheShadowVolume(cacheKey, subRenderer->GetShadowVolumePositions());
@@ -1772,7 +1772,7 @@ namespace GTE
 	}
 
 	/*
-	 * Send the ModelView matrix in [modelView] and Projection matrix in [projection] to the active shader.
+	 * Send relevant scene transforms the active shader.
 	 * The binding information stored in the active material holds the shader variable locations for these matrices.
 	 */
 	void RenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection)
@@ -1783,6 +1783,11 @@ namespace GTE
 		ShaderRef shader = activeMaterial->GetShader();
 		ASSERT(shader.IsValid(), "RenderManager::SendTransformUniformsToShader -> Active material contains null shader.");
 
+		Matrix4x4 modelInverseTranspose = model.matrix;
+		modelInverseTranspose.Transpose();
+		modelInverseTranspose.Invert();
+
+		activeMaterial->SendModelMatrixInverseTransposeToShader(&modelInverseTranspose);
 		activeMaterial->SendModelMatrixToShader(&model.matrix);
 		activeMaterial->SendModelViewMatrixToShader(&modelView.matrix);
 		activeMaterial->SendViewMatrixToShader(&view.matrix);

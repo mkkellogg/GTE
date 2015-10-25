@@ -22,6 +22,7 @@ namespace GTE
 		attenuation = 1;
 		SetRange(30);
 		shadowsEnabled = false;
+		attenuationOverride = false;
 	}
 
 	Light::~Light()
@@ -36,7 +37,10 @@ namespace GTE
 
 	void Light::CalcAttentuationForCurrentRange()
 	{
-		attenuation = 1.0f / range;
+		if(!attenuationOverride)
+		{
+			attenuation = 1.0f / range;
+		}
 	}
 
 	const Color4 * Light::GetColorPtr() const
@@ -108,6 +112,7 @@ namespace GTE
 	void Light::SetAttenuation(Real attenuation)
 	{
 		this->attenuation = attenuation;
+		attenuationOverride = true;
 	}
 
 	Real Light::GetAttenuation() const

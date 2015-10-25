@@ -56,8 +56,7 @@ void main()
     vec3 ndcCoords = vec3(texCoords.x * 2.0 - 1.0, texCoords.y * 2.0 - 1.0, depth * 2.0 -1.0);
 	
 	vec3 viewPos = calculatePosition(ndcCoords).xyz;
-	vec3 viewNormal = vNormal;
-	viewNormal = normalize(viewNormal);
+	vec3 viewNormal = normalize(vNormal);
 
     float ambientOcclusion = 0;
     

@@ -13,6 +13,7 @@ namespace GTE
 	const Char* const StandardUniforms::uniformNames[] = 
 	{   
 		"MODEL_MATRIX",
+		"MODEL_MATRIX_INVERSE_TRANSPOSE",
 		"MODELVIEW_MATRIX",
 		"MODELVIEWPROJECTION_MATRIX",
 		"PROJECTION_MATRIX",

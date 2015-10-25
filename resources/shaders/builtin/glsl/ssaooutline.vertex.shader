@@ -1,6 +1,8 @@
 #version 150
 
 uniform mat4 MODEL_MATRIX;
+uniform mat4 VIEW_MATRIX;
+uniform mat4 MODEL_MATRIX_INVERSE_TRANSPOSE;
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
 uniform int CLIP_PLANE_COUNT;
@@ -13,7 +15,7 @@ out vec3 vNormal;
  
 void main()
 {
-	vNormal =  vec3(MODELVIEW_MATRIX * FACENORMAL);
+	vNormal =  mat3(VIEW_MATRIX) * mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * FACENORMAL.xyz;
    	vec4 outPos = MODELVIEWPROJECTION_MATRIX * POSITION;
     gl_Position = outPos ;
     

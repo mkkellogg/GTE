@@ -503,7 +503,7 @@ namespace GTE
 	{
 		Real temp[DATA_SIZE];
 		Transpose(data, temp);
-		memcpy(temp, data, sizeof(Real) * DATA_SIZE);
+		memcpy(data, temp, sizeof(Real) * DATA_SIZE);
 	}
 
 	/*

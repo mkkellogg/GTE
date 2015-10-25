@@ -19,7 +19,8 @@ namespace GTE
 		Directional = 1,
 		Point = 2,
 		Spot = 3,
-		Ambient = 4
+		Ambient = 4,
+		Planar = 5
 	};
 
 	enum class LightCullType
@@ -40,6 +41,7 @@ namespace GTE
 		Vector3 direction;
 		LightType type;
 		Real intensity;
+		Bool attenuationOverride;
 		Real attenuation;
 		Real range;
 		Bool shadowsEnabled;

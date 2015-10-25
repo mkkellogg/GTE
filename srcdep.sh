@@ -10,6 +10,7 @@ do
 	if [ -a "$OBJFILE" ]; then
 		if [ ! -a "$OBJFILE" ] || [ $DEP -ot $SRC ]; then
 			g++ -MM -Isrc -std=c++11 -c $SRC | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n//g' -e 's/\\//g' > $DEPFILE
+			echo $SRC >> $DEPFILE
 		fi
 		DEPS=`cat $DEPFILE`
 		ENTRY=0

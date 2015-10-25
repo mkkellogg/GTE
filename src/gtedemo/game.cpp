@@ -163,7 +163,9 @@ void Game::SetupScene(GTE::AssetImporter& importer, Scenes scene)
 			lavaScene = new(std::nothrow) LavaScene();
 			ASSERT(lavaScene != nullptr, "Game::SetupScene -> Unable to allocate Lava scene.");
 			scenes[(GTE::UInt32)Scenes::LavaScene] = lavaScene;
+			lavaScene->SetPlayerObjectLayerMask(playerObjectLayerMask);
 			lavaScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+
 		break;
 		case Scenes::CastleScene:
 			castleScene = new(std::nothrow) CastleScene();
