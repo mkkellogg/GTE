@@ -217,6 +217,7 @@
     <ClCompile Include="src\graphics\shader\shader.cpp" />
     <ClCompile Include="src\graphics\shader\shaderGL.cpp" />
     <ClCompile Include="src\graphics\shader\shadersource.cpp" />
+    <ClCompile Include="src\graphics\shader\shadersourcelines.cpp" />
     <ClCompile Include="src\graphics\shader\uniformdesc.cpp" />
     <ClCompile Include="src\graphics\stdattributes.cpp" />
     <ClCompile Include="src\graphics\stduniforms.cpp" />
@@ -330,6 +331,7 @@
     <ClInclude Include="src\graphics\shader\shader.h" />
     <ClInclude Include="src\graphics\shader\shaderGL.h" />
     <ClInclude Include="src\graphics\shader\shadersource.h" />
+    <ClInclude Include="src\graphics\shader\shadersourcelines.h" />
     <ClInclude Include="src\graphics\shader\uniformdesc.h" />
     <ClInclude Include="src\graphics\stdattributes.h" />
     <ClInclude Include="src\graphics\stduniforms.h" />

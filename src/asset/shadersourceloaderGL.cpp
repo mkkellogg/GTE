@@ -24,17 +24,16 @@ namespace GTE
 
 	}
 
-	void ShaderSourceLoaderGL::LoadShaderSouce(const std::string name, ShaderSource& shaderSource) const
+	void ShaderSourceLoaderGL::LoadShaderSource(const std::string name, ShaderSource& shaderSource) const
 	{
 		std::string vertexSource;
 		std::string fragmentSource;
 
 		FileSystem * fileSystem = FileSystem::Instance();
 		std::string builtinPath = fileSystem->FixupPathForLocalFilesystem(Constants::BuiltinShaderPathOpenGL);
-
-		vertexSource = fileSystem->ConcatenatePaths(builtinPath, std::string(name + std::string(".vertex.shader")));
-		fragmentSource = fileSystem->ConcatenatePaths(builtinPath, std::string(name + std::string(".fragment.shader")));
-		shaderSource.Init(vertexSource, fragmentSource, ShaderSourceType::File, name);
+		vertexSource = std::string(name + std::string(".vertex.shader"));
+		fragmentSource = std::string(name + std::string(".fragment.shader"));
+		shaderSource.Init(vertexSource, fragmentSource, ShaderSourceType::File, builtinPath, name);
 	}
 }
 

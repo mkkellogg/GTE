@@ -20,7 +20,7 @@ namespace GTE
 
 	public:
 
-		virtual void LoadShaderSouce(const std::string name, ShaderSource& shaderSource) const = 0;
+		virtual void LoadShaderSource(const std::string name, ShaderSource& shaderSource) const = 0;
 	};
 }
 

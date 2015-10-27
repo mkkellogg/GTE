@@ -4,16 +4,17 @@ uniform mat4 MODEL_MATRIX;
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 PROJECTION_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
+uniform mat4 MODEL_MATRIX_INVERSE_TRANSPOSE;
 uniform vec4 LIGHT_DIRECTION;
 uniform int LIGHT_TYPE;
 uniform int CLIP_PLANE_COUNT;
 uniform vec4 CLIP_PLANE0;
 in vec4 POSITION;
-in vec3 COLOR;
+in vec4 COLOR;
 in vec2 UVTEXTURE0;
 in vec4 NORMAL;
  
-out vec3 vColor;
+out vec4 vColor;
 out vec2 vUVTexture0;
 out vec3 vNormal;
 out vec4 vPosition;
@@ -27,7 +28,7 @@ void main()
 	}
    	vColor = COLOR;
    	vUVTexture0 = UVTEXTURE0;
-   	vNormal = vec3(MODEL_MATRIX * NORMAL);
+	vNormal = mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * NORMAL.xyz;
    	vPosition = MODEL_MATRIX * POSITION;
     gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION ;
     

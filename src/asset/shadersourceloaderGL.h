@@ -21,7 +21,7 @@ namespace GTE
 
 	public:
 
-		void LoadShaderSouce(const std::string name, ShaderSource& shaderSource) const;
+		void LoadShaderSource(const std::string name, ShaderSource& shaderSource) const;
 	};
 
 }

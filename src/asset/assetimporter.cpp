@@ -53,7 +53,7 @@ namespace GTE
 	void AssetImporter::LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource)
 	{
 		ASSERT(shaderSourceLoader != nullptr, "AssetImporter::LoadBuildInShaderSource -> shaderSourceLoader is null.");
-		shaderSourceLoader->LoadShaderSouce(name, shaderSource);
+		shaderSourceLoader->LoadShaderSource(name, shaderSource);
 	}
 
 	void AssetImporter::SetBoolProperty(AssetImporterBoolProperty prop, Bool value)

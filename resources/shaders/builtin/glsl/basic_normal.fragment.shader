@@ -19,6 +19,7 @@ in vec3 vNormal;
 in vec3 vFaceNormal;
 in vec3 vTangent;
 in vec4 vPosition;
+in vec3 vLightDir;
 
 out vec4 out_color;
 
@@ -38,68 +39,23 @@ vec3 calcMappedNormal()
     return NewNormal;
 }
 
-vec4 calcSpecular(float attenuationFactor, vec3 lightVector, vec3 mappedNormal, vec3 surfaceNormal, vec4 eyePosition, vec4 position, float lightIntensity, vec4 lightColor)
-{
-	vec4 specularColor = vec4(0,0,0,0);
-	vec3 VertexToEye = normalize(vec3(eyePosition - position));
-    vec3 LightReflect = normalize(reflect(lightVector, mappedNormal));
-	float specularTerm = dot(VertexToEye, LightReflect);
-    specularTerm = pow(max(0.0, specularTerm), 32) * attenuationFactor * (lightIntensity) * SPECULAR_FACTOR;
-	if(dot(-lightVector,surfaceNormal) <0.0) specularTerm=0.0;
-    if (specularTerm > 0) {
-        specularColor = lightColor * specularTerm;
- 	}
- 	return specularColor;
- }
+#include "lighting_blinnphong.inc"
 
 void main()
 {
 	texColor = texture(TEXTURE0, vUVTexture0);
-	float diffuseTerm = 0.0;
-	float specularTerm = 0.0;
+	float DiffuseTerm = 0.0;
+	float SpecularTerm = 0.0;
+
 	vec4 specularColor = vec4(0,0,0,0);
 	vec4 diffuseColor = vec4(0,0,0,0);
-	vec3 surfaceNormal = normalize(vNormal);
+	vec3 surfaceNormal = normalize(vNormal);	
+	vec4 position = vPosition;
 	
-	vec3 toLight;
-	vec3 lightVector;
-	
-	if(LIGHT_TYPE == 4)
-	{
-		diffuseTerm = LIGHT_INTENSITY;
-		diffuseColor = LIGHT_COLOR * diffuseTerm;
-	}
-	else if(LIGHT_TYPE == 1)
-	{
-		vec3 mappedNormal = calcMappedNormal();
-		lightVector = normalize(vec3(LIGHT_DIRECTION));
-		toLight = -lightVector;
-		
-		diffuseTerm = clamp(dot(mappedNormal, toLight), 0.0, 1.0) * LIGHT_INTENSITY;
-		//if(dot(-lightVector, surfaceNormal) < 0.0) diffuseTerm=0.0;
-		diffuseColor = LIGHT_COLOR * diffuseTerm;
-        
-        specularColor = calcSpecular(1.0, lightVector, mappedNormal, surfaceNormal, EYE_POSITION, vPosition, LIGHT_INTENSITY, LIGHT_COLOR);
-    }
-    else if(LIGHT_TYPE == 2)
-    {
-   		vec3 mappedNormal = calcMappedNormal();
-   		lightVector = vec3(vPosition - LIGHT_POSITION);
-		toLight = -lightVector;
-		lightVector = normalize(lightVector);
+	calcBlinnPhongTermsForLight(position, calcMappedNormal(), surfaceNormal, LIGHT_POSITION, vLightDir, EYE_POSITION, LIGHT_INTENSITY, LIGHT_ATTENUATION, SPECULAR_FACTOR, DiffuseTerm, SpecularTerm);
 
-		float light_dist = length(toLight);
-		float attenForLength = LIGHT_ATTENUATION * light_dist;
-		float attenuationFactor = max(1.0-attenForLength,0.0);
-	    vec3 normalizedVertexToLight = normalize(toLight);
-	    
-	    diffuseTerm = clamp(dot(mappedNormal, normalizedVertexToLight), 0.0, 1.0) * attenuationFactor * LIGHT_INTENSITY;
-		//if(dot(-lightVector, mappedNormal) < 0.0) diffuseTerm=0.0;
-	    diffuseColor = LIGHT_COLOR * diffuseTerm;
-	    
-        specularColor = calcSpecular(attenuationFactor, lightVector, mappedNormal, surfaceNormal, EYE_POSITION, vPosition, LIGHT_INTENSITY, LIGHT_COLOR);
-    }
-	
-    outputF = texColor * (diffuseColor  + specularColor);
+	diffuseColor = LIGHT_COLOR * texColor;
+	specularColor = LIGHT_COLOR;
+    outputF = ((DiffuseTerm * diffuseColor) + (SpecularTerm * specularColor));
     out_color = outputF;
 }

@@ -1,6 +1,7 @@
 #version 150
 
 uniform mat4 MODEL_MATRIX;
+uniform mat4 MODEL_MATRIX_INVERSE_TRANSPOSE;
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 PROJECTION_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
@@ -26,13 +27,17 @@ out vec3 vNormal;
 out vec3 vFaceNormal;
 out vec3 vTangent;
 out vec4 vPosition;
+out vec3 vLightDir;
  
 void main()
 {
-	  mat4 invTransM = inverse(transpose(MODEL_MATRIX));
+	if (LIGHT_TYPE == 1 || LIGHT_TYPE == 5)
+	{
+		vLightDir = normalize(LIGHT_DIRECTION.xyz);
+	}
     vUVTexture0 = vec2(UVTEXTURE0.s * USCALE, UVTEXTURE0.t * VSCALE);
-    vNormal = vec3(invTransM * NORMAL);
-	  vFaceNormal = vec3(invTransM * FACENORMAL);
+    vNormal = mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * NORMAL.xyz;
+	vFaceNormal = mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * FACENORMAL.xyz;
     vTangent = vec3(MODEL_MATRIX * TANGENT);
     vPosition = MODEL_MATRIX * POSITION;
     gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION ;
