@@ -1,14 +1,14 @@
 #include <functional>
 #include <vector>
-#include "lavascene.h"
 #include <iostream>
 #include <memory>
 #include <functional>
+
+#include "lavascene.h"
 #include "gtedemo/lavafield.h"
 #include "engine.h"
 #include "input/inputmanager.h"
 #include "gtedemo/gameutil.h"
-#include "lavascene.h"
 #include "asset/assetimporter.h"
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
@@ -93,9 +93,7 @@ void LavaScene::OnActivate()
 void LavaScene::Update()
 {
 	GTE::Point3 lightRotatePoint(-23, 5, 0);
-	// rotate the point light around [lightRotatePoint]
 	spinningPointLightObject->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z, 0, 1, 0, 30 * GTE::Time::GetDeltaTime(), false);
-	//pointLightObject->SetActive(false);
 
 	// rotate the cube around its center and the y-axis
 	cubeSceneObject->GetTransform().Rotate(0, 1, 0, 20 * GTE::Time::GetDeltaTime(), true);
@@ -114,17 +112,14 @@ void LavaScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientL
 {
 	importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
 
-	// get reference to the engine's object manager
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
+	GTE::IntMask mergedMask;
 	GTE::LayerManager& layerManager = objectManager->GetLayerManager();
 	GTE::Int32 lavaWallLayerIndex = layerManager.AddLayer(LavaWallLayer);
 	GTE::Int32 lavaIslandObjectsLayerIndex = layerManager.AddLayer(LavaIslandObjectsLayer);
-
 	lavaPlanarLayerMask = layerManager.GetLayerMask(lavaWallLayerIndex);
 	lavaIslandObjectsLayerMask = layerManager.GetLayerMask(lavaIslandObjectsLayerIndex);
-
-	GTE::IntMask mergedMask;
 
 	GTE::LightRef ambientLight = ambientLightObject->GetLight();
 	mergedMask = ambientLight->GetCullingMask();
@@ -141,14 +136,14 @@ void LavaScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientL
 	sceneRoot = objectManager->CreateSceneObject();
 	ASSERT(sceneRoot.IsValid(), "Could not create scene root for lava scene!\n");
 
-	sceneRoot->GetTransform().Translate(-20,0,0, false);
+	sceneRoot->GetTransform().Translate(-20, 0, 0, false);
+
+	this->directionalLightObject = directionalLightObject;
 
 	SetupTerrain(importer);
 	SetupStructures(importer);
 	SetupExtra(importer);
 	SetupLights(importer, playerObject);
-
-	this->directionalLightObject = directionalLightObject;
 }
 
 /*
@@ -174,7 +169,7 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 	//========================================================
 
 	// load lava island model
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1, false, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
@@ -182,11 +177,12 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 
 	// place island in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.02f,.02f,.02f, false);
-	modelSceneObject->GetTransform().Translate(-30,-10,12,false);
-	modelSceneObject->GetTransform().Rotate(0,1,0,-30,true);
+	modelSceneObject->GetTransform().Scale(.02f, .02f, .02f, false);
+	modelSceneObject->GetTransform().Translate(-30, -10, 12, false);
+	modelSceneObject->GetTransform().Rotate(0, 1, 0, -30, true);
 
-	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1 , false, true);
+	// load lava island model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1, false, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
@@ -194,8 +190,8 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 
 	// place island in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.015f,.025f,.015f, false);
-	modelSceneObject->GetTransform().Translate(-17,-6.5,-16,false);
+	modelSceneObject->GetTransform().Scale(.015f, .025f, .015f, false);
+	modelSceneObject->GetTransform().Translate(-17, -6.5, -16, false);
 
 	//========================================================
 	//
@@ -215,8 +211,8 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 
 	GTE::SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
 	sceneRoot->AddChild(lavaFieldObject);
-	lavaFieldObject->GetTransform().Scale(100,1,97, false);
-	lavaFieldObject->GetTransform().Translate(-40,-17,0, false);
+	lavaFieldObject->GetTransform().Scale(100, 1, 97, false);
+	lavaFieldObject->GetTransform().Translate(-40, -17, 0, false);
 
 
 	//========================================================
@@ -241,47 +237,47 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 	// place initial stone in scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.0045f, .0045f, .0045f, false);
-	modelSceneObject->GetTransform().Rotate(0,1,0,25, false);
-	modelSceneObject->GetTransform().Rotate(0,0,1,15, false);
-	modelSceneObject->GetTransform().Translate(5,-15,-45,false);
+	modelSceneObject->GetTransform().Rotate(0, 1, 0, 25, false);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 15, false);
+	modelSceneObject->GetTransform().Translate(5, -15, -45, false);
 
 	// re-use the stone mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f,.5f, .5f, 1, 0,0, -90, -16,-15,-55, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f, .5f, .5f, 1, 0, 0, -90, -16, -15, -55, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f,.5f, .5f, 0, 1,0, -70, -54,-30,-52, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f, .5f, .5f, 0, 1, 0, -70, -54, -30, -52, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-15,false);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f,.5f, .5f, 1, 0,0, -90, -66,-15,-27, true,true,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, -15, false);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f, .5f, .5f, 1, 0, 0, -90, -66, -15, -27, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-90, true);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f,.5f, .5f, 0, 1,0, -20, -95,-17, 8, true,true,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, -90, true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f, .5f, .5f, 0, 1, 0, -20, -95, -17, 8, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .55f,.58f, .55f, 1, 0,0, -90, -90,-15, 30, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .55f, .58f, .55f, 1, 0, 0, -90, -90, -15, 30, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-40, true);
-	modelSceneObject->GetTransform().Rotate(1,0,0,-180, true);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f,.5f, .5f, 0, 1,0, -80, -85,-28, 43, true,true,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, -40, true);
+	modelSceneObject->GetTransform().Rotate(1, 0, 0, -180, true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .5f, .5f, .5f, 0, 1, 0, -80, -85, -28, 43, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .45f,.4f, .45f, 1, 0,0, -90, -40,-25, 45, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .45f, .4f, .45f, 1, 0, 0, -90, -40, -25, 45, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,-40, true);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .6f,.5f, .5f, 0, 1,0, -80, -20,-28, 45, true,true,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, -40, true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .6f, .5f, .5f, 0, 1, 0, -80, -20, -28, 45, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .40f,.6f, .55f, 0, 1,0, -10, 10,-30, 21, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .40f, .6f, .55f, 0, 1, 0, -10, 10, -30, 21, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .25f,.6f, .35f, 0, 1,0, -180, 10,-25, -27, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .25f, .6f, .35f, 0, 1, 0, -180, 10, -25, -27, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
-	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .40f,.6f, .40f, 0, 1,0, -180, 17,-32, 15, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(stone1Mesh, stone1Material, .40f, .6f, .40f, 0, 1, 0, -180, 17, -32, 15, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaPlanarLayerMask);
 }
@@ -314,8 +310,8 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// place mushroom house in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.12f,.12f,.12f, false);
-	modelSceneObject->GetTransform().Translate(-19,-6.5,-15,false);
+	modelSceneObject->GetTransform().Scale(.12f, .12f, .12f, false);
+	modelSceneObject->GetTransform().Translate(-19, -6.5, -15, false);
 
 	// load turrent tower
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Tower_01.fbx");
@@ -326,8 +322,8 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// place turret tower in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.05f,.05f,.05f, false);
-	modelSceneObject->GetTransform().Translate(-28.5,-10,7.5,false);
+	modelSceneObject->GetTransform().Scale(.05f, .05f, .05f, false);
+	modelSceneObject->GetTransform().Translate(-28.5, -10, 7.5, false);
 
 	//========================================================
 	//
@@ -336,7 +332,7 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 	//========================================================
 
 	// load bridge
-	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1 , true, true);
+	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1, true, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load bridge model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
@@ -353,15 +349,15 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// place bridge in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.1f,.1f,.075f, false);
-	modelSceneObject->GetTransform().Translate(-20,-11.5f,27,false);
-	modelSceneObject->GetTransform().Rotate(0,1,0,20,true);
+	modelSceneObject->GetTransform().Scale(.1f, .1f, .075f, false);
+	modelSceneObject->GetTransform().Translate(-20, -11.5f, 27, false);
+	modelSceneObject->GetTransform().Rotate(0, 1, 0, 20, true);
 
-	modelSceneObject = GameUtil::AddMeshToScene(woodBridgeMesh, woodBridgeMaterial, .06f,.1f, .1f, 1, 0,0, -90, -13,-8, -46, true,true,true);
+	modelSceneObject = GameUtil::AddMeshToScene(woodBridgeMesh, woodBridgeMaterial, .06f, .1f, .1f, 1, 0, 0, -90, -13, -8, -46, true, true, true);
 	woodBridgeMeshFilter = modelSceneObject->GetMesh3DFilter();
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsLayerMask(modelSceneObject, lavaIslandObjectsLayerMask);
-	modelSceneObject->GetTransform().Rotate(0,0,1,90,true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
 	woodBridgeMeshFilter->SetUseBackSetShadowVolume(false);
 	woodBridgeMeshFilter->SetUseCustomShadowVolumeOffset(true);
 	woodBridgeMeshFilter->SetCustomShadowVolumeOffset(0.6f);
@@ -425,7 +421,7 @@ void LavaScene::SetupExtra(GTE::AssetImporter& importer)
 	cubeSceneObject->SetMesh3DRenderer(renderer);
 
 	// scale the cube and move to its position in the scene
-	cubeSceneObject->GetTransform().Scale(1.5f, 1.5f,1.5f, false);
+	cubeSceneObject->GetTransform().Scale(1.5f, 1.5f, 1.5f, false);
 	cubeSceneObject->GetTransform().Translate(-37, -7, 14, false);
 }
 
@@ -478,7 +474,7 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	light->SetShadowsEnabled(true);
 	light->SetType(GTE::LightType::Point);
 	spinningPointLightObject->SetLight(light);
-	spinningPointLightObject->GetTransform().Scale(.4f,.4f,.4f, true);
+	spinningPointLightObject->GetTransform().Scale(.4f, .4f, .4f, true);
 	spinningPointLightObject->GetTransform().Translate(4, 2, 0, false);
 
 	//========================================================
@@ -492,7 +488,7 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	sceneRoot->AddChild(lavaLightObject);
 	lavaLightObject->SetStatic(true);
 	GTE::LightRef lavaLight = objectManager->CreateLight();
-	lavaLight->SetDirection(0,1,0);
+	lavaLight->SetDirection(0, 1, 0);
 	lavaLight->SetIntensity(3.25f);
 	lavaLight->SetCullingMask(lavaPlanarLayerMask);
 	lavaLight->SetRange(55);

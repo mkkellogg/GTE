@@ -24,7 +24,7 @@ class Game
 	enum class PlayerType
 	{
 		Koopa = 0,
-		Warrior=1
+		Warrior = 1
 	};
 
 	enum PlayerState
@@ -109,7 +109,7 @@ class Game
 
 	class SceneTransition
 	{
-		public:
+	public:
 
 		GTE::Transform OriginalTransform;
 	};
@@ -182,15 +182,15 @@ class Game
 	void DisplayInfo();
 	void SignalDisplayInfoChanged();
 
-    public:
+public:
 
-    Game();
-    ~Game();
+	Game();
+	~Game();
 
-    void Init();
-    void Update();
-    void OnPreRender();
-    void OnQuit();
+	void Init();
+	void Update();
+	void OnPreRender();
+	void OnQuit();
 };
 
 #endif

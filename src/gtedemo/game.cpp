@@ -159,26 +159,26 @@ void Game::SetupScene(GTE::AssetImporter& importer, Scenes scene)
 
 	switch(scene)
 	{
-		case Scenes::LavaScene:
-			lavaScene = new(std::nothrow) LavaScene();
-			ASSERT(lavaScene != nullptr, "Game::SetupScene -> Unable to allocate Lava scene.");
-			scenes[(GTE::UInt32)Scenes::LavaScene] = lavaScene;
-			lavaScene->SetPlayerObjectLayerMask(playerObjectLayerMask);
-			lavaScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+	case Scenes::LavaScene:
+		lavaScene = new(std::nothrow) LavaScene();
+		ASSERT(lavaScene != nullptr, "Game::SetupScene -> Unable to allocate Lava scene.");
+		scenes[(GTE::UInt32)Scenes::LavaScene] = lavaScene;
+		lavaScene->SetPlayerObjectLayerMask(playerObjectLayerMask);
+		lavaScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 
 		break;
-		case Scenes::CastleScene:
-			castleScene = new(std::nothrow) CastleScene();
-			ASSERT(castleScene != nullptr, "Game::SetupScene -> Unable to allocate Castle scene.");
-			scenes[(GTE::UInt32)Scenes::CastleScene] = castleScene;
-			castleScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+	case Scenes::CastleScene:
+		castleScene = new(std::nothrow) CastleScene();
+		ASSERT(castleScene != nullptr, "Game::SetupScene -> Unable to allocate Castle scene.");
+		scenes[(GTE::UInt32)Scenes::CastleScene] = castleScene;
+		castleScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
-		case Scenes::PoolScene:
-			poolScene = new(std::nothrow) PoolScene();
-			ASSERT(poolScene != nullptr, "Game::SetupScene -> Unable to allocate Pool scene.");
-			poolScene->SetMainCamera(cameraObject->GetCamera());
-			scenes[(GTE::UInt32)Scenes::PoolScene] = poolScene;
-			poolScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
+	case Scenes::PoolScene:
+		poolScene = new(std::nothrow) PoolScene();
+		ASSERT(poolScene != nullptr, "Game::SetupScene -> Unable to allocate Pool scene.");
+		poolScene->SetMainCamera(cameraObject->GetCamera());
+		scenes[(GTE::UInt32)Scenes::PoolScene] = poolScene;
+		poolScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
 		break;
 	}
 }
@@ -218,7 +218,7 @@ void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 	directionalLightObject = objectManager->CreateSceneObject();
 	directionalLightObject->SetStatic(true);
 	light = objectManager->CreateLight();
-	light->SetDirection(-.8f,-1.7f,-2);
+	light->SetDirection(-.8f, -1.7f, -2);
 	light->SetIntensity(.8f);
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(light->GetCullingMask(), playerObjectLayerMask);
 	light->SetCullingMask(mergedMask);
@@ -241,8 +241,8 @@ void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 
 	// place island in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.03f,.03f,.03f, false);
-	modelSceneObject->GetTransform().Translate(45,-10, 50, false);
+	modelSceneObject->GetTransform().Scale(.03f, .03f, .03f, false);
+	modelSceneObject->GetTransform().Translate(45, -10, 50, false);
 
 	//========================================================
 	//
@@ -251,15 +251,15 @@ void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 	//========================================================
 
 	// load bridge
-	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1 , false, true);
+	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1, false, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load bridge model!\n");
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// place bridge in the scene
 	modelSceneObject->SetActive(true);
-	modelSceneObject->GetTransform().Scale(.1f,.1f,.1f, false);
-	modelSceneObject->GetTransform().Translate(30,-11.5f,35,false);
-	modelSceneObject->GetTransform().Rotate(0,1,0,55,true);
+	modelSceneObject->GetTransform().Scale(.1f, .1f, .1f, false);
+	modelSceneObject->GetTransform().Translate(30, -11.5f, 35, false);
+	modelSceneObject->GetTransform().Rotate(0, 1, 0, 55, true);
 }
 
 /*
@@ -278,7 +278,7 @@ void Game::SwitchToScene(Scenes scene)
 	}
 
 	scenes[(GTE::UInt32)currentScene]->GetSceneRoot()->SetActive(true);
-	
+
 	//Engine::Instance()->GetRenderManager()->ClearCaches();
 }
 
@@ -302,15 +302,15 @@ void Game::TransitionToScene(Scenes scene)
 		scenes[(GTE::UInt32)scene]->OnActivate();
 		SignalDisplayInfoChanged();
 
-		switch (scene)
+		switch(scene)
 		{
-			case Scenes::CastleScene:
-				// force directional light to be off in castle scene
-				directionalLightObject->SetActive(false);
-				break;
-			default:
-				directionalLightObject->SetActive(directionalLightOn);
-				break;
+		case Scenes::CastleScene:
+			// force directional light to be off in castle scene
+			directionalLightObject->SetActive(false);
+			break;
+		default:
+			directionalLightObject->SetActive(directionalLightOn);
+			break;
 		}
 	}
 }
@@ -359,8 +359,8 @@ void Game::UpdateSceneTransition()
 		{
 			if(normalizedElapsedTime < times[i])
 			{
-				GTE::Real cElapsed = normalizedElapsedTime - times[i-1];
-				destScale =  ((cElapsed/(times[i]-times[i-1])) * (scales[i] - scales[i-1])) + scales[i-1];
+				GTE::Real cElapsed = normalizedElapsedTime - times[i - 1];
+				destScale = ((cElapsed / (times[i] - times[i - 1])) * (scales[i] - scales[i - 1])) + scales[i - 1];
 				break;
 			}
 		}
@@ -427,16 +427,16 @@ void Game::SetupCamera()
 
 	// decompose player's transform into position, rotation and scale
 	playerObject->GetTransform().CopyMatrix(mat);
-	mat.Decompose(trans,rot,scale);
-	cameraObject->GetTransform().Translate(trans.x+20,trans.y+10,trans.z+15, true);
+	mat.Decompose(trans, rot, scale);
+	cameraObject->GetTransform().Translate(trans.x + 20, trans.y + 10, trans.z + 15, true);
 
 	// create skybox texture
 	GTE::TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky_north.png",
-														 	 		"resources/textures/skybox-night/nightsky_south.png",
-														 	 		"resources/textures/skybox-night/nightsky_up.png",
-														 	 		"resources/textures/skybox-night/nightsky_down.png",
-														 	 		"resources/textures/skybox-night/nightsky_west.png",
-														 	 		"resources/textures/skybox-night/nightsky_east.png");
+		"resources/textures/skybox-night/nightsky_south.png",
+		"resources/textures/skybox-night/nightsky_up.png",
+		"resources/textures/skybox-night/nightsky_down.png",
+		"resources/textures/skybox-night/nightsky_west.png",
+		"resources/textures/skybox-night/nightsky_east.png");
 	// activate skybox
 	camera->SetupSkybox(skyboxTexture);
 	camera->SetSkyboxEnabled(true);
@@ -462,20 +462,20 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 
 	switch(playerType)
 	{
-		case PlayerType::Koopa:
-			importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
-			playerObject = importer.LoadModelDirect("resources/models/koopa/koopamod.fbx");
-			ASSERT(playerObject.IsValid(), "Could not load Koopa model!\n");
-			playerObject->GetTransform().SetIdentity();
-			playerObject->GetTransform().Translate(45,-10,55,false);
-			playerObject->GetTransform().Scale(.05f, .05f, .05f, true);
+	case PlayerType::Koopa:
+		importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
+		playerObject = importer.LoadModelDirect("resources/models/koopa/koopamod.fbx");
+		ASSERT(playerObject.IsValid(), "Could not load Koopa model!\n");
+		playerObject->GetTransform().SetIdentity();
+		playerObject->GetTransform().Translate(45, -10, 55, false);
+		playerObject->GetTransform().Scale(.05f, .05f, .05f, true);
 		break;
-		case PlayerType::Warrior:
-			importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, true);
-			playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx");
-			ASSERT(playerObject.IsValid(), "Could not load Warrior model!\n");
-			playerObject->GetTransform().Translate(45,-10,55,false);
-			playerObject->GetTransform().Scale(4, 4, 4, true);
+	case PlayerType::Warrior:
+		importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, true);
+		playerObject = importer.LoadModelDirect("resources/models/toonwarrior/character/warrior.fbx");
+		ASSERT(playerObject.IsValid(), "Could not load Warrior model!\n");
+		playerObject->GetTransform().Translate(45, -10, 55, false);
+		playerObject->GetTransform().Scale(4, 4, 4, true);
 		break;
 	}
 
@@ -487,22 +487,22 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 
 	switch(playerType)
 	{
-		case PlayerType::Koopa:
-			playerAnimations[PlayerState::Waiting] = importer.LoadAnimation("resources/models/koopa/model/koopa@wait.fbx", true);
-			playerAnimations[PlayerState::Walking]  = importer.LoadAnimation("resources/models/koopa/model/koopa@walk.fbx", true);
-			playerAnimations[PlayerState::Roaring]  = importer.LoadAnimation("resources/models/koopa/model/koopa@roar3.fbx", false);
-			playerAnimations[PlayerState::Jump]  = importer.LoadAnimation("resources/models/koopa/model/koopa@jump.fbx", false);
-			playerAnimations[PlayerState::JumpStart]  = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpstart.fbx", false);
-			playerAnimations[PlayerState::JumpEnd]  = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpend.fbx", false);
-			playerAnimations[PlayerState::JumpFall]  = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpfall.fbx", false);
+	case PlayerType::Koopa:
+		playerAnimations[PlayerState::Waiting] = importer.LoadAnimation("resources/models/koopa/model/koopa@wait.fbx", true);
+		playerAnimations[PlayerState::Walking] = importer.LoadAnimation("resources/models/koopa/model/koopa@walk.fbx", true);
+		playerAnimations[PlayerState::Roaring] = importer.LoadAnimation("resources/models/koopa/model/koopa@roar3.fbx", false);
+		playerAnimations[PlayerState::Jump] = importer.LoadAnimation("resources/models/koopa/model/koopa@jump.fbx", false);
+		playerAnimations[PlayerState::JumpStart] = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpstart.fbx", false);
+		playerAnimations[PlayerState::JumpEnd] = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpend.fbx", false);
+		playerAnimations[PlayerState::JumpFall] = importer.LoadAnimation("resources/models/koopa/model/koopa@jumpfall.fbx", false);
 		break;
-		case PlayerType::Warrior:
-			playerAnimations[PlayerState::Waiting] = importer.LoadAnimation("resources/models/toonwarrior/animations/idle.fbx", true);
-			playerAnimations[PlayerState::Walking] = importer.LoadAnimation("resources/models/toonwarrior/animations/walk.fbx", true);
-			playerAnimations[PlayerState::Attack1] = importer.LoadAnimation("resources/models/toonwarrior/animations/slash1.fbx", true);
-			playerAnimations[PlayerState::Attack2] = importer.LoadAnimation("resources/models/toonwarrior/animations/slash2.fbx", true);
-			playerAnimations[PlayerState::Attack3] = importer.LoadAnimation("resources/models/toonwarrior/animations/slash4.fbx", true);
-			playerAnimations[PlayerState::Defend1] = importer.LoadAnimation("resources/models/toonwarrior/animations/shield.fbx", true);
+	case PlayerType::Warrior:
+		playerAnimations[PlayerState::Waiting] = importer.LoadAnimation("resources/models/toonwarrior/animations/idle.fbx", true);
+		playerAnimations[PlayerState::Walking] = importer.LoadAnimation("resources/models/toonwarrior/animations/walk.fbx", true);
+		playerAnimations[PlayerState::Attack1] = importer.LoadAnimation("resources/models/toonwarrior/animations/slash1.fbx", true);
+		playerAnimations[PlayerState::Attack2] = importer.LoadAnimation("resources/models/toonwarrior/animations/slash2.fbx", true);
+		playerAnimations[PlayerState::Attack3] = importer.LoadAnimation("resources/models/toonwarrior/animations/slash4.fbx", true);
+		playerAnimations[PlayerState::Defend1] = importer.LoadAnimation("resources/models/toonwarrior/animations/shield.fbx", true);
 		break;
 	}
 
@@ -520,63 +520,63 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 
 	switch(playerType)
 	{
-		case PlayerType::Koopa:
-			compatible = animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Walking]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Waiting]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Jump] );
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Roaring]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpStart]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpEnd]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpFall]);
+	case PlayerType::Koopa:
+		compatible = animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Walking]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Waiting]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Jump]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Roaring]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpStart]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpEnd]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::JumpFall]);
 
-			ASSERT(compatible, "Koopa animations are not compatible!");
+		ASSERT(compatible, "Koopa animations are not compatible!");
 
-			// create an animation player and some animations to it for the player object.
-			playerAnimations[PlayerState::JumpFall]->ClipEnds(playerAnimations[PlayerState::JumpFall]->GetDuration() - .05f, playerAnimations[PlayerState::JumpFall]->GetDuration());
-			animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Waiting]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Walking]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Jump]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::JumpStart]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::JumpEnd]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::JumpFall]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Roaring]);
-			animationPlayer->SetSpeed(playerAnimations[PlayerState::Walking], 2);
-			animationPlayer->SetSpeed(playerAnimations[PlayerState::JumpStart], 4);
-			animationPlayer->SetPlaybackMode(playerAnimations[PlayerState::JumpFall], GTE::PlaybackMode::Clamp);
-			animationPlayer->Play(playerAnimations[PlayerState::Waiting]);
+		// create an animation player and some animations to it for the player object.
+		playerAnimations[PlayerState::JumpFall]->ClipEnds(playerAnimations[PlayerState::JumpFall]->GetDuration() - .05f, playerAnimations[PlayerState::JumpFall]->GetDuration());
+		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Waiting]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Walking]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Jump]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::JumpStart]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::JumpEnd]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::JumpFall]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Roaring]);
+		animationPlayer->SetSpeed(playerAnimations[PlayerState::Walking], 2);
+		animationPlayer->SetSpeed(playerAnimations[PlayerState::JumpStart], 4);
+		animationPlayer->SetPlaybackMode(playerAnimations[PlayerState::JumpFall], GTE::PlaybackMode::Clamp);
+		animationPlayer->Play(playerAnimations[PlayerState::Waiting]);
 
 		break;
-		case PlayerType::Warrior:
-			compatible = animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Waiting]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Walking]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Attack1]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Attack2]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Attack3]);
-			compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Defend1]);
+	case PlayerType::Warrior:
+		compatible = animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Waiting]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Walking]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Attack1]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Attack2]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Attack3]);
+		compatible &= animManager->IsCompatible(playerRenderer, playerAnimations[PlayerState::Defend1]);
 
-			ASSERT(compatible, "Warrior animations are not compatible!");
+		ASSERT(compatible, "Warrior animations are not compatible!");
 
-			// set all meshes to use standard shadow volume
-			GameUtil::ProcessSceneObjects(playerObject, [=](GTE::SceneObjectRef current)
+		// set all meshes to use standard shadow volume
+		GameUtil::ProcessSceneObjects(playerObject, [=](GTE::SceneObjectRef current)
+		{
+			GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
+			if(filter.IsValid())
 			{
-				GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
-				if (filter.IsValid())
-				{
-					filter->SetUseBackSetShadowVolume(false);
-				}
-			});
+				filter->SetUseBackSetShadowVolume(false);
+			}
+		});
 
-			// create an animation player and some animations to it for the player object.
-			animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Waiting]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Walking]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Attack1]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Attack2]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Attack3]);
-			animationPlayer->AddAnimation(playerAnimations[PlayerState::Defend1]);
-			animationPlayer->SetSpeed(playerAnimations[PlayerState::Attack3], .65f);
-			animationPlayer->Play(playerAnimations[PlayerState::Waiting]);
+		// create an animation player and some animations to it for the player object.
+		animationPlayer = animManager->RetrieveOrCreateAnimationPlayer(playerRenderer);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Waiting]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Walking]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Attack1]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Attack2]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Attack3]);
+		animationPlayer->AddAnimation(playerAnimations[PlayerState::Defend1]);
+		animationPlayer->SetSpeed(playerAnimations[PlayerState::Attack3], .65f);
+		animationPlayer->Play(playerAnimations[PlayerState::Waiting]);
 		break;
 	}
 }
@@ -670,33 +670,33 @@ void Game::DisplayInfo()
 
 		switch(selectedLighting)
 		{
-			case SceneLighting::Ambient:
-				printf(" |  Selected lighting: Ambient");
+		case SceneLighting::Ambient:
+			printf(" |  Selected lighting: Ambient");
 			break;
-			case SceneLighting::Directional:
-				printf(" |  Selected lighting: Directional");
+		case SceneLighting::Directional:
+			printf(" |  Selected lighting: Directional");
 			break;
-			case SceneLighting::Point:
-				printf(" |  Selected lighting: Point");
+		case SceneLighting::Point:
+			printf(" |  Selected lighting: Point");
 			break;
-			case SceneLighting::Lava:
-				printf(" |  Selected lighting: Lava lights");
+		case SceneLighting::Lava:
+			printf(" |  Selected lighting: Lava lights");
 			break;
-			default:
-				printf(" |  Selected lighting: None");
+		default:
+			printf(" |  Selected lighting: None");
 			break;
 		}
 
 		switch(currentScene)
 		{
-			case Scenes::LavaScene:
-				printf(" |  Current scene: Lava ");
+		case Scenes::LavaScene:
+			printf(" |  Current scene: Lava ");
 			break;
-			case Scenes::CastleScene:
-				printf(" |  Current scene: Castle");
+		case Scenes::CastleScene:
+			printf(" |  Current scene: Castle");
 			break;
-			case Scenes::PoolScene:
-				printf(" |  Current scene: Reflecting Pool");
+		case Scenes::PoolScene:
+			printf(" |  Current scene: Reflecting Pool");
 			break;
 		}
 
@@ -726,9 +726,9 @@ void Game::UpdatePlayerHorizontalSpeedAndDirection()
 	GTE::Real curSmooth = playerSpeedSmoothing * GTE::Time::GetDeltaTime();
 
 	if(playerState == PlayerState::Roaring ||
-	   playerState == PlayerState::Defend1 ||
-	   playerState == PlayerState::Attack1 ||
-	   playerState == PlayerState::Attack2)
+		playerState == PlayerState::Defend1 ||
+		playerState == PlayerState::Attack1 ||
+		playerState == PlayerState::Attack2)
 	{
 		playerHorizontalSpeed = GTE::GTEMath::Lerp(playerHorizontalSpeed, 0, curSmooth);
 		return;
@@ -764,10 +764,10 @@ void Game::UpdatePlayerHorizontalSpeedAndDirection()
 	GTE::InputManager * inputManager = GTE::Engine::Instance()->GetInputManager();
 
 	// get directional input
-	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Left))h -= 1;
-	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Right))h += 1;
-	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Up))v += 1;
-	if (inputManager->GetDigitalInputState(GTE::DigitalInput::Down))v -= 1;
+	if(inputManager->GetDigitalInputState(GTE::DigitalInput::Left))h -= 1;
+	if(inputManager->GetDigitalInputState(GTE::DigitalInput::Right))h += 1;
+	if(inputManager->GetDigitalInputState(GTE::DigitalInput::Up))v += 1;
+	if(inputManager->GetDigitalInputState(GTE::DigitalInput::Down))v -= 1;
 
 	playerIsMoving = GTE::GTEMath::Abs(h) > .1 || GTE::GTEMath::Abs(v) > .1;
 
@@ -851,7 +851,7 @@ void Game::UpdatePlayerVerticalSpeed()
 	}
 
 	// apply gravity to the player's Y velocity
-	if (!playerIsGrounded)playerVerticalSpeed -= 95 * GTE::Time::GetDeltaTime();
+	if(!playerIsGrounded)playerVerticalSpeed -= 95 * GTE::Time::GetDeltaTime();
 
 	// if the player was moving upwards but now is not after the application
 	// of gravity, then the jump's apex has been reached.
@@ -898,9 +898,9 @@ void Game::ApplyPlayerMovement()
 void Game::UpdatePlayerLookDirection()
 {
 	if(playerState == PlayerState::Roaring ||
-	   playerState == PlayerState::Defend1 ||
-	   playerState == PlayerState::Attack1 ||
-	   playerState == PlayerState::Attack2)return;
+		playerState == PlayerState::Defend1 ||
+		playerState == PlayerState::Attack1 ||
+		playerState == PlayerState::Attack2)return;
 
 	// axis around which to rotate player object
 	GTE::Vector3 rotationAxis(0, 1, 0);
@@ -926,35 +926,35 @@ void Game::UpdatePlayerAnimation()
 {
 	switch(playerType)
 	{
-		case PlayerType::Koopa:
-			if(playerState == PlayerState::Walking)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Walking], .2f);
-			else if(playerState == PlayerState::Waiting)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Waiting], .3f);
-			else if(playerState == PlayerState::Roaring)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Roaring], .2f);
-			else if(playerState == PlayerState::JumpStart)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::JumpStart], .1f);
-			else if(playerState == PlayerState::Jump)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Jump], .2f);
-			else if(playerState == PlayerState::JumpFall)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::JumpFall], .4f);
-			else if(playerState == PlayerState::JumpEnd)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::JumpEnd], .05f);
+	case PlayerType::Koopa:
+		if(playerState == PlayerState::Walking)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Walking], .2f);
+		else if(playerState == PlayerState::Waiting)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Waiting], .3f);
+		else if(playerState == PlayerState::Roaring)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Roaring], .2f);
+		else if(playerState == PlayerState::JumpStart)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::JumpStart], .1f);
+		else if(playerState == PlayerState::Jump)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Jump], .2f);
+		else if(playerState == PlayerState::JumpFall)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::JumpFall], .4f);
+		else if(playerState == PlayerState::JumpEnd)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::JumpEnd], .05f);
 		break;
-		case PlayerType::Warrior:
-			if(playerState == PlayerState::Walking)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Walking], .2f);
-			else if(playerState == PlayerState::Waiting)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Waiting], .3f);
-			else if(playerState == PlayerState::Attack1)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Attack1], .2f);
-			else if(playerState == PlayerState::Attack2)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Attack2], .2f);
-			else if(playerState == PlayerState::Attack3)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Attack3], .2f);
-			else if(playerState == PlayerState::Defend1)
-				animationPlayer->CrossFade(playerAnimations[PlayerState::Defend1], .2f);
+	case PlayerType::Warrior:
+		if(playerState == PlayerState::Walking)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Walking], .2f);
+		else if(playerState == PlayerState::Waiting)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Waiting], .3f);
+		else if(playerState == PlayerState::Attack1)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Attack1], .2f);
+		else if(playerState == PlayerState::Attack2)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Attack2], .2f);
+		else if(playerState == PlayerState::Attack3)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Attack3], .2f);
+		else if(playerState == PlayerState::Defend1)
+			animationPlayer->CrossFade(playerAnimations[PlayerState::Defend1], .2f);
 		break;
 	}
 }
@@ -967,72 +967,72 @@ void Game::ManagePlayerState()
 	GTE::Real currentStateTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(GTE::UInt32)playerState];
 	switch(playerType)
 	{
-		case PlayerType::Koopa:
-			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::C))
-			{
-				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
-					ActivatePlayerState(PlayerState::Roaring);
-			}
+	case PlayerType::Koopa:
+		if(GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::C))
+		{
+			if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
+				ActivatePlayerState(PlayerState::Roaring);
+		}
 
-			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::X))
-			{
-				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
-					ActivatePlayerState(PlayerState::JumpStart);
-			}
+		if(GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::X))
+		{
+			if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
+				ActivatePlayerState(PlayerState::JumpStart);
+		}
 
-			if(playerState == PlayerState::Roaring && currentStateTime > 6)ActivatePlayerState(PlayerState::Waiting);
-			if(playerState == PlayerState::JumpStart && currentStateTime >.2f)ActivatePlayerState(PlayerState::Jump);
-			if(playerJumpApexReached)ActivatePlayerState(PlayerState::JumpFall);
-			if(playerLanded)ActivatePlayerState(PlayerState::JumpEnd);
+		if(playerState == PlayerState::Roaring && currentStateTime > 6)ActivatePlayerState(PlayerState::Waiting);
+		if(playerState == PlayerState::JumpStart && currentStateTime > .2f)ActivatePlayerState(PlayerState::Jump);
+		if(playerJumpApexReached)ActivatePlayerState(PlayerState::JumpFall);
+		if(playerLanded)ActivatePlayerState(PlayerState::JumpEnd);
 
-			if(playerState == PlayerState::JumpEnd)
-			{
-				if(currentStateTime > .1f && playerHorizontalSpeed > .3f)ActivatePlayerState(PlayerState::Walking);
-				else if(currentStateTime > .3f)ActivatePlayerState(PlayerState::Waiting);
-			}
+		if(playerState == PlayerState::JumpEnd)
+		{
+			if(currentStateTime > .1f && playerHorizontalSpeed > .3f)ActivatePlayerState(PlayerState::Walking);
+			else if(currentStateTime > .3f)ActivatePlayerState(PlayerState::Waiting);
+		}
 
-			if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
-			{
-				if(playerHorizontalSpeed > .1f)ActivatePlayerState(PlayerState::Walking);
-				else ActivatePlayerState(PlayerState::Waiting);
-			}
+		if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
+		{
+			if(playerHorizontalSpeed > .1f)ActivatePlayerState(PlayerState::Walking);
+			else ActivatePlayerState(PlayerState::Waiting);
+		}
 		break;
-		case PlayerType::Warrior:
+	case PlayerType::Warrior:
 
-			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::X))
-			{
-				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
-					ActivatePlayerState(PlayerState::Attack1);
-			}
+		if(GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::X))
+		{
+			if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
+				ActivatePlayerState(PlayerState::Attack1);
+		}
 
-			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::C))
-			{
-				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
-					ActivatePlayerState(PlayerState::Attack2);
-			}
+		if(GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::C))
+		{
+			if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
+				ActivatePlayerState(PlayerState::Attack2);
+		}
 
-			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::V))
-			{
-				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
-					ActivatePlayerState(PlayerState::Attack3);
-			}
+		if(GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::V))
+		{
+			if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking)
+				ActivatePlayerState(PlayerState::Attack3);
+		}
 
-			if (GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::B))
-			{
-				if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking || playerState == PlayerState::Defend1 )
-					ActivatePlayerState(PlayerState::Defend1);
-			}
+		if(GTE::Engine::Instance()->GetInputManager()->IsKeyDown(GTE::Key::B))
+		{
+			if(playerState == PlayerState::Waiting || playerState == PlayerState::Walking || playerState == PlayerState::Defend1)
+				ActivatePlayerState(PlayerState::Defend1);
+		}
 
-			if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
-			{
-				if(playerHorizontalSpeed > .1)ActivatePlayerState(PlayerState::Walking);
-				else ActivatePlayerState(PlayerState::Waiting);
-			}
+		if(playerState == PlayerState::Walking || playerState == PlayerState::Waiting)
+		{
+			if(playerHorizontalSpeed > .1)ActivatePlayerState(PlayerState::Walking);
+			else ActivatePlayerState(PlayerState::Waiting);
+		}
 
-			if(playerState == PlayerState::Attack1 && currentStateTime > .5f)ActivatePlayerState(PlayerState::Waiting);
-			else if(playerState == PlayerState::Attack2 && currentStateTime > .45f)ActivatePlayerState(PlayerState::Waiting);
-			else if(playerState == PlayerState::Attack3 && currentStateTime > 1)ActivatePlayerState(PlayerState::Waiting);
-			else if(playerState == PlayerState::Defend1 && currentStateTime > .45f)ActivatePlayerState(PlayerState::Waiting);
+		if(playerState == PlayerState::Attack1 && currentStateTime > .5f)ActivatePlayerState(PlayerState::Waiting);
+		else if(playerState == PlayerState::Attack2 && currentStateTime > .45f)ActivatePlayerState(PlayerState::Waiting);
+		else if(playerState == PlayerState::Attack3 && currentStateTime > 1)ActivatePlayerState(PlayerState::Waiting);
+		else if(playerState == PlayerState::Defend1 && currentStateTime > .45f)ActivatePlayerState(PlayerState::Waiting);
 
 		break;
 	}
@@ -1046,22 +1046,22 @@ void Game::HandleGeneralInput()
 	GTE::InputManager * inputManager = GTE::Engine::Instance()->GetInputManager();
 
 	// toggle ssao
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::O))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::O))
 	{
 		GTE::CameraRef mainCamera = cameraObject->GetCamera();
 		mainCamera->SetSSAOEnabled(!mainCamera->IsSSAOEnabled());
 	}
 
 	// toggle ssao render mode
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::I))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::I))
 	{
 		GTE::CameraRef mainCamera = cameraObject->GetCamera();
-		if (mainCamera->GetSSAORenderMode() == GTE::SSAORenderMode::Outline)mainCamera->SetSSAORenderMode(GTE::SSAORenderMode::Standard);
+		if(mainCamera->GetSSAORenderMode() == GTE::SSAORenderMode::Outline)mainCamera->SetSSAORenderMode(GTE::SSAORenderMode::Standard);
 		else mainCamera->SetSSAORenderMode(GTE::SSAORenderMode::Outline);
 	}
 
 	// select ambient lights
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::A))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::A))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Ambient;
@@ -1069,7 +1069,7 @@ void Game::HandleGeneralInput()
 	}
 
 	// select directional light
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::D))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::D))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Directional;
@@ -1077,7 +1077,7 @@ void Game::HandleGeneralInput()
 	}
 
 	// select point lights
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::P))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::P))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Point;
@@ -1085,7 +1085,7 @@ void Game::HandleGeneralInput()
 	}
 
 	// select lava lights
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::L))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::L))
 	{
 		SignalDisplayInfoChanged();
 		selectedLighting = SceneLighting::Lava;
@@ -1099,7 +1099,7 @@ void Game::HandleGeneralInput()
 	LavaField *lavaField = lavaScene->GetLavaField();
 
 	// toggle lava
-	if (GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::K))
+	if(GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::K))
 	{
 		GTE::SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
 		lavaFieldObject->SetActive(!lavaFieldObject->IsActive());
@@ -1124,47 +1124,47 @@ void Game::HandleGeneralInput()
 	// update selected lights
 	switch(selectedLighting)
 	{
-		case SceneLighting::Ambient:
-			UpdateLight(ambientLightObject, toggleLight, intensityBoost, toggleCastShadows);
+	case SceneLighting::Ambient:
+		UpdateLight(ambientLightObject, toggleLight, intensityBoost, toggleCastShadows);
 		break;
-		case SceneLighting::Lava:
-			for(GTE::UInt32 i =0; i < lavaLightObjects.size(); i++)
-			{
-				UpdateLight(lavaLightObjects[i], toggleLight, intensityBoost, toggleCastShadows);
-			}
+	case SceneLighting::Lava:
+		for(GTE::UInt32 i = 0; i < lavaLightObjects.size(); i++)
+		{
+			UpdateLight(lavaLightObjects[i], toggleLight, intensityBoost, toggleCastShadows);
+		}
 		break;
-		case SceneLighting::Directional:
-			// prevent toggle of directional light in castle scene
-			if (currentScene != Scenes::CastleScene)
-			{
-				UpdateLight(directionalLightObject, toggleLight, intensityBoost, toggleCastShadows);
-				directionalLightOn = directionalLightObject->IsActive();
-			}
+	case SceneLighting::Directional:
+		// prevent toggle of directional light in castle scene
+		if(currentScene != Scenes::CastleScene)
+		{
+			UpdateLight(directionalLightObject, toggleLight, intensityBoost, toggleCastShadows);
+			directionalLightOn = directionalLightObject->IsActive();
+		}
 		break;
-		case SceneLighting::Point:
-			UpdateLight(lavaSpinningLight, toggleLight, intensityBoost, toggleCastShadows);
-			for(GTE::UInt32 i =0; i < castleLights.size(); i++)
-			{
-				UpdateLight(castleLights[i], toggleLight, intensityBoost, toggleCastShadows);
-			}
-			for(GTE::UInt32 i =0; i < reflectingPoolLights.size(); i++)
-			{
-				UpdateLight(reflectingPoolLights[i], toggleLight, intensityBoost, toggleCastShadows);
-			}
+	case SceneLighting::Point:
+		UpdateLight(lavaSpinningLight, toggleLight, intensityBoost, toggleCastShadows);
+		for(GTE::UInt32 i = 0; i < castleLights.size(); i++)
+		{
+			UpdateLight(castleLights[i], toggleLight, intensityBoost, toggleCastShadows);
+		}
+		for(GTE::UInt32 i = 0; i < reflectingPoolLights.size(); i++)
+		{
+			UpdateLight(reflectingPoolLights[i], toggleLight, intensityBoost, toggleCastShadows);
+		}
 		break;
-		default:
+	default:
 
 		break;
 	}
 
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::SpaceBar))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::SpaceBar))
 	{
 		poolScene->TriggerRippleDrop();
 	}
 
 
 	// toggle skybox
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::S))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::S))
 	{
 		if(cameraObject.IsValid())
 		{
@@ -1173,19 +1173,19 @@ void Game::HandleGeneralInput()
 	}
 
 	// change to lava scene
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::One))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::One))
 	{
 		TransitionToScene(Scenes::LavaScene);
 	}
 
 	// change to castle scene
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Two))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::Two))
 	{
 		TransitionToScene(Scenes::CastleScene);
 	}
 
 	// change to pool scene
-	if (inputManager->ShouldHandleOnKeyDown(GTE::Key::Three))
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::Three))
 	{
 		TransitionToScene(Scenes::PoolScene);
 	}
@@ -1204,10 +1204,10 @@ void Game::UpdateLight(GTE::SceneObjectRef sceneObject, GTE::Bool toggleLight, G
 	{
 		if(toggleLight)sceneObject->SetActive(!sceneObject->IsActive());
 
-		if (intensityChange != 0)
+		if(intensityChange != 0)
 		{
 			GTE::Real intensity = sceneObject->GetLight()->GetIntensity();
-			if (intensity + intensityChange < 0 && intensityChange < 0)intensityChange = -intensity;
+			if(intensity + intensityChange < 0 && intensityChange < 0)intensityChange = -intensity;
 			sceneObject->GetLight()->SetIntensity(intensity + intensityChange);
 		}
 
@@ -1268,7 +1268,7 @@ void Game::UpdatePlayerFollowCamera()
 	GTE::Point3::Subtract(playerPosCameraMoveTarget, cameraPos, cameraToPlayerMove);
 
 	// project [cameraToPlayerMove] into the x-z plane
-	cameraToPlayerMove.y=0;
+	cameraToPlayerMove.y = 0;
 
 	// target distance camera should be from the player object. this means the real target position for the
 	// camera will be [desiredFollowDistance] units away from [playerPosCameraMoveTarget]

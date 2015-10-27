@@ -22,7 +22,7 @@ class CastleScene : public Scene
 	// moving light A
 	GTE::SceneObjectRef movingLightA;
 
-	public:
+public:
 
 	CastleScene();
 	~CastleScene();

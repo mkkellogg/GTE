@@ -41,7 +41,7 @@ class LavaField
 	GTE::SceneObjectRef lavaFieldObject;
 
 	// width/height of both displacementA & displacementB
-	const GTE::UInt32 diplacementImageDimensionSize=128;
+	const GTE::UInt32 diplacementImageDimensionSize = 128;
 	// width of the lava field mesh in model space
 	GTE::Real fieldWidth;
 	// height of the lava field mesh in model space
@@ -62,7 +62,7 @@ class LavaField
 	GTE::Bool InitMeshAndMaterial();
 	void DisplaceField();
 
-	public:
+public:
 
 	LavaField(GTE::UInt32 subDivisions);
 	~LavaField();

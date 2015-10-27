@@ -40,7 +40,7 @@
  */
 GTE::SkinnedMesh3DRendererRef GameUtil::FindFirstSkinnedMeshRenderer(GTE::SceneObjectRef ref)
 {
-	if (!ref.IsValid())return GTE::SkinnedMesh3DRendererRef::Null();
+	if(!ref.IsValid())return GTE::SkinnedMesh3DRendererRef::Null();
 
 	if(ref->GetSkinnedMesh3DRenderer().IsValid())return ref->GetSkinnedMesh3DRenderer();
 
@@ -62,7 +62,7 @@ GTE::SkinnedMesh3DRendererRef GameUtil::FindFirstSkinnedMeshRenderer(GTE::SceneO
  */
 GTE::SceneObjectRef GameUtil::FindFirstSceneObjectWithMesh(GTE::SceneObjectRef ref)
 {
-	if (!ref.IsValid())return GTE::SceneObjectRef::Null();
+	if(!ref.IsValid())return GTE::SceneObjectRef::Null();
 
 	if(ref->GetMesh3D().IsValid())return ref;
 
@@ -125,7 +125,7 @@ void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root)
 	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
 	{
 		GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
-		if (filter.IsValid())
+		if(filter.IsValid())
 		{
 			filter->SetUseBackSetShadowVolume(false);
 		}
@@ -149,7 +149,7 @@ void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectRef root, GTE::Bool cast
 }
 
 GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
-											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
+	GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
 {
 	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
 }
@@ -163,7 +163,7 @@ GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialR
  * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
  */
 GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
-											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume)
+	GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume)
 {
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 	GTE::SceneObjectRef meshSceneObject = objectManager->CreateSceneObject();
@@ -178,9 +178,9 @@ GTE::SceneObjectRef GameUtil::AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialR
 	renderer->AddMaterial(material);
 	meshSceneObject->SetMesh3DRenderer(renderer);
 
-	meshSceneObject->GetTransform().Scale(sx,sy,sz, false);
-	if(ra != 0)meshSceneObject->GetTransform().Rotate(rx,ry,rz,ra,false);
-	meshSceneObject->GetTransform().Translate(tx,ty,tz,false);
+	meshSceneObject->GetTransform().Scale(sx, sy, sz, false);
+	if(ra != 0)meshSceneObject->GetTransform().Rotate(rx, ry, rz, ra, false);
+	meshSceneObject->GetTransform().Translate(tx, ty, tz, false);
 
 	if(isStatic)SetAllObjectsStatic(meshSceneObject);
 

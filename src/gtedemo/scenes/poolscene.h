@@ -63,7 +63,7 @@ class PoolScene : public Scene
 	void UpdateCameras();
 	void UpdateRippleSimulation();
 
-	public:
+public:
 
 	PoolScene();
 	~PoolScene();

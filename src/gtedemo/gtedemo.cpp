@@ -19,7 +19,7 @@ class CustomEngineCallbacks : public GTE::EngineCallbacks
 
 	public:
 
-	CustomEngineCallbacks(){}
+	CustomEngineCallbacks() {}
 
 	void OnInit()
 	{
@@ -36,17 +36,17 @@ class CustomEngineCallbacks : public GTE::EngineCallbacks
 		game->Update();
 	}
 
-	 void OnPreRender()
-	 {
-		 // pass the OnPreRender event to the main Game instance
-		 game->OnPreRender();
-	 }
+	void OnPreRender()
+	{
+		// pass the OnPreRender event to the main Game instance
+		game->OnPreRender();
+	}
 
 	void OnQuit()
 	{
 		game->OnQuit();
 	}
-	virtual ~CustomEngineCallbacks(){}
+	virtual ~CustomEngineCallbacks() {}
 };
 
 /*

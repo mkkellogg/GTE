@@ -43,7 +43,7 @@ class LavaScene : public Scene
 	// global directional light
 	GTE::SceneObjectRef directionalLightObject;
 
-	public:
+public:
 
 	LavaScene();
 	~LavaScene();

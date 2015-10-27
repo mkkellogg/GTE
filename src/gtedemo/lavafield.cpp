@@ -136,7 +136,7 @@ void LavaField::DisplaceField()
 		GTE::Real lerpDisp = GTE::GTEMath::Lerp(p->z, disp, .1f);
 
 		// apply displacement to Z-coordinate since mesh was aligned to XY-plane in model space.
-		p->Set(p->x,p->y,lerpDisp);
+		p->Set(p->x, p->y, lerpDisp);
 
 	}
 
@@ -165,7 +165,7 @@ LavaField::LavaField(GTE::UInt32 subDivisions)
 
 	fieldWidth = 0;
 	fieldHeight = 0;
-	dispHeight =5;
+	dispHeight = 5;
 }
 
 /*
@@ -207,7 +207,7 @@ GTE::Bool LavaField::Init()
 	lavaFieldObject->SetMesh3DRenderer(renderer);
 	lavaFieldObject->SetActive(true);
 	lavaFieldObject->SetStatic(false);
-	lavaFieldObject->GetTransform().Rotate(1,0,0,-90, false);
+	lavaFieldObject->GetTransform().Rotate(1, 0, 0, -90, false);
 
 	return true;
 }
@@ -269,12 +269,12 @@ void LavaField::SetDisplacementHeight(GTE::Real height)
 void LavaField::Update()
 {
 	dispOffset += GTE::Time::GetDeltaTime() * dispSpeed;
-	if (dispOffset >= (GTE::Real)diplacementImageDimensionSize * 2.0)dispOffset = 0;
+	if(dispOffset >= (GTE::Real)diplacementImageDimensionSize * 2.0)dispOffset = 0;
 	DisplaceField();
 
 	textAOffset -= GTE::Time::GetDeltaTime() * textureASpeed;
-	lavaMaterial->SetUniform2f(0,textAOffset, "UVTEXTURE0_OFFSET");
+	lavaMaterial->SetUniform2f(0, textAOffset, "UVTEXTURE0_OFFSET");
 
 	textBOffset -= GTE::Time::GetDeltaTime() * textureBSpeed;
-	lavaMaterial->SetUniform2f(0,textBOffset, "UVTEXTURE1_OFFSET");
+	lavaMaterial->SetUniform2f(0, textBOffset, "UVTEXTURE1_OFFSET");
 }
