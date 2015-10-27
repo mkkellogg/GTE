@@ -728,7 +728,7 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
 	// retrieve the first texture descriptor (at index 0) matching [textureType] from the Assimp material
 	texFound = assimpMaterial.GetTexture(textureType, 0, &aiTexturePath);
 
-	NONFATAL_ASSERT_RTRN(texFound == AI_SUCCESS, "ModelImporter::LoadAITexture -> Assimp material does not have desired texture type.", TextureRef::Null(), ModelImporterErrorCodes::AssimpTextureNotFound);
+	NONFATAL_ASSERT_RTRN(texFound == AI_SUCCESS, "ModelImporter::LoadAITexture -> Assimp material does not have desired texture type.", ModelImporterErrorCodes::AssimpTextureNotFound, TextureRef::Null(), false);
 
 	// build the full path to the texture image as specified by the Assimp material
 	std::string texPath = fileSystem->FixupPathForLocalFilesystem(std::string(aiTexturePath.data));

@@ -852,11 +852,32 @@ namespace GTE
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
+		varID = GetStandardUniformBinding(StandardUniform::LightRange);
+		if(varID >= 0)
+		{
+			shader->SendUniformToShader(varID, light->GetRange());
+			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
+		}
+
 		varID = GetStandardUniformBinding(StandardUniform::LightAttenuation);
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, light->GetAttenuation());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
+		}
+
+		varID = GetStandardUniformBinding(StandardUniform::LightParallelAngleAttenuation);
+		if(varID >= 0)
+		{
+			shader->SendUniformToShader(varID, (Int32)light->GetParallelAngleAttenuationType());
+			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
+		}
+
+		varID = GetStandardUniformBinding(StandardUniform::LightOrthoAngleAttenuation);
+		if(varID >= 0)
+		{
+			shader->SendUniformToShader(varID, (Int32)light->GetOrthoAngleAttenuationType());
+			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
 		}
 	}
 

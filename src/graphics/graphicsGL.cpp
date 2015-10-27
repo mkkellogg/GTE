@@ -1386,7 +1386,7 @@ namespace GTE
 			glBindTexture(GL_TEXTURE_CUBE_MAP, texGL->GetTextureID());
 			RawImage * imageData = texture->GetImageData((UInt32)side);
 			glTexImage2D(GetGLCubeTarget(side), 0, GetGLTextureFormat(attributes.Format), imageData->GetWidth(), imageData->GetHeight(), 0,
-				GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), data);
+						 GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), data);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		}
 		else
@@ -1394,7 +1394,7 @@ namespace GTE
 			glBindTexture(GL_TEXTURE_2D, texGL->GetTextureID());
 			RawImage * imageData = texture->GetImageData(0);
 			glTexImage2D(GL_TEXTURE_2D, 0, GetGLTextureFormat(attributes.Format), imageData->GetWidth(), imageData->GetHeight(), 0,
-				GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), data);
+						 GetGLPixelFormat(attributes.Format), GetGLPixelType(attributes.Format), data);
 			if (openGLVersion >= 3 && (attributes.FilterMode == TextureFilter::TriLinear || attributes.FilterMode == TextureFilter::BiLinear))glGenerateMipmap(GL_TEXTURE_2D);
 
 			glBindTexture(GL_TEXTURE_2D, 0);

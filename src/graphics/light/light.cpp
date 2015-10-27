@@ -23,6 +23,8 @@ namespace GTE
 		SetRange(30);
 		shadowsEnabled = false;
 		attenuationOverride = false;
+		parallelAttenuation = AngleAttenuationType::None;
+		orthoAttenuation = AngleAttenuationType::None;
 	}
 
 	Light::~Light()
@@ -118,6 +120,26 @@ namespace GTE
 	Real Light::GetAttenuation() const
 	{
 		return attenuation;
+	}
+
+	AngleAttenuationType Light::GetParallelAngleAttenuationType() const
+	{
+		return parallelAttenuation;
+	}
+
+	void Light::SetParallelAngleAttenuationType(AngleAttenuationType type)
+	{
+		parallelAttenuation = type;
+	}
+
+	AngleAttenuationType Light::GetOrthoAngleAttenuationType() const
+	{
+		return orthoAttenuation;
+	}
+
+	void Light::SetOrthoAngleAttenuationType(AngleAttenuationType type)
+	{
+		orthoAttenuation = type;
 	}
 
 	void Light::SetShadowsEnabled(Bool enabled)

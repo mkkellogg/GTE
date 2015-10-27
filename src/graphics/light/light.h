@@ -30,6 +30,13 @@ namespace GTE
 		Tiled
 	};
 
+	enum class AngleAttenuationType
+	{
+		None = 0,
+		Standard = 1,
+		Past90 = 2,
+	};
+
 	class Light : public SceneObjectComponent
 	{
 		// Since this ultimately derives from EngineObject, we make this class
@@ -44,6 +51,8 @@ namespace GTE
 		Bool attenuationOverride;
 		Real attenuation;
 		Real range;
+		AngleAttenuationType parallelAttenuation;
+		AngleAttenuationType orthoAttenuation;
 		Bool shadowsEnabled;
 		IntMask cullingMask;
 
@@ -77,6 +86,10 @@ namespace GTE
 
 		void SetAttenuation(Real attenuation);
 		Real GetAttenuation() const;
+		AngleAttenuationType GetParallelAngleAttenuationType() const;
+		void SetParallelAngleAttenuationType(AngleAttenuationType type);
+		AngleAttenuationType GetOrthoAngleAttenuationType() const;
+		void SetOrthoAngleAttenuationType(AngleAttenuationType type);
 
 		void SetShadowsEnabled(Bool enabled);
 		Bool GetShadowsEnabled() const;

@@ -21,13 +21,16 @@ namespace GTE
 		LightIntensity = 1024,
 		LightAttenuation = 2048,
 		LightType = 4096,
-		EmissiveColor = 8192,
-		Texture0 = 16384,
-		Texture1 = 32768,
-		NormalMap = 65536,
-		DoShadowVolumeRender = 131072,
-		ClipPlaneCount = 262144,
-		ClipPlane0 = 524288
+		LightRange = 8192,
+		LightParallelAngleAttenuation = 16384,
+		LightOrthoAngleAttenuation = 32768,
+		EmissiveColor = 65536,
+		Texture0 = 131072,
+		Texture1 = 262144,
+		NormalMap = 524288,
+		DoShadowVolumeRender = 1048576,
+		ClipPlaneCount = 2097152,
+		ClipPlane0 = 4194304
 	};
 
 	enum class StandardUniform
@@ -45,15 +48,18 @@ namespace GTE
 		LightIntensity = 10,
 		LightAttenuation = 11,
 		LightType = 12,
-		EmissiveColor = 13,
-		Texture0 = 14,
-		Texture1 = 15,
-		NormalMap = 16,
-		DoShadowVolumeRender = 17,
-		ClipPlaneCount = 18,
-		ClipPlane0 = 19,
-		_Last = 20, // always keep as last entry (before _None)
-		_None = 21
+		LightRange = 13,
+		LightParallelAngleAttenuation = 14,
+		LightOrthoAngleAttenuation = 15,
+		EmissiveColor = 16,
+		Texture0 = 17,
+		Texture1 = 18,
+		NormalMap = 19,
+		DoShadowVolumeRender = 20,
+		ClipPlaneCount = 21,
+		ClipPlane0 = 22,
+		_Last = 23, // always keep as last entry (before _None)
+		_None = 24
 	};
 
 	typedef IntMask StandardUniformSet;

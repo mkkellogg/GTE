@@ -1,4 +1,5 @@
 #version 150
+#include "common.inc"
 
 uniform mat4 MODEL_MATRIX;
 uniform mat4 MODELVIEW_MATRIX;
@@ -17,20 +18,20 @@ out vec4 vColor;
 out vec3 vNormal;
 out vec4 vPosition;
 out vec3 vLightDir;
- 
+
 void main()
 {
-	if (LIGHT_TYPE == 1 || LIGHT_TYPE == 5)
+	if(LIGHT_TYPE == LIGHT_TYPE_DIRECTIONAL || LIGHT_TYPE == LIGHT_TYPE_PLANAR)
 	{
 		vLightDir = normalize(LIGHT_DIRECTION.xyz);
 	}
-   	vColor = COLOR;
+	vColor = COLOR;
 	vNormal = mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * NORMAL.xyz;
-   	vPosition = MODEL_MATRIX * POSITION;
-    gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION ;
-    
-    if(CLIP_PLANE_COUNT > 0)
-    {
-    	gl_ClipDistance[0] = dot(MODEL_MATRIX * POSITION, CLIP_PLANE0);
-    }
+	vPosition = MODEL_MATRIX * POSITION;
+	gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION;
+
+	if(CLIP_PLANE_COUNT > 0)
+	{
+		gl_ClipDistance[0] = dot(MODEL_MATRIX * POSITION, CLIP_PLANE0);
+	}
 }

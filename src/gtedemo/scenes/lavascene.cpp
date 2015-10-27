@@ -493,6 +493,8 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	lavaLight->SetCullingMask(lavaPlanarLayerMask);
 	lavaLight->SetRange(55);
 	lavaLight->SetAttenuation(.05f);
+	lavaLight->SetParallelAngleAttenuationType(GTE::AngleAttenuationType::Past90);
+	lavaLight->SetOrthoAngleAttenuationType(GTE::AngleAttenuationType::Past90);
 	lavaLight->SetColor(GTE::Color4(1, .5f, 0, 1));
 	lavaLight->SetShadowsEnabled(false);
 	lavaLight->SetType(GTE::LightType::Planar);

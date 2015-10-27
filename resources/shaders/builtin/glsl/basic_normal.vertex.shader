@@ -1,11 +1,12 @@
 #version 150
+#include "common.inc"
 
 uniform mat4 MODEL_MATRIX;
 uniform mat4 MODEL_MATRIX_INVERSE_TRANSPOSE;
 uniform mat4 MODELVIEW_MATRIX;
 uniform mat4 PROJECTION_MATRIX;
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
- 
+
 in vec4 POSITION;
 in vec3 COLOR;
 in vec2 UVTEXTURE0;
@@ -28,22 +29,22 @@ out vec3 vFaceNormal;
 out vec3 vTangent;
 out vec4 vPosition;
 out vec3 vLightDir;
- 
+
 void main()
 {
-	if (LIGHT_TYPE == 1 || LIGHT_TYPE == 5)
+	if(LIGHT_TYPE == LIGHT_TYPE_DIRECTIONAL || LIGHT_TYPE == LIGHT_TYPE_PLANAR)
 	{
 		vLightDir = normalize(LIGHT_DIRECTION.xyz);
 	}
-    vUVTexture0 = vec2(UVTEXTURE0.s * USCALE, UVTEXTURE0.t * VSCALE);
-    vNormal = mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * NORMAL.xyz;
+	vUVTexture0 = vec2(UVTEXTURE0.s * USCALE, UVTEXTURE0.t * VSCALE);
+	vNormal = mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * NORMAL.xyz;
 	vFaceNormal = mat3(MODEL_MATRIX_INVERSE_TRANSPOSE) * FACENORMAL.xyz;
-    vTangent = vec3(MODEL_MATRIX * TANGENT);
-    vPosition = MODEL_MATRIX * POSITION;
-    gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION ;
-    
-    if(CLIP_PLANE_COUNT > 0)
-    {
-    	gl_ClipDistance[0] = dot(MODEL_MATRIX * POSITION, CLIP_PLANE0);
-    }
+	vTangent = vec3(MODEL_MATRIX * TANGENT);
+	vPosition = MODEL_MATRIX * POSITION;
+	gl_Position = MODELVIEWPROJECTION_MATRIX * POSITION;
+
+	if(CLIP_PLANE_COUNT > 0)
+	{
+		gl_ClipDistance[0] = dot(MODEL_MATRIX * POSITION, CLIP_PLANE0);
+	}
 }

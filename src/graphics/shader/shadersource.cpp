@@ -9,7 +9,7 @@
 #include <numeric>
 #include <memory.h>
 #include <math.h>
- 
+
 #include "shadersource.h"
 #include "filesys/filesystem.h"
 #include "global/global.h"
@@ -31,13 +31,13 @@ namespace GTE
 
 	ShaderSource::ShaderSource(const ShaderSource& source)
 	{
-		if (this == &source)return;
+		if(this == &source)return;
 		CopyToThis(source);
 	}
 
 	ShaderSource& ShaderSource::operator= (const ShaderSource& source)
 	{
-		if (this == &source)return *this;
+		if(this == &source)return *this;
 		CopyToThis(source);
 		return *this;
 	}
@@ -49,7 +49,7 @@ namespace GTE
 
 	void ShaderSource::CopyToThis(const ShaderSource& source)
 	{
-		if (this == &source)return;
+		if(this == &source)return;
 		this->loaded = source.loaded;
 		this->baseDir = source.baseDir;
 		this->sourceType = source.sourceType;
@@ -63,17 +63,17 @@ namespace GTE
 
 	void ShaderSource::ProcessShaderLinesToString(const ShaderSourceLines& lineSource, std::string& output, ProcessingContext& context)
 	{
-		if (sourceType != ShaderSourceType::File)return;
+		if(sourceType != ShaderSourceType::File)return;
 
 		output.clear();
-		
-		for (ShaderSourceLines::Iterator iter = lineSource.Begin(); iter != lineSource.End(); ++iter)
-		{		
+
+		for(ShaderSourceLines::Iterator iter = lineSource.Begin(); iter != lineSource.End(); ++iter)
+		{
 			const std::string& str = *iter;
 			std::string strProcesingResult;
 			Bool processed = ProcessShaderLine(str, strProcesingResult, context);
 
-			if (!processed)
+			if(!processed)
 			{
 				output.append(str);
 				output.append("\n");
@@ -88,7 +88,7 @@ namespace GTE
 
 	Bool ShaderSource::ProcessShaderLine(const std::string& line, std::string& strProcesingResult, ProcessingContext& context)
 	{
-		if (line.size() > 0)
+		if(line.size() > 0)
 		{
 			std::stringstream ss(line);
 			std::istream_iterator<std::string> iter(ss);
@@ -98,9 +98,9 @@ namespace GTE
 			std::string command;
 			std::vector<std::string> args;
 			UInt32 index = 0;
-			while (iter != end)
+			while(iter != end)
 			{
-				if (index == 0)
+				if(index == 0)
 				{
 					command = *iter;
 				}
@@ -113,7 +113,7 @@ namespace GTE
 				++iter;
 			}
 
-			if (index >= 1)
+			if(index >= 1)
 			{
 				return ProcessShaderCommand(command, args, strProcesingResult, context);
 			}
@@ -122,23 +122,35 @@ namespace GTE
 		return false;
 	}
 
-	Bool ShaderSource::ProcessShaderCommand(std::string& command, std::vector <std::string>& args, std::string& strProcesingResult, ProcessingContext& context)
+	Bool ShaderSource::ProcessShaderCommand(const std::string& command, const std::vector <std::string>& args, std::string& strProcesingResult, ProcessingContext& context)
 	{
-		if (command == "#include")
+		if(command == "#include")
 		{
-			if (args.size() > 0)
+			if(args.size() > 0)
 			{
+				UInt32 firstArgIndex = 0;
+				UInt32 lastArgIndex = args.size() - 1;
+
+				std::string fullArg = "";
+				for(UInt32 i = firstArgIndex; i <= lastArgIndex; i++)
+				{
+					fullArg.append(args[i]);
+				}
+
 				FileSystem * fileSystem = FileSystem::Instance();
-				std::string includeFile = args[0];
+				std::string includeFile = fullArg;
 				ShaderSourceLines temp;
 				std::string basePath = fileSystem->GetBasePath(includeFile);
 				includeFile = EngineUtility::Trim(includeFile);
 				includeFile = includeFile.substr(1, includeFile.size() - 2);
 				std::string fullIncludePath = fileSystem->ConcatenatePaths(baseDir, includeFile);
-				for (int i = 0; i < context.LoadedIncludes.size(); i++)
+				for(int i = 0; i < context.LoadedIncludes.size(); i++)
 				{
 					std::string& include = context.LoadedIncludes[i];
-					if (include == fullIncludePath)return true;
+					if(include == fullIncludePath)
+					{
+						return true;
+					}
 				}
 				context.LoadedIncludes.push_back(fullIncludePath);
 				Bool includeSuccess = ReadShaderSourceLines(fullIncludePath.c_str(), temp);
@@ -158,7 +170,7 @@ namespace GTE
 		this->baseDir = baseDir;
 		this->name = name;
 		this->sourceType = sourceType;
-		if (sourceType == ShaderSourceType::File)
+		if(sourceType == ShaderSourceType::File)
 		{
 			loaded = false;
 			vertexSourceFile = vertexSource;
@@ -166,7 +178,7 @@ namespace GTE
 			vertexSourceString = std::string("");
 			fragmentSourceString = std::string("");
 		}
-		else if (sourceType == ShaderSourceType::String)
+		else if(sourceType == ShaderSourceType::String)
 		{
 			loaded = true;
 			vertexSourceFile = std::string("");
@@ -180,27 +192,27 @@ namespace GTE
 
 	Bool ShaderSource::Load()
 	{
-		if (sourceType != ShaderSourceType::File)return true;
+		if(sourceType != ShaderSourceType::File)return true;
 
 		FileSystem * fileSystem = FileSystem::Instance();
 		std::string realVertexSource = fileSystem->ConcatenatePaths(baseDir, vertexSourceFile);
 		std::string realfragmentSource = fileSystem->ConcatenatePaths(baseDir, fragmentSourceFile);
-		
+
 		Bool vertexSuccess = ReadShaderSourceLines(realVertexSource.c_str(), vertexSourceLines);
 		Bool fragmentSuccess = ReadShaderSourceLines(realfragmentSource.c_str(), fragmentSourceLines);
 
 		loaded = vertexSuccess && fragmentSuccess ? true : false;
 
-		if (!loaded)
+		if(!loaded)
 		{
-			if (!vertexSuccess)
+			if(!vertexSuccess)
 			{
 				std::string errMsg = std::string("Could not load vertex shader: ") + realVertexSource;
 				Engine::Instance()->GetErrorManager()->SetAndReportError(ShaderSourceError::LoadError, errMsg);
 				return false;
 			}
 
-			if (!fragmentSuccess)
+			if(!fragmentSuccess)
 			{
 				std::string errMsg = std::string("Could not load fragment shader: ") + realfragmentSource;
 				Engine::Instance()->GetErrorManager()->SetAndReportError(ShaderSourceError::LoadError, errMsg);
@@ -233,20 +245,41 @@ namespace GTE
 
 	Bool ShaderSource::ReadShaderSourceLines(const Char *fn, ShaderSourceLines& dest)
 	{
-		NONFATAL_ASSERT(fn != nullptr, " ShaderSource::ReadShaderSource -> Invalid file name.", false);
-		
+		NONFATAL_ASSERT_RTRN(fn != nullptr, " ShaderSource::ReadShaderSource -> Invalid file name.", false, true);
+
 		int linecount = 0;
 		std::string line;
-		std::ifstream infile(fn);
 
-		NONFATAL_ASSERT(infile, " ShaderSource::ReadShaderSource -> Unable to open shader file.", false);
+		std::ifstream infile;
+		infile.exceptions(std::ifstream::failbit);
+
+		try
+		{
+			infile.open(fn, std::ifstream::in);
+		}
+		catch(std::ifstream::failure e)
+		{
+			std::string msg = " ShaderSource::ReadShaderSource -> Unable to open shader file: ";
+			msg.append(fn);
+			NONFATAL_ASSERT_RTRN(false, msg, false, true);
+			return false;
+		}
 
 		dest.Clear();
-		while (getline(infile, line)) 
+		try
 		{
-			dest.AddLine(line);
-			linecount++;
+			while(std::getline(infile, line))
+			{
+				dest.AddLine(line);
+				linecount++;
+
+			}
 		}
+		catch(std::ifstream::failure e)
+		{
+
+		}
+
 		infile.close();
 
 		return true;
