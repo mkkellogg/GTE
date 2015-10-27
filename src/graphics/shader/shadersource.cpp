@@ -22,6 +22,8 @@ namespace GTE
 	ShaderSource::ShaderSource()
 	{
 		initialized = false;
+		loaded = false;
+		sourceType = ShaderSourceType::String;
 	}
 
 	ShaderSource::ShaderSource(const std::string& vertexSource, const std::string& fragmentSource, ShaderSourceType sourceType, const std::string& baseDir, const std::string& name)
@@ -97,7 +99,7 @@ namespace GTE
 			std::string includeFileName;
 			std::string command;
 			std::vector<std::string> args;
-			UInt32 index = 0;
+			unsigned int index = 0;
 			while(iter != end)
 			{
 				if(index == 0)
@@ -132,7 +134,7 @@ namespace GTE
 				UInt32 lastArgIndex = args.size() - 1;
 
 				std::string fullArg = "";
-				for(UInt32 i = firstArgIndex; i <= lastArgIndex; i++)
+				for(unsigned int i = firstArgIndex; i <= lastArgIndex; i++)
 				{
 					fullArg.append(args[i]);
 				}
@@ -144,7 +146,7 @@ namespace GTE
 				includeFile = EngineUtility::Trim(includeFile);
 				includeFile = includeFile.substr(1, includeFile.size() - 2);
 				std::string fullIncludePath = fileSystem->ConcatenatePaths(baseDir, includeFile);
-				for(int i = 0; i < context.LoadedIncludes.size(); i++)
+				for(unsigned int i = 0; i < context.LoadedIncludes.size(); i++)
 				{
 					std::string& include = context.LoadedIncludes[i];
 					if(include == fullIncludePath)
@@ -154,7 +156,10 @@ namespace GTE
 				}
 				context.LoadedIncludes.push_back(fullIncludePath);
 				Bool includeSuccess = ReadShaderSourceLines(fullIncludePath.c_str(), temp);
-				ProcessShaderLinesToString(temp, strProcesingResult, context);
+				if(includeSuccess)
+				{
+					ProcessShaderLinesToString(temp, strProcesingResult, context);
+				}
 			}
 			else
 			{

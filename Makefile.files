@@ -196,7 +196,7 @@ $(ANIMATIONOBJ):
 # ==================================	
 
 SHADERSRC= src/graphics/shader
-SHADERSRCS= $(call toFullPath,$(SHADERSRC),shadersource.cpp shader.cpp uniformdesc.cpp attributedesc.cpp shaderGL.cpp)
+SHADERSRCS= $(call toFullPath,$(SHADERSRC),shadersource.cpp shadersourcelines.cpp shader.cpp uniformdesc.cpp attributedesc.cpp shaderGL.cpp)
 SHADEROBJ= $(call srcFilesToObjFiles,$(SHADERSRCS),$(SHADERSRC),$(OUTPUTDIR))
 	
 $(SHADEROBJ): 
