@@ -161,7 +161,7 @@ void PoolScene::UpdateRippleSimulation()
 			GTE::Real dropStrength = 2.3f;
 
 			dropStrength = (((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 1.0f) + 0.5f;
-			dropRadius = dropStrength / 35.0;
+			dropRadius = dropStrength / 35.0f;
 
 			//dropStrength = 0.8f;
 			//dropRadius = .05f;
@@ -261,7 +261,8 @@ void PoolScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientL
 
 	SetupTerrain(importer);
 	SetupStructures(importer);
-	//SetupPlants(importer);
+	SetupPlants(importer);
+	SetupExtra(importer);
 	SetupWaterSurface(importer);
 	SetupLights(importer, playerObject);
 
@@ -404,8 +405,6 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	singleStoneMesh->Update();
 
 
-
-
 	// load castle wall model for pool walls
 	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/castle/Wall_Block_01.fbx");
 	ASSERT(modelSceneObject.IsValid(), "Could not load wall model!\n");
@@ -485,6 +484,7 @@ void PoolScene::SetupPlants(GTE::AssetImporter& importer)
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
+	GameUtil::SetAllMeshesShadowVolumeOffset(modelSceneObject, 2.0f);
 
 	// extract tree mesh & material
 	GTE::SceneObjectRef treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
@@ -492,34 +492,89 @@ void PoolScene::SetupPlants(GTE::AssetImporter& importer)
 	GTE::Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
 	GTE::MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
 
+
 	// place initial tree in the scene
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.0015f, .0015f, .0015f, false);
-	modelSceneObject->GetTransform().Rotate(.8f, 0, .2f, -6, false);
-	modelSceneObject->GetTransform().Translate(55, -10.5f, 11, false);
+	//modelSceneObject->GetTransform().Rotate(.8f, 0, .2f, -6, false);
+	modelSceneObject->GetTransform().Translate(-8, -10.5f, 40, false);
 
 	// reuse the tree mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .10f, .10f, .10f, 1, 0, 0, -85, 57, -10, 24, true, true, true);
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .10f, .10f, .10f, 1, 0, 0, -85, -4, -10, 49, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15f, .15f, .20f, 1, 0, 0, -94, 61, -9, -15, true, true, true);
+	GameUtil::SetAllMeshesShadowVolumeOffset(modelSceneObject, 2.0f);
+
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15f, .15f, .15f, 1, 0, 0, -100, 0, -7, 15, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20f, .20f, .30f, 1, 0, 0, -93, 80, -9, -15, true, true, true);
+	GameUtil::SetAllMeshesShadowVolumeOffset(modelSceneObject, 2.0f);
+
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20f, .20f, .20f, 1, 0, 0, -85, 15, -12, 25, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .17f, .17f, .20f, 1, 0, 0, -85, 85, -9.5f, -13, true, true, true);
+	GameUtil::SetAllMeshesShadowVolumeOffset(modelSceneObject, 2.0f);
+
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20f, .20f, .24f, 1, 0, 0, -85, -27, -10, 25, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .22f, .22f, .38f, 1, 0, 0, -90, 115, -9.5f, 15, true, true, true);
+	GameUtil::SetAllMeshesShadowVolumeOffset(modelSceneObject, 2.0f);
+
+	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .18f, .18f, .20f, 1, 0, 0, -100, -22, -7, 18, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .19f, .19f, .28f, 1, 0, 0, -96, 105, -9.5f, 8, true, true, true);
+	GameUtil::SetAllMeshesShadowVolumeOffset(modelSceneObject, 2.0f);
+
+}
+
+/*
+* Add miscellaneous elements to the scene.
+*/
+void PoolScene::SetupExtra(GTE::AssetImporter& importer)
+{
+	// misc. reference variables
+	GTE::SceneObjectRef modelSceneObject;
+
+	//========================================================
+	//
+	// Fences
+	//
+	//========================================================
+
+	// load fence model
+	modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/wood/Barrier01.fbx");
+	ASSERT(modelSceneObject.IsValid(), "Could not load fence model!\n");
 	sceneRoot->AddChild(modelSceneObject);
-	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .18f, .18f, .20f, 1, 0, 0, -87, 95, -10, 32, true, true, true);
+	GameUtil::SetAllObjectsStatic(modelSceneObject);
+
+	// extract fence mesh & material
+	GTE::SceneObjectRef fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
+	GTE::MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
+
+	// place initial fence in the scene
+	modelSceneObject->SetActive(true);
+	modelSceneObject->GetTransform().Rotate(0, 1, 0, 50, false);
+	modelSceneObject->GetTransform().Scale(.6f, .6f, .6f, false);
+	modelSceneObject->GetTransform().Translate(6, -10.5f, 42, false);
+
+	/** re-use the fence mesh & material for multiple instances  **/
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, -1.0f, -10.5f, 49.0f, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
-	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 40, true);
+
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, -10.0f, -10.5f, 50.0f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, -25, true);
+
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 23.0f, -10.5f, 15.0f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 60, true);
+
+	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 23.0f, -10.5f, 6.0f, true, true, true);
+	sceneRoot->AddChild(modelSceneObject);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 120, true);
 }
 
 /*

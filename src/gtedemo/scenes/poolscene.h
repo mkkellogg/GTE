@@ -78,6 +78,7 @@ public:
 	void SetupStructures(GTE::AssetImporter& importer);
 	void SetupPlants(GTE::AssetImporter& importer);
 	void SetupWaterSurface(GTE::AssetImporter& importer);
+	void SetupExtra(GTE::AssetImporter& importer);
 	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject);
 
 	void TriggerRippleDrop();

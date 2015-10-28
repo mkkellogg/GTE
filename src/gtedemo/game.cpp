@@ -251,9 +251,14 @@ void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 	//========================================================
 
 	// load bridge
-	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1, false, true);
+	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1, true, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load bridge model!\n");
-	GameUtil::SetAllObjectsStatic(modelSceneObject);
+
+	GTE::SceneObjectRef woodBridgeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DFilterRef woodBridgeMeshFilter = woodBridgeMeshObject->GetMesh3DFilter();
+	woodBridgeMeshFilter->SetUseBackSetShadowVolume(false);
+	woodBridgeMeshFilter->SetUseCustomShadowVolumeOffset(true);
+	woodBridgeMeshFilter->SetCustomShadowVolumeOffset(6.5f);
 
 	// place bridge in the scene
 	modelSceneObject->SetActive(true);

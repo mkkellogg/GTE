@@ -25,6 +25,7 @@ public:
 	static void SetAllObjectsStatic(GTE::SceneObjectRef root);
 	static void SetAllObjectsLayerMask(GTE::SceneObjectRef root, GTE::IntMask mask);
 	static void SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root);
+	static void SetAllMeshesShadowVolumeOffset(GTE::SceneObjectRef root, GTE::Real offset);
 	static void SetAllObjectsCastShadows(GTE::SceneObjectRef root, GTE::Bool castShadows);
 
 	static GTE::SceneObjectRef AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,

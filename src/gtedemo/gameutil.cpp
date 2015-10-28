@@ -133,6 +133,23 @@ void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root)
 }
 
 /*
+* Set any mesh encountered in the scene hierarchy beginning with [root]
+* to use a shadow volume offset specified by [offset].
+*/
+void GameUtil::SetAllMeshesShadowVolumeOffset(GTE::SceneObjectRef root, GTE::Real offset)
+{
+	ProcessSceneObjects(root, [=](GTE::SceneObjectRef current)
+	{
+		GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
+		if(filter.IsValid())
+		{
+			filter->SetUseCustomShadowVolumeOffset(true);
+			filter->SetCustomShadowVolumeOffset(offset);
+		}
+	});
+}
+
+/*
  * Set any mesh encountered in the scene hierarchy beginning with [root]
  * to set shadow casting to [castShadows].
  */
