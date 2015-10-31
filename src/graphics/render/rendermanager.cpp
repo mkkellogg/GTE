@@ -673,12 +673,6 @@ namespace GTE
 		// modelPreTransform is pre-multiplied with the transform of each rendered scene object & light
 		Transform modelPreTransform = camera.GetUniformWorldSceneObjectTransform();
 
-		// TODO: Once front/back culling settings are part of  a material, this will have to change. In that case
-		// reverse culling will mean to reverse whatever the material specifies. For now since by default all
-		// objects have back-faces culled, we can reverse that in a single place by switching to fron-face culling.
-		//if (camera.GetReverseCulling())Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(RenderState::FaceCulling::Front);
-		//else Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(RenderState::FaceCulling::Back);
-
 		// we have not yet rendered any ambient lights
 		Bool renderedAmbient = false;
 
@@ -734,12 +728,10 @@ namespace GTE
 		// render all self-lit objects in the scene once
 		ForwardRenderSceneForSelfLitMaterials(modelPreTransform, viewTransform, viewInverse, camera);
 
-		Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(RenderState::FaceCulling::Back);
-
 		// if this camera has a skybox that is set up and enabled, then we want to render it
 		if (camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
 		{
-			ForwardRenderSkyboxForCamera(camera, viewTransform, viewInverse);
+			ForwardRenderSkyboxForCamera(camera, modelPreTransform, viewTransform, viewInverse);
 		}
 	}
 
@@ -864,7 +856,7 @@ namespace GTE
 	 * Render the skybox for [camera] using [viewTransformInverse] as the view transformation.
 	 * [viewTransformation] should be the inverse of the camera's transformation.
 	 */
-	void RenderManager::ForwardRenderSkyboxForCamera(Camera& camera, const Transform& viewTransform, const Transform& viewTransformInverse)
+	void RenderManager::ForwardRenderSkyboxForCamera(Camera& camera, const Transform& modelPreTransform,  const Transform& viewTransform, const Transform& viewTransformInverse)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
@@ -878,30 +870,11 @@ namespace GTE
 			SceneObjectRef skyboxObject = camera.GetSkyboxSceneObject();
 			NONFATAL_ASSERT(skyboxObject.IsValid(), "RenderManager::RenderSkyboxForCamera -> Camera has invalid skybox scene object.", true);
 
-			/// get the world space location of the camera
-			Point3 cameraOrigin;
-			cameraObject->GetAggregateTransform().TransformPoint(cameraOrigin);
-
-			// update the skybox's position to be equal to to the camera's position, but leave
-			// the skybox's orientation as default. if we matched the skybox's orientation to
-			// the camera's orientation, we'd always see the exact same area of the skybox, no
-			// matter where the camera was facing.
-			Transform base;
-			Vector3 trans(cameraOrigin.x, cameraOrigin.y, cameraOrigin.z);
-			base.Translate(trans, true);
-			skyboxObject->SetAggregateTransform(base);
-
 			// render the skybox
 			skyboxObject->SetActive(true);
-			MaterialRef skyboxMaterial = camera.GetSkyboxMaterial();
-
-			// set up skybox texture transformation
-			Matrix4x4 textureTrans;
-			camera.GetSkyboxTransform().CopyMatrix(textureTrans);
-			skyboxMaterial->SetMatrix4x4(textureTrans, "TEXTURETRANSFORM_MATRIX");
 
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
-			ForwardRenderSceneObject(skyboxObject.GetRef(), lightingDescriptor, Transform(), viewTransform, viewTransformInverse, camera,
+			ForwardRenderSceneObject(skyboxObject.GetRef(), lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera,
 				MaterialRef::Null(), true, true, FowardBlendingFilter::Never);
 			skyboxObject->SetActive(false);
 		}

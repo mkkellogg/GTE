@@ -581,6 +581,36 @@ namespace GTE
 		graphics->DestroyTexture(texture);
 	}
 
+	AtlasRef EngineObjectManager::CreateAtlas(TextureRef texture, Bool createFirstFullImage)
+	{
+		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateAtlas -> Graphics system is null.");
+
+		Atlas* atlas = graphics->CreateAtlas(texture, createFirstFullImage);
+		NONFATAL_ASSERT_RTRN(atlas != nullptr, "EngineObjectManager::CreateAtlas -> Could create new Atlas object.", AtlasRef::Null(), false);
+
+		return AtlasRef(atlas, [=](Atlas * atlas)
+		{
+			DeleteAtlas(atlas);
+		});
+	}
+
+	void EngineObjectManager::DestroyAtlas(AtlasRef atlas)
+	{
+		atlas.ForceDelete();
+	}
+
+	void EngineObjectManager::DeleteAtlas(Atlas * atlas)
+	{
+		ASSERT(atlas != nullptr, "EngineObjectManager::DeleteAtlas -> 'atlas' is null.");
+
+		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
+		ASSERT(graphics != nullptr, "EngineObjectManager::DeleteAtlas -> Graphics system is null.");
+
+		graphics->DestroyAtlas(atlas);
+	}
+
+
 	RenderTargetRef EngineObjectManager::CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{

@@ -29,6 +29,7 @@ namespace GTE
 	class Camera;
 	class TextureAttributes;
 	class Texture;
+	class Atlas;
 	class Light;
 	class RawImage;
 	class AttributeTransformer;
@@ -69,6 +70,7 @@ namespace GTE
 		void DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer);
 		void DeleteMaterial(Material * material);
 		void DeleteTexture(Texture * texture);
+		void DeleteAtlas(Atlas * atlas);
 		void DeleteRenderTarget(RenderTarget * target);
 		void DeleteShader(Shader * shader);
 		void DeleteSkeleton(Skeleton * target);
@@ -136,6 +138,8 @@ namespace GTE
 		TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 			RawImage * bottomData, RawImage * leftData, RawImage * rightData);
 		void DestroyTexture(TextureRef texture);
+		AtlasRef CreateAtlas(TextureRef texture, Bool createFirstFullImage);
+		void DestroyAtlas(AtlasRef atlas);
 		RenderTargetRef CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 			const TextureAttributes& colorTextureAttributes,
 			UInt32 width, UInt32 height);

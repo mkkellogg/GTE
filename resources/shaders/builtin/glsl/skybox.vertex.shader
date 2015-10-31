@@ -1,15 +1,16 @@
 #version 150
 
 uniform mat4 MODELVIEWPROJECTION_MATRIX;
+uniform mat4 MODELVIEW_MATRIX;
+uniform mat4 PROJECTION_MATRIX;
 in vec4 POSITION;
 
-uniform mat4 TEXTURETRANSFORM_MATRIX;
-
 out vec4 TexCoord0;
+out vec3 vWorldPos;
 
 void main()
 {
-    vec4 WVP_Pos = MODELVIEWPROJECTION_MATRIX * vec4(POSITION.xyz, 1.0);
-    TexCoord0 = TEXTURETRANSFORM_MATRIX * POSITION;    
-    gl_Position = WVP_Pos.xyww;
+	TexCoord0 = POSITION;
+	vWorldPos = mat3(MODELVIEW_MATRIX) * POSITION.xyz;
+	gl_Position = (PROJECTION_MATRIX * vec4(vWorldPos, 1.0)).xyww;
 }

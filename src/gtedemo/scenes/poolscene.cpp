@@ -118,11 +118,6 @@ void PoolScene::UpdateCameras()
 
 	// tell [waterReflectionCamera] about the reflection transform
 	waterReflectionCamera->SetUniformWorldSceneObjectTransform(reflectionTransform);
-
-	// need to reflect skybox texture coordinates
-	GTE::Transform skyboxTrans;
-	skyboxTrans.Scale(1, -1, 1, false);
-	waterReflectionCamera->SetSkyboxTextureTransform(skyboxTrans);
 }
 
 /*

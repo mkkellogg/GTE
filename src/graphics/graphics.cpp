@@ -8,7 +8,7 @@
 #include "graphics.h"
 #include "global/global.h"
 #include "global/assert.h"
-#include "graphicsGL.h"
+#include "texture/atlas.h"
 #include "shader/shader.h"
 #include "render/material.h"
 #include "geometry/transform.h"
@@ -133,6 +133,27 @@ namespace GTE
 	const GraphicsAttributes& Graphics::GetAttributes() const
 	{
 		return attributes;
+	}
+
+	/*
+	* Create an Atlas object that partitions [texture] in multiple sub-frames.
+	*
+	* [createFirstFullFrame] - If true, create initial frame that covers all of [texture].
+	*/
+	Atlas * Graphics::CreateAtlas(TextureRef texture, Bool createFirstFullFrame)
+	{
+		Atlas * atlas = new(std::nothrow)Atlas(texture, createFirstFullFrame);
+		ASSERT(atlas != nullptr, "Graphics::CreateAtlas -> Unable to allocate new atlas.");
+		return atlas;
+	}
+
+	/*
+	* Destroy the Atlas object specified by [atlas].
+	*/
+	void Graphics::DestroyAtlas(Atlas * atlas)
+	{
+		NONFATAL_ASSERT(atlas != nullptr, "Graphics::DestroyAtlas -> 'atlas' is null", true);
+		delete atlas;
 	}
 }
 

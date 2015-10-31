@@ -16,6 +16,7 @@
 #include "shader/shader.h"
 #include "texture/textureGL.h"
 #include "texture/texture.h"
+#include "texture/atlas.h"
 #include "texture/textureattr.h"
 #include "render/rendermanager.h"
 #include "render/vertexattrbuffer.h"

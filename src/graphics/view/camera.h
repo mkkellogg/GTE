@@ -128,9 +128,6 @@ namespace GTE
 
 		void SetFOV(Real fov);
 
-		void SetSkyboxTextureTransform(Transform& trans);
-		const Transform& GetSkyboxTransform();
-
 		Bool AddClipPlane(const Vector3& normal, Real offset);
 		const ClipPlane* GetClipPlane(UInt32 index);
 		UInt32 GetClipPlaneCount() const;

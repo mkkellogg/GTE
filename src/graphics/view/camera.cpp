@@ -84,6 +84,7 @@ namespace GTE
 			NONFATAL_ASSERT(skyboxMaterial.IsValid(), "Camera::SetSkybox -> Unable to create skybox material.", true);
 
 			skyboxMaterial->SetUseLighting(false);
+			skyboxMaterial->SetFaceCulling(RenderState::FaceCulling::Back);
 			skyboxMaterial->SetTexture(skyboxTexture, "SKYBOX_TEXTURE");
 
 			StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
@@ -334,16 +335,6 @@ namespace GTE
 	{
 		this->fov = fov;
 		UpdateDisplay();
-	}
-
-	void Camera::SetSkyboxTextureTransform(Transform& trans)
-	{
-		skyboxTextureTransform = trans;
-	}
-
-	const Transform& Camera::GetSkyboxTransform()
-	{
-		return skyboxTextureTransform;
 	}
 
 	Bool Camera::AddClipPlane(const Vector3& normal, Real offset)

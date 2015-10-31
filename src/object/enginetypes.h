@@ -85,6 +85,7 @@ namespace GTE
 	class EngineObjectManager;
 	class Material;
 	class Texture;
+	class Atlas;
 	class Transform;
 	class Skeleton;
 	class Animation;
@@ -161,6 +162,7 @@ namespace GTE
 	typedef EngineObjectRef<SceneObject> SceneObjectRef;
 	typedef EngineObjectRef<Material> MaterialRef;
 	typedef EngineObjectRef<Texture> TextureRef;
+	typedef EngineObjectRef<Atlas> AtlasRef;
 	typedef EngineObjectRef<Shader> ShaderRef;
 	typedef EngineObjectRef<Skeleton> SkeletonRef;
 	typedef EngineObjectRef<Animation> AnimationRef;
@@ -180,6 +182,7 @@ namespace GTE
 	typedef EngineObjectRef<const SceneObject> SceneObjectRefConst;
 	typedef EngineObjectRef<const Material> MaterialRefConst;
 	typedef EngineObjectRef<const Texture> TextureRefConst;
+	typedef EngineObjectRef<const Atlas> AtlasRefConst;
 	typedef EngineObjectRef<const Shader> ShaderRefConst;
 	typedef EngineObjectRef<const Skeleton> SkeletonRefConst;
 	typedef EngineObjectRef<const Animation> AnimationRefConst;

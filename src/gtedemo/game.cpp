@@ -436,12 +436,13 @@ void Game::SetupCamera()
 	cameraObject->GetTransform().Translate(trans.x + 20, trans.y + 10, trans.z + 15, true);
 
 	// create skybox texture
-	GTE::TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky_north.png",
-		"resources/textures/skybox-night/nightsky_south.png",
-		"resources/textures/skybox-night/nightsky_up.png",
-		"resources/textures/skybox-night/nightsky_down.png",
-		"resources/textures/skybox-night/nightsky_west.png",
-		"resources/textures/skybox-night/nightsky_east.png");
+	GTE::TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skybox-night/nightsky/nightsky_north.png",
+		"resources/textures/skybox-night/nightsky/nightsky_south.png",
+		"resources/textures/skybox-night/nightsky/nightsky_up.png",
+		"resources/textures/skybox-night/nightsky/nightsky_down.png",
+		"resources/textures/skybox-night/nightsky/nightsky_west.png",
+		"resources/textures/skybox-night/nightsky/nightsky_east.png");
+
 	// activate skybox
 	camera->SetupSkybox(skyboxTexture);
 	camera->SetSkyboxEnabled(true);

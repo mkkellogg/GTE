@@ -41,6 +41,7 @@ namespace GTE
 	class Shader;
 	class Material;
 	class Texture;
+	class Atlas;
 	class SubMesh3DRenderer;
 	class RenderManager;
 	class Camera;
@@ -111,6 +112,8 @@ namespace GTE
 		virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 											RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
 		virtual void DestroyTexture(Texture * texture) = 0;
+		Atlas * CreateAtlas(TextureRef texture, Bool createFirstFullFrame);
+		void DestroyAtlas(Atlas * atlas);
 		virtual RenderTarget * CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 												  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) = 0;
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
