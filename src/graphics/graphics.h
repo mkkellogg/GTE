@@ -27,6 +27,7 @@
 
 #include <string>
 #include "graphicsattr.h"
+#include "renderstate.h"
 #include "object/enginetypes.h"
 #include "base/intmask.h"
 #include "render/rendertarget.h"
@@ -119,14 +120,14 @@ namespace GTE
 
 		virtual void ClearRenderBuffers(UInt32 bufferMask) const = 0;
 
-		virtual void SetFaceCullingMode(FaceCullingMode mode) = 0;
-		virtual FaceCullingMode GetFaceCullingMode() const = 0;
+		virtual void SetFaceCullingMode(RenderState::FaceCulling mode) = 0;
+		virtual RenderState::FaceCulling GetFaceCullingMode() const = 0;
 
 		virtual void SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a) = 0;
 
 		virtual void SetDepthBufferEnabled(Bool enabled) = 0;
 		virtual void SetDepthBufferReadOnly(Bool readOnly) = 0;
-		virtual void SetDepthBufferFunction(DepthBufferFunction function) = 0;
+		virtual void SetDepthBufferFunction(RenderState::DepthBufferFunction function) = 0;
 
 		virtual void SetStencilBufferEnabled(Bool enabled) = 0;
 		virtual void SetStencilTestEnabled(Bool enabled) = 0;
@@ -134,9 +135,9 @@ namespace GTE
 		virtual void SetFaceCullingEnabled(Bool enabled) = 0;
 
 		virtual void SetBlendingEnabled(Bool enabled) = 0;
-		virtual void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) = 0;
+		virtual void SetBlendingFunction(RenderState::BlendingMethod source, RenderState::BlendingMethod dest) = 0;
 
-		virtual void ActivateMaterial(MaterialRef material) = 0;
+		virtual void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling) = 0;
 		virtual MaterialRef GetActiveMaterial() = 0;
 
 		virtual const GraphicsAttributes& GetAttributes() const;

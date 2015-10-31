@@ -680,5 +680,8 @@
     <ClInclude Include="src\graphics\shader\shadersourcelines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\renderstate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

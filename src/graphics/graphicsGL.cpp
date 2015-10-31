@@ -53,7 +53,7 @@ namespace GTE
 		stencilTestEnabled = false;
 		stencilBufferEnabled = false;
 
-		faceCullingMode = FaceCullingMode::Back;
+		faceCullingMode = RenderState::FaceCulling::Back;
 		faceCullingEnabled = true;
 
 		initialized = false;
@@ -167,14 +167,14 @@ namespace GTE
 		// enable depth buffer testing and make Read/Write
 		SetDepthBufferEnabled(true);
 		SetDepthBufferReadOnly(false);
-		SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+		SetDepthBufferFunction(RenderState::DepthBufferFunction::LessThanOrEqual);
 
 		// disable stencil buffer by default
 		SetStencilBufferEnabled(false);
 
 		// enable face culling
 		SetFaceCullingEnabled(true);
-		SetFaceCullingMode(FaceCullingMode::Back);
+		SetFaceCullingMode(RenderState::FaceCulling::Back);
 
 		defaultRenderTarget = Graphics::SetupDefaultRenderTarget();
 		ASSERT(defaultRenderTarget.IsValid(), "GraphicsGL::Init -> Unable to create default render target.");
@@ -302,11 +302,11 @@ namespace GTE
 	/*
 	 * Set the type of face that will be culled during rendering.
 	 */
-	void GraphicsGL::SetFaceCullingMode(FaceCullingMode mode)
+	void GraphicsGL::SetFaceCullingMode(RenderState::FaceCulling mode)
 	{
 		if (faceCullingMode != mode || !initialized)
 		{
-			if (mode == FaceCullingMode::Front)
+			if (mode == RenderState::FaceCulling::Front)
 				glCullFace(GL_FRONT);
 			else
 				glCullFace(GL_BACK);
@@ -317,7 +317,7 @@ namespace GTE
 	/*
 	 * Get the current face culling mode.
 	 */
-	FaceCullingMode GraphicsGL::GetFaceCullingMode() const
+	RenderState::FaceCulling GraphicsGL::GetFaceCullingMode() const
 	{
 		return faceCullingMode;
 	}
@@ -382,26 +382,26 @@ namespace GTE
 	/*
 	 * Set the test that is used when performing depth-buffer occlusion.
 	 */
-	void GraphicsGL::SetDepthBufferFunction(DepthBufferFunction function)
+	void GraphicsGL::SetDepthBufferFunction(RenderState::DepthBufferFunction function)
 	{
 		switch (function)
 		{
-		case DepthBufferFunction::Always:
+		case RenderState::DepthBufferFunction::Always:
 			glDepthFunc(GL_ALWAYS);
 			break;
-		case DepthBufferFunction::Greater:
+		case RenderState::DepthBufferFunction::Greater:
 			glDepthFunc(GL_GREATER);
 			break;
-		case DepthBufferFunction::GreaterThanOrEqual:
+		case RenderState::DepthBufferFunction::GreaterThanOrEqual:
 			glDepthFunc(GL_GEQUAL);
 			break;
-		case DepthBufferFunction::Less:
+		case RenderState::DepthBufferFunction::Less:
 			glDepthFunc(GL_LESS);
 			break;
-		case DepthBufferFunction::LessThanOrEqual:
+		case RenderState::DepthBufferFunction::LessThanOrEqual:
 			glDepthFunc(GL_LEQUAL);
 			break;
-		case DepthBufferFunction::Equal:
+		case RenderState::DepthBufferFunction::Equal:
 			glDepthFunc(GL_EQUAL);
 			break;
 		}
@@ -862,7 +862,7 @@ namespace GTE
 	/*
 	 * Set the type of blending to be used when it is enabled.
 	 */
-	void GraphicsGL::SetBlendingFunction(BlendingProperty source, BlendingProperty dest)
+	void GraphicsGL::SetBlendingFunction(RenderState::BlendingMethod source, RenderState::BlendingMethod dest)
 	{
 		glBlendFunc(GetGLBlendProperty(source), GetGLBlendProperty(dest));
 	}
@@ -870,26 +870,26 @@ namespace GTE
 	/*
 	 * Map BlendingProperty elements to OpenGL blending values.
 	 */
-	GLenum GraphicsGL::GetGLBlendProperty(BlendingProperty property) const
+	GLenum GraphicsGL::GetGLBlendProperty(RenderState::BlendingMethod property) const
 	{
 		switch (property)
 		{
-		case BlendingProperty::SrcAlpha:
+		case RenderState::BlendingMethod::SrcAlpha:
 			return GL_SRC_ALPHA;
 			break;
-		case BlendingProperty::OneMinusSrcAlpha:
+		case RenderState::BlendingMethod::OneMinusSrcAlpha:
 			return GL_ONE_MINUS_SRC_ALPHA;
 			break;
-		case BlendingProperty::DstAlpha:
+		case RenderState::BlendingMethod::DstAlpha:
 			return GL_DST_ALPHA;
 			break;
-		case BlendingProperty::OneMinusDstAlpha:
+		case RenderState::BlendingMethod::OneMinusDstAlpha:
 			return GL_ONE_MINUS_DST_ALPHA;
 			break;
-		case BlendingProperty::One:
+		case RenderState::BlendingMethod::One:
 			return GL_ONE;
 			break;
-		case BlendingProperty::Zero:
+		case RenderState::BlendingMethod::Zero:
 			return GL_ZERO;
 			break;
 		default:
@@ -904,7 +904,7 @@ namespace GTE
 	 * Activate a material, meaning its shader, attributes, and uniforms will be used for all rendering
 	 * calls while it is active.
 	 */
-	void GraphicsGL::ActivateMaterial(MaterialRef material)
+	void GraphicsGL::ActivateMaterial(MaterialRef material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::ActivateMaterial -> 'material' is invalid", true);
 
@@ -940,7 +940,56 @@ namespace GTE
 				// OpenGL call to activate the shader for [material]
 				glUseProgram(shaderGL->GetProgramID());
 			}
+
+			SetupStateForMaterial(material, reverseFaceCulling);
 		}
+	}
+
+	/*
+	* Set OpenGL state to match the state specified by [material].
+	*/
+	void GraphicsGL::SetupStateForMaterial(MaterialRef material, Bool reverseFaceCulling)
+	{
+		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
+
+		RenderState::BlendingMode blendingMode = material->GetBlendingMode();
+		switch(blendingMode)
+		{
+			case RenderState::BlendingMode::None:
+				SetBlendingEnabled(false);
+			break;
+			case RenderState::BlendingMode::Additive:
+				SetBlendingEnabled(true);
+				SetBlendingFunction(RenderState::BlendingMethod::One, RenderState::BlendingMethod::One);
+			break;
+			case RenderState::BlendingMode::Custom:
+				SetBlendingEnabled(true);
+				SetBlendingFunction(material->GetSourceBlendingMethod(), material->GetDestBlendingMethod());
+			break;
+		}
+
+		RenderState::FaceCulling faceCulling = material->GetFaceCulling();
+		switch(faceCulling)
+		{
+			case RenderState::FaceCulling::Front:
+				SetFaceCullingEnabled(true);
+				if(!reverseFaceCulling)SetFaceCullingMode(RenderState::FaceCulling::Front);
+				else SetFaceCullingMode(RenderState::FaceCulling::Back);
+			break;
+			case RenderState::FaceCulling::Back:
+				SetFaceCullingEnabled(true);
+				if(!reverseFaceCulling)SetFaceCullingMode(RenderState::FaceCulling::Back);
+				else SetFaceCullingMode(RenderState::FaceCulling::Front);
+			break;
+			case RenderState::FaceCulling::None:
+				SetFaceCullingEnabled(false);
+			break;
+		}
+
+		SetDepthBufferReadOnly(!material->GetDepthBufferWriteEnabled());
+
+		RenderState::DepthBufferFunction depthBufferFunction = material->GetDepthBufferFunction();
+		SetDepthBufferFunction(depthBufferFunction);
 	}
 
 	/*
@@ -967,7 +1016,7 @@ namespace GTE
 
 			// disable rendering to the color buffer
 			SetColorBufferChannelState(false, false, false, false);
-			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+			SetDepthBufferFunction(RenderState::DepthBufferFunction::LessThanOrEqual);
 			SetDepthBufferReadOnly(true);
 			SetFaceCullingEnabled(false);
 
@@ -999,7 +1048,7 @@ namespace GTE
 			// enable color buffer rendering
 			SetColorBufferChannelState(true, true, true, true);
 			SetDepthBufferReadOnly(false);
-			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+			SetDepthBufferFunction(RenderState::DepthBufferFunction::LessThanOrEqual);
 
 			// enable near & far clipping planes
 			glDisable(GL_DEPTH_CLAMP);
@@ -1022,7 +1071,7 @@ namespace GTE
 			// disable color buffer rendering
 			SetColorBufferChannelState(false, false, false, false);
 			SetDepthBufferReadOnly(false);
-			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+			SetDepthBufferFunction(RenderState::DepthBufferFunction::LessThanOrEqual);
 
 			// enable near & far clipping planes
 			glDisable(GL_DEPTH_CLAMP);
@@ -1040,7 +1089,7 @@ namespace GTE
 			// enable color buffer rendering
 			SetColorBufferChannelState(true, true, true, true);
 			SetDepthBufferReadOnly(false);
-			SetDepthBufferFunction(DepthBufferFunction::LessThanOrEqual);
+			SetDepthBufferFunction(RenderState::DepthBufferFunction::LessThanOrEqual);
 
 			// enable near & far clipping planes
 			glDisable(GL_DEPTH_CLAMP);

@@ -76,7 +76,7 @@ GTE::Bool LavaField::InitMeshAndMaterial()
 	// assign the textures to the material
 	lavaMaterial->SetTexture(lavaTextureA, "TEXTUREA");
 	lavaMaterial->SetTexture(lavaTextureB, "TEXTUREB");
-	lavaMaterial->SetSelfLit(true);
+	lavaMaterial->SetUseLighting(false);
 
 	return true;
 }

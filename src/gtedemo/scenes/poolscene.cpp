@@ -670,7 +670,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	GTE::ShaderSource waterShaderSource;
 	importer.LoadBuiltInShaderSource("waterplanar", waterShaderSource);
 	waterMaterial = objectManager->CreateMaterial("WaterMaterial", waterShaderSource);
-	waterMaterial->SetSelfLit(true);
+	waterMaterial->SetUseLighting(false);
 	waterMaterial->SetTexture(waterReflectionCamera->GetRenderTarget()->GetColorTexture(), "REFLECTED_TEXTURE");
 	waterMaterial->SetTexture(mainCamera->GetCopyRenderTarget()->GetColorTexture(), "SCREEN_BUFFER_TEXTURE");
 
@@ -742,14 +742,14 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	GTE::ShaderSource waterDropShaderSource;
 	importer.LoadBuiltInShaderSource("waterdrop", waterDropShaderSource);
 	waterDropMaterial = objectManager->CreateMaterial("WaterDropMaterial", waterDropShaderSource);
-	waterDropMaterial->SetSelfLit(true);
+	waterDropMaterial->SetUseLighting(false);
 	waterDropMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
 	// create material for updating height maps
 	GTE::ShaderSource waterHeightsShaderSource;
 	importer.LoadBuiltInShaderSource("waterheights", waterHeightsShaderSource);
 	waterHeightsMaterial = objectManager->CreateMaterial("WaterHeightsMaterial", waterHeightsShaderSource);
-	waterHeightsMaterial->SetSelfLit(true);
+	waterHeightsMaterial->SetUseLighting(false);
 	waterHeightsMaterial->SetUniform1f(1.0f / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
 	waterHeightsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
@@ -757,7 +757,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	GTE::ShaderSource waterNormalsShaderSource;
 	importer.LoadBuiltInShaderSource("waternormals", waterNormalsShaderSource);
 	waterNormalsMaterial = objectManager->CreateMaterial("WaterNormalsMaterial", waterNormalsShaderSource);
-	waterNormalsMaterial->SetSelfLit(true);
+	waterNormalsMaterial->SetUseLighting(false);
 	waterNormalsMaterial->SetUniform1f(1.0f / (GTE::Real)waterHeightMapResolution, "PIXEL_DISTANCE");
 	waterNormalsMaterial->SetTexture(waterHeights[0]->GetColorTexture(), "WATER_HEIGHT_MAP");
 
@@ -807,7 +807,7 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	GTE::Color4 poolLightMeshColor(1, .95f, .5f, 1);
 	GTE::MaterialRef poolLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
 	poolLightMeshMaterial->SetColor(poolLightMeshColor, "SELFCOLOR");
-	poolLightMeshMaterial->SetSelfLit(true);
+	poolLightMeshMaterial->SetUseLighting(false);
 
 	// create pool light
 	GTE::SceneObjectRef poolLightObject = objectManager->CreateSceneObject();

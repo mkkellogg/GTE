@@ -668,6 +668,7 @@ namespace GTE
 	{
 		UpdateUpdateCount();
 	}
+
 	/*
 	 * Get the total number of vertices contained in this sub-mesh.
 	 */

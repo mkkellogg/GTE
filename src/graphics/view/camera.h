@@ -136,7 +136,7 @@ namespace GTE
 		UInt32 GetClipPlaneCount() const;
 
 		void SetReverseCulling(Bool reverseCulling);
-		Bool GetReverseCulling();
+		Bool GetReverseCulling() const;
 
 		void SetUniformWorldSceneObjectTransform(const Transform& transform);
 		const Transform& GetUniformWorldSceneObjectTransform();

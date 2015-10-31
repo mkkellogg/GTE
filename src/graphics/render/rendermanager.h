@@ -65,13 +65,13 @@ namespace GTE
 			const Light* LightObject;
 			const Point3* LightPosition;
 			const Vector3* LightDirection;
-			Bool SelfLit;
+			Bool UseLighting;
 
-			LightingDescriptor(const Light* lightObject, const Point3* lightPosition, const Vector3 * lightDirection, Bool selfLit) : LightObject(lightObject),
+			LightingDescriptor(const Light* lightObject, const Point3* lightPosition, const Vector3 * lightDirection, Bool useLighting) : LightObject(lightObject),
 				LightPosition(lightPosition),
 				LightDirection(lightDirection)
 			{
-				this->SelfLit = selfLit;
+				this->UseLighting = useLighting;
 			}
 		};
 
@@ -169,7 +169,7 @@ namespace GTE
 		void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
 		UInt32 RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
 
-		void ActivateMaterial(MaterialRef material);
+		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);
 		void SendModelViewProjectionToShader(const Transform& modelViewProjection);
 		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);

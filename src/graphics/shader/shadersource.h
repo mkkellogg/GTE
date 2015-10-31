@@ -44,6 +44,7 @@ namespace GTE
 
 		void ProcessShaderLinesToString(const ShaderSourceLines& lineSource, std::string& output, ProcessingContext& context);
 		Bool ProcessShaderLine(const std::string& line, std::string& strProcesingResult, ProcessingContext& context);
+		Bool TokenizeShaderLine(const std::string& line, std::string& command, std::vector<std::string>& args);
 		Bool ProcessShaderCommand(const std::string& command, const std::vector <std::string>& args, std::string& strProcesingResult, ProcessingContext& context);
 
 	public:

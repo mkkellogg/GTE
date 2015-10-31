@@ -15,16 +15,6 @@
 
 namespace GTE
 {
-	enum class BlendingProperty
-	{
-		One,
-		SrcAlpha,
-		OneMinusSrcAlpha,
-		DstAlpha,
-		OneMinusDstAlpha,
-		Zero
-	};
-
 	enum class ColorChannel
 	{
 		Red = 0,
@@ -46,13 +36,7 @@ namespace GTE
 	{
 		Standard = 0,
 		Outline = 1
-	};
-
-	enum class FaceCullingMode
-	{
-		Back = 0,
-		Front = 1
-	};
+	};	
 
 	enum class AntialiasingMethod
 	{

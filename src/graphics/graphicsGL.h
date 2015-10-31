@@ -67,7 +67,7 @@ namespace GTE
 		// is face culling enabled in OpenGL?
 		Bool faceCullingEnabled;
 		// which faces will be culled during rendering?
-		FaceCullingMode faceCullingMode;
+		RenderState::FaceCulling faceCullingMode;
 		// number of currently active clip planes
 		UInt32 activeClipPlanes;
 		// RenderTarget objects that encapsulates the OpenGL default framebuffer
@@ -105,6 +105,8 @@ namespace GTE
 
 		void GetCurrentBufferBits();
 
+		void SetupStateForMaterial(MaterialRef material, Bool reverseFaceCulling);
+
 	public:
 
 		GLFWwindow* GetGLFWWindow();
@@ -134,22 +136,22 @@ namespace GTE
 		RenderTargetRef GetDefaultRenderTarget() override;
 		void ClearRenderBuffers(IntMask bufferMask) const override;
 
-		void SetFaceCullingMode(FaceCullingMode mode) override;
-		FaceCullingMode GetFaceCullingMode() const override;
+		void SetFaceCullingMode(RenderState::FaceCulling mode) override;
+		RenderState::FaceCulling GetFaceCullingMode() const override;
 		void SetFaceCullingEnabled(Bool enabled) override;
 
 		void SetColorBufferChannelState(Bool r, Bool g, Bool b, Bool a) override;
 		void SetDepthBufferEnabled(Bool enabled) override;
 		void SetDepthBufferReadOnly(Bool readOnly) override;
-		void SetDepthBufferFunction(DepthBufferFunction function) override;
+		void SetDepthBufferFunction(RenderState::DepthBufferFunction function) override;
 		void SetStencilBufferEnabled(Bool enabled) override;
 		void SetStencilTestEnabled(Bool enabled) override;
 
 		void SetBlendingEnabled(Bool enabled) override;
-		void SetBlendingFunction(BlendingProperty source, BlendingProperty dest) override;
-		GLenum GetGLBlendProperty(BlendingProperty property) const;
+		void SetBlendingFunction(RenderState::BlendingMethod source, RenderState::BlendingMethod dest) override;
+		GLenum GetGLBlendProperty(RenderState::BlendingMethod property) const;
 
-		void ActivateMaterial(MaterialRef material) override;
+		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling) override;
 		MaterialRef GetActiveMaterial() override;
 
 		void EnterRenderMode(RenderMode renderMode) override;

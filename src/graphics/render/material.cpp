@@ -44,7 +44,13 @@ namespace GTE
 		uniformsSetAndVerified = false;
 		uniformsSetValues = nullptr;
 
-		selfLit = false;
+		useLighting = true;
+		blendingMode = RenderState::BlendingMode::None;
+		sourceBlendingMethod = RenderState::BlendingMethod::SrcAlpha;
+		destBlendingMethod = RenderState::BlendingMethod::OneMinusSrcAlpha;
+		faceCulling = RenderState::FaceCulling::Back;
+		depthBufferWriteEnabled = true;
+		depthBufferFunction = RenderState::DepthBufferFunction::LessThanOrEqual;
 
 		currentSampletUnityIndex = 0;
 	}
@@ -938,19 +944,115 @@ namespace GTE
 	}
 
 	/*
-	 * Specify whether this material is self-lit or not.
+	 * Specify whether this material makes use of scene lights or not.
 	 */
-	void Material::SetSelfLit(Bool selfLit)
+	void Material::SetUseLighting(Bool useLighting)
 	{
-		this->selfLit = selfLit;
+		this->useLighting = useLighting;
 	}
 
 	/*
-	 * Is this material self-lit?
+	 * Does this material make use of scene lights?
 	 */
-	Bool Material::IsSelfLit()
+	Bool Material::UseLighting()
 	{
-		return selfLit;
+		return useLighting;
+	}
+
+	/*
+	* Set the blending mode to be used when rendering this material.
+	*/
+	void Material::SetBlendingMode(RenderState::BlendingMode mode)
+	{
+		blendingMode = mode;
+	}
+
+	/*
+	* Get the blending mode to be used when rendering this material.
+	*/
+	RenderState::BlendingMode Material::GetBlendingMode()
+	{
+		return blendingMode;
+	}
+
+	/*
+	* Set the source blending method to be used when rendering this material.
+	*/
+	void Material::SetSourceBlendingMethod(RenderState::BlendingMethod method)
+	{
+		sourceBlendingMethod = method;
+	}
+
+	/*
+	* Get the source blending method to be used when rendering this material.
+	*/
+	RenderState::BlendingMethod Material::GetSourceBlendingMethod()
+	{
+		return sourceBlendingMethod;
+	}
+
+	/*
+	* Set the destination blending method to be used when rendering this material.
+	*/
+	void Material::SetDestBlendingMethod(RenderState::BlendingMethod method)
+	{
+		destBlendingMethod = method;
+	}
+
+	/*
+	* Get the destination blending method to be used when rendering this material.
+	*/
+	RenderState::BlendingMethod Material::GetDestBlendingMethod()
+	{
+		return destBlendingMethod;
+	}
+
+	/*
+	* Set the face culling method to be used when rendering this material.
+	*/
+	void Material::SetFaceCulling(RenderState::FaceCulling method)
+	{
+		faceCulling = method;
+	}
+
+	/*
+	* Get the face culling method to be used when rendering this material.
+	*/
+	RenderState::FaceCulling Material::GetFaceCulling()
+	{
+		return faceCulling;
+	}
+
+	/*
+	* Set whether or not writing to the depth buffer is enabled.
+	*/
+	void Material::SetDepthBufferWriteEnabled(Bool enabled)
+	{
+		depthBufferWriteEnabled = enabled;
+	}
+
+	/*
+	* Get whether or not writing to the depth buffer is enabled.
+	*/
+	Bool Material::GetDepthBufferWriteEnabled()
+	{
+		return depthBufferWriteEnabled;
+	}
+
+	/*
+	* Set the depth buffer write test.
+	*/
+	void Material::SetDepthBufferFunction(RenderState::DepthBufferFunction function)
+	{
+		depthBufferFunction = function;
+	}
+
+	/*
+	* Get the depth buffer write test.
+	*/
+	RenderState::DepthBufferFunction Material::GetDepthBufferFunction()
+	{
+		return depthBufferFunction;
 	}
 }
 

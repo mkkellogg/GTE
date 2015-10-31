@@ -452,7 +452,7 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	GTE::ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("selflit", selfLitShaderSource);
 	GTE::MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
-	selflitMaterial->SetSelfLit(true);
+	selflitMaterial->SetUseLighting(false);
 	selflitMaterial->SetColor(GTE::Color4(1, 1, 1, 1), "SELFCOLOR");
 
 	// create spinning point light

@@ -92,30 +92,11 @@ namespace GTE
 	{
 		if(line.size() > 0)
 		{
-			std::stringstream ss(line);
-			std::istream_iterator<std::string> iter(ss);
-			std::istream_iterator<std::string> end;
-
-			std::string includeFileName;
 			std::string command;
 			std::vector<std::string> args;
-			unsigned int index = 0;
-			while(iter != end)
-			{
-				if(index == 0)
-				{
-					command = *iter;
-				}
-				else
-				{
-					args.push_back(*iter);
-				}
+			Bool success = TokenizeShaderLine(line, command, args);
 
-				index++;
-				++iter;
-			}
-
-			if(index >= 1)
+			if(success == true)
 			{
 				return ProcessShaderCommand(command, args, strProcesingResult, context);
 			}
@@ -124,28 +105,48 @@ namespace GTE
 		return false;
 	}
 
+	Bool ShaderSource::TokenizeShaderLine(const std::string& line, std::string& command, std::vector<std::string>& args)
+	{
+		std::stringstream ss(line);
+		std::istream_iterator<std::string> iter(ss);
+		std::istream_iterator<std::string> end;
+
+		unsigned int count = 0;
+		while(iter != end)
+		{
+			if(count == 0)
+			{
+				command = *iter;
+			}
+			else
+			{
+				args.push_back(*iter);
+			}
+
+			count++;
+			++iter;
+		}
+
+		if(count > 0)return true;
+		else return false;
+	}
+
 	Bool ShaderSource::ProcessShaderCommand(const std::string& command, const std::vector <std::string>& args, std::string& strProcesingResult, ProcessingContext& context)
 	{
 		if(command == "#include")
 		{
 			if(args.size() > 0)
 			{
-				UInt32 firstArgIndex = 0;
-				UInt32 lastArgIndex = args.size() - 1;
-
-				std::string fullArg = "";
-				for(unsigned int i = firstArgIndex; i <= lastArgIndex; i++)
+				std::string includeFile = "";
+				for(int i = 0; i < args.size(); i++)
 				{
-					fullArg.append(args[i]);
+					includeFile.append(args[i]);
 				}
 
-				FileSystem * fileSystem = FileSystem::Instance();
-				std::string includeFile = fullArg;
 				ShaderSourceLines temp;
-				std::string basePath = fileSystem->GetBasePath(includeFile);
 				includeFile = EngineUtility::Trim(includeFile);
 				includeFile = includeFile.substr(1, includeFile.size() - 2);
-				std::string fullIncludePath = fileSystem->ConcatenatePaths(baseDir, includeFile);
+				std::string fullIncludePath = FileSystem::Instance()->ConcatenatePaths(baseDir, includeFile);
 				for(unsigned int i = 0; i < context.LoadedIncludes.size(); i++)
 				{
 					std::string& include = context.LoadedIncludes[i];

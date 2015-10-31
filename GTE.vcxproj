@@ -306,6 +306,7 @@
     <ClInclude Include="src\graphics\graphics.h" />
     <ClInclude Include="src\graphics\graphicsattr.h" />
     <ClInclude Include="src\graphics\graphicsGL.h" />
+    <ClInclude Include="src\graphics\renderstate.h" />
     <ClInclude Include="src\graphics\image\imageloader.h" />
     <ClInclude Include="src\graphics\image\rawimage.h" />
     <ClInclude Include="src\graphics\light\light.h" />

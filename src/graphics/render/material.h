@@ -19,6 +19,7 @@
 #define _GTE_MATERIAL_H_
 
 #include "graphics/stdattributes.h"
+#include "graphics/renderstate.h"
 #include "graphics/stduniforms.h"
 #include "graphics/color/color4.h"
 #include "object/engineobject.h"
@@ -41,7 +42,7 @@ namespace GTE
 
 	class VertexAttrBufferBinding
 	{
-	public:
+		public:
 
 		VertexAttrBuffer * Buffer;
 		StandardAttribute Attribute;
@@ -120,7 +121,14 @@ namespace GTE
 		std::map<std::string, int> textureUniformSamplerUnitIndex;
 
 		// does this material require a light to be rendered?
-		Bool selfLit;
+		Bool useLighting;
+
+		RenderState::BlendingMode blendingMode;
+		RenderState::BlendingMethod sourceBlendingMethod;
+		RenderState::BlendingMethod destBlendingMethod;
+		RenderState::FaceCulling faceCulling;
+		Bool depthBufferWriteEnabled;
+		RenderState::DepthBufferFunction depthBufferFunction;
 
 		UInt32 GetRequiredUniformSize(UniformType uniformType);
 		Bool allSetUniformsandAttributesVerified;
@@ -188,8 +196,21 @@ namespace GTE
 
 		Bool VerifySetVars(Int32 vertexCount);
 
-		void SetSelfLit(Bool selfLit);
-		Bool IsSelfLit();
+		void SetUseLighting(Bool selfLit);
+		Bool UseLighting();
+
+		void SetBlendingMode(RenderState::BlendingMode mode);
+		RenderState::BlendingMode GetBlendingMode();
+		void SetSourceBlendingMethod(RenderState::BlendingMethod method);
+		RenderState::BlendingMethod GetSourceBlendingMethod();
+		void SetDestBlendingMethod(RenderState::BlendingMethod method);
+		RenderState::BlendingMethod GetDestBlendingMethod();
+		void SetFaceCulling(RenderState::FaceCulling mode);
+		RenderState::FaceCulling GetFaceCulling();
+		void SetDepthBufferWriteEnabled(Bool enabled);
+		Bool GetDepthBufferWriteEnabled();
+		void SetDepthBufferFunction(RenderState::DepthBufferFunction function);
+		RenderState::DepthBufferFunction GetDepthBufferFunction();
 	};
 }
 

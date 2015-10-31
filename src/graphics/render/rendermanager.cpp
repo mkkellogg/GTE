@@ -75,24 +75,26 @@ namespace GTE
 		// construct shadow volume material
 		assetImporter.LoadBuiltInShaderSource("shadowvolume", shaderSource);
 		shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);
+		shadowVolumeMaterial->SetFaceCulling(RenderState::FaceCulling::None);
+		shadowVolumeMaterial->SetDepthBufferWriteEnabled(false);
 		ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.");
 
 		// construct SSAO outline material
 		assetImporter.LoadBuiltInShaderSource("ssaooutline", shaderSource);
 		ssaoOutlineMaterial = objectManager->CreateMaterial("SSAOOutline", shaderSource);
-		ssaoOutlineMaterial->SetSelfLit(true);
+		ssaoOutlineMaterial->SetUseLighting(false);
 		ASSERT(ssaoOutlineMaterial.IsValid(), "RenderManager::Init -> Unable to create SSAO outline material.");
 
 		// construct depth-only material
 		assetImporter.LoadBuiltInShaderSource("depthonly", shaderSource);
 		depthOnlyMaterial = objectManager->CreateMaterial("DepthOnlyMaterial", shaderSource);
-		depthOnlyMaterial->SetSelfLit(true);
+		depthOnlyMaterial->SetUseLighting(false);
 		ASSERT(depthOnlyMaterial.IsValid(), "RenderManager::Init -> Unable to create depth only material.");
 
 		// construct depth-value material
 		assetImporter.LoadBuiltInShaderSource("depthvalue", shaderSource);
 		depthValueMaterial = objectManager->CreateMaterial("DepthValueMaterial", shaderSource);
-		depthValueMaterial->SetSelfLit(true);
+		depthValueMaterial->SetUseLighting(false);
 		ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.");
 
 		// build depth texture off-screen render target
@@ -298,7 +300,7 @@ namespace GTE
 
 		// activate the material, which will switch the GPU's active shader to
 		// the one associated with the material
-		ActivateMaterial(material);
+		ActivateMaterial(material, false);
 
 		// send uniforms set for the material to its shader
 		SendActiveMaterialUniformsToShader();
@@ -674,8 +676,8 @@ namespace GTE
 		// TODO: Once front/back culling settings are part of  a material, this will have to change. In that case
 		// reverse culling will mean to reverse whatever the material specifies. For now since by default all
 		// objects have back-faces culled, we can reverse that in a single place by switching to fron-face culling.
-		if (camera.GetReverseCulling())Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Front);
-		else Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Back);
+		//if (camera.GetReverseCulling())Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(RenderState::FaceCulling::Front);
+		//else Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(RenderState::FaceCulling::Back);
 
 		// we have not yet rendered any ambient lights
 		Bool renderedAmbient = false;
@@ -732,7 +734,7 @@ namespace GTE
 		// render all self-lit objects in the scene once
 		ForwardRenderSceneForSelfLitMaterials(modelPreTransform, viewTransform, viewInverse, camera);
 
-		Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(FaceCullingMode::Back);
+		Engine::Instance()->GetGraphicsSystem()->SetFaceCullingMode(RenderState::FaceCulling::Back);
 
 		// if this camera has a skybox that is set up and enabled, then we want to render it
 		if (camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
@@ -836,7 +838,7 @@ namespace GTE
 						}
 
 						// set up lighting descriptor for non self-lit lighting
-						LightingDescriptor lightingDescriptor(&light, &lightPosition, &lightDirection, false);
+						LightingDescriptor lightingDescriptor(&light, &lightPosition, &lightDirection, true);
 						ForwardRenderSceneObject(*child, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse,
 							camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
 					}
@@ -898,7 +900,7 @@ namespace GTE
 			camera.GetSkyboxTransform().CopyMatrix(textureTrans);
 			skyboxMaterial->SetMatrix4x4(textureTrans, "TEXTURETRANSFORM_MATRIX");
 
-			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, true);
+			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 			ForwardRenderSceneObject(skyboxObject.GetRef(), lightingDescriptor, Transform(), viewTransform, viewTransformInverse, camera,
 				MaterialRef::Null(), true, true, FowardBlendingFilter::Never);
 			skyboxObject->SetActive(false);
@@ -1036,7 +1038,7 @@ namespace GTE
 			Transform full;
 			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
 
-			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, true);
+			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 			ForwardRenderSceneObject(*child, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter);
 		}
 	}
@@ -1121,21 +1123,20 @@ namespace GTE
 				Bool skipMesh = false;
 				// current material is self-lit, the we only want to render if the
 				//lighting descriptor specifies self-lit and vice-versa
-				if (currentMaterial->IsSelfLit() && !lightingDescriptor.SelfLit)skipMesh = true;
-				if (!currentMaterial->IsSelfLit() && lightingDescriptor.SelfLit)skipMesh = true;
+				if (currentMaterial->UseLighting() != lightingDescriptor.UseLighting)skipMesh = true;
 				if (rendered && !renderMoreThanOnce)skipMesh = true;
 
 				if (!skipMesh)
 				{
 					// activate the material, which will switch the GPU's active shader to
 					// the one associated with the material
-					ActivateMaterial(currentMaterial);
+					ActivateMaterial(currentMaterial, camera.GetReverseCulling());
 
 					// send uniforms set for the new material to its shader
 					SendActiveMaterialUniformsToShader();
 
-					// send light data to the active shader (if not self-lit)
-					if (!lightingDescriptor.SelfLit)
+					// send light data to the active shader (if it needs it)
+					if (lightingDescriptor.UseLighting)
 					{
 						currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, lightingDescriptor.LightDirection);
 					}
@@ -1155,12 +1156,12 @@ namespace GTE
 						if (GetForwardBlending() == FowardBlendingMethod::Subtractive)
 						{
 							Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
-							Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(BlendingProperty::Zero, BlendingProperty::SrcAlpha);
+							Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::Zero, RenderState::BlendingMethod::SrcAlpha);
 						}
 						else
 						{
 							Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
-							Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(BlendingProperty::One, BlendingProperty::One);
+							Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::One, RenderState::BlendingMethod::One);
 						}
 					}
 					else
@@ -1258,7 +1259,7 @@ namespace GTE
 
 				// activate the material, which will switch the GPU's active shader to
 				// the one associated with the material
-				ActivateMaterial(shadowVolumeMaterial);
+				ActivateMaterial(shadowVolumeMaterial, camera.GetReverseCulling());
 
 				Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
 				if (filter.IsValid() && filter->GetUseCustomShadowVolumeOffset())
@@ -1861,11 +1862,11 @@ namespace GTE
 	 * Activate [material], which will switch the GPU's active shader to
 	 * the one associated with it.
 	 */
-	void RenderManager::ActivateMaterial(MaterialRef material)
+	void RenderManager::ActivateMaterial(MaterialRef material, Bool reverseFaceCulling)
 	{
 		// We MUST notify the graphics system about the change in active material because other
 		// components (like Mesh3DRenderer) need to know about the active material
-		Engine::Instance()->GetGraphicsSystem()->ActivateMaterial(material);
+		Engine::Instance()->GetGraphicsSystem()->ActivateMaterial(material, reverseFaceCulling);
 	}
 }
 

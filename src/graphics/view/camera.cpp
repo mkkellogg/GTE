@@ -83,7 +83,7 @@ namespace GTE
 			skyboxMaterial = objectManager->CreateMaterial(std::string("SkyBox"), skyboxShaderSource);
 			NONFATAL_ASSERT(skyboxMaterial.IsValid(), "Camera::SetSkybox -> Unable to create skybox material.", true);
 
-			skyboxMaterial->SetSelfLit(true);
+			skyboxMaterial->SetUseLighting(false);
 			skyboxMaterial->SetTexture(skyboxTexture, "SKYBOX_TEXTURE");
 
 			StandardAttributeSet meshAttributes = StandardAttributes::CreateAttributeSet();
@@ -371,7 +371,7 @@ namespace GTE
 		this->reverseCulling = reverseCulling;
 	}
 
-	Bool Camera::GetReverseCulling()
+	Bool Camera::GetReverseCulling() const
 	{
 		return reverseCulling;
 	}

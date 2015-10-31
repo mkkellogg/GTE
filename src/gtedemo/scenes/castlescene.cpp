@@ -594,7 +594,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	GTE::Color4 lanternLightMeshColor(1, .95f, .5f, 1);
 	GTE::MaterialRef lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
 	lanterLightMeshMaterial->SetColor(lanternLightMeshColor, "SELFCOLOR");
-	lanterLightMeshMaterial->SetSelfLit(true);
+	lanterLightMeshMaterial->SetUseLighting(false);
 
 	// create castle center lantern
 	GTE::SceneObjectRef lanternObject = objectManager->CreateSceneObject();
