@@ -71,7 +71,8 @@ namespace GTE
 		// a manner that is more suitable for delivery to the GPU
 		const static Int32 MAX_ATTRIBUTE_BUFFERS = 64;
 		VertexAttrBuffer * attributeBuffers[MAX_ATTRIBUTE_BUFFERS];
-		std::vector<VertexAttrBufferBinding> boundAttributeBuffers;
+		std::vector<VertexAttrBufferBinding> boundStandardAttributeBuffers;
+		std::vector<VertexAttrBufferBinding> boundCustomAttributeBuffers;
 		std::vector<VertexAttrBufferBinding> boundShadowVolumeAttributeBuffers;
 
 		// number of vertices for which vertex attributes in [attributeBuffers] are stored
@@ -121,7 +122,7 @@ namespace GTE
 		void Destroy();
 		void DestroyBuffers();
 		void DestroyBuffer(VertexAttrBuffer ** buffer);
-		Bool InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride);
+		Bool InitAttributeData(UInt32 attr, Int32 length, Int32 componentCount, Int32 stride);
 
 		const Point3Array * GetShadowVolumePositions();
 		void SetShadowVolumePositionData(const Point3Array * points);

@@ -26,6 +26,7 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"
 #include "geometry/vector/vector3array.h"
+#include "customfloatattribute.h"
 #include "gtemath/gtemath.h"
 #include "global/global.h"
 #include "global/assert.h"
@@ -49,7 +50,7 @@ namespace GTE
 	 */
 	SubMesh3D::SubMesh3D(StandardAttributeSet attributes) : EngineObject()
 	{
-		attributeSet = attributes;
+		standardAttributes = attributes;
 		totalVertexCount = 0;
 		normalsSmoothingThreshold = 90;
 
@@ -63,6 +64,12 @@ namespace GTE
 		buildFaces = true;
 		calculateNormals = true;
 		calculateTangents = true;
+
+		customFloatAttributeCount = 0;
+		for(UInt32 c = 0; c < MAX_CUSTOM_ATTRIBUTES; c++)
+		{
+			customFloatAttributes[c] = nullptr;
+		}
 
 		UpdateUpdateCount();
 	}
@@ -130,7 +137,7 @@ namespace GTE
 	*/
 	void SubMesh3D::CalculateNormals(Real smoothingThreshhold)
 	{
-		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))return;
+		if (!StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Normal))return;
 
 		// loop through each triangle in this mesh's vertices
 		// and calculate normals for each
@@ -283,7 +290,7 @@ namespace GTE
 	*/
 	void SubMesh3D::CalculateTangents(Real smoothingThreshhold)
 	{
-		if (!StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))return;
+		if (!StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Tangent))return;
 
 		// loop through each triangle in this mesh's vertices
 		// and calculate tangents for each
@@ -499,6 +506,23 @@ namespace GTE
 	void SubMesh3D::Destroy()
 	{
 		DestroyVertexCrossMap();
+		DestroyCustomAttributes();
+	}
+
+	/*
+	* Deallocate and destroy all custom attribute data.
+	*/
+	void SubMesh3D::DestroyCustomAttributes()
+	{
+		for(UInt32 c = 0; c < MAX_CUSTOM_ATTRIBUTES; c++)
+		{
+			if(customFloatAttributes[c] != nullptr)
+			{
+				customFloatAttributes[c]->Destroy();
+				delete customFloatAttributes[c];
+				customFloatAttributes[c] = nullptr;
+			}
+		}
 	}
 
 	/*
@@ -681,9 +705,9 @@ namespace GTE
 	 * Get a StandardAttributeSet that describes the attributes possessed by
 	 * this sub-mesh.
 	 */
-	StandardAttributeSet SubMesh3D::GetAttributeSet() const
+	StandardAttributeSet SubMesh3D::GetStandardAttributeSet() const
 	{
-		return attributeSet;
+		return standardAttributes;
 	}
 
 	/*
@@ -704,38 +728,38 @@ namespace GTE
 		Bool initSuccess = true;
 		Int32 errorMask = 0;
 
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Position))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Position))
 		{
 			initSuccess = positions.Init(totalVertexCount) && initSuccess;
 			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::Position;
 		}
 
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Normal))
 		{
 			initSuccess = vertexNormals.Init(totalVertexCount) && initSuccess;
 			initSuccess = faceNormals.Init(totalVertexCount) && initSuccess;
 			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::Normal;
 		}
 
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Tangent))
 		{
 			initSuccess = vertexTangents.Init(totalVertexCount) && initSuccess;
 			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::Tangent;
 		}
 
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::VertexColor))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::VertexColor))
 		{
 			initSuccess = colors.Init(totalVertexCount) && initSuccess;
 			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::VertexColor;
 		}
 
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::UVTexture0))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::UVTexture0))
 		{
 			initSuccess = uvs0.Init(totalVertexCount) && initSuccess;
 			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::UVTexture0;
 		}
 
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::UVTexture1))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::UVTexture1))
 		{
 			initSuccess = uvs1.Init(totalVertexCount) && initSuccess;
 			if (!initSuccess)errorMask |= (Int32)StandardAttributeMaskComponent::UVTexture1;
@@ -769,7 +793,7 @@ namespace GTE
 	{
 		for (UInt32 i = 0; i < totalVertexCount; i += 3)
 		{
-			if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Position))
+			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Position))
 			{
 				Point3 * p1 = positions.GetPoint(i);
 				Point3  p1r = *p1;
@@ -779,7 +803,7 @@ namespace GTE
 				*p3 = p1r;
 			}
 
-			if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))
+			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Normal))
 			{
 				Vector3 * n1 = vertexNormals.GetVector(i);
 				Vector3  n1r = *n1;
@@ -796,7 +820,7 @@ namespace GTE
 				*n3 = n1r;
 			}
 
-			if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::VertexColor))
+			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::VertexColor))
 			{
 				Color4 * c1 = colors.GetColor(i);
 				Color4  c1r = *c1;
@@ -806,7 +830,7 @@ namespace GTE
 				*c3 = c1r;
 			}
 
-			if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::UVTexture0))
+			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::UVTexture0))
 			{
 				UV2 * u1 = uvs0.GetCoordinate(i);
 				UV2  u1r = *u1;
@@ -816,7 +840,7 @@ namespace GTE
 				*u3 = u1r;
 			}
 
-			if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::UVTexture1))
+			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::UVTexture1))
 			{
 				UV2 * u1 = uvs1.GetCoordinate(i);
 				UV2  u1r = *u1;
@@ -849,7 +873,7 @@ namespace GTE
 	 */
 	void SubMesh3D::InvertNormals()
 	{
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Normal))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Normal))
 		{
 			for (UInt32 i = 0; i < totalVertexCount; i++)
 			{
@@ -866,7 +890,7 @@ namespace GTE
 	 */
 	void SubMesh3D::InvertTangents()
 	{
-		if (StandardAttributes::HasAttribute(attributeSet, StandardAttribute::Tangent))
+		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Tangent))
 		{
 			for (UInt32 i = 0; i < totalVertexCount; i++)
 			{
@@ -892,6 +916,66 @@ namespace GTE
 	{
 		if (threshhold > 180)threshhold = 180;
 		this->normalsSmoothingThreshold = threshhold;
+	}
+
+	/*
+	* Get the number of custom attributes in this mesh.
+	*/
+	UInt32 SubMesh3D::GetCustomFloatAttributeCount() const
+	{
+		return customFloatAttributeCount;
+	}
+
+	/*
+	* Add a custom set of floating-point vertex attribute data to this mesh, and
+	* link to [id].
+	*/
+	Bool SubMesh3D::AddCustomFloatAttribute(UInt32 componentCount, UInt32 id)
+	{
+		NONFATAL_ASSERT_RTRN(id < MAX_CUSTOM_ATTRIBUTES, "SubMesh3D::AddCustomFloatAttribute -> 'id' was too large.", false, true);
+
+		if(customFloatAttributes[id] != nullptr)
+		{
+			customFloatAttributes[id]->Destroy();
+			customFloatAttributes[id] = new(std::nothrow) CustomFloatAttribute();
+
+			ASSERT(customFloatAttributes[id] != nullptr, "SubMesh3D::AddCustomFloatAttribute -> Unabled to allocate new custom attribute.");
+		}
+
+		Bool initSuccess = customFloatAttributes[id]->Init(totalVertexCount, componentCount);
+		if(initSuccess)customFloatAttributeCount++;
+
+		return initSuccess;
+	}
+
+	/*
+	* Get the descriptor for the custom floating-point vertex attribute data linked to [id].
+	*/
+	CustomFloatAttribute* SubMesh3D::GetCustomFloatAttributeByID(UInt32 id)
+	{
+		NONFATAL_ASSERT_RTRN(id < MAX_CUSTOM_ATTRIBUTES, "SubMesh3D::GetCustomFloatAttribute -> 'id' was too large.", nullptr, true);
+
+		return customFloatAttributes[id];
+	}
+
+	/*
+	* Get the descriptor for the nth set of custom floating-point vertex attribute data;
+	*/
+	CustomFloatAttribute* SubMesh3D::GetCustomFloatAttributeByOrder(UInt32 n)
+	{
+		NONFATAL_ASSERT_RTRN(n < MAX_CUSTOM_ATTRIBUTES, "SubMesh3D::GetCustomFloatAttribute -> 'n' was too large.", nullptr, true);
+
+		UInt32 found = 0;
+		for(UInt32 i = 0; i < MAX_CUSTOM_ATTRIBUTES; i++)
+		{			
+			if(customFloatAttributes[i] != nullptr)
+			{
+				if(found == n)return customFloatAttributes[i];
+				found++;
+			}
+		}
+
+		return nullptr;
 	}
 
 	/*

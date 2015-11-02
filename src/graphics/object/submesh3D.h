@@ -25,6 +25,7 @@
 #include "global/global.h"
 #include "object/enginetypes.h"
 
+
 namespace GTE
 {
 	//forward declarations
@@ -34,6 +35,7 @@ namespace GTE
 	class UV2;
 	class EngineObjectManager;
 	class SubMesh3DRenderer;
+	class CustomFloatAttribute;
 
 	class SubMesh3D : public EngineObject
 	{
@@ -43,8 +45,10 @@ namespace GTE
 		friend class EngineObjectManager;
 		friend class Mesh3D;
 
-		// the attributes for which this mesh contains data
-		StandardAttributeSet attributeSet;
+		static const int MAX_CUSTOM_ATTRIBUTES = 16;
+
+		// the standard attributes for which this mesh contains data
+		StandardAttributeSet standardAttributes;
 		// total number of vertices in this mesh
 		UInt32 totalVertexCount;
 		// this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
@@ -63,6 +67,9 @@ namespace GTE
 		UV2Array uvs0;
 		UV2Array uvs1;
 
+		UInt32 customFloatAttributeCount;
+		CustomFloatAttribute* customFloatAttributes[MAX_CUSTOM_ATTRIBUTES];
+
 		Bool isDirty;
 		// inter-face angle above which smoothing/average of vertex normals should
 		// not occur
@@ -80,7 +87,7 @@ namespace GTE
 		// radius of the sphere  of influence along the Z-axis
 		Vector3 sphereOfInfluenceZ;
 
-		// pointer to the containing MEsh3D object
+		// pointer to the containing Mesh3D object
 		Mesh3D * containerMesh;
 
 		// last time this mesh was modified
@@ -100,6 +107,8 @@ namespace GTE
 		virtual ~SubMesh3D();
 		
 		void Destroy();
+		void DestroyCustomAttributes();
+
 		void DestroyVertexCrossMap();
 		Bool BuildVertexCrossMap();
 
@@ -140,8 +149,13 @@ namespace GTE
 
 		Bool Init(UInt32 totalVertexCount);
 		UInt32 GetTotalVertexCount() const;
-		StandardAttributeSet GetAttributeSet() const;
+		StandardAttributeSet GetStandardAttributeSet() const;
 		UInt32 GetUpdateCount() const;
+
+		UInt32 GetCustomFloatAttributeCount() const;
+		Bool AddCustomFloatAttribute(UInt32 componentCount, UInt32 id);
+		CustomFloatAttribute* GetCustomFloatAttributeByID(UInt32 id);
+		CustomFloatAttribute* GetCustomFloatAttributeByOrder(UInt32 id);
 
 		Point3Array * GetPostions();
 		Vector3Array * GetVertexNormals();

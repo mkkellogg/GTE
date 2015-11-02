@@ -13,6 +13,7 @@
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/render/vertexattrbuffer.h"
+#include "graphics/object/customfloatattribute.h"
 #include "mesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "geometry/point/point3.h"
@@ -112,14 +113,13 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::DestroyBuffers()
 	{
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::Position]);
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::Normal]);
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::FaceNormal]);
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::Tangent]);
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::VertexColor]);
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::UVTexture0]);
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::UVTexture1]);
-		DestroyBuffer(&attributeBuffers[(Int32)StandardAttribute::ShadowPosition]);
+		for(UInt32 i =0; i < MAX_ATTRIBUTE_BUFFERS; i++)
+		{
+			if(attributeBuffers[i] != nullptr)
+			{
+				DestroyBuffer(&attributeBuffers[i]);
+			}
+		}
 	}
 
 	/*
@@ -156,12 +156,12 @@ namespace GTE
 	/*
 	 * Create & initialize the vertex attribute buffer in [attributeBuffers] that corresponds to [attr].
 	 */
-	Bool SubMesh3DRenderer::InitAttributeData(StandardAttribute attr, Int32 length, Int32 componentCount, Int32 stride)
+	Bool SubMesh3DRenderer::InitAttributeData(UInt32 attr, Int32 length, Int32 componentCount, Int32 stride)
 	{
 		// if the buffer already exists, destroy it first
-		DestroyBuffer(&attributeBuffers[(Int32)attr]);
+		DestroyBuffer(&attributeBuffers[attr]);
 		// create and initialize buffer
-		Bool initSuccess = InitBuffer(&attributeBuffers[(Int32)attr], length, componentCount, stride);
+		Bool initSuccess = InitBuffer(&attributeBuffers[attr], length, componentCount, stride);
 
 		return initSuccess;
 	}
@@ -542,12 +542,12 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not find matching sub mesh for sub renderer.");
 
-		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
 		StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
 
-		boundAttributeBuffers.clear();
+		boundStandardAttributeBuffers.clear();
 		// loop through each standard attribute and create/initialize vertex attribute buffer for each
-		for (Int32 i = 0; i < (Int32)StandardAttribute::_Last; i++)
+		for (UInt32 i = 0; i < (UInt32)StandardAttribute::_Last; i++)
 		{
 			StandardAttribute attr = (StandardAttribute)i;
 			if (StandardAttributes::HasAttribute(meshAttributes, attr))
@@ -557,12 +557,26 @@ namespace GTE
 
 				Int32 stride = 0;
 
-				Int32 initSuccess = InitAttributeData(attr, mesh->GetTotalVertexCount(), componentCount, stride);
+				Bool initSuccess = InitAttributeData((UInt32)attr, mesh->GetTotalVertexCount(), componentCount, stride);
 				if (!initSuccess)StandardAttributes::AddAttribute(&err, attr);
 
-				VertexAttrBufferBinding binding(attributeBuffers[i], attr, -1);
-				boundAttributeBuffers.push_back(binding);
+				VertexAttrBufferBinding binding(attributeBuffers[(UInt32)attr], attr, -1);
+				boundStandardAttributeBuffers.push_back(binding);
 			}
+		}
+
+		for(UInt32 i = 0; i < mesh->GetCustomFloatAttributeCount(); i++)
+		{
+			CustomFloatAttribute * attr = mesh->GetCustomFloatAttributeByOrder(i);
+			ASSERT(attr != nullptr, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Null custom attribute found.");
+
+			UInt32 componentCount = attr->GetComponentCount();
+			UInt32 stride = 0;
+			Bool initSuccess = InitAttributeData((Int32)StandardAttribute::_Last + i, mesh->GetTotalVertexCount(), componentCount, stride);
+
+			// TODO: assign correct value for custom attribute identifier here
+			VertexAttrBufferBinding binding(attributeBuffers[(UInt32)attr], StandardAttribute::_None, -1);
+			boundCustomAttributeBuffers.push_back(binding);
 		}
 
 		// update the local vertex count
@@ -572,7 +586,7 @@ namespace GTE
 		// shadow or not. This could be quite wasteful, so implement a way to avoid this excess memory usage.
 		Bool shadowVolumeInitSuccess = true;
 		shadowVolumeInitSuccess = shadowVolumePositions.Init(storedVertexCount * 8);
-		shadowVolumeInitSuccess &= InitAttributeData(StandardAttribute::ShadowPosition, storedVertexCount * 8, 4, 0);
+		shadowVolumeInitSuccess &= InitAttributeData((UInt32)StandardAttribute::ShadowPosition, storedVertexCount * 8, 4, 0);
 		ASSERT(shadowVolumeInitSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
 
 		boundShadowVolumeAttributeBuffers.clear();
@@ -594,7 +608,7 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateAttributeTransformerData -> Could not find matching sub mesh for sub renderer.");
 
-		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
 
 		doPositionTransform = false;
 		doNormalTransform = false;
@@ -675,7 +689,7 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
 
-		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
 
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Position))SetPositionData(mesh->GetPostions());
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::Normal))SetNormalData(mesh->GetVertexNormals());
@@ -722,7 +736,7 @@ namespace GTE
 
 		// if the vertex count of this sub-renderer does not match that of the target sub-mesh, call
 		// the UpdateMeshAttributeBuffers() method to resize
-		if (mesh->GetTotalVertexCount() != storedVertexCount || mesh->GetAttributeSet() != storedAttributes)
+		if (mesh->GetTotalVertexCount() != storedVertexCount || mesh->GetStandardAttributeSet() != storedAttributes)
 		{
 			updateSuccess = updateSuccess && UpdateMeshAttributeBuffers();
 		}
@@ -756,7 +770,7 @@ namespace GTE
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.");
 
 		StandardAttributeSet materialAttributes = material->GetStandardAttributes();
-		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
 
 		// look for mismatched shader variables and mesh attributes
 		for (Int32 i = 0; i < (Int32)StandardAttribute::_Last; i++)
@@ -868,7 +882,7 @@ namespace GTE
 		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::Render -> Could not find matching sub mesh for sub renderer.");
 
-		StandardAttributeSet meshAttributes = mesh->GetAttributeSet();
+		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
 
 		if (doAttributeTransform)
 		{
@@ -899,7 +913,7 @@ namespace GTE
 		MaterialRef currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
 
-		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);
+		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundStandardAttributeBuffers, mesh->GetTotalVertexCount(), true);
 	}
 
 	/*
