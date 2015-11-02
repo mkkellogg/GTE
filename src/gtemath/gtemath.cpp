@@ -88,4 +88,9 @@ namespace GTE
 	{
 		return (b - a) * t + a;
 	}
+
+	Real GTEMath::Random()
+	{
+		return (Real)rand();
+	}
 }

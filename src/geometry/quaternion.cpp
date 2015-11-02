@@ -450,7 +450,7 @@ namespace GTE
 	{
 		Vector3 euler;
 		const static Real PI_OVER_2 = Constants::PI * 0.5f;
-		const static Real EPSILON = 1e-10;
+		const static Real EPSILON = (Real)1e-10;
 		Real sqw, sqx, sqy, sqz;
 
 		// quick conversion to Euler angles to give tilt to user

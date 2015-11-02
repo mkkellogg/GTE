@@ -35,7 +35,6 @@ namespace GTE
 		Vector3(Bool permAttached, Real * target);
 		Vector3(Real x, Real y, Real z);
 		Vector3(const Vector3& vector);
-		Vector3(const Real * data);
 		~Vector3() override;
 
 		Vector3& operator=(const Vector3 & source);
@@ -43,10 +42,15 @@ namespace GTE
 		Bool operator==(const Vector3 & source);
 		static Bool AreStrictlyEqual(const Vector3* a, const Vector3* b);
 		void Set(Real x, Real y, Real z);
+		Real MaxComponentMagnitude();
 
 		void Add(const Vector3& v);
 		static void Add(const Vector3& v1, const Vector3& v2, Vector3& result);
-		static void Subtract(const Vector3& v1, const Vector3& p2, Vector3& result);
+		static void Subtract(const Vector3& v1, const Vector3& v2, Vector3& result);
+		void Multiply(const Vector3& v);
+		static void Multiply(const Vector3& a, const Vector3& b, Vector3& results);
+		void Lerp(const Vector3& v1, const Vector3& v2, Real t);
+		static void Lerp(const Vector3& v1, const Vector3& v2, Vector3& result, Real t);
 
 		void Scale(Real magnitude);
 		void Normalize();
@@ -56,7 +60,7 @@ namespace GTE
 		static Real Magnitude(Real x, Real y, Real z);
 		static Real SquareMagnitude(Real x, Real y, Real z);
 		Real QuickMagnitude() const;
-		void Invert();
+		void Invert();		
 		static void Cross(const Vector3& a, const Vector3& b, Vector3& results);
 		static void CalcNormal(const Vector3& a, const Vector3& b, Vector3& result);
 		static Real Dot(const Vector3& a, const Vector3& b);

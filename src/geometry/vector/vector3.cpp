@@ -97,14 +97,6 @@ namespace GTE
 	}
 
 	/*
-	 * Set the values of this vector
-	 */
-	void Vector3::Set(Real x, Real y, Real z)
-	{
-		BaseVector4::Set(x, y, z, 0);
-	}
-
-	/*
 	 * Clean up
 	 */
 	Vector3::~Vector3()
@@ -113,13 +105,27 @@ namespace GTE
 	}
 
 	/*
+	* Set the values of this vector
+	*/
+	void Vector3::Set(Real x, Real y, Real z)
+	{
+		BaseVector4::Set(x, y, z, 0);
+	}
+
+	/*
+	* Get the maximum of the respective absolute value of each component.
+	*/
+	Real Vector3::MaxComponentMagnitude()
+	{
+		return GTEMath::Max(GTEMath::Abs(x), GTEMath::Max(GTEMath::Abs(y), GTEMath::Abs(z)));
+	}
+
+	/*
 	 * Add vector [v] to this vector
 	 */
-	void Vector3::Add(const Vector3& vector)
+	void Vector3::Add(const Vector3& v)
 	{
-		x += vector.x;
-		y += vector.y;
-		z += vector.z;
+		Add(*this, v, *this);
 	}
 
 	/*
@@ -140,6 +146,42 @@ namespace GTE
 		result.x = v1.x - v2.x;
 		result.y = v1.y - v2.y;
 		result.z = v1.z - v2.z;
+	}
+
+	/*
+	* Component-wise multiply this vector with [v].
+	*/
+	void Vector3::Multiply(const Vector3& v)
+	{
+		Multiply(*this, v, *this);
+	}
+
+	/*
+	* Component-wise multiply [a] with [b], and store the result in [result].
+	*/
+	void Vector3::Multiply(const Vector3& a, const Vector3& b, Vector3& result)
+	{
+		result.x = a.x * b.x;
+		result.y = a.y * b.y;
+		result.z = a.z * b.z;
+	}
+
+	/*
+	* Linearly interpolate this vector from [v1] to [v2].
+	*/
+	void Vector3::Lerp(const Vector3& v1, const Vector3& v2, Real t)
+	{
+		Lerp(v1, v2, *this, t);
+	}
+
+	/*
+	* Linearly interpolate from [v1] to [v2] and store the result in [result]
+	*/
+	void Vector3::Lerp(const Vector3& v1, const Vector3& v2, Vector3& result, Real t)
+	{
+		result.x = ((v2.x - v1.x) * t) + v1.x;
+		result.y = ((v2.y - v1.y) * t) + v1.y;
+		result.z = ((v2.z - v1.z) * t) + v1.z;
 	}
 
 	/*
@@ -236,11 +278,9 @@ namespace GTE
 	 */
 	void Vector3::Cross(const Vector3& a, const Vector3& b, Vector3& result)
 	{
-		Real x, y, z;
-		x = (a.y*b.z) - (b.y*a.z);
-		y = (b.x*a.z) - (a.x*b.z);
-		z = (a.x*b.y) - (b.x*a.y);
-		result.Set(x, y, z);
+		result.x = (a.y*b.z) - (b.y*a.z);
+		result.y = (b.x*a.z) - (a.x*b.z);
+		result.z = (a.x*b.y) - (b.x*a.y);
 	}
 
 	/*
@@ -354,7 +394,7 @@ namespace GTE
 
 	Bool Vector3::IsZeroLength() const
 	{
-		Real epsilon = 1e-06;
+		Real epsilon = (Real)1e-06;
 		Real sqlen = (x * x) + (y * y) + (z * z);
 		return (sqlen < (epsilon * epsilon));
 	}

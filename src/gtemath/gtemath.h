@@ -22,6 +22,7 @@ namespace GTE
 		static Real Min(Real a, Real b);
 		static Real Max(Real a, Real b);
 		static Real Lerp(Real a, Real b, Real t);
+		static Real Random();
 	};
 }
 

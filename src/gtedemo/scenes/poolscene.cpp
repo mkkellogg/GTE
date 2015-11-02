@@ -158,12 +158,6 @@ void PoolScene::UpdateRippleSimulation()
 			dropStrength = (((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 1.0f) + 0.5f;
 			dropRadius = dropStrength / 35.0f;
 
-			//dropStrength = 0.8f;
-			//dropRadius = .05f;
-
-		//	dropStrength = 2.0f;
-			//dropRadius = .05f;
-
 			dropStrength = 0.4f;
 			dropRadius = .04f;
 

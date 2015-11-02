@@ -19,7 +19,6 @@ namespace GTE
 		UV2(Bool permAttached, Real * target);
 		UV2(Real u, Real v);
 		UV2(const UV2& uv);
-		UV2(const Real * data);
 		~UV2();
 
 		UV2 & operator= (const UV2 & source);

@@ -174,7 +174,7 @@ namespace GTE
 		Bool AddClipPlane() override;
 		void DeactiveAllClipPlanes() override;
 
-		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate) override;
+		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundStandardAttributeBuffers, UInt32 vertexCount, Bool validate) override;
 	};
 }
 

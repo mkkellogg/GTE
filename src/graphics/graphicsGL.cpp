@@ -1497,22 +1497,22 @@ namespace GTE
 	/*
 	 * Generic function for rendering the attributes for groups of vertices.
 	 *
-	 * [boundBuffers] - Array of VertexAttrBufferBinding instances, which hold arrays of attributes (normals, positions, UV coordinates, etc.)
-	 * 				    in a format suitable for sending to the GPU.
+	 * [standardBoundBuffers] - Array of VertexAttrBufferBinding instances, which hold arrays of standard 
+								attributes (normals, positions, UV coordinates, etc.) in a format suitable for sending to the GPU.
 	 * [vertexCount] - Number of vertices being sent to the GPU.
 	 * [validate] - Specifies whether or not to validate the shader variables that have been set prior to rendering.
 	 */
-	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate)
+	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundStandardAttributeBuffers, UInt32 vertexCount, Bool validate)
 	{
 		MaterialRef currentMaterial = GetActiveMaterial();
 
 		VertexAttrBufferBinding binding;
-		for (UInt32 b = 0; b < boundBuffers.size(); b++)
+		for (UInt32 b = 0; b < boundStandardAttributeBuffers.size(); b++)
 		{
-			binding = boundBuffers[b];
-			if (binding.Attribute != StandardAttribute::_None)
+			binding = boundStandardAttributeBuffers[b];
+			if (binding.StdAttribute != StandardAttribute::_None)
 			{
-				currentMaterial->SendStandardAttributeBufferToShader(binding.Attribute, binding.Buffer);
+				currentMaterial->SendStandardAttributeBufferToShader(binding.StdAttribute, binding.Buffer);
 			}
 		}
 

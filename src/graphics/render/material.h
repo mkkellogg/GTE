@@ -45,21 +45,21 @@ namespace GTE
 		public:
 
 		VertexAttrBuffer * Buffer;
-		StandardAttribute Attribute;
-		Int32 AltBinding;
+		StandardAttribute StdAttribute;
+		Int32 CustomAttribute;
 
 		VertexAttrBufferBinding()
 		{
-			Attribute = StandardAttribute::_None;
+			StdAttribute = StandardAttribute::_None;
 			Buffer = nullptr;
-			AltBinding = -1;
+			CustomAttribute = -1;
 		}
 
-		VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute attribute, Int32 altBinding)
+		VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute stdAttribute, Int32 customAttribute)
 		{
 			this->Buffer = buffer;
-			this->Attribute = attribute;
-			this->AltBinding = altBinding;
+			this->StdAttribute = stdAttribute;
+			this->CustomAttribute = customAttribute;
 		}
 	};
 
@@ -172,17 +172,6 @@ namespace GTE
 		void SendAttributeBufferToShader(Int32 varID, VertexAttrBuffer *buffer);
 
 		StandardUniformSet GetStandardUniforms() const;
-
-		void SendSetUniformToShader(UInt32 index);
-		void SendAllSetUniformsToShader();
-		void SetTexture(TextureRef texture, const std::string& varName);
-		void SetMatrix4x4(const Matrix4x4& mat, const std::string& varName);
-		void SetUniform1f(Real val, const std::string& varName);
-		void SetUniform2f(Real v1, Real v2, const std::string& varName);
-		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName);
-		void SetColor(const Color4& val, const std::string& varName);
-		UInt32 GetSetUniformCount() const;
-
 		void SendClipPlaneCountToShader(UInt32 count);
 		void SendClipPlaneToShader(UInt32 index, Real eq1, Real eq2, Real eq3, Real eq4);
 		void SendModelMatrixInverseTransposeToShader(const Matrix4x4 * mat);
@@ -193,6 +182,17 @@ namespace GTE
 		void SendMVPMatrixToShader(const Matrix4x4 * mat);
 		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
 		void SendEyePositionToShader(const Point3 * position);
+
+		void SendSetUniformToShader(UInt32 index);
+		void SendAllSetUniformsToShader();
+		UInt32 GetSetUniformCount() const;
+
+		void SetTexture(TextureRef texture, const std::string& varName);
+		void SetMatrix4x4(const Matrix4x4& mat, const std::string& varName);
+		void SetUniform1f(Real val, const std::string& varName);
+		void SetUniform2f(Real v1, Real v2, const std::string& varName);
+		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName);
+		void SetColor(const Color4& val, const std::string& varName);
 
 		Bool VerifySetVars(Int32 vertexCount);
 

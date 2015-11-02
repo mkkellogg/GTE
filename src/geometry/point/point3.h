@@ -36,13 +36,7 @@ namespace GTE
 		Point3(Bool permAttached, Real * target);
 		Point3(Real x, Real y, Real z);
 		Point3(const Point3& point);
-		Point3(const Real * data);
 		~Point3() override;
-
-		void Add(const Vector3& v);
-		static void Add(const Point3& point, const Vector3& v, Point3& result);
-		static void Subtract(const Point3& p1, const Point3& p2, Vector3&  result);
-		static void Lerp(const Point3& p1, const Point3& p2, Point3& result, Real t);
 
 		Point3 & operator= (const Point3 & source);
 		Bool operator==(const Point3 & source);
@@ -51,6 +45,20 @@ namespace GTE
 		static Bool AreEqual(const Point3* a, const Point3* b);
 		static Bool AreStrictlyEqual(const Point3* a, const Point3* b);
 		void Set(Real x, Real y, Real z);
+		Real MaxComponentMagnitude();
+
+		void Add(const Vector3& v);
+		void Add(const Point3& v);
+		static void Add(const Point3& point, const Vector3& v, Point3& result);
+		static void Add(const Point3& point, const Point3& v, Point3& result);
+		static void Subtract(const Point3& p1, const Point3& p2, Vector3&  result);
+		void Multiply(const Point3& p);
+		static void Multiply(const Point3& a, const Point3& b, Point3& results);
+		void Lerp(const Point3& p1, const Point3& p2, Real t);
+		static void Lerp(const Point3& p1, const Point3& p2, Point3& result, Real t);
+
+		void Scale(Real magnitude);
+		void Normalize();		
 
 		void AttachTo(Real * data) override;
 		void Detach() override;
