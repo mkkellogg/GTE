@@ -44,7 +44,7 @@ The binaries for all required libraries are available for Windows and can be dow
 * GLFW 3: http://www.glfw.org/download.html (choose 64-bit Windows binaries)
 * GLEW:   http://glew.sourceforge.net/index.html
 	
-This repository includes a Visual Studio 2013 solution for GTE. You will need to update it to point to the correct include and library folders for the above libraries on your system. The solution is configured for 64-bit development so make sure to link to the 64-bit versions of those libraries.
+This repository includes a Visual Studio 2015 solution for GTE. You will need to update it to point to the correct include and library folders for the above libraries on your system. The solution is configured for 64-bit development so make sure to link to the 64-bit versions of those libraries.
 	
 The include paths can be set by right clicking on the "GTE" project, selecting "Properties", and then expanding "Configuration Properties" to find the "C/C++" page, which contains the field "Additional Include Directories". Edit that field as appropriate.
 	
