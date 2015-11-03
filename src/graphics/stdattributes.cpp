@@ -10,11 +10,46 @@
 
 namespace GTE
 {
-	const Char* const StandardAttributes::attributeNames[] = { "POSITION", "SHADOW_POSITION", "NORMAL", "FACENORMAL", "TANGENT", "COLOR", "UVTEXTURE0", "UVTEXTURE1", "UVNORMALMAP" };
+	const std::string StandardAttributes::attributeNames[] = 
+	{ 
+		"POSITION", 
+		"SHADOW_POSITION", 
+		"NORMAL", 
+		"FACENORMAL", 
+		"TANGENT", 
+		"COLOR", 
+		"UVTEXTURE0", 
+		"UVTEXTURE1", 
+		"UVNORMALMAP" 
+	};
 
-	const Char * StandardAttributes::GetAttributeName(StandardAttribute attr)
+	std::unordered_map<std::string, StandardAttribute> StandardAttributes::nameToAttribute
 	{
-		return attributeNames[(IntMask)attr];
+		{attributeNames[(UInt16)StandardAttribute::Position],StandardAttribute::Position},
+		{attributeNames[(UInt16)StandardAttribute::ShadowPosition],StandardAttribute::ShadowPosition},
+		{attributeNames[(UInt16)StandardAttribute::Normal],StandardAttribute::Normal},
+		{attributeNames[(UInt16)StandardAttribute::FaceNormal],StandardAttribute::FaceNormal},
+		{attributeNames[(UInt16)StandardAttribute::Tangent],StandardAttribute::Tangent},
+		{attributeNames[(UInt16)StandardAttribute::VertexColor],StandardAttribute::VertexColor},
+		{attributeNames[(UInt16)StandardAttribute::UVTexture0],StandardAttribute::UVTexture0},
+		{attributeNames[(UInt16)StandardAttribute::UVTexture1],StandardAttribute::UVTexture1},
+		{attributeNames[(UInt16)StandardAttribute::UVNormalMap],StandardAttribute::UVNormalMap}
+	};
+
+	const std::string& StandardAttributes::GetAttributeName(StandardAttribute attr)
+	{
+		return attributeNames[(UInt16)attr];
+	}
+
+	StandardAttribute StandardAttributes::GetAttributeForName(const std::string& name)
+	{
+		auto result = nameToAttribute.find(name);
+		if(result == nameToAttribute.end())
+		{
+			return StandardAttribute::_None;
+		}
+
+		return (*result).second;
 	}
 
 	StandardAttribute StandardAttributes::AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component)
@@ -24,7 +59,7 @@ namespace GTE
 
 	StandardAttributeMaskComponent StandardAttributes::AttributeToAttributeMaskComponent(StandardAttribute attr)
 	{
-		return (StandardAttributeMaskComponent)IntMaskUtil::IndexToMaskValue((IntMask)attr);
+		return (StandardAttributeMaskComponent)IntMaskUtil::IndexToMaskValue((UInt16)attr);
 	}
 
 	void StandardAttributes::AddAttribute(StandardAttributeSet * set, StandardAttribute attr)

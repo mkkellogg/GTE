@@ -3,6 +3,8 @@
 
 #include "object/enginetypes.h"
 #include "base/intmask.h"
+#include <unordered_map>
+#include <string>
 
 namespace GTE
 {
@@ -38,11 +40,13 @@ namespace GTE
 
 	class StandardAttributes
 	{
-		static const Char* const attributeNames[];
+		static const std::string attributeNames[];
+		static std::unordered_map<std::string, StandardAttribute> nameToAttribute;
 
 	public:
 
-		static const Char * GetAttributeName(StandardAttribute attr);
+		static const std::string& GetAttributeName(StandardAttribute attr);
+		static StandardAttribute GetAttributeForName(const std::string& name);
 		static StandardAttribute AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component);
 		static StandardAttributeMaskComponent AttributeToAttributeMaskComponent(StandardAttribute attr);
 

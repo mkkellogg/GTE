@@ -1828,7 +1828,7 @@ namespace GTE
 	{
 		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendCustomUniformsToShader -> Active material is not valid.");
-		activeMaterial->SendAllSetUniformsToShader();
+		activeMaterial->SendAllStoredUniformValuesToShader();
 	}
 
 	/*

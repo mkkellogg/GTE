@@ -3,6 +3,8 @@
 
 #include "object/enginetypes.h"
 #include "base/intmask.h"
+#include <unordered_map>
+#include <string>
 
 namespace GTE
 {
@@ -66,11 +68,13 @@ namespace GTE
 
 	class StandardUniforms
 	{
-		static const Char* const uniformNames[];
+		static const std::string uniformNames[];
+		static std::unordered_map<std::string, StandardUniform> nameToUniform;
 
 	public:
 
-		static const Char * GetUniformName(StandardUniform uniform);
+		static const std::string& GetUniformName(StandardUniform uniform);
+		static StandardUniform GetUniformForName(const std::string& name);
 		static StandardUniform UniformMaskComponentToUniform(StandardUniformMaskComponent component);
 		static StandardUniformMaskComponent UniformToUniformMaskComponent(StandardUniform uniform);
 

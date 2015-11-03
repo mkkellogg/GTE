@@ -142,8 +142,8 @@ namespace GTE
 		static StandardUniform MapTextureTypeToUniform(TextureType textureType);
 		static StandardAttribute MapTextureTypeToAttribute(TextureType textureType);
 		static UV2Array* GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D& mesh, ShaderMaterialCharacteristic property);
-		static std::string GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property);
-		static std::string GetBuiltinVariableNameForTextureType(TextureType textureType);
+		static const std::string* GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property);
+		static const std::string* GetBuiltinVariableNameForTextureType(TextureType textureType);
 		static TextureType ConvertAITextureKeyToTextureType(Int32 aiTextureKey);
 		static Int32 ConvertTextureTypeToAITextureKey(TextureType textureType);
 

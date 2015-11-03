@@ -231,6 +231,7 @@
     <ClCompile Include="src\graphics\texture\texture.cpp" />
     <ClCompile Include="src\graphics\texture\textureattr.cpp" />
     <ClCompile Include="src\graphics\texture\textureGL.cpp" />
+    <ClCompile Include="src\graphics\uniformcatalog.cpp" />
     <ClCompile Include="src\graphics\uv\uv2.cpp" />
     <ClCompile Include="src\graphics\uv\uv2array.cpp" />
     <ClCompile Include="src\graphics\uv\uv2factory.cpp" />
@@ -360,6 +361,7 @@
     <ClInclude Include="src\graphics\texture\texture.h" />
     <ClInclude Include="src\graphics\texture\textureattr.h" />
     <ClInclude Include="src\graphics\texture\textureGL.h" />
+    <ClInclude Include="src\graphics\uniformcatalog.h" />
     <ClInclude Include="src\graphics\uv\uv2.h" />
     <ClInclude Include="src\graphics\uv\uv2array.h" />
     <ClInclude Include="src\graphics\uv\uv2factory.h" />

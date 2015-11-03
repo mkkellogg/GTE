@@ -786,13 +786,13 @@ Bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assim
 	UInt32 aiTextureKey = ConvertTextureTypeToAITextureKey(textureType);
 
 	// get the name of the shader uniform that handles textures of [textureType]
-	std::string textureName = GetBuiltinVariableNameForTextureType(textureType);
+	const std::string* textureName = GetBuiltinVariableNameForTextureType(textureType);
 
 	// if we can't find a shader variable for the diffuse texture, then the load of this material has failed
-	NONFATAL_ASSERT_RTRN(!textureName.empty(), "ModelImporter::SetupImportedMaterialTexture -> Could not locate shader variable for texture.", false, true);
+	NONFATAL_ASSERT_RTRN(textureName != nullptr, "ModelImporter::SetupImportedMaterialTexture -> Could not locate shader variable for texture.", false, true);
 
 	// set the diffuse texture in the material for the mesh specified by [meshIndex]
-	materialImportDesc.meshSpecificProperties[meshIndex].material->SetTexture(texture, textureName);
+	materialImportDesc.meshSpecificProperties[meshIndex].material->SetTexture(texture, *textureName);
 
 	Int32 mappedIndex;
 
@@ -1361,30 +1361,28 @@ StandardAttribute ModelImporter::MapTextureTypeToAttribute(TextureType textureTy
 	return StandardAttribute::_None;
 }
 
-std::string ModelImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property)
+const std::string* ModelImporter::GetBuiltinVariableNameForShaderMaterialCharacteristic(ShaderMaterialCharacteristic property)
 {
-
 	StandardUniform uniform = MapShaderMaterialCharacteristicToUniform(property);
 
 	if(uniform != StandardUniform::_None)
 	{
-		return StandardUniforms::GetUniformName(uniform);
+		return &StandardUniforms::GetUniformName(uniform);
 	}
 
-	return "";
+	return nullptr;
 }
 
-std::string ModelImporter::GetBuiltinVariableNameForTextureType(TextureType textureType)
+const std::string* ModelImporter::GetBuiltinVariableNameForTextureType(TextureType textureType)
 {
-
 	StandardUniform uniform = MapTextureTypeToUniform(textureType);
 
 	if(uniform != StandardUniform::_None)
 	{
-		return StandardUniforms::GetUniformName(uniform);
+		return &StandardUniforms::GetUniformName(uniform);
 	}
 
-	return "";
+	return nullptr;
 }
 
 ModelImporter::TextureType ModelImporter::ConvertAITextureKeyToTextureType(Int32 aiTextureKey)

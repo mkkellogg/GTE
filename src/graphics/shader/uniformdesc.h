@@ -12,6 +12,8 @@
 
 #include "object/enginetypes.h"
 #include "geometry/matrix4x4.h"
+#include "graphics/uniformcatalog.h"
+#include <string>
 
 namespace GTE
 {
@@ -49,12 +51,14 @@ namespace GTE
 		~UniformDescriptor();
 
 		Int32 Size;
-		Char Name[128];
+		std::string Name;		
 		UInt32 ShaderVarID;
 		UInt32 SamplerUnitIndex;
 		UniformType Type;
-		Bool IsSet;
 
+		Bool IsSet;
+		UInt32 SetSize;
+		UniformID RegisteredUniformID;
 		TextureRef SamplerData;
 		Matrix4x4 MatrixData;
 		Real BasicFloatData[4];

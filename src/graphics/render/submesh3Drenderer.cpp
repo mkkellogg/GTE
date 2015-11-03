@@ -572,10 +572,11 @@ namespace GTE
 
 			UInt32 componentCount = attr->GetComponentCount();
 			UInt32 stride = 0;
-			Bool initSuccess = InitAttributeData((Int32)StandardAttribute::_Last + i, mesh->GetTotalVertexCount(), componentCount, stride);
+			UInt32 attributeBufferIndex = (UInt32)StandardAttribute::_Last + i;
+			Bool initSuccess = InitAttributeData(attributeBufferIndex, mesh->GetTotalVertexCount(), componentCount, stride);
 
 			// TODO: assign correct value for custom attribute identifier here
-			VertexAttrBufferBinding binding(attributeBuffers[(UInt32)attr], StandardAttribute::_None, -1);
+			VertexAttrBufferBinding binding(attributeBuffers[attributeBufferIndex], StandardAttribute::_None, -1);
 			boundCustomAttributeBuffers.push_back(binding);
 		}
 

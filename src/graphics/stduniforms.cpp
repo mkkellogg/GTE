@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	const Char* const StandardUniforms::uniformNames[] = 
+	const std::string StandardUniforms::uniformNames[] =
 	{   
 		"MODEL_MATRIX",
 		"MODEL_MATRIX_INVERSE_TRANSPOSE",
@@ -37,9 +37,48 @@ namespace GTE
 		"CLIP_PLANE0" 
 	};
 
-	const Char * StandardUniforms::GetUniformName(StandardUniform uniform)
+	std::unordered_map<std::string, StandardUniform> StandardUniforms::nameToUniform 
 	{
-		return uniformNames[(Int16)uniform];
+		{uniformNames[(UInt16)StandardUniform::ModelMatrix],StandardUniform::ModelMatrix},
+		{uniformNames[(UInt16)StandardUniform::ModelMatrixInverseTranspose],StandardUniform::ModelMatrixInverseTranspose},
+		{uniformNames[(UInt16)StandardUniform::ModelViewMatrix],StandardUniform::ModelViewMatrix},
+		{uniformNames[(UInt16)StandardUniform::ModelViewProjectionMatrix],StandardUniform::ModelViewProjectionMatrix},
+		{uniformNames[(UInt16)StandardUniform::ProjectionMatrix],StandardUniform::ProjectionMatrix},
+		{uniformNames[(UInt16)StandardUniform::ViewMatrix],StandardUniform::ViewMatrix},
+		{uniformNames[(UInt16)StandardUniform::ModelMatrix],StandardUniform::ModelMatrixInverseTranspose},
+		{uniformNames[(UInt16)StandardUniform::EyePosition],StandardUniform::EyePosition},
+		{uniformNames[(UInt16)StandardUniform::LightPosition],StandardUniform::LightPosition},
+		{uniformNames[(UInt16)StandardUniform::LightDirection],StandardUniform::LightDirection},
+		{uniformNames[(UInt16)StandardUniform::LightColor],StandardUniform::LightColor},
+		{uniformNames[(UInt16)StandardUniform::LightIntensity],StandardUniform::LightIntensity},
+		{uniformNames[(UInt16)StandardUniform::LightAttenuation],StandardUniform::LightAttenuation},
+		{uniformNames[(UInt16)StandardUniform::LightType],StandardUniform::LightType},
+		{uniformNames[(UInt16)StandardUniform::LightRange],StandardUniform::LightRange},
+		{uniformNames[(UInt16)StandardUniform::LightParallelAngleAttenuation],StandardUniform::LightParallelAngleAttenuation},
+		{uniformNames[(UInt16)StandardUniform::LightOrthoAngleAttenuation],StandardUniform::LightOrthoAngleAttenuation},
+		{uniformNames[(UInt16)StandardUniform::EmissiveColor],StandardUniform::EmissiveColor},
+		{uniformNames[(UInt16)StandardUniform::Texture0],StandardUniform::Texture0},
+		{uniformNames[(UInt16)StandardUniform::Texture1],StandardUniform::Texture1},
+		{uniformNames[(UInt16)StandardUniform::NormalMap],StandardUniform::NormalMap},
+		{uniformNames[(UInt16)StandardUniform::DoShadowVolumeRender],StandardUniform::DoShadowVolumeRender},
+		{uniformNames[(UInt16)StandardUniform::ClipPlaneCount],StandardUniform::ClipPlaneCount},
+		{uniformNames[(UInt16)StandardUniform::ClipPlane0],StandardUniform::ClipPlane0}
+	};
+
+	const std::string& StandardUniforms::GetUniformName(StandardUniform uniform)
+	{
+		return uniformNames[(UInt16)uniform];
+	}
+
+	StandardUniform StandardUniforms::GetUniformForName(const std::string& name)
+	{
+		auto result = nameToUniform.find(name);
+		if(result == nameToUniform.end())
+		{
+			return StandardUniform::_None;
+		}
+
+		return (*result).second;
 	}
 
 	StandardUniform StandardUniforms::UniformMaskComponentToUniform(StandardUniformMaskComponent component)
@@ -49,7 +88,7 @@ namespace GTE
 
 	StandardUniformMaskComponent StandardUniforms::UniformToUniformMaskComponent(StandardUniform uniform)
 	{
-		return (StandardUniformMaskComponent)IntMaskUtil::IndexToMaskValue((IntMask)uniform);
+		return (StandardUniformMaskComponent)IntMaskUtil::IndexToMaskValue((UInt16)uniform);
 	}
 
 	void StandardUniforms::AddUniform(StandardUniformSet * set, StandardUniform uniform)

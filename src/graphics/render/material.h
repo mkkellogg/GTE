@@ -21,10 +21,12 @@
 #include "graphics/stdattributes.h"
 #include "graphics/renderstate.h"
 #include "graphics/stduniforms.h"
+#include "graphics/uniformcatalog.h"
 #include "graphics/color/color4.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "graphics/shader/uniformdesc.h"
+#include "graphics/shader/attributedesc.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -90,30 +92,20 @@ namespace GTE
 
 		// ids/locations of shader variables corresponding to standard attributes
 		Int32 standardAttributeBindings[BINDINGS_ARRAY_MAX_LENGTH];
-		// ids/locations of shader variables corresponding to standard uniforms
-		Int32 standardUniformBindings[BINDINGS_ARRAY_MAX_LENGTH];
 
-		// a vector UniformDescriptor objects that describe custom uniforms that are set
-		// by the developer and
-		std::vector<UniformDescriptor*> setUniforms;
+		// a vector of UniformDescriptor objects that describe uniforms exposed by this
+		// material's shader
+		std::vector<UniformDescriptor> localUniformDescriptors;
+
+		// a vector of AttributeDescriptor objects that describe attributes exposed by this
+		// material's shader
+		std::vector<AttributeDescriptor> localAttributeDescriptors;
 
 		// have all the attributes been given valid values?
 		Bool attributesSetAndVerified;
 
-		// length of values for each attribute that has been set
-		Int32 * attributesSetValues;
-
-		// map a shader variable ID/location to its index in attributesSetValues
-		std::map<int, int> attributeLocationsToVerificationIndex;
-
 		// have all the uniforms been given valid values?
 		Bool uniformsSetAndVerified;
-
-		// length of values for each uniform that has been set
-		Int32 * uniformsSetValues;
-
-		// map a shader variable ID/location to its index in uniformsSetValues
-		std::map<int, int> uniformLocationsToVerificationIndex;
 
 		// current highest used sampler unit index
 		UInt32 currentSampletUnityIndex;
@@ -133,23 +125,30 @@ namespace GTE
 		UInt32 GetRequiredUniformSize(UniformType uniformType);
 		Bool allSetUniformsandAttributesVerified;
 
-		void BindStandardVars();
-		void ClearStandardBindings();
+		void BindVars();
+		void ClearBindings();
 		Bool SetupSetVerifiers();
 
-		Bool SetupSetUniforms();
-		void DestroySetUniforms();
+		Bool InitializeUniformDescriptors();
+		void DestroyUniformDescriptors();
 
+		Bool InitializeAttributeDescriptors();
+		void DestroyAttributeDescriptors();
+
+		Int32 GetLocalAttributeDescriptorIndexByShaderVarID(UInt32 shaderVarID) const;
 		void SetStandardAttributeBinding(Int32 varID, StandardAttribute attr);
 		Int32 GetStandardAttributeBinding(StandardAttribute attr) const;
 		Int32 TestForStandardAttribute(StandardAttribute attr) const;
 
-		Int32 GetUniformIndex(const std::string& uniformName);
+		Int32 GetLocalUniformDescriptorIndexByUniformID(const std::string& uniformName) const;
+		Int32 GetLocalUniformDescriptorIndexByName(UniformID uniform) const;
+		Int32 GetLocalUniformDescriptorIndexByShaderVarID(UInt32 shaderVarID) const;
 		UInt32 GetSamplerUnitForName(const std::string& name);
-		void SetStandardUniformBinding(Int32 varID, StandardUniform uniform);
-		Int32 GetStandardUniformBinding(StandardUniform uniform) const;
-		Int32 TestForStandardUniform(StandardUniform uniform) const;
+		void SetUniformBinding(Int32 varID, UniformID uniform);
+		Int32 GetUniformBinding(UniformID uniform) const;
+		Int32 TestForUniform(UniformID uniform) const;
 		Bool ValidateUniformName(const std::string& name, int& loc, int& index);
+		void SendStoredUniformValueToShader(UInt32 index);
 
 		void SetAttributeSetValue(Int32 varID, Int32 size);
 		void SetUniformSetValue(Int32 varID, Int32 size);
@@ -183,16 +182,21 @@ namespace GTE
 		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
 		void SendEyePositionToShader(const Point3 * position);
 
-		void SendSetUniformToShader(UInt32 index);
-		void SendAllSetUniformsToShader();
+		void SendAllStoredUniformValuesToShader();
 		UInt32 GetSetUniformCount() const;
 
 		void SetTexture(TextureRef texture, const std::string& varName);
+		void SetTexture(TextureRef texture, UniformID uniformID);
 		void SetMatrix4x4(const Matrix4x4& mat, const std::string& varName);
+		void SetMatrix4x4(const Matrix4x4& mat, UniformID uniformID);
 		void SetUniform1f(Real val, const std::string& varName);
+		void SetUniform1f(Real val, UniformID uniformID);
 		void SetUniform2f(Real v1, Real v2, const std::string& varName);
+		void SetUniform2f(Real v1, Real v2, UniformID uniformID);
 		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName);
+		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, UniformID uniformID);
 		void SetColor(const Color4& val, const std::string& varName);
+		void SetColor(const Color4& val, UniformID uniformID);
 
 		Bool VerifySetVars(Int32 vertexCount);
 

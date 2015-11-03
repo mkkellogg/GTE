@@ -377,7 +377,7 @@ namespace GTE
 					samplerUnitIndex++;
 				}
 
-				strcpy(desc->Name, name);
+				desc->Name = name;
 			}
 
 			uniformCount = totalUniforms;
@@ -433,7 +433,7 @@ namespace GTE
 					break;
 				}
 
-				strcpy(desc->Name, name);
+				desc->Name = name;
 			}
 
 			attributeCount = totalAttributes;

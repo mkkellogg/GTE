@@ -11,6 +11,7 @@
 #define _GTE_ATTRIBUTE_DESCRIPTOR_H_
 
 #include "object/enginetypes.h"
+#include <string>
 
 namespace GTE
 {
@@ -37,11 +38,13 @@ namespace GTE
 		AttributeDescriptor();
 		~AttributeDescriptor();
 
-		Int32 Size;
-		Bool IsSet;
+		Int32 Size;		
 		AttributeType Type;
 		UInt32 ShaderVarID;
-		Char Name[128];
+		std::string Name;
+
+		Bool IsSet;
+		UInt32 SetSize;
 		Real * FloatData;
 	};
 }
