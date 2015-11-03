@@ -129,6 +129,16 @@ IMAGEOBJ= $(call srcFilesToObjFiles,$(IMAGESRCS),$(IMAGESRC),$(OUTPUTDIR))
 $(IMAGEOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(IMAGESRC),$@,$(OUTPUTDIR)) 
 	
+# ==================================
+# Particle system
+# ==================================	
+
+PARTICLESSRC= src/graphics/particles
+PARTICLESSRCS= $(call toFullPath,$(PARTICLESSRC),particlesystem.cpp particleutil.cpp)
+PARTICLEOBJ= $(call srcFilesToObjFiles,$(PARTICLESSRCS),$(PARTICLESSRC),$(OUTPUTDIR))
+	
+$(PARTICLEOBJ): 
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(PARTICLESSRC),$@,$(OUTPUTDIR)) 
 	
 # ==================================
 # Graphics
@@ -142,11 +152,11 @@ COLORSRC= $(BASEGRAPHICSSRC)/color
 UVSRC= $(BASEGRAPHICSSRC)/uv
 
 LIGHTSRCS= $(call toFullPath,$(LIGHTSRC),light.cpp)
-TEXTURESRCS= $(call toFullPath,$(TEXTURESRC),texture.cpp textureattr.cpp textureGL.cpp)
+TEXTURESRCS= $(call toFullPath,$(TEXTURESRC),texture.cpp textureattr.cpp textureGL.cpp atlas.cpp)
 VIEWSYSSRCS= $(call toFullPath,$(VIEWSYSSRC),camera.cpp)
 COLORSRCS= $(call toFullPath,$(COLORSRC),color4.cpp color4factory.cpp color4array.cpp)
 UVSRCS= $(call toFullPath,$(UVSRC),uv2.cpp uv2factory.cpp uv2array.cpp)
-BASEGRAPHICSSRCS= $(call toFullPath,$(BASEGRAPHICSSRC),graphics.cpp stdattributes.cpp stduniforms.cpp screendesc.cpp graphicsGL.cpp)
+BASEGRAPHICSSRCS= $(call toFullPath,$(BASEGRAPHICSSRC),graphics.cpp stdattributes.cpp stduniforms.cpp screendesc.cpp graphicsGL.cpp uniformcatalog.cpp)
 
 ALLGRAPHICSSRCS= $(BASEGRAPHICSSRCS) $(LIGHTSRCS) $(TEXTURESRCS) $(VIEWSYSSRCS) $(COLORSRCS) $(UVSRCS) 
 
@@ -220,7 +230,7 @@ $(RENDEROBJ):
 # ==================================
 
 GRAPHICSOBJECTSRC= src/graphics/object
-GRAPHICSOBJECTSRCS= $(call toFullPath,$(GRAPHICSOBJECTSRC),mesh3D.cpp submesh3D.cpp submesh3Dfaces.cpp submesh3Dface.cpp mesh3Dfilter.cpp)
+GRAPHICSOBJECTSRCS= $(call toFullPath,$(GRAPHICSOBJECTSRC),mesh3D.cpp submesh3D.cpp submesh3Dfaces.cpp submesh3Dface.cpp mesh3Dfilter.cpp customfloatattribute.cpp)
 GRAPHICSOBJECTOBJ= $(call srcFilesToObjFiles,$(GRAPHICSOBJECTSRCS),$(GRAPHICSOBJECTSRC),$(OUTPUTDIR))
 	
 $(GRAPHICSOBJECTOBJ): 
@@ -249,7 +259,7 @@ VECTORSRC= $(GEOMETRYBASESRC)/vector
 
 GEOMETRYBASESRCS= $(call toFullPath,$(GEOMETRYBASESRC),matrix4x4.cpp quaternion.cpp transform.cpp sceneobjecttransform.cpp)
 POINTSRCS= $(call toFullPath,$(POINTSRC),point3.cpp point3factory.cpp point3array.cpp) 
-VECTORSRCS= $(call toFullPath,$(VECTORSRC),vector3.cpp vector3factory.cpp vector3array.cpp)
+VECTORSRCS= $(call toFullPath,$(VECTORSRC),vector3.cpp vector3factory.cpp vector3array.cpp vector2.cpp vector2factory.cpp vector2array.cpp)
 
 ALLGEOMETRYSRCS= $(GEOMETRYBASESRCS) $(POINTSRCS) $(VECTORSRCS)
 
@@ -307,6 +317,6 @@ $(GTEMATHOBJ):
 # ALL
 # ==================================
 
-ALLSRCS= $(ENGINESRCS) $(BASESRCS) $(UTILSRCS) $(ALLGTEDEMOSRCS) $(GTEMATHSRCS) $(ALLGEOMETRYSRCS) $(GRAPHICSOBJECTSRCS) $(DEBUGSRCS) $(ALLGRAPHICSSRCS) $(ANIMATIONSRCS) $(IMAGESRCS) $(RENDERSRCS) $(SHADERSRCS) $(GLOBALSRCS) $(ENGINEOBJECTSRCS) $(ASSETSRCS) $(FILESYSTEMSRCS) $(INPUTSRCS) $(ERRORSRCS)
+ALLSRCS= $(ENGINESRCS) $(BASESRCS) $(UTILSRCS) $(ALLGTEDEMOSRCS) $(GTEMATHSRCS) $(ALLGEOMETRYSRCS) $(GRAPHICSOBJECTSRCS) $(DEBUGSRCS) $(PARTICLESSRCS) $(ALLGRAPHICSSRCS) $(ANIMATIONSRCS) $(IMAGESRCS) $(RENDERSRCS) $(SHADERSRCS) $(GLOBALSRCS) $(ENGINEOBJECTSRCS) $(ASSETSRCS) $(FILESYSTEMSRCS) $(INPUTSRCS) $(ERRORSRCS)
 
-OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(ALLGTEDEMOOBJ) $(GTEMATHOBJ) $(ALLGEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(ALLGRAPHICSOBJ) $(ANIMATIONOBJ) $(IMAGEOBJ) $(RENDEROBJ) $(SHADEROBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)
+OBJECTFILES= $(ENGINEOBJ) $(BASEOBJ) $(UTILOBJ) $(ALLGTEDEMOOBJ) $(GTEMATHOBJ) $(ALLGEOMETRYOBJ) $(GRAPHICSOBJECTOBJ) $(DEBUGOBJ) $(PARTICLEOBJ) $(ALLGRAPHICSOBJ) $(ANIMATIONOBJ) $(IMAGEOBJ) $(RENDEROBJ) $(SHADEROBJ) $(GLOBALOBJ) $(ENGINEOBJECTOBJ) $(ASSETOBJ) $(FILESYSTEMOBJ) $(INPUTOBJ) $(ERROROBJ)

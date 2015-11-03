@@ -26,7 +26,7 @@ namespace GTE
 
 		public:
 
-		EvenIntervalIndexModifier(UInt32 totalSteps, Bool runOnce) : ParticleModifier(runOnce)
+		EvenIntervalIndexModifier(UInt32 totalSteps, Bool runOnce) : ParticleModifier<UInt32>(runOnce)
 		{
 			this->totalSteps = totalSteps;
 		}

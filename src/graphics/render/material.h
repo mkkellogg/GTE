@@ -198,7 +198,7 @@ namespace GTE
 		void SetColor(const Color4& val, const std::string& varName);
 		void SetColor(const Color4& val, UniformID uniformID);
 
-		Bool VerifySetVars(Int32 vertexCount);
+		Bool VerifySetVars(UInt32 vertexCount);
 
 		void SetUseLighting(Bool selfLit);
 		Bool UseLighting();

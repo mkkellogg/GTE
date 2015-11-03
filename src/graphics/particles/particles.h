@@ -12,7 +12,6 @@
 
 namespace GTE
 {
-
 	enum class ParticleRangeType
 	{
 		Linear = 0,
@@ -20,7 +19,6 @@ namespace GTE
 		Sphere = 2,
 		Planar = 3
 	};
-
 }
 
 #endif

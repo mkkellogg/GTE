@@ -137,9 +137,6 @@ namespace GTE
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::SetupSetVerifiers -> Shader is invalid.", false, true);
 
-		UInt32 attributeCount = shader->GetAttributeCount();
-		UInt32 uniformCount = shader->GetUniformCount();
-
 		ResetVerificationState();
 
 		return true;
@@ -993,7 +990,7 @@ namespace GTE
 	 * Verify that all uniforms and attributes exposed by this material's shader have values
 	 * set for them and that those values are of the correct size.
 	 */
-	Bool Material::VerifySetVars(Int32 vertexCount)
+	Bool Material::VerifySetVars(UInt32 vertexCount)
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::VerifySetVars -> 'shader' is null.", false, true);
 		if (allSetUniformsandAttributesVerified == true)return true;
@@ -1015,7 +1012,7 @@ namespace GTE
 		for (UInt32 i = 0; i < shader->GetUniformCount(); i++)
 		{
 			const UniformDescriptor& desc = localUniformDescriptors[i];
-			Int32 requiredSize = GetRequiredUniformSize(desc.Type);
+			UInt32 requiredSize = GetRequiredUniformSize(desc.Type);
 
 			if (desc.SetSize != requiredSize)
 			{

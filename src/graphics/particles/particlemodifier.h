@@ -13,12 +13,14 @@
 
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
-#include "particle.h"
 #include <vector>
 #include <string>
 
 namespace GTE
 {
+	//forward declarations
+	class Particle;
+
 	template <typename T> class ParticleModifier
 	{
 		protected:

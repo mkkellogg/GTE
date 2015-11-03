@@ -31,7 +31,7 @@ namespace GTE
 
 		public:
 
-		RandomModifier(T& offset, T& range, ParticleRangeType rangeType, Bool edgeClamp, Bool runOnce) : ParticleModifier(runOnce)
+		RandomModifier(T& offset, T& range, ParticleRangeType rangeType, Bool edgeClamp, Bool runOnce) : ParticleModifier<T>(runOnce)
 		{
 			this->offset = offset;
 			this->range = range;
@@ -51,7 +51,7 @@ namespace GTE
 
 		void Update(Particle& particle, T& targetAttribute, Real t) override
 		{
-			if(!runOnce)
+			if(!this->runOnce)
 			{
 				ParticleUtil::GetRandom(offset, range, targetAttribute, edgeClamp, rangeType);
 			}

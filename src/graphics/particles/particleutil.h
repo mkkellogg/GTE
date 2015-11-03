@@ -20,7 +20,7 @@
 
 namespace GTE
 {
-	// forward delcarations
+	// forward declarations
 	class BaseVector4;
 	class Vector3;
 	class Vector2;
@@ -36,7 +36,7 @@ namespace GTE
 
 		public:
 		
-		template <class T> static void GetRandom(const T& offset, const T& range, T& target, Bool edgeClamp, ParticleRangeType rangeType)
+		template <typename T> static void GetRandom(const T& offset, const T& range, T& target, Bool edgeClamp, ParticleRangeType rangeType)
 		{
 			RandomizeVectorObject(target);
 			if(rangeType == ParticleRangeType::Sphere)
@@ -58,21 +58,10 @@ namespace GTE
 			target.Add(offset);
 		}
 
-		template <> static void GetRandom<Real>(const Real& offset, const Real& range, Real& target, Bool edgeClamp, ParticleRangeType rangeType)
-		{
-			target = offset + range * (GTEMath::Random() - 0.5f);
-		}
-
 		template <class T> static void Lerp(const T& a, const T& b, T& target, Real t)
 		{
 			target.Lerp(a, b, t);
 		}
-
-		template <> static void Lerp<Real>(const Real& a, const Real& b, Real& target, Real t)
-		{
-			target = a + t * (b - a);
-		}
-
 	};
 }
 

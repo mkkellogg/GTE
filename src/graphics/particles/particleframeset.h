@@ -71,7 +71,7 @@ namespace GTE
 
 		void AddKeyFrame(Real time, T value)
 		{
-			KeyFrame newFrame(time, value);
+			KeyFrame<T> newFrame(time, value);
 			frames.push_back(newFrame);
 		}
 

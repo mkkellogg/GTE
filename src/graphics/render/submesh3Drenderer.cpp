@@ -543,7 +543,6 @@ namespace GTE
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not find matching sub mesh for sub renderer.");
 
 		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
-		StandardAttributeSet err = StandardAttributes::CreateAttributeSet();
 
 		boundStandardAttributeBuffers.clear();
 		// loop through each standard attribute and create/initialize vertex attribute buffer for each
@@ -558,7 +557,7 @@ namespace GTE
 				Int32 stride = 0;
 
 				Bool initSuccess = InitAttributeData((UInt32)attr, mesh->GetTotalVertexCount(), componentCount, stride);
-				if (!initSuccess)StandardAttributes::AddAttribute(&err, attr);
+				ASSERT(initSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not initialize attribute data.");
 
 				VertexAttrBufferBinding binding(attributeBuffers[(UInt32)attr], attr, -1);
 				boundStandardAttributeBuffers.push_back(binding);
@@ -574,6 +573,7 @@ namespace GTE
 			UInt32 stride = 0;
 			UInt32 attributeBufferIndex = (UInt32)StandardAttribute::_Last + i;
 			Bool initSuccess = InitAttributeData(attributeBufferIndex, mesh->GetTotalVertexCount(), componentCount, stride);
+			ASSERT(initSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not initialize attribute data.");
 
 			// TODO: assign correct value for custom attribute identifier here
 			VertexAttrBufferBinding binding(attributeBuffers[attributeBufferIndex], StandardAttribute::_None, -1);

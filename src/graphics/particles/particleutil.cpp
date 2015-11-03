@@ -41,4 +41,14 @@ namespace GTE
 	{
 		target.Set(GTEMath::Random() - 0.5f, GTEMath::Random() - 0.5f, GTEMath::Random() - 0.5f, GTEMath::Random() - 0.5f);
 	}
+
+	template <> void ParticleUtil::GetRandom<Real>(const Real& offset, const Real& range, Real& target, Bool edgeClamp, ParticleRangeType rangeType)
+	{
+		target = offset + range * (GTEMath::Random() - 0.5f);
+	}
+
+	template <> void ParticleUtil::Lerp<Real>(const Real& a, const Real& b, Real& target, Real t)
+	{
+		target = a + t * (b - a);
+	}
 }

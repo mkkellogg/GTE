@@ -29,7 +29,7 @@ namespace GTE
 
 		public:
 
-		FrameSetModifier(Bool runOnce) : ParticleModifier(runOnce)
+		FrameSetModifier(Bool runOnce) : ParticleModifier<T>(runOnce)
 		{
 
 		}
@@ -46,7 +46,7 @@ namespace GTE
 
 		void Update(Particle& particle, T& targetAttribute, Real t) override
 		{
-			if(!runOnce)
+			if(!this->runOnce)
 			{
 				frameSet.InterpolateFrameValues(t, targetAttribute);
 			}

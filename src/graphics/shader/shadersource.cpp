@@ -138,7 +138,7 @@ namespace GTE
 			if(args.size() > 0)
 			{
 				std::string includeFile = "";
-				for(int i = 0; i < args.size(); i++)
+				for(UInt32 i = 0; i < args.size(); i++)
 				{
 					includeFile.append(args[i]);
 				}
