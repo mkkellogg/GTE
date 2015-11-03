@@ -28,7 +28,7 @@ namespace GTE
 
 		public:
 
-		static TID MaterialVarDirectory::RegisterVarID(std::string name)
+		static TID RegisterVarID(std::string name)
 		{
 			TID foundID = VarID_Invalid;
 
@@ -54,12 +54,12 @@ namespace GTE
 			return foundID;
 		}
 
-		static TID MaterialVarDirectory::GetVarID(TSV var)
+		static TID GetVarID(TSV var)
 		{
 			return registeredStandardVars[(UInt16)var];
 		}
 
-		static const std::string* MaterialVarDirectory::GetVarName(TID id)
+		static const std::string* GetVarName(TID id)
 		{
 			auto result = varNames.find(id);
 			if(result == varNames.end())
