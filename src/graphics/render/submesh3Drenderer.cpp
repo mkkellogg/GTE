@@ -13,7 +13,7 @@
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/render/vertexattrbuffer.h"
-#include "graphics/object/customfloatattribute.h"
+#include "graphics/object/customfloatattributebuffer.h"
 #include "mesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "geometry/point/point3.h"
@@ -564,12 +564,12 @@ namespace GTE
 			}
 		}
 
-		for(UInt32 i = 0; i < mesh->GetCustomFloatAttributeCount(); i++)
+		for(UInt32 i = 0; i < mesh->GetCustomFloatAttributeBufferCount(); i++)
 		{
-			CustomFloatAttribute * attr = mesh->GetCustomFloatAttributeByOrder(i);
-			ASSERT(attr != nullptr, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Null custom attribute found.");
+			CustomFloatAttributeBuffer * attrBuffer = mesh->GetCustomFloatAttributeBufferByOrder(i);
+			ASSERT(attrBuffer != nullptr, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Null custom attribute found.");
 
-			UInt32 componentCount = attr->GetComponentCount();
+			UInt32 componentCount = attrBuffer->GetComponentCount();
 			UInt32 stride = 0;
 			UInt32 attributeBufferIndex = (UInt32)StandardAttribute::_Last + i;
 			Bool initSuccess = InitAttributeData(attributeBufferIndex, mesh->GetTotalVertexCount(), componentCount, stride);

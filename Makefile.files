@@ -230,7 +230,7 @@ $(RENDEROBJ):
 # ==================================
 
 GRAPHICSOBJECTSRC= src/graphics/object
-GRAPHICSOBJECTSRCS= $(call toFullPath,$(GRAPHICSOBJECTSRC),mesh3D.cpp submesh3D.cpp submesh3Dfaces.cpp submesh3Dface.cpp mesh3Dfilter.cpp customfloatattribute.cpp)
+GRAPHICSOBJECTSRCS= $(call toFullPath,$(GRAPHICSOBJECTSRC),mesh3D.cpp submesh3D.cpp submesh3Dfaces.cpp submesh3Dface.cpp mesh3Dfilter.cpp customfloatattributebuffer.cpp)
 GRAPHICSOBJECTOBJ= $(call srcFilesToObjFiles,$(GRAPHICSOBJECTSRCS),$(GRAPHICSOBJECTSRC),$(OUTPUTDIR))
 	
 $(GRAPHICSOBJECTOBJ): 

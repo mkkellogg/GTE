@@ -199,7 +199,7 @@
     <ClCompile Include="src\graphics\image\imageloader.cpp" />
     <ClCompile Include="src\graphics\image\rawimage.cpp" />
     <ClCompile Include="src\graphics\light\light.cpp" />
-    <ClCompile Include="src\graphics\object\customfloatattribute.cpp" />
+    <ClCompile Include="src\graphics\object\customfloatattributebuffer.cpp" />
     <ClCompile Include="src\graphics\object\mesh3D.cpp" />
     <ClCompile Include="src\graphics\object\mesh3Dfilter.cpp" />
     <ClCompile Include="src\graphics\object\submesh3D.cpp" />
@@ -317,7 +317,7 @@
     <ClInclude Include="src\graphics\graphics.h" />
     <ClInclude Include="src\graphics\graphicsattr.h" />
     <ClInclude Include="src\graphics\graphicsGL.h" />
-    <ClInclude Include="src\graphics\object\customfloatattribute.h" />
+    <ClInclude Include="src\graphics\object\customfloatattributebuffer.h" />
     <ClInclude Include="src\graphics\particles\evenintervalindexmodifier.h" />
     <ClInclude Include="src\graphics\particles\framesetmodifier.h" />
     <ClInclude Include="src\graphics\particles\particle.h" />

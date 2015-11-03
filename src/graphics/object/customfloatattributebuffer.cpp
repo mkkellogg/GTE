@@ -1,4 +1,4 @@
-#include "customfloatattribute.h"
+#include "customfloatattributebuffer.h"
 #include "gtemath/gtemath.h"
 #include "object/enginetypes.h"
 #include "global/global.h"
@@ -11,14 +11,14 @@
 
 namespace GTE
 {
-	CustomFloatAttribute::CustomFloatAttribute()
+	CustomFloatAttributeBuffer::CustomFloatAttributeBuffer()
 	{
 		componentCount = 0;
 		size = 0;
 		data = nullptr;
 	}
 
-	Bool CustomFloatAttribute::Init(UInt32 size, UInt32 componentCount)
+	Bool CustomFloatAttributeBuffer::Init(UInt32 size, UInt32 componentCount)
 	{
 		Destroy();
 
@@ -26,12 +26,12 @@ namespace GTE
 		this->size = size;
 		data = new(std::nothrow) Real[componentCount * size];
 
-		ASSERT(data != nullptr, "CustomFloatAttribute::Init -> Unable to allocate data.");
+		ASSERT(data != nullptr, "CustomFloatAttributeBuffer::Init -> Unable to allocate data.");
 
 		return true;
 	}
 
-	void CustomFloatAttribute::Destroy()
+	void CustomFloatAttributeBuffer::Destroy()
 	{
 		if(data != nullptr)
 		{
@@ -40,17 +40,17 @@ namespace GTE
 		}
 	}
 
-	Real * CustomFloatAttribute::GetDataPtr()
+	Real * CustomFloatAttributeBuffer::GetDataPtr()
 	{
 		return data;
 	}
 
-	UInt32 CustomFloatAttribute::GetSize() const
+	UInt32 CustomFloatAttributeBuffer::GetSize() const
 	{
 		return size;
 	}
 
-	UInt32 CustomFloatAttribute::GetComponentCount() const
+	UInt32 CustomFloatAttributeBuffer::GetComponentCount() const
 	{
 		return componentCount;
 	}

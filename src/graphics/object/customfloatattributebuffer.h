@@ -7,8 +7,8 @@
 * Descriptor for custom floating point vertex attribute data.
 */
 
-#ifndef _GTE_CUSTOM_FLOAT_ATTRIBUTE_H_
-#define _GTE_CUSTOM_FLOAT_ATTRIBUTE_H_
+#ifndef _GTE_CUSTOM_FLOAT_ATTRIBUTE_BUFFER_H_
+#define _GTE_CUSTOM_FLOAT_ATTRIBUTE_BUFFER_H_
 
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
@@ -18,7 +18,7 @@
 
 namespace GTE
 {
-	class CustomFloatAttribute
+	class CustomFloatAttributeBuffer
 	{
 		friend class SubMesh3D;
 
@@ -26,7 +26,7 @@ namespace GTE
 		UInt32 componentCount;
 		UInt32 size;
 
-		CustomFloatAttribute();
+		CustomFloatAttributeBuffer();
 		Bool Init(UInt32 size, UInt32 componentCount);
 		void Destroy();
 

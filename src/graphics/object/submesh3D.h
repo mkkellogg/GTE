@@ -35,7 +35,7 @@ namespace GTE
 	class UV2;
 	class EngineObjectManager;
 	class SubMesh3DRenderer;
-	class CustomFloatAttribute;
+	class CustomFloatAttributeBuffer;
 
 	class SubMesh3D : public EngineObject
 	{
@@ -67,8 +67,8 @@ namespace GTE
 		UV2Array uvs0;
 		UV2Array uvs1;
 
-		UInt32 customFloatAttributeCount;
-		CustomFloatAttribute* customFloatAttributes[MAX_CUSTOM_ATTRIBUTES];
+		UInt32 customFloatAttributeBufferCount;
+		CustomFloatAttributeBuffer* customFloatAttributeBuffers[MAX_CUSTOM_ATTRIBUTES];
 
 		Bool isDirty;
 		// inter-face angle above which smoothing/average of vertex normals should
@@ -107,7 +107,7 @@ namespace GTE
 		virtual ~SubMesh3D();
 		
 		void Destroy();
-		void DestroyCustomAttributes();
+		void DestroyCustomAttributeBuffers();
 
 		void DestroyVertexCrossMap();
 		Bool BuildVertexCrossMap();
@@ -152,10 +152,10 @@ namespace GTE
 		StandardAttributeSet GetStandardAttributeSet() const;
 		UInt32 GetUpdateCount() const;
 
-		UInt32 GetCustomFloatAttributeCount() const;
-		Bool AddCustomFloatAttribute(UInt32 componentCount, UInt32 id);
-		CustomFloatAttribute* GetCustomFloatAttributeByID(UInt32 id);
-		CustomFloatAttribute* GetCustomFloatAttributeByOrder(UInt32 id);
+		UInt32 GetCustomFloatAttributeBufferCount() const;
+		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, UInt32 id);
+		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByID(UInt32 id);
+		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByOrder(UInt32 id);
 
 		Point3Array * GetPostions();
 		Vector3Array * GetVertexNormals();
