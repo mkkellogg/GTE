@@ -5,17 +5,17 @@
 #include <math.h>
 
 #include "base/intmask.h"
-#include "uniformcatalog.h"
+#include "uniformdirectory.h"
 #include "debug/gtedebug.h"
 
 namespace GTE
 {
-	UInt32 UniformCatalog::nextID = 0;
-	std::unordered_map <std::string, UniformID> UniformCatalog::registeredUniforms;
-	std::unordered_map <UniformID, std::string> UniformCatalog::uniformNames;
-	UniformID UniformCatalog::registeredStandardUniforms[(UInt16)StandardUniform::_Last];
+	UInt32 UniformDirectory::nextID = 0;
+	std::unordered_map <std::string, UniformID> UniformDirectory::registeredUniforms;
+	std::unordered_map <UniformID, std::string> UniformDirectory::uniformNames;
+	UniformID UniformDirectory::registeredStandardUniforms[(UInt16)StandardUniform::_Last];
 
-	UniformID UniformCatalog::RegisterUniformID(std::string name)
+	UniformID UniformDirectory::RegisterUniformID(std::string name)
 	{		
 		UniformID foundID = UniformID_Invalid;
 
@@ -41,12 +41,12 @@ namespace GTE
 		return foundID;
 	}
 
-	UniformID UniformCatalog::GetUniformID(StandardUniform uniform)
+	UniformID UniformDirectory::GetUniformID(StandardUniform uniform)
 	{
 		return registeredStandardUniforms[(UInt16)uniform];
 	}
 
-	const std::string* UniformCatalog::GetUniformName(UniformID id)
+	const std::string* UniformDirectory::GetUniformName(UniformID id)
 	{
 		auto result = uniformNames.find(id);
 		if(result == uniformNames.end())

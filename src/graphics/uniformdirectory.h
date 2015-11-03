@@ -1,5 +1,5 @@
-#ifndef _GTE_UNIFORM_CATALOG_H_
-#define _GTE_UNIFORM_CATALOG_H_
+#ifndef _GTE_UNIFORM_DIRECTORY_H_
+#define _GTE_UNIFORM_DIRECTORY_H_
 
 #include "object/enginetypes.h"
 #include "base/intmask.h"
@@ -11,7 +11,7 @@ namespace GTE
 {
 	typedef UInt32 UniformID;
 
-	class UniformCatalog
+	class UniformDirectory
 	{
 		public:
 

@@ -21,7 +21,7 @@
 #include "graphics/stdattributes.h"
 #include "graphics/renderstate.h"
 #include "graphics/stduniforms.h"
-#include "graphics/uniformcatalog.h"
+#include "graphics/uniformdirectory.h"
 #include "graphics/color/color4.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
@@ -108,9 +108,9 @@ namespace GTE
 		Bool uniformsSetAndVerified;
 
 		// current highest used sampler unit index
-		UInt32 currentSampletUnityIndex;
+		UInt32 currentSamplerUnitIndex;
 		// map a texture uniform to its sampler unit
-		std::map<std::string, int> textureUniformSamplerUnitIndex;
+		std::map<UniformID, int> textureUniformSamplerUnitIndex;
 
 		// does this material require a light to be rendered?
 		Bool useLighting;
@@ -140,10 +140,10 @@ namespace GTE
 		Int32 GetStandardAttributeBinding(StandardAttribute attr) const;
 		Int32 TestForStandardAttribute(StandardAttribute attr) const;
 
-		Int32 GetLocalUniformDescriptorIndexByUniformID(const std::string& uniformName) const;
-		Int32 GetLocalUniformDescriptorIndexByName(UniformID uniform) const;
+		Int32 GetLocalUniformDescriptorIndexByName(const std::string& uniformName) const;
+		Int32 GetLocalUniformDescriptorIndexByUniformID(UniformID uniform) const;
 		Int32 GetLocalUniformDescriptorIndexByShaderVarID(UInt32 shaderVarID) const;
-		UInt32 GetSamplerUnitForName(const std::string& name);
+		UInt32 GetSamplerUnitForUniform(UniformID uniform);
 		void SetUniformBinding(Int32 varID, UniformID uniform);
 		Int32 GetUniformBinding(UniformID uniform) const;
 		Int32 TestForUniform(UniformID uniform) const;

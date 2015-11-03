@@ -7,6 +7,7 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/transform.h"
 #include "base/intmask.h"
+#include "graphics/uniformdirectory.h"
 #include <functional>
 #include <vector>
 
@@ -59,6 +60,18 @@ class PoolScene : public Scene
 
 	// should we add a drop?
 	bool shouldTripperDrop;
+
+	// custom material uniforms
+	GTE::UniformID uniform_WATER_HEIGHT_MAP;
+	GTE::UniformID uniform_PIXEL_DISTANCE;
+	GTE::UniformID uniform_REFRACTED_COLOR_FACTOR;
+	GTE::UniformID uniform_REFLECTED_COLOR_FACTOR;
+	GTE::UniformID uniform_SELFCOLOR;
+	GTE::UniformID uniform_REFLECTED_TEXTURE;
+	GTE::UniformID uniform_SCREEN_BUFFER_TEXTURE;
+	GTE::UniformID uniform_DROP_RADIUS;
+	GTE::UniformID uniform_DROP_STRENGTH;
+	GTE::UniformID uniform_DROP_POSITION;
 
 	void UpdateCameras();
 	void UpdateRippleSimulation();

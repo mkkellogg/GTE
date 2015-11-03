@@ -15,7 +15,7 @@
 #include "graphics/texture/texture.h"
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
-#include "graphics/uniformcatalog.h"
+#include "graphics/uniformdirectory.h"
 #include "graphics/shader/uniformdesc.h"
 #include "graphics/shader/attributedesc.h"
 #include "graphics/render/vertexattrbuffer.h"
@@ -50,7 +50,7 @@ namespace GTE
 		depthBufferWriteEnabled = true;
 		depthBufferFunction = RenderState::DepthBufferFunction::LessThanOrEqual;
 
-		currentSampletUnityIndex = 0;
+		currentSamplerUnitIndex = 0;
 	}
 
 	/*
@@ -306,7 +306,7 @@ namespace GTE
 	* Get the index in the shader's list of uniform descriptors corresponding
 	* to [uniformName].
 	 */
-	Int32 Material::GetLocalUniformDescriptorIndexByUniformID(const std::string& uniformName) const
+	Int32 Material::GetLocalUniformDescriptorIndexByName(const std::string& uniformName) const
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::GetUniformIndex -> Shader is invalid.", -1, true);
 
@@ -327,7 +327,7 @@ namespace GTE
 	* Get the index in the shader's list of uniform descriptors corresponding
 	* to [uniform].
 	*/
-	Int32 Material::GetLocalUniformDescriptorIndexByName(UniformID uniform) const
+	Int32 Material::GetLocalUniformDescriptorIndexByUniformID(UniformID uniform) const
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), "Material::GetUniformIndex -> Shader is invalid.", -1, true);
 
@@ -365,19 +365,21 @@ namespace GTE
 		return foundIndex;
 	}
 
-	UInt32 Material::GetSamplerUnitForName(const std::string& name)
+	UInt32 Material::GetSamplerUnitForUniform(UniformID uniform)
 	{
 		UInt32 index = 0;
 
-		if (textureUniformSamplerUnitIndex.find(name) == textureUniformSamplerUnitIndex.end())
+		auto result = textureUniformSamplerUnitIndex.find(uniform);
+
+		if (result == textureUniformSamplerUnitIndex.end())
 		{
-			textureUniformSamplerUnitIndex[name] = currentSampletUnityIndex;
-			index = currentSampletUnityIndex;
-			currentSampletUnityIndex++;
+			textureUniformSamplerUnitIndex[uniform] = currentSamplerUnitIndex;
+			index = currentSamplerUnitIndex;
+			currentSamplerUnitIndex++;
 		}
 		else
 		{
-			index = textureUniformSamplerUnitIndex[name];
+			index = (*result).second;
 		}
 
 		return index;
@@ -390,7 +392,7 @@ namespace GTE
 	{
 		if(uniform < BINDINGS_ARRAY_MAX_LENGTH)
 		{
-			Int32 index = GetLocalUniformDescriptorIndexByName(uniform);
+			Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
 			if(index >= 0 && index < BINDINGS_ARRAY_MAX_LENGTH)
 			{
 				UniformDescriptor& desc = localUniformDescriptors[index];
@@ -404,7 +406,7 @@ namespace GTE
 	 */
 	Int32 Material::GetUniformBinding(UniformID uniform) const
 	{
-		Int32 index = GetLocalUniformDescriptorIndexByName(uniform);
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
 		if(index >= 0 && index < BINDINGS_ARRAY_MAX_LENGTH)
 		{
 			const UniformDescriptor& desc = localUniformDescriptors[index];
@@ -420,7 +422,7 @@ namespace GTE
 	 */
 	Int32 Material::TestForUniform(UniformID uniform) const
 	{
-		const std::string* uniformName = UniformCatalog::GetUniformName(uniform);
+		const std::string* uniformName = UniformDirectory::GetUniformName(uniform);
 
 		if(uniformName == nullptr)return -1;
 
@@ -447,7 +449,7 @@ namespace GTE
 
 		// get the index in [localUniformDescriptors] that has the UniformDescriptor for the
 		// uniform named [varName]
-		index = GetLocalUniformDescriptorIndexByUniformID(name);
+		index = GetLocalUniformDescriptorIndexByName(name);
 
 		if (index < 0)
 		{
@@ -487,14 +489,14 @@ namespace GTE
 		for(UInt32 i = 0; i < localUniformDescriptors.size(); i++)
 		{
 			UniformDescriptor& desc = localUniformDescriptors[i];
-			desc.RegisteredUniformID = UniformCatalog::RegisterUniformID(desc.Name);
+			desc.RegisteredUniformID = UniformDirectory::RegisterUniformID(desc.Name);
 		}
 
 		standardUniforms = StandardUniforms::CreateUniformSet();
 		for (Int32 i = 0; i < (Int32)StandardUniform::_Last; i++)
 		{
 			StandardUniform stdUniform = (StandardUniform)i;
-			UniformID uniform = UniformCatalog::GetUniformID(stdUniform);
+			UniformID uniform = UniformDirectory::GetUniformID(stdUniform);
 
 			Int32 varID = TestForUniform(uniform);
 			if (varID >= 0)
@@ -643,21 +645,29 @@ namespace GTE
 	 */
 	void Material::SetTexture(TextureRef texture, const std::string& varName)
 	{
+		UniformID uniform = UniformDirectory::RegisterUniformID(varName);
+		SetTexture(texture, uniform);
+	}
+
+	/*
+	* Find a uniform with the name specified by [uniform] and set its
+	* value to the sampler data held by [texture]
+	*/
+	void Material::SetTexture(TextureRef texture, UniformID uniform)
+	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetTexture -> Shader is null.", true);
 		NONFATAL_ASSERT(texture.IsValid(), "Material::SetTexture -> 'texture' is null.", true);
 
-		Int32 loc, foundIndex;
-		Bool success = ValidateUniformName(varName, loc, foundIndex);
-		if (!success)return;
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
+		NONFATAL_ASSERT(index >= 0, "Material::SetTexture -> Invalid uniform.", true);
 
 		TextureAttributes textureAttributes = texture->GetAttributes();
 
-		UniformDescriptor& desc = localUniformDescriptors[foundIndex];
-		desc.ShaderVarID = loc;
-		if (textureAttributes.IsCube)desc.Type = UniformType::SamplerCube;
+		UniformDescriptor& desc = localUniformDescriptors[index];
+		if(textureAttributes.IsCube)desc.Type = UniformType::SamplerCube;
 		else desc.Type = UniformType::Sampler2D;
 		desc.SamplerData = texture;
-		desc.SamplerUnitIndex = GetSamplerUnitForName(varName);
+		desc.SamplerUnitIndex = GetSamplerUnitForUniform(uniform);
 		desc.IsSet = true;
 	}
 
@@ -667,19 +677,26 @@ namespace GTE
 	 */
 	void Material::SetMatrix4x4(const Matrix4x4& mat, const std::string& varName)
 	{
+		UniformID uniform = UniformDirectory::RegisterUniformID(varName);
+		SetMatrix4x4(mat, uniform);
+	}
+
+	/*
+	* Find a uniform with the name specified by [uniform] and set its
+	* value to [val]
+	*/
+	void Material::SetMatrix4x4(const Matrix4x4& mat, UniformID uniform)
+	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetMatrix4x4 -> Shader is null.", true);
 
-		Int32 loc, foundIndex;
-		Bool success = ValidateUniformName(varName, loc, foundIndex);
-		if (!success)return;
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
+		NONFATAL_ASSERT(index >= 0, "Material::SetMatrix4x4 -> Invalid uniform.", true);
 
-		UniformDescriptor& desc = localUniformDescriptors[foundIndex];
-		desc.ShaderVarID = loc;
+		UniformDescriptor& desc = localUniformDescriptors[index];
 		desc.Type = UniformType::Matrix4x4;
 		desc.MatrixData = mat;
 		desc.IsSet = true;
 	}
-
 
 	/*
 	 * Find a uniform with the name specified by [varName] and set its
@@ -687,14 +704,22 @@ namespace GTE
 	 */
 	void Material::SetUniform1f(Real val, const std::string& varName)
 	{
+		UniformID uniform = UniformDirectory::RegisterUniformID(varName);
+		SetUniform1f(val, uniform);
+	}
+
+	/*
+	* Find a uniform with the name specified by [uniform] and set its
+	* value to [val]
+	*/
+	void Material::SetUniform1f(Real val, UniformID uniform)
+	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform1f -> 'shader' is null.", true);
 
-		Int32 loc, foundIndex;
-		Bool success = ValidateUniformName(varName, loc, foundIndex);
-		if (!success)return;
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
+		NONFATAL_ASSERT(index >= 0, "Material::SetUniform1f -> Invalid uniform.", true);
 
-		UniformDescriptor & desc = localUniformDescriptors[foundIndex];
-		desc.ShaderVarID = loc;
+		UniformDescriptor & desc = localUniformDescriptors[index];
 		desc.Type = UniformType::Float;
 		desc.BasicFloatData[0] = val;
 		desc.IsSet = true;
@@ -706,14 +731,22 @@ namespace GTE
 	 */
 	void Material::SetUniform2f(Real v1, Real v2, const std::string& varName)
 	{
+		UniformID uniform = UniformDirectory::RegisterUniformID(varName);
+		SetUniform2f(v1, v2, uniform);
+	}
+
+	/*
+	* Find a uniform with the name specified by [uniform] and set its
+	* value to the vector made up of v1 & v2.
+	*/
+	void Material::SetUniform2f(Real v1, Real v2, UniformID uniform)
+	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform2f -> 'shader' is null.", true);
 
-		Int32 loc, foundIndex;
-		Bool success = ValidateUniformName(varName, loc, foundIndex);
-		if (!success)return;
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
+		NONFATAL_ASSERT(index >= 0, "Material::SetUniform2f -> Invalid uniform.", true);
 
-		UniformDescriptor& desc = localUniformDescriptors[foundIndex];
-		desc.ShaderVarID = loc;
+		UniformDescriptor& desc = localUniformDescriptors[index];
 		desc.Type = UniformType::Float2;
 		desc.BasicFloatData[0] = v1;
 		desc.BasicFloatData[1] = v2;
@@ -726,14 +759,22 @@ namespace GTE
 	 */
 	void Material::SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName)
 	{
+		UniformID uniform = UniformDirectory::RegisterUniformID(varName);
+		SetUniform4f(v1, v2, v3, v4, uniform);
+	}
+
+	/*
+	* Find a uniform with the name specified by [uniform] and set its
+	* value to the vector made up of v1 & v2 & v3 &v4.
+	*/
+	void Material::SetUniform4f(Real v1, Real v2, Real v3, Real v4, UniformID uniform)
+	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform4f -> 'shader' is null.", true);
 
-		Int32 loc, foundIndex;
-		Bool success = ValidateUniformName(varName, loc, foundIndex);
-		if (!success)return;
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
+		NONFATAL_ASSERT(index >= 0, "Material::SetUniform4f -> Invalid uniform.", true);
 
-		UniformDescriptor& desc = localUniformDescriptors[foundIndex];
-		desc.ShaderVarID = loc;
+		UniformDescriptor& desc = localUniformDescriptors[index];
 		desc.Type = UniformType::Float4;
 		desc.BasicFloatData[0] = v1;
 		desc.BasicFloatData[1] = v2;
@@ -747,14 +788,21 @@ namespace GTE
 	*/
 	void Material::SetColor(const Color4& val, const std::string& varName)
 	{
+		UniformID uniform = UniformDirectory::RegisterUniformID(varName);
+		SetColor(val, uniform);
+	}
+
+	/* Find a uniform with the name specified by [uniform] and set its
+	* value to [val].
+	*/
+	void Material::SetColor(const Color4& val, UniformID uniform)
+	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetColor -> 'shader' is null.", true);
 
-		Int32 loc, foundIndex;
-		Bool success = ValidateUniformName(varName, loc, foundIndex);
-		if (!success)return;
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
+		NONFATAL_ASSERT(index >= 0, "Material::SetUniform4f -> Invalid uniform.", true);
 
-		UniformDescriptor& desc = localUniformDescriptors[foundIndex];
-		desc.ShaderVarID = loc;
+		UniformDescriptor& desc = localUniformDescriptors[index];
 		desc.Type = UniformType::Float4;
 		desc.BasicFloatData[0] = val.r;
 		desc.BasicFloatData[1] = val.g;
@@ -779,7 +827,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::ClipPlaneCount));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::ClipPlaneCount));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, (Int32)count);
@@ -795,7 +843,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendClipPlaneToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID((StandardUniform)((UInt32)StandardUniform::ClipPlane0 + index)));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID((StandardUniform)((UInt32)StandardUniform::ClipPlane0 + index)));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader4(varID, eq1, eq2, eq3, eq4);
@@ -811,7 +859,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelMatrixInverseTransposeToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::ModelMatrixInverseTranspose));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::ModelMatrixInverseTranspose));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -827,7 +875,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelMatrixToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::ModelMatrix));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::ModelMatrix));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -843,7 +891,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelViewMatrixToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::ModelViewMatrix));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::ModelViewMatrix));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -859,7 +907,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendViewMatrixToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::ViewMatrix));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::ViewMatrix));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -875,7 +923,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendProjectionMatrixToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::ProjectionMatrix));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::ProjectionMatrix));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -891,7 +939,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendMVPMatrixToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::ModelViewProjectionMatrix));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::ModelViewProjectionMatrix));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, mat);
@@ -909,21 +957,21 @@ namespace GTE
 		NONFATAL_ASSERT(light != nullptr, "Material::SendLightToShader -> 'light' is null.", true);
 		NONFATAL_ASSERT(position != nullptr, "Material::SendLightToShader -> 'position' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightType));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightType));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, (Int32)light->GetType());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightPosition));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightPosition));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, position);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightDirection));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightDirection));
 		if (varID >= 0)
 		{
 			if (altDirection != nullptr)shader->SendUniformToShader(varID, altDirection);
@@ -931,42 +979,42 @@ namespace GTE
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightColor));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightColor));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, light->GetColorPtr());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightIntensity));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightIntensity));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, light->GetIntensity());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightRange));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightRange));
 		if(varID >= 0)
 		{
 			shader->SendUniformToShader(varID, light->GetRange());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightAttenuation));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightAttenuation));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, light->GetAttenuation());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightParallelAngleAttenuation));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightParallelAngleAttenuation));
 		if(varID >= 0)
 		{
 			shader->SendUniformToShader(varID, (Int32)light->GetParallelAngleAttenuationType());
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
 		}
 
-		varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::LightOrthoAngleAttenuation));
+		varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::LightOrthoAngleAttenuation));
 		if(varID >= 0)
 		{
 			shader->SendUniformToShader(varID, (Int32)light->GetOrthoAngleAttenuationType());
@@ -978,7 +1026,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendViewPositionToShader -> 'shader' is null.", true);
 
-		Int32 varID = GetUniformBinding(UniformCatalog::GetUniformID(StandardUniform::EyePosition));
+		Int32 varID = GetUniformBinding(UniformDirectory::GetUniformID(StandardUniform::EyePosition));
 		if (varID >= 0)
 		{
 			shader->SendUniformToShader(varID, position);

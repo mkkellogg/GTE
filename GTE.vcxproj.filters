@@ -357,7 +357,7 @@
     <ClCompile Include="src\graphics\object\customfloatattribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\uniformcatalog.cpp">
+    <ClCompile Include="src\graphics\uniformdirectory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -749,7 +749,7 @@
     <ClInclude Include="src\graphics\object\customfloatattribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\uniformcatalog.h">
+    <ClInclude Include="src\graphics\uniformdirectory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
