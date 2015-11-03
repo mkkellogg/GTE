@@ -21,7 +21,7 @@
 #include "graphics/stdattributes.h"
 #include "graphics/renderstate.h"
 #include "graphics/stduniforms.h"
-#include "graphics/uniformdirectory.h"
+#include "graphics/materialvardirectory.h"
 #include "graphics/color/color4.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"

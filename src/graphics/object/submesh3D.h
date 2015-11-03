@@ -14,6 +14,7 @@
 #include "mesh3D.h"
 #include "object/sceneobjectcomponent.h"
 #include "graphics/stdattributes.h"
+#include "graphics/materialvardirectory.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
@@ -68,7 +69,7 @@ namespace GTE
 		UV2Array uvs1;
 
 		UInt32 customFloatAttributeBufferCount;
-		CustomFloatAttributeBuffer* customFloatAttributeBuffers[MAX_CUSTOM_ATTRIBUTES];
+		std::vector<CustomFloatAttributeBuffer> customFloatAttributeBuffers;
 
 		Bool isDirty;
 		// inter-face angle above which smoothing/average of vertex normals should
@@ -130,6 +131,8 @@ namespace GTE
 		void InvertTangents();
 		void UpdateUpdateCount();
 
+		Int32 GetCustomFloatAttributeBufferIndex(AttributeID id);
+
 	public:
 
 		void SetCalculateNormals(Bool calculate);
@@ -153,9 +156,10 @@ namespace GTE
 		UInt32 GetUpdateCount() const;
 
 		UInt32 GetCustomFloatAttributeBufferCount() const;
-		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, UInt32 id);
-		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByID(UInt32 id);
-		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByOrder(UInt32 id);
+		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, const std::string& name);
+		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, AttributeID id);
+		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByID(AttributeID id);
+		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByOrder(AttributeID id);
 
 		Point3Array * GetPostions();
 		Vector3Array * GetVertexNormals();

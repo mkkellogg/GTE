@@ -52,6 +52,11 @@ namespace GTE
 		return (*result).second;
 	}
 
+	StandardAttribute StandardAttributes::ForName(const std::string& name)
+	{
+		return GetAttributeForName(name);
+	}
+
 	StandardAttribute StandardAttributes::AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component)
 	{
 		return (StandardAttribute)IntMaskUtil::MaskValueToIndex((IntMask)component);

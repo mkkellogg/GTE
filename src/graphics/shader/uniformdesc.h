@@ -12,7 +12,7 @@
 
 #include "object/enginetypes.h"
 #include "geometry/matrix4x4.h"
-#include "graphics/uniformdirectory.h"
+#include "graphics/materialvardirectory.h"
 #include <string>
 
 namespace GTE

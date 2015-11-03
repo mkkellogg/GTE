@@ -13,6 +13,7 @@
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "gtemath/gtemath.h"
+#include "graphics/materialvardirectory.h"
 #include <vector>
 #include <string>
 
@@ -25,13 +26,18 @@ namespace GTE
 		Real * data;
 		UInt32 componentCount;
 		UInt32 size;
+		AttributeID attributeID;
 
-		CustomFloatAttributeBuffer();
+		
 		Bool Init(UInt32 size, UInt32 componentCount);
 		void Destroy();
 
 		public:
 		
+		CustomFloatAttributeBuffer();
+		virtual ~CustomFloatAttributeBuffer();
+
+		void SetAttributeID(AttributeID id);
 		Real * GetDataPtr();
 		UInt32 GetSize() const;
 		UInt32 GetComponentCount() const;

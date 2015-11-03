@@ -75,6 +75,7 @@ namespace GTE
 
 		static const std::string& GetUniformName(StandardUniform uniform);
 		static StandardUniform GetUniformForName(const std::string& name);
+		static StandardUniform ForName(const std::string& name);
 		static StandardUniform UniformMaskComponentToUniform(StandardUniformMaskComponent component);
 		static StandardUniformMaskComponent UniformToUniformMaskComponent(StandardUniform uniform);
 

@@ -18,6 +18,11 @@ namespace GTE
 		data = nullptr;
 	}
 
+	CustomFloatAttributeBuffer::~CustomFloatAttributeBuffer()
+	{
+		Destroy();
+	}
+
 	Bool CustomFloatAttributeBuffer::Init(UInt32 size, UInt32 componentCount)
 	{
 		Destroy();
@@ -38,6 +43,11 @@ namespace GTE
 			delete data;
 			data = nullptr;
 		}
+	}
+
+	void CustomFloatAttributeBuffer::SetAttributeID(AttributeID id)
+	{
+		this->attributeID = id;
 	}
 
 	Real * CustomFloatAttributeBuffer::GetDataPtr()

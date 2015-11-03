@@ -156,7 +156,7 @@ TEXTURESRCS= $(call toFullPath,$(TEXTURESRC),texture.cpp textureattr.cpp texture
 VIEWSYSSRCS= $(call toFullPath,$(VIEWSYSSRC),camera.cpp)
 COLORSRCS= $(call toFullPath,$(COLORSRC),color4.cpp color4factory.cpp color4array.cpp)
 UVSRCS= $(call toFullPath,$(UVSRC),uv2.cpp uv2factory.cpp uv2array.cpp)
-BASEGRAPHICSSRCS= $(call toFullPath,$(BASEGRAPHICSSRC),graphics.cpp stdattributes.cpp stduniforms.cpp screendesc.cpp graphicsGL.cpp uniformdirectory.cpp)
+BASEGRAPHICSSRCS= $(call toFullPath,$(BASEGRAPHICSSRC),graphics.cpp stdattributes.cpp stduniforms.cpp screendesc.cpp graphicsGL.cpp)
 
 ALLGRAPHICSSRCS= $(BASEGRAPHICSSRCS) $(LIGHTSRCS) $(TEXTURESRCS) $(VIEWSYSSRCS) $(COLORSRCS) $(UVSRCS) 
 

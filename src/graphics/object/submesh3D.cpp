@@ -66,10 +66,6 @@ namespace GTE
 		calculateTangents = true;
 
 		customFloatAttributeBufferCount = 0;
-		for(UInt32 c = 0; c < MAX_CUSTOM_ATTRIBUTES; c++)
-		{
-			customFloatAttributeBuffers[c] = nullptr;
-		}
 
 		UpdateUpdateCount();
 	}
@@ -514,15 +510,7 @@ namespace GTE
 	*/
 	void SubMesh3D::DestroyCustomAttributeBuffers()
 	{
-		for(UInt32 c = 0; c < MAX_CUSTOM_ATTRIBUTES; c++)
-		{
-			if(customFloatAttributeBuffers[c] != nullptr)
-			{
-				customFloatAttributeBuffers[c]->Destroy();
-				delete customFloatAttributeBuffers[c];
-				customFloatAttributeBuffers[c] = nullptr;
-			}
-		}
+		customFloatAttributeBuffers.clear();
 	}
 
 	/*
@@ -909,6 +897,21 @@ namespace GTE
 	}
 
 	/*
+	* Get the index of the custom float  attribute buffer in [customFloatAttributeBuffers]
+	* corresponding to [id].
+	*/
+	Int32 SubMesh3D::GetCustomFloatAttributeBufferIndex(AttributeID id)
+	{
+		for(UInt32 i = 0; i < customFloatAttributeBuffers.size(); i++)
+		{
+			CustomFloatAttributeBuffer& buf = customFloatAttributeBuffers[i];
+			if(buf.attributeID == id)return i;
+		}
+
+		return -1;
+	}
+
+	/*
 	 * Set the threshold angle (in degrees) to be used when calculating averaged
 	 * face normals for smoothed shading.
 	 */
@@ -928,22 +931,41 @@ namespace GTE
 
 	/*
 	* Add a custom set of floating-point vertex attribute data to this mesh, and
+	* link to the attribute specified by [name].
+	*/
+	Bool SubMesh3D::AddCustomFloatAttributeBuffer(UInt32 componentCount, const std::string& name)
+	{
+		AttributeID id = AttributeDirectory::RegisterVarID(name);
+		return AddCustomFloatAttributeBuffer(componentCount, id);
+	}
+
+	/*
+	* Add a custom set of floating-point vertex attribute data to this mesh, and
 	* link to [id].
 	*/
-	Bool SubMesh3D::AddCustomFloatAttributeBuffer(UInt32 componentCount, UInt32 id)
+	Bool SubMesh3D::AddCustomFloatAttributeBuffer(UInt32 componentCount, AttributeID id)
 	{
-		NONFATAL_ASSERT_RTRN(id < MAX_CUSTOM_ATTRIBUTES, "SubMesh3D::AddCustomFloatAttributeBuffer -> 'id' was too large.", false, true);
+		if(id == AttributeDirectory::VarID_Invalid)return false;
 
-		if(customFloatAttributeBuffers[id] != nullptr)
+		CustomFloatAttributeBuffer* target = nullptr;
+
+		Int32 index = GetCustomFloatAttributeBufferIndex(id);
+		// index < 0 means the descriptor does not yet exist
+		if(index < 0)
 		{
-			customFloatAttributeBuffers[id]->Destroy();
-			customFloatAttributeBuffers[id] = new(std::nothrow) CustomFloatAttributeBuffer();
-
-			ASSERT(customFloatAttributeBuffers[id] != nullptr, "SubMesh3D::AddCustomFloatAttributeBuffer -> Unabled to allocate new custom attribute.");
+			customFloatAttributeBuffers.push_back(CustomFloatAttributeBuffer());
+			target = &customFloatAttributeBuffers[customFloatAttributeBuffers.size() - 1];
+		}
+		else
+		{
+			target = &customFloatAttributeBuffers[index];
+			target->Destroy();
 		}
 
-		Bool initSuccess = customFloatAttributeBuffers[id]->Init(totalVertexCount, componentCount);
+		Bool initSuccess = target->Init(totalVertexCount, componentCount);
 		if(initSuccess)customFloatAttributeBufferCount++;
+
+		target->SetAttributeID(id);
 
 		return initSuccess;
 	}
@@ -951,31 +973,22 @@ namespace GTE
 	/*
 	* Get the descriptor for the custom floating-point vertex attribute data linked to [id].
 	*/
-	CustomFloatAttributeBuffer* SubMesh3D::GetCustomFloatAttributeBufferByID(UInt32 id)
+	CustomFloatAttributeBuffer* SubMesh3D::GetCustomFloatAttributeBufferByID(AttributeID id)
 	{
-		NONFATAL_ASSERT_RTRN(id < MAX_CUSTOM_ATTRIBUTES, "SubMesh3D::GetCustomFloatAttributeBufferByID -> 'id' was too large.", nullptr, true);
+		Int32 index = GetCustomFloatAttributeBufferIndex(id);
+		NONFATAL_ASSERT_RTRN(index >= 0, "SubMesh3D::GetCustomFloatAttributeBufferByID -> Could not locate descriptor for attribute buffer.", nullptr, true);
 
-		return customFloatAttributeBuffers[id];
+		return &customFloatAttributeBuffers[index];
 	}
 
 	/*
 	* Get the descriptor for the nth set of custom floating-point vertex attribute data;
 	*/
-	CustomFloatAttributeBuffer* SubMesh3D::GetCustomFloatAttributeBufferByOrder(UInt32 n)
+	CustomFloatAttributeBuffer* SubMesh3D::GetCustomFloatAttributeBufferByOrder(AttributeID n)
 	{
-		NONFATAL_ASSERT_RTRN(n < MAX_CUSTOM_ATTRIBUTES, "SubMesh3D::GetCustomFloatAttributeBufferByOrder -> 'n' was too large.", nullptr, true);
+		NONFATAL_ASSERT_RTRN(n < customFloatAttributeBuffers.size(), "SubMesh3D::GetCustomFloatAttributeBufferByOrder -> 'n' was too large.", nullptr, true);
 
-		UInt32 found = 0;
-		for(UInt32 i = 0; i < MAX_CUSTOM_ATTRIBUTES; i++)
-		{			
-			if(customFloatAttributeBuffers[i] != nullptr)
-			{
-				if(found == n)return customFloatAttributeBuffers[i];
-				found++;
-			}
-		}
-
-		return nullptr;
+		return &customFloatAttributeBuffers[n];
 	}
 
 	/*

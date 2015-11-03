@@ -354,9 +354,6 @@
     <ClCompile Include="src\geometry\vector\vector2array.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\uniformdirectory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\object\customfloatattributebuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -746,10 +743,10 @@
     <ClInclude Include="src\graphics\particles\particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\uniformdirectory.h">
+    <ClInclude Include="src\graphics\object\customfloatattributebuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\object\customfloatattributebuffer.h">
+    <ClInclude Include="src\graphics\materialvardirectory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -47,6 +47,7 @@ namespace GTE
 
 		static const std::string& GetAttributeName(StandardAttribute attr);
 		static StandardAttribute GetAttributeForName(const std::string& name);
+		static StandardAttribute ForName(const std::string& name);
 		static StandardAttribute AttributeMaskComponentToAttribute(StandardAttributeMaskComponent component);
 		static StandardAttributeMaskComponent AttributeToAttributeMaskComponent(StandardAttribute attr);
 

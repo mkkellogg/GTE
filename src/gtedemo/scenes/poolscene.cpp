@@ -52,16 +52,16 @@ PoolScene::PoolScene() : Scene()
 	lastWaterDropTime = GTE::Time::GetRealTimeSinceStartup();
 	lastWaterSimAdvanceTime = GTE::Time::GetRealTimeSinceStartup();
 
-	uniform_WATER_HEIGHT_MAP = GTE::UniformDirectory::RegisterUniformID("WATER_HEIGHT_MAP");
-	uniform_PIXEL_DISTANCE = GTE::UniformDirectory::RegisterUniformID("PIXEL_DISTANCE");
-	uniform_REFRACTED_COLOR_FACTOR = GTE::UniformDirectory::RegisterUniformID("REFRACTED_COLOR_FACTOR");
-	uniform_REFLECTED_COLOR_FACTOR = GTE::UniformDirectory::RegisterUniformID("REFLECTED_COLOR_FACTOR");
-	uniform_SELFCOLOR = GTE::UniformDirectory::RegisterUniformID("SELFCOLOR");
-	uniform_REFLECTED_TEXTURE = GTE::UniformDirectory::RegisterUniformID("REFLECTED_TEXTURE");
-	uniform_SCREEN_BUFFER_TEXTURE = GTE::UniformDirectory::RegisterUniformID("SCREEN_BUFFER_TEXTURE");
-	uniform_DROP_RADIUS = GTE::UniformDirectory::RegisterUniformID("DROP_RADIUS");
-	uniform_DROP_STRENGTH = GTE::UniformDirectory::RegisterUniformID("DROP_STRENGTH");
-	uniform_DROP_POSITION = GTE::UniformDirectory::RegisterUniformID("DROP_POSITION");
+	uniform_WATER_HEIGHT_MAP = GTE::UniformDirectory::RegisterVarID("WATER_HEIGHT_MAP");
+	uniform_PIXEL_DISTANCE = GTE::UniformDirectory::RegisterVarID("PIXEL_DISTANCE");
+	uniform_REFRACTED_COLOR_FACTOR = GTE::UniformDirectory::RegisterVarID("REFRACTED_COLOR_FACTOR");
+	uniform_REFLECTED_COLOR_FACTOR = GTE::UniformDirectory::RegisterVarID("REFLECTED_COLOR_FACTOR");
+	uniform_SELFCOLOR = GTE::UniformDirectory::RegisterVarID("SELFCOLOR");
+	uniform_REFLECTED_TEXTURE = GTE::UniformDirectory::RegisterVarID("REFLECTED_TEXTURE");
+	uniform_SCREEN_BUFFER_TEXTURE = GTE::UniformDirectory::RegisterVarID("SCREEN_BUFFER_TEXTURE");
+	uniform_DROP_RADIUS = GTE::UniformDirectory::RegisterVarID("DROP_RADIUS");
+	uniform_DROP_STRENGTH = GTE::UniformDirectory::RegisterVarID("DROP_STRENGTH");
+	uniform_DROP_POSITION = GTE::UniformDirectory::RegisterVarID("DROP_POSITION");
 }
 
 /*

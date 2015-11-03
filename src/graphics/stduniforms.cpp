@@ -81,6 +81,11 @@ namespace GTE
 		return (*result).second;
 	}
 
+	StandardUniform StandardUniforms::ForName(const std::string& name)
+	{
+		return GetUniformForName(name);
+	}
+
 	StandardUniform StandardUniforms::UniformMaskComponentToUniform(StandardUniformMaskComponent component)
 	{
 		return (StandardUniform)IntMaskUtil::MaskValueToIndex((IntMask)component);
