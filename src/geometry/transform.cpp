@@ -145,6 +145,23 @@ namespace GTE
 	}
 
 	/*
+	* Get a reference to this transform's matrix.
+	*/
+	Matrix4x4& Transform::GetMatrix()
+	{
+		return this->matrix;
+	}
+
+	/*
+	* Get a const reference to this transform's matrix.
+	*/
+	const Matrix4x4& Transform::GetConstMatrix() const
+	{
+		return this->matrix;
+	}
+
+
+	/*
 	 * Apply translation transformation to this transform's matrix. The parameter [local]
 	 * determines if the transformation is relative to world space or the transform's
 	 * local space.

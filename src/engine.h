@@ -23,6 +23,7 @@ namespace GTE
 	class Graphics;
 	class EngineObjectManager;
 	class AnimationManager;
+	class SceneManager;
 	class InputManager;
 	class ErrorManager;
 	class GraphicsAttributes;
@@ -58,6 +59,9 @@ namespace GTE
 
 		// Manages active animations
 		AnimationManager * animationManager;
+
+		// manage scene objects
+		SceneManager * sceneManager;
 
 		// Manages user input
 		InputManager * inputManager;

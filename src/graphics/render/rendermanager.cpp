@@ -43,7 +43,7 @@ namespace GTE
 	/*
 	* Single default constructor
 	*/
-	RenderManager::RenderManager() : sceneProcessingStack(Constants::MaxObjectRecursionDepth, 1)
+	RenderManager::RenderManager()
 	{
 		lightCount = 0;
 		ambientLightCount = 0;
@@ -65,8 +65,6 @@ namespace GTE
 	 */
 	Bool RenderManager::Init()
 	{
-		ASSERT(sceneProcessingStack.Init(), "RenderManager::Init -> unable to initialize view transform stack.");
-
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 		AssetImporter assetImporter;
@@ -232,7 +230,8 @@ namespace GTE
 	 */
 	void RenderManager::PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack)
 	{
-		transformStack.Push(&transform.matrix);
+		const Matrix4x4& matrix = transform.GetConstMatrix();
+		transformStack.Push(&matrix);
 	}
 
 	/*
@@ -244,14 +243,6 @@ namespace GTE
 
 		Matrix4x4 * mat = transformStack.Pop();
 		transform.SetTo(*mat);
-	}
-
-	/*
-	 * Get the number of entries stored on the transform stack.
-	 */
-	UInt32 RenderManager::RenderDepth(const DataStack<Matrix4x4>& transformStack) const
-	{
-		return transformStack.GetEntryCount();
 	}
 
 	/*
@@ -343,20 +334,18 @@ namespace GTE
 	/*
 	 * Kick off the scene processing from the root of the scene.
 	 */
-	void RenderManager::PreProcessScene()
+	void RenderManager::Update()
 	{
 		lightCount = 0;
 		ambientLightCount = 0;
 		cameraCount = 0;
 		sceneMeshCount = 0;
 
-		Transform cameraModelView;
-
 		SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "RenderManager::PreProcessScene -> 'sceneRoot' is null.");
 
 		// gather information about the cameras, lights, and renderable meshes in the scene
-		PreProcessScene(sceneRoot.GetRef(), cameraModelView);
+		PreProcessScene(sceneRoot.GetRef(), 0);
 		// perform any pre-transformations and calculations (e.g. vertex skinning)
 		PreRenderScene();
 		// calculate shadow volumes
@@ -364,14 +353,9 @@ namespace GTE
 	}
 
 	/*
-	 * ProcessScene:
+	 * PreProcessScene:
 	 *
-	 * Recursively visits each object in the scene that is reachable from [parent]. The transforms of each
-	 * scene object are concatenated as progress moves down the scene object tree and passed to the current
-	 * invocation via [aggregateTransform]. These aggregate transforms are saved to each SceneObject via
-	 * SceneObject::SetAggregateTransform().
-	 *
-	 * Additionally, for each SceneObject that is visited during this search, this method saves references to:
+	 * For each SceneObject that is visited during this search, this method saves references to:
 	 *
 	 *   1. Scene objects that contain instances of Camera -> saved to [sceneCameras]
 	 *   2. Scene objects that contain instances of Light -> saved to [sceneAmbientLights] or [sceneLights]
@@ -383,13 +367,10 @@ namespace GTE
 	 * and calls the SubMesh3DRenderer::PreRender() Method. For skinned meshes, this method will (indirectly) perform the
 	 * vertex skinning transformation.
 	 */
-	void RenderManager::PreProcessScene(SceneObject& parent, Transform& aggregateTransform)
+	void RenderManager::PreProcessScene(SceneObject& parent, UInt32 recursionDepth)
 	{
-		Transform model;
-		Transform modelInverse;
-
 		// enforce max recursion depth
-		if (RenderDepth(sceneProcessingStack) >= Constants::MaxObjectRecursionDepth - 1)return;
+		if (recursionDepth >= Constants::MaxObjectRecursionDepth - 1)return;
 
 		for (UInt32 i = 0; i < parent.GetChildrenCount(); i++)
 		{
@@ -404,13 +385,6 @@ namespace GTE
 			// only process active scene objects
 			if (child->IsActive())
 			{
-				// save the existing view transform
-				PushTransformData(aggregateTransform, sceneProcessingStack);
-
-				// concatenate the current view transform with that of the current scene object
-				Transform& localTransform = child->GetTransform();
-				aggregateTransform.TransformBy(localTransform);
-
 				CameraRef camera = child->GetCamera();
 				if (camera.IsValid() && cameraCount < MAX_CAMERAS)
 				{
@@ -476,14 +450,8 @@ namespace GTE
 					}
 				}
 
-				// save the aggregate/global/world transform
-				child->SetAggregateTransform(aggregateTransform);
-
 				// continue recursion through child object
-				PreProcessScene(child.GetRef(), aggregateTransform);
-
-				// restore previous view transform
-				PopTransformData(aggregateTransform, sceneProcessingStack);
+				PreProcessScene(child.GetRef(), recursionDepth + 1);
 			}
 		}
 	}
@@ -522,7 +490,7 @@ namespace GTE
 					SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
 					if (subRenderer.IsValid())
 					{
-						subRenderer->PreRender(model.matrix, modelInverse.matrix);
+						subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
 					}
 				}
 			}
@@ -535,7 +503,7 @@ namespace GTE
 					SubMesh3DRendererRef subRenderer = skinnedMeshRenderer->GetSubRenderer(r);
 					if (subRenderer.IsValid())
 					{
-						subRenderer->PreRender(model.matrix, modelInverse.matrix);
+						subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
 					}
 				}
 			}
@@ -1757,16 +1725,16 @@ namespace GTE
 		ShaderRef shader = activeMaterial->GetShader();
 		ASSERT(shader.IsValid(), "RenderManager::SendTransformUniformsToShader -> Active material contains null shader.");
 
-		Matrix4x4 modelInverseTranspose = model.matrix;
+		Matrix4x4 modelInverseTranspose = model.GetConstMatrix();
 		modelInverseTranspose.Transpose();
 		modelInverseTranspose.Invert();
 
 		activeMaterial->SendModelMatrixInverseTransposeToShader(&modelInverseTranspose);
-		activeMaterial->SendModelMatrixToShader(&model.matrix);
-		activeMaterial->SendModelViewMatrixToShader(&modelView.matrix);
-		activeMaterial->SendViewMatrixToShader(&view.matrix);
-		activeMaterial->SendProjectionMatrixToShader(&projection.matrix);
-		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.matrix);
+		activeMaterial->SendModelMatrixToShader(&model.GetConstMatrix());
+		activeMaterial->SendModelViewMatrixToShader(&modelView.GetConstMatrix());
+		activeMaterial->SendViewMatrixToShader(&view.GetConstMatrix());
+		activeMaterial->SendProjectionMatrixToShader(&projection.GetConstMatrix());
+		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.GetConstMatrix());
 	}
 
 	/*
@@ -1781,7 +1749,7 @@ namespace GTE
 		ShaderRef shader = activeMaterial->GetShader();
 		ASSERT(shader.IsValid(), "RenderManager::SendModelViewProjectionToShader -> Active material contains null shader.");
 
-		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.matrix);
+		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.GetConstMatrix());
 	}
 
 	/*

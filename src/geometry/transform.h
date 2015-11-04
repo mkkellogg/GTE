@@ -18,15 +18,13 @@ namespace GTE
 {
 	class Transform
 	{
-		// give access to the transform's matrix
-		friend class RenderManager;
 
-	protected:
+		protected:
 
 		// the 4x4 matrix that is encapsulated by this transform
 		Matrix4x4 matrix;
 
-	public:
+		public:
 
 		Transform();
 		Transform(const Transform & source);
@@ -45,6 +43,9 @@ namespace GTE
 		void PreTransformBy(const Matrix4x4& matrix);
 		void TransformBy(const Transform& transform);
 		void PreTransformBy(const Transform& transform);
+
+		Matrix4x4& GetMatrix();
+		const Matrix4x4& GetConstMatrix() const;
 
 		virtual void Translate(Real x, Real y, Real z, Bool local);
 		virtual void Translate(Vector3& vector, Bool local);

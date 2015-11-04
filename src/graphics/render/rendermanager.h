@@ -95,8 +95,6 @@ namespace GTE
 		MaterialRef ssaoOutlineMaterial;
 		// for off-screen rendering
 		RenderTargetRef depthRenderTarget;
-		// transform stack used for processing scene hierarchy
-		DataStack<Matrix4x4> sceneProcessingStack;
 
 		// number of meshes found in the scene during ProcessScene()
 		UInt32 sceneMeshCount;
@@ -126,8 +124,8 @@ namespace GTE
 
 		std::stack<RenderTargetRef> renderTargetStack;
 
-		void PreProcessScene();
-		void PreProcessScene(SceneObject& parent, Transform& aggregateTransform);
+		void Update();
+		void PreProcessScene(SceneObject& parent, UInt32 recursionDepth);
 		void PreRenderScene();
 
 		void RenderSceneForCamera(UInt32 cameraIndex);
@@ -167,7 +165,6 @@ namespace GTE
 
 		void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
 		void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
-		UInt32 RenderDepth(const DataStack<Matrix4x4>& transformStack) const;
 
 		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);

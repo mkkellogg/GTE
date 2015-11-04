@@ -357,6 +357,9 @@
     <ClCompile Include="src\graphics\object\customfloatattributebuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scene\scenemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\asset\assetimporter.h">
@@ -747,6 +750,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\materialvardirectory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\scenemanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

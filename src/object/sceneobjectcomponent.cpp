@@ -22,4 +22,9 @@ namespace GTE
 	{
 		return sceneObject;
 	}
+
+	void SceneObjectComponent::Update()
+	{
+
+	}
 }

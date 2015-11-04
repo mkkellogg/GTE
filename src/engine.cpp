@@ -10,6 +10,7 @@
 #include "graphics/graphicsGL.h"
 #include "graphics/animation/animationmanager.h"
 #include "graphics/render/rendermanager.h"
+#include "scene/scenemanager.h"
 #include "input/inputmanager.h"
 #include "input/inputmanagerGL.h"
 #include "error/errormanager.h"
@@ -32,6 +33,7 @@ namespace GTE
 		graphicsSystem = nullptr;
 		renderManager = nullptr;
 		animationManager = nullptr;
+		sceneManager = nullptr;
 		inputManager = nullptr;
 		errorManager = nullptr;
 		callbacks = nullptr;
@@ -47,6 +49,7 @@ namespace GTE
 	{
 		SAFE_DELETE(inputManager);
 		SAFE_DELETE(animationManager);
+		SAFE_DELETE(sceneManager);
 		SAFE_DELETE(engineObjectManager);
 		SAFE_DELETE(renderManager);
 		SAFE_DELETE(graphicsSystem);
@@ -105,18 +108,24 @@ namespace GTE
 		ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.");
 
 		renderManager = new(std::nothrow) RenderManager();
-		ASSERT(renderManager != nullptr, "Engine::Init -> Unable to allocate render manager");
+		ASSERT(renderManager != nullptr, "Engine::Init -> Unable to allocate render manager.");
 
 		Bool renderInitSuccess = renderManager->Init();
-		ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager");
+		ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager.");
 
 		// This portion of the initialization of the engine object manager must be called
 		// after the graphics engine is initialized
 		Bool initShadersSuccess = engineObjectManager->InitBuiltinShaders();
-		ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initialize built-in shaders");
+		ASSERT(initShadersSuccess == true, "Engine::Init -> Could not initialize built-in shaders.");
 
 		animationManager = new(std::nothrow) AnimationManager();
 		ASSERT(animationManager != nullptr, "Engine::Init -> Unable to create animation manager.");
+
+		sceneManager = new(std::nothrow) SceneManager();
+		ASSERT(sceneManager != nullptr, "Engine::Init -> Unable to create scene manager.");
+
+		Bool sceneManagerInitSuccess = sceneManager->Init();
+		ASSERT(sceneManagerInitSuccess == true, "Engine::Init -> Unable to initialize scene manager.");
 
 		// TODO: add switch to detect correct type for platform
 		// for now, only support OpenGL
@@ -161,7 +170,8 @@ namespace GTE
 		animationManager->Update();
 		inputManager->Update();
 		if (callbacks != nullptr)callbacks->OnUpdate();
-		renderManager->PreProcessScene();
+		sceneManager->Update();
+		renderManager->Update();
 		if (callbacks != nullptr)callbacks->OnPreRender();
 		renderManager->RenderScene();
 		graphicsSystem->PostRender();

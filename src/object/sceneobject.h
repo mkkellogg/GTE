@@ -30,6 +30,7 @@ namespace GTE
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
 		friend class RenderManager;
+		friend class SceneManager;
 
 		// Mesh3DFilter needs to be a friend so that it can update
 		// any attached renderer when its mesh is updated

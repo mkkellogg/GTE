@@ -116,8 +116,8 @@ ASSETOBJ= $(call srcFilesToObjFiles,$(ASSETSRCS),$(ASSETSRC),$(OUTPUTDIR))
 	
 $(ASSETOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ASSETSRC),$@,$(OUTPUTDIR)) 
-	
-		
+
+
 # ==================================
 # Image processing
 # ==================================	
@@ -128,7 +128,8 @@ IMAGEOBJ= $(call srcFilesToObjFiles,$(IMAGESRCS),$(IMAGESRC),$(OUTPUTDIR))
 	
 $(IMAGEOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(IMAGESRC),$@,$(OUTPUTDIR)) 
-	
+
+
 # ==================================
 # Particle system
 # ==================================	
@@ -139,7 +140,20 @@ PARTICLEOBJ= $(call srcFilesToObjFiles,$(PARTICLESSRCS),$(PARTICLESSRC),$(OUTPUT
 	
 $(PARTICLEOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(PARTICLESSRC),$@,$(OUTPUTDIR)) 
+
+
+# ==================================
+# Scene 
+# ==================================	
+
+SCENESRC= src/scene
+SCENESRCS= $(call toFullPath,$(SCENESRC),scenemanager.cpp)
+SCENEOBJ= $(call srcFilesToObjFiles,$(SCENESRCS),$(SCENESRC),$(OUTPUTDIR))
 	
+$(SCENEOBJ): 
+	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(SCENESRC),$@,$(OUTPUTDIR)) 
+
+
 # ==================================
 # Graphics
 # ==================================
@@ -187,11 +201,10 @@ $(COLOROBJ):
 $(UVOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(UVSRC),$@,$(OUTPUTDIR)) 
 
-	
 
 # ==================================
 # Animation
-# ==================================	
+# ==================================
 
 ANIMATIONSRC= src/graphics/animation
 ANIMATIONSRCS= $(call toFullPath,$(ANIMATIONSRC),skeleton.cpp vertexbonemap.cpp skeletonnode.cpp bone.cpp sceneobjectskeletonnode.cpp keyframeset.cpp keyframe.cpp translationkeyframe.cpp scalekeyframe.cpp rotationkeyframe.cpp animation.cpp animationmanager.cpp animationinstance.cpp animationplayer.cpp blendop.cpp crossfadeblendop.cpp)
@@ -199,11 +212,11 @@ ANIMATIONOBJ= $(call srcFilesToObjFiles,$(ANIMATIONSRCS),$(ANIMATIONSRC),$(OUTPU
 
 $(ANIMATIONOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ANIMATIONSRC),$@,$(OUTPUTDIR))
-	
-	
+
+
 # ==================================
 # Shader
-# ==================================	
+# ==================================
 
 SHADERSRC= src/graphics/shader
 SHADERSRCS= $(call toFullPath,$(SHADERSRC),shadersource.cpp shadersourcelines.cpp shader.cpp uniformdesc.cpp attributedesc.cpp shaderGL.cpp)
@@ -212,7 +225,7 @@ SHADEROBJ= $(call srcFilesToObjFiles,$(SHADERSRCS),$(SHADERSRC),$(OUTPUTDIR))
 $(SHADEROBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(SHADERSRC),$@,$(OUTPUTDIR))
 
-	
+
 # ==================================
 # Render
 # ==================================
@@ -223,8 +236,8 @@ RENDEROBJ= $(call srcFilesToObjFiles,$(RENDERSRCS),$(RENDERSRC),$(OUTPUTDIR))
 
 $(RENDEROBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(RENDERSRC),$@,$(OUTPUTDIR))
-	
-	
+
+
 # ==================================
 # GraphicsObject
 # ==================================
@@ -232,11 +245,11 @@ $(RENDEROBJ):
 GRAPHICSOBJECTSRC= src/graphics/object
 GRAPHICSOBJECTSRCS= $(call toFullPath,$(GRAPHICSOBJECTSRC),mesh3D.cpp submesh3D.cpp submesh3Dfaces.cpp submesh3Dface.cpp mesh3Dfilter.cpp customfloatattributebuffer.cpp)
 GRAPHICSOBJECTOBJ= $(call srcFilesToObjFiles,$(GRAPHICSOBJECTSRCS),$(GRAPHICSOBJECTSRC),$(OUTPUTDIR))
-	
+
 $(GRAPHICSOBJECTOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(GRAPHICSOBJECTSRC),$@,$(OUTPUTDIR))
-	
-	
+
+
 # ==================================
 # Debug
 # ==================================	
