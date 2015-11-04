@@ -11,6 +11,7 @@
 #include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/submesh3D.h"
+#include "graphics/object/customfloatattributebuffer.h"
 #include "graphics/object/mesh3Dfilter.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"

@@ -984,7 +984,7 @@ namespace GTE
 	/*
 	* Get the descriptor for the nth set of custom floating-point vertex attribute data;
 	*/
-	CustomFloatAttributeBuffer* SubMesh3D::GetCustomFloatAttributeBufferByOrder(AttributeID n)
+	CustomFloatAttributeBuffer* SubMesh3D::GetCustomFloatAttributeBufferByOrder(UInt32 n)
 	{
 		NONFATAL_ASSERT_RTRN(n < customFloatAttributeBuffers.size(), "SubMesh3D::GetCustomFloatAttributeBufferByOrder -> 'n' was too large.", nullptr, true);
 

@@ -159,7 +159,7 @@ namespace GTE
 		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, const std::string& name);
 		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, AttributeID id);
 		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByID(AttributeID id);
-		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByOrder(AttributeID id);
+		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByOrder(UInt32 id);
 
 		Point3Array * GetPostions();
 		Vector3Array * GetVertexNormals();

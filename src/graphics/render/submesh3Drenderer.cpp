@@ -137,7 +137,7 @@ namespace GTE
 	/*
 	 * Create and initialize an instance of VertexAttrBuffer.
 	 */
-	Bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride)
+	Bool SubMesh3DRenderer::InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride, const Real * srcData)
 	{
 		NONFATAL_ASSERT_RTRN(buffer != nullptr, "SubMesh3DRenderer::InitBuffer -> Attempted to initialize vertex attribute buffer from null pointer.", false, true);
 
@@ -148,7 +148,7 @@ namespace GTE
 		*buffer = Engine::Instance()->GetGraphicsSystem()->CreateVertexAttributeBuffer();
 		ASSERT(*buffer != nullptr, "SubMesh3DRenderer::InitBuffer -> Graphics::CreateVertexAttrBuffer() returned null.");
 		// initialize the vertex attribute buffer
-		(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, nullptr);
+		(*buffer)->Init(vertexCount, componentCount, stride, buffersOnGPU, srcData);
 
 		return true;
 	}
@@ -156,12 +156,12 @@ namespace GTE
 	/*
 	 * Create & initialize the vertex attribute buffer in [attributeBuffers] that corresponds to [attr].
 	 */
-	Bool SubMesh3DRenderer::InitAttributeData(UInt32 attr, Int32 length, Int32 componentCount, Int32 stride)
+	Bool SubMesh3DRenderer::InitAttributeData(UInt32 attr, Int32 length, Int32 componentCount, Int32 stride, const Real * srcData)
 	{
 		// if the buffer already exists, destroy it first
 		DestroyBuffer(&attributeBuffers[attr]);
 		// create and initialize buffer
-		Bool initSuccess = InitBuffer(&attributeBuffers[attr], length, componentCount, stride);
+		Bool initSuccess = InitBuffer(&attributeBuffers[attr], length, componentCount, stride, srcData);
 
 		return initSuccess;
 	}
@@ -530,6 +530,14 @@ namespace GTE
 	}
 
 	/*
+	* Set the vertex attribute buffer data at [index] in [attributeBuffers] with [data].
+	*/
+	void SubMesh3DRenderer::SetAttributeData(UInt32 index, Real * data)
+	{
+		attributeBuffers[index]->SetData(data);
+	}
+
+	/*
 	 * Update the vertex attribute buffers of this sub-renderer to reflect type & size of the attribute
 	 * data in the target sub-mesh.
 	 */
@@ -556,7 +564,7 @@ namespace GTE
 
 				Int32 stride = 0;
 
-				Bool initSuccess = InitAttributeData((UInt32)attr, mesh->GetTotalVertexCount(), componentCount, stride);
+				Bool initSuccess = InitAttributeData((UInt32)attr, mesh->GetTotalVertexCount(), componentCount, stride, nullptr);
 				ASSERT(initSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not initialize attribute data.");
 
 				VertexAttrBufferBinding binding(attributeBuffers[(UInt32)attr], AttributeDirectory::GetStandardVarID(attr));
@@ -564,15 +572,14 @@ namespace GTE
 			}
 		}
 
+		UInt32 firstCustomAttributeIndex = GetFirstCustomAttributeBufferIndex();
 		for(UInt32 i = 0; i < mesh->GetCustomFloatAttributeBufferCount(); i++)
 		{
 			CustomFloatAttributeBuffer * attrBuffer = mesh->GetCustomFloatAttributeBufferByOrder(i);
 			ASSERT(attrBuffer != nullptr, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Null custom attribute found.");
 
-			UInt32 componentCount = attrBuffer->GetComponentCount();
-			UInt32 stride = 0;
-			UInt32 attributeBufferIndex = (UInt32)StandardAttribute::_Last + i;
-			Bool initSuccess = InitAttributeData(attributeBufferIndex, mesh->GetTotalVertexCount(), componentCount, stride);
+			UInt32 attributeBufferIndex = firstCustomAttributeIndex + i;
+			Bool initSuccess = InitAttributeData(attributeBufferIndex, attrBuffer->GetSize(), attrBuffer->GetComponentCount(), 0, attrBuffer->GetDataPtr());
 			ASSERT(initSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not initialize attribute data.");
 
 			VertexAttrBufferBinding binding(attributeBuffers[attributeBufferIndex], attrBuffer->GetAttributeID());
@@ -586,7 +593,7 @@ namespace GTE
 		// shadow or not. This could be quite wasteful, so implement a way to avoid this excess memory usage.
 		Bool shadowVolumeInitSuccess = true;
 		shadowVolumeInitSuccess = shadowVolumePositions.Init(storedVertexCount * 8);
-		shadowVolumeInitSuccess &= InitAttributeData((UInt32)StandardAttribute::ShadowPosition, storedVertexCount * 8, 4, 0);
+		shadowVolumeInitSuccess &= InitAttributeData((UInt32)StandardAttribute::ShadowPosition, storedVertexCount * 8, 4, 0, nullptr);
 		ASSERT(shadowVolumeInitSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
 
 		boundShadowVolumeAttributeBuffers.clear();
@@ -698,6 +705,14 @@ namespace GTE
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))SetVertexColorData(mesh->GetColors());
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))SetUV1Data(mesh->GetUVs0());
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))SetUV2Data(mesh->GetUVs1());
+
+		UInt32 firstCustomAttributeIndex = GetFirstCustomAttributeBufferIndex();
+		for(UInt32 i = 0; i < mesh->GetCustomFloatAttributeBufferCount(); i++)
+		{
+			CustomFloatAttributeBuffer * attrBuffer = mesh->GetCustomFloatAttributeBufferByOrder(i);
+			ASSERT(attrBuffer != nullptr, "SubMesh3DRenderer::CopyMeshData -> Null custom attribute found.");
+			SetAttributeData(i + firstCustomAttributeIndex, attrBuffer->GetDataPtr());
+		}
 	}
 
 	/*
@@ -713,6 +728,14 @@ namespace GTE
 		// make sure the time stamp equals the target mesh's timestamp exactly,
 		// not the current time
 		updateCount = mesh->GetUpdateCount();
+	}
+
+	/*
+	* Get the index in [attributeBuffers] where storage of custom attribute buffers begins.
+	*/
+	UInt32 SubMesh3DRenderer::GetFirstCustomAttributeBufferIndex()
+	{
+		return (UInt32)StandardAttribute::_Last;
 	}
 
 	/*

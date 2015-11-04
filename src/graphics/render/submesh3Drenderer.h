@@ -117,11 +117,11 @@ namespace GTE
 		void SetContainerRenderer(Mesh3DRenderer * renderer);
 		void SetTargetSubMeshIndex(UInt32 index);
 
-		Bool InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride);
+		Bool InitBuffer(VertexAttrBuffer ** buffer, Int32 vertexCount, Int32 componentCount, Int32 stride, const Real * srcData);
 		void Destroy();
 		void DestroyBuffers();
 		void DestroyBuffer(VertexAttrBuffer ** buffer);
-		Bool InitAttributeData(UInt32 attr, Int32 length, Int32 componentCount, Int32 stride);
+		Bool InitAttributeData(UInt32 attr, Int32 length, Int32 componentCount, Int32 stride, const Real * srcData);
 
 		const Point3Array * GetShadowVolumePositions();
 		void SetShadowVolumePositionData(const Point3Array * points);
@@ -132,6 +132,7 @@ namespace GTE
 		void SetVertexColorData(Color4Array * colors);
 		void SetUV1Data(UV2Array * uvs);
 		void SetUV2Data(UV2Array * uvs);
+		void SetAttributeData(UInt32 index, Real * data);
 
 		Bool ValidateMaterialForMesh(MaterialRef material);
 		Bool UpdateMeshAttributeBuffers();
@@ -144,6 +145,8 @@ namespace GTE
 		Bool ShouldUpdateFromMesh();
 		void CopyMeshData();
 		void UpdateUpdateCount();
+
+		UInt32 GetFirstCustomAttributeBufferIndex();
 
 	public:
 

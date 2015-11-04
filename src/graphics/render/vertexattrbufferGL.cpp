@@ -95,8 +95,7 @@ namespace GTE
 
 	void VertexAttrBufferGL::InitData(const Real * srcData)
 	{
-		Int32 fullDataSize = CalcFullSize();
-		memcpy(data, srcData, fullDataSize);
+		Int32 fullDataSize = CalcFullSize();		
 
 		if (dataOnGPU)
 		{
@@ -105,6 +104,7 @@ namespace GTE
 			glBufferSubData(GL_ARRAY_BUFFER, 0, fullDataSize, srcData);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
+		else memcpy(data, srcData, fullDataSize);
 	}
 
 	/*
