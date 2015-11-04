@@ -278,7 +278,9 @@ namespace GTE
 	void Material::SetAttributeBinding(Int32 varID, AttributeID attribute)
 	{
 		Int32 index = GetLocalAttributeDescriptorIndexByAttributeID(attribute);
-		if(index >= 0 && index < localAttributeDescriptors.size())
+		NONFATAL_ASSERT(index >= 0, "Material::SetAttributeBinding -> Attribute not found.", true);
+
+		if((UInt32)index < localAttributeDescriptors.size())
 		{
 			AttributeDescriptor& desc = localAttributeDescriptors[index];
 			desc.ShaderVarID = varID;
@@ -291,7 +293,9 @@ namespace GTE
 	Int32 Material::GetAttributeBinding(AttributeID attribute) const
 	{
 		Int32 index = GetLocalAttributeDescriptorIndexByAttributeID(attribute);
-		if(index >= 0 && index < localAttributeDescriptors.size())
+		if(index < 0)return -1;
+
+		if((UInt32)index < localAttributeDescriptors.size())
 		{
 			const AttributeDescriptor& desc = localAttributeDescriptors[index];
 			return desc.ShaderVarID;
@@ -406,7 +410,9 @@ namespace GTE
 	void Material::SetUniformBinding(Int32 varID, UniformID uniform)
 	{
 		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
-		if(index >= 0 && index < localUniformDescriptors.size())
+		NONFATAL_ASSERT(index >= 0, "Material::SetUniformBinding -> Uniform not found.", true);
+
+		if((UInt32)index < localUniformDescriptors.size())
 		{
 			UniformDescriptor& desc = localUniformDescriptors[index];
 			desc.ShaderVarID = varID;
@@ -419,7 +425,9 @@ namespace GTE
 	Int32 Material::GetUniformBinding(UniformID uniform) const
 	{
 		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
-		if(index >= 0 && index < localUniformDescriptors.size())
+		if(index < 0)return -1;
+
+		if((UInt32)index < localUniformDescriptors.size())
 		{
 			const UniformDescriptor& desc = localUniformDescriptors[index];
 			return desc.ShaderVarID;
