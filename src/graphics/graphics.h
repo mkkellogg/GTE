@@ -160,7 +160,7 @@ namespace GTE
 		virtual Bool AddClipPlane() = 0;
 		virtual void DeactiveAllClipPlanes() = 0;
 
-		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundBuffers, UInt32 vertexCount, Bool validate) = 0;
+		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate) = 0;
 	};
 }
 

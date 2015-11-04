@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "uniformdesc.h"
+#include "graphics/materialvardirectory.h"
 
 namespace GTE
 {
@@ -15,7 +16,7 @@ namespace GTE
 		Size = -1;
 		Type = UniformType::Float;
 
-		RegisteredUniformID = -1;
+		RegisteredUniformID = UniformDirectory::VarID_Invalid;
 		ExtendedFloatData = nullptr;
 		IsSet = false;
 		SetSize = 0;

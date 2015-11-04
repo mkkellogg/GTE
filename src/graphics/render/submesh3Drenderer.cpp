@@ -544,7 +544,7 @@ namespace GTE
 
 		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
 
-		boundStandardAttributeBuffers.clear();
+		boundAttributeBuffers.clear();
 		// loop through each standard attribute and create/initialize vertex attribute buffer for each
 		for (UInt32 i = 0; i < (UInt32)StandardAttribute::_Last; i++)
 		{
@@ -559,8 +559,8 @@ namespace GTE
 				Bool initSuccess = InitAttributeData((UInt32)attr, mesh->GetTotalVertexCount(), componentCount, stride);
 				ASSERT(initSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not initialize attribute data.");
 
-				VertexAttrBufferBinding binding(attributeBuffers[(UInt32)attr], attr, -1);
-				boundStandardAttributeBuffers.push_back(binding);
+				VertexAttrBufferBinding binding(attributeBuffers[(UInt32)attr], AttributeDirectory::GetStandardVarID(attr));
+				boundAttributeBuffers.push_back(binding);
 			}
 		}
 
@@ -575,9 +575,8 @@ namespace GTE
 			Bool initSuccess = InitAttributeData(attributeBufferIndex, mesh->GetTotalVertexCount(), componentCount, stride);
 			ASSERT(initSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not initialize attribute data.");
 
-			// TODO: assign correct value for custom attribute identifier here
-			VertexAttrBufferBinding binding(attributeBuffers[attributeBufferIndex], StandardAttribute::_None, -1);
-			boundCustomAttributeBuffers.push_back(binding);
+			VertexAttrBufferBinding binding(attributeBuffers[attributeBufferIndex], attrBuffer->GetAttributeID());
+			boundAttributeBuffers.push_back(binding);
 		}
 
 		// update the local vertex count
@@ -591,7 +590,7 @@ namespace GTE
 		ASSERT(shadowVolumeInitSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
 
 		boundShadowVolumeAttributeBuffers.clear();
-		VertexAttrBufferBinding shadowVolumePositionBinding(attributeBuffers[(Int32)StandardAttribute::ShadowPosition], StandardAttribute::ShadowPosition, -1);
+		VertexAttrBufferBinding shadowVolumePositionBinding(attributeBuffers[(Int32)StandardAttribute::ShadowPosition], AttributeDirectory::GetStandardVarID(StandardAttribute::ShadowPosition));
 		boundShadowVolumeAttributeBuffers.push_back(shadowVolumePositionBinding);
 
 		storedAttributes = meshAttributes;
@@ -773,7 +772,7 @@ namespace GTE
 		StandardAttributeSet materialAttributes = material->GetStandardAttributes();
 		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
 
-		// look for mismatched shader variables and mesh attributes
+		// look for mismatched shader attributes and mesh attributes
 		for (Int32 i = 0; i < (Int32)StandardAttribute::_Last; i++)
 		{
 			StandardAttribute attr = (StandardAttribute)i;
@@ -914,7 +913,7 @@ namespace GTE
 		MaterialRef currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
 
-		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundStandardAttributeBuffers, mesh->GetTotalVertexCount(), true);
+		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);
 	}
 
 	/*

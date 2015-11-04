@@ -11,6 +11,7 @@
 #define _GTE_ATTRIBUTE_DESCRIPTOR_H_
 
 #include "object/enginetypes.h"
+#include "graphics/materialvardirectory.h"
 #include <string>
 
 namespace GTE
@@ -43,6 +44,7 @@ namespace GTE
 		UInt32 ShaderVarID;
 		std::string Name;
 
+		AttributeID RegisteredAttributeID;
 		Bool IsSet;
 		UInt32 SetSize;
 		Real * FloatData;

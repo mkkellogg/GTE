@@ -6,6 +6,8 @@
  
 #include "engine.h"
 #include "graphics.h"
+#include "stdattributes.h"
+#include "stduniforms.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "texture/atlas.h"
@@ -59,11 +61,14 @@ namespace GTE
 
 	/*
 	 * For now this method does nothing. It is meant to be overridden in a
-	 * deriving class. It is not virtual because it will likely contain code
+	 * deriving class. It is not purely virtual because it will likely contain code
 	 * as the Graphics class evolves.
 	 */
 	Bool Graphics::Init(const GraphicsAttributes& attributes)
 	{
+		StandardAttributes::RegisterAll();
+		StandardUniforms::RegisterAll();
+
 		return true;
 	}
 

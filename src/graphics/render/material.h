@@ -3,16 +3,19 @@
  *
  * author: Mark Kellogg
  *
- * A Material represents an instance of a Shader along with a set of values for the custom uniforms
+ * A Material represents an instance of a Shader along with a set of values for the uniforms
  * that shader exposes.
  *
- * A Material, like other engine objects (such as Shader and Mesh3D), utilizes the notion of standard attributes
+ * A Material, like other engine objects (such as Shader and Mesh3D), understands  the notion of standard attributes
  * and standard uniforms. These are shader variables that are very common, sometimes required,
  * and are supplied to a shader by the engine, not explicitly by the developer using the engine.
  * An example is mesh vertex normals. The developer does not explicitly set these each frame; the
  * engine takes them from a mesh and sends them to the shader. Therefore the shader variable's name needs to
  * correspond to a predetermined name that the engine has defined. In the case of vertex normals, the name of
  * the variable is 'NORMAL'.
+ *
+ * An instance of Material is not restricted to standard attributes and standard uniforms, it supports any attribute
+ * or uniform defined by the developer.
  */
 
 #ifndef _GTE_MATERIAL_H_
@@ -47,21 +50,18 @@ namespace GTE
 		public:
 
 		VertexAttrBuffer * Buffer;
-		StandardAttribute StdAttribute;
-		Int32 CustomAttribute;
+		AttributeID RegisteredAttributeID;
 
 		VertexAttrBufferBinding()
 		{
-			StdAttribute = StandardAttribute::_None;
 			Buffer = nullptr;
-			CustomAttribute = -1;
+			RegisteredAttributeID = AttributeDirectory::VarID_Invalid;
 		}
 
-		VertexAttrBufferBinding(VertexAttrBuffer * buffer, StandardAttribute stdAttribute, Int32 customAttribute)
+		VertexAttrBufferBinding(VertexAttrBuffer * buffer, AttributeID id)
 		{
 			this->Buffer = buffer;
-			this->StdAttribute = stdAttribute;
-			this->CustomAttribute = customAttribute;
+			this->RegisteredAttributeID = id;
 		}
 	};
 
@@ -71,9 +71,6 @@ namespace GTE
 		// a friend of EngineObjectManager, and the constructor & destructor
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
-
-		// length of the array that contains binding information for stand attributes & uniforms
-		static const Int32 BINDINGS_ARRAY_MAX_LENGTH = 128;
 
 		// the following are values for the sizes of data required by various types of uniforms
 		static const Int32 SAMPLER_2D_DATA_SIZE = 64;
@@ -89,9 +86,6 @@ namespace GTE
 		// bit masks to hold binding status for standard uniforms and attributes
 		StandardAttributeSet standardAttributes;
 		StandardUniformSet standardUniforms;
-
-		// ids/locations of shader variables corresponding to standard attributes
-		Int32 standardAttributeBindings[BINDINGS_ARRAY_MAX_LENGTH];
 
 		// a vector of UniformDescriptor objects that describe uniforms exposed by this
 		// material's shader
@@ -126,8 +120,6 @@ namespace GTE
 		Bool allSetUniformsandAttributesVerified;
 
 		void BindVars();
-		void ClearBindings();
-		Bool SetupSetVerifiers();
 
 		Bool InitializeUniformDescriptors();
 		void DestroyUniformDescriptors();
@@ -136,14 +128,15 @@ namespace GTE
 		void DestroyAttributeDescriptors();
 
 		Int32 GetLocalAttributeDescriptorIndexByShaderVarID(UInt32 shaderVarID) const;
-		void SetStandardAttributeBinding(Int32 varID, StandardAttribute attr);
-		Int32 GetStandardAttributeBinding(StandardAttribute attr) const;
-		Int32 TestForStandardAttribute(StandardAttribute attr) const;
+		Int32 GetLocalAttributeDescriptorIndexByAttributeID(AttributeID attribute) const;
+		void SetAttributeBinding(Int32 varID, AttributeID attribute);
+		Int32 GetAttributeBinding(AttributeID attribute) const;
+		Int32 TestForAttribute(AttributeID attribute) const;
 
 		Int32 GetLocalUniformDescriptorIndexByName(const std::string& uniformName) const;
 		Int32 GetLocalUniformDescriptorIndexByUniformID(UniformID uniform) const;
 		Int32 GetLocalUniformDescriptorIndexByShaderVarID(UInt32 shaderVarID) const;
-		UInt32 GetSamplerUnitForUniform(UniformID uniform);
+		UInt32 ReserveSamplerUnitForUniform(UniformID uniform);
 		void SetUniformBinding(Int32 varID, UniformID uniform);
 		Int32 GetUniformBinding(UniformID uniform) const;
 		Int32 TestForUniform(UniformID uniform) const;
@@ -167,8 +160,7 @@ namespace GTE
 		ShaderRef GetShader() ;
 
 		StandardAttributeSet GetStandardAttributes() const;
-		void SendStandardAttributeBufferToShader(StandardAttribute attr, VertexAttrBuffer *buffer);
-		void SendAttributeBufferToShader(Int32 varID, VertexAttrBuffer *buffer);
+		void SendAttributeBufferToShader(AttributeID, VertexAttrBuffer *buffer);
 
 		StandardUniformSet GetStandardUniforms() const;
 		void SendClipPlaneCountToShader(UInt32 count);
@@ -183,7 +175,6 @@ namespace GTE
 		void SendEyePositionToShader(const Point3 * position);
 
 		void SendAllStoredUniformValuesToShader();
-		UInt32 GetSetUniformCount() const;
 
 		void SetTexture(TextureRef texture, const std::string& varName);
 		void SetTexture(TextureRef texture, UniformID uniformID);
@@ -195,8 +186,8 @@ namespace GTE
 		void SetUniform2f(Real v1, Real v2, UniformID uniformID);
 		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName);
 		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, UniformID uniformID);
-		void SetColor(const Color4& val, const std::string& varName);
-		void SetColor(const Color4& val, UniformID uniformID);
+		void SetColor(const Color4& color, const std::string& varName);
+		void SetColor(const Color4& color, UniformID uniformID);
 
 		Bool VerifySetVars(UInt32 vertexCount);
 

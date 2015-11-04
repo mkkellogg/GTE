@@ -44,6 +44,7 @@ namespace GTE
 		static std::unordered_map<std::string, StandardAttribute> nameToAttribute;
 
 	public:
+		static void RegisterAll();
 
 		static const std::string& GetAttributeName(StandardAttribute attr);
 		static StandardAttribute GetAttributeForName(const std::string& name);

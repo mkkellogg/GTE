@@ -54,10 +54,25 @@ namespace GTE
 			return foundID;
 		}
 
-		static TID GetVarID(TSV var)
+		static TID GetStandardVarID(TSV var)
 		{
 			return registeredStandardVars[(UInt16)var];
 		}
+
+		static TSV GetStandardVar(TID id)
+		{
+			for(UInt16 i = 0; i < (UInt16)TSV::_Last; i++)
+			{
+				if(registeredStandardVars[i] == id)
+				{
+					return (TSV)i;
+					
+				}
+			}
+
+			return TSV::_None;
+		}
+
 
 		static const std::string* GetVarName(TID id)
 		{

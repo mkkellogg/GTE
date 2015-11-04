@@ -72,6 +72,8 @@ namespace GTE
 		static std::unordered_map<std::string, StandardUniform> nameToUniform;
 
 	public:
+		
+		static void RegisterAll();
 
 		static const std::string& GetUniformName(StandardUniform uniform);
 		static StandardUniform GetUniformForName(const std::string& name);

@@ -50,6 +50,11 @@ namespace GTE
 		this->attributeID = id;
 	}
 
+	AttributeID CustomFloatAttributeBuffer::GetAttributeID()
+	{
+		return attributeID;
+	}
+
 	Real * CustomFloatAttributeBuffer::GetDataPtr()
 	{
 		return data;

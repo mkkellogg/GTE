@@ -7,6 +7,7 @@
 #include "base/intmask.h"
 #include "stdattributes.h"
 #include "debug/gtedebug.h"
+#include "materialvardirectory.h"
 
 namespace GTE
 {
@@ -35,6 +36,14 @@ namespace GTE
 		{attributeNames[(UInt16)StandardAttribute::UVTexture1],StandardAttribute::UVTexture1},
 		{attributeNames[(UInt16)StandardAttribute::UVNormalMap],StandardAttribute::UVNormalMap}
 	};
+
+	void StandardAttributes::RegisterAll()
+	{
+		for(UInt32 i = 0; i < (UInt32)StandardAttribute::_Last; i++)
+		{
+			AttributeDirectory::RegisterVarID(GetAttributeName((StandardAttribute)i));
+		}
+	}
 
 	const std::string& StandardAttributes::GetAttributeName(StandardAttribute attr)
 	{

@@ -7,6 +7,7 @@
 #include "base/intmask.h"
 #include "stduniforms.h"
 #include "debug/gtedebug.h"
+#include "materialvardirectory.h"
 
 namespace GTE
 {
@@ -64,6 +65,14 @@ namespace GTE
 		{uniformNames[(UInt16)StandardUniform::ClipPlaneCount],StandardUniform::ClipPlaneCount},
 		{uniformNames[(UInt16)StandardUniform::ClipPlane0],StandardUniform::ClipPlane0}
 	};
+
+	void StandardUniforms::RegisterAll()
+	{
+		for(UInt32 i = 0; i < (UInt32)StandardUniform::_Last; i++)
+		{
+			UniformDirectory::RegisterVarID(GetUniformName((StandardUniform)i));
+		}
+	}
 
 	const std::string& StandardUniforms::GetUniformName(StandardUniform uniform)
 	{

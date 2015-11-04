@@ -38,6 +38,8 @@ namespace GTE
 		virtual ~CustomFloatAttributeBuffer();
 
 		void SetAttributeID(AttributeID id);
+		AttributeID GetAttributeID();
+
 		Real * GetDataPtr();
 		UInt32 GetSize() const;
 		UInt32 GetComponentCount() const;
