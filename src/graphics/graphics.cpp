@@ -15,7 +15,6 @@
 #include "render/material.h"
 #include "geometry/transform.h"
 #include "render/submesh3Drenderer.h"
-#include "render/rendermanager.h"
 #include "object/engineobjectmanager.h"
 #include "object/sceneobject.h"
 #include "global/global.h"

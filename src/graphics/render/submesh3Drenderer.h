@@ -57,7 +57,7 @@ namespace GTE
 		friend class EngineObjectManager;
 
 		// needed for special access during rendering
-		friend class RenderManager;
+		friend class ForwardRenderManager;
 
 		// index of this sub-renderer in containing Mesh3DRenderer instance's list of sub-renderers
 		Int32 targetSubMeshIndex;

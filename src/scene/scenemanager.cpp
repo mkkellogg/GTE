@@ -116,7 +116,7 @@ namespace GTE
 	*/
 	void SceneManager::ProcessSceneObject(SceneObject& object)
 	{
-		
+
 	}
 
 	/*

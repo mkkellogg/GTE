@@ -19,7 +19,6 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/mesh3Dfilter.h"
-#include "graphics/render/rendermanager.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
 #include "global/assert.h"

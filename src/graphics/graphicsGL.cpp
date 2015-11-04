@@ -18,7 +18,6 @@
 #include "texture/texture.h"
 #include "texture/atlas.h"
 #include "texture/textureattr.h"
-#include "render/rendermanager.h"
 #include "render/vertexattrbuffer.h"
 #include "render/vertexattrbufferGL.h"
 #include "render/submesh3Drenderer.h"

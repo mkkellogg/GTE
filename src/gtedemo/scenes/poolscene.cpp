@@ -86,8 +86,6 @@ GTE::SceneObjectRef PoolScene::GetSceneRoot()
  */
 void PoolScene::OnActivate()
 {
-	//directionalLightObject->GetLight()->SetDirection(.8,-1.7,2);
-	//Engine::Instance()->GetRenderManager()->ClearCaches();
 
 	UpdateCameras();
 }

@@ -9,7 +9,7 @@
 #include "graphics/graphics.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/animation/animationmanager.h"
-#include "graphics/render/rendermanager.h"
+#include "graphics/render/forwardrendermanager.h"
 #include "scene/scenemanager.h"
 #include "input/inputmanager.h"
 #include "input/inputmanagerGL.h"
@@ -107,10 +107,11 @@ namespace GTE
 		Bool graphicsInitSuccess = graphicsSystem->Init(graphicsAttributes);
 		ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.");
 
-		renderManager = new(std::nothrow) RenderManager();
+		ForwardRenderManager* theRenderManager = new(std::nothrow) ForwardRenderManager();
+		renderManager = theRenderManager;
 		ASSERT(renderManager != nullptr, "Engine::Init -> Unable to allocate render manager.");
 
-		Bool renderInitSuccess = renderManager->Init();
+		Bool renderInitSuccess = theRenderManager->Init();
 		ASSERT(renderInitSuccess == true, "Engine::Init -> Unable to initialize render manager.");
 
 		// This portion of the initialization of the engine object manager must be called

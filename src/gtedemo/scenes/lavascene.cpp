@@ -18,7 +18,6 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/material.h"
-#include "graphics/render/rendermanager.h"
 #include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
@@ -83,8 +82,7 @@ GTE::SceneObjectRef LavaScene::GetSceneRoot()
  */
 void LavaScene::OnActivate()
 {
-	//directionalLightObject->GetLight()->SetDirection(-.8,-1.7,-2);
-	//Engine::Instance()->GetRenderManager()->ClearCaches();
+
 }
 
 /*
