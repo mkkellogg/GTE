@@ -41,6 +41,7 @@ namespace GTE
 		uniformsSetAndVerified = false;
 
 		useLighting = true;
+		renderQueueType = RenderQueueType::Geometry;
 		blendingMode = RenderState::BlendingMode::None;
 		sourceBlendingMethod = RenderState::BlendingMethod::SrcAlpha;
 		destBlendingMethod = RenderState::BlendingMethod::OneMinusSrcAlpha;
@@ -1065,6 +1066,22 @@ namespace GTE
 	Bool Material::UseLighting()
 	{
 		return useLighting;
+	}
+
+	/*
+	* Set the render queue for this material
+	*/
+	void Material::SetRenderQueue(RenderQueueType queue)
+	{
+		renderQueueType = queue;
+	}
+
+	/*
+	* Get the render queue for this material
+	*/
+	RenderQueueType Material::GetRenderQueueType()
+	{
+		return renderQueueType;
 	}
 
 	/*

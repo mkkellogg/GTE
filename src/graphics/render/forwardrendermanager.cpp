@@ -48,7 +48,8 @@ namespace GTE
 		lightCount = 0;
 		ambientLightCount = 0;
 		cameraCount = 0;
-		sceneMeshCount = 0;
+		renderQueueCount = 0;
+		renderableSceneObjectCount = 0;
 		forwardBlending = FowardBlendingMethod::Additive;
 	}
 
@@ -58,6 +59,7 @@ namespace GTE
 	ForwardRenderManager::~ForwardRenderManager()
 	{
 		DestroyCachedShadowVolumes();
+		DestroyRenderQueues();
 	}
 
 	/*
@@ -318,7 +320,8 @@ namespace GTE
 		lightCount = 0;
 		ambientLightCount = 0;
 		cameraCount = 0;
-		sceneMeshCount = 0;
+
+		ClearAllRenderQueues();
 
 		SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "RenderManager::PreProcessScene -> 'sceneRoot' is null.");
@@ -357,7 +360,7 @@ namespace GTE
 
 			if (!child.IsValid())
 			{
-				Debug::PrintWarning("RenderManager::PreProcessScene -> Null scene object encountered.");
+				Debug::PrintWarning("ForwardRenderManager::PreProcessScene -> Null scene object encountered.");
 				continue;
 			}
 
@@ -410,22 +413,31 @@ namespace GTE
 
 				Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
 				Mesh3DFilterRef meshFilter = child->GetMesh3DFilter();
+				Mesh3DRef mesh = child->GetMesh3D();
 				SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
 
-				if (meshFilter.IsValid() && child->GetMesh3D().IsValid() && sceneMeshCount < MAX_SCENE_MESHES)
+				if(meshFilter.IsValid() && mesh.IsValid() && (meshRenderer.IsValid() || skinnedMeshRenderer.IsValid()))
 				{
-					// check for standard mesh renderer
-					if (meshRenderer.IsValid())
-					{
-						sceneMeshObjects[sceneMeshCount] = child;
-						sceneMeshCount++;
-					}
+					Mesh3DRenderer * renderer = nullptr;
+					if(meshRenderer.IsValid())
+						renderer = meshRenderer.GetPtr();
+					else if(skinnedMeshRenderer.IsValid())
+						renderer = skinnedMeshRenderer.GetPtr();
 
-					// check for skinned mesh renderer
-					if (skinnedMeshRenderer.IsValid())
+					if(renderer != nullptr &&  mesh->GetSubMeshCount() == renderer->GetSubRendererCount() && renderer->GetMaterialCount() > 0 && renderableSceneObjectCount < MAX_SCENE_MESHES)
 					{
-						sceneMeshObjects[sceneMeshCount] = child;
-						sceneMeshCount++;
+						renderableSceneObjects[renderableSceneObjectCount] = child;
+						renderableSceneObjectCount++;
+						UInt32 materialCount = renderer->GetMaterialCount();
+						UInt32 subMeshCount = mesh->GetSubMeshCount();
+						for(UInt32 i = 0; i < subMeshCount; i++)
+						{
+							MaterialRef mat = renderer->GetMaterial(i % materialCount);
+							RenderQueue* targetRenderQueue = GetRenderQueue((UInt32)mat->GetRenderQueueType());
+
+							Transform * aggregateTransform = const_cast<Transform*>(&child->GetAggregateTransform());
+							targetRenderQueue->Add(child, mesh->GetSubMesh(i), renderer->GetSubRenderer(i), mat, meshFilter, aggregateTransform);
+						}
 					}
 				}
 
@@ -446,9 +458,9 @@ namespace GTE
 		Transform modelInverse;
 
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-		for (UInt32 s = 0; s < sceneMeshCount; s++)
+		for(UInt32 s = 0; s < renderableSceneObjectCount; s++)
 		{
-			SceneObjectRef childRef = sceneMeshObjects[s];
+			SceneObjectRef childRef = renderableSceneObjects[s];
 
 			Mesh3DRef mesh = childRef->GetMesh3D();
 			Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
@@ -461,30 +473,90 @@ namespace GTE
 			Mesh3DFilterRef meshFilter = childRef->GetMesh3DFilter();
 			SkinnedMesh3DRendererRef skinnedMeshRenderer = childRef->GetSkinnedMesh3DRenderer();
 
-			if (meshRenderer.IsValid())
+			if(meshRenderer.IsValid())
 			{
 				// for each sub-renderer, call the PreRender() method
-				for (UInt32 r = 0; r < meshRenderer->GetSubRendererCount(); r++)
+				for(UInt32 r = 0; r < meshRenderer->GetSubRendererCount(); r++)
 				{
 					SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
-					if (subRenderer.IsValid())
+					if(subRenderer.IsValid())
 					{
 						subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
 					}
 				}
 			}
 
-			if (skinnedMeshRenderer.IsValid())
+			if(skinnedMeshRenderer.IsValid())
 			{
 				// for each sub-renderer, call the PreRender() method
-				for (UInt32 r = 0; r < skinnedMeshRenderer->GetSubRendererCount(); r++)
+				for(UInt32 r = 0; r < skinnedMeshRenderer->GetSubRendererCount(); r++)
 				{
 					SubMesh3DRendererRef subRenderer = skinnedMeshRenderer->GetSubRenderer(r);
-					if (subRenderer.IsValid())
+					if(subRenderer.IsValid())
 					{
 						subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
 					}
 				}
+			}
+		}
+	}
+
+	/*
+	* Empty out all render queues.
+	*/
+	void ForwardRenderManager::ClearAllRenderQueues()
+	{
+		for(UInt32 i = 0; i < renderQueueCount; i++)
+		{
+			RenderQueue* queue = renderQueues[i];
+			NONFATAL_ASSERT(queue != nullptr, "RenderManager::ClearAllRenderQueues -> Null render queue encountered.", true);
+
+			queue->Clear();
+		}
+
+		renderableSceneObjectCount = 0;
+	}
+
+	/*
+	* Return the render queue that is linked to [renderQueueID]. If it doesn't
+	* yet exist, create it.
+	*/
+	RenderQueue* ForwardRenderManager::GetRenderQueue(UInt32 renderQueueID)
+	{
+		for(UInt32 i = 0; i < renderQueueCount; i++)
+		{
+			RenderQueue* queue = renderQueues[i];
+			NONFATAL_ASSERT_RTRN(queue != nullptr, "RenderManager::GetRenderQueue -> Null render queue encountered.", nullptr, true);
+
+			if(queue->GetID() == renderQueueID)
+			{
+				return queue;
+			}
+		}
+		ASSERT(renderQueueCount < MAX_RENDER_QUEUES, "RenderManager::GetRenderQueue -> Maximum number of render queues exceeded!");
+
+		// create new queue for [renderQueueID], since it doesn't yet exist
+		RenderQueue * newQueue = new(std::nothrow) RenderQueue(renderQueueID, 128, 128);
+		ASSERT(newQueue != nullptr, "ForwardRenderManager::GetRenderQueue -> Unable to allocate to render queue.");
+		renderQueues[renderQueueCount] = newQueue;
+		renderQueueCount++;
+
+		//TODO: SORT!!!
+
+		return newQueue;
+	}
+
+	/*
+	* Deallocate & destroy all render queues.
+	*/
+	void ForwardRenderManager::DestroyRenderQueues()
+	{
+		for(UInt32 i = 0; i < renderQueueCount; i++)
+		{
+			if(renderQueues[i] != nullptr)
+			{
+				delete renderQueues[i];
+				renderQueues[i] = nullptr;
 			}
 		}
 	}
@@ -735,51 +807,60 @@ namespace GTE
 					continue;
 			}
 
-			// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-			for (UInt32 s = 0; s < sceneMeshCount; s++)
+			for(UInt32 i = 0; i < renderQueueCount; i++)
 			{
-				SceneObjectRef childRef = sceneMeshObjects[s];
+				RenderQueue* queue = renderQueues[i];
+				NONFATAL_ASSERT(queue != nullptr, "RenderManager::RenderSceneForLight -> Null render queue encountered.", true);
 
-				Mesh3DRef mesh = childRef->GetMesh3D();
-				Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
-				SceneObject * child = childRef.GetPtr();
-
-				// copy the full transform of the scene object, including those of all ancestors
-				Transform full;
-				SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
-
-				// make sure the current mesh should not be culled from [light].
-				if (!ShouldCullFromCamera(camera, *child) &&
-					!ShouldCullFromLight(light, lightPosition, full, *child))
+				// loop through each mesh-containing SceneObject in [sceneMeshObjects]
+				for(UInt32 s = 0; s < queue->GetObjectCount(); s++)
 				{
-					if (pass == ShadowVolumeRender) // shadow volume pass
+					RenderQueueEntry* entry = queue->GetObject(s);
+					NONFATAL_ASSERT(entry != nullptr, "RenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
+
+					SceneObjectRef childRef = entry->Container;
+
+					Mesh3DRef mesh = childRef->GetMesh3D();
+					Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
+					SceneObject * child = childRef.GetPtr();
+
+					// copy the full transform of the scene object, including those of all ancestors
+					Transform full;
+					SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+
+					// make sure the current mesh should not be culled from [light].
+					if(!ShouldCullFromCamera(camera, *child) &&
+					   !ShouldCullFromLight(light, lightPosition, full, *child))
 					{
-						if (filter->GetCastShadows())
+						if(pass == ShadowVolumeRender) // shadow volume pass
 						{
-							RenderShadowVolumesForSceneObject(*child, light, lightPosition, lightDirection, modelPreTransform, viewTransformInverse, camera);
-						}
-					}
-					else if (pass == StandardRender) // normal rendering pass
-					{
-						// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
-						if (light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && filter->GetReceiveShadows())
-						{
-							if (currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
+							if(filter->GetCastShadows())
 							{
-								currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
-								Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
+								RenderShadowVolumeForMesh(*entry, light, lightPosition, lightDirection, modelPreTransform, viewTransformInverse, camera);
 							}
 						}
-						else if (currentRenderMode != RenderMode::Standard)
+						else if(pass == StandardRender) // normal rendering pass
 						{
-							currentRenderMode = RenderMode::Standard;
-							Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
-						}
+							// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
+							if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && filter->GetReceiveShadows())
+							{
+								if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
+								{
+									currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
+									Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
+								}
+							}
+							else if(currentRenderMode != RenderMode::Standard)
+							{
+								currentRenderMode = RenderMode::Standard;
+								Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
+							}
 
-						// set up lighting descriptor for non self-lit lighting
-						LightingDescriptor lightingDescriptor(&light, &lightPosition, &lightDirection, true);
-						RenderSceneObject(*child, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse,
-							camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
+							// set up lighting descriptor for non self-lit lighting
+							LightingDescriptor lightingDescriptor(&light, &lightPosition, &lightDirection, true);
+							RenderMesh(*entry, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse,
+											  camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
+						}
 					}
 				}
 			}
@@ -817,12 +898,34 @@ namespace GTE
 			SceneObjectRef skyboxObject = camera.GetSkyboxSceneObject();
 			NONFATAL_ASSERT(skyboxObject.IsValid(), "RenderManager::RenderSkyboxForCamera -> Camera has invalid skybox scene object.", true);
 
-			// render the skybox
+			Mesh3DRendererRef meshRenderer = skyboxObject->GetMesh3DRenderer();
+			SkinnedMesh3DRendererRef skinnedmeshRenderer = skyboxObject->GetSkinnedMesh3DRenderer();
+			Mesh3DRenderer * renderer = nullptr;
+			if(meshRenderer.IsValid())
+				renderer = meshRenderer.GetPtr();
+			else if(skinnedmeshRenderer.IsValid())
+				renderer = skinnedmeshRenderer.GetPtr();
+
+			NONFATAL_ASSERT(renderer != nullptr, "RenderManager::RenderSkyboxForCamera -> Could not find valid renderer for skybox.", true);
+		
+			Mesh3DRef mesh = renderer->GetTargetMesh();
+			NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderSkyboxForCamera -> Skybox has invalid mesh.", true);
+			NONFATAL_ASSERT(mesh->GetSubMeshCount() > 0, "RenderManager::RenderSkyboxForCamera -> Skybox has empty mesh.", true);
+			NONFATAL_ASSERT(renderer->GetSubRendererCount() > 0, "RenderManager::RenderSkyboxForCamera -> Skybox has no renderers.", true);
+			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "RenderManager::RenderSkyboxForCamera -> Skybox has no material.", true);
+			
 			skyboxObject->SetActive(true);
 
+			skyboxEntry.Container = skyboxObject;
+			skyboxEntry.Mesh = mesh->GetSubMesh(0);
+			skyboxEntry.Renderer = renderer->GetSubRenderer(0);
+			skyboxEntry.RenderMaterial = renderer->GetMaterial(0);
+
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
-			RenderSceneObject(skyboxObject.GetRef(), lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera,
-				MaterialRef::Null(), true, true, FowardBlendingFilter::Never);
+
+			// render the skybox
+			RenderMesh(skyboxEntry, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, MaterialRef::Null(), true, true, FowardBlendingFilter::Never);
+
 			skyboxObject->SetActive(false);
 		}
 	}
@@ -933,38 +1036,46 @@ namespace GTE
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
-		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-		for (UInt32 s = 0; s < sceneMeshCount; s++)
+		for(UInt32 i = 0; i < renderQueueCount; i++)
 		{
-			SceneObjectRef childRef = sceneMeshObjects[s];
+			RenderQueue* queue = renderQueues[i];
+			NONFATAL_ASSERT(queue != nullptr, "RenderManager::RenderSceneWithSelfLitLighting -> Null render queue encountered.", true);
 
-			// check if [childRef] should be rendered for [camera]
-			if (ShouldCullFromCamera(camera, childRef.GetRef()))
+			// loop through each mesh-containing SceneObject in [sceneMeshObjects]
+			for(UInt32 s = 0; s < queue->GetObjectCount(); s++)
 			{
-				continue;
+				RenderQueueEntry* entry = queue->GetObject(s);
+				SceneObjectRef childRef = entry->Container;
+
+				// check if [childRef] should be rendered for [camera]
+				if(ShouldCullFromCamera(camera, childRef.GetRef()))
+				{
+					continue;
+				}
+
+				// execute filter function (if one is specified)
+				if(filterFunction != nullptr)
+				{
+					Bool filter = filterFunction(childRef);
+					if(filter)continue;
+				}
+
+				Mesh3DRef mesh = childRef->GetMesh3D();
+				SceneObject * child = childRef.GetPtr();
+
+				// copy the full transform of the scene object, including those of all ancestors
+				Transform full;
+				SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+
+				LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
+				RenderMesh(*entry, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter);
 			}
-
-			// execute filter function (if one is specified)
-			if (filterFunction != nullptr)
-			{
-				Bool filter = filterFunction(childRef);
-				if (filter)continue;
-			}
-
-			Mesh3DRef mesh = childRef->GetMesh3D();
-			SceneObject * child = childRef.GetPtr();
-
-			// copy the full transform of the scene object, including those of all ancestors
-			Transform full;
-			SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
-
-			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
-			RenderSceneObject(*child, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter);
 		}
 	}
 	/*
-	 * Forward-Render the meshes attached to [sceneObject].
+	 * Forward-Render the mesh attached to [entry].
 	 *
+	 * [entry] - RenderQueueEntry object that contains the relevant renderable and transform information.
 	 * [lightingDescriptor] - Describes the lighting to be used for rendering (if there is any).
 	 * [camera] - The Camera object for which rendering is taking place.
 	 * [modelPreTransform] - This transform is pre-multiplied with the transform of each rendered scene object.
@@ -976,254 +1087,197 @@ namespace GTE
 	 * [renderMoreThanOnce] - If true, meshes can be rendered more than once (meaning in the additive passes).
 	 * [blendingFilter] - Determines how forward-rendering blending will be applied.
 	 */
-	void ForwardRenderManager::RenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
+	void ForwardRenderManager::RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
 		const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
 		Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
-		Mesh3DRenderer * renderer = nullptr;
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
-		Transform modelInverse;
+	
+		SceneObjectRef sceneObject = entry.Container;
+		SubMesh3DRendererRef renderer = entry.Renderer;
+		SubMesh3DRef mesh = entry.Mesh;
 
+		NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderMesh -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(sceneObject.IsValid(), "RenderManager::RenderMesh -> Scene object is not valid.", true);
+		NONFATAL_ASSERT(renderer.IsValid(), "RenderManager::RenderMesh -> Null sub renderer encountered.", true);
 
-		// check if [sceneObject] has a mesh & renderer
-		if (sceneObject.GetMesh3DRenderer().IsValid())
+		// determine if this mesh has been rendered before
+		ObjectPairKey key(sceneObject->GetObjectID(), mesh->GetObjectID());
+		Bool rendered = renderedObjects[key];
+
+		MaterialRef currentMaterial;
+		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
+
+		// if we have an override material, we use that for every mesh
+		if(doMaterialOvverride)
+			currentMaterial = materialOverride;
+		else
+			currentMaterial = entry.RenderMaterial;
+
+		NONFATAL_ASSERT(currentMaterial.IsValid(), "RenderManager::RenderMesh -> Null material encountered.", true);
+
+		Bool skipMesh = false;
+		// current material is self-lit, the we only want to render if the
+		//lighting descriptor specifies self-lit and vice-versa
+		if(currentMaterial->UseLighting() != lightingDescriptor.UseLighting)skipMesh = true;
+		if(rendered && !renderMoreThanOnce)skipMesh = true;
+
+		if(skipMesh)return;
+
+		model.SetTo(sceneObject->GetAggregateTransform());
+		model.PreTransformBy(modelPreTransform);
+
+		// concatenate model transform with inverted view transform, and then with
+		// the camera's projection transform.
+		modelView.SetTo(model);
+		modelView.PreTransformBy(viewTransformInverse);
+		modelViewProjection.SetTo(modelView);
+		modelViewProjection.PreTransformBy(camera.GetProjectionTransform());
+
+		// activate the material, which will switch the GPU's active shader to
+		// the one associated with the material
+		ActivateMaterial(currentMaterial, camera.GetReverseCulling());
+
+		// send uniforms set for the new material to its shader
+		SendActiveMaterialUniformsToShader();
+
+		// send light data to the active shader (if it needs it)
+		if (lightingDescriptor.UseLighting)
 		{
-			renderer = sceneObject.GetMesh3DRenderer().GetPtr();
+			currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, lightingDescriptor.LightDirection);
 		}
-		else if (sceneObject.GetSkinnedMesh3DRenderer().IsValid())
+		// pass concatenated modelViewTransform and projection transforms to shader
+		SendTransformUniformsToShader(model, modelView, viewTransformInverse, camera.GetProjectionTransform(), modelViewProjection);
+
+		Point3 viewOrigin;
+		viewTransform.TransformPoint(viewOrigin);
+		// send camera attributes to the active shader
+		SendCameraAttributesToShader(camera, viewOrigin);
+
+		// if this sub mesh has already been rendered by this camera, then we want to use
+		// additive blending to combine it with the output from other lights. Otherwise
+		// turn off blending and render.
+		if ((rendered && blendingFilter == FowardBlendingFilter::OnlyIfRendered) || (blendingFilter == FowardBlendingFilter::Always))
 		{
-			renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
-		}
-
-		if (renderer != nullptr)
-		{
-			Mesh3DRef mesh = renderer->GetTargetMesh();
-
-			NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::ForwardRenderSceneObject -> Renderer returned null mesh.", true);
-			NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(), "RenderManager::ForwardRenderSceneObject -> Sub mesh count does not match sub renderer count!.", true);
-			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "RenderManager::ForwardRenderSceneObject -> Renderer has no materials.", true);
-
-			UInt32 materialIndex = 0;
-			Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
-
-			model.SetTo(sceneObject.GetAggregateTransform());
-			model.PreTransformBy(modelPreTransform);
-
-			// concatenate model transform with inverted view transform, and then with
-			// the camera's projection transform.
-			modelView.SetTo(model);
-			modelView.PreTransformBy(viewTransformInverse);
-			modelViewProjection.SetTo(modelView);
-			modelViewProjection.PreTransformBy(camera.GetProjectionTransform());
-
-			// loop through each sub-renderer and render its mesh(es)
-			for (UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
+			if (GetForwardBlending() == FowardBlendingMethod::Subtractive)
 			{
-				MaterialRef currentMaterial;
-
-				// if we have an override material, we use that for every mesh
-				if (doMaterialOvverride)
-					currentMaterial = materialOverride;
-				else
-					currentMaterial = renderer->GetMaterial(materialIndex);
-
-				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
-				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-
-				NONFATAL_ASSERT(currentMaterial.IsValid(), "RenderManager::ForwardRenderSceneObject -> Null material encountered.", true);
-				NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::ForwardRenderSceneObject -> Null sub renderer encountered.", true);
-				NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::ForwardRenderSceneObject -> Null sub mesh encountered.", true);
-
-				// determine if this mesh has been rendered before
-				ObjectPairKey key(sceneObject.GetObjectID(), subMesh->GetObjectID());
-				Bool rendered = renderedObjects[key];
-
-				Bool skipMesh = false;
-				// current material is self-lit, the we only want to render if the
-				//lighting descriptor specifies self-lit and vice-versa
-				if (currentMaterial->UseLighting() != lightingDescriptor.UseLighting)skipMesh = true;
-				if (rendered && !renderMoreThanOnce)skipMesh = true;
-
-				if (!skipMesh)
-				{
-					// activate the material, which will switch the GPU's active shader to
-					// the one associated with the material
-					ActivateMaterial(currentMaterial, camera.GetReverseCulling());
-
-					// send uniforms set for the new material to its shader
-					SendActiveMaterialUniformsToShader();
-
-					// send light data to the active shader (if it needs it)
-					if (lightingDescriptor.UseLighting)
-					{
-						currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, lightingDescriptor.LightDirection);
-					}
-					// pass concatenated modelViewTransform and projection transforms to shader
-					SendTransformUniformsToShader(model, modelView, viewTransformInverse, camera.GetProjectionTransform(), modelViewProjection);
-
-					Point3 viewOrigin;
-					viewTransform.TransformPoint(viewOrigin);
-					// send camera attributes to the active shader
-					SendCameraAttributesToShader(camera, viewOrigin);
-
-					// if this sub mesh has already been rendered by this camera, then we want to use
-					// additive blending to combine it with the output from other lights. Otherwise
-					// turn off blending and render.
-					if ((rendered && blendingFilter == FowardBlendingFilter::OnlyIfRendered) || (blendingFilter == FowardBlendingFilter::Always))
-					{
-						if (GetForwardBlending() == FowardBlendingMethod::Subtractive)
-						{
-							Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
-							Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::Zero, RenderState::BlendingMethod::SrcAlpha);
-						}
-						else
-						{
-							Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
-							Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::One, RenderState::BlendingMethod::One);
-						}
-					}
-					else
-					{
-						Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(false);
-					}
-
-					// render the current mesh
-					subRenderer->Render();
-
-					// flag the current scene object as being rendered (at least once)
-					if (flagRendered)renderedObjects[key] = true;
-				}
-
-				// Advance material index. Renderer can have any number of materials > 0; it does not have to match
-				// the number of sub meshes. If the end of the material array is reached, loop back to the beginning.
-				if (!doMaterialOvverride)
-				{
-					materialIndex++;
-					if (materialIndex >= renderer->GetMaterialCount())
-					{
-						materialIndex = 0;
-					}
-				}
+				Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
+				Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::Zero, RenderState::BlendingMethod::SrcAlpha);
+			}
+			else
+			{
+				Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
+				Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::One, RenderState::BlendingMethod::One);
 			}
 		}
+		else
+		{
+			Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(false);
+		}
+
+		// render the current mesh
+		renderer->Render();
+
+		// flag the current scene object as being rendered (at least once)
+		if (flagRendered)renderedObjects[key] = true;
 	}
 
 	/*
 	 * Render the shadow volumes for the meshes attached to [sceneObject] for [light]. This essentially means altering the
-	 * stencil buffer to reflect areas of the rendered scene that are shadowed from [light] by the meshes attached to [sceneObject].
+	 * stencil buffer to reflect areas of the rendered scene that are shadowed from [light] by the mesh attached to [entry].
 	 *
+	 * [entry] - RenderQueueEntry object that contains the relevant renderable and transform information.
 	 * [lightPosition] - The world space position of [light].
 	 * [camera] - The Camera object for which rendering is taking place.
 	 * [modelPreTransform] - This transform is pre-multiplied with the transform of each rendered shadow volume.
 	 * [viewTransformInverse] - The view transform for rendering. (it should be the inverse of the camera's local-to-world-space transformation).
 	 */
-	void ForwardRenderManager::RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
+	void ForwardRenderManager::RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 		const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera)
 	{
-		Mesh3DRenderer * renderer = nullptr;
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
 		Transform modelInverse;
 
-		// check if [sceneObject] has a mesh & renderer
-		if (sceneObject.GetMesh3DRenderer().IsValid())
+		SceneObjectRef sceneObject = entry.Container;
+		SubMesh3DRendererRef renderer = entry.Renderer;
+		SubMesh3DRef mesh = entry.Mesh;
+
+		NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(sceneObject.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Scene object is not valid.", true);
+		NONFATAL_ASSERT(renderer.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub renderer encountered.", true);
+
+		// if mesh doesn't have face data, it can't have a shadow volume
+		if(!mesh->HasFaces())return;
+
+		Mesh3DFilterRef filter = entry.MeshFilter;
+		NONFATAL_ASSERT(filter.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
+
+		// calculate model transform and inverse model transform
+		model.SetTo(sceneObject->GetAggregateTransform());
+		model.PreTransformBy(modelPreTransform);
+		modelInverse.SetTo(model);
+		modelInverse.Invert();
+
+		// calculate the position and/or direction of [light]
+		// in the mesh's local space
+		Point3 modelLocalLightPos = lightPosition;
+		Vector3 modelLocalLightDir = lightDirection;
+		modelInverse.TransformPoint(modelLocalLightPos);
+		modelInverse.TransformVector(modelLocalLightDir);
+
+
+		// build special MVP transform for rendering shadow volumes
+		Real scaleFactor = filter->GetUseBackSetShadowVolume() ? .99f : .99f;
+		BuildShadowVolumeMVPTransform(model, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
+
+		// activate the material, which will switch the GPU's active shader to
+		// the one associated with the material
+		ActivateMaterial(shadowVolumeMaterial, camera.GetReverseCulling());
+
+		if (filter.IsValid() && filter->GetUseCustomShadowVolumeOffset())
 		{
-			renderer = sceneObject.GetMesh3DRenderer().GetPtr();
+			// set the epsilon offset for the shadow volume shader based on custom value
+			shadowVolumeMaterial->SetUniform1f(filter->GetCustomShadowVolumeOffset(), "EPSILON");
 		}
-		else if (sceneObject.GetSkinnedMesh3DRenderer().IsValid())
+		else
 		{
-			renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
+			// set the epsilon offset for the shadow volume shader based on type of shadow volume
+			if (filter->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.00002f, "EPSILON");
+			else shadowVolumeMaterial->SetUniform1f(.2f, "EPSILON");
 		}
 
-		if (renderer != nullptr)
+		// send uniforms set for the shadow volume material to its shader
+		SendActiveMaterialUniformsToShader();
+		// pass special shadow volume model-view-matrix to shader
+		SendModelViewProjectionToShader(modelViewProjection);
+
+		Point3 viewOrigin;
+		// send camera data to shader for [camera]
+		SendCameraAttributesToShader(camera, viewOrigin);
+
+		// send shadow volume uniforms to shader
+		shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
+
+		Light& castLight = const_cast<Light&>(light);
+		SceneObjectRef lightObject = castLight.GetSceneObject();
+
+		ObjectPairKey cacheKey;
+
+		// form cache key from sub-renderer's object ID and light's object ID
+		cacheKey.ObjectAID = renderer->GetObjectID();
+		cacheKey.ObjectBID = light.GetObjectID();
+
+		const Point3Array * cachedShadowVolume = nullptr;
+		cachedShadowVolume = GetCachedShadowVolume(cacheKey);
+
+		// render the shadow volume if it is valid
+		if (cachedShadowVolume != nullptr)
 		{
-			Mesh3DRef mesh = renderer->GetTargetMesh();
-			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
-			
-			NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
-			NONFATAL_ASSERT(filter.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
-			NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(), "RenderManager::RenderShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
-			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "RenderManager::RenderShadowVolumesForSceneObject -> Renderer has no materials.", true);
-
-			// calculate model transform and inverse model transform
-			model.SetTo(sceneObject.GetAggregateTransform());
-			model.PreTransformBy(modelPreTransform);
-			modelInverse.SetTo(model);
-			modelInverse.Invert();
-
-			// calculate the position and/or direction of [light]
-			// in the mesh's local space
-			Point3 modelLocalLightPos = lightPosition;
-			Vector3 modelLocalLightDir = lightDirection;
-			modelInverse.TransformPoint(modelLocalLightPos);
-			modelInverse.TransformVector(modelLocalLightDir);
-
-			// loop through each sub-renderer and render the shadow volume for its sub-mesh
-			for (UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
-			{
-				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
-				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-
-				// if mesh doesn't have face data, it can't have a shadow volume
-				if (!subMesh->HasFaces())continue;
-
-				NONFATAL_ASSERT(subRenderer.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub renderer encountered.", true);
-				NONFATAL_ASSERT(subMesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
-
-				// build special MVP transform for rendering shadow volumes
-				Real scaleFactor = filter->GetUseBackSetShadowVolume() ? .99f : .99f;
-				BuildShadowVolumeMVPTransform(model, camera, viewTransformInverse, modelViewProjection, scaleFactor, scaleFactor);
-
-				// activate the material, which will switch the GPU's active shader to
-				// the one associated with the material
-				ActivateMaterial(shadowVolumeMaterial, camera.GetReverseCulling());
-
-				Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
-				if (filter.IsValid() && filter->GetUseCustomShadowVolumeOffset())
-				{
-					// set the epsilon offset for the shadow volume shader based on custom value
-					shadowVolumeMaterial->SetUniform1f(filter->GetCustomShadowVolumeOffset(), "EPSILON");
-				}
-				else
-				{
-					// set the epsilon offset for the shadow volume shader based on type of shadow volume
-					if (filter->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.00002f, "EPSILON");
-					else shadowVolumeMaterial->SetUniform1f(.2f, "EPSILON");
-				}
-
-				// send uniforms set for the shadow volume material to its shader
-				SendActiveMaterialUniformsToShader();
-				// pass special shadow volume model-view-matrix to shader
-				SendModelViewProjectionToShader(modelViewProjection);
-
-				Point3 viewOrigin;
-				// send camera data to shader for [camera]
-				SendCameraAttributesToShader(camera, viewOrigin);
-
-				// send shadow volume uniforms to shader
-				shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
-
-				Light& castLight = const_cast<Light&>(light);
-				SceneObjectRef lightObject = castLight.GetSceneObject();
-
-				ObjectPairKey cacheKey;
-
-				// form cache key from sub-renderer's object ID and light's object ID
-				cacheKey.ObjectAID = subRenderer->GetObjectID();
-				cacheKey.ObjectBID = light.GetObjectID();
-
-				const Point3Array * cachedShadowVolume = nullptr;
-				cachedShadowVolume = GetCachedShadowVolume(cacheKey);
-
-				// render the shadow volume if it is valid
-				if (cachedShadowVolume != nullptr)
-				{
-					subRenderer->RenderShadowVolume(cachedShadowVolume);
-				}
-			}
+			renderer->RenderShadowVolume(cachedShadowVolume);
 		}
 	}
 
@@ -1271,25 +1325,35 @@ namespace GTE
 		Vector3 lightDirection = light.GetDirection();
 		lightFullTransform.TransformVector(lightDirection);
 
-		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
-		for (UInt32 s = 0; s < sceneMeshCount; s++)
+
+		for(UInt32 i = 0; i < renderQueueCount; i++)
 		{
-			SceneObjectRef childRef = sceneMeshObjects[s];
+			RenderQueue* queue = renderQueues[i];
+			NONFATAL_ASSERT(queue != nullptr, "RenderManager::BuildShadowVolumesForLight -> Null render queue encountered.", true);
 
-			if (childRef->IsActive())
+			// loop through each mesh-containing SceneObject in [sceneMeshObjects]
+			for(UInt32 s = 0; s < queue->GetObjectCount(); s++)
 			{
-				Mesh3DRef mesh = childRef->GetMesh3D();
-				Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
-				SceneObject * child = childRef.GetPtr();
+				RenderQueueEntry* entry = queue->GetObject(s);
+				NONFATAL_ASSERT(entry != nullptr, "RenderManager::BuildShadowVolumesForLight -> Null render queue entry encountered.", true);
 
-				// copy the full transform of the scene object, including those of all ancestors
-				Transform full;
-				SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+				SceneObjectRef childRef = entry->Container;
 
-				// make sure the current mesh should not be culled from [light].
-				if (!ShouldCullFromLight(light, lightPosition, full, *child))
+				if(childRef->IsActive())
 				{
-					BuildShadowVolumesForSceneObject(*child, light, lightPosition, lightDirection);
+					Mesh3DRef mesh = childRef->GetMesh3D();
+					Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
+					SceneObject * child = childRef.GetPtr();
+
+					// copy the full transform of the scene object, including those of all ancestors
+					Transform full;
+					SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+
+					// make sure the current mesh should not be culled from [light].
+					if(!ShouldCullFromLight(light, lightPosition, full, *child))
+					{
+						BuildShadowVolumesForSceneObject(*child, light, lightPosition, lightDirection);
+					}
 				}
 			}
 		}

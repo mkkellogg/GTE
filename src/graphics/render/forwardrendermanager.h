@@ -27,6 +27,7 @@
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
 #include "geometry/transform.h"
+#include "renderqueue.h"
 
 namespace GTE
 {
@@ -78,10 +79,12 @@ namespace GTE
 			}
 		};
 
-		static const Int32 MAX_LIGHTS = 16;
-		static const Int32 MAX_CAMERAS = 8;
-		static const Int32 MAX_SCENE_MESHES = 128;
+		static const UInt32 MAX_LIGHTS = 16;
+		static const UInt32 MAX_CAMERAS = 8;
+		static const UInt32 MAX_SCENE_MESHES = 128;
+		static const UInt32 MAX_RENDER_QUEUES = 128;
 
+		RenderQueueEntry skyboxEntry;
 		// mesh for doing full screen effects
 		Mesh3DRef fullScreenQuad;
 		// Ortho camera for rendering to [fullScreenQuad]
@@ -99,23 +102,28 @@ namespace GTE
 		// for off-screen rendering
 		RenderTargetRef depthRenderTarget;
 
-		// number of meshes found in the scene during ProcessScene()
-		UInt32 sceneMeshCount;
-		// number of lights found in the scene during ProcessScene()
+		// number of renderable scene objects found during scene processing
+		UInt32 renderableSceneObjectCount;
+		// number active render queues
+		UInt32 renderQueueCount;
+		// number of lights found in the scene during PreProcessScene()
 		UInt32 lightCount;
-		// number of ambient lights found in the scene during  ProcessScene()
+		// number of ambient lights found in the scene during  PreProcessScene()
 		UInt32 ambientLightCount;
-		// number of cameras found in the scene during  ProcessScene()
+		// number of cameras found in the scene during  PreProcessScene()
 		UInt32 cameraCount;
 
-		// list of meshes found in the scene during ProcessScene()
-		SceneObjectRef sceneMeshObjects[MAX_SCENE_MESHES];
-		// list of lights found in the scene during ProcessScene()
+		// scene objects that contain valid renderables
+		SceneObjectRef renderableSceneObjects[MAX_SCENE_MESHES];
+		// meshes that are valid for rendering
+		RenderQueue* renderQueues[MAX_RENDER_QUEUES];
+		// list of lights found in the scene during PreProcessScene()
 		SceneObjectRef sceneLights[MAX_LIGHTS];
-		// list of ambient lights found in the scene during ProcessScene()
+		// list of ambient lights found in the scene during PreProcessScene()
 		SceneObjectRef sceneAmbientLights[MAX_LIGHTS];
-		// list of cameras found in the scene during ProcessScene()
+		// list of cameras found in the scene during PreProcessScene()
 		SceneObjectRef sceneCameras[MAX_CAMERAS];
+
 		// current blending method used in forward rendering
 		FowardBlendingMethod forwardBlending;
 
@@ -131,13 +139,17 @@ namespace GTE
 		void PreProcessScene(SceneObject& parent, UInt32 recursionDepth);
 		void PreRenderScene();
 
+		void ClearAllRenderQueues();
+		RenderQueue* GetRenderQueue(UInt32 renderQueueID);
+		void DestroyRenderQueues();
+
 		void RenderSceneForCamera(UInt32 cameraIndex);
 		void RenderSceneForCamera(Camera& camera);
 		void RenderSceneForCameraAndCurrentRenderTarget(Camera& camera, const Transform& viewTransform, const Transform& viewInverse);
 		void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& modelPreTransform,
 			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
-		void RenderSceneObject(SceneObject& sceneObject, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
+		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
 			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
 			Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void RenderSkyboxForCamera(Camera& camera, const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse);
@@ -150,7 +162,7 @@ namespace GTE
 			std::function<Bool(SceneObjectRef)> filterFunction);
 		Bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 		void BuildShadowVolumeMVPTransform(const Transform& modelTransform,  const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
-		void RenderShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
+		void RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 			const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void BuildSceneShadowVolumes();
 		void BuildShadowVolumesForLight(const Light& light, const Transform& lightFullTransform);

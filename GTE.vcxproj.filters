@@ -363,6 +363,9 @@
     <ClCompile Include="src\graphics\render\rendermanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\render\renderqueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\asset\assetimporter.h">
@@ -759,6 +762,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\render\rendermanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\render\renderqueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

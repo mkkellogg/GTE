@@ -30,6 +30,7 @@
 #include "object/enginetypes.h"
 #include "graphics/shader/uniformdesc.h"
 #include "graphics/shader/attributedesc.h"
+#include "rendermanager.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -108,6 +109,8 @@ namespace GTE
 
 		// does this material require a light to be rendered?
 		Bool useLighting;
+
+		RenderQueueType renderQueueType;
 
 		RenderState::BlendingMode blendingMode;
 		RenderState::BlendingMethod sourceBlendingMethod;
@@ -193,7 +196,8 @@ namespace GTE
 
 		void SetUseLighting(Bool selfLit);
 		Bool UseLighting();
-
+		void SetRenderQueue(RenderQueueType queue);
+		RenderQueueType GetRenderQueueType();
 		void SetBlendingMode(RenderState::BlendingMode mode);
 		RenderState::BlendingMode GetBlendingMode();
 		void SetSourceBlendingMethod(RenderState::BlendingMethod method);

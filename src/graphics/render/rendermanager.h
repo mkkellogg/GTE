@@ -14,14 +14,8 @@
 #include <unordered_map>
 #include <memory>
 #include <stack>
-#include "rendermanager.h"
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
-#include "object/objectpairkey.h"
-#include "util/datastack.h"
-#include "graphics/view/camera.h"
-#include "graphics/light/light.h"
-#include "geometry/transform.h"
 
 namespace GTE
 {
@@ -36,6 +30,11 @@ namespace GTE
 	class Transform;
 	class Point3Array;
 
+	enum class RenderQueueType
+	{
+		Geometry = 1000,
+		Transparent = 2000
+	};
 
 	class RenderManager
 	{
@@ -43,7 +42,7 @@ namespace GTE
 
 		virtual void Update() = 0;
 
-	public:
+		public:
 
 		RenderManager();
 		virtual ~RenderManager();
