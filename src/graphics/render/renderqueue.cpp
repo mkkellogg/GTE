@@ -60,7 +60,7 @@ namespace GTE
 		totalCount += count;
 	}
 
-	void RenderQueue::Add(SceneObjectRef container, SubMesh3DRef mesh, SubMesh3DRendererRef renderer, MaterialRef renderMaterial, Mesh3DFilterRef meshFilter, Transform* aggregateTransform)
+	void RenderQueue::Add(SceneObject* container, SubMesh3D* mesh, SubMesh3DRenderer* renderer, MaterialRef* renderMaterial, Mesh3DFilter* meshFilter, Transform* aggregateTransform)
 	{
 		if(realCount >= totalCount)
 		{
@@ -73,7 +73,6 @@ namespace GTE
 		entry.Renderer = renderer;
 		entry.RenderMaterial = renderMaterial;
 		entry.MeshFilter = meshFilter;
-		entry.AggregateTransform = aggregateTransform;
 		realCount++;
 	}
 

@@ -40,6 +40,8 @@ namespace GTE
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
 
+		friend class ForwardRenderManager;
+
 	protected:
 
 		// list of materials that will be used to render the sub-meshes
@@ -51,6 +53,8 @@ namespace GTE
 		virtual ~Mesh3DRenderer();
 		void DestroyRenderers();
 		void DestroyRenderer(UInt32 index);
+
+		MaterialRef* GetMaterialPtr(UInt32 index);
 
 	public:
 

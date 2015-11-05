@@ -904,14 +904,14 @@ namespace GTE
 	 * Activate a material, meaning its shader, attributes, and uniforms will be used for all rendering
 	 * calls while it is active.
 	 */
-	void GraphicsGL::ActivateMaterial(MaterialRef material, Bool reverseFaceCulling)
+	void GraphicsGL::ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::ActivateMaterial -> 'material' is invalid", true);
 
-		if (!this->activeMaterial.IsValid() || !(this->activeMaterial->GetObjectID() == material->GetObjectID()))
+		if (!activeMaterial.IsValid() || this->activeMaterial->GetObjectID() != material->GetObjectID())
 		{
 			GLuint oldActiveProgramID = (GLuint)0xFFFFFFF0;
-			if (this->activeMaterial.IsValid())
+			if (activeMaterial.IsValid())
 			{
 				ShaderRef currentShader = this->activeMaterial->GetShader();
 				if (currentShader.IsValid())
@@ -940,7 +940,6 @@ namespace GTE
 				// OpenGL call to activate the shader for [material]
 				glUseProgram(shaderGL->GetProgramID());
 			}
-
 			SetupStateForMaterial(material, reverseFaceCulling);
 		}
 	}
@@ -948,9 +947,9 @@ namespace GTE
 	/*
 	* Set OpenGL state to match the state specified by [material].
 	*/
-	void GraphicsGL::SetupStateForMaterial(MaterialRef material, Bool reverseFaceCulling)
+	void GraphicsGL::SetupStateForMaterial(MaterialRef& material, Bool reverseFaceCulling)
 	{
-		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
+		NONFATAL_ASSERT(material != nullptr, "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
 
 		RenderState::BlendingMode blendingMode = material->GetBlendingMode();
 		switch(blendingMode)
@@ -995,7 +994,7 @@ namespace GTE
 	/*
 	* Get the material that is currently being used for rendering.
 	*/
-	MaterialRef GraphicsGL::GetActiveMaterial()
+	MaterialRef& GraphicsGL::GetActiveMaterial()
 	{
 		return activeMaterial;
 	}
@@ -1503,7 +1502,8 @@ namespace GTE
 	 */
 	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate)
 	{
-		MaterialRef currentMaterial = GetActiveMaterial();
+		MaterialRef& currentMaterial = GetActiveMaterial();
+		NONFATAL_ASSERT(currentMaterial.IsValid(), "GraphicsGL::RenderTriangles -> 'currentMaterial' is null.", true);
 
 		VertexAttrBufferBinding binding;
 		for (UInt32 b = 0; b < boundAttributeBuffers.size(); b++)

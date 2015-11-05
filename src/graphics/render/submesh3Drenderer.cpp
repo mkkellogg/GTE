@@ -48,6 +48,7 @@ namespace GTE
 	 */
 	SubMesh3DRenderer::SubMesh3DRenderer(Bool buffersOnGPU, AttributeTransformer * attributeTransformer)
 	{
+		this->lastUsedMaterialID = (UInt32)-1;
 		this->containerRenderer = nullptr;
 		this->targetSubMeshIndex = -1;
 
@@ -780,12 +781,12 @@ namespace GTE
 	 * expected by the shader belonging to [material] match the attributes that are supplied by the target sub-mesh. It also
 	 * means calling VerifySetVars() to ensure all uniforms & attributes expected by the shader have been set correctly.
 	 */
-	Bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialRef material)
+	Bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialRef& material)
 	{
 		// don't bother validating this material if it has already been validated
-		if (material == lastUsedMaterial)return true;
+		if (material->GetObjectID() == lastUsedMaterialID)return true;
 
-		lastUsedMaterial = material;
+		lastUsedMaterialID = material->GetObjectID();
 
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UseMaterial -> Container renderer is null.");
 
@@ -933,7 +934,7 @@ namespace GTE
 
 		if (ShouldUpdateFromMesh())this->UpdateFromMesh();
 
-		MaterialRef currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef& currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
 
 		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);

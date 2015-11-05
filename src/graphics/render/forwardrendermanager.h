@@ -114,15 +114,15 @@ namespace GTE
 		UInt32 cameraCount;
 
 		// scene objects that contain valid renderables
-		SceneObjectRef renderableSceneObjects[MAX_SCENE_MESHES];
+		SceneObject* renderableSceneObjects[MAX_SCENE_MESHES];
 		// meshes that are valid for rendering
 		RenderQueue* renderQueues[MAX_RENDER_QUEUES];
 		// list of lights found in the scene during PreProcessScene()
-		SceneObjectRef sceneLights[MAX_LIGHTS];
+		SceneObject* sceneLights[MAX_LIGHTS];
 		// list of ambient lights found in the scene during PreProcessScene()
-		SceneObjectRef sceneAmbientLights[MAX_LIGHTS];
+		SceneObject* sceneAmbientLights[MAX_LIGHTS];
 		// list of cameras found in the scene during PreProcessScene()
-		SceneObjectRef sceneCameras[MAX_CAMERAS];
+		SceneObject* sceneCameras[MAX_CAMERAS];
 
 		// current blending method used in forward rendering
 		FowardBlendingMethod forwardBlending;
@@ -150,16 +150,16 @@ namespace GTE
 			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
-			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
-			Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+						const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef& materialOverride,
+						Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void RenderSkyboxForCamera(Camera& camera, const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse);
 		void RenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-			MaterialRef material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+											MaterialRef&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-			MaterialRef material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
-			std::function<Bool(SceneObjectRef)> filterFunction);
+											MaterialRef&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+			std::function<Bool(SceneObject*)> filterFunction);
 		Bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 		void BuildShadowVolumeMVPTransform(const Transform& modelTransform,  const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
 		void RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
@@ -178,7 +178,7 @@ namespace GTE
 
 		void ClearBuffersForCamera(const Camera& camera) const;
 
-		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling);
+		void ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);
 		void SendModelViewProjectionToShader(const Transform& modelViewProjection);
 		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);

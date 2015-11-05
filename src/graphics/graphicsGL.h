@@ -45,6 +45,7 @@ namespace GTE
 	{
 		friend class Graphics;
 		friend class Engine;
+		friend class SubMesh3DRenderer;
 
 		GLFWwindow* window;
 
@@ -97,6 +98,10 @@ namespace GTE
 		void PostRender() override;
 
 		RenderTarget * CreateDefaultRenderTarget() override;
+		Bool ActivateRenderTarget(RenderTargetRef target) override;
+		RenderTargetRef GetCurrrentRenderTarget() override;
+		Bool ActivateCubeRenderTargetSide(CubeTextureSide side) override;
+		Bool RestoreDefaultRenderTarget() override;
 
 		GLenum GetGLCubeTarget(CubeTextureSide side) const;
 		GLenum GetGLTextureFormat(TextureFormat format) const;
@@ -104,12 +109,6 @@ namespace GTE
 		GLenum GetGLPixelType(TextureFormat format) const;
 
 		void GetCurrentBufferBits();
-
-		void SetupStateForMaterial(MaterialRef material, Bool reverseFaceCulling);
-
-	public:
-
-		GLFWwindow* GetGLFWWindow();
 
 		Shader * CreateShader(const ShaderSource& shaderSource) override;
 		void DestroyShader(Shader * shader) override;
@@ -134,6 +133,19 @@ namespace GTE
 		void DestroyRenderTarget(RenderTarget * target) override;
 
 		RenderTargetRef GetDefaultRenderTarget() override;
+
+		void SetupStateForMaterial(MaterialRef& material, Bool reverseFaceCulling);
+		void ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling) override;
+		MaterialRef& GetActiveMaterial() override;
+
+		void EnterRenderMode(RenderMode renderMode) override;		
+
+		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate) override;
+
+	public:
+
+		GLFWwindow* GetGLFWWindow();
+
 		void ClearRenderBuffers(IntMask bufferMask) const override;
 
 		void SetFaceCullingMode(RenderState::FaceCulling mode) override;
@@ -149,20 +161,11 @@ namespace GTE
 
 		void SetBlendingEnabled(Bool enabled) override;
 		void SetBlendingFunction(RenderState::BlendingMethod source, RenderState::BlendingMethod dest) override;
-		GLenum GetGLBlendProperty(RenderState::BlendingMethod property) const;
-
-		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling) override;
-		MaterialRef GetActiveMaterial() override;
-
-		void EnterRenderMode(RenderMode renderMode) override;
+		GLenum GetGLBlendProperty(RenderState::BlendingMethod property) const;	
 
 		Bool Init(const GraphicsAttributes& attributes) override;
 		UInt32 GetOpenGLVersion() const;
-
-		Bool ActivateRenderTarget(RenderTargetRef target) override;
-		RenderTargetRef GetCurrrentRenderTarget() override;
-		Bool ActivateCubeRenderTargetSide(CubeTextureSide side) override;
-		Bool RestoreDefaultRenderTarget() override;
+		
 		Bool CanBlitColorBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
 		Bool CanBlitDepthBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
 		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const override;
@@ -172,9 +175,7 @@ namespace GTE
 		void RebuildMipMaps(TextureRef texture) const override;
 
 		Bool AddClipPlane() override;
-		void DeactiveAllClipPlanes() override;
-
-		void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate) override;
+		void DeactiveAllClipPlanes() override;		
 	};
 }
 

@@ -65,6 +65,9 @@ namespace GTE
 	{
 		friend class Engine;
 		friend class EngineObjectManager;
+		friend class ForwardRenderManager;
+		friend class SubMesh3DRenderer;
+		friend class Camera;
 
 	protected:
 
@@ -91,9 +94,11 @@ namespace GTE
 		virtual Bool Init(const GraphicsAttributes& attributes);
 		virtual RenderTarget * CreateDefaultRenderTarget() = 0;
 		RenderTargetRef SetupDefaultRenderTarget();
-
-	public:
-
+		virtual Bool ActivateRenderTarget(RenderTargetRef target) = 0;
+		virtual RenderTargetRef GetCurrrentRenderTarget() = 0;
+		virtual Bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
+		virtual Bool RestoreDefaultRenderTarget() = 0;
+		
 		virtual Shader * CreateShader(const ShaderSource& shaderSource) = 0;
 		virtual void DestroyShader(Shader * shader) = 0;
 		virtual VertexAttrBuffer * CreateVertexAttributeBuffer() = 0;
@@ -108,7 +113,7 @@ namespace GTE
 											Byte * leftData, UInt32 lw, UInt32 lh,
 											Byte * rightData, UInt32 rw, UInt32 rh) = 0;
 		virtual Texture * CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
-										    const std::string& bottom, const std::string& left, const std::string& right) = 0;
+											const std::string& bottom, const std::string& left, const std::string& right) = 0;
 		virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 											RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
 		virtual void DestroyTexture(Texture * texture) = 0;
@@ -118,6 +123,17 @@ namespace GTE
 												  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) = 0;
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 		virtual RenderTargetRef GetDefaultRenderTarget() = 0;
+
+		virtual void ActivateMaterial(MaterialRef&, Bool reverseFaceCulling) = 0;
+		virtual MaterialRef& GetActiveMaterial() = 0;
+
+		virtual void EnterRenderMode(RenderMode renderMode) = 0;		
+
+		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate) = 0;
+
+	public:
+
+		
 
 		Real GetCurrentFPS() const;
 
@@ -140,17 +156,8 @@ namespace GTE
 		virtual void SetBlendingEnabled(Bool enabled) = 0;
 		virtual void SetBlendingFunction(RenderState::BlendingMethod source, RenderState::BlendingMethod dest) = 0;
 
-		virtual void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling) = 0;
-		virtual MaterialRef GetActiveMaterial() = 0;
-
 		virtual const GraphicsAttributes& GetAttributes() const;
-
-		virtual void EnterRenderMode(RenderMode renderMode) = 0;
-
-		virtual Bool ActivateRenderTarget(RenderTargetRef target) = 0;
-		virtual RenderTargetRef GetCurrrentRenderTarget() = 0;
-		virtual Bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
-		virtual Bool RestoreDefaultRenderTarget() = 0;
+	
 		virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const = 0;
 
 		virtual void SetTextureData(TextureRef texture, const Byte * data) const = 0;
@@ -158,9 +165,7 @@ namespace GTE
 		virtual void RebuildMipMaps(TextureRef texture) const = 0;
 
 		virtual Bool AddClipPlane() = 0;
-		virtual void DeactiveAllClipPlanes() = 0;
-
-		virtual void RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate) = 0;
+		virtual void DeactiveAllClipPlanes() = 0;		
 	};
 }
 

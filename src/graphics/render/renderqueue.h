@@ -29,30 +29,27 @@ namespace GTE
 
 		RenderQueueEntry()
 		{
-			Container = SceneObjectRef::Null();;
-			Mesh = SubMesh3DRef::Null();
-			Renderer = SubMesh3DRendererRef::Null();
-			RenderMaterial = MaterialRef::Null();
-			MeshFilter = Mesh3DFilterRef::Null();
-			AggregateTransform = nullptr;
+			Container = nullptr;
+			Mesh = nullptr;
+			Renderer = nullptr;
+			RenderMaterial = nullptr;
+			MeshFilter = nullptr;
 		}
 
-		RenderQueueEntry(SceneObjectRef container, SubMesh3DRef mesh, SubMesh3DRendererRef renderer, MaterialRef renderMaterial, Mesh3DFilterRef meshFilter, Transform* aggregateTransform)
+		RenderQueueEntry(SceneObject* container, SubMesh3D* mesh, SubMesh3DRenderer* renderer, MaterialRef* renderMaterial, Mesh3DFilter* meshFilter, Transform* aggregateTransform)
 		{
 			Container = container;
 			Mesh = mesh;
 			Renderer = renderer;
 			RenderMaterial = renderMaterial;
 			MeshFilter = meshFilter;
-			AggregateTransform = aggregateTransform;
 		}
 
-		SceneObjectRef Container;
-		SubMesh3DRef Mesh;
-		SubMesh3DRendererRef Renderer;
-		MaterialRef RenderMaterial;
-		Mesh3DFilterRef MeshFilter;
-		Transform* AggregateTransform;
+		SceneObject* Container;
+		SubMesh3D* Mesh;
+		SubMesh3DRenderer* Renderer;
+		MaterialRef* RenderMaterial;
+		Mesh3DFilter* MeshFilter;
 	};
 
 	class RenderQueue 
@@ -74,7 +71,7 @@ namespace GTE
 
 		UInt32 GetID();
 		void Clear();
-		void Add(SceneObjectRef container, SubMesh3DRef mesh, SubMesh3DRendererRef renderer, MaterialRef renderMaterial, Mesh3DFilterRef meshFilter, Transform* aggregateTransform);
+		void Add(SceneObject* container, SubMesh3D* mesh, SubMesh3DRenderer* renderer, MaterialRef* renderMaterial, Mesh3DFilter* meshFilter, Transform* aggregateTransform);
 		RenderQueueEntry* GetObject(UInt32 index);
 		UInt32 GetObjectCount();
 	};

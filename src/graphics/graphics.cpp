@@ -46,7 +46,6 @@ namespace GTE
 	 */
 	RenderTargetRef Graphics::SetupDefaultRenderTarget()
 	{
-
 		// get reference to the engine's object manager
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
@@ -54,8 +53,9 @@ namespace GTE
 		ASSERT(defaultTarget != nullptr, "GraphicsGL::SetupDefaultRenderTarget -> Default target is null.");
 
 		RenderTargetRef defaultRenderTarget = objectManager->WrapRenderTarget(defaultTarget);
-		return defaultRenderTarget;
+		ASSERT(defaultRenderTarget.IsValid(), "GraphicsGL::SetupDefaultRenderTarget -> Default target is null.");
 
+		return defaultRenderTarget;
 	}
 
 	/*

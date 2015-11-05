@@ -74,28 +74,28 @@ namespace GTE
 
 		// construct shadow volume material
 		assetImporter.LoadBuiltInShaderSource("shadowvolume", shaderSource);
-		shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);
+		shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);		
+		ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.");
 		shadowVolumeMaterial->SetFaceCulling(RenderState::FaceCulling::None);
 		shadowVolumeMaterial->SetDepthBufferWriteEnabled(false);
-		ASSERT(shadowVolumeMaterial.IsValid(), "RenderManager::Init -> Unable to create shadow volume material.");
 
 		// construct SSAO outline material
 		assetImporter.LoadBuiltInShaderSource("ssaooutline", shaderSource);
-		ssaoOutlineMaterial = objectManager->CreateMaterial("SSAOOutline", shaderSource);
-		ssaoOutlineMaterial->SetUseLighting(false);
+		ssaoOutlineMaterial = objectManager->CreateMaterial("SSAOOutline", shaderSource);		
 		ASSERT(ssaoOutlineMaterial.IsValid(), "RenderManager::Init -> Unable to create SSAO outline material.");
+		ssaoOutlineMaterial->SetUseLighting(false);
 
 		// construct depth-only material
 		assetImporter.LoadBuiltInShaderSource("depthonly", shaderSource);
-		depthOnlyMaterial = objectManager->CreateMaterial("DepthOnlyMaterial", shaderSource);
-		depthOnlyMaterial->SetUseLighting(false);
+		depthOnlyMaterial = objectManager->CreateMaterial("DepthOnlyMaterial", shaderSource);		
 		ASSERT(depthOnlyMaterial.IsValid(), "RenderManager::Init -> Unable to create depth only material.");
+		depthOnlyMaterial->SetUseLighting(false);
 
 		// construct depth-value material
 		assetImporter.LoadBuiltInShaderSource("depthvalue", shaderSource);
-		depthValueMaterial = objectManager->CreateMaterial("DepthValueMaterial", shaderSource);
-		depthValueMaterial->SetUseLighting(false);
+		MaterialRef depthValueMaterial = objectManager->CreateMaterial("DepthValueMaterial", shaderSource);
 		ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.");
+		depthValueMaterial->SetUseLighting(false);
 
 		// build depth texture off-screen render target
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
@@ -356,13 +356,15 @@ namespace GTE
 
 		for (UInt32 i = 0; i < parent.GetChildrenCount(); i++)
 		{
-			SceneObjectRef child = parent.GetChildAt(i);
+			SceneObjectRef childRef = parent.GetChildAt(i);
 
-			if (!child.IsValid())
+			if (!childRef.IsValid())
 			{
 				Debug::PrintWarning("ForwardRenderManager::PreProcessScene -> Null scene object encountered.");
 				continue;
 			}
+
+			SceneObject* child = childRef.GetPtr();
 
 			// only process active scene objects
 			if (child->IsActive())
@@ -432,17 +434,17 @@ namespace GTE
 						UInt32 subMeshCount = mesh->GetSubMeshCount();
 						for(UInt32 i = 0; i < subMeshCount; i++)
 						{
-							MaterialRef mat = renderer->GetMaterial(i % materialCount);
-							RenderQueue* targetRenderQueue = GetRenderQueue((UInt32)mat->GetRenderQueueType());
+							MaterialRef* mat = renderer->GetMaterialPtr(i % materialCount);
+							RenderQueue* targetRenderQueue = GetRenderQueue((UInt32)(*mat)->GetRenderQueueType());
 
 							Transform * aggregateTransform = const_cast<Transform*>(&child->GetAggregateTransform());
-							targetRenderQueue->Add(child, mesh->GetSubMesh(i), renderer->GetSubRenderer(i), mat, meshFilter, aggregateTransform);
+							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), mat, meshFilter.GetPtr(), aggregateTransform);
 						}
 					}
 				}
 
 				// continue recursion through child object
-				PreProcessScene(child.GetRef(), recursionDepth + 1);
+				PreProcessScene(*child, recursionDepth + 1);
 			}
 		}
 	}
@@ -460,41 +462,37 @@ namespace GTE
 		// loop through each mesh-containing SceneObject in [sceneMeshObjects]
 		for(UInt32 s = 0; s < renderableSceneObjectCount; s++)
 		{
-			SceneObjectRef childRef = renderableSceneObjects[s];
+			SceneObject* child = renderableSceneObjects[s];
 
-			Mesh3DRef mesh = childRef->GetMesh3D();
-			Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
+			Mesh3DRef mesh = child->GetMesh3D();
+			Mesh3DFilterRef filter = child->GetMesh3DFilter();
 
-			model.SetTo(childRef->GetAggregateTransform());
+			model.SetTo(child->GetAggregateTransform());
 			modelInverse.SetTo(model);
 			modelInverse.Invert();
 
-			Mesh3DRendererRef meshRenderer = childRef->GetMesh3DRenderer();
-			Mesh3DFilterRef meshFilter = childRef->GetMesh3DFilter();
-			SkinnedMesh3DRendererRef skinnedMeshRenderer = childRef->GetSkinnedMesh3DRenderer();
+			Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
+			Mesh3DFilterRef meshFilter = child->GetMesh3DFilter();
+			SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
 
-			if(meshRenderer.IsValid())
+			if(meshRenderer.IsValid() || skinnedMeshRenderer.IsValid())
 			{
-				// for each sub-renderer, call the PreRender() method
-				for(UInt32 r = 0; r < meshRenderer->GetSubRendererCount(); r++)
-				{
-					SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
-					if(subRenderer.IsValid())
-					{
-						subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
-					}
-				}
-			}
+				Mesh3DRenderer * renderer = nullptr;
+				if(meshRenderer.IsValid())
+					renderer = meshRenderer.GetPtr();
+				else if(skinnedMeshRenderer.IsValid())
+					renderer = skinnedMeshRenderer.GetPtr();
 
-			if(skinnedMeshRenderer.IsValid())
-			{
-				// for each sub-renderer, call the PreRender() method
-				for(UInt32 r = 0; r < skinnedMeshRenderer->GetSubRendererCount(); r++)
+				if(renderer != nullptr)
 				{
-					SubMesh3DRendererRef subRenderer = skinnedMeshRenderer->GetSubRenderer(r);
-					if(subRenderer.IsValid())
+					// for each sub-renderer, call the PreRender() method
+					for(UInt32 r = 0; r < renderer->GetSubRendererCount(); r++)
 					{
-						subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
+						SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(r);
+						if(subRenderer.IsValid())
+						{
+							subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
+						}
 					}
 				}
 			}
@@ -569,10 +567,10 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(cameraIndex < cameraCount, "RenderManager::RenderSceneFromCamera -> cameraIndex out of bounds", true);
 
-		SceneObjectRef objectRef = sceneCameras[cameraIndex];
-		NONFATAL_ASSERT(objectRef.IsValid(), "RenderManager::RenderSceneFromCamera -> Camera's scene object is not valid.", true);
+		SceneObject* object = sceneCameras[cameraIndex];
+		NONFATAL_ASSERT(object != nullptr, "RenderManager::RenderSceneFromCamera -> Camera's scene object is not valid.", true);
 
-		CameraRef cameraRef = objectRef->GetCamera();
+		CameraRef cameraRef = object->GetCamera();
 		NONFATAL_ASSERT(cameraRef.IsValid(), "RenderManager::RenderSceneFromCamera -> Camera is not valid.", true);
 		Camera& camera = cameraRef.GetRef();
 
@@ -700,8 +698,8 @@ namespace GTE
 		{
 			for (UInt32 l = 0; l < ambientLightCount; l++)
 			{
-				SceneObjectRef lightObject = sceneAmbientLights[l];
-				ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light's scene object is not valid.");
+				SceneObject* lightObject = sceneAmbientLights[l];
+				ASSERT(lightObject != nullptr, "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light's scene object is not valid.");
 
 				LightRef lightRef = lightObject->GetLight();
 				ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light is not valid.");
@@ -728,8 +726,8 @@ namespace GTE
 		// loop through each regular light and render scene for that light
 		for (UInt32 l = 0; l < lightCount; l++)
 		{
-			SceneObjectRef lightObject = sceneLights[l];
-			ASSERT(lightObject.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light's scene object is not valid.");
+			SceneObject* lightObject = sceneLights[l];
+			ASSERT(lightObject != nullptr, "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light's scene object is not valid.");
 
 			LightRef lightRef = lightObject->GetLight();
 			ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light is not valid.");
@@ -818,19 +816,19 @@ namespace GTE
 					RenderQueueEntry* entry = queue->GetObject(s);
 					NONFATAL_ASSERT(entry != nullptr, "RenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
 
-					SceneObjectRef childRef = entry->Container;
+					SceneObject* sceneObject = entry->Container;
+					NONFATAL_ASSERT(sceneObject != nullptr, "RenderManager::RenderSceneForLight -> Null scene object encountered.", true);
 
-					Mesh3DRef mesh = childRef->GetMesh3D();
-					Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
-					SceneObject * child = childRef.GetPtr();
+					Mesh3DRef mesh = sceneObject->GetMesh3D();
+					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
 
 					// copy the full transform of the scene object, including those of all ancestors
 					Transform full;
-					SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+					full.SetTo(sceneObject->GetAggregateTransform());
 
 					// make sure the current mesh should not be culled from [light].
-					if(!ShouldCullFromCamera(camera, *child) &&
-					   !ShouldCullFromLight(light, lightPosition, full, *child))
+					if(!ShouldCullFromCamera(camera, *sceneObject) &&
+					   !ShouldCullFromLight(light, lightPosition, full, *sceneObject))
 					{
 						if(pass == ShadowVolumeRender) // shadow volume pass
 						{
@@ -876,8 +874,7 @@ namespace GTE
 	void ForwardRenderManager::RenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform,
 		const Transform& viewTransformInverse, const Camera& camera)
 	{
-		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera,
-			MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
+		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, MaterialRef::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
 	}
 
 	/*
@@ -916,10 +913,10 @@ namespace GTE
 			
 			skyboxObject->SetActive(true);
 
-			skyboxEntry.Container = skyboxObject;
-			skyboxEntry.Mesh = mesh->GetSubMesh(0);
-			skyboxEntry.Renderer = renderer->GetSubRenderer(0);
-			skyboxEntry.RenderMaterial = renderer->GetMaterial(0);
+			skyboxEntry.Container = skyboxObject.GetPtr();
+			skyboxEntry.Mesh = mesh->GetSubMesh(0).GetPtr();
+			skyboxEntry.Renderer = renderer->GetSubRenderer(0).GetPtr();
+			skyboxEntry.RenderMaterial = renderer->GetMaterialPtr(0);
 
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 
@@ -938,8 +935,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::RenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera)
 	{
-		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera,
-			depthOnlyMaterial, false, false, FowardBlendingFilter::Never);
+		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, depthOnlyMaterial, false, false, FowardBlendingFilter::Never);
 	}
 
 	/*
@@ -963,7 +959,7 @@ namespace GTE
 		Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearMask);
 
 		// render the depth values for the scene to the off-screen color texture (filter out non-static objects)
-		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never, [=](SceneObjectRef sceneObject)
+		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never, [=](SceneObject* sceneObject)
 		{
 			return !sceneObject->IsStatic();
 		});
@@ -991,7 +987,7 @@ namespace GTE
 		// scene that are occluded.
 		SetForwardBlending(FowardBlendingMethod::Subtractive);
 		// rendering scene with SSAO material and filter out non-static objects
-		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, ssaoOutlineMaterial, false, true, FowardBlendingFilter::Always, [=](SceneObjectRef sceneObject)
+		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, ssaoOutlineMaterial, false, true, FowardBlendingFilter::Always, [=](SceneObject* sceneObject)
 		{
 			return !sceneObject->IsStatic();
 		});
@@ -1006,8 +1002,7 @@ namespace GTE
 	 * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object & light.
 	 */
 	void ForwardRenderManager::RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse,
-		const Camera& camera, MaterialRef material, Bool flagRendered,
-		Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
+		const Camera& camera, MaterialRef&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
 		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter, nullptr);
 	}
@@ -1031,8 +1026,8 @@ namespace GTE
 	 * Render from the perspective of [camera] using [viewTransformInverse] as the camera's position and orientation.
 	 */
 	void ForwardRenderManager::RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse,
-		const Camera& camera, MaterialRef material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
-		std::function<Bool(SceneObjectRef)> filterFunction)
+		const Camera& camera, MaterialRef&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+		std::function<Bool(SceneObject*)> filterFunction)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
@@ -1045,10 +1040,10 @@ namespace GTE
 			for(UInt32 s = 0; s < queue->GetObjectCount(); s++)
 			{
 				RenderQueueEntry* entry = queue->GetObject(s);
-				SceneObjectRef childRef = entry->Container;
+				SceneObject* sceneObject = entry->Container;
 
 				// check if [childRef] should be rendered for [camera]
-				if(ShouldCullFromCamera(camera, childRef.GetRef()))
+				if(ShouldCullFromCamera(camera, *sceneObject))
 				{
 					continue;
 				}
@@ -1056,16 +1051,15 @@ namespace GTE
 				// execute filter function (if one is specified)
 				if(filterFunction != nullptr)
 				{
-					Bool filter = filterFunction(childRef);
+					Bool filter = filterFunction(sceneObject);
 					if(filter)continue;
 				}
 
-				Mesh3DRef mesh = childRef->GetMesh3D();
-				SceneObject * child = childRef.GetPtr();
-
+				Mesh3DRef mesh = sceneObject->GetMesh3D();
+				
 				// copy the full transform of the scene object, including those of all ancestors
 				Transform full;
-				SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+				full.SetTo(sceneObject->GetAggregateTransform());
 
 				LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 				RenderMesh(*entry, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter);
@@ -1088,35 +1082,30 @@ namespace GTE
 	 * [blendingFilter] - Determines how forward-rendering blending will be applied.
 	 */
 	void ForwardRenderManager::RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
-		const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
+		const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef&  materialOverride,
 		Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
 	
-		SceneObjectRef sceneObject = entry.Container;
-		SubMesh3DRendererRef renderer = entry.Renderer;
-		SubMesh3DRef mesh = entry.Mesh;
+		SceneObject* sceneObject = entry.Container;
+		SubMesh3DRenderer* renderer = entry.Renderer;
+		SubMesh3D* mesh = entry.Mesh;
 
-		NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderMesh -> Renderer returned null mesh.", true);
-		NONFATAL_ASSERT(sceneObject.IsValid(), "RenderManager::RenderMesh -> Scene object is not valid.", true);
-		NONFATAL_ASSERT(renderer.IsValid(), "RenderManager::RenderMesh -> Null sub renderer encountered.", true);
+		NONFATAL_ASSERT(mesh != nullptr, "RenderManager::RenderMesh -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(sceneObject != nullptr, "RenderManager::RenderMesh -> Scene object is not valid.", true);
+		NONFATAL_ASSERT(renderer != nullptr, "RenderManager::RenderMesh -> Null sub renderer encountered.", true);
 
 		// determine if this mesh has been rendered before
 		ObjectPairKey key(sceneObject->GetObjectID(), mesh->GetObjectID());
 		Bool rendered = renderedObjects[key];
-
-		MaterialRef currentMaterial;
-		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
-
+		
 		// if we have an override material, we use that for every mesh
-		if(doMaterialOvverride)
-			currentMaterial = materialOverride;
-		else
-			currentMaterial = entry.RenderMaterial;
+		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
+		MaterialRef& currentMaterial = doMaterialOvverride ? materialOverride : *entry.RenderMaterial;
 
-		NONFATAL_ASSERT(currentMaterial.IsValid(), "RenderManager::RenderMesh -> Null material encountered.", true);
+		NONFATAL_ASSERT(currentMaterial != nullptr, "RenderManager::RenderMesh -> Null material encountered.", true);
 
 		Bool skipMesh = false;
 		// current material is self-lit, the we only want to render if the
@@ -1182,6 +1171,7 @@ namespace GTE
 
 		// flag the current scene object as being rendered (at least once)
 		if (flagRendered)renderedObjects[key] = true;
+
 	}
 
 	/*
@@ -1202,19 +1192,19 @@ namespace GTE
 		Transform model;
 		Transform modelInverse;
 
-		SceneObjectRef sceneObject = entry.Container;
-		SubMesh3DRendererRef renderer = entry.Renderer;
-		SubMesh3DRef mesh = entry.Mesh;
+		SceneObject* sceneObject = entry.Container;
+		SubMesh3DRenderer* renderer = entry.Renderer;
+		SubMesh3D* mesh = entry.Mesh;
 
-		NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
-		NONFATAL_ASSERT(sceneObject.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Scene object is not valid.", true);
-		NONFATAL_ASSERT(renderer.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Null sub renderer encountered.", true);
+		NONFATAL_ASSERT(mesh != nullptr, "RenderManager::RenderShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
+		NONFATAL_ASSERT(sceneObject != nullptr, "RenderManager::RenderShadowVolumesForSceneObject -> Scene object is not valid.", true);
+		NONFATAL_ASSERT(renderer != nullptr, "RenderManager::RenderShadowVolumesForSceneObject -> Null sub renderer encountered.", true);
 
 		// if mesh doesn't have face data, it can't have a shadow volume
 		if(!mesh->HasFaces())return;
 
-		Mesh3DFilterRef filter = entry.MeshFilter;
-		NONFATAL_ASSERT(filter.IsValid(), "RenderManager::RenderShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
+		Mesh3DFilter* filter = entry.MeshFilter;
+		NONFATAL_ASSERT(filter != nullptr, "RenderManager::RenderShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
 
 		// calculate model transform and inverse model transform
 		model.SetTo(sceneObject->GetAggregateTransform());
@@ -1238,7 +1228,7 @@ namespace GTE
 		// the one associated with the material
 		ActivateMaterial(shadowVolumeMaterial, camera.GetReverseCulling());
 
-		if (filter.IsValid() && filter->GetUseCustomShadowVolumeOffset())
+		if (filter->GetUseCustomShadowVolumeOffset())
 		{
 			// set the epsilon offset for the shadow volume shader based on custom value
 			shadowVolumeMaterial->SetUniform1f(filter->GetCustomShadowVolumeOffset(), "EPSILON");
@@ -1289,8 +1279,8 @@ namespace GTE
 		// loop through each light in [sceneLights]
 		for (UInt32 l = 0; l < lightCount; l++)
 		{
-			SceneObjectRef lightObject = sceneLights[l];
-			NONFATAL_ASSERT(lightObject.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light's scene object is not valid.", true);
+			SceneObject* lightObject = sceneLights[l];
+			NONFATAL_ASSERT(lightObject != nullptr, "RenderManager::BuildSceneShadowVolumes -> Light's scene object is not valid.", true);
 
 			// verify the light is active
 			if (lightObject->IsActive())
@@ -1337,22 +1327,21 @@ namespace GTE
 				RenderQueueEntry* entry = queue->GetObject(s);
 				NONFATAL_ASSERT(entry != nullptr, "RenderManager::BuildShadowVolumesForLight -> Null render queue entry encountered.", true);
 
-				SceneObjectRef childRef = entry->Container;
+				SceneObject* sceneObject = entry->Container;
 
-				if(childRef->IsActive())
+				if(sceneObject->IsActive())
 				{
-					Mesh3DRef mesh = childRef->GetMesh3D();
-					Mesh3DFilterRef filter = childRef->GetMesh3DFilter();
-					SceneObject * child = childRef.GetPtr();
+					Mesh3DRef mesh = sceneObject->GetMesh3D();
+					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
 
 					// copy the full transform of the scene object, including those of all ancestors
 					Transform full;
-					SceneObjectTransform::GetWorldTransform(full, childRef, true, false);
+					full.SetTo(sceneObject->GetAggregateTransform());
 
 					// make sure the current mesh should not be culled from [light].
-					if(!ShouldCullFromLight(light, lightPosition, full, *child))
+					if(!ShouldCullFromLight(light, lightPosition, full, *sceneObject))
 					{
-						BuildShadowVolumesForSceneObject(*child, light, lightPosition, lightDirection);
+						BuildShadowVolumesForSceneObject(*sceneObject, light, lightPosition, lightDirection);
 					}
 				}
 			}
@@ -1762,7 +1751,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection)
 	{
-		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendTransformUniformsToShader -> Active material is null.");
 
 		ShaderRef shader = activeMaterial->GetShader();
@@ -1786,7 +1775,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendModelViewProjectionToShader(const Transform& modelViewProjection)
 	{
-		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendModelViewProjectionToShader -> Active material is null.");
 
 		ShaderRef shader = activeMaterial->GetShader();
@@ -1800,7 +1789,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition)
 	{
-		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendClipPlaneToShader -> Active material is null.");
 
 		ShaderRef shader = activeMaterial->GetShader();
@@ -1837,7 +1826,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendActiveMaterialUniformsToShader()  const
 	{
-		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendCustomUniformsToShader -> Active material is not valid.");
 		activeMaterial->SendAllStoredUniformValuesToShader();
 	}
@@ -1846,7 +1835,7 @@ namespace GTE
 	 * Activate [material], which will switch the GPU's active shader to
 	 * the one associated with it.
 	 */
-	void ForwardRenderManager::ActivateMaterial(MaterialRef material, Bool reverseFaceCulling)
+	void ForwardRenderManager::ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling)
 	{
 		// We MUST notify the graphics system about the change in active material because other
 		// components (like Mesh3DRenderer) need to know about the active material

@@ -62,7 +62,7 @@ namespace GTE
 		// index of this sub-renderer in containing Mesh3DRenderer instance's list of sub-renderers
 		Int32 targetSubMeshIndex;
 		// a reference to the last valid material used to for rendering
-		MaterialRef lastUsedMaterial;
+		UInt32 lastUsedMaterialID;
 		// pointer to the Mesh3DRenderer instance that contains this instance of SubMesh3DRenderer
 		Mesh3DRenderer * containerRenderer;
 
@@ -134,7 +134,7 @@ namespace GTE
 		void SetUV2Data(UV2Array * uvs);
 		void SetAttributeData(UInt32 index, Real * data);
 
-		Bool ValidateMaterialForMesh(MaterialRef material);
+		Bool ValidateMaterialForMesh(MaterialRef& material);
 		Bool UpdateMeshAttributeBuffers();
 		Bool UpdateAttributeTransformerData();
 
