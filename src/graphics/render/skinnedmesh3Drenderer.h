@@ -56,8 +56,8 @@ namespace GTE
 
 	public:
 
-		void SetSkeleton(SkeletonSharedPtr skeleton);
-		SkeletonSharedPtr GetSkeleton();
+		void SetSkeleton(SkeletonRef skeleton);
+		SkeletonRef GetSkeleton();
 		void InitializeForMesh();
 		void MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, Int32 vertexBoneMapIndex);
 

@@ -210,7 +210,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::BuildShadowVolume(const Vector3& lightPosDir, Bool directional, Bool backFacesFrontCap)
 	{
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::BuildShadowVolume -> Mesh is invalid.");
 
 		if (ShouldUpdateFromMesh())this->UpdateFromMesh();
@@ -548,7 +548,7 @@ namespace GTE
 		DestroyBuffers();
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Could not find matching sub mesh for sub renderer.");
 
 		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
@@ -613,7 +613,7 @@ namespace GTE
 	 */
 	Bool SubMesh3DRenderer::UpdateAttributeTransformerData()
 	{
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateAttributeTransformerData -> Could not find matching sub mesh for sub renderer.");
 
 		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
@@ -680,7 +680,7 @@ namespace GTE
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::ShouldUpdateFromMesh -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::ShouldUpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
 		if (mesh->GetUpdateCount() != GetUpdateCount())return true;
@@ -694,7 +694,7 @@ namespace GTE
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::CopyMeshData -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::CopyMeshData -> Could not find matching sub mesh for sub renderer.");
 
 		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
@@ -723,7 +723,7 @@ namespace GTE
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UpdateTimeStamp -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateTimeStamp -> Could not find matching sub mesh for sub renderer.");
 
 		// make sure the time stamp equals the target mesh's timestamp exactly,
@@ -753,7 +753,7 @@ namespace GTE
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UpdateFromMesh -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UpdateFromMesh -> Could not find matching sub mesh for sub renderer.");
 
 		Bool updateSuccess = true;
@@ -790,7 +790,7 @@ namespace GTE
 
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::UseMaterial -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::UseMaterial -> Could not find matching sub mesh for sub renderer.");
 
 		StandardAttributeSet materialAttributes = material->GetStandardAttributes();
@@ -859,7 +859,7 @@ namespace GTE
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRenderer::PreRender -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::PreRender -> Could not find matching sub mesh for sub renderer.");
 
 		if (doAttributeTransform)
@@ -903,7 +903,7 @@ namespace GTE
 	 */
 	const Point3* SubMesh3DRenderer::GetFinalCenter() const
 	{
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::Render -> Could not find matching sub mesh for sub renderer.");
 
 		StandardAttributeSet meshAttributes = mesh->GetStandardAttributeSet();
@@ -929,7 +929,7 @@ namespace GTE
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRendererGL::Render -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRendererGL::Render -> Could not find matching sub mesh for sub renderer.");
 
 		if (ShouldUpdateFromMesh())this->UpdateFromMesh();
@@ -947,7 +947,7 @@ namespace GTE
 	{
 		ASSERT(containerRenderer != nullptr, "SubMesh3DRendererGL::RenderShadowVolume -> Container renderer is null.");
 
-		SubMesh3DSharedPtr mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
 		ASSERT(mesh.IsValid(), "SubMesh3DRendererGL::RenderShadowVolume -> Could not find matching sub mesh for sub renderer.");
 
 		RenderShadowVolume(&shadowVolumePositions);

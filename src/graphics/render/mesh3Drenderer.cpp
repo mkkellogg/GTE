@@ -57,7 +57,7 @@ namespace GTE
 		EngineObjectManager *objectManager = Engine::Instance()->GetEngineObjectManager();
 		if (index < subRenderers.size())
 		{
-			SubMesh3DRendererSharedPtr renderer = subRenderers[index];
+			SubMesh3DRendererRef renderer = subRenderers[index];
 			if (renderer.IsValid())
 			{
 				objectManager->DestroySubMesh3DRenderer(renderer);
@@ -115,7 +115,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(sceneObject.IsValid(), "Mesh3DRenderer::UpdateFromMesh -> 'sceneObject' is null.", true);
 
-		Mesh3DSharedPtr mesh = GetTargetMesh();
+		Mesh3DRef mesh = GetTargetMesh();
 		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3DRenderer::UpdateFromMesh -> mesh is null.", true);
 
 		InitializeForMesh(mesh);
@@ -145,7 +145,7 @@ namespace GTE
 		{
 			for (UInt32 i = (UInt32)subRenderers.size(); i < subMeshCount; i++)
 			{
-				SubMesh3DRendererSharedPtr renderer = engineObjectManager->CreateSubMesh3DRenderer();
+				SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
 				NONFATAL_ASSERT(renderer.IsValid(), "Mesh3DRenderer::UpdateFromMesh(Mesh3DSharedPtr) -> Could not create new SubMesh3DRenderer.", false);
 
 				renderer->SetTargetSubMeshIndex(i);
