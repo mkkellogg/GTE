@@ -93,7 +93,7 @@ namespace GTE
 
 		// construct depth-value material
 		assetImporter.LoadBuiltInShaderSource("depthvalue", shaderSource);
-		MaterialSharedPtr depthValueMaterial = objectManager->CreateMaterial("DepthValueMaterial", shaderSource);
+		depthValueMaterial = objectManager->CreateMaterial("DepthValueMaterial", shaderSource);
 		ASSERT(depthValueMaterial.IsValid(), "RenderManager::Init -> Unable to create depth value material.");
 		depthValueMaterial->SetUseLighting(false);
 
@@ -656,10 +656,10 @@ namespace GTE
 			RenderSceneForCameraAndCurrentRenderTarget(camera, viewTransform, viewInverse);
 		}
 
-		RenderTargetSharedPtr copyTarget = camera.GetCopyRenderTarget();
+		RenderTargetRef copyTarget = camera.GetCopyRenderTarget();
 		if (copyTarget.IsValid())
 		{
-			RenderTargetSharedPtr source = camera.GetRenderTarget();
+			RenderTargetRef source = camera.GetRenderTarget();
 			graphics->CopyBetweenRenderTargets(source, copyTarget);
 		}
 
@@ -701,7 +701,7 @@ namespace GTE
 				SceneObject* lightObject = sceneAmbientLights[l];
 				ASSERT(lightObject != nullptr, "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light's scene object is not valid.");
 
-				LightSharedPtr lightRef = lightObject->GetLight();
+				LightRef lightRef = lightObject->GetLight();
 				ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Ambient light is not valid.");
 
 				// render all objects in the scene that have non self-lit materials
@@ -729,7 +729,7 @@ namespace GTE
 			SceneObject* lightObject = sceneLights[l];
 			ASSERT(lightObject != nullptr, "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light's scene object is not valid.");
 
-			LightSharedPtr lightRef = lightObject->GetLight();
+			LightRef lightRef = lightObject->GetLight();
 			ASSERT(lightRef.IsValid(), "RenderManager::ForwardRenderSceneForCameraAndCurrentRenderTarget -> Light is not valid.");
 
 			// render all objects in the scene that have non self-lit materials
@@ -819,8 +819,8 @@ namespace GTE
 					SceneObject* sceneObject = entry->Container;
 					NONFATAL_ASSERT(sceneObject != nullptr, "RenderManager::RenderSceneForLight -> Null scene object encountered.", true);
 
-					Mesh3DSharedPtr mesh = sceneObject->GetMesh3D();
-					Mesh3DFilterSharedPtr filter = sceneObject->GetMesh3DFilter();
+					Mesh3DRef mesh = sceneObject->GetMesh3D();
+					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
 
 					// copy the full transform of the scene object, including those of all ancestors
 					Transform full;
@@ -857,7 +857,7 @@ namespace GTE
 							// set up lighting descriptor for non self-lit lighting
 							LightingDescriptor lightingDescriptor(&light, &lightPosition, &lightDirection, true);
 							RenderMesh(*entry, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse,
-											  camera, MaterialSharedPtr::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
+											  camera, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
 						}
 					}
 				}
@@ -874,7 +874,7 @@ namespace GTE
 	void ForwardRenderManager::RenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform,
 		const Transform& viewTransformInverse, const Camera& camera)
 	{
-		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, MaterialSharedPtr::Null(), true, true, FowardBlendingFilter::OnlyIfRendered);
+		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
 	}
 
 	/*
@@ -888,15 +888,15 @@ namespace GTE
 		// ensure the camera has a valid skybox
 		if (camera.IsSkyboxSetup() && camera.IsSkyboxEnabled())
 		{
-			SceneObjectSharedPtr cameraObject = camera.GetSceneObject();
+			SceneObjectRef cameraObject = camera.GetSceneObject();
 			NONFATAL_ASSERT(cameraObject.IsValid(), "RenderManager::RenderSkyboxForCamera -> Camera is not attached to a scene object.", true);
 
 			// retrieve the scene objects for the camera and for the camera's skybox
-			SceneObjectSharedPtr skyboxObject = camera.GetSkyboxSceneObject();
+			SceneObjectRef skyboxObject = camera.GetSkyboxSceneObject();
 			NONFATAL_ASSERT(skyboxObject.IsValid(), "RenderManager::RenderSkyboxForCamera -> Camera has invalid skybox scene object.", true);
 
-			Mesh3DRendererSharedPtr meshRenderer = skyboxObject->GetMesh3DRenderer();
-			SkinnedMesh3DRendererSharedPtr skinnedmeshRenderer = skyboxObject->GetSkinnedMesh3DRenderer();
+			Mesh3DRendererRef meshRenderer = skyboxObject->GetMesh3DRenderer();
+			SkinnedMesh3DRendererRef skinnedmeshRenderer = skyboxObject->GetSkinnedMesh3DRenderer();
 			Mesh3DRenderer * renderer = nullptr;
 			if(meshRenderer.IsValid())
 				renderer = meshRenderer.GetPtr();
@@ -905,7 +905,7 @@ namespace GTE
 
 			NONFATAL_ASSERT(renderer != nullptr, "RenderManager::RenderSkyboxForCamera -> Could not find valid renderer for skybox.", true);
 		
-			Mesh3DSharedPtr mesh = renderer->GetTargetMesh();
+			Mesh3DRef mesh = renderer->GetTargetMesh();
 			NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::RenderSkyboxForCamera -> Skybox has invalid mesh.", true);
 			NONFATAL_ASSERT(mesh->GetSubMeshCount() > 0, "RenderManager::RenderSkyboxForCamera -> Skybox has empty mesh.", true);
 			NONFATAL_ASSERT(renderer->GetSubRendererCount() > 0, "RenderManager::RenderSkyboxForCamera -> Skybox has no renderers.", true);
@@ -921,7 +921,7 @@ namespace GTE
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 
 			// render the skybox
-			RenderMesh(skyboxEntry, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, MaterialSharedPtr::Null(), true, true, FowardBlendingFilter::Never);
+			RenderMesh(skyboxEntry, lightingDescriptor, modelPreTransform, viewTransform, viewTransformInverse, camera, NullMaterialRef, true, true, FowardBlendingFilter::Never);
 
 			skyboxObject->SetActive(false);
 		}
@@ -959,7 +959,8 @@ namespace GTE
 		Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearMask);
 
 		// render the depth values for the scene to the off-screen color texture (filter out non-static objects)
-		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, depthValueMaterial, false, true, FowardBlendingFilter::Never, [=](SceneObject* sceneObject)
+		MaterialRef depthValueMaterialRef = depthValueMaterial;
+		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, depthValueMaterialRef, false, true, FowardBlendingFilter::Never, [=](SceneObject* sceneObject)
 		{
 			return !sceneObject->IsStatic();
 		});
@@ -967,11 +968,10 @@ namespace GTE
 		PopRenderTarget();
 
 		Matrix4x4 projectionInvMat;
-		camera.GetProjectionTransform().CopyMatrix(projectionInvMat);
-		projectionInvMat.Invert();
+		camera.GetInverseProjectionTransform().CopyMatrix(projectionInvMat);
 
 		// retrieve the color texture (which contains depth values) from the off-screen render target
-		TextureSharedPtr depthTexture = depthRenderTarget->GetColorTexture();
+		TextureRef depthTexture = depthRenderTarget->GetColorTexture();
 
 		// set SSAO material values
 		ssaoOutlineMaterial->SetTexture(depthTexture, "DEPTH_TEXTURE");
@@ -987,7 +987,8 @@ namespace GTE
 		// scene that are occluded.
 		SetForwardBlending(FowardBlendingMethod::Subtractive);
 		// rendering scene with SSAO material and filter out non-static objects
-		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, ssaoOutlineMaterial, false, true, FowardBlendingFilter::Always, [=](SceneObject* sceneObject)
+		MaterialRef ssaoOutlineMaterialRef = ssaoOutlineMaterial;
+		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, ssaoOutlineMaterialRef, false, true, FowardBlendingFilter::Always, [=](SceneObject* sceneObject)
 		{
 			return !sceneObject->IsStatic();
 		});
@@ -1055,7 +1056,7 @@ namespace GTE
 					if(filter)continue;
 				}
 
-				Mesh3DSharedPtr mesh = sceneObject->GetMesh3D();
+				Mesh3DRef mesh = sceneObject->GetMesh3D();
 				
 				// copy the full transform of the scene object, including those of all ancestors
 				Transform full;
@@ -1103,7 +1104,7 @@ namespace GTE
 		
 		// if we have an override material, we use that for every mesh
 		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
-		const MaterialSharedPtr& currentMaterial = doMaterialOvverride ? materialOverride : *entry.RenderMaterial;
+		MaterialRef currentMaterial = doMaterialOvverride ? materialOverride : *entry.RenderMaterial;
 
 		NONFATAL_ASSERT(currentMaterial != nullptr, "RenderManager::RenderMesh -> Null material encountered.", true);
 
@@ -1253,7 +1254,7 @@ namespace GTE
 		shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
 
 		Light& castLight = const_cast<Light&>(light);
-		SceneObjectSharedPtr lightObject = castLight.GetSceneObject();
+		SceneObjectRef lightObject = castLight.GetSceneObject();
 
 		ObjectPairKey cacheKey;
 
@@ -1285,7 +1286,7 @@ namespace GTE
 			// verify the light is active
 			if (lightObject->IsActive())
 			{
-				LightSharedPtr lightRef = lightObject->GetLight();
+				LightRef lightRef = lightObject->GetLight();
 				NONFATAL_ASSERT(lightRef.IsValid(), "RenderManager::BuildSceneShadowVolumes -> Light is not valid.", true);
 
 				// verify that this light casts shadows
@@ -1331,8 +1332,8 @@ namespace GTE
 
 				if(sceneObject->IsActive())
 				{
-					Mesh3DSharedPtr mesh = sceneObject->GetMesh3D();
-					Mesh3DFilterSharedPtr filter = sceneObject->GetMesh3DFilter();
+					Mesh3DRef mesh = sceneObject->GetMesh3D();
+					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
 
 					// copy the full transform of the scene object, including those of all ancestors
 					Transform full;
@@ -1360,8 +1361,8 @@ namespace GTE
 		Transform model;
 		Transform modelInverse;
 
-		const Mesh3DRendererSharedPtr& mesh3DRenderer = sceneObject.GetMesh3DRenderer();
-		const SkinnedMesh3DRendererSharedPtr& skinnedMesh3DRenderer = sceneObject.GetSkinnedMesh3DRenderer();
+		Mesh3DRendererRef mesh3DRenderer = sceneObject.GetMesh3DRenderer();
+		SkinnedMesh3DRendererRef skinnedMesh3DRenderer = sceneObject.GetSkinnedMesh3DRenderer();
 
 		// check if [sceneObject] has a mesh & renderer
 		if (mesh3DRenderer.IsValid())
@@ -1375,8 +1376,8 @@ namespace GTE
 
 		if (renderer != nullptr)
 		{
-			Mesh3DSharedPtr mesh = renderer->GetTargetMesh();
-			Mesh3DFilterSharedPtr filter = sceneObject.GetMesh3DFilter();
+			Mesh3DRef mesh = renderer->GetTargetMesh();
+			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
 
 			NONFATAL_ASSERT(mesh.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
 			NONFATAL_ASSERT(filter.IsValid(), "RenderManager::BuildShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
@@ -1398,8 +1399,8 @@ namespace GTE
 			// loop through each sub-renderer and render the shadow volume for its sub-mesh
 			for (UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
 			{
-				SubMesh3DRendererSharedPtr subRenderer = renderer->GetSubRenderer(i);
-				SubMesh3DSharedPtr subMesh = mesh->GetSubMesh(i);
+				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
+				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
 				// if mesh doesn't have face data, it can't have a shadow volume
 				if (!subMesh->HasFaces())continue;
@@ -1422,7 +1423,7 @@ namespace GTE
 				}
 
 				Light& castLight = const_cast<Light&>(light);
-				SceneObjectSharedPtr lightObject = castLight.GetSceneObject();
+				SceneObjectRef lightObject = castLight.GetSceneObject();
 
 				ObjectPairKey cacheKey;
 				Bool cached = false;
@@ -1471,8 +1472,8 @@ namespace GTE
 		if (!sceneObject->IsActive())return false;
 
 		Mesh3DRenderer * renderer = nullptr;
-		const Mesh3DRendererSharedPtr& mesh3DRenderer = sceneObject->GetMesh3DRenderer();
-		const SkinnedMesh3DRendererSharedPtr& skinnedMesh3DRenderer = sceneObject->GetSkinnedMesh3DRenderer();
+		Mesh3DRendererRef mesh3DRenderer = sceneObject->GetMesh3DRenderer();
+		SkinnedMesh3DRendererRef skinnedMesh3DRenderer = sceneObject->GetSkinnedMesh3DRenderer();
 
 		// check if [sceneObject] has a mesh & renderer
 		if(mesh3DRenderer.IsValid())
@@ -1484,7 +1485,7 @@ namespace GTE
 			renderer = const_cast<SkinnedMesh3DRenderer *>(skinnedMesh3DRenderer.GetConstPtr());
 		}
 
-		Mesh3DSharedPtr mesh = renderer->GetTargetMesh();
+		Mesh3DRef mesh = renderer->GetTargetMesh();
 
 		if (!mesh.IsValid())
 		{
@@ -1670,7 +1671,7 @@ namespace GTE
 		}
 
 		SceneObject& sceneObj = const_cast<SceneObject&>(sceneObject);
-		Mesh3DSharedPtr meshRef = sceneObj.GetMesh3D();
+		Mesh3DRef meshRef = sceneObj.GetMesh3D();
 
 		if (meshRef.IsValid())
 		{
@@ -1758,7 +1759,7 @@ namespace GTE
 		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendTransformUniformsToShader -> Active material is null.");
 
-		ShaderSharedPtr shader = activeMaterial->GetShader();
+		ShaderRef shader = activeMaterial->GetShader();
 		ASSERT(shader.IsValid(), "RenderManager::SendTransformUniformsToShader -> Active material contains null shader.");
 
 		Matrix4x4 modelInverseTranspose = model.GetConstMatrix();
@@ -1782,7 +1783,7 @@ namespace GTE
 		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendModelViewProjectionToShader -> Active material is null.");
 
-		ShaderSharedPtr shader = activeMaterial->GetShader();
+		ShaderRef shader = activeMaterial->GetShader();
 		ASSERT(shader.IsValid(), "RenderManager::SendModelViewProjectionToShader -> Active material contains null shader.");
 
 		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.GetConstMatrix());
@@ -1796,7 +1797,7 @@ namespace GTE
 		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendClipPlaneToShader -> Active material is null.");
 
-		ShaderSharedPtr shader = activeMaterial->GetShader();
+		ShaderRef shader = activeMaterial->GetShader();
 		ASSERT(shader.IsValid(), "RenderManager::SendClipPlaneToShader -> Active material contains null shader.");
 
 		// for now we only support up to one clip plane

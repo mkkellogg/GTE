@@ -949,7 +949,7 @@ namespace GTE
 	*/
 	void GraphicsGL::SetupStateForMaterial(MaterialRef material, Bool reverseFaceCulling)
 	{
-		NONFATAL_ASSERT(material != nullptr, "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
+		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
 
 		RenderState::BlendingMode blendingMode = material->GetBlendingMode();
 		switch(blendingMode)

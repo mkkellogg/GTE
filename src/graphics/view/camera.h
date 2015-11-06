@@ -40,6 +40,7 @@ namespace GTE
 		UInt32 clearBufferMask;
 
 		Transform projection;
+		Transform projectionInverse;
 		Transform skyboxTextureTransform;
 
 		Bool skyboxSetup;
@@ -105,6 +106,7 @@ namespace GTE
 		UInt32 GetRenderOrderIndex();
 
 		const Transform& GetProjectionTransform() const;
+		const Transform& GetInverseProjectionTransform() const;
 		void TransformProjectionTransformBy(const Transform& transform);
 		void PreTransformProjectionTransformBy(const Transform& transform);
 

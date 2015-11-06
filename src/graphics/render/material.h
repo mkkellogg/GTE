@@ -154,13 +154,13 @@ namespace GTE
 
 		Material(const std::string& materialName);
 		virtual ~Material();
-		Bool Init(ShaderSharedPtr shader);
+		Bool Init(ShaderRef shader);
 
 	public:
 
 		void ResetVerificationState();
 
-		ShaderSharedPtr GetShader() ;
+		ShaderRef GetShader() ;
 
 		StandardAttributeSet GetStandardAttributes() const;
 		void SendAttributeBufferToShader(AttributeID, VertexAttrBuffer *buffer);
@@ -179,8 +179,8 @@ namespace GTE
 
 		void SendAllStoredUniformValuesToShader();
 
-		void SetTexture(TextureSharedPtr texture, const std::string& varName);
-		void SetTexture(TextureSharedPtr texture, UniformID uniformID);
+		void SetTexture(TextureRef texture, const std::string& varName);
+		void SetTexture(TextureRef texture, UniformID uniformID);
 		void SetMatrix4x4(const Matrix4x4& mat, const std::string& varName);
 		void SetMatrix4x4(const Matrix4x4& mat, UniformID uniformID);
 		void SetUniform1f(Real val, const std::string& varName);

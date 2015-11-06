@@ -54,8 +54,8 @@ namespace GTE
 
 		virtual Bool Init() = 0;
 		Bool HasBuffer(RenderBufferType bufferType) const;
-		TextureSharedPtr GetDepthTexture();
-		TextureSharedPtr GetColorTexture();
+		TextureRef GetDepthTexture();
+		TextureRef GetColorTexture();
 		UInt32 GetWidth() const;
 		UInt32 GetHeight() const;
 		Bool IsColorBufferTexture() const;

@@ -104,7 +104,7 @@ namespace GTE
 	 *
 	 * This method will return true if initialization succeeds, otherwise it returns false.
 	 */
-	Bool Material::Init(ShaderSharedPtr shader)
+	Bool Material::Init(ShaderRef shader)
 	{
 		NONFATAL_ASSERT_RTRN(shader.IsValid(), " Material::Init -> tried to initialize with invalid shader.", false, true);
 		NONFATAL_ASSERT_RTRN(shader->IsLoaded(), " Material::Init -> tried to initialize with unloaded shader.", false, true);
@@ -520,7 +520,7 @@ namespace GTE
 	/*
 	 * Get a pointer to the shader to which this material is connected.
 	 */
-	ShaderSharedPtr Material::GetShader() 
+	ShaderRef Material::GetShader() 
 	{
 		return shader;
 	}
@@ -626,7 +626,7 @@ namespace GTE
 	 * Find a uniform with the name specified by [varName] and set its
 	 * value to the sampler data held by [texture]
 	 */
-	void Material::SetTexture(TextureSharedPtr texture, const std::string& varName)
+	void Material::SetTexture(TextureRef texture, const std::string& varName)
 	{
 		UniformID uniform = UniformDirectory::RegisterVarID(varName);
 		SetTexture(texture, uniform);
@@ -636,7 +636,7 @@ namespace GTE
 	* Find a uniform with the name specified by [uniform] and set its
 	* value to the sampler data held by [texture].
 	*/
-	void Material::SetTexture(TextureSharedPtr texture, UniformID uniform)
+	void Material::SetTexture(TextureRef texture, UniformID uniform)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SetTexture -> Shader is null.", true);
 		NONFATAL_ASSERT(texture.IsValid(), "Material::SetTexture -> 'texture' is null.", true);

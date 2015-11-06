@@ -217,6 +217,11 @@ namespace GTE
 		return projection;
 	}
 
+	const Transform& Camera::GetInverseProjectionTransform() const
+	{
+		return projectionInverse;
+	}
+
 	void Camera::TransformProjectionTransformBy(const Transform& transform)
 	{
 		projection.TransformBy(transform);
@@ -314,6 +319,8 @@ namespace GTE
 			Transform::BuildOrthographicProjectionMatrix(proj, top, bottom, left, right, near, far);
 		}
 		projection.SetTo(proj);
+		projectionInverse.SetTo(proj);
+		projectionInverse.Invert();
 	}
 
 	void Camera::SetCullingMask(IntMask mask)
