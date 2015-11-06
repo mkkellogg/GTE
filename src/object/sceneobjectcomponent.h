@@ -27,7 +27,7 @@ namespace GTE
 
 	public:
 
-		SceneObjectSharedPtr GetSceneObject();
+		SceneObjectRef GetSceneObject();
 		virtual void Update();
 	};
 }

@@ -60,7 +60,7 @@ namespace GTE
 
 	}
 
-	void Camera::SetupSkybox(TextureSharedPtr cubeTexture)
+	void Camera::SetupSkybox(TextureRef cubeTexture)
 	{
 		NONFATAL_ASSERT(cubeTexture.IsValid(), "Camera::SetSkybox -> 'cubeTexture' is not valid.", true);
 
@@ -108,7 +108,7 @@ namespace GTE
 		}
 	}
 
-	void Camera::ShareSkybox(CameraSharedPtr camera)
+	void Camera::ShareSkybox(CameraRef camera)
 	{
 		sharedSkyboxCamera = camera;
 		skyboxSetup = true;
@@ -129,19 +129,19 @@ namespace GTE
 		return skyboxEnabled;
 	}
 
-	SceneObjectSharedPtr Camera::GetSkyboxSceneObject()
+	SceneObjectRef Camera::GetSkyboxSceneObject()
 	{
 		if (sharedSkyboxCamera.IsValid())return sharedSkyboxCamera->GetSkyboxSceneObject();
 		return skyboxSceneObject;
 	}
 
-	TextureSharedPtr Camera::GetSkyboxTexture()
+	TextureRef Camera::GetSkyboxTexture()
 	{
 		if (sharedSkyboxCamera.IsValid())return sharedSkyboxCamera->GetSkyboxTexture();
 		return skyboxTexture;
 	}
 
-	MaterialSharedPtr Camera::GetSkyboxMaterial()
+	MaterialRef Camera::GetSkyboxMaterial()
 	{
 		if (sharedSkyboxCamera.IsValid())return sharedSkyboxCamera->GetSkyboxMaterial();
 		return skyboxMaterial;
@@ -252,7 +252,7 @@ namespace GTE
 		UpdateDisplay();
 	}
 
-	RenderTargetSharedPtr Camera::GetRenderTarget()
+	RenderTargetRef Camera::GetRenderTarget()
 	{
 		if (!renderTarget.IsValid())return Engine::Instance()->GetGraphicsSystem()->GetDefaultRenderTarget();
 		else return renderTarget;
@@ -279,11 +279,11 @@ namespace GTE
 		colorAttributes.MipMapLevel = 4;
 		colorAttributes.WrapMode = TextureWrap::Clamp;
 
-		RenderTargetSharedPtr renderTarget = GetRenderTarget();
+		RenderTargetRef renderTarget = GetRenderTarget();
 		copyTarget = objectManager->CreateRenderTarget(true, false, false, colorAttributes, renderTarget->GetWidth(), renderTarget->GetHeight());
 	}
 
-	RenderTargetSharedPtr Camera::GetCopyRenderTarget()
+	RenderTargetRef Camera::GetCopyRenderTarget()
 	{
 		return copyTarget;
 	}
@@ -300,7 +300,7 @@ namespace GTE
 		}
 		else
 		{
-			RenderTargetSharedPtr renderTarget = GetRenderTarget();
+			RenderTargetRef renderTarget = GetRenderTarget();
 			Real height = (Real)renderTarget->GetHeight();
 			Real width = (Real)renderTarget->GetWidth();
 			Real halfWidth = width / 2.0f;

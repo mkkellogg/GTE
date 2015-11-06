@@ -18,7 +18,7 @@ namespace GTE
 
 	}
 
-	SceneObjectSharedPtr SceneObjectComponent::GetSceneObject()
+	SceneObjectRef SceneObjectComponent::GetSceneObject()
 	{
 		return sceneObject;
 	}

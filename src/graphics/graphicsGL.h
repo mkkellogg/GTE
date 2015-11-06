@@ -132,7 +132,7 @@ namespace GTE
 										  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) override;
 		void DestroyRenderTarget(RenderTarget * target) override;
 
-		RenderTargetSharedPtr GetDefaultRenderTarget() override;
+		RenderTargetRef GetDefaultRenderTarget() override;
 
 		void SetupStateForMaterial(MaterialRef material, Bool reverseFaceCulling);
 		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling) override;

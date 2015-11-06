@@ -219,7 +219,7 @@ namespace GTE
 		return light;
 	}
 
-	void SceneObject::AddChild(SceneObjectSharedPtr child)
+	void SceneObject::AddChild(SceneObjectRef child)
 	{
 		NONFATAL_ASSERT(child.IsValid(), "SceneObject::AddChild -> 'child' is invalid.", true);
 
@@ -232,7 +232,7 @@ namespace GTE
 
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
-		SceneObjectSharedPtr sceneObjectRef = objectManager->FindSceneObjectInDirectory(this->GetObjectID());
+		SceneObjectRef sceneObjectRef = objectManager->FindSceneObjectInDirectory(this->GetObjectID());
 		ASSERT(sceneObjectRef.IsValid(), "SceneObject::AddChild -> Could not find matching reference for 'child' scene object.");
 
 		//TODO: add check for duplicate children
@@ -257,7 +257,7 @@ namespace GTE
 		children.push_back(child);
 	}
 
-	void SceneObject::RemoveChild(SceneObjectSharedPtr child)
+	void SceneObject::RemoveChild(SceneObjectRef child)
 	{
 		NONFATAL_ASSERT(child.IsValid(), "SceneObject::RemoveChild -> 'child' is invalid.", true);
 
@@ -292,7 +292,7 @@ namespace GTE
 		return (UInt32)children.size();
 	}
 
-	SceneObjectSharedPtr SceneObject::GetChildAt(UInt32 index) const
+	SceneObjectRef SceneObject::GetChildAt(UInt32 index) const
 	{
 		if (index < children.size())
 		{
@@ -301,11 +301,11 @@ namespace GTE
 		else
 		{
 			Debug::PrintError("SceneObject::GetChildAt -> index out of range.");
-			return SceneObjectSharedPtr::Null();
+			return NullSceneObjectRef;
 		}
 	}
 
-	SceneObjectSharedPtr SceneObject::GetParent() const
+	SceneObjectRef SceneObject::GetParent() const
 	{
 		return parent;
 	}

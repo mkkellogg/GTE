@@ -122,7 +122,7 @@ namespace GTE
 		virtual RenderTarget * CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 												  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) = 0;
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
-		virtual RenderTargetSharedPtr GetDefaultRenderTarget() = 0;
+		virtual RenderTargetRef GetDefaultRenderTarget() = 0;
 
 		virtual void ActivateMaterial(MaterialRef, Bool reverseFaceCulling) = 0;
 		virtual MaterialRef GetActiveMaterial() = 0;

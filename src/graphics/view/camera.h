@@ -81,14 +81,14 @@ namespace GTE
 
 	public:
 
-		void SetupSkybox(TextureSharedPtr cubeTexture);
-		void ShareSkybox(CameraSharedPtr camera);
+		void SetupSkybox(TextureRef cubeTexture);
+		void ShareSkybox(CameraRef camera);
 		Bool IsSkyboxSetup() const;
 		void SetSkyboxEnabled(Bool enabled);
 		Bool IsSkyboxEnabled() const;
-		SceneObjectSharedPtr GetSkyboxSceneObject();
-		TextureSharedPtr GetSkyboxTexture();
-		MaterialSharedPtr GetSkyboxMaterial();
+		SceneObjectRef GetSkyboxSceneObject();
+		TextureRef GetSkyboxTexture();
+		MaterialRef GetSkyboxMaterial();
 
 		void SetSSAOEnabled(Bool enabled);
 		Bool IsSSAOEnabled();
@@ -114,11 +114,11 @@ namespace GTE
 
 		void SetupOffscreenRenderTarget(Int32 width, Int32 height);
 		void SetupOffscreenRenderTarget(Int32 width, Int32 height, Bool cube);
-		RenderTargetSharedPtr GetRenderTarget();
+		RenderTargetRef GetRenderTarget();
 		void SetWidthHeightRatio(Real width, Real height);
 
 		void SetupCopyRenderTarget();
-		RenderTargetSharedPtr GetCopyRenderTarget();
+		RenderTargetRef GetCopyRenderTarget();
 
 		void UpdateDisplay();
 

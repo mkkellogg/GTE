@@ -356,7 +356,7 @@ namespace GTE
 
 		for (UInt32 i = 0; i < parent.GetChildrenCount(); i++)
 		{
-			SceneObjectSharedPtr childRef = parent.GetChildAt(i);
+			SceneObjectRef childRef = parent.GetChildAt(i);
 
 			if (!childRef.IsValid())
 			{
@@ -464,16 +464,16 @@ namespace GTE
 		{
 			SceneObject* child = renderableSceneObjects[s];
 
-			Mesh3DSharedPtr mesh = child->GetMesh3D();
-			Mesh3DFilterSharedPtr filter = child->GetMesh3DFilter();
+			Mesh3DRef mesh = child->GetMesh3D();
+			Mesh3DFilterRef filter = child->GetMesh3DFilter();
 
 			model.SetTo(child->GetAggregateTransform());
 			modelInverse.SetTo(model);
 			modelInverse.Invert();
 
-			Mesh3DRendererSharedPtr meshRenderer = child->GetMesh3DRenderer();
-			Mesh3DFilterSharedPtr meshFilter = child->GetMesh3DFilter();
-			SkinnedMesh3DRendererSharedPtr skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
+			Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
+			Mesh3DFilterRef meshFilter = child->GetMesh3DFilter();
+			SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
 
 			if(meshRenderer.IsValid() || skinnedMeshRenderer.IsValid())
 			{
@@ -488,7 +488,7 @@ namespace GTE
 					// for each sub-renderer, call the PreRender() method
 					for(UInt32 r = 0; r < renderer->GetSubRendererCount(); r++)
 					{
-						SubMesh3DRendererSharedPtr subRenderer = renderer->GetSubRenderer(r);
+						SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(r);
 						if(subRenderer.IsValid())
 						{
 							subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
@@ -570,11 +570,11 @@ namespace GTE
 		SceneObject* object = sceneCameras[cameraIndex];
 		NONFATAL_ASSERT(object != nullptr, "RenderManager::RenderSceneFromCamera -> Camera's scene object is not valid.", true);
 
-		CameraSharedPtr cameraRef = object->GetCamera();
+		CameraRef cameraRef = object->GetCamera();
 		NONFATAL_ASSERT(cameraRef.IsValid(), "RenderManager::RenderSceneFromCamera -> Camera is not valid.", true);
 		Camera& camera = cameraRef.GetRef();
 
-		SceneObjectSharedPtr sceneRoot = (SceneObjectSharedPtr)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
+		SceneObjectRef sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "RenderManager::RenderSceneFromCamera -> sceneRoot is null.");
 
 		// currently we use forward rendering
@@ -587,7 +587,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::RenderSceneForCamera(Camera& camera)
 	{
-		SceneObjectSharedPtr cameraObject = camera.GetSceneObject();
+		SceneObjectRef cameraObject = camera.GetSceneObject();
 		NONFATAL_ASSERT(cameraObject.IsValid(), "RenderManager::ForwardRenderSceneForCamera -> Camera is not attached to a scene object.", true);
 
 		// clear stack of activated render targets

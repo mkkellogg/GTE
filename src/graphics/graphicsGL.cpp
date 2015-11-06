@@ -841,7 +841,7 @@ namespace GTE
 	/*
 	 * Get the default render target for the graphics system.
 	 */
-	RenderTargetSharedPtr GraphicsGL::GetDefaultRenderTarget()
+	RenderTargetRef GraphicsGL::GetDefaultRenderTarget()
 	{
 		return defaultRenderTarget;
 	}

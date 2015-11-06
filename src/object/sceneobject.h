@@ -89,11 +89,11 @@ namespace GTE
 		CameraRef GetCamera();
 		LightRef GetLight();
 
-		void AddChild(SceneObjectSharedPtr child);
-		void RemoveChild(SceneObjectSharedPtr child);
+		void AddChild(SceneObjectRef child);
+		void RemoveChild(SceneObjectRef child);
 		UInt32 GetChildrenCount() const;
-		SceneObjectSharedPtr GetChildAt(UInt32 index) const;
-		SceneObjectSharedPtr GetParent() const;
+		SceneObjectRef GetChildAt(UInt32 index) const;
+		SceneObjectRef GetParent() const;
 
 		// TODO: optimize this hashing function (implement correctly)
 		typedef struct
