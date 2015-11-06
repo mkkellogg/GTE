@@ -464,15 +464,11 @@ namespace GTE
 		{
 			SceneObject* child = renderableSceneObjects[s];
 
-			Mesh3DRef mesh = child->GetMesh3D();
-			Mesh3DFilterRef filter = child->GetMesh3DFilter();
-
 			model.SetTo(child->GetAggregateTransform());
 			modelInverse.SetTo(model);
 			modelInverse.Invert();
 
 			Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
-			Mesh3DFilterRef meshFilter = child->GetMesh3DFilter();
 			SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
 
 			if(meshRenderer.IsValid() || skinnedMeshRenderer.IsValid())
@@ -819,7 +815,6 @@ namespace GTE
 					SceneObject* sceneObject = entry->Container;
 					NONFATAL_ASSERT(sceneObject != nullptr, "RenderManager::RenderSceneForLight -> Null scene object encountered.", true);
 
-					Mesh3DRef mesh = sceneObject->GetMesh3D();
 					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
 
 					// copy the full transform of the scene object, including those of all ancestors
@@ -1056,8 +1051,6 @@ namespace GTE
 					if(filter)continue;
 				}
 
-				Mesh3DRef mesh = sceneObject->GetMesh3D();
-				
 				// copy the full transform of the scene object, including those of all ancestors
 				Transform full;
 				full.SetTo(sceneObject->GetAggregateTransform());
@@ -1253,12 +1246,8 @@ namespace GTE
 		// send shadow volume uniforms to shader
 		shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
 
-		Light& castLight = const_cast<Light&>(light);
-		SceneObjectRef lightObject = castLight.GetSceneObject();
-
-		ObjectPairKey cacheKey;
-
 		// form cache key from sub-renderer's object ID and light's object ID
+		ObjectPairKey cacheKey;
 		cacheKey.ObjectAID = renderer->GetObjectID();
 		cacheKey.ObjectBID = light.GetObjectID();
 
@@ -1332,9 +1321,6 @@ namespace GTE
 
 				if(sceneObject->IsActive())
 				{
-					Mesh3DRef mesh = sceneObject->GetMesh3D();
-					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
-
 					// copy the full transform of the scene object, including those of all ancestors
 					Transform full;
 					full.SetTo(sceneObject->GetAggregateTransform());
