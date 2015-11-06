@@ -120,7 +120,7 @@ namespace GTE
 		// in [maxSoiX], [maxSoiY], and [maxSoiX] respectively.
 		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
-			SubMesh3DSharedPtr subMesh = subMeshes[i];
+			SubMesh3DRef subMesh = subMeshes[i];
 			if (subMesh.IsValid())
 			{
 				const Point3 temp = subMesh->GetCenter();
