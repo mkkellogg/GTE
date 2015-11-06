@@ -535,7 +535,19 @@ namespace GTE
 		renderQueues[renderQueueCount] = newQueue;
 		renderQueueCount++;
 
-		//TODO: SORT!!!
+		//TODO: sort more efficiently (quick sort would be best since it's in-place)
+		for(UInt32 i = 0; i < renderQueueCount; i++)
+		{
+			for(UInt32 j = 0; j < renderQueueCount; j++)
+			{
+				if(j < renderQueueCount - 1 && renderQueues[j] > renderQueues[j + 1])
+				{
+					RenderQueue * temp = renderQueues[j];
+					renderQueues[j] = renderQueues[j + 1];
+					renderQueues[j + 1] = temp;
+				}
+			}
+		}
 
 		return newQueue;
 	}
