@@ -199,7 +199,7 @@ namespace GTE
 		return mesh3DFilter;
 	}
 
-	Mesh3DRendererRef SceneObject::GetMesh3DRenderer()
+	const Mesh3DRendererRef& SceneObject::GetMesh3DRenderer()
 	{
 		return renderer3D;
 	}

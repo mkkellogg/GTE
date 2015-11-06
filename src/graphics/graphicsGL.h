@@ -98,8 +98,8 @@ namespace GTE
 		void PostRender() override;
 
 		RenderTarget * CreateDefaultRenderTarget() override;
-		Bool ActivateRenderTarget(RenderTargetRef target) override;
-		RenderTargetRef GetCurrrentRenderTarget() override;
+		Bool ActivateRenderTarget(const RenderTargetRef& target) override;
+		const RenderTargetRef& GetCurrrentRenderTarget() override;
 		Bool ActivateCubeRenderTargetSide(CubeTextureSide side) override;
 		Bool RestoreDefaultRenderTarget() override;
 
@@ -134,8 +134,8 @@ namespace GTE
 
 		RenderTargetRef GetDefaultRenderTarget() override;
 
-		void SetupStateForMaterial(MaterialRef& material, Bool reverseFaceCulling);
-		void ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling) override;
+		void SetupStateForMaterial(const MaterialRef& material, Bool reverseFaceCulling);
+		void ActivateMaterial(const MaterialRef& material, Bool reverseFaceCulling) override;
 		MaterialRef& GetActiveMaterial() override;
 
 		void EnterRenderMode(RenderMode renderMode) override;		

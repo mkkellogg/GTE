@@ -83,7 +83,7 @@ namespace GTE
 
 		Mesh3DRef GetMesh3D();
 		Mesh3DFilterRef GetMesh3DFilter();
-		Mesh3DRendererRef GetMesh3DRenderer();
+		const Mesh3DRendererRef& GetMesh3DRenderer();
 		SkinnedMesh3DRendererRef GetSkinnedMesh3DRenderer();
 
 		CameraRef GetCamera();

@@ -29,7 +29,7 @@ namespace GTE
 
 	UInt32 ShaderSourceLines::GetLineCount()
 	{
-		return lines.size();
+		return (UInt32)lines.size();
 	}
 
 	ShaderSourceLines::Iterator ShaderSourceLines::Begin() const
@@ -40,7 +40,7 @@ namespace GTE
 
 	ShaderSourceLines::Iterator ShaderSourceLines::End() const
 	{
-		ShaderSourceLines::Iterator end(lines.size(), this);
+		ShaderSourceLines::Iterator end((UInt32)lines.size(), this);
 		return end;
 	}
 }

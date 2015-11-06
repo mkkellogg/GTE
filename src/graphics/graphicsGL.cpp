@@ -904,7 +904,7 @@ namespace GTE
 	 * Activate a material, meaning its shader, attributes, and uniforms will be used for all rendering
 	 * calls while it is active.
 	 */
-	void GraphicsGL::ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling)
+	void GraphicsGL::ActivateMaterial(const MaterialRef& material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::ActivateMaterial -> 'material' is invalid", true);
 
@@ -947,7 +947,7 @@ namespace GTE
 	/*
 	* Set OpenGL state to match the state specified by [material].
 	*/
-	void GraphicsGL::SetupStateForMaterial(MaterialRef& material, Bool reverseFaceCulling)
+	void GraphicsGL::SetupStateForMaterial(const MaterialRef& material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material != nullptr, "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
 
@@ -1244,23 +1244,24 @@ namespace GTE
 	/*
 	 * Make [target] the target for all standard rendering operations.
 	 */
-	Bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
+	Bool GraphicsGL::ActivateRenderTarget(const RenderTargetRef& target)
 	{
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> 'target' is not valid.", false, true);
 
-		RenderTargetGL * targetGL = dynamic_cast<RenderTargetGL *>(target.GetPtr());
-		ASSERT(targetGL != nullptr, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.");
+		RenderTarget * renderTarget = const_cast<RenderTarget*>(target.GetConstPtr());
+		RenderTargetGL * renderTargetGL = dynamic_cast<RenderTargetGL *>(renderTarget);
+		ASSERT(renderTargetGL != nullptr, "RenderTargetGL::ActiveRenderTarget -> Render target is not a valid OpenGL render target.");
 
 		if (currentRenderTarget.IsValid())
 		{
 			// prevent activating the currently active target.
 			RenderTargetGL * currentTargetGL = dynamic_cast<RenderTargetGL *>(currentRenderTarget.GetPtr());
-			if (currentTargetGL->GetFBOID() == targetGL->GetFBOID())return true;
+			if (currentTargetGL->GetFBOID() == renderTargetGL->GetFBOID())return true;
 		}
 
 		glViewport(0, 0, target->GetWidth(), target->GetHeight());
 
-		glBindFramebuffer(GL_FRAMEBUFFER, targetGL->GetFBOID());
+		glBindFramebuffer(GL_FRAMEBUFFER, renderTargetGL->GetFBOID());
 
 		currentRenderTarget = target;
 
@@ -1272,7 +1273,7 @@ namespace GTE
 	/*
 	 * Get the currently active render target.
 	 */
-	RenderTargetRef GraphicsGL::GetCurrrentRenderTarget()
+	const RenderTargetRef& GraphicsGL::GetCurrrentRenderTarget()
 	{
 		return currentRenderTarget;
 	}

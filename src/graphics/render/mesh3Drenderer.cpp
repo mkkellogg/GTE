@@ -49,15 +49,6 @@ namespace GTE
 	}
 
 	/*
-	* Get a reference to the material at [index] in the member list of materials, [materials].
-	*/
-	MaterialRef* Mesh3DRenderer::GetMaterialPtr(UInt32 index)
-	{
-		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", nullptr, true);
-		return &materials[index];
-	}
-
-	/*
 	 * Deallocate and destroy the sub-renderer at [index] in the member list of
 	 * sub-renderers: [subRenderers].
 	 */
@@ -86,9 +77,9 @@ namespace GTE
 	/*
 	 * Get a reference to the material at [index] in the member list of materials, [materials].
 	 */
-	MaterialRef Mesh3DRenderer::GetMaterial(UInt32 index)
+	const MaterialRef& Mesh3DRenderer::GetMaterial(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", MaterialRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", MaterialRef::NullRef, true);
 		return materials[index];
 	}
 

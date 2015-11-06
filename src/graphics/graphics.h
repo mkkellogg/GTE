@@ -94,8 +94,8 @@ namespace GTE
 		virtual Bool Init(const GraphicsAttributes& attributes);
 		virtual RenderTarget * CreateDefaultRenderTarget() = 0;
 		RenderTargetRef SetupDefaultRenderTarget();
-		virtual Bool ActivateRenderTarget(RenderTargetRef target) = 0;
-		virtual RenderTargetRef GetCurrrentRenderTarget() = 0;
+		virtual Bool ActivateRenderTarget(const RenderTargetRef& target) = 0;
+		virtual const RenderTargetRef& GetCurrrentRenderTarget() = 0;
 		virtual Bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
 		virtual Bool RestoreDefaultRenderTarget() = 0;
 		
@@ -124,7 +124,7 @@ namespace GTE
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
 		virtual RenderTargetRef GetDefaultRenderTarget() = 0;
 
-		virtual void ActivateMaterial(MaterialRef&, Bool reverseFaceCulling) = 0;
+		virtual void ActivateMaterial(const MaterialRef&, Bool reverseFaceCulling) = 0;
 		virtual MaterialRef& GetActiveMaterial() = 0;
 
 		virtual void EnterRenderMode(RenderMode renderMode) = 0;		

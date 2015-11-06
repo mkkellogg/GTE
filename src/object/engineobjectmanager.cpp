@@ -169,9 +169,9 @@ namespace GTE
 		delete sceneObject;
 	}
 
-	const SceneObjectRef EngineObjectManager::GetSceneRoot() const
+	const SceneObjectRef& EngineObjectManager::GetSceneRoot() const
 	{
-		return (const SceneObjectRef)sceneRootRef;
+		return sceneRootRef;
 	}
 
 	Mesh3DRef EngineObjectManager::CreateMesh3D(UInt32 subMeshCount)

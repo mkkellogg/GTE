@@ -133,7 +133,7 @@ namespace GTE
 		// cache shadow volumes that don't need to be constantly rebuilt
 		std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
-		std::stack<RenderTargetRef> renderTargetStack;
+		std::stack<const RenderTargetRef*> renderTargetStack;
 
 		void Update() override;
 		void PreProcessScene(SceneObject& parent, UInt32 recursionDepth);
@@ -178,7 +178,7 @@ namespace GTE
 
 		void ClearBuffersForCamera(const Camera& camera) const;
 
-		void ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling);
+		void ActivateMaterial(const MaterialRef& material, Bool reverseFaceCulling);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);
 		void SendModelViewProjectionToShader(const Transform& modelViewProjection);
 		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);
@@ -189,8 +189,8 @@ namespace GTE
 		Bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 
-		void PushRenderTarget(RenderTargetRef renderTarget);
-		RenderTargetRef PopRenderTarget();
+		void PushRenderTarget(const RenderTargetRef& renderTarget);
+		const RenderTargetRef& PopRenderTarget();
 		void ClearRenderTargetStack();
 
 		Bool InitFullScreenQuad();
@@ -204,7 +204,7 @@ namespace GTE
 		void RenderScene() override;
 		void ClearCaches() override;
 
-		void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers) override;
+		void RenderFullScreenQuad(const RenderTargetRef& renderTarget, const MaterialRef& material, Bool clearBuffers) override;
 	};
 }
 

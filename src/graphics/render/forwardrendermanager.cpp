@@ -182,9 +182,9 @@ namespace GTE
 	/*
 	 * Push a new render target on to the render target stack and activate it.
 	 */
-	void ForwardRenderManager::PushRenderTarget(RenderTargetRef renderTarget)
+	void ForwardRenderManager::PushRenderTarget(const RenderTargetRef& renderTarget)
 	{
-		renderTargetStack.push(renderTarget);
+		renderTargetStack.push(&renderTarget);
 		// activate the new render target
 		Engine::Instance()->GetGraphicsSystem()->ActivateRenderTarget(renderTarget);
 	}
@@ -193,9 +193,9 @@ namespace GTE
 	 * Pop the current render target off the stack and activate the one below it.
 	 * If there is none below, activate the default render target.
 	 */
-	RenderTargetRef ForwardRenderManager::PopRenderTarget()
+	const RenderTargetRef& ForwardRenderManager::PopRenderTarget()
 	{
-		RenderTargetRef old = RenderTargetRef::Null();
+		const RenderTargetRef* old = nullptr;
 		if (renderTargetStack.size() > 0)
 		{
 			old = renderTargetStack.top();
@@ -204,7 +204,7 @@ namespace GTE
 
 		if (renderTargetStack.size() > 0)
 		{
-			RenderTargetRef top = renderTargetStack.top();
+			const RenderTargetRef& top = *renderTargetStack.top();
 			// activate the new render target
 			Engine::Instance()->GetGraphicsSystem()->ActivateRenderTarget(top);
 		}
@@ -214,7 +214,7 @@ namespace GTE
 			Engine::Instance()->GetGraphicsSystem()->RestoreDefaultRenderTarget();
 		}
 
-		return old;
+		return old == nullptr ? RenderTargetRef::NullRef : *old;
 
 	}
 
@@ -260,7 +260,7 @@ namespace GTE
 	 * [clearBuffers] - Should the buffers belonging to [renderTarget] be cleared before rendering?
 	 *
 	 */
-	void ForwardRenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers)
+	void ForwardRenderManager::RenderFullScreenQuad(const RenderTargetRef& renderTarget, const MaterialRef& material, Bool clearBuffers)
 	{
 		Transform model;
 		Transform modelView;
@@ -280,7 +280,7 @@ namespace GTE
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 
 		// save the currently active render target
-		RenderTargetRef currentTarget = graphics->GetCurrrentRenderTarget();
+		const RenderTargetRef& currentTarget = graphics->GetCurrrentRenderTarget();
 
 		// set [renderTarget] as the current render target
 		graphics->ActivateRenderTarget(renderTarget);
@@ -297,7 +297,7 @@ namespace GTE
 		fullScreenQuadObject->SetActive(true);
 
 		// set [material] to be the material for the full screen quad mesh
-		Mesh3DRendererRef renderer = fullScreenQuadObject->GetMesh3DRenderer();
+		const Mesh3DRendererRef& renderer = fullScreenQuadObject->GetMesh3DRenderer();
 		if (renderer->GetMaterialCount() > 0)renderer->SetMaterial(0, material);
 		else renderer->AddMaterial(material);
 
@@ -323,11 +323,11 @@ namespace GTE
 
 		ClearAllRenderQueues();
 
-		SceneObjectRef sceneRoot = (SceneObjectRef)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
+		const SceneObjectRef& sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "RenderManager::PreProcessScene -> 'sceneRoot' is null.");
 
 		// gather information about the cameras, lights, and renderable meshes in the scene
-		PreProcessScene(sceneRoot.GetRef(), 0);
+		PreProcessScene(const_cast<SceneObject&>(sceneRoot.GetConstRef()), 0);
 		// perform any pre-transformations and calculations (e.g. vertex skinning)
 		PreRenderScene();
 		// calculate shadow volumes
@@ -434,11 +434,11 @@ namespace GTE
 						UInt32 subMeshCount = mesh->GetSubMeshCount();
 						for(UInt32 i = 0; i < subMeshCount; i++)
 						{
-							MaterialRef* mat = renderer->GetMaterialPtr(i % materialCount);
-							RenderQueue* targetRenderQueue = GetRenderQueue((UInt32)(*mat)->GetRenderQueueType());
+							MaterialRef& mat = const_cast<MaterialRef&>(renderer->GetMaterial(i % materialCount));
+							RenderQueue* targetRenderQueue = GetRenderQueue((UInt32)mat->GetRenderQueueType());
 
 							Transform * aggregateTransform = const_cast<Transform*>(&child->GetAggregateTransform());
-							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), mat, meshFilter.GetPtr(), aggregateTransform);
+							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), &mat, meshFilter.GetPtr(), aggregateTransform);
 						}
 					}
 				}
@@ -916,7 +916,7 @@ namespace GTE
 			skyboxEntry.Container = skyboxObject.GetPtr();
 			skyboxEntry.Mesh = mesh->GetSubMesh(0).GetPtr();
 			skyboxEntry.Renderer = renderer->GetSubRenderer(0).GetPtr();
-			skyboxEntry.RenderMaterial = renderer->GetMaterialPtr(0);
+			skyboxEntry.RenderMaterial = const_cast<MaterialRef*>(&renderer->GetMaterial(0));
 
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 
@@ -1360,14 +1360,17 @@ namespace GTE
 		Transform model;
 		Transform modelInverse;
 
+		const Mesh3DRendererRef& mesh3DRenderer = sceneObject.GetMesh3DRenderer();
+		const SkinnedMesh3DRendererRef& skinnedMesh3DRenderer = sceneObject.GetSkinnedMesh3DRenderer();
+
 		// check if [sceneObject] has a mesh & renderer
-		if (sceneObject.GetMesh3DRenderer().IsValid())
+		if (mesh3DRenderer.IsValid())
 		{
-			renderer = sceneObject.GetMesh3DRenderer().GetPtr();
+			renderer = const_cast<Mesh3DRenderer *>(mesh3DRenderer.GetConstPtr());
 		}
-		else if (sceneObject.GetSkinnedMesh3DRenderer().IsValid())
+		else if (skinnedMesh3DRenderer.IsValid())
 		{
-			renderer = (Mesh3DRenderer *)sceneObject.GetSkinnedMesh3DRenderer().GetPtr();
+			renderer = const_cast<SkinnedMesh3DRenderer *>(skinnedMesh3DRenderer.GetConstPtr());
 		}
 
 		if (renderer != nullptr)
@@ -1466,15 +1469,23 @@ namespace GTE
 		}
 
 		SceneObject * object = sceneObject.GetPtr();
-
 		if (!object->IsActive())return false;
 
 		Mesh3DRenderer * renderer = nullptr;
+		const Mesh3DRendererRef& mesh3DRenderer = object->GetMesh3DRenderer();
+		const SkinnedMesh3DRendererRef& skinnedMesh3DRenderer = object->GetSkinnedMesh3DRenderer();
 
-		// check if current SceneObject has a mesh & renderer
-		if (object->GetMesh3DRenderer().IsValid())renderer = object->GetMesh3DRenderer().GetPtr();
-		else if (object->GetSkinnedMesh3DRenderer().IsValid())renderer = (Mesh3DRenderer *)object->GetSkinnedMesh3DRenderer().GetPtr();
-		else
+		// check if [sceneObject] has a mesh & renderer
+		if(mesh3DRenderer.IsValid())
+		{
+			renderer = const_cast<Mesh3DRenderer *>(mesh3DRenderer.GetConstPtr());
+		}
+		else if(skinnedMesh3DRenderer.IsValid())
+		{
+			renderer = const_cast<SkinnedMesh3DRenderer *>(skinnedMesh3DRenderer.GetConstPtr());
+		}
+
+		if(object == nullptr)
 		{
 			Debug::PrintWarning("RenderManager::ValidateSceneObjectForRendering -> Could not find renderer for mesh.");
 			return false;
@@ -1835,7 +1846,7 @@ namespace GTE
 	 * Activate [material], which will switch the GPU's active shader to
 	 * the one associated with it.
 	 */
-	void ForwardRenderManager::ActivateMaterial(MaterialRef& material, Bool reverseFaceCulling)
+	void ForwardRenderManager::ActivateMaterial(const MaterialRef& material, Bool reverseFaceCulling)
 	{
 		// We MUST notify the graphics system about the change in active material because other
 		// components (like Mesh3DRenderer) need to know about the active material

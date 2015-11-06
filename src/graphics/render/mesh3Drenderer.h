@@ -54,12 +54,10 @@ namespace GTE
 		void DestroyRenderers();
 		void DestroyRenderer(UInt32 index);
 
-		MaterialRef* GetMaterialPtr(UInt32 index);
-
 	public:
 
 		UInt32 GetMaterialCount() const;
-		MaterialRef GetMaterial(UInt32 index);
+		const MaterialRef& GetMaterial(UInt32 index);
 		void SetMaterial(UInt32 index, MaterialRef material);
 		void AddMaterial(MaterialRef material);
 

@@ -93,7 +93,7 @@ namespace GTE
 		LayerManager& GetLayerManager();
 
 		SceneObjectRef FindSceneObjectInDirectory(unsigned long objectID);
-		const SceneObjectRef GetSceneRoot() const;
+		const SceneObjectRef& GetSceneRoot() const;
 		SceneObjectRef CreateSceneObject();
 		void DestroySceneObject(SceneObjectRef sceneObject);
 

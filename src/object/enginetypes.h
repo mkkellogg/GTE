@@ -98,7 +98,8 @@ namespace GTE
 		friend class EngineObjectManager;
 
 	public:
-
+		static EngineObjectRef<T> NullRef;
+		
 		EngineObjectRef() : std::shared_ptr<T>(nullptr) {}
 		EngineObjectRef(const EngineObjectRef<T>& ref) : std::shared_ptr<T>(ref){}
 		EngineObjectRef(const std::shared_ptr<T>& ref) : std::shared_ptr<T>(ref){}
@@ -149,6 +150,8 @@ namespace GTE
 			return EngineObjectRef<T>();
 		}
 	};
+
+	template <typename T> EngineObjectRef<T> EngineObjectRef<T>::NullRef;
 
 	typedef EngineObjectRef<Shader> ShaderRef;
 	typedef EngineObjectRef<SubMesh3DRenderer> SubMesh3DRendererRef;
