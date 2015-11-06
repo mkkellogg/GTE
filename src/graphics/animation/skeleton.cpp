@@ -198,7 +198,7 @@ namespace GTE
 	/*
 	 * Replace the bones in this skeleton with matching bones from [skeleton].
 	 */
-	void Skeleton::OverrideBonesFrom(SkeletonSharedConstPtr skeleton, Bool takeOffset, Bool takeNode)
+	void Skeleton::OverrideBonesFrom(SkeletonConstRef skeleton, Bool takeOffset, Bool takeNode)
 	{
 		NONFATAL_ASSERT(skeleton.IsValid(), "Skeleton::OverrideBonesFrom -> 'skeleton' is not valid.", true);
 		OverrideBonesFrom(skeleton.GetConstPtr(), takeOffset, takeNode);

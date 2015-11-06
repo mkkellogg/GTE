@@ -107,7 +107,7 @@ namespace GTE
 		// what should happen when playback reaches the end of the clip?
 		PlaybackMode PlayBackMode;
 
-		AnimationInstance(SkeletonSharedPtr target, AnimationSharedConstPtr animation);
+		AnimationInstance(SkeletonRef target, AnimationConstRef animation);
 		~AnimationInstance();
 
 		void Destroy();

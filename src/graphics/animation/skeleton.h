@@ -78,7 +78,7 @@ namespace GTE
 		SkeletonNode * GetNodeFromList(UInt32 nodeIndex);
 		void AddNodeToList(SkeletonNode * node);
 
-		void OverrideBonesFrom(SkeletonSharedConstPtr skeleton, Bool takeOffset, Bool takeNode);
+		void OverrideBonesFrom(SkeletonConstRef skeleton, Bool takeOffset, Bool takeNode);
 		void OverrideBonesFrom(const Skeleton * skeleton, Bool takeOffset, Bool takeNode);
 	};
 }

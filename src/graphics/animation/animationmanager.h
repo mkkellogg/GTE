@@ -30,13 +30,13 @@ namespace GTE
 
 	public:
 
-		Bool IsCompatible(SkinnedMesh3DRendererSharedConstPtr meshRenderer, AnimationSharedConstPtr animation) const;
-		Bool IsCompatible(SkeletonSharedConstPtr skeleton, AnimationSharedConstPtr animation) const;
+		Bool IsCompatible(SkinnedMesh3DRendererConstRef meshRenderer, AnimationConstRef animation) const;
+		Bool IsCompatible(SkeletonConstRef skeleton, AnimationConstRef animation) const;
 
 		void Update();
 
-		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkeletonSharedPtr target);
-		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererSharedConstPtr renderer);
+		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkeletonRef target);
+		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererConstRef renderer);
 	};
 }
 

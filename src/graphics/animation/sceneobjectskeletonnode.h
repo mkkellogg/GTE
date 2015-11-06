@@ -29,7 +29,7 @@ namespace GTE
 		// target SceneObject
 		SceneObjectSharedPtr Target;
 
-		SceneObjectSkeletonNode(SceneObjectSharedPtr target, Int32 boneIndex, const std::string& name);
+		SceneObjectSkeletonNode(SceneObjectRef target, Int32 boneIndex, const std::string& name);
 		~SceneObjectSkeletonNode();
 
 		const Transform * GetFullTransform() const;

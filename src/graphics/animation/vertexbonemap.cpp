@@ -93,7 +93,7 @@ namespace GTE
 	/*
 	 * Update the bone indices in this map to match that of [skeleton]
 	 */
-	void VertexBoneMap::BindTo(SkeletonSharedConstPtr skeleton)
+	void VertexBoneMap::BindTo(SkeletonConstRef skeleton)
 	{
 		NONFATAL_ASSERT(skeleton.IsValid(), "VertexBoneMap::BindTo -> 'skeleton' is not valid.", true);
 
