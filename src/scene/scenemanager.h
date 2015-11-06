@@ -31,9 +31,6 @@ namespace GTE
 		SceneManager();
 		~SceneManager();
 
-		// map object IDs of Skeleton objects to their assign animation player
-		std::unordered_map<ObjectID, AnimationPlayerSharedPtr> activePlayers;
-
 		// transform stack used for processing scene hierarchy
 		DataStack<Matrix4x4> sceneProcessingStack;
 

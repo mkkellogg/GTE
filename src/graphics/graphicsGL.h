@@ -168,11 +168,11 @@ namespace GTE
 		
 		Bool CanBlitColorBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
 		Bool CanBlitDepthBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
-		void CopyBetweenRenderTargets(RenderTargetSharedPtr src, RenderTargetSharedConstPtr dest) const override;
+		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetConstRef dest) const override;
 
-		void SetTextureData(TextureSharedPtr texture, const Byte * data) const override;
-		void SetTextureData(TextureSharedPtr texture, const Byte * data, CubeTextureSide side) const override;
-		void RebuildMipMaps(TextureSharedPtr texture) const override;
+		void SetTextureData(TextureRef texture, const Byte * data) const override;
+		void SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const override;
+		void RebuildMipMaps(TextureRef texture) const override;
 
 		Bool AddClipPlane() override;
 		void DeactiveAllClipPlanes() override;		

@@ -1371,7 +1371,7 @@ namespace GTE
 	/*
 	 * Copy the contents of one render target to another.
 	 */
-	void GraphicsGL::CopyBetweenRenderTargets(RenderTargetSharedPtr src, RenderTargetSharedConstPtr dest) const
+	void GraphicsGL::CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetConstRef dest) const
 	{
 		GLuint currentFB = 0;
 		if (currentRenderTarget.IsValid())
@@ -1413,7 +1413,7 @@ namespace GTE
 	/*
 	 * Set the contents of [texture] be that of [data].
 	 */
-	void GraphicsGL::SetTextureData(TextureSharedPtr texture, const Byte * data) const
+	void GraphicsGL::SetTextureData(TextureRef texture, const Byte * data) const
 	{
 		SetTextureData(texture, data, CubeTextureSide::Front);
 	}
@@ -1422,7 +1422,7 @@ namespace GTE
 	 * Set the contents of [texture] be that of [data]. If it is a cube texture, update
 	 * the side specified by [side].
 	 */
-	void GraphicsGL::SetTextureData(TextureSharedPtr texture, const Byte * data, CubeTextureSide side) const
+	void GraphicsGL::SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const
 	{
 		NONFATAL_ASSERT(texture.IsValid(), "GraphicsGL::SetTextureData -> 'texture' is not valid.", true);
 
@@ -1453,7 +1453,7 @@ namespace GTE
 	/*
 	 * Force a rebuild of the mip-maps for [texture].
 	 */
-	void GraphicsGL::RebuildMipMaps(TextureSharedPtr texture) const
+	void GraphicsGL::RebuildMipMaps(TextureRef texture) const
 	{
 		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
 		ASSERT(texGL != nullptr, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");

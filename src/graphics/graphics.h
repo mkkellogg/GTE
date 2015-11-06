@@ -158,11 +158,11 @@ namespace GTE
 
 		virtual const GraphicsAttributes& GetAttributes() const;
 	
-		virtual void CopyBetweenRenderTargets(RenderTargetSharedPtr src, RenderTargetSharedConstPtr dest) const = 0;
+		virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetConstRef dest) const = 0;
 
-		virtual void SetTextureData(TextureSharedPtr texture, const Byte * data) const = 0;
-		virtual void SetTextureData(TextureSharedPtr texture, const Byte * data, CubeTextureSide side) const = 0;
-		virtual void RebuildMipMaps(TextureSharedPtr texture) const = 0;
+		virtual void SetTextureData(TextureRef texture, const Byte * data) const = 0;
+		virtual void SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const = 0;
+		virtual void RebuildMipMaps(TextureRef texture) const = 0;
 
 		virtual Bool AddClipPlane() = 0;
 		virtual void DeactiveAllClipPlanes() = 0;		

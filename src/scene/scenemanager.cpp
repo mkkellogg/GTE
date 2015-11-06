@@ -56,7 +56,7 @@ namespace GTE
 	 */
 	void SceneManager::Update()
 	{
-		SceneObjectSharedPtr sceneRoot = (SceneObjectSharedPtr)Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
+		SceneObjectRef sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "SceneManager::Update -> 'sceneRoot' is null.");
 
 		Transform baseTransform;
@@ -78,7 +78,7 @@ namespace GTE
 
 		for(UInt32 i = 0; i < parent.GetChildrenCount(); i++)
 		{
-			SceneObjectSharedPtr child = parent.GetChildAt(i);
+			SceneObjectRef child = parent.GetChildAt(i);
 
 			if(!child.IsValid())
 			{
