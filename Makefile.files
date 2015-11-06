@@ -99,7 +99,7 @@ $(ENGINEOBJ):
 # ==================================
 
 ENGINEOBJECTSRC= src/object
-ENGINEOBJECTSRCS= $(call toFullPath,$(ENGINEOBJECTSRC),sceneobjectcomponent.cpp engineobjectmanager.cpp engineobject.cpp sceneobject.cpp shaderorganizer.cpp objectpairkey.cpp layermanager.cpp)
+ENGINEOBJECTSRCS= $(call toFullPath,$(ENGINEOBJECTSRC),sceneobjectcomponent.cpp engineobjectmanager.cpp engineobject.cpp sceneobject.cpp shaderorganizer.cpp objectpairkey.cpp layermanager.cpp enginetypes.cpp)
 ENGINEOBJECTOBJ= $(call srcFilesToObjFiles,$(ENGINEOBJECTSRCS),$(ENGINEOBJECTSRC),$(OUTPUTDIR))
 		
 $(ENGINEOBJECTOBJ): 

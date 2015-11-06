@@ -110,18 +110,19 @@ namespace GTE
 		return true;
 	}
 
-	SceneObjectSharedPtr EngineObjectManager::FindSceneObjectInDirectory(unsigned long objectID)
+	SceneObjectRef EngineObjectManager::FindSceneObjectInDirectory(unsigned long objectID)
 	{
-		if (sceneObjectDirectory.find(objectID) != sceneObjectDirectory.end())
+		auto result = sceneObjectDirectory.find(objectID);
+		if (result != sceneObjectDirectory.end())
 		{
-			SceneObjectSharedPtr ref = sceneObjectDirectory[objectID];
+			SceneObjectRef ref = (*result).second;
 			return ref;
 		}
 
-		return SceneObjectSharedPtr::Null();
+		return NullSceneObjectRef;
 	}
 
-	void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, SceneObjectSharedPtr ref)
+	void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref)
 	{
 		ASSERT(ref.IsValid(), "EngineObjectManager::AddSceneObjectToDirectory -> Tried to add invalid scene object reference.");
 		sceneObjectDirectory[objectID] = ref;
@@ -169,7 +170,7 @@ namespace GTE
 		delete sceneObject;
 	}
 
-	const SceneObjectSharedPtr& EngineObjectManager::GetSceneRoot() const
+	SceneObjectRef EngineObjectManager::GetSceneRoot() const
 	{
 		return sceneRootRef;
 	}

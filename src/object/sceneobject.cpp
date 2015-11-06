@@ -115,12 +115,12 @@ namespace GTE
 		if (skinnedMesh3DRenderer.IsValid() && mesh.IsValid())skinnedMesh3DRenderer->InitializeForMesh();
 	}
 
-	Bool SceneObject::SetMesh3DRenderer(Mesh3DRendererSharedPtr renderer)
+	Bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
 	{
 		if (this->renderer3D == renderer)return true;
 		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::SetMeshRenderer3D -> 'renderer' is invalid.", false, true);
 
-		SceneObjectSharedPtr thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 		ASSERT(thisRef.IsValid(), "SceneObject::SetMeshRenderer3D -> Could not find matching reference for scene object");
 
 		renderer->sceneObject = thisRef;
@@ -131,12 +131,12 @@ namespace GTE
 		return true;
 	}
 
-	Bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererSharedPtr renderer)
+	Bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
 	{
 		if (this->skinnedRenderer3D == renderer)return true;
 		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::SkinnedMesh3DRendererRef -> 'renderer' is invalid.", false, true);
 
-		SceneObjectSharedPtr thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 		ASSERT(thisRef.IsValid(), "SceneObject::SkinnedMesh3DRendererRef -> Could not find matching reference for scene object.");
 
 		renderer->sceneObject = thisRef;
@@ -147,11 +147,11 @@ namespace GTE
 		return true;
 	}
 
-	Bool SceneObject::SetMesh3DFilter(Mesh3DFilterSharedPtr filter)
+	Bool SceneObject::SetMesh3DFilter(Mesh3DFilterRef filter)
 	{
 		NONFATAL_ASSERT_RTRN(filter.IsValid(), "SceneObject::SetMesh3DFilter -> 'filter' is invalid.", false, true);
 
-		SceneObjectSharedPtr thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 		ASSERT(thisRef.IsValid(), "SceneObject::SetMesh3DFilter -> Could not find matching reference for scene object.");
 
 		filter->sceneObject = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
@@ -162,11 +162,11 @@ namespace GTE
 		return true;
 	}
 
-	Bool SceneObject::SetCamera(CameraSharedPtr camera)
+	Bool SceneObject::SetCamera(CameraRef camera)
 	{
 		NONFATAL_ASSERT_RTRN(camera.IsValid(), "SceneObject::SetCamera -> 'camera' is invalid.", false, true);
 
-		SceneObjectSharedPtr thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 		ASSERT(thisRef.IsValid(), "SceneObject::SetCamera -> Could not find matching reference for scene object.");
 
 		camera->sceneObject = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
@@ -175,11 +175,11 @@ namespace GTE
 		return true;
 	}
 
-	Bool SceneObject::SetLight(LightSharedPtr light)
+	Bool SceneObject::SetLight(LightRef light)
 	{
 		NONFATAL_ASSERT_RTRN(light.IsValid(), "SceneObject::SetLight -> 'light' is invalid.", false, true);
 
-		SceneObjectSharedPtr thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 		ASSERT(thisRef.IsValid(), "SceneObject::SetLight -> Could not find matching reference for scene object.");
 
 		light->sceneObject = thisRef;
@@ -188,33 +188,33 @@ namespace GTE
 		return true;
 	}
 
-	Mesh3DSharedPtr SceneObject::GetMesh3D()
+	Mesh3DRef SceneObject::GetMesh3D()
 	{
-		if (!mesh3DFilter.IsValid())return Mesh3DSharedPtr::Null();
+		if (!mesh3DFilter.IsValid())return NullMesh3DRef;
 		return mesh3DFilter->GetMesh3D();
 	}
 
-	Mesh3DFilterSharedPtr SceneObject::GetMesh3DFilter()
+	Mesh3DFilterRef SceneObject::GetMesh3DFilter()
 	{
 		return mesh3DFilter;
 	}
 
-	const Mesh3DRendererSharedPtr& SceneObject::GetMesh3DRenderer()
+	Mesh3DRendererRef SceneObject::GetMesh3DRenderer()
 	{
 		return renderer3D;
 	}
 
-	SkinnedMesh3DRendererSharedPtr SceneObject::GetSkinnedMesh3DRenderer()
+	SkinnedMesh3DRendererRef SceneObject::GetSkinnedMesh3DRenderer()
 	{
 		return skinnedRenderer3D;
 	}
 
-	CameraSharedPtr SceneObject::GetCamera()
+	CameraRef SceneObject::GetCamera()
 	{
 		return camera;
 	}
 
-	LightSharedPtr SceneObject::GetLight()
+	LightRef SceneObject::GetLight()
 	{
 		return light;
 	}

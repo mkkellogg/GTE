@@ -47,8 +47,8 @@ namespace GTE
 
 	public:
 
-		void SetMesh3D(Mesh3DSharedPtr mesh);
-		Mesh3DSharedPtr GetMesh3D();
+		void SetMesh3D(Mesh3DRef mesh);
+		Mesh3DRef GetMesh3D();
 
 		void SetCastShadows(Bool castShadows);
 		Bool GetCastShadows() const;

@@ -74,20 +74,20 @@ namespace GTE
 		const SceneObjectTransform& GetConstTransform() const;
 		const Transform& GetAggregateTransform() const;
 
-		Bool SetMesh3DRenderer(Mesh3DRendererSharedPtr renderer);
-		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererSharedPtr renderer);
-		Bool SetMesh3DFilter(Mesh3DFilterSharedPtr filter);
+		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
+		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
+		Bool SetMesh3DFilter(Mesh3DFilterRef filter);
 
-		Bool SetCamera(CameraSharedPtr camera);
-		Bool SetLight(LightSharedPtr light);
+		Bool SetCamera(CameraRef camera);
+		Bool SetLight(LightRef light);
 
-		Mesh3DSharedPtr GetMesh3D();
-		Mesh3DFilterSharedPtr GetMesh3DFilter();
-		const Mesh3DRendererSharedPtr& GetMesh3DRenderer();
-		SkinnedMesh3DRendererSharedPtr GetSkinnedMesh3DRenderer();
+		Mesh3DRef GetMesh3D();
+		Mesh3DFilterRef GetMesh3DFilter();
+		Mesh3DRendererRef GetMesh3DRenderer();
+		SkinnedMesh3DRendererRef GetSkinnedMesh3DRenderer();
 
-		CameraSharedPtr GetCamera();
-		LightSharedPtr GetLight();
+		CameraRef GetCamera();
+		LightRef GetLight();
 
 		void AddChild(SceneObjectSharedPtr child);
 		void RemoveChild(SceneObjectSharedPtr child);

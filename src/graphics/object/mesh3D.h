@@ -62,8 +62,8 @@ namespace GTE
 	public:
 
 		UInt32 GetSubMeshCount() const;
-		void SetSubMesh(SubMesh3DSharedPtr mesh, UInt32 index);
-		SubMesh3DSharedPtr GetSubMesh(UInt32 index);
+		void SetSubMesh(SubMesh3DRef mesh, UInt32 index);
+		SubMesh3DRef GetSubMesh(UInt32 index);
 		Bool Init();
 		void Update();
 

@@ -134,7 +134,7 @@ namespace GTE
 		void SetUV2Data(UV2Array * uvs);
 		void SetAttributeData(UInt32 index, Real * data);
 
-		Bool ValidateMaterialForMesh(MaterialSharedPtr& material);
+		Bool ValidateMaterialForMesh(MaterialRef material);
 		Bool UpdateMeshAttributeBuffers();
 		Bool UpdateAttributeTransformerData();
 

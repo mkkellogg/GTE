@@ -250,6 +250,7 @@
     <ClCompile Include="src\input\inputmanagerGL.cpp" />
     <ClCompile Include="src\object\engineobject.cpp" />
     <ClCompile Include="src\object\engineobjectmanager.cpp" />
+    <ClCompile Include="src\object\enginetypes.cpp" />
     <ClCompile Include="src\object\layermanager.cpp" />
     <ClCompile Include="src\object\objectpairkey.cpp" />
     <ClCompile Include="src\object\sceneobject.cpp" />

@@ -98,7 +98,7 @@ namespace GTE
 		friend class EngineObjectManager;
 
 	public:
-		static EngineObjectSharedPtr<T> NullRef;
+		static const EngineObjectSharedPtr<T> NullRef;
 		
 		EngineObjectSharedPtr() : std::shared_ptr<T>(nullptr) {}
 		EngineObjectSharedPtr(const EngineObjectSharedPtr<T>& ref) : std::shared_ptr<T>(ref){}
@@ -110,12 +110,12 @@ namespace GTE
 			return EngineObjectSharedPtr<const T>(std::shared_ptr<T>(*this));
 		}
 
-		T* GetPtr()
+		T* GetPtr() const
 		{
 			return std::shared_ptr<T>::get();
 		}
 
-		T& GetRef()
+		T& GetRef() const
 		{
 			return std::shared_ptr<T>::operator*();
 		}
@@ -151,7 +151,7 @@ namespace GTE
 		}
 	};
 
-	template <typename T> EngineObjectSharedPtr<T> EngineObjectSharedPtr<T>::NullRef;
+	template <typename T> const EngineObjectSharedPtr<T> EngineObjectSharedPtr<T>::NullRef;
 
 	typedef EngineObjectSharedPtr<Shader> ShaderSharedPtr;
 	typedef EngineObjectSharedPtr<SubMesh3DRenderer> SubMesh3DRendererSharedPtr;
@@ -190,6 +190,63 @@ namespace GTE
 	typedef EngineObjectSharedPtr<const AnimationInstance> AnimationInstanceSharedConstPtr;
 	typedef EngineObjectSharedPtr<const AnimationPlayer> AnimationPlayerSharedConstPtr;
 	typedef EngineObjectSharedPtr<const RenderTarget> RenderTargetSharedConstPtr;
+
+	typedef const ShaderSharedPtr& ShaderRef;
+	typedef const SubMesh3DRendererSharedPtr& SubMesh3DRendererRef;
+	typedef const SubMesh3DSharedPtr& SubMesh3DRef;
+	typedef const Mesh3DRendererSharedPtr& Mesh3DRendererRef;
+	typedef const SkinnedMesh3DRendererSharedPtr& SkinnedMesh3DRendererRef;
+	typedef const Mesh3DSharedPtr& Mesh3DRef;
+	typedef const Mesh3DFilterSharedPtr& Mesh3DFilterRef;
+	typedef const CameraSharedPtr& CameraRef;
+	typedef const LightSharedPtr& LightRef;
+	typedef const SceneObjectSharedPtr& SceneObjectRef;
+	typedef const MaterialSharedPtr& MaterialRef;
+	typedef const TextureSharedPtr& TextureRef;
+	typedef const AtlasSharedPtr& AtlasRef;
+	typedef const SkeletonSharedPtr& SkeletonRef;
+	typedef const AnimationSharedPtr& AnimationRef;
+	typedef const AnimationInstanceSharedPtr& AnimationInstanceRef;
+	typedef const AnimationPlayerSharedPtr& AnimationPlayerRef;
+	typedef const RenderTargetSharedPtr& RenderTargetRef;
+
+	extern const ShaderSharedPtr& NullShaderRef;
+	extern const SubMesh3DRendererSharedPtr& NullSubMesh3DRendererRef;
+	extern const SubMesh3DSharedPtr& NullSubMesh3DRef;
+	extern const Mesh3DRendererSharedPtr& NullMesh3DRendererRef;
+	extern const SkinnedMesh3DRendererSharedPtr& NullSkinnedMesh3DRendererRef;
+	extern const Mesh3DSharedPtr& NullMesh3DRef;
+	extern const Mesh3DFilterSharedPtr& NullMesh3DFilterRef;
+	extern const CameraSharedPtr& NullCameraRef;
+	extern const LightSharedPtr& NullLightRef;
+	extern const SceneObjectSharedPtr& NullSceneObjectRef;
+	extern const MaterialSharedPtr& NullMaterialRef;
+	extern const TextureSharedPtr& NullTextureRef;
+	extern const AtlasSharedPtr& NullAtlasRef;
+	extern const SkeletonSharedPtr& NullSkeletonRef;
+	extern const AnimationSharedPtr& NullAnimationRef;
+	extern const AnimationInstanceSharedPtr& NullAnimationInstanceRef;
+	extern const AnimationPlayerSharedPtr& NullAnimationPlayerRef;
+	extern const RenderTargetSharedPtr& NullRenderTargetRef;
+
+	typedef const ShaderSharedConstPtr& ShaderConstRef;
+	typedef const SubMesh3DRendererSharedConstPtr& SubMesh3DRendererConstRef;
+	typedef const SubMesh3DSharedConstPtr& SubMesh3DConstRef;
+	typedef const Mesh3DRendererSharedConstPtr& Mesh3DRendererConstRef;
+	typedef const SkinnedMesh3DRendererSharedConstPtr& SkinnedMesh3DRendererConstRef;
+	typedef const Mesh3DSharedConstPtr& Mesh3DConstRef;
+	typedef const Mesh3DFilterSharedConstPtr& Mesh3DFilterConstRef;
+	typedef const CameraSharedConstPtr& CameraConstRef;
+	typedef const LightSharedConstPtr& LightConstRef;
+	typedef const SceneObjectSharedConstPtr& SceneObjectConstRef;
+	typedef const MaterialSharedConstPtr& MaterialConstRef;
+	typedef const TextureSharedConstPtr& TextureConstRef;
+	typedef const AtlasSharedConstPtr& AtlasConstRef;
+	typedef const SkeletonSharedConstPtr& SkeletonConstRef;
+	typedef const AnimationSharedConstPtr& AnimationConstRef;
+	typedef const AnimationInstanceSharedConstPtr& AnimationInstanceConstRef;
+	typedef const AnimationPlayerSharedConstPtr& AnimationPlayerConstRef;
+	typedef const RenderTargetSharedConstPtr& RenderTargetConstRef;
 }
 
 

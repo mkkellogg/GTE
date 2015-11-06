@@ -781,7 +781,7 @@ namespace GTE
 	 * expected by the shader belonging to [material] match the attributes that are supplied by the target sub-mesh. It also
 	 * means calling VerifySetVars() to ensure all uniforms & attributes expected by the shader have been set correctly.
 	 */
-	Bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialSharedPtr& material)
+	Bool SubMesh3DRenderer::ValidateMaterialForMesh(MaterialRef material)
 	{
 		// don't bother validating this material if it has already been validated
 		if (material->GetObjectID() == lastUsedMaterialID)return true;
@@ -934,7 +934,7 @@ namespace GTE
 
 		if (ShouldUpdateFromMesh())this->UpdateFromMesh();
 
-		MaterialSharedPtr& currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
 
 		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);

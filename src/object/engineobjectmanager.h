@@ -57,7 +57,7 @@ namespace GTE
 		EngineObjectManager();
 		virtual ~EngineObjectManager();
 
-		void AddSceneObjectToDirectory(unsigned long objectID, SceneObjectSharedPtr ref);
+		void AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref);
 
 		void DeleteSceneObject(SceneObject * sceneObject);
 		void DeleteLight(Light * light);
@@ -92,8 +92,8 @@ namespace GTE
 
 		LayerManager& GetLayerManager();
 
-		SceneObjectSharedPtr FindSceneObjectInDirectory(unsigned long objectID);
-		const SceneObjectSharedPtr& GetSceneRoot() const;
+		SceneObjectRef FindSceneObjectInDirectory(unsigned long objectID);
+		SceneObjectRef GetSceneRoot() const;
 		SceneObjectSharedPtr CreateSceneObject();
 		void DestroySceneObject(SceneObjectSharedPtr sceneObject);
 

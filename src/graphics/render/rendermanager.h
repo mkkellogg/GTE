@@ -50,7 +50,7 @@ namespace GTE
 		virtual void RenderScene() = 0;
 		virtual void ClearCaches() = 0;
 
-		virtual void RenderFullScreenQuad(const RenderTargetSharedPtr& renderTarget, const MaterialSharedPtr& material, Bool clearBuffers) = 0;
+		virtual void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers) = 0;
 	};
 }
 

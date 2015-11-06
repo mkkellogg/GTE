@@ -169,7 +169,7 @@ namespace GTE
 	/*
 	 *Set the sub-mesh at [index] to be [mesh].
 	 */
-	void Mesh3D::SetSubMesh(SubMesh3DSharedPtr mesh, UInt32 index)
+	void Mesh3D::SetSubMesh(SubMesh3DRef mesh, UInt32 index)
 	{
 		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3D::SetSubMesh -> 'mesh' is null.", true);
 
@@ -190,7 +190,7 @@ namespace GTE
 	/*
 	 * Get a reference to the sub-mesh at [index].
 	 */
-	SubMesh3DSharedPtr Mesh3D::GetSubMesh(UInt32 index)
+	SubMesh3DRef Mesh3D::GetSubMesh(UInt32 index)
 	{
 		if (index < subMeshCount)
 		{
@@ -199,7 +199,7 @@ namespace GTE
 		else
 		{
 			Debug::PrintError("Mesh3D::GetSubMesh -> Index out of range.");
-			return SubMesh3DSharedPtr::Null();
+			return NullSubMesh3DRef;
 		}
 	}
 

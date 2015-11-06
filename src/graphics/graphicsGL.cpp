@@ -904,7 +904,7 @@ namespace GTE
 	 * Activate a material, meaning its shader, attributes, and uniforms will be used for all rendering
 	 * calls while it is active.
 	 */
-	void GraphicsGL::ActivateMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling)
+	void GraphicsGL::ActivateMaterial(MaterialRef material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::ActivateMaterial -> 'material' is invalid", true);
 
@@ -947,7 +947,7 @@ namespace GTE
 	/*
 	* Set OpenGL state to match the state specified by [material].
 	*/
-	void GraphicsGL::SetupStateForMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling)
+	void GraphicsGL::SetupStateForMaterial(MaterialRef material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material != nullptr, "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
 
@@ -994,7 +994,7 @@ namespace GTE
 	/*
 	* Get the material that is currently being used for rendering.
 	*/
-	MaterialSharedPtr& GraphicsGL::GetActiveMaterial()
+	MaterialRef GraphicsGL::GetActiveMaterial()
 	{
 		return activeMaterial;
 	}
@@ -1244,7 +1244,7 @@ namespace GTE
 	/*
 	 * Make [target] the target for all standard rendering operations.
 	 */
-	Bool GraphicsGL::ActivateRenderTarget(const RenderTargetSharedPtr& target)
+	Bool GraphicsGL::ActivateRenderTarget(RenderTargetRef target)
 	{
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> 'target' is not valid.", false, true);
 
@@ -1273,7 +1273,7 @@ namespace GTE
 	/*
 	 * Get the currently active render target.
 	 */
-	const RenderTargetSharedPtr& GraphicsGL::GetCurrrentRenderTarget()
+	RenderTargetRef GraphicsGL::GetCurrrentRenderTarget()
 	{
 		return currentRenderTarget;
 	}
@@ -1503,7 +1503,7 @@ namespace GTE
 	 */
 	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate)
 	{
-		MaterialSharedPtr& currentMaterial = GetActiveMaterial();
+		MaterialRef currentMaterial = GetActiveMaterial();
 		NONFATAL_ASSERT(currentMaterial.IsValid(), "GraphicsGL::RenderTriangles -> 'currentMaterial' is null.", true);
 
 		VertexAttrBufferBinding binding;

@@ -150,17 +150,17 @@ namespace GTE
 			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
-						const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialSharedPtr& materialOverride,
+						const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
 						Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void RenderSkyboxForCamera(Camera& camera, const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse);
 		void RenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-											MaterialSharedPtr&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+											MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-											MaterialSharedPtr&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+											MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
 			std::function<Bool(SceneObject*)> filterFunction);
-		Bool ValidateSceneObjectForRendering(SceneObjectSharedPtr sceneObject) const;
+		Bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
 		void BuildShadowVolumeMVPTransform(const Transform& modelTransform,  const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
 		void RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 			const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
@@ -178,7 +178,7 @@ namespace GTE
 
 		void ClearBuffersForCamera(const Camera& camera) const;
 
-		void ActivateMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling);
+		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);
 		void SendModelViewProjectionToShader(const Transform& modelViewProjection);
 		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);
@@ -189,8 +189,8 @@ namespace GTE
 		Bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 
-		void PushRenderTarget(const RenderTargetSharedPtr& renderTarget);
-		const RenderTargetSharedPtr& PopRenderTarget();
+		void PushRenderTarget(RenderTargetRef renderTarget);
+		RenderTargetRef PopRenderTarget();
 		void ClearRenderTargetStack();
 
 		Bool InitFullScreenQuad();
@@ -204,7 +204,7 @@ namespace GTE
 		void RenderScene() override;
 		void ClearCaches() override;
 
-		void RenderFullScreenQuad(const RenderTargetSharedPtr& renderTarget, const MaterialSharedPtr& material, Bool clearBuffers) override;
+		void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers) override;
 	};
 }
 

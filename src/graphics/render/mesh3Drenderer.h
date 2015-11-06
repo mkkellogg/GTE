@@ -57,18 +57,18 @@ namespace GTE
 	public:
 
 		UInt32 GetMaterialCount() const;
-		const MaterialSharedPtr& GetMaterial(UInt32 index);
-		void SetMaterial(UInt32 index, MaterialSharedPtr material);
-		void AddMaterial(MaterialSharedPtr material);
+		MaterialRef GetMaterial(UInt32 index);
+		void SetMaterial(UInt32 index, MaterialRef material);
+		void AddMaterial(MaterialRef material);
 
 		virtual void InitializeForMesh();
-		void InitializeForMesh(Mesh3DSharedConstPtr mesh);
+		void InitializeForMesh(Mesh3DConstRef mesh);
 		void UpdateFromSubMesh(UInt32 index);
 
-		virtual Mesh3DSharedPtr GetTargetMesh();
-		SubMesh3DSharedPtr GetSubMeshForSubRenderer(SubMesh3DRendererSharedConstPtr subRenderer);
-		virtual SubMesh3DSharedPtr GetSubMesh(UInt32 index);
-		SubMesh3DRendererSharedPtr GetSubRenderer(UInt32 index);
+		virtual Mesh3DRef GetTargetMesh();
+		SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererConstRef subRenderer);
+		virtual SubMesh3DRef GetSubMesh(UInt32 index);
+		SubMesh3DRendererRef GetSubRenderer(UInt32 index);
 		UInt32 GetSubRendererCount() const;
 	};
 }

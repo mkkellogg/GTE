@@ -182,7 +182,7 @@ namespace GTE
 	/*
 	 * Push a new render target on to the render target stack and activate it.
 	 */
-	void ForwardRenderManager::PushRenderTarget(const RenderTargetSharedPtr& renderTarget)
+	void ForwardRenderManager::PushRenderTarget(RenderTargetRef renderTarget)
 	{
 		renderTargetStack.push(&renderTarget);
 		// activate the new render target
@@ -193,7 +193,7 @@ namespace GTE
 	 * Pop the current render target off the stack and activate the one below it.
 	 * If there is none below, activate the default render target.
 	 */
-	const RenderTargetSharedPtr& ForwardRenderManager::PopRenderTarget()
+	RenderTargetRef ForwardRenderManager::PopRenderTarget()
 	{
 		const RenderTargetSharedPtr* old = nullptr;
 		if (renderTargetStack.size() > 0)
@@ -204,7 +204,7 @@ namespace GTE
 
 		if (renderTargetStack.size() > 0)
 		{
-			const RenderTargetSharedPtr& top = *renderTargetStack.top();
+			RenderTargetRef top = *renderTargetStack.top();
 			// activate the new render target
 			Engine::Instance()->GetGraphicsSystem()->ActivateRenderTarget(top);
 		}
@@ -213,8 +213,8 @@ namespace GTE
 			// activate the default render target
 			Engine::Instance()->GetGraphicsSystem()->RestoreDefaultRenderTarget();
 		}
-
-		return old == nullptr ? RenderTargetSharedPtr::NullRef : *old;
+		
+		return old == nullptr ? NullRenderTargetRef : *old;
 
 	}
 
@@ -260,7 +260,7 @@ namespace GTE
 	 * [clearBuffers] - Should the buffers belonging to [renderTarget] be cleared before rendering?
 	 *
 	 */
-	void ForwardRenderManager::RenderFullScreenQuad(const RenderTargetSharedPtr& renderTarget, const MaterialSharedPtr& material, Bool clearBuffers)
+	void ForwardRenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers)
 	{
 		Transform model;
 		Transform modelView;
@@ -280,7 +280,7 @@ namespace GTE
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 
 		// save the currently active render target
-		const RenderTargetSharedPtr& currentTarget = graphics->GetCurrrentRenderTarget();
+		RenderTargetRef currentTarget = graphics->GetCurrrentRenderTarget();
 
 		// set [renderTarget] as the current render target
 		graphics->ActivateRenderTarget(renderTarget);
@@ -297,7 +297,7 @@ namespace GTE
 		fullScreenQuadObject->SetActive(true);
 
 		// set [material] to be the material for the full screen quad mesh
-		const Mesh3DRendererSharedPtr& renderer = fullScreenQuadObject->GetMesh3DRenderer();
+		Mesh3DRendererRef renderer = fullScreenQuadObject->GetMesh3DRenderer();
 		if (renderer->GetMaterialCount() > 0)renderer->SetMaterial(0, material);
 		else renderer->AddMaterial(material);
 
@@ -323,11 +323,11 @@ namespace GTE
 
 		ClearAllRenderQueues();
 
-		const SceneObjectSharedPtr& sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
+		SceneObjectRef sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "RenderManager::PreProcessScene -> 'sceneRoot' is null.");
 
 		// gather information about the cameras, lights, and renderable meshes in the scene
-		PreProcessScene(const_cast<SceneObject&>(sceneRoot.GetConstRef()), 0);
+		PreProcessScene(sceneRoot.GetRef(), 0);
 		// perform any pre-transformations and calculations (e.g. vertex skinning)
 		PreRenderScene();
 		// calculate shadow volumes
@@ -369,7 +369,7 @@ namespace GTE
 			// only process active scene objects
 			if (child->IsActive())
 			{
-				CameraSharedPtr camera = child->GetCamera();
+				CameraRef camera = child->GetCamera();
 				if (camera.IsValid() && cameraCount < MAX_CAMERAS)
 				{
 					// add a scene camera from which to render the scene
@@ -390,7 +390,7 @@ namespace GTE
 					}
 				}
 
-				LightSharedPtr light = child->GetLight();
+				LightRef light = child->GetLight();
 				if (light.IsValid())
 				{
 					if (light->GetType() == LightType::Ambient)
@@ -413,10 +413,10 @@ namespace GTE
 					}
 				}
 
-				Mesh3DRendererSharedPtr meshRenderer = child->GetMesh3DRenderer();
-				Mesh3DFilterSharedPtr meshFilter = child->GetMesh3DFilter();
-				Mesh3DSharedPtr mesh = child->GetMesh3D();
-				SkinnedMesh3DRendererSharedPtr skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
+				Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
+				Mesh3DFilterRef meshFilter = child->GetMesh3DFilter();
+				Mesh3DRef mesh = child->GetMesh3D();
+				SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
 
 				if(meshFilter.IsValid() && mesh.IsValid() && (meshRenderer.IsValid() || skinnedMeshRenderer.IsValid()))
 				{
@@ -434,11 +434,11 @@ namespace GTE
 						UInt32 subMeshCount = mesh->GetSubMeshCount();
 						for(UInt32 i = 0; i < subMeshCount; i++)
 						{
-							MaterialSharedPtr& mat = const_cast<MaterialSharedPtr&>(renderer->GetMaterial(i % materialCount));
+							MaterialRef mat = renderer->GetMaterial(i % materialCount);
 							RenderQueue* targetRenderQueue = GetRenderQueue((UInt32)mat->GetRenderQueueType());
 
 							Transform * aggregateTransform = const_cast<Transform*>(&child->GetAggregateTransform());
-							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), &mat, meshFilter.GetPtr(), aggregateTransform);
+							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);
 						}
 					}
 				}
@@ -1002,7 +1002,7 @@ namespace GTE
 	 * [modelPreTransform] is pre-multiplied with the transform of each rendered scene object & light.
 	 */
 	void ForwardRenderManager::RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse,
-		const Camera& camera, MaterialSharedPtr&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
+		const Camera& camera, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
 		RenderSceneWithSelfLitLighting(modelPreTransform, viewTransform, viewTransformInverse, camera, material, flagRendered, renderMoreThanOnce, blendingFilter, nullptr);
 	}
@@ -1026,7 +1026,7 @@ namespace GTE
 	 * Render from the perspective of [camera] using [viewTransformInverse] as the camera's position and orientation.
 	 */
 	void ForwardRenderManager::RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse,
-		const Camera& camera, MaterialSharedPtr&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+		const Camera& camera, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
 		std::function<Bool(SceneObject*)> filterFunction)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
@@ -1082,7 +1082,7 @@ namespace GTE
 	 * [blendingFilter] - Determines how forward-rendering blending will be applied.
 	 */
 	void ForwardRenderManager::RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
-		const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialSharedPtr&  materialOverride,
+		const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef  materialOverride,
 		Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
 	{
 		Transform modelViewProjection;
@@ -1103,7 +1103,7 @@ namespace GTE
 		
 		// if we have an override material, we use that for every mesh
 		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
-		MaterialSharedPtr& currentMaterial = doMaterialOvverride ? materialOverride : *entry.RenderMaterial;
+		const MaterialSharedPtr& currentMaterial = doMaterialOvverride ? materialOverride : *entry.RenderMaterial;
 
 		NONFATAL_ASSERT(currentMaterial != nullptr, "RenderManager::RenderMesh -> Null material encountered.", true);
 
@@ -1460,7 +1460,7 @@ namespace GTE
 	 * is a mesh and a mesh renderer present, and verifying that [sceneObject]
 	 * is active.
 	 */
-	Bool ForwardRenderManager::ValidateSceneObjectForRendering(SceneObjectSharedPtr sceneObject) const
+	Bool ForwardRenderManager::ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const
 	{
 		if (!sceneObject.IsValid())
 		{
@@ -1468,12 +1468,11 @@ namespace GTE
 			return false;
 		}
 
-		SceneObject * object = sceneObject.GetPtr();
-		if (!object->IsActive())return false;
+		if (!sceneObject->IsActive())return false;
 
 		Mesh3DRenderer * renderer = nullptr;
-		const Mesh3DRendererSharedPtr& mesh3DRenderer = object->GetMesh3DRenderer();
-		const SkinnedMesh3DRendererSharedPtr& skinnedMesh3DRenderer = object->GetSkinnedMesh3DRenderer();
+		const Mesh3DRendererSharedPtr& mesh3DRenderer = sceneObject->GetMesh3DRenderer();
+		const SkinnedMesh3DRendererSharedPtr& skinnedMesh3DRenderer = sceneObject->GetSkinnedMesh3DRenderer();
 
 		// check if [sceneObject] has a mesh & renderer
 		if(mesh3DRenderer.IsValid())
@@ -1483,12 +1482,6 @@ namespace GTE
 		else if(skinnedMesh3DRenderer.IsValid())
 		{
 			renderer = const_cast<SkinnedMesh3DRenderer *>(skinnedMesh3DRenderer.GetConstPtr());
-		}
-
-		if(object == nullptr)
-		{
-			Debug::PrintWarning("RenderManager::ValidateSceneObjectForRendering -> Could not find renderer for mesh.");
-			return false;
 		}
 
 		Mesh3DSharedPtr mesh = renderer->GetTargetMesh();
@@ -1762,7 +1755,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection)
 	{
-		MaterialSharedPtr& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendTransformUniformsToShader -> Active material is null.");
 
 		ShaderSharedPtr shader = activeMaterial->GetShader();
@@ -1786,7 +1779,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendModelViewProjectionToShader(const Transform& modelViewProjection)
 	{
-		MaterialSharedPtr& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendModelViewProjectionToShader -> Active material is null.");
 
 		ShaderSharedPtr shader = activeMaterial->GetShader();
@@ -1800,7 +1793,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition)
 	{
-		MaterialSharedPtr& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendClipPlaneToShader -> Active material is null.");
 
 		ShaderSharedPtr shader = activeMaterial->GetShader();
@@ -1837,7 +1830,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::SendActiveMaterialUniformsToShader()  const
 	{
-		MaterialSharedPtr& activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
+		MaterialRef activeMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(activeMaterial.IsValid(), "RenderManager::SendCustomUniformsToShader -> Active material is not valid.");
 		activeMaterial->SendAllStoredUniformValuesToShader();
 	}
@@ -1846,7 +1839,7 @@ namespace GTE
 	 * Activate [material], which will switch the GPU's active shader to
 	 * the one associated with it.
 	 */
-	void ForwardRenderManager::ActivateMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling)
+	void ForwardRenderManager::ActivateMaterial(MaterialRef material, Bool reverseFaceCulling)
 	{
 		// We MUST notify the graphics system about the change in active material because other
 		// components (like Mesh3DRenderer) need to know about the active material
