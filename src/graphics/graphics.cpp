@@ -44,7 +44,7 @@ namespace GTE
 	/*
 	 * Create default render target and wrap in a RenderTargetRef reference.
 	 */
-	RenderTargetRef Graphics::SetupDefaultRenderTarget()
+	RenderTargetSharedPtr Graphics::SetupDefaultRenderTarget()
 	{
 		// get reference to the engine's object manager
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -52,7 +52,7 @@ namespace GTE
 		RenderTarget * defaultTarget = CreateDefaultRenderTarget();
 		ASSERT(defaultTarget != nullptr, "GraphicsGL::SetupDefaultRenderTarget -> Default target is null.");
 
-		RenderTargetRef defaultRenderTarget = objectManager->WrapRenderTarget(defaultTarget);
+		RenderTargetSharedPtr defaultRenderTarget = objectManager->WrapRenderTarget(defaultTarget);
 		ASSERT(defaultRenderTarget.IsValid(), "GraphicsGL::SetupDefaultRenderTarget -> Default target is null.");
 
 		return defaultRenderTarget;
@@ -144,7 +144,7 @@ namespace GTE
 	*
 	* [createFirstFullFrame] - If true, create initial frame that covers all of [texture].
 	*/
-	Atlas * Graphics::CreateAtlas(TextureRef texture, Bool createFirstFullFrame)
+	Atlas * Graphics::CreateAtlas(TextureSharedPtr texture, Bool createFirstFullFrame)
 	{
 		Atlas * atlas = new(std::nothrow)Atlas(texture, createFirstFullFrame);
 		ASSERT(atlas != nullptr, "Graphics::CreateAtlas -> Unable to allocate new atlas.");

@@ -38,7 +38,7 @@ namespace GTE
 		// and (inverse) bind pose transformation of each bone. it also describes the scene
 		// object to which each bone corresponds indirectly through the node structures
 		// it contains.
-		SkeletonRef skeleton;
+		SkeletonSharedPtr skeleton;
 
 		// all the VertexBoneMap objects for this renderer
 		std::vector<VertexBoneMap *> vertexBoneMaps;
@@ -56,8 +56,8 @@ namespace GTE
 
 	public:
 
-		void SetSkeleton(SkeletonRef skeleton);
-		SkeletonRef GetSkeleton();
+		void SetSkeleton(SkeletonSharedPtr skeleton);
+		SkeletonSharedPtr GetSkeleton();
 		void InitializeForMesh();
 		void MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, Int32 vertexBoneMapIndex);
 

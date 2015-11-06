@@ -57,7 +57,7 @@ namespace GTE
 		EngineObjectManager *objectManager = Engine::Instance()->GetEngineObjectManager();
 		if (index < subRenderers.size())
 		{
-			SubMesh3DRendererRef renderer = subRenderers[index];
+			SubMesh3DRendererSharedPtr renderer = subRenderers[index];
 			if (renderer.IsValid())
 			{
 				objectManager->DestroySubMesh3DRenderer(renderer);
@@ -77,16 +77,16 @@ namespace GTE
 	/*
 	 * Get a reference to the material at [index] in the member list of materials, [materials].
 	 */
-	const MaterialRef& Mesh3DRenderer::GetMaterial(UInt32 index)
+	const MaterialSharedPtr& Mesh3DRenderer::GetMaterial(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", MaterialRef::NullRef, true);
+		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", MaterialSharedPtr::NullRef, true);
 		return materials[index];
 	}
 
 	/*
 	 * Set the material at [index] in the member list of materials, [materials].
 	 */
-	void Mesh3DRenderer::SetMaterial(UInt32 index, MaterialRef material)
+	void Mesh3DRenderer::SetMaterial(UInt32 index, MaterialSharedPtr material)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "Mesh3DRenderer::SetMaterial -> 'material' is null.", true);
 		NONFATAL_ASSERT(index < GetMaterialCount(), "Mesh3DRenderer::SetMaterial -> 'index' is out of range.", true);
@@ -97,7 +97,7 @@ namespace GTE
 	/*
 	 * Add a material to the member list of materials, [materials].
 	 */
-	void Mesh3DRenderer::AddMaterial(MaterialRef material)
+	void Mesh3DRenderer::AddMaterial(MaterialSharedPtr material)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "Mesh3DRenderer::AddMaterial -> 'material' is null.", true);
 		materials.push_back(material);
@@ -115,7 +115,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(sceneObject.IsValid(), "Mesh3DRenderer::UpdateFromMesh -> 'sceneObject' is null.", true);
 
-		Mesh3DRef mesh = GetTargetMesh();
+		Mesh3DSharedPtr mesh = GetTargetMesh();
 		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3DRenderer::UpdateFromMesh -> mesh is null.", true);
 
 		InitializeForMesh(mesh);
@@ -124,7 +124,7 @@ namespace GTE
 	/*
 	 * Update this renderer and prepare it for rendering of the sub-meshes contained in [mesh].
 	 */
-	void Mesh3DRenderer::InitializeForMesh(Mesh3DRefConst mesh)
+	void Mesh3DRenderer::InitializeForMesh(Mesh3DSharedConstPtr mesh)
 	{
 		EngineObjectManager * engineObjectManager = Engine::Instance()->GetEngineObjectManager();
 		UInt32 subMeshCount = mesh->GetSubMeshCount();
@@ -145,8 +145,8 @@ namespace GTE
 		{
 			for (UInt32 i = (UInt32)subRenderers.size(); i < subMeshCount; i++)
 			{
-				SubMesh3DRendererRef renderer = engineObjectManager->CreateSubMesh3DRenderer();
-				NONFATAL_ASSERT(renderer.IsValid(), "Mesh3DRenderer::UpdateFromMesh(Mesh3DRef) -> Could not create new SubMesh3DRenderer.", false);
+				SubMesh3DRendererSharedPtr renderer = engineObjectManager->CreateSubMesh3DRenderer();
+				NONFATAL_ASSERT(renderer.IsValid(), "Mesh3DRenderer::UpdateFromMesh(Mesh3DSharedPtr) -> Could not create new SubMesh3DRenderer.", false);
 
 				renderer->SetTargetSubMeshIndex(i);
 				renderer->SetContainerRenderer(this);
@@ -170,7 +170,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(index < subRenderers.size(), "Mesh3DRenderer::UpdateFromSubMesh -> 'index' is out of range.", true);
 
-		SubMesh3DRendererRef renderer = subRenderers[index];
+		SubMesh3DRendererSharedPtr renderer = subRenderers[index];
 		renderer->UpdateFromMesh();
 	}
 
@@ -178,11 +178,11 @@ namespace GTE
 	 * Get the target mesh for this renderer. The Mesh3D object that is attached to the same SceneObject
 	 * as this renderer will implicitly be the target mesh.
 	 */
-	Mesh3DRef Mesh3DRenderer::GetTargetMesh()
+	Mesh3DSharedPtr Mesh3DRenderer::GetTargetMesh()
 	{
-		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetTargetMesh -> 'sceneObject' is null.", Mesh3DRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetTargetMesh -> 'sceneObject' is null.", Mesh3DSharedPtr::Null(), true);
 
-		Mesh3DRef mesh = sceneObject->GetMesh3D();
+		Mesh3DSharedPtr mesh = sceneObject->GetMesh3D();
 
 		return mesh;
 	}
@@ -191,41 +191,41 @@ namespace GTE
 	 * Get the sub-mesh contained in the target mesh for this renderer that corresponds to [subRenderer]. This will be
 	 * the SubMesh3D instance that [subRenderer] is responsible for rendering.
 	 */
-	SubMesh3DRef Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererRefConst subRenderer)
+	SubMesh3DSharedPtr Mesh3DRenderer::GetSubMeshForSubRenderer(SubMesh3DRendererSharedConstPtr subRenderer)
 	{
-		NONFATAL_ASSERT_RTRN(subRenderer.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'subRenderer' is null.", SubMesh3DRef::Null(), true);
-		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'sceneObject' is null.", SubMesh3DRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(subRenderer.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'subRenderer' is null.", SubMesh3DSharedPtr::Null(), true);
+		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'sceneObject' is null.", SubMesh3DSharedPtr::Null(), true);
 
 		// this loop finds the index in [subRenderers] to which [subRenderer] belongs
 		for (UInt32 i = 0; i < subRenderers.size(); i++)
 		{
 			if (subRenderers[i] == subRenderer)
 			{
-				Mesh3DRef mesh = GetTargetMesh();
-				NONFATAL_ASSERT_RTRN(mesh.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'mesh' is null.", SubMesh3DRef::Null(), false);
+				Mesh3DSharedPtr mesh = GetTargetMesh();
+				NONFATAL_ASSERT_RTRN(mesh.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'mesh' is null.", SubMesh3DSharedPtr::Null(), false);
 
-				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-				NONFATAL_ASSERT_RTRN(subMesh.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'subMesh' is null.", SubMesh3DRef::Null(), false);
+				SubMesh3DSharedPtr subMesh = mesh->GetSubMesh(i);
+				NONFATAL_ASSERT_RTRN(subMesh.IsValid(), "Mesh3DRenderer::GetSubMeshForSubRenderer -> 'subMesh' is null.", SubMesh3DSharedPtr::Null(), false);
 
 				return subMesh;
 			}
 		}
 
-		return SubMesh3DRef::Null();
+		return SubMesh3DSharedPtr::Null();
 	}
 
 	/*
 	 * Get the sub-mesh at [index] in the target mesh for this renderer.
 	 */
-	SubMesh3DRef Mesh3DRenderer::GetSubMesh(UInt32 index)
+	SubMesh3DSharedPtr Mesh3DRenderer::GetSubMesh(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetSubMesh -> 'sceneObject' is null.", SubMesh3DRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(sceneObject.IsValid(), "Mesh3DRenderer::GetSubMesh -> 'sceneObject' is null.", SubMesh3DSharedPtr::Null(), true);
 
-		Mesh3DRef mesh = GetTargetMesh();
-		NONFATAL_ASSERT_RTRN(mesh.IsValid(), "Mesh3DRenderer::GetSubMesh -> 'mesh' is null.", SubMesh3DRef::Null(), true);
+		Mesh3DSharedPtr mesh = GetTargetMesh();
+		NONFATAL_ASSERT_RTRN(mesh.IsValid(), "Mesh3DRenderer::GetSubMesh -> 'mesh' is null.", SubMesh3DSharedPtr::Null(), true);
 
-		SubMesh3DRef subMesh = mesh->GetSubMesh(index);
-		NONFATAL_ASSERT_RTRN(subMesh.IsValid(), "Mesh3DRenderer::GetSubMesh -> 'subMesh' is null.", SubMesh3DRef::Null(), true);
+		SubMesh3DSharedPtr subMesh = mesh->GetSubMesh(index);
+		NONFATAL_ASSERT_RTRN(subMesh.IsValid(), "Mesh3DRenderer::GetSubMesh -> 'subMesh' is null.", SubMesh3DSharedPtr::Null(), true);
 
 		return subMesh;
 	}
@@ -233,12 +233,12 @@ namespace GTE
 	/*
 	 * Get the sub-renderer at [index] in the member list of sub-renderers, [subRenderers].
 	 */
-	SubMesh3DRendererRef Mesh3DRenderer::GetSubRenderer(UInt32 index)
+	SubMesh3DRendererSharedPtr Mesh3DRenderer::GetSubRenderer(UInt32 index)
 	{
 		if (index >= subRenderers.size())
 		{
 			Debug::PrintError("Mesh3DRenderer::GetSubRenderer -> 'index' is out of range.");
-			return SubMesh3DRendererRef::Null();
+			return SubMesh3DRendererSharedPtr::Null();
 		}
 
 		return subRenderers[index];

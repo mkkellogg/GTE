@@ -841,7 +841,7 @@ namespace GTE
 	/*
 	 * Get the default render target for the graphics system.
 	 */
-	RenderTargetRef GraphicsGL::GetDefaultRenderTarget()
+	RenderTargetSharedPtr GraphicsGL::GetDefaultRenderTarget()
 	{
 		return defaultRenderTarget;
 	}
@@ -904,7 +904,7 @@ namespace GTE
 	 * Activate a material, meaning its shader, attributes, and uniforms will be used for all rendering
 	 * calls while it is active.
 	 */
-	void GraphicsGL::ActivateMaterial(const MaterialRef& material, Bool reverseFaceCulling)
+	void GraphicsGL::ActivateMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "GraphicsGL::ActivateMaterial -> 'material' is invalid", true);
 
@@ -913,7 +913,7 @@ namespace GTE
 			GLuint oldActiveProgramID = (GLuint)0xFFFFFFF0;
 			if (activeMaterial.IsValid())
 			{
-				ShaderRef currentShader = this->activeMaterial->GetShader();
+				ShaderSharedPtr currentShader = this->activeMaterial->GetShader();
 				if (currentShader.IsValid())
 				{
 					const ShaderGL * currentShaderGL = dynamic_cast<const ShaderGL *>(currentShader.GetConstPtr());
@@ -928,7 +928,7 @@ namespace GTE
 			activeMaterial = material;
 			material->ResetVerificationState();
 
-			ShaderRef shader = material->GetShader();
+			ShaderSharedPtr shader = material->GetShader();
 			NONFATAL_ASSERT(shader.IsValid(), "GraphicsGL::ActivateMaterial -> 'shader' is null.", true);
 
 			const ShaderGL * shaderGL = dynamic_cast<const ShaderGL *>(shader.GetConstPtr());
@@ -947,7 +947,7 @@ namespace GTE
 	/*
 	* Set OpenGL state to match the state specified by [material].
 	*/
-	void GraphicsGL::SetupStateForMaterial(const MaterialRef& material, Bool reverseFaceCulling)
+	void GraphicsGL::SetupStateForMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling)
 	{
 		NONFATAL_ASSERT(material != nullptr, "GraphicsGL::SetupStateForMaterial -> 'material' is invalid.", true);
 
@@ -994,7 +994,7 @@ namespace GTE
 	/*
 	* Get the material that is currently being used for rendering.
 	*/
-	MaterialRef& GraphicsGL::GetActiveMaterial()
+	MaterialSharedPtr& GraphicsGL::GetActiveMaterial()
 	{
 		return activeMaterial;
 	}
@@ -1244,7 +1244,7 @@ namespace GTE
 	/*
 	 * Make [target] the target for all standard rendering operations.
 	 */
-	Bool GraphicsGL::ActivateRenderTarget(const RenderTargetRef& target)
+	Bool GraphicsGL::ActivateRenderTarget(const RenderTargetSharedPtr& target)
 	{
 		NONFATAL_ASSERT_RTRN(target.IsValid(), "RenderTargetGL::ActiveRenderTarget -> 'target' is not valid.", false, true);
 
@@ -1273,7 +1273,7 @@ namespace GTE
 	/*
 	 * Get the currently active render target.
 	 */
-	const RenderTargetRef& GraphicsGL::GetCurrrentRenderTarget()
+	const RenderTargetSharedPtr& GraphicsGL::GetCurrrentRenderTarget()
 	{
 		return currentRenderTarget;
 	}
@@ -1371,7 +1371,7 @@ namespace GTE
 	/*
 	 * Copy the contents of one render target to another.
 	 */
-	void GraphicsGL::CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const
+	void GraphicsGL::CopyBetweenRenderTargets(RenderTargetSharedPtr src, RenderTargetSharedConstPtr dest) const
 	{
 		GLuint currentFB = 0;
 		if (currentRenderTarget.IsValid())
@@ -1413,7 +1413,7 @@ namespace GTE
 	/*
 	 * Set the contents of [texture] be that of [data].
 	 */
-	void GraphicsGL::SetTextureData(TextureRef texture, const Byte * data) const
+	void GraphicsGL::SetTextureData(TextureSharedPtr texture, const Byte * data) const
 	{
 		SetTextureData(texture, data, CubeTextureSide::Front);
 	}
@@ -1422,7 +1422,7 @@ namespace GTE
 	 * Set the contents of [texture] be that of [data]. If it is a cube texture, update
 	 * the side specified by [side].
 	 */
-	void GraphicsGL::SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const
+	void GraphicsGL::SetTextureData(TextureSharedPtr texture, const Byte * data, CubeTextureSide side) const
 	{
 		NONFATAL_ASSERT(texture.IsValid(), "GraphicsGL::SetTextureData -> 'texture' is not valid.", true);
 
@@ -1453,7 +1453,7 @@ namespace GTE
 	/*
 	 * Force a rebuild of the mip-maps for [texture].
 	 */
-	void GraphicsGL::RebuildMipMaps(TextureRef texture) const
+	void GraphicsGL::RebuildMipMaps(TextureSharedPtr texture) const
 	{
 		TextureGL * texGL = dynamic_cast<TextureGL*>(texture.GetPtr());
 		ASSERT(texGL != nullptr, "GraphicsGL::RebuildMipMaps -> Texture is not a valid OpenGL texture.");
@@ -1503,7 +1503,7 @@ namespace GTE
 	 */
 	void GraphicsGL::RenderTriangles(const std::vector<VertexAttrBufferBinding>& boundAttributeBuffers, UInt32 vertexCount, Bool validate)
 	{
-		MaterialRef& currentMaterial = GetActiveMaterial();
+		MaterialSharedPtr& currentMaterial = GetActiveMaterial();
 		NONFATAL_ASSERT(currentMaterial.IsValid(), "GraphicsGL::RenderTriangles -> 'currentMaterial' is null.", true);
 
 		VertexAttrBufferBinding binding;

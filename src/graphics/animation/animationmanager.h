@@ -26,17 +26,17 @@ namespace GTE
 		~AnimationManager();
 
 		// map object IDs of Skeleton objects to their assign animation player
-		std::unordered_map<ObjectID, AnimationPlayerRef> activePlayers;
+		std::unordered_map<ObjectID, AnimationPlayerSharedPtr> activePlayers;
 
 	public:
 
-		Bool IsCompatible(SkinnedMesh3DRendererRefConst meshRenderer, AnimationRefConst animation) const;
-		Bool IsCompatible(SkeletonRefConst skeleton, AnimationRefConst animation) const;
+		Bool IsCompatible(SkinnedMesh3DRendererSharedConstPtr meshRenderer, AnimationSharedConstPtr animation) const;
+		Bool IsCompatible(SkeletonSharedConstPtr skeleton, AnimationSharedConstPtr animation) const;
 
 		void Update();
 
-		AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkeletonRef target);
-		AnimationPlayerRef RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRefConst renderer);
+		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkeletonSharedPtr target);
+		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererSharedConstPtr renderer);
 	};
 }
 

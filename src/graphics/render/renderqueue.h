@@ -36,7 +36,7 @@ namespace GTE
 			MeshFilter = nullptr;
 		}
 
-		RenderQueueEntry(SceneObject* container, SubMesh3D* mesh, SubMesh3DRenderer* renderer, MaterialRef* renderMaterial, Mesh3DFilter* meshFilter, Transform* aggregateTransform)
+		RenderQueueEntry(SceneObject* container, SubMesh3D* mesh, SubMesh3DRenderer* renderer, MaterialSharedPtr* renderMaterial, Mesh3DFilter* meshFilter, Transform* aggregateTransform)
 		{
 			Container = container;
 			Mesh = mesh;
@@ -48,7 +48,7 @@ namespace GTE
 		SceneObject* Container;
 		SubMesh3D* Mesh;
 		SubMesh3DRenderer* Renderer;
-		MaterialRef* RenderMaterial;
+		MaterialSharedPtr* RenderMaterial;
 		Mesh3DFilter* MeshFilter;
 	};
 
@@ -71,7 +71,7 @@ namespace GTE
 
 		UInt32 GetID();
 		void Clear();
-		void Add(SceneObject* container, SubMesh3D* mesh, SubMesh3DRenderer* renderer, MaterialRef* renderMaterial, Mesh3DFilter* meshFilter, Transform* aggregateTransform);
+		void Add(SceneObject* container, SubMesh3D* mesh, SubMesh3DRenderer* renderer, MaterialSharedPtr* renderMaterial, Mesh3DFilter* meshFilter, Transform* aggregateTransform);
 		RenderQueueEntry* GetObject(UInt32 index);
 		UInt32 GetObjectCount();
 	};

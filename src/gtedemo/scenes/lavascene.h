@@ -17,7 +17,7 @@ class LavaField;
 class LavaScene : public Scene
 {
 	// the SceneObject instance at the root of the scene
-	GTE::SceneObjectRef sceneRoot;
+	GTE::SceneObjectSharedPtr sceneRoot;
 
 	// layer name for lava pool wall
 	static const std::string LavaWallLayer;
@@ -31,36 +31,36 @@ class LavaScene : public Scene
 	GTE::IntMask playerObjectLayerMask;
 
 	// SceneObject that contains the spinning point light in the scene
-	GTE::SceneObjectRef spinningPointLightObject;
+	GTE::SceneObjectSharedPtr spinningPointLightObject;
 	// scene lava
 	LavaField * lavaField;
 	// material for geometry near lavafield
-	GTE::MaterialRef planarLitMaterial;
+	GTE::MaterialSharedPtr planarLitMaterial;
 	// container lava lights
-	std::vector<GTE::SceneObjectRef> lavaLightObjects;
+	std::vector<GTE::SceneObjectSharedPtr> lavaLightObjects;
 	// The single cube in the scene
-	GTE::SceneObjectRef cubeSceneObject;
+	GTE::SceneObjectSharedPtr cubeSceneObject;
 	// global directional light
-	GTE::SceneObjectRef directionalLightObject;
+	GTE::SceneObjectSharedPtr directionalLightObject;
 
 public:
 
 	LavaScene();
 	~LavaScene();
 
-	GTE::SceneObjectRef GetSceneRoot();
+	GTE::SceneObjectSharedPtr GetSceneRoot();
 	void OnActivate();
 	void Update();
-	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject);
+	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject);
 	void SetPlayerObjectLayerMask(GTE::IntMask playerObjectLayerMask);
 
 	void SetupTerrain(GTE::AssetImporter& importer);
 	void SetupStructures(GTE::AssetImporter& importer);
 	void SetupExtra(GTE::AssetImporter& importer);
-	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject);
+	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
 
-	GTE::SceneObjectRef GetSpinningPointLightObject();
-	std::vector<GTE::SceneObjectRef>& GetLavaLightObjects();
+	GTE::SceneObjectSharedPtr GetSpinningPointLightObject();
+	std::vector<GTE::SceneObjectSharedPtr>& GetLavaLightObjects();
 	LavaField * GetLavaField();
 };
 

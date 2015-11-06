@@ -18,7 +18,7 @@ namespace GTE
 	/*
 	* Single constructor that initializes member variables.
 	*/
-	AnimationInstance::AnimationInstance(SkeletonRef target, AnimationRefConst animation)
+	AnimationInstance::AnimationInstance(SkeletonSharedPtr target, AnimationSharedConstPtr animation)
 	{
 		this->Target = target;
 		this->SourceAnimation = animation;

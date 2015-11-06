@@ -45,7 +45,7 @@ namespace GTE
 	/*
 	 * Set this mesh filter's target mesh.
 	 */
-	void Mesh3DFilter::SetMesh3D(Mesh3DRef mesh)
+	void Mesh3DFilter::SetMesh3D(Mesh3DSharedPtr mesh)
 	{
 		this->mesh = mesh;
 
@@ -58,7 +58,7 @@ namespace GTE
 	/*
 	 * Get the target mesh for this mesh filter.
 	 */
-	Mesh3DRef Mesh3DFilter::GetMesh3D()
+	Mesh3DSharedPtr Mesh3DFilter::GetMesh3D()
 	{
 		return mesh;
 	}

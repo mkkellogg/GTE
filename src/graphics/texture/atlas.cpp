@@ -15,7 +15,7 @@
 
 namespace GTE
 {
-	Atlas::Atlas(TextureRef texture, Bool createFirstFullFrame)
+	Atlas::Atlas(TextureSharedPtr texture, Bool createFirstFullFrame)
 	{
 		this->texture = texture;
 		imageCount = 0;
@@ -43,12 +43,12 @@ namespace GTE
 		return &images[index];
 	}
 
-	TextureRef Atlas::GetTexture()
+	TextureSharedPtr Atlas::GetTexture()
 	{
 		return texture;
 	}
 
-	Atlas* Atlas::CreateGridAtlas(TextureRef texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY)
+	Atlas* Atlas::CreateGridAtlas(TextureSharedPtr texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY)
 	{
 		Atlas * atlas = new(std::nothrow) Atlas(texture, false);
 

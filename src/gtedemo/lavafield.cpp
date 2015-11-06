@@ -94,7 +94,7 @@ void LavaField::DisplaceField()
 	GTE::Byte * pixelsB = displacementB->GetPixels();
 	GTE::Byte * curPixelsB;
 
-	GTE::SubMesh3DRef subMesh = fieldMesh->GetSubMesh(0);
+	GTE::SubMesh3DSharedPtr subMesh = fieldMesh->GetSubMesh(0);
 	GTE::Point3Array * positions = subMesh->GetPostions();
 
 	// loop through each vertex in the lava field mesh and displace each
@@ -192,14 +192,14 @@ GTE::Bool LavaField::Init()
 	ASSERT(lavaFieldObject.IsValid(), "LavaField::Init -> Could not create lava field scene object.");
 
 	// set up mesh filter
-	GTE::Mesh3DFilterRef meshFilter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterSharedPtr meshFilter = objectManager->CreateMesh3DFilter();
 	ASSERT(meshFilter.IsValid(), "LavaField::Init -> Could not create lava field mesh filter.");
 	meshFilter->SetMesh3D(fieldMesh);
 	meshFilter->SetCastShadows(false);
 	meshFilter->SetReceiveShadows(false);
 
 	// set up renderer
-	GTE::Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 	ASSERT(renderer.IsValid(), "LavaField::Init -> Could not create lava field renderer.");
 	renderer->AddMaterial(lavaMaterial);
 
@@ -215,7 +215,7 @@ GTE::Bool LavaField::Init()
 /*
  * Get the SceneObject instance that holds the lava field mesh.
  */
-GTE::SceneObjectRef LavaField::GetSceneObject()
+GTE::SceneObjectSharedPtr LavaField::GetSceneObject()
 {
 	return lavaFieldObject;
 }

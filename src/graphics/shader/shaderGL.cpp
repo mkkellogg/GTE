@@ -506,11 +506,11 @@ namespace GTE
 	 * [varID] - shader var ID/location of the uniform for which the value is to be set.
 	 * [texture] - Holds sampler data to be sent
 	 */
-	void ShaderGL::SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureRef texture)
+	void ShaderGL::SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture)
 	{
 		ASSERT(texture.IsValid(), "ShaderGL::SendUniformToShader(UInt32, Texture *) -> 'texture' is null.");
 
-		Texture* texturePtr = ((TextureRef)texture).GetPtr();
+		Texture* texturePtr = ((TextureSharedPtr)texture).GetPtr();
 		TextureGL * texGL = dynamic_cast<TextureGL *>(texturePtr);
 
 		ASSERT(texGL != nullptr, "ShaderGL::SendUniformToShader(UInt32, Texture *) -> texture is not TextureGL !!");

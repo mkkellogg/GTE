@@ -68,7 +68,7 @@ namespace GTE
 		// push-back (preallocated) [subMeshCount] entries in [subMeshes]
 		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
-			subMeshes.push_back(SubMesh3DRef::Null());
+			subMeshes.push_back(SubMesh3DSharedPtr::Null());
 		}
 
 		return true;
@@ -90,7 +90,7 @@ namespace GTE
 		// loop through each sub-mesh to calculate average center position
 		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
-			SubMesh3DRef subMesh = subMeshes[i];
+			SubMesh3DSharedPtr subMesh = subMeshes[i];
 			if (subMesh.IsValid())
 			{
 				const Point3 temp = subMesh->GetCenter();
@@ -120,7 +120,7 @@ namespace GTE
 		// in [maxSoiX], [maxSoiY], and [maxSoiX] respectively.
 		for (UInt32 i = 0; i < subMeshCount; i++)
 		{
-			SubMesh3DRef subMesh = subMeshes[i];
+			SubMesh3DSharedPtr subMesh = subMeshes[i];
 			if (subMesh.IsValid())
 			{
 				const Point3 temp = subMesh->GetCenter();
@@ -169,7 +169,7 @@ namespace GTE
 	/*
 	 *Set the sub-mesh at [index] to be [mesh].
 	 */
-	void Mesh3D::SetSubMesh(SubMesh3DRef mesh, UInt32 index)
+	void Mesh3D::SetSubMesh(SubMesh3DSharedPtr mesh, UInt32 index)
 	{
 		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3D::SetSubMesh -> 'mesh' is null.", true);
 
@@ -190,7 +190,7 @@ namespace GTE
 	/*
 	 * Get a reference to the sub-mesh at [index].
 	 */
-	SubMesh3DRef Mesh3D::GetSubMesh(UInt32 index)
+	SubMesh3DSharedPtr Mesh3D::GetSubMesh(UInt32 index)
 	{
 		if (index < subMeshCount)
 		{
@@ -199,7 +199,7 @@ namespace GTE
 		else
 		{
 			Debug::PrintError("Mesh3D::GetSubMesh -> Index out of range.");
-			return SubMesh3DRef::Null();
+			return SubMesh3DSharedPtr::Null();
 		}
 	}
 

@@ -41,9 +41,9 @@ namespace GTE
 		// height of this render target
 		UInt32 height;
 		// texture to which color rendering will occur
-		TextureRef colorTexture;
+		TextureSharedPtr colorTexture;
 		// texture to which depth rendering will occur
-		TextureRef depthTexture;
+		TextureSharedPtr depthTexture;
 		// texture attributes of [colorTexture]
 		TextureAttributes colorTextureAttributes;
 
@@ -54,8 +54,8 @@ namespace GTE
 
 		virtual Bool Init() = 0;
 		Bool HasBuffer(RenderBufferType bufferType) const;
-		TextureRef GetDepthTexture();
-		TextureRef GetColorTexture();
+		TextureSharedPtr GetDepthTexture();
+		TextureSharedPtr GetColorTexture();
 		UInt32 GetWidth() const;
 		UInt32 GetHeight() const;
 		Bool IsColorBufferTexture() const;

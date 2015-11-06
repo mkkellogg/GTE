@@ -61,7 +61,7 @@ CastleScene::~CastleScene()
 /*
  * Get the SceneObject instance at the root of the scene.
  */
-GTE::SceneObjectRef CastleScene::GetSceneRoot()
+GTE::SceneObjectSharedPtr CastleScene::GetSceneRoot()
 {
 	return sceneRoot;
 }
@@ -92,7 +92,7 @@ void CastleScene::Update()
  * [directLightObject] - Global scene object that contains the global directional light.
  * [playerObject] - Scene object that contains the player mesh & renderer.
  */
-void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject)
+void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject)
 {
 	importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
 
@@ -122,7 +122,7 @@ void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambien
 void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	//========================================================
 	//
@@ -148,7 +148,7 @@ void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	// get reference to the engine's object manager
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
@@ -159,13 +159,13 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	GTE::TextureAttributes texAttributes;
 	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	GTE::TextureRef texture = objectManager->CreateTexture("resources/models/toonlevel/castle/Castle01.png", texAttributes);
-	GTE::TextureRef normalmap = objectManager->CreateTexture("resources/models/toonlevel/castle/Castle01Normals.png", texAttributes);
+	GTE::TextureSharedPtr texture = objectManager->CreateTexture("resources/models/toonlevel/castle/Castle01.png", texAttributes);
+	GTE::TextureSharedPtr normalmap = objectManager->CreateTexture("resources/models/toonlevel/castle/Castle01Normals.png", texAttributes);
 
 	// create the castle's material using the "basic_normal" built-in shader
 	GTE::ShaderSource basicShaderSource;
 	importer.LoadBuiltInShaderSource("basic_normal", basicShaderSource);
-	GTE::MaterialRef castleNormalMaterial = objectManager->CreateMaterial(std::string("CastleNormalMat"), basicShaderSource);
+	GTE::MaterialSharedPtr castleNormalMaterial = objectManager->CreateMaterial(std::string("CastleNormalMat"), basicShaderSource);
 	castleNormalMaterial->SetTexture(texture, "TEXTURE0");
 	castleNormalMaterial->SetTexture(normalmap, "NORMALMAP");
 	castleNormalMaterial->SetUniform1f(1.0f, "USCALE");
@@ -188,10 +188,10 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract mesh & material from castle tower model
-	GTE::SceneObjectRef tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
-	GTE::Mesh3DFilterRef towerMeshFilter = tower2MeshObject->GetMesh3DFilter();
+	GTE::SceneObjectSharedPtr tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr tower2Mesh = tower2MeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr towerRenderer = tower2MeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DFilterSharedPtr towerMeshFilter = tower2MeshObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 
 	tower2Mesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
@@ -238,10 +238,10 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	modelSceneObject->GetTransform().Translate(65, -10, -8.8f, false);
 
 	// extract mesh & material from left archway model
-	GTE::SceneObjectRef archwayMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef archwayMesh = archwayMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef archwayRenderer = archwayMeshObject->GetMesh3DRenderer();
-	GTE::Mesh3DFilterRef archwayMeshFilter = archwayMeshObject->GetMesh3DFilter();
+	GTE::SceneObjectSharedPtr archwayMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr archwayMesh = archwayMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr archwayRenderer = archwayMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DFilterSharedPtr archwayMeshFilter = archwayMeshObject->GetMesh3DFilter();
 	archwayMeshFilter->SetUseBackSetShadowVolume(false);
 
 	// prep left archway mesh & material for normal mapped rendering
@@ -291,10 +291,10 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract mesh & material from castle wall model
-	GTE::SceneObjectRef wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
-	GTE::Mesh3DFilterRef wallMeshFilter = wallBlockMeshObject->GetMesh3DFilter();
+	GTE::SceneObjectSharedPtr wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr wallBlockMesh = wallBlockMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DFilterSharedPtr wallMeshFilter = wallBlockMeshObject->GetMesh3DFilter();
 	wallMeshFilter->SetUseBackSetShadowVolume(false);
 
 	wallBlockMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
@@ -352,7 +352,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	//========================================================
 	//
@@ -368,10 +368,10 @@ void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
 
 	// extract tree mesh & material
-	GTE::SceneObjectRef treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr treeMesh = treeMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr treeRenderer = treeMeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr treeMaterial = treeRenderer->GetMaterial(0);
 
 	// place initial tree in the scene
 	modelSceneObject->SetActive(true);
@@ -409,7 +409,7 @@ void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 {
 	// misc. reference variables
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	//========================================================
 	//
@@ -424,10 +424,10 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract fence mesh & material
-	GTE::SceneObjectRef fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr fenceMesh = fenceMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr fenceMaterial = fenceRenderer->GetMaterial(0);
 
 	// place initial fence in the scene
 	modelSceneObject->SetActive(true);
@@ -481,10 +481,10 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract barrel mesh and material
-	GTE::SceneObjectRef barrelMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef barrelMesh = barrelMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef barrelRenderer = barrelMeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef barrelMaterial = barrelRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr barrelMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr barrelMesh = barrelMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr barrelRenderer = barrelMeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr barrelMaterial = barrelRenderer->GetMaterial(0);
 
 	// place initial barrel in the scene
 	modelSceneObject->SetActive(true);
@@ -512,7 +512,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	//========================================================
 
 	// create instance of SceneObject to hold the floor mesh and its renderer
-	GTE::SceneObjectRef cubeSceneObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectSharedPtr cubeSceneObject = objectManager->CreateSceneObject();
 	cubeSceneObject->SetStatic(true);
 	sceneRoot->AddChild(cubeSceneObject);
 
@@ -520,14 +520,14 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GTE::TextureAttributes texAttributes;
 	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
 	texAttributes.MipMapLevel = 4;
-	GTE::TextureRef texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
-	GTE::TextureRef normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
+	GTE::TextureSharedPtr texture = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/color.png", texAttributes);
+	GTE::TextureSharedPtr normalmap = objectManager->CreateTexture("resources/textures/normalmapped/bubblegrip/normal.png", texAttributes);
 
 
 	// create the floor's material using the "basic_normal" built-in shader
 	GTE::ShaderSource basicShaderSource;
 	importer.LoadBuiltInShaderSource("basic_normal", basicShaderSource);
-	GTE::MaterialRef material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
+	GTE::MaterialSharedPtr material = objectManager->CreateMaterial(std::string("BasicMaterial"), basicShaderSource);
 	material->SetTexture(texture, "TEXTURE0");
 	material->SetTexture(normalmap, "NORMALMAP");
 	material->SetUniform1f(3.4f, "USCALE");
@@ -543,15 +543,15 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Tangent);
 
 	// create the floor mesh
-	GTE::Mesh3DRef cubeMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
-	GTE::Mesh3DFilterRef cubeMeshfilter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DSharedPtr cubeMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
+	GTE::Mesh3DFilterSharedPtr cubeMeshfilter = objectManager->CreateMesh3DFilter();
 	cubeSceneObject->SetMesh3DFilter(cubeMeshfilter);
 	cubeMeshfilter->SetMesh3D(cubeMesh);
 	cubeMeshfilter->SetCastShadows(false);
 	cubeMeshfilter->SetReceiveShadows(true);
 
 	// create the floor mesh's renderer
-	GTE::Mesh3DRendererRef renderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
 	cubeSceneObject->SetMesh3DRenderer(renderer);
 
@@ -563,9 +563,9 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 /*
 * Set up the lights that belong to thsi scene.
 */
-void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject)
+void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject)
 {
-	GTE::SceneObjectRef sceneObject;
+	GTE::SceneObjectSharedPtr sceneObject;
 
 	// get reference to the engine's object manager
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
@@ -573,7 +573,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	// create material for light meshes
 	GTE::ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("selflit", selfLitShaderSource);
-	GTE::MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
+	GTE::MaterialSharedPtr selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
 	selflitMaterial->SetColor(GTE::Color4(1, 1, 1, 1), "SELFCOLOR");
 
 	//========================================================
@@ -587,18 +587,18 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
 
 	// create mesh & material for castle lantern
-	GTE::Mesh3DRef lanternLightMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
+	GTE::Mesh3DSharedPtr lanternLightMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
 	GTE::Color4 lanternLightColor(1, .66f, .231f, 1);
 	GTE::Color4 lanternLightMeshColor(1, .95f, .5f, 1);
-	GTE::MaterialRef lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
+	GTE::MaterialSharedPtr lanterLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
 	lanterLightMeshMaterial->SetColor(lanternLightMeshColor, "SELFCOLOR");
 	lanterLightMeshMaterial->SetUseLighting(false);
 
 	// create castle center lantern
-	GTE::SceneObjectRef lanternObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectSharedPtr lanternObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(lanternObject);
 	//lanternObject->SetStatic(true);
-	GTE::LightRef lanternLight = objectManager->CreateLight();
+	GTE::LightSharedPtr lanternLight = objectManager->CreateLight();
 	lanternLight->SetIntensity(1.8f);
 	lanternLight->SetRange(25);
 	lanternLight->SetColor(lanternLightColor);
@@ -611,10 +611,10 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	lanternObject->GetTransform().Scale(.2f, .2f, .2f, true);
 	//lanternObject->GetTransform().Translate(75f, -6, -5, false);
 	lanternObject->GetTransform().Translate(72.0f, -1, -8, false);
-	GTE::Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterSharedPtr filter = objectManager->CreateMesh3DFilter();
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);
-	GTE::Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
 	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
 	pointLights.push_back(lanternObject);
@@ -645,7 +645,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef 
 	pointLights.push_back(lanternObject);
 }
 
-std::vector<GTE::SceneObjectRef>& CastleScene::GetPointLights()
+std::vector<GTE::SceneObjectSharedPtr>& CastleScene::GetPointLights()
 {
 	return pointLights;
 }

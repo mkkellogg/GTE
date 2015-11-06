@@ -14,34 +14,34 @@
 class PoolScene : public Scene
 {
 	// the SceneObject instance at the root of the scene
-	GTE::SceneObjectRef sceneRoot;
+	GTE::SceneObjectSharedPtr sceneRoot;
 	// point lights in this scene
-	std::vector<GTE::SceneObjectRef> pointLights;
+	std::vector<GTE::SceneObjectSharedPtr> pointLights;
 	// global directional light
-	GTE::SceneObjectRef directionalLightObject;
+	GTE::SceneObjectSharedPtr directionalLightObject;
 	// player object
-	GTE::SceneObjectRef playerObject;
+	GTE::SceneObjectSharedPtr playerObject;
 	// position of player in previous frame
 	GTE::Point3 lastPlayerPos;
 	// main camera
-	GTE::CameraRef mainCamera;
+	GTE::CameraSharedPtr mainCamera;
 
 	// water surface object
-	GTE::SceneObjectRef waterSurfaceSceneObject;
+	GTE::SceneObjectSharedPtr waterSurfaceSceneObject;
 	// camera for rendering water reflection
-	GTE::CameraRef waterReflectionCamera;
+	GTE::CameraSharedPtr waterReflectionCamera;
 	// camera for rendering water's surface
-	GTE::CameraRef waterSurfaceCamera;
+	GTE::CameraSharedPtr waterSurfaceCamera;
 	// material for rendering water
-	GTE::MaterialRef waterMaterial;
+	GTE::MaterialSharedPtr waterMaterial;
 	// height maps for water surface
-	GTE::RenderTargetRef waterHeights[2];
+	GTE::RenderTargetSharedPtr waterHeights[2];
 	// material for rendering the height maps
-	GTE::MaterialRef waterHeightsMaterial;
+	GTE::MaterialSharedPtr waterHeightsMaterial;
 	// material for rendering the normal map
-	GTE::MaterialRef waterNormalsMaterial;
+	GTE::MaterialSharedPtr waterNormalsMaterial;
 	// material for adding a new water drop
-	GTE::MaterialRef waterDropMaterial;
+	GTE::MaterialSharedPtr waterDropMaterial;
 
 	// last time drop was added to pool
 	GTE::Real lastWaterDropTime;
@@ -81,22 +81,22 @@ public:
 	PoolScene();
 	~PoolScene();
 
-	GTE::SceneObjectRef GetSceneRoot();
+	GTE::SceneObjectSharedPtr GetSceneRoot();
 	void OnActivate();
 	void Update();
-	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject);
-	void SetMainCamera(GTE::CameraRef camera);
+	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject);
+	void SetMainCamera(GTE::CameraSharedPtr camera);
 
 	void SetupTerrain(GTE::AssetImporter& importer);
 	void SetupStructures(GTE::AssetImporter& importer);
 	void SetupPlants(GTE::AssetImporter& importer);
 	void SetupWaterSurface(GTE::AssetImporter& importer);
 	void SetupExtra(GTE::AssetImporter& importer);
-	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject);
+	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
 
 	void TriggerRippleDrop();
 
-	std::vector<GTE::SceneObjectRef>& GetPointLights();
+	std::vector<GTE::SceneObjectSharedPtr>& GetPointLights();
 };
 
 #endif

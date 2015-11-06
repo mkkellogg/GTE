@@ -82,7 +82,7 @@ namespace GTE
 		VertexMappingDescriptor* GetDescriptor(UInt32 index);
 		UInt32 GetVertexCount() const;
 		UInt32 GetUniqueVertexCount() const;
-		void BindTo(SkeletonRefConst skeleton);
+		void BindTo(SkeletonSharedConstPtr skeleton);
 	};
 }
 

@@ -52,7 +52,7 @@ namespace GTE
 	protected:
 
 		// the material that is currently being used for rendering
-		MaterialRef activeMaterial;
+		MaterialSharedPtr activeMaterial;
 		// is OpenGL blending enabled?
 		Bool blendingEnabled;
 		// is OpenGL depth buffer enabled?
@@ -72,9 +72,9 @@ namespace GTE
 		// number of currently active clip planes
 		UInt32 activeClipPlanes;
 		// RenderTarget objects that encapsulates the OpenGL default framebuffer
-		RenderTargetRef defaultRenderTarget;
+		RenderTargetSharedPtr defaultRenderTarget;
 		// currently bound render target;
-		RenderTargetRef currentRenderTarget;
+		RenderTargetSharedPtr currentRenderTarget;
 		// number of bits per channel in the OpenGL color buffer
 		Int32 redBits, greenBits, blueBits, alphaBits;
 		// bit depth of the OpenGL depth buffer
@@ -98,8 +98,8 @@ namespace GTE
 		void PostRender() override;
 
 		RenderTarget * CreateDefaultRenderTarget() override;
-		Bool ActivateRenderTarget(const RenderTargetRef& target) override;
-		const RenderTargetRef& GetCurrrentRenderTarget() override;
+		Bool ActivateRenderTarget(const RenderTargetSharedPtr& target) override;
+		const RenderTargetSharedPtr& GetCurrrentRenderTarget() override;
 		Bool ActivateCubeRenderTargetSide(CubeTextureSide side) override;
 		Bool RestoreDefaultRenderTarget() override;
 
@@ -132,11 +132,11 @@ namespace GTE
 										  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) override;
 		void DestroyRenderTarget(RenderTarget * target) override;
 
-		RenderTargetRef GetDefaultRenderTarget() override;
+		RenderTargetSharedPtr GetDefaultRenderTarget() override;
 
-		void SetupStateForMaterial(const MaterialRef& material, Bool reverseFaceCulling);
-		void ActivateMaterial(const MaterialRef& material, Bool reverseFaceCulling) override;
-		MaterialRef& GetActiveMaterial() override;
+		void SetupStateForMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling);
+		void ActivateMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling) override;
+		MaterialSharedPtr& GetActiveMaterial() override;
 
 		void EnterRenderMode(RenderMode renderMode) override;		
 
@@ -168,11 +168,11 @@ namespace GTE
 		
 		Bool CanBlitColorBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
 		Bool CanBlitDepthBuffers(const RenderTargetGL * src, const RenderTargetGL * dest) const;
-		void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const override;
+		void CopyBetweenRenderTargets(RenderTargetSharedPtr src, RenderTargetSharedConstPtr dest) const override;
 
-		void SetTextureData(TextureRef texture, const Byte * data) const override;
-		void SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const override;
-		void RebuildMipMaps(TextureRef texture) const override;
+		void SetTextureData(TextureSharedPtr texture, const Byte * data) const override;
+		void SetTextureData(TextureSharedPtr texture, const Byte * data, CubeTextureSide side) const override;
+		void RebuildMipMaps(TextureSharedPtr texture) const override;
 
 		Bool AddClipPlane() override;
 		void DeactiveAllClipPlanes() override;		

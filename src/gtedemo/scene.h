@@ -30,11 +30,11 @@ class Scene
 	Scene();
 	virtual ~Scene();
 
-	virtual GTE::SceneObjectRef GetSceneRoot() = 0;
+	virtual GTE::SceneObjectSharedPtr GetSceneRoot() = 0;
 	virtual void OnActivate() = 0;
 	virtual void Update() = 0;
-	virtual void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, 
-					   GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject) = 0;
+	virtual void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject,
+					   GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject) = 0;
 };
 
 #endif

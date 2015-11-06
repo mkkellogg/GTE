@@ -86,21 +86,21 @@ namespace GTE
 
 		RenderQueueEntry skyboxEntry;
 		// mesh for doing full screen effects
-		Mesh3DRef fullScreenQuad;
+		Mesh3DSharedPtr fullScreenQuad;
 		// Ortho camera for rendering to [fullScreenQuad]
-		CameraRef fullScreenQuadCam;
+		CameraSharedPtr fullScreenQuadCam;
 		// scene object for full screen quad mesh
-		SceneObjectRef fullScreenQuadObject;
+		SceneObjectSharedPtr fullScreenQuadObject;
 		// material for rendering shadow volumes
-		MaterialRef shadowVolumeMaterial;
+		MaterialSharedPtr shadowVolumeMaterial;
 		// material for rendering only to the depth buffer
-		MaterialRef depthOnlyMaterial;
+		MaterialSharedPtr depthOnlyMaterial;
 		// material for rendering depth values to color buffer
-		MaterialRef depthValueMaterial;
+		MaterialSharedPtr depthValueMaterial;
 		// material for rendering SSAO-style outlines
-		MaterialRef ssaoOutlineMaterial;
+		MaterialSharedPtr ssaoOutlineMaterial;
 		// for off-screen rendering
-		RenderTargetRef depthRenderTarget;
+		RenderTargetSharedPtr depthRenderTarget;
 
 		// number of renderable scene objects found during scene processing
 		UInt32 renderableSceneObjectCount;
@@ -133,7 +133,7 @@ namespace GTE
 		// cache shadow volumes that don't need to be constantly rebuilt
 		std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
-		std::stack<const RenderTargetRef*> renderTargetStack;
+		std::stack<const RenderTargetSharedPtr*> renderTargetStack;
 
 		void Update() override;
 		void PreProcessScene(SceneObject& parent, UInt32 recursionDepth);
@@ -150,17 +150,17 @@ namespace GTE
 			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
-						const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef& materialOverride,
+						const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialSharedPtr& materialOverride,
 						Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void RenderSkyboxForCamera(Camera& camera, const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse);
 		void RenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
 		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-											MaterialRef&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+											MaterialSharedPtr&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
 		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-											MaterialRef&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
+											MaterialSharedPtr&  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
 			std::function<Bool(SceneObject*)> filterFunction);
-		Bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
+		Bool ValidateSceneObjectForRendering(SceneObjectSharedPtr sceneObject) const;
 		void BuildShadowVolumeMVPTransform(const Transform& modelTransform,  const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
 		void RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 			const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
@@ -178,7 +178,7 @@ namespace GTE
 
 		void ClearBuffersForCamera(const Camera& camera) const;
 
-		void ActivateMaterial(const MaterialRef& material, Bool reverseFaceCulling);
+		void ActivateMaterial(const MaterialSharedPtr& material, Bool reverseFaceCulling);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);
 		void SendModelViewProjectionToShader(const Transform& modelViewProjection);
 		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);
@@ -189,8 +189,8 @@ namespace GTE
 		Bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 
-		void PushRenderTarget(const RenderTargetRef& renderTarget);
-		const RenderTargetRef& PopRenderTarget();
+		void PushRenderTarget(const RenderTargetSharedPtr& renderTarget);
+		const RenderTargetSharedPtr& PopRenderTarget();
 		void ClearRenderTargetStack();
 
 		Bool InitFullScreenQuad();
@@ -204,7 +204,7 @@ namespace GTE
 		void RenderScene() override;
 		void ClearCaches() override;
 
-		void RenderFullScreenQuad(const RenderTargetRef& renderTarget, const MaterialRef& material, Bool clearBuffers) override;
+		void RenderFullScreenQuad(const RenderTargetSharedPtr& renderTarget, const MaterialSharedPtr& material, Bool clearBuffers) override;
 	};
 }
 

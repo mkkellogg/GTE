@@ -44,13 +44,13 @@ namespace GTE
 
 		Bool skyboxSetup;
 		Bool skyboxEnabled;
-		MaterialRef skyboxMaterial;
-		TextureRef skyboxTexture;
-		SceneObjectRef skyboxSceneObject;
-		Mesh3DRef skyboxMesh;
-		Mesh3DFilterRef skyboxMeshFilter;
-		Mesh3DRendererRef skyboxMeshRenderer;
-		CameraRef sharedSkyboxCamera;
+		MaterialSharedPtr skyboxMaterial;
+		TextureSharedPtr skyboxTexture;
+		SceneObjectSharedPtr skyboxSceneObject;
+		Mesh3DSharedPtr skyboxMesh;
+		Mesh3DFilterSharedPtr skyboxMeshFilter;
+		Mesh3DRendererSharedPtr skyboxMeshRenderer;
+		CameraSharedPtr sharedSkyboxCamera;
 
 		SSAORenderMode ssaoMode;
 		Bool ssaoEnabled;
@@ -59,9 +59,9 @@ namespace GTE
 
 		UInt32 renderOrderIndex;
 
-		RenderTargetRef renderTarget;
+		RenderTargetSharedPtr renderTarget;
 
-		RenderTargetRef copyTarget;
+		RenderTargetSharedPtr copyTarget;
 
 		IntMask cullingMask;
 
@@ -81,14 +81,14 @@ namespace GTE
 
 	public:
 
-		void SetupSkybox(TextureRef cubeTexture);
-		void ShareSkybox(CameraRef camera);
+		void SetupSkybox(TextureSharedPtr cubeTexture);
+		void ShareSkybox(CameraSharedPtr camera);
 		Bool IsSkyboxSetup() const;
 		void SetSkyboxEnabled(Bool enabled);
 		Bool IsSkyboxEnabled() const;
-		SceneObjectRef GetSkyboxSceneObject();
-		TextureRef GetSkyboxTexture();
-		MaterialRef GetSkyboxMaterial();
+		SceneObjectSharedPtr GetSkyboxSceneObject();
+		TextureSharedPtr GetSkyboxTexture();
+		MaterialSharedPtr GetSkyboxMaterial();
 
 		void SetSSAOEnabled(Bool enabled);
 		Bool IsSSAOEnabled();
@@ -114,11 +114,11 @@ namespace GTE
 
 		void SetupOffscreenRenderTarget(Int32 width, Int32 height);
 		void SetupOffscreenRenderTarget(Int32 width, Int32 height, Bool cube);
-		RenderTargetRef GetRenderTarget();
+		RenderTargetSharedPtr GetRenderTarget();
 		void SetWidthHeightRatio(Real width, Real height);
 
 		void SetupCopyRenderTarget();
-		RenderTargetRef GetCopyRenderTarget();
+		RenderTargetSharedPtr GetCopyRenderTarget();
 
 		void UpdateDisplay();
 

@@ -76,14 +76,14 @@ namespace GTE
 		}
 	}
 
-	Mesh3DRef EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, Real width, Real height,
+	Mesh3DSharedPtr EngineUtility::CreateRectangularMesh(StandardAttributeSet meshAttributes, Real width, Real height,
 		UInt32 subDivisionsPerWidth, UInt32 subDivisionsPerHeight,
 		Bool calculateNormals, Bool calculateTangents, Bool buildFaces)
 	{
 		if (width <= 0 || height <= 0)
 		{
 			Engine::Instance()->GetErrorManager()->SetError(EngineUtilityError::InvalidDimensions, "EngineUtility::CreateSquareMesh -> Width and height must be greater than 0.");
-			return Mesh3DRef::Null();
+			return Mesh3DSharedPtr::Null();
 		}
 
 		// force mesh to have at least positions and normals
@@ -100,10 +100,10 @@ namespace GTE
 		UInt32 totalVertices = totalSubSquares * 6;
 
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-		SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
+		SubMesh3DSharedPtr subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 		subMesh->Init(totalVertices);
 
-		Mesh3DRef mesh = objectManager->CreateMesh3D(1);
+		Mesh3DSharedPtr mesh = objectManager->CreateMesh3D(1);
 		mesh->Init();
 
 		Point3Array * points = subMesh->GetPostions();
@@ -189,12 +189,12 @@ namespace GTE
 		return mesh;
 	}
 
-	Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes)
+	Mesh3DSharedPtr EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes)
 	{
 		return CreateCubeMesh(meshAttributes, false);
 	}
 
-	Mesh3DRef EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes, Bool doCCW)
+	Mesh3DSharedPtr EngineUtility::CreateCubeMesh(StandardAttributeSet meshAttributes, Bool doCCW)
 	{
 		// force mesh to have at least positions and normals
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
@@ -202,10 +202,10 @@ namespace GTE
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Position);
 
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-		SubMesh3DRef subMesh = objectManager->CreateSubMesh3D(meshAttributes);
+		SubMesh3DSharedPtr subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 		subMesh->Init(36);
 
-		Mesh3DRef mesh = objectManager->CreateMesh3D(1);
+		Mesh3DSharedPtr mesh = objectManager->CreateMesh3D(1);
 		mesh->Init();
 		mesh->SetSubMesh(subMesh, 0);
 

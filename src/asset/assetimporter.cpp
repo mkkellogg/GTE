@@ -33,18 +33,18 @@ namespace GTE
 		SAFE_DELETE(shaderSourceLoader);
 	}
 
-	SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath) const
+	SceneObjectSharedPtr AssetImporter::LoadModelDirect(const std::string& filePath) const
 	{
 		return LoadModelDirect(filePath, 1, true, true);
 	}
 
-	SceneObjectRef AssetImporter::LoadModelDirect(const std::string& filePath, Real importScale, Bool castShadows, Bool receiveShadows) const
+	SceneObjectSharedPtr AssetImporter::LoadModelDirect(const std::string& filePath, Real importScale, Bool castShadows, Bool receiveShadows) const
 	{
 		ModelImporter importer;
 		return importer.LoadModelDirect(filePath, importScale, castShadows, receiveShadows, GetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots));
 	}
 
-	AnimationRef AssetImporter::LoadAnimation(const std::string& filePath, Bool addLoopPadding) const
+	AnimationSharedPtr AssetImporter::LoadAnimation(const std::string& filePath, Bool addLoopPadding) const
 	{
 		ModelImporter importer;
 		return importer.LoadAnimation(filePath, addLoopPadding, GetBoolProperty(AssetImporterBoolProperty::PreserveFBXPivots));

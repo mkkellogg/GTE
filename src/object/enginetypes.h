@@ -93,21 +93,21 @@ namespace GTE
 	class AnimationPlayer;
 	class RenderTarget;
 
-	template <typename T> class EngineObjectRef : public std::shared_ptr<T>
+	template <typename T> class EngineObjectSharedPtr : public std::shared_ptr<T>
 	{
 		friend class EngineObjectManager;
 
 	public:
-		static EngineObjectRef<T> NullRef;
+		static EngineObjectSharedPtr<T> NullRef;
 		
-		EngineObjectRef() : std::shared_ptr<T>(nullptr) {}
-		EngineObjectRef(const EngineObjectRef<T>& ref) : std::shared_ptr<T>(ref){}
-		EngineObjectRef(const std::shared_ptr<T>& ref) : std::shared_ptr<T>(ref){}
-		EngineObjectRef(T * ptr, std::function<void(T*)> deleter) : std::shared_ptr<T>(ptr, deleter){}
+		EngineObjectSharedPtr() : std::shared_ptr<T>(nullptr) {}
+		EngineObjectSharedPtr(const EngineObjectSharedPtr<T>& ref) : std::shared_ptr<T>(ref){}
+		EngineObjectSharedPtr(const std::shared_ptr<T>& ref) : std::shared_ptr<T>(ref){}
+		EngineObjectSharedPtr(T * ptr, std::function<void(T*)> deleter) : std::shared_ptr<T>(ptr, deleter){}
 
-		operator EngineObjectRef<const T>() const 
+		operator EngineObjectSharedPtr<const T>() const
 		{ 
-			return EngineObjectRef<const T>(std::shared_ptr<T>(*this));
+			return EngineObjectSharedPtr<const T>(std::shared_ptr<T>(*this));
 		}
 
 		T* GetPtr()
@@ -130,7 +130,7 @@ namespace GTE
 			return std::shared_ptr<T>::operator*();
 		}
 
-		Bool operator==(const EngineObjectRef<T>& other) const
+		Bool operator==(const EngineObjectSharedPtr<T>& other) const
 		{
 			return GetConstPtr() == other.GetConstPtr();
 		}
@@ -145,55 +145,51 @@ namespace GTE
 			return std::shared_ptr<T>::reset();
 		}
 
-		static EngineObjectRef<T> Null()
+		static EngineObjectSharedPtr<T> Null()
 		{
-			return EngineObjectRef<T>();
+			return EngineObjectSharedPtr<T>();
 		}
 	};
 
-	template <typename T> EngineObjectRef<T> EngineObjectRef<T>::NullRef;
+	template <typename T> EngineObjectSharedPtr<T> EngineObjectSharedPtr<T>::NullRef;
 
-	typedef EngineObjectRef<Shader> ShaderRef;
-	typedef EngineObjectRef<SubMesh3DRenderer> SubMesh3DRendererRef;
-	typedef EngineObjectRef<SubMesh3D> SubMesh3DRef;
-	typedef EngineObjectRef<Mesh3DRenderer> Mesh3DRendererRef;
-	typedef EngineObjectRef<SkinnedMesh3DRenderer> SkinnedMesh3DRendererRef;
-	typedef EngineObjectRef<Mesh3D> Mesh3DRef;
-	typedef EngineObjectRef<Mesh3DFilter> Mesh3DFilterRef;
-	typedef EngineObjectRef<Camera> CameraRef;
-	typedef EngineObjectRef<Light> LightRef;
-	typedef EngineObjectRef<SceneObject> SceneObjectRef;
-	typedef EngineObjectRef<Material> MaterialRef;
-	typedef EngineObjectRef<Texture> TextureRef;
-	typedef EngineObjectRef<Atlas> AtlasRef;
-	typedef EngineObjectRef<Shader> ShaderRef;
-	typedef EngineObjectRef<Skeleton> SkeletonRef;
-	typedef EngineObjectRef<Animation> AnimationRef;
-	typedef EngineObjectRef<AnimationInstance> AnimationInstanceRef;
-	typedef EngineObjectRef<AnimationPlayer> AnimationPlayerRef;
-	typedef EngineObjectRef<RenderTarget> RenderTargetRef;
+	typedef EngineObjectSharedPtr<Shader> ShaderSharedPtr;
+	typedef EngineObjectSharedPtr<SubMesh3DRenderer> SubMesh3DRendererSharedPtr;
+	typedef EngineObjectSharedPtr<SubMesh3D> SubMesh3DSharedPtr;
+	typedef EngineObjectSharedPtr<Mesh3DRenderer> Mesh3DRendererSharedPtr;
+	typedef EngineObjectSharedPtr<SkinnedMesh3DRenderer> SkinnedMesh3DRendererSharedPtr;
+	typedef EngineObjectSharedPtr<Mesh3D> Mesh3DSharedPtr;
+	typedef EngineObjectSharedPtr<Mesh3DFilter> Mesh3DFilterSharedPtr;
+	typedef EngineObjectSharedPtr<Camera> CameraSharedPtr;
+	typedef EngineObjectSharedPtr<Light> LightSharedPtr;
+	typedef EngineObjectSharedPtr<SceneObject> SceneObjectSharedPtr;
+	typedef EngineObjectSharedPtr<Material> MaterialSharedPtr;
+	typedef EngineObjectSharedPtr<Texture> TextureSharedPtr;
+	typedef EngineObjectSharedPtr<Atlas> AtlasSharedPtr;
+	typedef EngineObjectSharedPtr<Skeleton> SkeletonSharedPtr;
+	typedef EngineObjectSharedPtr<Animation> AnimationSharedPtr;
+	typedef EngineObjectSharedPtr<AnimationInstance> AnimationInstanceSharedPtr;
+	typedef EngineObjectSharedPtr<AnimationPlayer> AnimationPlayerSharedPtr;
+	typedef EngineObjectSharedPtr<RenderTarget> RenderTargetSharedPtr;
 
-	typedef EngineObjectRef<const Shader> ShaderRefConst;
-	typedef EngineObjectRef<const SubMesh3DRenderer> SubMesh3DRendererRefConst;
-	typedef EngineObjectRef<const SubMesh3D> SubMesh3DRefConst;
-	typedef EngineObjectRef<const Mesh3DRenderer> Mesh3DRendererRefConst;
-	typedef EngineObjectRef<const SkinnedMesh3DRenderer> SkinnedMesh3DRendererRefConst;
-	typedef EngineObjectRef<const Mesh3D> Mesh3DRefConst;
-	typedef EngineObjectRef<const Mesh3DFilter> Mesh3DFilterRefConst;
-	typedef EngineObjectRef<const Camera> CameraRefConst;
-	typedef EngineObjectRef<const Light> LightRefConst;
-	typedef EngineObjectRef<const SceneObject> SceneObjectRefConst;
-	typedef EngineObjectRef<const Material> MaterialRefConst;
-	typedef EngineObjectRef<const Texture> TextureRefConst;
-	typedef EngineObjectRef<const Atlas> AtlasRefConst;
-	typedef EngineObjectRef<const Shader> ShaderRefConst;
-	typedef EngineObjectRef<const Skeleton> SkeletonRefConst;
-	typedef EngineObjectRef<const Animation> AnimationRefConst;
-	typedef EngineObjectRef<const AnimationInstance> AnimationInstanceRefConst;
-	typedef EngineObjectRef<const AnimationPlayer> AnimationPlayerRefConst;
-	typedef EngineObjectRef<const RenderTarget> RenderTargetRefConst;
-
-	typedef std::shared_ptr<Transform> TransformRef;
+	typedef EngineObjectSharedPtr<const Shader> ShaderSharedConstPtr;
+	typedef EngineObjectSharedPtr<const SubMesh3DRenderer> SubMesh3DRendererSharedConstPtr;
+	typedef EngineObjectSharedPtr<const SubMesh3D> SubMesh3DSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Mesh3DRenderer> Mesh3DRendererSharedConstPtr;
+	typedef EngineObjectSharedPtr<const SkinnedMesh3DRenderer> SkinnedMesh3DRendererSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Mesh3D> Mesh3DSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Mesh3DFilter> Mesh3DFilterSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Camera> CameraSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Light> LightSharedConstPtr;
+	typedef EngineObjectSharedPtr<const SceneObject> SceneObjectSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Material> MaterialSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Texture> TextureSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Atlas> AtlasSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Skeleton> SkeletonSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Animation> AnimationSharedConstPtr;
+	typedef EngineObjectSharedPtr<const AnimationInstance> AnimationInstanceSharedConstPtr;
+	typedef EngineObjectSharedPtr<const AnimationPlayer> AnimationPlayerSharedConstPtr;
+	typedef EngineObjectSharedPtr<const RenderTarget> RenderTargetSharedConstPtr;
 }
 
 

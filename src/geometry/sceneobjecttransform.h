@@ -37,7 +37,7 @@ namespace GTE
 		SceneObjectTransform(SceneObject* sceneObject);
 		~SceneObjectTransform() override;
 
-		static void GetWorldTransform(Transform& transform, SceneObjectRefConst sceneObject, Bool includeSelf, Bool invert);
+		static void GetWorldTransform(Transform& transform, SceneObjectSharedConstPtr sceneObject, Bool includeSelf, Bool invert);
 		static void GetWorldTransform(Transform& transform, const SceneObject * sceneObject, Bool includeSelf, Bool invert);
 
 		void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;

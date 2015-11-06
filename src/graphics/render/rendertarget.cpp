@@ -55,7 +55,7 @@ namespace GTE
 	/*
 	 * Get a reference to the depth texture.
 	 */
-	TextureRef RenderTarget::GetDepthTexture()
+	TextureSharedPtr RenderTarget::GetDepthTexture()
 	{
 		return depthTexture;
 	}
@@ -63,7 +63,7 @@ namespace GTE
 	/*
 	 * Get a reference to the color texture.
 	 */
-	TextureRef RenderTarget::GetColorTexture()
+	TextureSharedPtr RenderTarget::GetColorTexture()
 	{
 		return colorTexture;
 	}

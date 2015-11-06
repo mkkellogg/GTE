@@ -38,7 +38,7 @@ class LavaField
 	// current offset/position of [lavaTextureB].
 	GTE::Real textBOffset;
 	// SceneObject instance that holds the lava field mesh
-	GTE::SceneObjectRef lavaFieldObject;
+	GTE::SceneObjectSharedPtr lavaFieldObject;
 
 	// width/height of both displacementA & displacementB
 	const GTE::UInt32 diplacementImageDimensionSize = 128;
@@ -48,12 +48,12 @@ class LavaField
 	GTE::Real fieldHeight;
 
 	// material used to render the lava field mesh
-	GTE::MaterialRef lavaMaterial;
+	GTE::MaterialSharedPtr lavaMaterial;
 	// the lava field mesh
-	GTE::Mesh3DRef fieldMesh;
+	GTE::Mesh3DSharedPtr fieldMesh;
 	// both textures are combined in the shader for the lava field mesh
-	GTE::TextureRef lavaTextureA;
-	GTE::TextureRef lavaTextureB;
+	GTE::TextureSharedPtr lavaTextureA;
+	GTE::TextureSharedPtr lavaTextureB;
 	// first displacement map used is displacing the lava field mesh
 	GTE::RawImage * displacementA;
 	// second displacement map used is displacing the lava field mesh
@@ -68,7 +68,7 @@ public:
 	~LavaField();
 
 	GTE::Bool Init();
-	GTE::SceneObjectRef GetSceneObject();
+	GTE::SceneObjectSharedPtr GetSceneObject();
 	void Update();
 
 	void SetDisplacementSpeed(GTE::Real speed);

@@ -19,19 +19,19 @@ class GameUtil
 {
 public:
 
-	static void ProcessSceneObjects(GTE::SceneObjectRef ref, std::function<void(GTE::SceneObjectRef)> func);
-	static GTE::SkinnedMesh3DRendererRef FindFirstSkinnedMeshRenderer(GTE::SceneObjectRef ref);
-	static GTE::SceneObjectRef FindFirstSceneObjectWithMesh(GTE::SceneObjectRef ref);
-	static void SetAllObjectsStatic(GTE::SceneObjectRef root);
-	static void SetAllObjectsLayerMask(GTE::SceneObjectRef root, GTE::IntMask mask);
-	static void SetAllMeshesStandardShadowVolume(GTE::SceneObjectRef root);
-	static void SetAllMeshesShadowVolumeOffset(GTE::SceneObjectRef root, GTE::Real offset);
-	static void SetAllObjectsCastShadows(GTE::SceneObjectRef root, GTE::Bool castShadows);
+	static void ProcessSceneObjects(GTE::SceneObjectSharedPtr ref, std::function<void(GTE::SceneObjectSharedPtr)> func);
+	static GTE::SkinnedMesh3DRendererSharedPtr FindFirstSkinnedMeshRenderer(GTE::SceneObjectSharedPtr ref);
+	static GTE::SceneObjectSharedPtr FindFirstSceneObjectWithMesh(GTE::SceneObjectSharedPtr ref);
+	static void SetAllObjectsStatic(GTE::SceneObjectSharedPtr root);
+	static void SetAllObjectsLayerMask(GTE::SceneObjectSharedPtr root, GTE::IntMask mask);
+	static void SetAllMeshesStandardShadowVolume(GTE::SceneObjectSharedPtr root);
+	static void SetAllMeshesShadowVolumeOffset(GTE::SceneObjectSharedPtr root, GTE::Real offset);
+	static void SetAllObjectsCastShadows(GTE::SceneObjectSharedPtr root, GTE::Bool castShadows);
 
-	static GTE::SceneObjectRef AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+	static GTE::SceneObjectSharedPtr AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
 											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows);
 
-	static GTE::SceneObjectRef AddMeshToScene(GTE::Mesh3DRef mesh, GTE::MaterialRef material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+	static GTE::SceneObjectSharedPtr AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
 											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume);
 };
 

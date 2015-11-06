@@ -49,7 +49,7 @@ namespace GTE
 	/*
 	 * Set the skeleton for this renderer.
 	 */
-	void SkinnedMesh3DRenderer::SetSkeleton(SkeletonRef skeleton)
+	void SkinnedMesh3DRenderer::SetSkeleton(SkeletonSharedPtr skeleton)
 	{
 		this->skeleton = skeleton;
 	}
@@ -57,7 +57,7 @@ namespace GTE
 	/*
 	 * Get a reference to this renderer's skeleton.
 	 */
-	SkeletonRef SkinnedMesh3DRenderer::GetSkeleton()
+	SkeletonSharedPtr SkinnedMesh3DRenderer::GetSkeleton()
 	{
 		return skeleton;
 	}
@@ -72,7 +72,7 @@ namespace GTE
 	void SkinnedMesh3DRenderer::InitializeForMesh()
 	{
 		// get the target mesh
-		Mesh3DRef mesh = GetTargetMesh();
+		Mesh3DSharedPtr mesh = GetTargetMesh();
 		//Mesh3DRef mesh = sceneObject->GetMesh3D();
 
 		if (mesh.IsValid())
@@ -84,7 +84,7 @@ namespace GTE
 			for (UInt32 i = 0; i < mesh->GetSubMeshCount(); i++)
 			{
 				Int32 vertexBoneMapIndex = -1;
-				SubMesh3DRendererRef subRenderer = this->GetSubRenderer(i);
+				SubMesh3DRendererSharedPtr subRenderer = this->GetSubRenderer(i);
 
 				// does the sub-mesh at index [i] have a corresponding VertexBoneMap object?
 				if (subMeshIndexMap.find(i) != subMeshIndexMap.end() && subMeshIndexMap[i] >= 0)

@@ -76,7 +76,7 @@ PoolScene::~PoolScene()
 /*
  * Get the SceneObject instance at the root of the scene.
  */
-GTE::SceneObjectRef PoolScene::GetSceneRoot()
+GTE::SceneObjectSharedPtr PoolScene::GetSceneRoot()
 {
 	return sceneRoot;
 }
@@ -248,7 +248,7 @@ void PoolScene::Update()
  * [directLightObject] - Global scene object that contains the global directional light.
  * [playerObject] - Scene object that contains the player mesh & renderer.
  */
-void PoolScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject)
+void PoolScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject)
 {
 	importer.SetBoolProperty(GTE::AssetImporterBoolProperty::PreserveFBXPivots, false);
 
@@ -272,7 +272,7 @@ void PoolScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientL
 /*
  * Set the reference to the main/global camera.
  */
-void PoolScene::SetMainCamera(GTE::CameraRef camera)
+void PoolScene::SetMainCamera(GTE::CameraSharedPtr camera)
 {
 	mainCamera = camera;
 }
@@ -283,7 +283,7 @@ void PoolScene::SetMainCamera(GTE::CameraRef camera)
 void PoolScene::SetupTerrain(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	//========================================================
 	//
@@ -311,7 +311,7 @@ void PoolScene::SetupTerrain(GTE::AssetImporter& importer)
 void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	//========================================================
 	//
@@ -326,10 +326,10 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract mesh & material from castle tower model
-	GTE::SceneObjectRef tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef tower2Mesh = tower2MeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef towerRenderer = tower2MeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef towerMaterial = towerRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr tower2Mesh = tower2MeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr towerRenderer = tower2MeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr towerMaterial = towerRenderer->GetMaterial(0);
 
 	// place initial castle tower in scene
 	modelSceneObject->SetActive(true);
@@ -352,10 +352,10 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract mesh & material from castle tower model
-	GTE::SceneObjectRef singleStoneMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef singleStoneMesh = singleStoneMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef singleStoneRenderer = singleStoneMeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef singleStoneMaterial = singleStoneRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr singleStoneMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr singleStoneMesh = singleStoneMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr singleStoneRenderer = singleStoneMeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr singleStoneMaterial = singleStoneRenderer->GetMaterial(0);
 
 	// place initial single stone in scene
 	modelSceneObject->SetActive(true);
@@ -411,10 +411,10 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract mesh & material from castle wall model
-	GTE::SceneObjectRef wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr wallBlockMesh = wallBlockMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
 
 	// place initial pool wall in scene
 	modelSceneObject->SetActive(true);
@@ -469,7 +469,7 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 void PoolScene::SetupPlants(GTE::AssetImporter& importer)
 {
 	// multi-use reference
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	//========================================================
 	//
@@ -486,10 +486,10 @@ void PoolScene::SetupPlants(GTE::AssetImporter& importer)
 	GameUtil::SetAllMeshesShadowVolumeOffset(modelSceneObject, 2.0f);
 
 	// extract tree mesh & material
-	GTE::SceneObjectRef treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef treeMesh = treeMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef treeRenderer = treeMeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef treeMaterial = treeRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr treeMesh = treeMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr treeRenderer = treeMeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr treeMaterial = treeRenderer->GetMaterial(0);
 
 
 	// place initial tree in the scene
@@ -532,7 +532,7 @@ void PoolScene::SetupPlants(GTE::AssetImporter& importer)
 void PoolScene::SetupExtra(GTE::AssetImporter& importer)
 {
 	// misc. reference variables
-	GTE::SceneObjectRef modelSceneObject;
+	GTE::SceneObjectSharedPtr modelSceneObject;
 
 	//========================================================
 	//
@@ -547,10 +547,10 @@ void PoolScene::SetupExtra(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	// extract fence mesh & material
-	GTE::SceneObjectRef fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DRef fenceMesh = fenceMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererRef fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
-	GTE::MaterialRef fenceMaterial = fenceRenderer->GetMaterial(0);
+	GTE::SceneObjectSharedPtr fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr fenceMesh = fenceMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
+	GTE::MaterialSharedPtr fenceMaterial = fenceRenderer->GetMaterial(0);
 
 	// place initial fence in the scene
 	modelSceneObject->SetActive(true);
@@ -619,7 +619,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	cameraMask = objectManager->GetLayerManager().RemoveLayerFromMask(cameraMask, reflectiveLayerIndex);
 	waterReflectionCamera->SetCullingMask(cameraMask);
 
-	GTE::SceneObjectRef waterReflectionCameraObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectSharedPtr waterReflectionCameraObject = objectManager->CreateSceneObject();
 	waterReflectionCameraObject->SetCamera(waterReflectionCamera);
 	sceneRoot->AddChild(waterReflectionCameraObject);
 	waterReflectionCamera->AddClipPlane(GTE::Vector3(0, -1, 0), -7);
@@ -642,7 +642,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	cameraMask = objectManager->GetLayerManager().GetLayerMask(reflectiveLayerIndex);
 	waterSurfaceCamera->SetCullingMask(cameraMask);
 
-	GTE::SceneObjectRef waterSurfaceCameraObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectSharedPtr waterSurfaceCameraObject = objectManager->CreateSceneObject();
 	waterSurfaceCameraObject->SetCamera(waterSurfaceCamera);
 	sceneRoot->AddChild(waterSurfaceCameraObject);
 
@@ -663,7 +663,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture0);
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::UVTexture1);
-	GTE::Mesh3DRef waterMesh = GTE::EngineUtility::CreateRectangularMesh(meshAttributes, 2, 2, waterMeshResolution, waterMeshResolution, false, false, false);
+	GTE::Mesh3DSharedPtr waterMesh = GTE::EngineUtility::CreateRectangularMesh(meshAttributes, 2, 2, waterMeshResolution, waterMeshResolution, false, false, false);
 
 	// create material for water surface
 	GTE::ShaderSource waterShaderSource;
@@ -674,7 +674,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	waterMaterial->SetTexture(mainCamera->GetCopyRenderTarget()->GetColorTexture(), "SCREEN_BUFFER_TEXTURE");
 
 	// create a renderer for the water mesh
-	GTE::Mesh3DRendererRef waterMeshRenderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr waterMeshRenderer = objectManager->CreateMesh3DRenderer();
 	waterMeshRenderer->AddMaterial(waterMaterial);
 	waterSurfaceSceneObject->SetMesh3DRenderer(waterMeshRenderer);
 
@@ -689,7 +689,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	}
 
 	// add water mesh to its scene object
-	GTE::Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterSharedPtr filter = objectManager->CreateMesh3DFilter();
 	waterSurfaceSceneObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(waterMesh);
 	filter->SetCastShadows(false);
@@ -777,9 +777,9 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 /*
 * Set up the lights that belong to this scene.
 */
-void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject)
+void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject)
 {
-	GTE::SceneObjectRef sceneObject;
+	GTE::SceneObjectSharedPtr sceneObject;
 
 	// get reference to the engine's object manager
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
@@ -787,7 +787,7 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	// create material for light meshes
 	GTE::ShaderSource selfLitShaderSource;
 	importer.LoadBuiltInShaderSource("selflit", selfLitShaderSource);
-	GTE::MaterialRef selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
+	GTE::MaterialSharedPtr selflitMaterial = objectManager->CreateMaterial("SelfLitMaterial", selfLitShaderSource);
 	selflitMaterial->SetColor(GTE::Color4(1, 1, 1, 1), uniform_SELFCOLOR);
 
 	//========================================================
@@ -801,18 +801,18 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	GTE::StandardAttributes::AddAttribute(&meshAttributes, GTE::StandardAttribute::Normal);
 
 	// create mesh & material for pool light
-	GTE::Mesh3DRef poolLightMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
+	GTE::Mesh3DSharedPtr poolLightMesh = GTE::EngineUtility::CreateCubeMesh(meshAttributes);
 	GTE::Color4 poolLightColor(1, .66f, .231f, 1);
 	GTE::Color4 poolLightMeshColor(1, .95f, .5f, 1);
-	GTE::MaterialRef poolLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
+	GTE::MaterialSharedPtr poolLightMeshMaterial = objectManager->CreateMaterial("LanternLightMeshMaterial", selfLitShaderSource);
 	poolLightMeshMaterial->SetColor(poolLightMeshColor, uniform_SELFCOLOR);
 	poolLightMeshMaterial->SetUseLighting(false);
 
 	// create pool light
-	GTE::SceneObjectRef poolLightObject = objectManager->CreateSceneObject();
+	GTE::SceneObjectSharedPtr poolLightObject = objectManager->CreateSceneObject();
 	sceneRoot->AddChild(poolLightObject);
 	poolLightObject->SetStatic(true);
-	GTE::LightRef poolLight = objectManager->CreateLight();
+	GTE::LightSharedPtr poolLight = objectManager->CreateLight();
 	poolLight->SetIntensity(1.8f);
 	poolLight->SetRange(25);
 	poolLight->SetColor(poolLightColor);
@@ -828,10 +828,10 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 	poolLight->SetCullingMask(mergedMask);
 
 	// add mesh for pool light to scene
-	GTE::Mesh3DFilterRef filter = objectManager->CreateMesh3DFilter();
+	GTE::Mesh3DFilterSharedPtr filter = objectManager->CreateMesh3DFilter();
 	poolLightObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(poolLightMesh);
-	GTE::Mesh3DRendererRef lanterLightRenderer = objectManager->CreateMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(poolLightMeshMaterial);
 	poolLightObject->SetMesh3DRenderer(lanterLightRenderer);
 
@@ -841,7 +841,7 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef pl
 /*
  * Return the point lights used in this scene.
  */
-std::vector<GTE::SceneObjectRef>& PoolScene::GetPointLights()
+std::vector<GTE::SceneObjectSharedPtr>& PoolScene::GetPointLights()
 {
 	return pointLights;
 }

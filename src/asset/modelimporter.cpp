@@ -148,7 +148,7 @@ const aiScene * ModelImporter::LoadAIScene(const std::string& filePath, Bool pre
  * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
  * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
  */
-SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, Real importScale, Bool castShadows, Bool receiveShadows, Bool preserveFBXPivots)
+SceneObjectSharedPtr ModelImporter::LoadModelDirect(const std::string& modelPath, Real importScale, Bool castShadows, Bool receiveShadows, Bool preserveFBXPivots)
 {
 	FileSystem * fileSystem = FileSystem::Instance();
 	std::string fixedModelPath = fileSystem->FixupPathForLocalFilesystem(modelPath);
@@ -159,12 +159,12 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, Real
 	if(scene != nullptr)
 	{
 		// the model has been loaded from disk into Assimp data structures, now convert to engine-native structures
-		SceneObjectRef result = ProcessModelScene(fixedModelPath, *scene, importScale, castShadows, receiveShadows);
+		SceneObjectSharedPtr result = ProcessModelScene(fixedModelPath, *scene, importScale, castShadows, receiveShadows);
 		return result;
 	}
 	else
 	{
-		return SceneObjectRef::Null();
+		return SceneObjectSharedPtr::Null();
 	}
 }
 
@@ -179,7 +179,7 @@ SceneObjectRef ModelImporter::LoadModelDirect(const std::string& modelPath, Real
  * [castShadows] - Show the model's meshes cast shadows after being loaded into the scene?
  * [receiveShadows] - Show the model's meshes receive shadows after being loaded into the scene?
  */
-SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, Bool castShadows, Bool receiveShadows) const
+SceneObjectSharedPtr ModelImporter::ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, Bool castShadows, Bool receiveShadows) const
 {
 	// get a pointer to the Engine's object manager
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
@@ -189,9 +189,9 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	std::vector<MaterialImportDescriptor> materialImportDescriptors;
 
 	// verify that we have a valid scene
-	NONFATAL_ASSERT_RTRN(scene.mRootNode != nullptr,"ModelImporter::ProcessModelScene -> Assimp scene root is null.", SceneObjectRef::Null(), true);
-	SceneObjectRef root = objectManager->CreateSceneObject();
-	NONFATAL_ASSERT_RTRN(root.IsValid(),"ModelImporter::ProcessModelScene -> Could not create root object.", SceneObjectRef::Null(), true);
+	NONFATAL_ASSERT_RTRN(scene.mRootNode != nullptr,"ModelImporter::ProcessModelScene -> Assimp scene root is null.", SceneObjectSharedPtr::Null(), true);
+	SceneObjectSharedPtr root = objectManager->CreateSceneObject();
+	NONFATAL_ASSERT_RTRN(root.IsValid(),"ModelImporter::ProcessModelScene -> Could not create root object.", SceneObjectSharedPtr::Null(), true);
 
 	FileSystem * fileSystem = FileSystem::Instance();
 	std::string fixedModelPath = fileSystem->FixupPathForLocalFilesystem(modelPath);
@@ -203,7 +203,7 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	if(!processMaterialsSuccess)
 	{
 		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::ProcessMaterialsFailed, "ModelImporter::ProcessModelScene -> ProcessMaterials() returned an error.");
-		return SceneObjectRef::Null();
+		return SceneObjectSharedPtr::Null();
 	}
 
 	// deactivate the root scene object so that it is not immediately
@@ -212,10 +212,10 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	Matrix4x4 baseTransform;
 
 	// pull the skeleton data from the scene/model (if it exists)
-	SkeletonRef skeleton = LoadSkeleton(scene);
+	SkeletonSharedPtr skeleton = LoadSkeleton(scene);
 
 	// container for all the SceneObject instances that get created during this process
-	std::vector<SceneObjectRef> createdSceneObjects;
+	std::vector<SceneObjectSharedPtr> createdSceneObjects;
 
 	// recursively move down the Assimp scene hierarchy and process each node one by one.
 	// all instances of SceneObject that are generated get stored in [createdSceneObjects].
@@ -229,11 +229,11 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 	for(UInt32 s = 0; s < createdSceneObjects.size(); s++)
 	{
 		// does the SceneObject instance have a SkinnedMesh3DRenderer ?
-		SkinnedMesh3DRendererRef renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
+		SkinnedMesh3DRendererSharedPtr renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
 		if(renderer.IsValid())
 		{
 			// clone [skeleton]
-			SkeletonRef skeletonClone = objectManager->CloneSkeleton(skeleton);
+			SkeletonSharedPtr skeletonClone = objectManager->CloneSkeleton(skeleton);
 			if(!skeletonClone.IsValid())
 			{
 				Debug::PrintWarning("ModelImporter::ProcessModelScene -> Could not clone scene skeleton.");
@@ -276,10 +276,10 @@ SceneObjectRef ModelImporter::ProcessModelScene(const std::string& modelPath, co
 void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 											   const aiNode& node,
 											   Real scale,
-											   SceneObjectRef parent,
+											   SceneObjectSharedPtr parent,
 											   std::vector<MaterialImportDescriptor>& materialImportDescriptors,
-											   SkeletonRef skeleton,
-											   std::vector<SceneObjectRef>& createdSceneObjects,
+											   SkeletonSharedPtr skeleton,
+											   std::vector<SceneObjectSharedPtr>& createdSceneObjects,
 											   Bool castShadows,
 											   Bool receiveShadows) const
 {
@@ -291,7 +291,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
 
 	// create new scene object to hold the Mesh3D object and its renderer
-	SceneObjectRef sceneObject = engineObjectManager->CreateSceneObject();
+	SceneObjectSharedPtr sceneObject = engineObjectManager->CreateSceneObject();
 	NONFATAL_ASSERT(sceneObject.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create scene object.", false);
 
 	// determine if [skeleton] is valid
@@ -299,8 +299,8 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 	Bool requiresSkinnedRenderer = false;
 
 	Mesh3DRenderer * rendererPtr = nullptr;
-	SkinnedMesh3DRendererRef skinnedMeshRenderer;
-	Mesh3DRendererRef meshRenderer;
+	SkinnedMesh3DRendererSharedPtr skinnedMeshRenderer;
+	Mesh3DRendererSharedPtr meshRenderer;
 
 	std::vector<UInt32> boneCounts;
 
@@ -320,7 +320,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 		// create a containing Mesh3D object that will hold all sub-meshes created for this node.
 		// for each Assimp mesh, one SubMesh3D will be created added to the Mesh3D instance.
-		Mesh3DRef mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
+		Mesh3DSharedPtr mesh3D = engineObjectManager->CreateMesh3D(node.mNumMeshes);
 		NONFATAL_ASSERT(mesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not create Mesh3D object.", false);
 
 		// initialize the new Mesh3D instance
@@ -362,7 +362,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 
 			Int32 materialIndex = mesh->mMaterialIndex;
 			MaterialImportDescriptor& materialImportDescriptor = materialImportDescriptors[materialIndex];
-			MaterialRef material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
+			MaterialSharedPtr material = materialImportDescriptor.meshSpecificProperties[sceneMeshIndex].material;
 			NONFATAL_ASSERT(material.IsValid(),"ModelImporter::RecursiveProcessModelScene -> nullptr Material object encountered.", true);
 
 			// add the material to the mesh renderer
@@ -372,14 +372,14 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			// differently or else it won't display correctly. we pass the [invert] flag to ConvertAssimpMesh()
 			Bool invert = HasOddReflections(mat);
 			// convert Assimp mesh to a Mesh3D object
-			SubMesh3DRef subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor, invert);
+			SubMesh3DSharedPtr subMesh3D = ConvertAssimpMesh(sceneMeshIndex, scene, materialImportDescriptor, invert);
 			NONFATAL_ASSERT(subMesh3D.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Could not convert Assimp mesh.", false);
 
 			// add the mesh to the newly created scene object
 			mesh3D->SetSubMesh(subMesh3D, n);
 		}
 
-		Mesh3DFilterRef filter = engineObjectManager->CreateMesh3DFilter();
+		Mesh3DFilterSharedPtr filter = engineObjectManager->CreateMesh3DFilter();
 		NONFATAL_ASSERT(filter.IsValid(),"ModelImporter::RecursiveProcessModelScene -> Unable to create mesh#D filter object.", false);
 
 		// set shadow properties
@@ -460,9 +460,9 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
  * [materialImportDescriptor] - Descriptor for the mesh's material.
  * [invert] - If true it means the mesh has an inverted scale transformation to deal with
  */
-SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, Bool invert) const
+SubMesh3DSharedPtr ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, Bool invert) const
 {
-	NONFATAL_ASSERT_RTRN(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DRef::Null(), true);
+	NONFATAL_ASSERT_RTRN(meshIndex < scene.mNumMeshes, "ModelImporter::ConvertAssimpMesh -> mesh index is out of range.", SubMesh3DSharedPtr::Null(), true);
 
 	UInt32 vertexCount = 0;
 	aiMesh & mesh = *scene.mMeshes[meshIndex];
@@ -501,8 +501,8 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 	EngineObjectManager * engineObjectManager =  Engine::Instance()->GetEngineObjectManager();
 
 	// create Mesh3D object with the constructed StandardAttributeSet
-	SubMesh3DRef mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
-	NONFATAL_ASSERT_RTRN(mesh3D.IsValid(),"ModelImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DRef::Null(), false);
+	SubMesh3DSharedPtr mesh3D = engineObjectManager->CreateSubMesh3D(meshAttributes);
+	NONFATAL_ASSERT_RTRN(mesh3D.IsValid(),"ModelImporter::ConvertAssimpMesh -> Could not create Mesh3D object.", SubMesh3DSharedPtr::Null(), false);
 
 	Bool initSuccess = mesh3D->Init(vertexCount);
 
@@ -511,7 +511,7 @@ SubMesh3DRef ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiScene& s
 	{
 		engineObjectManager->DestroySubMesh3D(mesh3D);
 		Debug::PrintError("ModelImporter::ConvertAssimpMesh -> Could not init mesh.");
-		return SubMesh3DRef::Null();
+		return SubMesh3DSharedPtr::Null();
 	}
 
 	Int32 vertexIndex = 0;
@@ -621,7 +621,7 @@ Bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 
 		aiReturn texFound = AI_SUCCESS;
 
-		TextureRef diffuseTexture;
+		TextureSharedPtr diffuseTexture;
 		//	TextureRef bumpTexture;
 		//	TextureRef specularTexture;
 
@@ -647,7 +647,7 @@ Bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 			if(materialImportDescriptor.UsedByMesh(i))
 			{
 				// see if we can match a loaded shader to the properties of this material and the current mesh
-				ShaderRef loadedShader = engineObjectManager->GetLoadedShader(materialImportDescriptor.meshSpecificProperties[i].shaderProperties);
+				ShaderSharedPtr loadedShader = engineObjectManager->GetLoadedShader(materialImportDescriptor.meshSpecificProperties[i].shaderProperties);
 
 				// if we can't find a loaded shader that matches the properties of this material and
 				// the current mesh...well we can't really load this material
@@ -661,7 +661,7 @@ Bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
 				}
 
 				// create a new Material engine object
-				MaterialRef newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
+				MaterialSharedPtr newMaterial = engineObjectManager->CreateMaterial(mtName.C_Str(),loadedShader);
 				if(!newMaterial.IsValid())
 				{
 					std::string msg = "ModelImporter::ProcessMaterials -> Could not create new Material object.";
@@ -710,10 +710,10 @@ Bool ModelImporter::ProcessMaterials(const std::string& modelPath, const aiScene
  * [assimpMaterial] - The Assimp material.
  * [textureType] - The type of texture to look for (diffuse, specular, normal map, etc...)
  */
-TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureType textureType, const std::string& modelPath) const
+TextureSharedPtr ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureType textureType, const std::string& modelPath) const
 {
 	// temp variables
-	TextureRef texture;
+	TextureSharedPtr texture;
 	aiString aiTexturePath;
 	aiReturn texFound = AI_SUCCESS;
 
@@ -728,7 +728,7 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
 	// retrieve the first texture descriptor (at index 0) matching [textureType] from the Assimp material
 	texFound = assimpMaterial.GetTexture(textureType, 0, &aiTexturePath);
 
-	NONFATAL_ASSERT_RTRN(texFound == AI_SUCCESS, "ModelImporter::LoadAITexture -> Assimp material does not have desired texture type.", ModelImporterErrorCodes::AssimpTextureNotFound, TextureRef::Null(), false);
+	NONFATAL_ASSERT_RTRN(texFound == AI_SUCCESS, "ModelImporter::LoadAITexture -> Assimp material does not have desired texture type.", ModelImporterErrorCodes::AssimpTextureNotFound, TextureSharedPtr::Null(), false);
 
 	// build the full path to the texture image as specified by the Assimp material
 	std::string texPath = fileSystem->FixupPathForLocalFilesystem(std::string(aiTexturePath.data));
@@ -766,7 +766,7 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
 	{
 		std::string msg = std::string("ModelImporter::LoadAITexture -> Could not load texture file: ") + fullTextureFilePath;
 		Engine::Instance()->GetErrorManager()->SetAndReportError(ModelImporterErrorCodes::TextureFileLoadFailed, msg);
-		return TextureRef::Null();
+		return TextureSharedPtr::Null();
 	}
 
 	return texture;
@@ -779,7 +779,7 @@ TextureRef ModelImporter::LoadAITexture(aiMaterial& assimpMaterial, aiTextureTyp
  * The method then locates the Assimp UV data for that texture and stores that in the mesh-specific properties of
  * [materialImportDesc].
  */
-Bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, TextureType textureType, const TextureRef texture,
+Bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, TextureType textureType, const TextureSharedPtr texture,
 		 	 	 	 	 	 	 	 	 	 	 	 	 UInt32 meshIndex, MaterialImportDescriptor& materialImportDesc) const
 {
 	// get the Assimp material key for textures of type [textureType]
@@ -885,7 +885,7 @@ void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescri
 	}
 }
 
-void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, Bool reverseVertexOrder) const
+void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonSharedPtr skeleton, SkinnedMesh3DRendererSharedPtr target, Bool reverseVertexOrder) const
 {
 	for(UInt32 m = 0; m < scene.mNumMeshes; m++)
 	{
@@ -917,24 +917,24 @@ void ModelImporter::SetupVertexBoneMapForRenderer(const aiScene& scene, Skeleton
 	}
 }
 
-SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
+SkeletonSharedPtr ModelImporter::LoadSkeleton(const aiScene& scene) const
 {
 	UInt32 boneCount = CountBones(scene);
 	if(boneCount <=0 )
 	{
-		return SkeletonRef::Null();
+		return SkeletonSharedPtr::Null();
 	}
 
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	SkeletonRef target = objectManager->CreateSkeleton(boneCount);
-	NONFATAL_ASSERT_RTRN(target.IsValid(),"ModelImporter::LoadSkeleton -> Could not allocate skeleton.",SkeletonRef::Null(), false);
+	SkeletonSharedPtr target = objectManager->CreateSkeleton(boneCount);
+	NONFATAL_ASSERT_RTRN(target.IsValid(),"ModelImporter::LoadSkeleton -> Could not allocate skeleton.", SkeletonSharedPtr::Null(), false);
 
 	Bool skeletonInitSuccess = target->Init();
 	if(!skeletonInitSuccess)
 	{
 		Debug::PrintError("ModelImporter::LoadSkeleton -> Unable to initialize skeleton.");
 		objectManager->DestroySkeleton(target);
-		return SkeletonRef::Null();
+		return SkeletonSharedPtr::Null();
 	}
 
 	UInt32 boneIndex = 0;
@@ -953,7 +953,7 @@ SkeletonRef ModelImporter::LoadSkeleton(const aiScene& scene) const
 	{
 		Debug::PrintError("ModelImporter::LoadSkeleton -> Could not create node hierarchy.");
 		objectManager->DestroySkeleton(target);
-		return SkeletonRef::Null();
+		return SkeletonSharedPtr::Null();
 	}
 
 	return target;
@@ -1003,7 +1003,7 @@ VertexBoneMap * ModelImporter::ExpandIndexBoneMapping(VertexBoneMap& indexBoneMa
 	return fullBoneMap;
 }
 
-void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const
+void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonSharedPtr skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const
 {
 	NONFATAL_ASSERT(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.", true);
 
@@ -1037,7 +1037,7 @@ void ModelImporter::AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const ai
 	}
 }
 
-void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonRefConst skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const
+void ModelImporter::SetupVertexBoneMapMappingsFromAIMesh(SkeletonSharedConstPtr skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const
 {
 	NONFATAL_ASSERT(skeleton.IsValid(), "ModelImporter::AddBoneMappings -> skeleton is invalid.", true);
 
@@ -1094,9 +1094,9 @@ unsigned ModelImporter::CountBones(const aiScene& scene) const
 	return boneCount;
 }
 
-Bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const
+Bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonSharedPtr skeleton, const aiScene& scene) const
 {
-	SceneObjectSkeletonNode * skeletonNode = new(std::nothrow) SceneObjectSkeletonNode(SceneObjectRef::Null(), -1, "");
+	SceneObjectSkeletonNode * skeletonNode = new(std::nothrow) SceneObjectSkeletonNode(SceneObjectSharedPtr::Null(), -1, "");
 	if(skeletonNode == nullptr)
 	{
 		Debug::PrintError("ModelImporter::ExpandIndexBoneMapping -> Could not allocate skeleton root node.");
@@ -1117,7 +1117,7 @@ Bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 		std::string boneName(node.mName.C_Str());
 		Int32 mappedBoneIndex = skeletonPtr->GetBoneMapping(boneName);
 
-		SceneObjectSkeletonNode * childSkeletonNode = new(std::nothrow) SceneObjectSkeletonNode(SceneObjectRef::Null(), mappedBoneIndex, boneName);
+		SceneObjectSkeletonNode * childSkeletonNode = new(std::nothrow) SceneObjectSkeletonNode(SceneObjectSharedPtr::Null(), mappedBoneIndex, boneName);
 		if(childSkeletonNode == nullptr)
 		{
 			Debug::PrintError("ModelImporter::ExpandIndexBoneMapping -> Could not allocate skeleton child node.");
@@ -1148,10 +1148,10 @@ Bool ModelImporter::CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScen
 	return success;
 }
 
-AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Bool addLoopPadding) const
+AnimationSharedPtr ModelImporter::LoadAnimation (aiAnimation& animation, Bool addLoopPadding) const
 {
 	EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-	NONFATAL_ASSERT_RTRN(objectManager != nullptr,"ModelImporter::LoadAnimation -> EngineObjectManager instance is null.", AnimationRef::Null(), true);
+	NONFATAL_ASSERT_RTRN(objectManager != nullptr,"ModelImporter::LoadAnimation -> EngineObjectManager instance is null.", AnimationSharedPtr::Null(), true);
 
 	Real ticksPerSecond = (Real)animation.mTicksPerSecond;
 
@@ -1163,18 +1163,18 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Bool addLoopP
 
 	if(addLoopPadding) durationTicks += loopPadding;
 
-	NONFATAL_ASSERT_RTRN(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> Ticks per second is 0.", AnimationRef::Null(), true);
+	NONFATAL_ASSERT_RTRN(ticksPerSecond > 0, "ModelImporter::LoadAnimation -> Ticks per second is 0.", AnimationSharedPtr::Null(), true);
 	//Real duration = durationTicks / ticksPerSecond;
 
-	AnimationRef animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond);
-	NONFATAL_ASSERT_RTRN(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationRef::Null(), false);
+	AnimationSharedPtr animationRef = objectManager->CreateAnimation(durationTicks, ticksPerSecond);
+	NONFATAL_ASSERT_RTRN(animationRef.IsValid(),"ModelImporter::LoadAnimation -> Unable to create Animation.", AnimationSharedPtr::Null(), false);
 
 	Bool initSuccess = animationRef->Init(animation.mNumChannels);
 	if(!initSuccess)
 	{
 		objectManager->DestroyAnimation(animationRef);
 		Debug::PrintError("ModelImporter::LoadAnimation -> Unable to initialize Animation.");
-		return AnimationRef::Null();
+		return AnimationSharedPtr::Null();
 	}
 
 	for(UInt32 n = 0; n < animation.mNumChannels; n++)
@@ -1194,7 +1194,7 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Bool addLoopP
 				objectManager->DestroyAnimation(animationRef);
 				std::string msg = std::string("ModelImporter::LoadAnimation -> nullptr KeyFrameSet encountered for: ") + nodeName;
 				Debug::PrintError(msg);
-				return AnimationRef::Null();
+				return AnimationSharedPtr::Null();
 			}
 
 			keyFrameSet->Used = true;
@@ -1245,18 +1245,18 @@ AnimationRef ModelImporter::LoadAnimation (aiAnimation& animation, Bool addLoopP
  * Currently this loads only the first animation found in the model file.
  *
  */
-AnimationRef ModelImporter::LoadAnimation(const std::string& filePath, Bool addLoopPadding, Bool preserveFBXPivots)
+AnimationSharedPtr ModelImporter::LoadAnimation(const std::string& filePath, Bool addLoopPadding, Bool preserveFBXPivots)
 {
 	InitImporter();
 
 	const aiScene * scene = LoadAIScene(filePath, preserveFBXPivots);
-	NONFATAL_ASSERT_RTRN(scene != nullptr, "ModelImporter::LoadAnimation -> Unable to load scene.", AnimationRef::Null(), false);
+	NONFATAL_ASSERT_RTRN(scene != nullptr, "ModelImporter::LoadAnimation -> Unable to load scene.", AnimationSharedPtr::Null(), false);
 
-	NONFATAL_ASSERT_RTRN(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationRef::Null(), true);
+	NONFATAL_ASSERT_RTRN(scene->mNumAnimations > 0, "ModelImporter::LoadAnimation -> Model does not contain any animations.", AnimationSharedPtr::Null(), true);
 
 	// only load the first animation
-	AnimationRef animation = LoadAnimation(*(scene->mAnimations[0]), addLoopPadding);
-	NONFATAL_ASSERT_RTRN(animation.IsValid(),"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationRef::Null(), false);
+	AnimationSharedPtr animation = LoadAnimation(*(scene->mAnimations[0]), addLoopPadding);
+	NONFATAL_ASSERT_RTRN(animation.IsValid(),"ModelImporter::LoadAnimation -> Unable to load Animation.", AnimationSharedPtr::Null(), false);
 
 	return animation;
 }

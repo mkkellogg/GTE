@@ -201,7 +201,7 @@ void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 
 	// create ambient light
 	ambientLightObject = objectManager->CreateSceneObject();
-	GTE::LightRef light = objectManager->CreateLight();
+	GTE::LightSharedPtr light = objectManager->CreateLight();
 	light->SetIntensity(.30f);
 	light->SetType(GTE::LightType::Ambient);
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(light->GetCullingMask(), playerObjectLayerMask);
@@ -235,7 +235,7 @@ void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 	//========================================================
 
 	// load castle island model
-	GTE::SceneObjectRef modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1, false, true);
+	GTE::SceneObjectSharedPtr modelSceneObject = importer.LoadModelDirect("resources/models/toonlevel/island/island.fbx", 1, false, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
@@ -254,8 +254,8 @@ void Game::SetupGlobalElements(GTE::AssetImporter& importer)
 	modelSceneObject = importer.LoadModelDirect("resources/models/bridge/bridge.fbx", 1, true, true);
 	ASSERT(modelSceneObject.IsValid(), "Could not load bridge model!\n");
 
-	GTE::SceneObjectRef woodBridgeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
-	GTE::Mesh3DFilterRef woodBridgeMeshFilter = woodBridgeMeshObject->GetMesh3DFilter();
+	GTE::SceneObjectSharedPtr woodBridgeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DFilterSharedPtr woodBridgeMeshFilter = woodBridgeMeshObject->GetMesh3DFilter();
 	woodBridgeMeshFilter->SetUseBackSetShadowVolume(false);
 	woodBridgeMeshFilter->SetUseCustomShadowVolumeOffset(true);
 	woodBridgeMeshFilter->SetCustomShadowVolumeOffset(6.5f);
@@ -341,9 +341,9 @@ void Game::UpdateSceneTransition()
 		Scene* destSceneObj = scenes[(GTE::UInt32)sceneTransitionDest];
 
 		// source scene root
-		GTE::SceneObjectRef srcRoot = srcSceneObj->GetSceneRoot();
+		GTE::SceneObjectSharedPtr srcRoot = srcSceneObj->GetSceneRoot();
 		// destination scene root
-		GTE::SceneObjectRef destRoot = destSceneObj->GetSceneRoot();
+		GTE::SceneObjectSharedPtr destRoot = destSceneObj->GetSceneRoot();
 
 		// activate destination scene
 		destRoot->SetActive(true);
@@ -399,7 +399,7 @@ void Game::SetupTransitionForScene(Scenes scene)
 	Scene* sceneObj = scenes[(GTE::UInt32)scene];
 
 	// for now we are only saving the original transform of the scene root
-	GTE::SceneObjectRef sceneRoot = sceneObj->GetSceneRoot();
+	GTE::SceneObjectSharedPtr sceneRoot = sceneObj->GetSceneRoot();
 	sceneTransition.OriginalTransform.SetTo(sceneRoot->GetTransform());
 }
 
@@ -413,7 +413,7 @@ void Game::SetupCamera()
 
 	// create camera
 	cameraObject = objectManager->CreateSceneObject();
-	GTE::CameraRef camera = objectManager->CreateCamera();
+	GTE::CameraSharedPtr camera = objectManager->CreateCamera();
 	camera->SetRenderOrderIndex(5);
 	camera->SetupCopyRenderTarget();
 	cameraObject->SetCamera(camera);
@@ -436,7 +436,7 @@ void Game::SetupCamera()
 	cameraObject->GetTransform().Translate(trans.x + 20, trans.y + 10, trans.z + 15, true);
 
 	// create skybox texture
-	GTE::TextureRef skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skyboxes/nightsky/nightsky_north.png",
+	GTE::TextureSharedPtr skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skyboxes/nightsky/nightsky_north.png",
 		"resources/textures/skyboxes/nightsky/nightsky_south.png",
 		"resources/textures/skyboxes/nightsky/nightsky_up.png",
 		"resources/textures/skyboxes/nightsky/nightsky_down.png",
@@ -454,8 +454,8 @@ void Game::SetupCamera()
  */
 void Game::SetupPlayer(GTE::AssetImporter& importer)
 {
-	GTE::SkinnedMesh3DRendererRef playerMeshRenderer;
-	GTE::Mesh3DRef firstMesh;
+	GTE::SkinnedMesh3DRendererSharedPtr playerMeshRenderer;
+	GTE::Mesh3DSharedPtr firstMesh;
 	playerType = PlayerType::Warrior;
 	playerState = PlayerState::Waiting;
 	playerIsGrounded = true;
@@ -564,9 +564,9 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 		ASSERT(compatible, "Warrior animations are not compatible!");
 
 		// set all meshes to use standard shadow volume
-		GameUtil::ProcessSceneObjects(playerObject, [=](GTE::SceneObjectRef current)
+		GameUtil::ProcessSceneObjects(playerObject, [=](GTE::SceneObjectSharedPtr current)
 		{
-			GTE::Mesh3DFilterRef filter = current->GetMesh3DFilter();
+			GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
 			if(filter.IsValid())
 			{
 				filter->SetUseBackSetShadowVolume(false);
@@ -1054,14 +1054,14 @@ void Game::HandleGeneralInput()
 	// toggle ssao
 	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::O))
 	{
-		GTE::CameraRef mainCamera = cameraObject->GetCamera();
+		GTE::CameraSharedPtr mainCamera = cameraObject->GetCamera();
 		mainCamera->SetSSAOEnabled(!mainCamera->IsSSAOEnabled());
 	}
 
 	// toggle ssao render mode
 	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::I))
 	{
-		GTE::CameraRef mainCamera = cameraObject->GetCamera();
+		GTE::CameraSharedPtr mainCamera = cameraObject->GetCamera();
 		if(mainCamera->GetSSAORenderMode() == GTE::SSAORenderMode::Outline)mainCamera->SetSSAORenderMode(GTE::SSAORenderMode::Standard);
 		else mainCamera->SetSSAORenderMode(GTE::SSAORenderMode::Outline);
 	}
@@ -1107,7 +1107,7 @@ void Game::HandleGeneralInput()
 	// toggle lava
 	if(GTE::Engine::Instance()->GetInputManager()->ShouldHandleOnKeyDown(GTE::Key::K))
 	{
-		GTE::SceneObjectRef lavaFieldObject = lavaField->GetSceneObject();
+		GTE::SceneObjectSharedPtr lavaFieldObject = lavaField->GetSceneObject();
 		lavaFieldObject->SetActive(!lavaFieldObject->IsActive());
 	}
 
@@ -1122,10 +1122,10 @@ void Game::HandleGeneralInput()
 	else if(reduceLightIntensity)intensityBoost = -.05f;
 
 	// get references to various lights across multiple scenes
-	std::vector<GTE::SceneObjectRef>& lavaLightObjects = lavaScene->GetLavaLightObjects();
-	std::vector<GTE::SceneObjectRef>& castleLights = castleScene->GetPointLights();
-	GTE::SceneObjectRef lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
-	std::vector<GTE::SceneObjectRef>& reflectingPoolLights = poolScene->GetPointLights();
+	std::vector<GTE::SceneObjectSharedPtr>& lavaLightObjects = lavaScene->GetLavaLightObjects();
+	std::vector<GTE::SceneObjectSharedPtr>& castleLights = castleScene->GetPointLights();
+	GTE::SceneObjectSharedPtr lavaSpinningLight = lavaScene->GetSpinningPointLightObject();
+	std::vector<GTE::SceneObjectSharedPtr>& reflectingPoolLights = poolScene->GetPointLights();
 
 	// update selected lights
 	switch(selectedLighting)
@@ -1204,7 +1204,7 @@ void Game::HandleGeneralInput()
  * [intensityChange] - Amount by which light intensity should be adjusted.
  * [toggleCastShadows] - Toggle whether or not shadows are enabled for the light.
  */
-void Game::UpdateLight(GTE::SceneObjectRef sceneObject, GTE::Bool toggleLight, GTE::Real intensityChange, GTE::Bool toggleCastShadows)
+void Game::UpdateLight(GTE::SceneObjectSharedPtr sceneObject, GTE::Bool toggleLight, GTE::Real intensityChange, GTE::Bool toggleCastShadows)
 {
 	if(sceneObject.IsValid())
 	{

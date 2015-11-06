@@ -47,7 +47,7 @@ namespace GTE
 	 * [skeleton. This match-up is accomplished by matching the name of the channel to the name
 	 * of the skeleton node.
 	 */
-	Bool AnimationManager::IsCompatible(SkeletonRefConst skeleton, AnimationRefConst animation) const
+	Bool AnimationManager::IsCompatible(SkeletonSharedConstPtr skeleton, AnimationSharedConstPtr animation) const
 	{
 		NONFATAL_ASSERT_RTRN(skeleton.IsValid(), "AnimationManager::IsCompatible -> Skeleton is not valid.", false, true);
 		NONFATAL_ASSERT_RTRN(animation.IsValid(), "AnimationManager::IsCompatible -> Animation is not valid.", false, true);
@@ -97,7 +97,7 @@ namespace GTE
 	/*
 	 * Determine if the Skeleton object belonging to [meshRenderer] is compatible with target Skeleton of [animation].
 	 */
-	Bool AnimationManager::IsCompatible(SkinnedMesh3DRendererRefConst meshRenderer, AnimationRefConst animation) const
+	Bool AnimationManager::IsCompatible(SkinnedMesh3DRendererSharedConstPtr meshRenderer, AnimationSharedConstPtr animation) const
 	{
 		NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "AnimationManager::IsCompatible -> Mesh renderer is not valid.", false, true);
 
@@ -112,9 +112,9 @@ namespace GTE
 	 */
 	void AnimationManager::Update()
 	{
-		for (std::unordered_map<UInt32, AnimationPlayerRef>::iterator iter = activePlayers.begin(); iter != activePlayers.end(); ++iter)
+		for (std::unordered_map<UInt32, AnimationPlayerSharedPtr>::iterator iter = activePlayers.begin(); iter != activePlayers.end(); ++iter)
 		{
-			AnimationPlayerRef player = iter->second;
+			AnimationPlayerSharedPtr player = iter->second;
 
 			if (player.IsValid())
 			{
@@ -127,17 +127,17 @@ namespace GTE
 	 * Check active players to see if any are playing animations for [target]. If not, create one
 	 * and assign it to [target].
 	 */
-	AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkeletonRef target)
+	AnimationPlayerSharedPtr AnimationManager::RetrieveOrCreateAnimationPlayer(SkeletonSharedPtr target)
 	{
-		NONFATAL_ASSERT_RTRN(target.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(target.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Target is not valid.", AnimationPlayerSharedPtr::Null(), true);
 
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 		ASSERT(objectManager != nullptr, "AnimationManager::RetrieveOrCreateAnimationPlayer -> Engine object manager is null.");
 
 		if (activePlayers.find(target->GetObjectID()) == activePlayers.end())
 		{
-			AnimationPlayerRef player = objectManager->CreateAnimationPlayer(target);
-			NONFATAL_ASSERT_RTRN(player.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Unable to create player.", AnimationPlayerRef::Null(), false);
+			AnimationPlayerSharedPtr player = objectManager->CreateAnimationPlayer(target);
+			NONFATAL_ASSERT_RTRN(player.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Unable to create player.", AnimationPlayerSharedPtr::Null(), false);
 
 			// put the newly created AnimationPlayer in the list of active players.s
 			activePlayers[target->GetObjectID()] = player;
@@ -151,9 +151,9 @@ namespace GTE
 	 * Check active players to see if any are playing animations for the skeleton belonging to [renderer].
 	 * If not, create one and assign it to [target].
 	 */
-	AnimationPlayerRef AnimationManager::RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererRefConst renderer)
+	AnimationPlayerSharedPtr AnimationManager::RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererSharedConstPtr renderer)
 	{
-		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Mesh renderer is not valid.", AnimationPlayerRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "AnimationManager::RetrieveOrCreateAnimationPlayer -> Mesh renderer is not valid.", AnimationPlayerSharedPtr::Null(), true);
 
 		SkinnedMesh3DRenderer * rendererPtr = const_cast<SkinnedMesh3DRenderer *>(renderer.GetConstPtr());
 		return RetrieveOrCreateAnimationPlayer(rendererPtr->GetSkeleton());

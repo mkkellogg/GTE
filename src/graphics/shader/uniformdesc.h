@@ -59,7 +59,7 @@ namespace GTE
 		Bool IsSet;
 		UInt32 SetSize;
 		UniformID RegisteredUniformID;
-		TextureRef SamplerData;
+		TextureSharedPtr SamplerData;
 		Matrix4x4 MatrixData;
 		Real BasicFloatData[4];
 		Real * ExtendedFloatData;

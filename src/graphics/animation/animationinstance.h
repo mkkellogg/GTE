@@ -65,9 +65,9 @@ namespace GTE
 		Int32 * NodeToChannelMap;
 
 		// the target of this instance
-		SkeletonRef Target;
+		SkeletonSharedPtr Target;
 		// the Animation for which this is an instance
-		AnimationRefConst SourceAnimation;
+		AnimationSharedConstPtr SourceAnimation;
 		// used to make animation play faster or slow than default. default = 1.
 		Real SpeedFactor;
 
@@ -107,7 +107,7 @@ namespace GTE
 		// what should happen when playback reaches the end of the clip?
 		PlaybackMode PlayBackMode;
 
-		AnimationInstance(SkeletonRef target, AnimationRefConst animation);
+		AnimationInstance(SkeletonSharedPtr target, AnimationSharedConstPtr animation);
 		~AnimationInstance();
 
 		void Destroy();

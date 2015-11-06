@@ -44,20 +44,20 @@ namespace GTE
 		friend class Engine;
 		friend class Graphics;
 
-		std::unordered_map<ObjectID, SceneObjectRef> sceneObjectDirectory;
+		std::unordered_map<ObjectID, SceneObjectSharedPtr> sceneObjectDirectory;
 
 		LayerManager layerManager;
 		ShaderOrganizer loadedShaders;
 		std::vector<EngineObject *> engineObjects;
 		SceneObject sceneRoot;
-		SceneObjectRef sceneRootRef;
+		SceneObjectSharedPtr sceneRootRef;
 		unsigned long currentEngineObjectID;
 
 		unsigned long GetNextObjectID();
 		EngineObjectManager();
 		virtual ~EngineObjectManager();
 
-		void AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref);
+		void AddSceneObjectToDirectory(unsigned long objectID, SceneObjectSharedPtr ref);
 
 		void DeleteSceneObject(SceneObject * sceneObject);
 		void DeleteLight(Light * light);
@@ -80,7 +80,7 @@ namespace GTE
 
 		Bool InitBuiltinShaders();
 
-		RenderTargetRef WrapRenderTarget(RenderTarget * target);
+		RenderTargetSharedPtr WrapRenderTarget(RenderTarget * target);
 
 	public:
 
@@ -88,71 +88,71 @@ namespace GTE
 
 		Bool Init();
 
-		ShaderRef GetLoadedShader(LongMask properties);
+		ShaderSharedPtr GetLoadedShader(LongMask properties);
 
 		LayerManager& GetLayerManager();
 
-		SceneObjectRef FindSceneObjectInDirectory(unsigned long objectID);
-		const SceneObjectRef& GetSceneRoot() const;
-		SceneObjectRef CreateSceneObject();
-		void DestroySceneObject(SceneObjectRef sceneObject);
+		SceneObjectSharedPtr FindSceneObjectInDirectory(unsigned long objectID);
+		const SceneObjectSharedPtr& GetSceneRoot() const;
+		SceneObjectSharedPtr CreateSceneObject();
+		void DestroySceneObject(SceneObjectSharedPtr sceneObject);
 
-		Mesh3DRef CreateMesh3D(UInt32 subMeshCount);
-		void DestroyMesh3D(Mesh3DRef mesh);
-		Mesh3DFilterRef CreateMesh3DFilter();
-		void DestroyMesh3DFilter(Mesh3DFilterRef filter);
-		Mesh3DRendererRef CreateMesh3DRenderer();
-		void DestroyMesh3DRenderer(Mesh3DRendererRef renderer);
-		SkinnedMesh3DRendererRef CreateSkinnedMesh3DRenderer();
-		void DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
-		SubMesh3DRef CreateSubMesh3D(StandardAttributeSet attributes);
-		void DestroySubMesh3D(SubMesh3DRef mesh);
-		SubMesh3DRendererRef CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer);
-		SubMesh3DRendererRef CreateSubMesh3DRenderer();
-		void DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer);
+		Mesh3DSharedPtr CreateMesh3D(UInt32 subMeshCount);
+		void DestroyMesh3D(Mesh3DSharedPtr mesh);
+		Mesh3DFilterSharedPtr CreateMesh3DFilter();
+		void DestroyMesh3DFilter(Mesh3DFilterSharedPtr filter);
+		Mesh3DRendererSharedPtr CreateMesh3DRenderer();
+		void DestroyMesh3DRenderer(Mesh3DRendererSharedPtr renderer);
+		SkinnedMesh3DRendererSharedPtr CreateSkinnedMesh3DRenderer();
+		void DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererSharedPtr renderer);
+		SubMesh3DSharedPtr CreateSubMesh3D(StandardAttributeSet attributes);
+		void DestroySubMesh3D(SubMesh3DSharedPtr mesh);
+		SubMesh3DRendererSharedPtr CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer);
+		SubMesh3DRendererSharedPtr CreateSubMesh3DRenderer();
+		void DestroySubMesh3DRenderer(SubMesh3DRendererSharedPtr renderer);
 
-		SkeletonRef CreateSkeleton(UInt32 boneCount);
-		SkeletonRef CloneSkeleton(SkeletonRef source);
-		void DestroySkeleton(SkeletonRef skeleton);
+		SkeletonSharedPtr CreateSkeleton(UInt32 boneCount);
+		SkeletonSharedPtr CloneSkeleton(SkeletonSharedPtr source);
+		void DestroySkeleton(SkeletonSharedPtr skeleton);
 
-		AnimationRef CreateAnimation(Real duration, Real ticksPerSecond);
-		void DestroyAnimation(AnimationRef animation);
-		AnimationInstanceRef CreateAnimationInstance(SkeletonRef target, AnimationRefConst animation);
-		void DestroyAnimationInstance(AnimationInstanceRef instance);
-		AnimationPlayerRef CreateAnimationPlayer(SkeletonRef target);
-		void DestroyAnimationPlayer(AnimationPlayerRef player);
+		AnimationSharedPtr CreateAnimation(Real duration, Real ticksPerSecond);
+		void DestroyAnimation(AnimationSharedPtr animation);
+		AnimationInstanceSharedPtr CreateAnimationInstance(SkeletonSharedPtr target, AnimationSharedConstPtr animation);
+		void DestroyAnimationInstance(AnimationInstanceSharedPtr instance);
+		AnimationPlayerSharedPtr CreateAnimationPlayer(SkeletonSharedPtr target);
+		void DestroyAnimationPlayer(AnimationPlayerSharedPtr player);
 
-		ShaderRef CreateShader(const ShaderSource& shaderSource);
-		void DestroyShader(ShaderRef shader);
-		TextureRef CreateTexture(const std::string& sourcePath, TextureAttributes attributes);
-		TextureRef CreateTexture(RawImage * imageData, TextureAttributes attributes);
-		TextureRef CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, TextureAttributes attributes);
-		TextureRef CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
+		ShaderSharedPtr CreateShader(const ShaderSource& shaderSource);
+		void DestroyShader(ShaderSharedPtr shader);
+		TextureSharedPtr CreateTexture(const std::string& sourcePath, TextureAttributes attributes);
+		TextureSharedPtr CreateTexture(RawImage * imageData, TextureAttributes attributes);
+		TextureSharedPtr CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, TextureAttributes attributes);
+		TextureSharedPtr CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
 			Byte * backData, UInt32 backw, UInt32 backh,
 			Byte * topData, UInt32 tw, UInt32 th,
 			Byte * bottomData, UInt32 botw, UInt32 both,
 			Byte * leftData, UInt32 lw, UInt32 lh,
 			Byte * rightData, UInt32 rw, UInt32 rh);
-		TextureRef CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+		TextureSharedPtr CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 			const std::string& bottom, const std::string& left, const std::string& right);
-		TextureRef CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
+		TextureSharedPtr CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 			RawImage * bottomData, RawImage * leftData, RawImage * rightData);
-		void DestroyTexture(TextureRef texture);
-		AtlasRef CreateAtlas(TextureRef texture, Bool createFirstFullImage);
-		void DestroyAtlas(AtlasRef atlas);
-		RenderTargetRef CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
+		void DestroyTexture(TextureSharedPtr texture);
+		AtlasSharedPtr CreateAtlas(TextureSharedPtr texture, Bool createFirstFullImage);
+		void DestroyAtlas(AtlasSharedPtr atlas);
+		RenderTargetSharedPtr CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 			const TextureAttributes& colorTextureAttributes,
 			UInt32 width, UInt32 height);
-		void DestroyRenderTarget(RenderTargetRef target);
+		void DestroyRenderTarget(RenderTargetSharedPtr target);
 
-		MaterialRef CreateMaterial(const std::string& name, ShaderRef shader);
-		MaterialRef CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
-		void DestroyMaterial(MaterialRef material);
+		MaterialSharedPtr CreateMaterial(const std::string& name, ShaderSharedPtr shader);
+		MaterialSharedPtr CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
+		void DestroyMaterial(MaterialSharedPtr material);
 
-		CameraRef CreateCamera();
-		void DestroyCamera(CameraRef camera);
-		LightRef CreateLight();
-		void DestroyLight(LightRef light);
+		CameraSharedPtr CreateCamera();
+		void DestroyCamera(CameraSharedPtr camera);
+		LightSharedPtr CreateLight();
+		void DestroyLight(LightSharedPtr light);
 	};
 }
 

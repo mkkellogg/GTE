@@ -14,31 +14,31 @@
 class CastleScene : public Scene
 {
 	// the SceneObject instance at the root of the scene
-	GTE::SceneObjectRef sceneRoot;
+	GTE::SceneObjectSharedPtr sceneRoot;
 	// point lights in this scene
-	std::vector<GTE::SceneObjectRef> pointLights;
+	std::vector<GTE::SceneObjectSharedPtr> pointLights;
 	// global directional light
-	GTE::SceneObjectRef directionalLightObject;
+	GTE::SceneObjectSharedPtr directionalLightObject;
 	// moving light A
-	GTE::SceneObjectRef movingLightA;
+	GTE::SceneObjectSharedPtr movingLightA;
 
 public:
 
 	CastleScene();
 	~CastleScene();
 
-	GTE::SceneObjectRef GetSceneRoot();
+	GTE::SceneObjectSharedPtr GetSceneRoot();
 	void OnActivate();
 	void Update();
-	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectRef ambientLightObject, GTE::SceneObjectRef directionalLightObject, GTE::SceneObjectRef playerObject);
+	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject);
 
 	void SetupTerrain(GTE::AssetImporter& importer);
 	void SetupStructures(GTE::AssetImporter& importer);
 	void SetupPlants(GTE::AssetImporter& importer);
 	void SetupExtra(GTE::AssetImporter& importer);
-	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectRef playerObject);
+	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
 
-	std::vector<GTE::SceneObjectRef>& GetPointLights();
+	std::vector<GTE::SceneObjectSharedPtr>& GetPointLights();
 };
 
 #endif

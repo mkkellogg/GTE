@@ -28,9 +28,9 @@ namespace GTE
 		AssetImporter();
 		~AssetImporter();
 
-		SceneObjectRef LoadModelDirect(const std::string& filePath) const;
-		SceneObjectRef LoadModelDirect(const std::string& filePath, Real importScale, Bool castShadows, Bool receiveShadows) const;
-		AnimationRef LoadAnimation(const std::string& filePath, Bool addLoopPadding) const;
+		SceneObjectSharedPtr LoadModelDirect(const std::string& filePath) const;
+		SceneObjectSharedPtr LoadModelDirect(const std::string& filePath, Real importScale, Bool castShadows, Bool receiveShadows) const;
+		AnimationSharedPtr LoadAnimation(const std::string& filePath, Bool addLoopPadding) const;
 		void LoadBuiltInShaderSource(const std::string name, ShaderSource& shaderSource);
 
 		void SetBoolProperty(AssetImporterBoolProperty prop, Bool value);

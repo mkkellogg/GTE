@@ -72,7 +72,7 @@ namespace GTE
 	 * concatenate each ancestor's transform to form the transform that is inherited by
 	 * [sceneObject].
 	 */
-	void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObjectRefConst sceneObject, Bool includeSelf, Bool invert)
+	void SceneObjectTransform::GetWorldTransform(Transform& transform, SceneObjectSharedConstPtr sceneObject, Bool includeSelf, Bool invert)
 	{
 		NONFATAL_ASSERT(sceneObject.IsValid(), "SceneObjectTransform::GetWorldTransform() -> 'sceneObject' is not valid.", true);
 		GetWorldTransform(transform, sceneObject.GetPtr(), includeSelf, invert);
@@ -89,7 +89,7 @@ namespace GTE
 
 		Transform full;
 		if (includeSelf)full.SetTo(sceneObject->GetConstTransform());
-		SceneObjectRef parent = sceneObject->GetParent();
+		SceneObjectSharedPtr parent = sceneObject->GetParent();
 		while (parent.IsValid())
 		{
 			// Since we are processing the ancestors in reverse order (going up the tree)

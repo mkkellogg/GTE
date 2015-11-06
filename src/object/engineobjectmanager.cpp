@@ -46,7 +46,7 @@ namespace GTE
 		currentEngineObjectID = 0L;
 
 		sceneRoot.SetObjectID(GetNextObjectID());
-		sceneRootRef = SceneObjectRef(&sceneRoot, [=](SceneObject * sceneObject)
+		sceneRootRef = SceneObjectSharedPtr(&sceneRoot, [=](SceneObject * sceneObject)
 		{
 
 		});
@@ -74,7 +74,7 @@ namespace GTE
 		std::string vertexSource;
 		std::string fragmentSource;
 		ShaderSource shaderSource;
-		ShaderRef shader;
+		ShaderSharedPtr shader;
 		AssetImporter assetImporter;
 
 		FileSystem * fileSystem = FileSystem::Instance();
@@ -110,24 +110,24 @@ namespace GTE
 		return true;
 	}
 
-	SceneObjectRef EngineObjectManager::FindSceneObjectInDirectory(unsigned long objectID)
+	SceneObjectSharedPtr EngineObjectManager::FindSceneObjectInDirectory(unsigned long objectID)
 	{
 		if (sceneObjectDirectory.find(objectID) != sceneObjectDirectory.end())
 		{
-			SceneObjectRef ref = sceneObjectDirectory[objectID];
+			SceneObjectSharedPtr ref = sceneObjectDirectory[objectID];
 			return ref;
 		}
 
-		return SceneObjectRef::Null();
+		return SceneObjectSharedPtr::Null();
 	}
 
-	void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, SceneObjectRef ref)
+	void EngineObjectManager::AddSceneObjectToDirectory(unsigned long objectID, SceneObjectSharedPtr ref)
 	{
 		ASSERT(ref.IsValid(), "EngineObjectManager::AddSceneObjectToDirectory -> Tried to add invalid scene object reference.");
 		sceneObjectDirectory[objectID] = ref;
 	}
 
-	ShaderRef EngineObjectManager::GetLoadedShader(LongMask properties)
+	ShaderSharedPtr EngineObjectManager::GetLoadedShader(LongMask properties)
 	{
 		return loadedShaders.GetShader(properties);
 	}
@@ -137,13 +137,13 @@ namespace GTE
 		return layerManager;
 	}
 
-	SceneObjectRef EngineObjectManager::CreateSceneObject()
+	SceneObjectSharedPtr EngineObjectManager::CreateSceneObject()
 	{
 		SceneObject *sceneObject = new(std::nothrow) SceneObject();
 		ASSERT(sceneObject != nullptr, "EngineObjectManager::CreateSceneObject -> could not allocate new scene object.");
 		sceneObject->SetObjectID(GetNextObjectID());
 
-		SceneObjectRef ref(sceneObject, [=](SceneObject * sceneObject)
+		SceneObjectSharedPtr ref(sceneObject, [=](SceneObject * sceneObject)
 		{
 			DeleteSceneObject(sceneObject);
 		});
@@ -157,7 +157,7 @@ namespace GTE
 		return ref;
 	}
 
-	void EngineObjectManager::DestroySceneObject(SceneObjectRef sceneObject)
+	void EngineObjectManager::DestroySceneObject(SceneObjectSharedPtr sceneObject)
 	{
 		NONFATAL_ASSERT(sceneObject.IsValid(), "EngineObjectManager::DestroySceneObject -> 'sceneObject' is invalid.", true);
 		sceneObject.ForceDelete();
@@ -169,24 +169,24 @@ namespace GTE
 		delete sceneObject;
 	}
 
-	const SceneObjectRef& EngineObjectManager::GetSceneRoot() const
+	const SceneObjectSharedPtr& EngineObjectManager::GetSceneRoot() const
 	{
 		return sceneRootRef;
 	}
 
-	Mesh3DRef EngineObjectManager::CreateMesh3D(UInt32 subMeshCount)
+	Mesh3DSharedPtr EngineObjectManager::CreateMesh3D(UInt32 subMeshCount)
 	{
 		Mesh3D * mesh = new(std::nothrow) Mesh3D(subMeshCount);
 		ASSERT(mesh != nullptr, "EngineObjectManager::CreateMesh3D -> Could not allocate new Mesh3D object.");
 		mesh->SetObjectID(GetNextObjectID());
 
-		return Mesh3DRef(mesh, [=](Mesh3D * mesh)
+		return Mesh3DSharedPtr(mesh, [=](Mesh3D * mesh)
 		{
 			DeleteMesh3D(mesh);
 		});
 	}
 
-	void EngineObjectManager::DestroyMesh3D(Mesh3DRef mesh)
+	void EngineObjectManager::DestroyMesh3D(Mesh3DSharedPtr mesh)
 	{
 		mesh.ForceDelete();
 	}
@@ -197,19 +197,19 @@ namespace GTE
 		delete mesh;
 	}
 
-	Mesh3DFilterRef EngineObjectManager::CreateMesh3DFilter()
+	Mesh3DFilterSharedPtr EngineObjectManager::CreateMesh3DFilter()
 	{
 		Mesh3DFilter * filter = new(std::nothrow) Mesh3DFilter();
 		ASSERT(filter != nullptr, "EngineObjectManager::CreateMesh3DFilter -> Could not allocate new Mesh3DFilter object.");
 		filter->SetObjectID(GetNextObjectID());
 
-		return Mesh3DFilterRef(filter, [=](Mesh3DFilter * filter)
+		return Mesh3DFilterSharedPtr(filter, [=](Mesh3DFilter * filter)
 		{
 			DeleteMesh3DFilter(filter);
 		});
 	}
 
-	void EngineObjectManager::DestroyMesh3DFilter(Mesh3DFilterRef filter)
+	void EngineObjectManager::DestroyMesh3DFilter(Mesh3DFilterSharedPtr filter)
 	{
 		filter.ForceDelete();
 	}
@@ -220,19 +220,19 @@ namespace GTE
 		delete filter;
 	}
 
-	Mesh3DRendererRef EngineObjectManager::CreateMesh3DRenderer()
+	Mesh3DRendererSharedPtr EngineObjectManager::CreateMesh3DRenderer()
 	{
 		Mesh3DRenderer * renderer = new(std::nothrow) Mesh3DRenderer();
 		ASSERT(renderer != nullptr, "EngineObjectManager::CreateMesh3DRenderer -> Could not allocate new Mesh3DRenderer object.");
 		renderer->SetObjectID(GetNextObjectID());
 
-		return Mesh3DRendererRef(renderer, [=](Mesh3DRenderer * renderer)
+		return Mesh3DRendererSharedPtr(renderer, [=](Mesh3DRenderer * renderer)
 		{
 			DeleteMesh3DRenderer(renderer);
 		});
 	}
 
-	void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRendererRef renderer)
+	void EngineObjectManager::DestroyMesh3DRenderer(Mesh3DRendererSharedPtr renderer)
 	{
 		renderer.ForceDelete();
 	}
@@ -243,19 +243,19 @@ namespace GTE
 		delete renderer;
 	}
 
-	SkinnedMesh3DRendererRef EngineObjectManager::CreateSkinnedMesh3DRenderer()
+	SkinnedMesh3DRendererSharedPtr EngineObjectManager::CreateSkinnedMesh3DRenderer()
 	{
 		SkinnedMesh3DRenderer * renderer = new(std::nothrow) SkinnedMesh3DRenderer();
 		ASSERT(renderer != nullptr, "EngineObjectManager::CreateSkinnedMesh3DRenderer -> Could not allocate new SkinnedMesh3DRenderer object.");
 		renderer->SetObjectID(GetNextObjectID());
 
-		return SkinnedMesh3DRendererRef(renderer, [=](SkinnedMesh3DRenderer * renderer)
+		return SkinnedMesh3DRendererSharedPtr(renderer, [=](SkinnedMesh3DRenderer * renderer)
 		{
 			DeleteSkinnedMesh3DRenderer(renderer);
 		});
 	}
 
-	void EngineObjectManager::DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
+	void EngineObjectManager::DestroySkinnedMesh3DRenderer(SkinnedMesh3DRendererSharedPtr renderer)
 	{
 		renderer.ForceDelete();
 	}
@@ -266,19 +266,19 @@ namespace GTE
 		delete renderer;
 	}
 
-	SubMesh3DRef EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
+	SubMesh3DSharedPtr EngineObjectManager::CreateSubMesh3D(StandardAttributeSet attributes)
 	{
 		SubMesh3D * mesh = new(std::nothrow) SubMesh3D(attributes);
 		ASSERT(mesh != nullptr, "EngineObjectManager::CreateSubMesh3D -> could not allocate new SubMesh3D object.");
 		mesh->SetObjectID(GetNextObjectID());
 
-		return SubMesh3DRef(mesh, [=](SubMesh3D * mesh)
+		return SubMesh3DSharedPtr(mesh, [=](SubMesh3D * mesh)
 		{
 			DeleteSubMesh3D(mesh);
 		});
 	}
 
-	void EngineObjectManager::DestroySubMesh3D(SubMesh3DRef mesh)
+	void EngineObjectManager::DestroySubMesh3D(SubMesh3DSharedPtr mesh)
 	{
 		NONFATAL_ASSERT(mesh.IsValid(), "EngineObjectManager::DestroySubMesh3D -> 'mesh' is invalid.", true);
 		mesh.ForceDelete();
@@ -290,12 +290,12 @@ namespace GTE
 		delete mesh;
 	}
 
-	SubMesh3DRendererRef  EngineObjectManager::CreateSubMesh3DRenderer()
+	SubMesh3DRendererSharedPtr  EngineObjectManager::CreateSubMesh3DRenderer()
 	{
 		return CreateSubMesh3DRenderer(nullptr);
 	}
 
-	SubMesh3DRendererRef EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
+	SubMesh3DRendererSharedPtr EngineObjectManager::CreateSubMesh3DRenderer(AttributeTransformer * attrTransformer)
 	{
 		// TODO: for now we force vertex attribute buffers to be on GPU
 		// in the constructor for SubMesh3DRenderer, need to think
@@ -305,13 +305,13 @@ namespace GTE
 		ASSERT(renderer != nullptr, "EngineObjectManager::CreateMesh3DRenderer(AttributeTransformer) -> could not allocate new SubMesh3DRenderer object.");
 		renderer->SetObjectID(GetNextObjectID());
 
-		return SubMesh3DRendererRef(renderer, [=](SubMesh3DRenderer * renderer)
+		return SubMesh3DRendererSharedPtr(renderer, [=](SubMesh3DRenderer * renderer)
 		{
 			DeleteSubMesh3DRenderer(renderer);
 		});
 	}
 
-	void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRendererRef renderer)
+	void EngineObjectManager::DestroySubMesh3DRenderer(SubMesh3DRendererSharedPtr renderer)
 	{
 		NONFATAL_ASSERT(renderer.IsValid(), "EngineObjectManager::DestroySubMesh3DRenderer -> 'renderer' is invalid.", true);
 		renderer.ForceDelete();
@@ -323,31 +323,31 @@ namespace GTE
 		delete renderer;
 	}
 
-	SkeletonRef EngineObjectManager::CreateSkeleton(UInt32 boneCount)
+	SkeletonSharedPtr EngineObjectManager::CreateSkeleton(UInt32 boneCount)
 	{
 		Skeleton * skeleton = new(std::nothrow) Skeleton(boneCount);
 		ASSERT(skeleton != nullptr, "EngineObjectManager::CreateSkeleton -> Could not allocate new skeleton.");
 
-		return SkeletonRef(skeleton, [=](Skeleton * skeleton)
+		return SkeletonSharedPtr(skeleton, [=](Skeleton * skeleton)
 		{
 			DeleteSkeleton(skeleton);
 		});
 	}
 
-	SkeletonRef EngineObjectManager::CloneSkeleton(SkeletonRef source)
+	SkeletonSharedPtr EngineObjectManager::CloneSkeleton(SkeletonSharedPtr source)
 	{
-		NONFATAL_ASSERT_RTRN(source.IsValid(), "EngineObjectManager::CloneSkeleton -> 'source' is invalid.", SkeletonRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(source.IsValid(), "EngineObjectManager::CloneSkeleton -> 'source' is invalid.", SkeletonSharedPtr::Null(), true);
 
 		Skeleton * skeleton = source->FullClone();
-		NONFATAL_ASSERT_RTRN(skeleton != nullptr, "EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(skeleton != nullptr, "EngineObjectManager::CloneSkeleton -> Could not clone source.", SkeletonSharedPtr::Null(), true);
 
-		return SkeletonRef(skeleton, [=](Skeleton * skeleton)
+		return SkeletonSharedPtr(skeleton, [=](Skeleton * skeleton)
 		{
 			DeleteSkeleton(skeleton);
 		});
 	}
 
-	void EngineObjectManager::DestroySkeleton(SkeletonRef target)
+	void EngineObjectManager::DestroySkeleton(SkeletonSharedPtr target)
 	{
 		target.ForceDelete();
 	}
@@ -358,19 +358,19 @@ namespace GTE
 		delete target;
 	}
 
-	AnimationRef EngineObjectManager::CreateAnimation(Real duration, Real ticksPerSecond)
+	AnimationSharedPtr EngineObjectManager::CreateAnimation(Real duration, Real ticksPerSecond)
 	{
 		Animation * animation = new(std::nothrow) Animation(duration, ticksPerSecond);
 		ASSERT(animation != nullptr, "EngineObjectManager::CreateAnimation -> Could not allocate new Animation object.");
 		animation->SetObjectID(GetNextObjectID());
 
-		return AnimationRef(animation, [=](Animation * animation)
+		return AnimationSharedPtr(animation, [=](Animation * animation)
 		{
 			DeleteAnimation(animation);
 		});
 	}
 
-	void EngineObjectManager::DestroyAnimation(AnimationRef animation)
+	void EngineObjectManager::DestroyAnimation(AnimationSharedPtr animation)
 	{
 		animation.ForceDelete();
 	}
@@ -381,21 +381,21 @@ namespace GTE
 		delete animation;
 	}
 
-	AnimationInstanceRef EngineObjectManager::CreateAnimationInstance(SkeletonRef target, AnimationRefConst animation)
+	AnimationInstanceSharedPtr EngineObjectManager::CreateAnimationInstance(SkeletonSharedPtr target, AnimationSharedConstPtr animation)
 	{
-		NONFATAL_ASSERT_RTRN(target.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'target' is invalid.", AnimationInstanceRef::Null(), true);
-		NONFATAL_ASSERT_RTRN(animation.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'animation' is invalid.", AnimationInstanceRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(target.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'target' is invalid.", AnimationInstanceSharedPtr::Null(), true);
+		NONFATAL_ASSERT_RTRN(animation.IsValid(), "EngineObjectManager::CreateAnimationInstance -> 'animation' is invalid.", AnimationInstanceSharedPtr::Null(), true);
 
 		AnimationInstance * instance = new(std::nothrow) AnimationInstance(target, animation);
 		ASSERT(instance != nullptr, "EngineObjectManager::CreateAnimationInstance -> Could not allocate new AnimationInstance object.");
 
-		return AnimationInstanceRef(instance, [=](AnimationInstance * instance)
+		return AnimationInstanceSharedPtr(instance, [=](AnimationInstance * instance)
 		{
 			DeleteAnimationInstance(instance);
 		});
 	}
 
-	void EngineObjectManager::DestroyAnimationInstance(AnimationInstanceRef instance)
+	void EngineObjectManager::DestroyAnimationInstance(AnimationInstanceSharedPtr instance)
 	{
 		instance.ForceDelete();
 	}
@@ -406,20 +406,20 @@ namespace GTE
 		delete instance;
 	}
 
-	AnimationPlayerRef EngineObjectManager::CreateAnimationPlayer(SkeletonRef target)
+	AnimationPlayerSharedPtr EngineObjectManager::CreateAnimationPlayer(SkeletonSharedPtr target)
 	{
-		NONFATAL_ASSERT_RTRN(target.IsValid(), "EngineObjectManager::CreateAnimationPlayer -> 'target' is invalid.", AnimationPlayerRef::Null(), true);
+		NONFATAL_ASSERT_RTRN(target.IsValid(), "EngineObjectManager::CreateAnimationPlayer -> 'target' is invalid.", AnimationPlayerSharedPtr::Null(), true);
 
 		AnimationPlayer * player = new(std::nothrow) AnimationPlayer(target);
 		ASSERT(player != nullptr, "EngineObjectManager::CreateAnimationPlayer -> Could not allocate new AnimationPlayer object.");
 
-		return AnimationPlayerRef(player, [=](AnimationPlayer * player)
+		return AnimationPlayerSharedPtr(player, [=](AnimationPlayer * player)
 		{
 			DeleteAnimationPlayer(player);
 		});
 	}
 
-	void EngineObjectManager::DestroyAnimationPlayer(AnimationPlayerRef player)
+	void EngineObjectManager::DestroyAnimationPlayer(AnimationPlayerSharedPtr player)
 	{
 		player.ForceDelete();
 	}
@@ -430,22 +430,22 @@ namespace GTE
 		delete player;
 	}
 
-	ShaderRef EngineObjectManager::CreateShader(const ShaderSource& shaderSource)
+	ShaderSharedPtr EngineObjectManager::CreateShader(const ShaderSource& shaderSource)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateShader -> Graphics system is null.");
 
 		Shader * shader = graphics->CreateShader(shaderSource);
-		NONFATAL_ASSERT_RTRN(shader != nullptr, "EngineObjectManager::CreateShader -> Could not create new Shader object.", ShaderRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(shader != nullptr, "EngineObjectManager::CreateShader -> Could not create new Shader object.", ShaderSharedPtr::Null(), false);
 		shader->SetObjectID(GetNextObjectID());
 
-		return ShaderRef(shader, [=](Shader * shader)
+		return ShaderSharedPtr(shader, [=](Shader * shader)
 		{
 			DeleteShader(shader);
 		});
 	}
 
-	void EngineObjectManager::DestroyShader(ShaderRef shader)
+	void EngineObjectManager::DestroyShader(ShaderSharedPtr shader)
 	{
 		shader.ForceDelete();
 	}
@@ -459,7 +459,7 @@ namespace GTE
 		graphics->DestroyShader(shader);
 	}
 
-	TextureRef EngineObjectManager::CreateTexture(const std::string& sourcePath, TextureAttributes attributes)
+	TextureSharedPtr EngineObjectManager::CreateTexture(const std::string& sourcePath, TextureAttributes attributes)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		Texture * texture = graphics->CreateTexture(sourcePath, attributes);
@@ -467,48 +467,48 @@ namespace GTE
 		if (texture == nullptr)
 		{
 			Debug::PrintError("EngineObjectManager::CreateTexture -> could not create new Texture object.");
-			return TextureRef::Null();
+			return TextureSharedPtr::Null();
 		}
 
 		texture->SetObjectID(GetNextObjectID());
 
-		return TextureRef(texture, [=](Texture * texture)
+		return TextureSharedPtr(texture, [=](Texture * texture)
 		{
 			DeleteTexture(texture);
 		});
 	}
 
-	TextureRef EngineObjectManager::CreateTexture(RawImage * imageData, TextureAttributes attributes)
+	TextureSharedPtr EngineObjectManager::CreateTexture(RawImage * imageData, TextureAttributes attributes)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateTexture(imageData, attributes);
-		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureSharedPtr::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
-		return TextureRef(texture, [=](Texture * texture)
+		return TextureSharedPtr(texture, [=](Texture * texture)
 		{
 			DeleteTexture(texture);
 		});
 	}
 
-	TextureRef EngineObjectManager::CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, TextureAttributes attributes)
+	TextureSharedPtr EngineObjectManager::CreateTexture(UInt32 width, UInt32 height, Byte * pixelData, TextureAttributes attributes)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateTexture(width, height, pixelData, attributes);
-		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateTexture -> Could not create new Texture object.", TextureSharedPtr::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
-		return TextureRef(texture, [=](Texture * texture)
+		return TextureSharedPtr(texture, [=](Texture * texture)
 		{
 			DeleteTexture(texture);
 		});
 	}
 
-	TextureRef EngineObjectManager::CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
+	TextureSharedPtr EngineObjectManager::CreateCubeTexture(Byte * frontData, UInt32 fw, UInt32 fh,
 		Byte * backData, UInt32 backw, UInt32 backh,
 		Byte * topData, UInt32 tw, UInt32 th,
 		Byte * bottomData, UInt32 botw, UInt32 both,
@@ -525,48 +525,48 @@ namespace GTE
 			leftData, lw, lh,
 			rightData, rw, rh);
 
-		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureSharedPtr::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
-		return TextureRef(texture, [=](Texture * texture)
+		return TextureSharedPtr(texture, [=](Texture * texture)
 		{
 			DeleteTexture(texture);
 		});
 	}
 
-	TextureRef EngineObjectManager::CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
+	TextureSharedPtr EngineObjectManager::CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 		const std::string& bottom, const std::string& left, const std::string& right)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateCubeTexture(front, back, top, bottom, left, right);
-		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could not create new Texture object.", TextureSharedPtr::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
-		return TextureRef(texture, [=](Texture * texture)
+		return TextureSharedPtr(texture, [=](Texture * texture)
 		{
 			DeleteTexture(texture);
 		});
 	}
 
-	TextureRef EngineObjectManager::CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
+	TextureSharedPtr EngineObjectManager::CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 		RawImage * bottomData, RawImage * leftData, RawImage * rightData)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateCubeTexture -> Graphics system is null.");
 
 		Texture * texture = graphics->CreateCubeTexture(frontData, backData, topData, bottomData, leftData, rightData);
-		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could create new Texture object.", TextureRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(texture != nullptr, "EngineObjectManager::CreateCubeTexture -> Could create new Texture object.", TextureSharedPtr::Null(), false);
 		texture->SetObjectID(GetNextObjectID());
 
-		return TextureRef(texture, [=](Texture * texture)
+		return TextureSharedPtr(texture, [=](Texture * texture)
 		{
 			DeleteTexture(texture);
 		});
 	}
 
-	void EngineObjectManager::DestroyTexture(TextureRef texture)
+	void EngineObjectManager::DestroyTexture(TextureSharedPtr texture)
 	{
 		texture.ForceDelete();
 	}
@@ -581,21 +581,21 @@ namespace GTE
 		graphics->DestroyTexture(texture);
 	}
 
-	AtlasRef EngineObjectManager::CreateAtlas(TextureRef texture, Bool createFirstFullImage)
+	AtlasSharedPtr EngineObjectManager::CreateAtlas(TextureSharedPtr texture, Bool createFirstFullImage)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateAtlas -> Graphics system is null.");
 
 		Atlas* atlas = graphics->CreateAtlas(texture, createFirstFullImage);
-		NONFATAL_ASSERT_RTRN(atlas != nullptr, "EngineObjectManager::CreateAtlas -> Could create new Atlas object.", AtlasRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(atlas != nullptr, "EngineObjectManager::CreateAtlas -> Could create new Atlas object.", AtlasSharedPtr::Null(), false);
 
-		return AtlasRef(atlas, [=](Atlas * atlas)
+		return AtlasSharedPtr(atlas, [=](Atlas * atlas)
 		{
 			DeleteAtlas(atlas);
 		});
 	}
 
-	void EngineObjectManager::DestroyAtlas(AtlasRef atlas)
+	void EngineObjectManager::DestroyAtlas(AtlasSharedPtr atlas)
 	{
 		atlas.ForceDelete();
 	}
@@ -611,35 +611,35 @@ namespace GTE
 	}
 
 
-	RenderTargetRef EngineObjectManager::CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
+	RenderTargetSharedPtr EngineObjectManager::CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 		const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height)
 	{
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateRenderTarget -> Graphics system is null.");
 
 		RenderTarget*  target = graphics->CreateRenderTarget(hasColor, hasDepth, enableStencilBuffer, colorTextureAttributes, width, height);
-		NONFATAL_ASSERT_RTRN(target != nullptr, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(target != nullptr, "EngineObjectManager::CreateRenderBuffer -> Could not create new RenderTarget object.", RenderTargetSharedPtr::Null(), false);
 
 		Bool success = target->Init();
-		NONFATAL_ASSERT_RTRN(success == true, "EngineObjectManager::CreateRenderBuffer -> Could not initialize RenderTarget object.", RenderTargetRef::Null(), false);
+		NONFATAL_ASSERT_RTRN(success == true, "EngineObjectManager::CreateRenderBuffer -> Could not initialize RenderTarget object.", RenderTargetSharedPtr::Null(), false);
 
-		return RenderTargetRef(target, [=](RenderTarget * target)
+		return RenderTargetSharedPtr(target, [=](RenderTarget * target)
 		{
 			DeleteRenderTarget(target);
 		});
 	}
 
-	RenderTargetRef EngineObjectManager::WrapRenderTarget(RenderTarget * target)
+	RenderTargetSharedPtr EngineObjectManager::WrapRenderTarget(RenderTarget * target)
 	{
 		ASSERT(target != nullptr, "EngineObjectManager::WrapRenderTarget -> 'target' is null.");
 
-		return RenderTargetRef(target, [=](RenderTarget * target)
+		return RenderTargetSharedPtr(target, [=](RenderTarget * target)
 		{
 			DeleteRenderTarget(target);
 		});
 	}
 
-	void EngineObjectManager::DestroyRenderTarget(RenderTargetRef buffer)
+	void EngineObjectManager::DestroyRenderTarget(RenderTargetSharedPtr buffer)
 	{
 		buffer.ForceDelete();
 	}
@@ -654,30 +654,30 @@ namespace GTE
 		graphics->DestroyRenderTarget(target);
 	}
 
-	MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, ShaderRef shader)
+	MaterialSharedPtr EngineObjectManager::CreateMaterial(const std::string& name, ShaderSharedPtr shader)
 	{
 		Material * m = new(std::nothrow) Material(name);
-		ASSERT(m != nullptr, "EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> Unable to allocate material.");
+		ASSERT(m != nullptr, "EngineObjectManager::CreateMaterial(std::string&, ShaderSharedPtr) -> Unable to allocate material.");
 
 		Bool initSuccess = m->Init(shader);
 		if (!initSuccess)
 		{
-			Debug::PrintError("EngineObjectManager::CreateMaterial(std::string&, ShaderRef) -> could not Init material");
+			Debug::PrintError("EngineObjectManager::CreateMaterial(std::string&, ShaderSharedPtr) -> could not Init material");
 			delete m;
-			return MaterialRef::Null();
+			return MaterialSharedPtr::Null();
 		}
 		m->SetObjectID(GetNextObjectID());
 
-		return MaterialRef(m, [=](Material * m)
+		return MaterialSharedPtr(m, [=](Material * m)
 		{
 			DeleteMaterial(m);
 		});
 	}
 
-	MaterialRef EngineObjectManager::CreateMaterial(const std::string& name, const ShaderSource& shaderSource)
+	MaterialSharedPtr EngineObjectManager::CreateMaterial(const std::string& name, const ShaderSource& shaderSource)
 	{
-		ShaderRef shader = CreateShader(shaderSource);
-		if (!shader.IsValid())return MaterialRef::Null();
+		ShaderSharedPtr shader = CreateShader(shaderSource);
+		if (!shader.IsValid())return MaterialSharedPtr::Null();
 
 		Material * m = new(std::nothrow) Material(name);
 		Bool initSuccess = m->Init(shader);
@@ -686,17 +686,17 @@ namespace GTE
 		{
 			Debug::PrintError("EngineObjectManager::CreateMaterial(const std::string&, const std::string&) -> could not Init material");
 			delete m;
-			return MaterialRef::Null();
+			return MaterialSharedPtr::Null();
 		}
 		m->SetObjectID(GetNextObjectID());
 
-		return MaterialRef(m, [=](Material * m)
+		return MaterialSharedPtr(m, [=](Material * m)
 		{
 			DeleteMaterial(m);
 		});
 	}
 
-	void EngineObjectManager::DestroyMaterial(MaterialRef material)
+	void EngineObjectManager::DestroyMaterial(MaterialSharedPtr material)
 	{
 		material.ForceDelete();
 	}
@@ -704,7 +704,7 @@ namespace GTE
 	void EngineObjectManager::DeleteMaterial(Material * material)
 	{
 		ASSERT(material != nullptr, "EngineObjectManager::DeleteMaterial -> 'material' is null.");
-		ShaderRef shader = material->GetShader();
+		ShaderSharedPtr shader = material->GetShader();
 
 		ASSERT(shader.IsValid(), "EngineObjectManager::DeleteMaterial -> 'shader' is null.");
 		DestroyShader(shader);
@@ -712,7 +712,7 @@ namespace GTE
 		delete material;
 	}
 
-	CameraRef EngineObjectManager::CreateCamera()
+	CameraSharedPtr EngineObjectManager::CreateCamera()
 	{
 		Camera * camera = new(std::nothrow) Camera();
 		ASSERT(camera != nullptr, "EngineObjectManager::CreateCamera -> Could not allocate new Camera object.");
@@ -722,13 +722,13 @@ namespace GTE
 		IntMask allMask = layerManager.CreateFullLayerMask();
 		camera->SetCullingMask(allMask);
 
-		return CameraRef(camera, [=](Camera * camera)
+		return CameraSharedPtr(camera, [=](Camera * camera)
 		{
 			DeleteCamera(camera);
 		});
 	}
 
-	void EngineObjectManager::DestroyCamera(CameraRef camera)
+	void EngineObjectManager::DestroyCamera(CameraSharedPtr camera)
 	{
 		camera.ForceDelete();
 	}
@@ -739,7 +739,7 @@ namespace GTE
 		delete camera;
 	}
 
-	LightRef EngineObjectManager::CreateLight()
+	LightSharedPtr EngineObjectManager::CreateLight()
 	{
 		Light * light = new(std::nothrow) Light();
 		ASSERT(light != nullptr, "EngineObjectManager::CreateLight -> Could not create new Light object.");
@@ -747,13 +747,13 @@ namespace GTE
 		light->SetObjectID(GetNextObjectID());
 		light->SetCullingMask(layerManager.GetLayerMask(DefaultLayer));
 
-		return LightRef(light, [=](Light * light)
+		return LightSharedPtr(light, [=](Light * light)
 		{
 			DeleteLight(light);
 		});
 	}
 
-	void EngineObjectManager::DestroyLight(LightRef light)
+	void EngineObjectManager::DestroyLight(LightSharedPtr light)
 	{
 		light.ForceDelete();
 	}

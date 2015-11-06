@@ -96,7 +96,7 @@ namespace GTE
 	{
 		if (renderer != nullptr && renderer->GetSkeleton().IsValid())
 		{
-			SkeletonRef skeleton = renderer->GetSkeleton();
+			SkeletonSharedPtr skeleton = renderer->GetSkeleton();
 			boneCount = skeleton->GetBoneCount();
 			boneTransformed = new(std::nothrow) UChar[boneCount];
 			ASSERT(boneTransformed != nullptr, "SkinnedMesh3DAttributeTransformer::CreateTransformedBoneFlagsArray -> Unable to allocate flags array.");
@@ -113,7 +113,7 @@ namespace GTE
 	{
 		if (renderer != nullptr && renderer->GetSkeleton().IsValid())
 		{
-			SkeletonRef skeleton = renderer->GetSkeleton();
+			SkeletonSharedPtr skeleton = renderer->GetSkeleton();
 			memset(boneTransformed, 0, sizeof(UChar) * skeleton->GetBoneCount());
 		}
 	}
@@ -500,7 +500,7 @@ namespace GTE
 						currentCacheSize = uniqueVertexCount;
 					}
 
-			SkeletonRef skeleton = renderer->GetSkeleton();
+			SkeletonSharedPtr skeleton = renderer->GetSkeleton();
 			ASSERT(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformAttributes -> renderer's skeleton is not valid.");
 
 			if (boneCount < 0 || (UInt32)boneCount != skeleton->GetBoneCount())

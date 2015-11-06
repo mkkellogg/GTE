@@ -45,9 +45,9 @@ namespace GTE
 	protected:
 
 		// list of materials that will be used to render the sub-meshes
-		std::vector <MaterialRef> materials;
+		std::vector <MaterialSharedPtr> materials;
 		// the renderers for each of the sub-meshes
-		std::vector <SubMesh3DRendererRef> subRenderers;
+		std::vector <SubMesh3DRendererSharedPtr> subRenderers;
 
 		Mesh3DRenderer();
 		virtual ~Mesh3DRenderer();
@@ -57,18 +57,18 @@ namespace GTE
 	public:
 
 		UInt32 GetMaterialCount() const;
-		const MaterialRef& GetMaterial(UInt32 index);
-		void SetMaterial(UInt32 index, MaterialRef material);
-		void AddMaterial(MaterialRef material);
+		const MaterialSharedPtr& GetMaterial(UInt32 index);
+		void SetMaterial(UInt32 index, MaterialSharedPtr material);
+		void AddMaterial(MaterialSharedPtr material);
 
 		virtual void InitializeForMesh();
-		void InitializeForMesh(Mesh3DRefConst mesh);
+		void InitializeForMesh(Mesh3DSharedConstPtr mesh);
 		void UpdateFromSubMesh(UInt32 index);
 
-		virtual Mesh3DRef GetTargetMesh();
-		SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererRefConst subRenderer);
-		virtual SubMesh3DRef GetSubMesh(UInt32 index);
-		SubMesh3DRendererRef GetSubRenderer(UInt32 index);
+		virtual Mesh3DSharedPtr GetTargetMesh();
+		SubMesh3DSharedPtr GetSubMeshForSubRenderer(SubMesh3DRendererSharedConstPtr subRenderer);
+		virtual SubMesh3DSharedPtr GetSubMesh(UInt32 index);
+		SubMesh3DRendererSharedPtr GetSubRenderer(UInt32 index);
 		UInt32 GetSubRendererCount() const;
 	};
 }

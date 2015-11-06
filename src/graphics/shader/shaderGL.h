@@ -92,7 +92,7 @@ namespace GTE
 
 		void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer);
 
-		void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureRef texture);
+		void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture);
 		void SendUniformToShader(Int32 varID, const Matrix4x4 * mat);
 		void SendUniformToShader(Int32 varID, const Point3 * point);
 		void SendUniformToShader(Int32 varID, const Vector3 * vector);

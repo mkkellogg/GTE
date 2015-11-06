@@ -20,14 +20,14 @@ namespace GTE
 
 	protected:
 
-		SceneObjectRef sceneObject;
+		SceneObjectSharedPtr sceneObject;
 
 		SceneObjectComponent();
 		virtual ~SceneObjectComponent();
 
 	public:
 
-		SceneObjectRef GetSceneObject();
+		SceneObjectSharedPtr GetSceneObject();
 		virtual void Update();
 	};
 }

@@ -52,9 +52,9 @@ namespace GTE
 		// mapping from object ID's of Animation objects to respective indices in member arrays/vectors
 		std::unordered_map<ObjectID, UInt32> animationIndexMap;
 		// target of all animations managed by this player
-		SkeletonRef target;
+		SkeletonSharedPtr target;
 		// mapping from the object ID's of Animation objects to corresponding AnimationInstance objects
-		std::vector<AnimationInstanceRef> registeredAnimations;
+		std::vector<AnimationInstanceSharedPtr> registeredAnimations;
 		// weights used for animation blending
 		std::vector<Real> animationWeights;
 		// active animation blending operations
@@ -64,7 +64,7 @@ namespace GTE
 		// number of animations currently playing
 		Int32 playingAnimationsCount;
 
-		AnimationPlayer(SkeletonRef target);
+		AnimationPlayer(SkeletonSharedPtr target);
 		~AnimationPlayer();
 
 		void QueueBlendOperation(BlendOp * op);
@@ -76,12 +76,12 @@ namespace GTE
 		void CheckWeights();
 		void ApplyActiveAnimations();
 		void UpdateAnimationsProgress();
-		void UpdateAnimationInstanceProgress(AnimationInstanceRef instance) const;
-		void CalculateInterpolatedValues(AnimationInstanceRefConst instance, UInt32 channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-		void CalculateInterpolatedTranslation(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
-		void CalculateInterpolatedScale(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
-		void CalculateInterpolatedRotation(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
-		Bool CalculateInterpolation(AnimationInstanceRefConst instance, const KeyFrameSet& keyFrameSet, UInt32& lastIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const;
+		void UpdateAnimationInstanceProgress(AnimationInstanceSharedPtr instance) const;
+		void CalculateInterpolatedValues(AnimationInstanceSharedConstPtr instance, UInt32 channel, Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+		void CalculateInterpolatedTranslation(AnimationInstanceSharedConstPtr instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
+		void CalculateInterpolatedScale(AnimationInstanceSharedConstPtr instance, const KeyFrameSet& keyFrameSet, Vector3& vector) const;
+		void CalculateInterpolatedRotation(AnimationInstanceSharedConstPtr instance, const KeyFrameSet& keyFrameSet, Quaternion& rotation) const;
+		Bool CalculateInterpolation(AnimationInstanceSharedConstPtr instance, const KeyFrameSet& keyFrameSet, UInt32& lastIndex, UInt32& nextIndex, Real& interFrameProgress, TransformationCompnent component) const;
 		Real GetKeyFrameTime(TransformationCompnent transformationComponent, Int32 frameIndex, const KeyFrameSet& keyFrameSet) const;
 
 		void SetSpeed(UInt32 animationIndex, Real speedFactor);
@@ -92,15 +92,15 @@ namespace GTE
 
 	public:
 
-		void AddAnimation(AnimationRefConst animation);
-		void SetSpeed(AnimationRefConst animation, Real speedFactor);
-		void Play(AnimationRefConst animation);
-		void Stop(AnimationRefConst animation);
-		void Pause(AnimationRefConst animation);
-		void Resume(AnimationRefConst animation);
-		void CrossFade(AnimationRefConst target, Real duration);
-		void CrossFade(AnimationRefConst target, Real duration, Bool queued);
-		void SetPlaybackMode(AnimationRefConst target, PlaybackMode playbackMode);
+		void AddAnimation(AnimationSharedConstPtr animation);
+		void SetSpeed(AnimationSharedConstPtr animation, Real speedFactor);
+		void Play(AnimationSharedConstPtr animation);
+		void Stop(AnimationSharedConstPtr animation);
+		void Pause(AnimationSharedConstPtr animation);
+		void Resume(AnimationSharedConstPtr animation);
+		void CrossFade(AnimationSharedConstPtr target, Real duration);
+		void CrossFade(AnimationSharedConstPtr target, Real duration, Bool queued);
+		void SetPlaybackMode(AnimationSharedConstPtr target, PlaybackMode playbackMode);
 	};
 }
 

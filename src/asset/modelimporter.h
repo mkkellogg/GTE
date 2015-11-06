@@ -75,7 +75,7 @@ namespace GTE
 
 			Int32 vertexColorsIndex;
 			LongMask shaderProperties;
-			MaterialRef material;
+			MaterialSharedPtr material;
 			Bool invertVCoords;
 			std::map<TextureType, int> uvMapping;
 
@@ -114,25 +114,25 @@ namespace GTE
 		void InitImporter();
 		const aiScene * LoadAIScene(const std::string& filePath, Bool preserveFBXPivots);
 
-		void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, Real scale, SceneObjectRef parent,
-			std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonRef skeleton,
-			std::vector<SceneObjectRef>& createdSceneObjects, Bool castShadows, Bool receiveShadows) const;
-		SceneObjectRef ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, Bool castShadows, Bool receiveShadows) const;
+		void RecursiveProcessModelScene(const aiScene& scene, const aiNode& nd, Real scale, SceneObjectSharedPtr parent,
+			std::vector<MaterialImportDescriptor>& materialImportDescriptors, SkeletonSharedPtr skeleton,
+			std::vector<SceneObjectSharedPtr>& createdSceneObjects, Bool castShadows, Bool receiveShadows) const;
+		SceneObjectSharedPtr ProcessModelScene(const std::string& modelPath, const aiScene& scene, Real importScale, Bool castShadows, Bool receiveShadows) const;
 		Bool ProcessMaterials(const std::string& modelPath, const aiScene& scene, std::vector<MaterialImportDescriptor>& materialImportDescriptors) const;
-		TextureRef LoadAITexture(aiMaterial& material, aiTextureType textureType, const std::string& modelPath) const;
-		Bool SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, const TextureType textureType, TextureRef texture,
+		TextureSharedPtr LoadAITexture(aiMaterial& material, aiTextureType textureType, const std::string& modelPath) const;
+		Bool SetupMeshSpecificMaterialWithTexture(const aiMaterial& assimpMaterial, const TextureType textureType, TextureSharedPtr texture,
 			UInt32 meshIndex, MaterialImportDescriptor& materialImportDesc) const;
 		static void GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene);
-		SubMesh3DRef ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, Bool invert) const;
-		void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonRef skeleton, SkinnedMesh3DRendererRef target, Bool reverseVertexOrder) const;
+		SubMesh3DSharedPtr ConvertAssimpMesh(UInt32 meshIndex, const aiScene& scene, MaterialImportDescriptor& materialImportDescriptor, Bool invert) const;
+		void SetupVertexBoneMapForRenderer(const aiScene& scene, SkeletonSharedPtr skeleton, SkinnedMesh3DRendererSharedPtr target, Bool reverseVertexOrder) const;
 
-		SkeletonRef LoadSkeleton(const aiScene& scene) const;
+		SkeletonSharedPtr LoadSkeleton(const aiScene& scene) const;
 		VertexBoneMap * ExpandIndexBoneMapping(VertexBoneMap& indexBoneMap, const aiMesh& mesh, Bool reverseVertexOrder) const;
-		void AddMeshBoneMappingsToSkeleton(SkeletonRef skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const;
-		void SetupVertexBoneMapMappingsFromAIMesh(SkeletonRefConst skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
+		void AddMeshBoneMappingsToSkeleton(SkeletonSharedPtr skeleton, const aiMesh& mesh, UInt32& currentBoneIndex) const;
+		void SetupVertexBoneMapMappingsFromAIMesh(SkeletonSharedConstPtr skeleton, const aiMesh& mesh, VertexBoneMap& vertexIndexBoneMap) const;
 		unsigned CountBones(const aiScene& scene) const;
-		Bool CreateAndMapNodeHierarchy(SkeletonRef skeleton, const aiScene& scene) const;
-		AnimationRef LoadAnimation(aiAnimation& animation, Bool addLoopPadding) const;
+		Bool CreateAndMapNodeHierarchy(SkeletonSharedPtr skeleton, const aiScene& scene) const;
+		AnimationSharedPtr LoadAnimation(aiAnimation& animation, Bool addLoopPadding) const;
 
 		void TraverseScene(const aiScene& scene, SceneTraverseOrder traverseOrder, std::function<Bool(const aiNode&)> callback) const;
 		void PreOrderTraverseScene(const aiScene& scene, const aiNode& node, std::function<Bool(const aiNode&)> callback) const;
@@ -151,8 +151,8 @@ namespace GTE
 
 	public:
 
-		SceneObjectRef LoadModelDirect(const std::string& modelPath, Real importScale, Bool castShadows, Bool receiveShadows, Bool preserveFBXPivots);
-		AnimationRef LoadAnimation(const std::string& filePath, Bool addLoopPadding, Bool preserveFBXPivots);
+		SceneObjectSharedPtr LoadModelDirect(const std::string& modelPath, Real importScale, Bool castShadows, Bool receiveShadows, Bool preserveFBXPivots);
+		AnimationSharedPtr LoadAnimation(const std::string& filePath, Bool addLoopPadding, Bool preserveFBXPivots);
 
 	};
 }

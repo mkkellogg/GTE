@@ -43,14 +43,14 @@ namespace GTE
 		Bool isStatic;
 		SceneObjectTransform transform;
 		Transform processingTransform;
-		std::vector<SceneObjectRef > children;
-		SceneObjectRef parent;
+		std::vector<SceneObjectSharedPtr > children;
+		SceneObjectSharedPtr parent;
 		IntMask layerMask;
-		CameraRef camera;
-		LightRef light;
-		Mesh3DRendererRef renderer3D;
-		SkinnedMesh3DRendererRef skinnedRenderer3D;
-		Mesh3DFilterRef mesh3DFilter;
+		CameraSharedPtr camera;
+		LightSharedPtr light;
+		Mesh3DRendererSharedPtr renderer3D;
+		SkinnedMesh3DRendererSharedPtr skinnedRenderer3D;
+		Mesh3DFilterSharedPtr mesh3DFilter;
 
 		SceneObject();
 		virtual ~SceneObject();
@@ -74,26 +74,26 @@ namespace GTE
 		const SceneObjectTransform& GetConstTransform() const;
 		const Transform& GetAggregateTransform() const;
 
-		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
-		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
-		Bool SetMesh3DFilter(Mesh3DFilterRef filter);
+		Bool SetMesh3DRenderer(Mesh3DRendererSharedPtr renderer);
+		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererSharedPtr renderer);
+		Bool SetMesh3DFilter(Mesh3DFilterSharedPtr filter);
 
-		Bool SetCamera(CameraRef camera);
-		Bool SetLight(LightRef light);
+		Bool SetCamera(CameraSharedPtr camera);
+		Bool SetLight(LightSharedPtr light);
 
-		Mesh3DRef GetMesh3D();
-		Mesh3DFilterRef GetMesh3DFilter();
-		const Mesh3DRendererRef& GetMesh3DRenderer();
-		SkinnedMesh3DRendererRef GetSkinnedMesh3DRenderer();
+		Mesh3DSharedPtr GetMesh3D();
+		Mesh3DFilterSharedPtr GetMesh3DFilter();
+		const Mesh3DRendererSharedPtr& GetMesh3DRenderer();
+		SkinnedMesh3DRendererSharedPtr GetSkinnedMesh3DRenderer();
 
-		CameraRef GetCamera();
-		LightRef GetLight();
+		CameraSharedPtr GetCamera();
+		LightSharedPtr GetLight();
 
-		void AddChild(SceneObjectRef child);
-		void RemoveChild(SceneObjectRef child);
+		void AddChild(SceneObjectSharedPtr child);
+		void RemoveChild(SceneObjectSharedPtr child);
 		UInt32 GetChildrenCount() const;
-		SceneObjectRef GetChildAt(UInt32 index) const;
-		SceneObjectRef GetParent() const;
+		SceneObjectSharedPtr GetChildAt(UInt32 index) const;
+		SceneObjectSharedPtr GetParent() const;
 
 		// TODO: optimize this hashing function (implement correctly)
 		typedef struct

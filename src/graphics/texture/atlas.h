@@ -44,21 +44,21 @@ namespace GTE
 
 		private:
 
-		TextureRef texture;
+		TextureSharedPtr texture;
 		UInt32 imageCount; 
 		std::vector<ImageDescriptor> images;
 
 		protected:
 
-		static Atlas* CreateGridAtlas(TextureRef texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY);
-		Atlas(TextureRef texture, Bool createFirstFullFrame);
+		static Atlas* CreateGridAtlas(TextureSharedPtr texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY);
+		Atlas(TextureSharedPtr texture, Bool createFirstFullFrame);
 		virtual ~Atlas();
 
 		public:
 		
 		void AddImageDescriptor(Real left, Real top, Real right, Real bottom);
 		ImageDescriptor* GetImageDescriptor(UInt32 index);
-		TextureRef GetTexture();
+		TextureSharedPtr GetTexture();
 	};
 }
 

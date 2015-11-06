@@ -33,7 +33,7 @@ namespace GTE
 
 	}
 
-	void ShaderOrganizer::AddShader(LongMask properties, ShaderRef shader)
+	void ShaderOrganizer::AddShader(LongMask properties, ShaderSharedPtr shader)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "ShaderManager::AddShader -> 'shader' is null.", true);
 		NONFATAL_ASSERT(shader->IsLoaded(), "ShaderManager::AddShader -> 'shader' is not loaded.", true);
@@ -45,14 +45,14 @@ namespace GTE
 	// Ultimately we want it to return a shader that doesn't have any ADDITIONAL properties
 	// beyond what is specified by [flags], but it's ok to have less. However, EXACT
 	// matching is preferred for best results.
-	ShaderRef ShaderOrganizer::GetShader(LongMask flags)
+	ShaderSharedPtr ShaderOrganizer::GetShader(LongMask flags)
 	{
 		if (loadedShaders.find(flags) != loadedShaders.end())
 		{
 			return loadedShaders[flags];
 		}
 
-		return ShaderRef::Null();
+		return ShaderSharedPtr::Null();
 	}
 }
 

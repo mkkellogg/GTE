@@ -76,20 +76,20 @@ class Game
 
 
 	// SceneObject that contains the main camera for the scene
-	GTE::SceneObjectRef cameraObject;
+	GTE::SceneObjectSharedPtr cameraObject;
 	// The SceneObject to which the player model hierarchy is attached
-	GTE::SceneObjectRef playerObject;
+	GTE::SceneObjectSharedPtr playerObject;
 
 	// scene object that holds the scene's directional light
-	GTE::SceneObjectRef directionalLightObject;
+	GTE::SceneObjectSharedPtr directionalLightObject;
 	// scene object that holds the scene's ambient light
-	GTE::SceneObjectRef ambientLightObject;
+	GTE::SceneObjectSharedPtr ambientLightObject;
 	//The SkinnedMesh3DRenderer that render the player's skinned mesh
-	GTE::SkinnedMesh3DRendererRef playerRenderer;
+	GTE::SkinnedMesh3DRendererSharedPtr playerRenderer;
 	// player animations
-	GTE::AnimationRef playerAnimations[PlayerState::_Count];
+	GTE::AnimationSharedPtr playerAnimations[PlayerState::_Count];
 	// The AnimationPlayer responsible for managing the animations of the player 
-	GTE::AnimationPlayerRef animationPlayer;
+	GTE::AnimationPlayerSharedPtr animationPlayer;
 
 	// number of frames rendered;
 	GTE::UInt32 frameCount;
@@ -177,7 +177,7 @@ class Game
 	void ActivatePlayerState(PlayerState state);
 	void ManagePlayerState();
 	void HandleGeneralInput();
-	void UpdateLight(GTE::SceneObjectRef sceneObject, GTE::Bool toggleLight, GTE::Real intensityChange, GTE::Bool toggleCastShadows);
+	void UpdateLight(GTE::SceneObjectSharedPtr sceneObject, GTE::Bool toggleLight, GTE::Real intensityChange, GTE::Bool toggleCastShadows);
 
 	void DisplayInfo();
 	void SignalDisplayInfoChanged();

@@ -15,7 +15,7 @@ namespace GTE
 	/*
 	* Only constructor, which is parameterized.
 	*/
-	SceneObjectSkeletonNode::SceneObjectSkeletonNode(SceneObjectRef target, Int32 boneIndex, const std::string& name) : SkeletonNode(boneIndex, name)
+	SceneObjectSkeletonNode::SceneObjectSkeletonNode(SceneObjectSharedPtr target, Int32 boneIndex, const std::string& name) : SkeletonNode(boneIndex, name)
 	{
 		this->Target = target;
 	}

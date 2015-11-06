@@ -93,9 +93,9 @@ namespace GTE
 
 		virtual Bool Init(const GraphicsAttributes& attributes);
 		virtual RenderTarget * CreateDefaultRenderTarget() = 0;
-		RenderTargetRef SetupDefaultRenderTarget();
-		virtual Bool ActivateRenderTarget(const RenderTargetRef& target) = 0;
-		virtual const RenderTargetRef& GetCurrrentRenderTarget() = 0;
+		RenderTargetSharedPtr SetupDefaultRenderTarget();
+		virtual Bool ActivateRenderTarget(const RenderTargetSharedPtr& target) = 0;
+		virtual const RenderTargetSharedPtr& GetCurrrentRenderTarget() = 0;
 		virtual Bool ActivateCubeRenderTargetSide(CubeTextureSide side) = 0;
 		virtual Bool RestoreDefaultRenderTarget() = 0;
 		
@@ -117,15 +117,15 @@ namespace GTE
 		virtual Texture * CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 											RawImage * bottomData, RawImage * leftData, RawImage * rightData) = 0;
 		virtual void DestroyTexture(Texture * texture) = 0;
-		Atlas * CreateAtlas(TextureRef texture, Bool createFirstFullFrame);
+		Atlas * CreateAtlas(TextureSharedPtr texture, Bool createFirstFullFrame);
 		void DestroyAtlas(Atlas * atlas);
 		virtual RenderTarget * CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 												  const TextureAttributes& colorTextureAttributes, UInt32 width, UInt32 height) = 0;
 		virtual void DestroyRenderTarget(RenderTarget * target) = 0;
-		virtual RenderTargetRef GetDefaultRenderTarget() = 0;
+		virtual RenderTargetSharedPtr GetDefaultRenderTarget() = 0;
 
-		virtual void ActivateMaterial(const MaterialRef&, Bool reverseFaceCulling) = 0;
-		virtual MaterialRef& GetActiveMaterial() = 0;
+		virtual void ActivateMaterial(const MaterialSharedPtr&, Bool reverseFaceCulling) = 0;
+		virtual MaterialSharedPtr& GetActiveMaterial() = 0;
 
 		virtual void EnterRenderMode(RenderMode renderMode) = 0;		
 
@@ -158,11 +158,11 @@ namespace GTE
 
 		virtual const GraphicsAttributes& GetAttributes() const;
 	
-		virtual void CopyBetweenRenderTargets(RenderTargetRef src, RenderTargetRefConst dest) const = 0;
+		virtual void CopyBetweenRenderTargets(RenderTargetSharedPtr src, RenderTargetSharedConstPtr dest) const = 0;
 
-		virtual void SetTextureData(TextureRef texture, const Byte * data) const = 0;
-		virtual void SetTextureData(TextureRef texture, const Byte * data, CubeTextureSide side) const = 0;
-		virtual void RebuildMipMaps(TextureRef texture) const = 0;
+		virtual void SetTextureData(TextureSharedPtr texture, const Byte * data) const = 0;
+		virtual void SetTextureData(TextureSharedPtr texture, const Byte * data, CubeTextureSide side) const = 0;
+		virtual void RebuildMipMaps(TextureSharedPtr texture) const = 0;
 
 		virtual Bool AddClipPlane() = 0;
 		virtual void DeactiveAllClipPlanes() = 0;		

@@ -36,7 +36,7 @@ namespace GTE
 
 	class ShaderOrganizer
 	{
-		std::map<LongMask, ShaderRef> loadedShaders;
+		std::map<LongMask, ShaderSharedPtr> loadedShaders;
 
 	protected:
 
@@ -45,8 +45,8 @@ namespace GTE
 		ShaderOrganizer();
 		~ShaderOrganizer();
 
-		void AddShader(LongMask properties, ShaderRef shader);
-		ShaderRef GetShader(LongMask flags);
+		void AddShader(LongMask properties, ShaderSharedPtr shader);
+		ShaderSharedPtr GetShader(LongMask flags);
 	};
 }
 
