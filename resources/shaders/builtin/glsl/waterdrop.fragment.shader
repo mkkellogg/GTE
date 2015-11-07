@@ -21,7 +21,7 @@ void main()
 	float dropStrength = DROP_STRENGTH;
 	float dropRadius = DROP_RADIUS;
 
-    vec4 data = texture2D(WATER_HEIGHT_MAP, vUVTexture0.st);
+    vec4 data = texture(WATER_HEIGHT_MAP, vUVTexture0.st);
      
     float drop = max(0.0, 1.0 - length(DROP_POSITION - vUVTexture0.st) / dropRadius);
     drop = 0.5 - cos(drop * PI) * 0.5;

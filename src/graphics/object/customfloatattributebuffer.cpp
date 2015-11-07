@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "customfloatattributebuffer.h"
 #include "gtemath/gtemath.h"
 #include "object/enginetypes.h"
@@ -7,7 +9,6 @@
 #include "debug/gtedebug.h"
 #include "engine.h"
 
-#include <stdio.h>
 
 namespace GTE
 {
