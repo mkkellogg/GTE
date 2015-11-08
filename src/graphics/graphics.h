@@ -137,7 +137,7 @@ namespace GTE
 
 		Real GetCurrentFPS() const;
 
-		virtual void ClearRenderBuffers(UInt32 bufferMask) const = 0;
+		virtual void ClearRenderBuffers(IntMask bufferMask) const = 0;
 
 		virtual void SetFaceCullingMode(RenderState::FaceCulling mode) = 0;
 		virtual RenderState::FaceCulling GetFaceCullingMode() const = 0;

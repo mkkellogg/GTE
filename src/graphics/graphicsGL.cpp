@@ -109,6 +109,13 @@ namespace GTE
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+		glfwWindowHint(GLFW_DEPTH_BITS, 32);
+
+		glfwWindowHint(GLFW_RED_BITS, 8);
+		glfwWindowHint(GLFW_GREEN_BITS, 8);
+		glfwWindowHint(GLFW_BLUE_BITS, 8);
+		glfwWindowHint(GLFW_ALPHA_BITS, 8);
+
 		// create a windowed mode window and its OpenGL context 
 		window = glfwCreateWindow(attributes.WindowWidth, attributes.WindowHeight, attributes.WindowTitle.c_str(), nullptr, nullptr);
 

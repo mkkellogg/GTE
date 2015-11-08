@@ -92,18 +92,18 @@ namespace GTE
 		MaterialRef GetSkyboxMaterial();
 
 		void SetSSAOEnabled(Bool enabled);
-		Bool IsSSAOEnabled();
+		Bool IsSSAOEnabled() const;
 		void SetSSAORenderMode(SSAORenderMode mode);
-		SSAORenderMode GetSSAORenderMode();
+		SSAORenderMode GetSSAORenderMode() const;
 
 		void SetAmbientPassEnabled(Bool enabled);
-		Bool IsAmbientPassEnabled();
+		Bool IsAmbientPassEnabled() const;
 
 		void SetDepthPassEnabled(Bool enabled);
-		Bool IsDepthPassEnabled();
+		Bool IsDepthPassEnabled() const;
 
 		void SetRenderOrderIndex(UInt32 index);
-		UInt32 GetRenderOrderIndex();
+		UInt32 GetRenderOrderIndex() const;
 
 		const Transform& GetProjectionTransform() const;
 		const Transform& GetInverseProjectionTransform() const;
@@ -138,7 +138,7 @@ namespace GTE
 		Bool GetReverseCulling() const;
 
 		void SetUniformWorldSceneObjectTransform(const Transform& transform);
-		const Transform& GetUniformWorldSceneObjectTransform();
+		const Transform& GetUniformWorldSceneObjectTransform() const;
 
 		void SetProjectionMode(ProjectionMode mode);
 	};

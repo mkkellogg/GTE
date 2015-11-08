@@ -152,7 +152,7 @@ namespace GTE
 		ssaoEnabled = enabled;
 	}
 
-	Bool Camera::IsSSAOEnabled()
+	Bool Camera::IsSSAOEnabled() const
 	{
 		return ssaoEnabled;
 	}
@@ -162,7 +162,7 @@ namespace GTE
 		ssaoMode = mode;
 	}
 
-	SSAORenderMode Camera::GetSSAORenderMode()
+	SSAORenderMode Camera::GetSSAORenderMode() const
 	{
 		return ssaoMode;
 	}
@@ -172,7 +172,7 @@ namespace GTE
 		ambientPassEnabled = enabled;
 	}
 
-	Bool Camera::IsAmbientPassEnabled()
+	Bool Camera::IsAmbientPassEnabled() const
 	{
 		return ambientPassEnabled;
 	}
@@ -182,7 +182,7 @@ namespace GTE
 		depthPassEnabled = enabled;
 	}
 
-	Bool Camera::IsDepthPassEnabled()
+	Bool Camera::IsDepthPassEnabled() const
 	{
 		return depthPassEnabled;
 	}
@@ -192,7 +192,7 @@ namespace GTE
 		renderOrderIndex = index;
 	}
 
-	UInt32 Camera::GetRenderOrderIndex()
+	UInt32 Camera::GetRenderOrderIndex() const
 	{
 		return renderOrderIndex;
 	}
@@ -379,7 +379,7 @@ namespace GTE
 		uniformWorldSceneObjectTransform = transform;
 	}
 
-	const Transform& Camera::GetUniformWorldSceneObjectTransform()
+	const Transform& Camera::GetUniformWorldSceneObjectTransform() const
 	{
 		return uniformWorldSceneObjectTransform;
 	}

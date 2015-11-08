@@ -58,6 +58,7 @@ namespace GTE
 	class ForwardRenderManager : public RenderManager
 	{
 		friend class Engine;
+
 		/*
 		 * Data structure that is passed to RenderSceneObjectMeshes() that describes the kind of
 		 * lighting to be used (or not used) during rendering.
@@ -76,6 +77,62 @@ namespace GTE
 				LightDirection(lightDirection)
 			{
 				this->UseLighting = useLighting;
+			
+			}
+		};
+
+		/*
+		* Data structure that is passed to RenderSceneObjectMeshes() that describes properties
+		* such as the view transform, inverse view transform, and view position.
+		*/
+		class ViewDescriptor
+		{
+			public:
+
+			IntMask ClearBufferMask;
+			IntMask CullingMask;
+
+			Bool ReverseCulling;
+
+			Transform ViewTransform;
+			Transform ViewTransformInverse;
+
+			Point3 ViewPosition;
+
+			Transform ProjectionTransform;
+			Transform ProjectionTransformInverse;
+			Transform UniformWorldSceneObjectTransform;
+
+			Bool AmbientPassEnabled;
+			Bool DepthPassEnabled;
+
+			Bool SSAOEnabled;
+			SSAORenderMode SSAOMode;
+
+			Bool SkyboxEnabled;
+			SceneObject * SkyboxObject;
+
+			UInt32 ClipPlaneCount;
+			Vector3 ClipPlane0Normal;
+			Real ClipPlane0Offset;
+
+			ViewDescriptor()
+			{
+				CullingMask = 0;
+				ClearBufferMask = 0;
+
+				ReverseCulling = false;
+
+				AmbientPassEnabled = true;
+				DepthPassEnabled = true;
+
+				SSAOEnabled = true;
+				SSAOMode = SSAORenderMode::Standard;
+
+				SkyboxObject = nullptr;
+
+				ClipPlaneCount = 0;
+				ClipPlane0Offset = 0.0f;
 			}
 		};
 
@@ -145,27 +202,29 @@ namespace GTE
 
 		void RenderSceneForCamera(UInt32 cameraIndex);
 		void RenderSceneForCamera(Camera& camera);
-		void RenderSceneForCameraAndCurrentRenderTarget(Camera& camera, const Transform& viewTransform, const Transform& viewInverse);
-		void RenderSceneForLight(const Light& light, const Transform& lightFullTransform, const Transform& modelPreTransform,
-			const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
-		void RenderSceneForSelfLitMaterials(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
-		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const Transform& modelPreTransform,
-						const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera, MaterialRef materialOverride,
-						Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
-		void RenderSkyboxForCamera(Camera& camera, const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse);
-		void RenderDepthBuffer(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
-		void RenderSceneSSAO(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera);
-		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-											MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
-		void RenderSceneWithSelfLitLighting(const Transform& modelPreTransform, const Transform& viewTransform, const Transform& viewTransformInverse, const Camera& camera,
-											MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter,
-			std::function<Bool(SceneObject*)> filterFunction);
-		Bool ValidateSceneObjectForRendering(SceneObjectRef sceneObject) const;
-		void BuildShadowVolumeMVPTransform(const Transform& modelTransform,  const Camera& camera, const Transform& viewTransformInverse, Transform& outTransform, Real xScale, Real yScale) const;
+
+		void GetViewDescriptorForCamera(const Camera& camera, const Transform* altViewTransform, ViewDescriptor& descriptor);
+
+		void RenderSceneForCurrentRenderTarget(const ViewDescriptor& viewDescriptor);
+		void RenderSkyboxForCamera(const ViewDescriptor& viewDescriptor);
+		void RenderDepthBuffer(const ViewDescriptor& viewDescriptor);
+		void RenderSceneSSAO(const ViewDescriptor& viewDescriptor);
+		
+		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor);
+
+		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
+									 FowardBlendingFilter blendingFilter,  std::function<Bool(SceneObject*)> filterFunction);
+
+		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const ViewDescriptor& viewDescriptor, 
+						MaterialRef materialOverride, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+
 		void RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
-			const Transform& modelPreTransform, const Transform& viewTransformInverse, const Camera& camera);
+									   const ViewDescriptor& viewDescriptor);
+		
+		void BuildShadowVolumeMVPTransform(const Transform& modelTransform, const Transform& viewTransformInverse, const Transform& projectionTransform,
+										   Transform& outTransform, Real xScale, Real yScale) const;
 		void BuildSceneShadowVolumes();
-		void BuildShadowVolumesForLight(const Light& light, const Transform& lightFullTransform);
+		void BuildShadowVolumesForLight(const Light& light, const Transform& lightWorldTransform);
 		void BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection);
 		void CacheShadowVolume(const ObjectPairKey& key, const Point3Array * positions);
 		void ClearCachedShadowVolume(const ObjectPairKey& key);
@@ -176,17 +235,17 @@ namespace GTE
 		void SetForwardBlending(FowardBlendingMethod method);
 		FowardBlendingMethod GetForwardBlending() const;
 
-		void ClearBuffersForCamera(const Camera& camera) const;
+		void ClearRenderBuffers(IntMask clearMask) const;
 
 		void ActivateMaterial(MaterialRef material, Bool reverseFaceCulling);
 		void SendTransformUniformsToShader(const Transform& model, const Transform& modelView, const Transform& view, const Transform& projection, const Transform& modelViewProjection);
 		void SendModelViewProjectionToShader(const Transform& modelViewProjection);
-		void SendCameraAttributesToShader(const Camera& camera, const Point3& cameraPosition);
+		void SendViewAttributesToShader(const ViewDescriptor& viewDescriptor);
 		void SendActiveMaterialUniformsToShader() const;
 
-		Bool ShouldCullFromCamera(const Camera& camera, const SceneObject& sceneObject) const;
-		Bool ShouldCullFromLight(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const SceneObject& sceneObject) const;
-		Bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
+		Bool ShouldCullByLayer(IntMask cullingMask, const SceneObject& sceneObject) const;
+		Bool ShouldCullFromLight(const Light& light, const Point3& lightWorldPosition, const SceneObject& sceneObject, const Transform& sceneObjectWorldTransform) const;
+		Bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const Mesh3D& mesh) const;
 		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
 
 		void PushRenderTarget(RenderTargetRef renderTarget);
