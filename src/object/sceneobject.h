@@ -77,10 +77,15 @@ namespace GTE
 		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
 		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
 		Bool SetMesh3DFilter(Mesh3DFilterRef filter);
-
 		Bool SetCamera(CameraRef camera);
 		Bool SetLight(LightRef light);
 
+		Bool RemoveMesh3DRenderer();
+		Bool RemoveSkinnedMesh3DRenderer();
+		Bool RemoveMesh3DFilter();
+		Bool RemoveCamera();
+		Bool RemoveLight();
+	
 		Mesh3DRef GetMesh3D();
 		Mesh3DFilterRef GetMesh3DFilter();
 		Mesh3DRendererRef GetMesh3DRenderer();

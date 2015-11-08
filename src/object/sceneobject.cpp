@@ -188,6 +188,56 @@ namespace GTE
 		return true;
 	}
 
+	Bool SceneObject::RemoveMesh3DRenderer()
+	{
+		NONFATAL_ASSERT_RTRN(renderer3D.IsValid(), "SceneObject::RemoveMesh3DRenderer -> Scene object has no mesh renderer.", false, true);
+
+		renderer3D->sceneObject = SceneObjectSharedPtr::Null();
+		this->renderer3D = Mesh3DRendererSharedPtr::Null();
+
+		return true;
+	}
+
+	Bool SceneObject::RemoveSkinnedMesh3DRenderer()
+	{
+		NONFATAL_ASSERT_RTRN(skinnedRenderer3D.IsValid(), "SceneObject::RemoveSkinnedMesh3DRenderer -> Scene object has no skinned mesh renderer.", false, true);
+
+		skinnedRenderer3D->sceneObject = SceneObjectSharedPtr::Null();
+		this->skinnedRenderer3D = SkinnedMesh3DRendererSharedPtr::Null();
+
+		return true;
+	}
+
+	Bool SceneObject::RemoveMesh3DFilter()
+	{
+		NONFATAL_ASSERT_RTRN(mesh3DFilter.IsValid(), "SceneObject::RemoveMesh3DFilter -> Scene object has no mesh filter.", false, true);
+
+		mesh3DFilter->sceneObject = SceneObjectSharedPtr::Null();
+		this->mesh3DFilter = Mesh3DFilterSharedPtr::Null();
+
+		return true;
+	}
+
+	Bool SceneObject::RemoveCamera()
+	{
+		NONFATAL_ASSERT_RTRN(camera.IsValid(), "SceneObject::RemoveCamera -> Scene object has no camera.", false, true);
+
+		camera->sceneObject = SceneObjectSharedPtr::Null();
+		this->camera = CameraSharedPtr::Null();
+
+		return true;
+	}
+
+	Bool SceneObject::RemoveLight()
+	{
+		NONFATAL_ASSERT_RTRN(light.IsValid(), "SceneObject::RemoveLight -> Scene object has no light.", false, true);
+
+		light->sceneObject = SceneObjectSharedPtr::Null();
+		this->light = LightSharedPtr::Null();
+		return true;
+
+	}
+
 	Mesh3DRef SceneObject::GetMesh3D()
 	{
 		if (!mesh3DFilter.IsValid())return NullMesh3DRef;

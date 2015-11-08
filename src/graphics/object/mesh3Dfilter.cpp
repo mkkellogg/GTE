@@ -56,6 +56,17 @@ namespace GTE
 	}
 
 	/*
+	* Remove the target mesh for this mesh filter.
+	*/
+	Bool Mesh3DFilter::RemoveMesh3D()
+	{
+		NONFATAL_ASSERT_RTRN(mesh.IsValid(), "Mesh3DFilter::RemoveMesh3D -> Mesh filter has no target mesh.", false, true);
+		this->mesh = Mesh3DSharedPtr::Null();
+
+		return true;
+	}
+
+	/*
 	 * Get the target mesh for this mesh filter.
 	 */
 	Mesh3DRef Mesh3DFilter::GetMesh3D()
