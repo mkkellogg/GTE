@@ -110,7 +110,7 @@ namespace GTE
 		// does this material require a light to be rendered?
 		Bool useLighting;
 
-		RenderQueueType renderQueueType;
+		UInt32 renderQueueID;
 
 		RenderState::BlendingMode blendingMode;
 		RenderState::BlendingMethod sourceBlendingMethod;
@@ -197,7 +197,8 @@ namespace GTE
 		void SetUseLighting(Bool selfLit);
 		Bool UseLighting();
 		void SetRenderQueue(RenderQueueType queue);
-		RenderQueueType GetRenderQueueType();
+		void SetRenderQueue(UInt32 queue);
+		UInt32 GetRenderQueue();
 		void SetBlendingMode(RenderState::BlendingMode mode);
 		RenderState::BlendingMode GetBlendingMode();
 		void SetSourceBlendingMethod(RenderState::BlendingMethod method);

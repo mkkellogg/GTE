@@ -32,6 +32,10 @@ namespace GTE
 		
 		private:
 	
+		SceneObjectSharedPtr meshObject;
+		Mesh3DSharedPtr mesh;
+		MaterialSharedPtr particleMaterial;
+
 		Bool zSort;
 		Bool simulateInLocalSpace;
 
@@ -59,6 +63,9 @@ namespace GTE
 		Real particleLifeSpan;
 		Real averageParticleLifeSpan;
 
+		UInt32 vertexCount;
+		UInt32 maxParticleCount;
+
 		UInt32 liveParticleCount;
 		UInt32 deadParticleCount;
 		Particle* liveParticleArray;
@@ -80,13 +87,16 @@ namespace GTE
 
 		void CalculateAverageParticleLifeSpan();
 		void CalculateMaxParticleCount();
+		Bool InitializeMesh();
+		void DestroyMesh();
 
 		public:
 
 		ParticleSystem();
 		virtual ~ParticleSystem();
 		void Destroy();
-		
+
+		static MaterialSharedPtr CreateMaterial(const std::string& shaderName, const std::string& materialName);
 	};
 }
 

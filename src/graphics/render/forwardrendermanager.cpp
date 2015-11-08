@@ -433,7 +433,7 @@ namespace GTE
 						for(UInt32 i = 0; i < subMeshCount; i++)
 						{
 							MaterialRef mat = renderer->GetMaterial(i % materialCount);
-							RenderQueue* targetRenderQueue = GetRenderQueue((UInt32)mat->GetRenderQueueType());
+							RenderQueue* targetRenderQueue = GetRenderQueue(mat->GetRenderQueue());
 
 							Transform * aggregateTransform = const_cast<Transform*>(&child->GetAggregateTransform());
 							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);

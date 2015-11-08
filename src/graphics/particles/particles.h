@@ -19,6 +19,11 @@ namespace GTE
 		Sphere = 2,
 		Planar = 3
 	};
+
+	enum class ParticleConstants
+	{
+		VerticesPerParticle = 6
+	};
 }
 
 #endif

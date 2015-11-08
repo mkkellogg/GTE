@@ -41,7 +41,7 @@ namespace GTE
 		uniformsSetAndVerified = false;
 
 		useLighting = true;
-		renderQueueType = RenderQueueType::Geometry;
+		renderQueueID = (UInt32)RenderQueueType::Geometry;
 		blendingMode = RenderState::BlendingMode::None;
 		sourceBlendingMethod = RenderState::BlendingMethod::SrcAlpha;
 		destBlendingMethod = RenderState::BlendingMethod::OneMinusSrcAlpha;
@@ -1073,15 +1073,23 @@ namespace GTE
 	*/
 	void Material::SetRenderQueue(RenderQueueType queue)
 	{
-		renderQueueType = queue;
+		renderQueueID = (UInt32)queue;
+	}
+
+	/*
+	* Set the render queue for this material
+	*/
+	void Material::SetRenderQueue(UInt32 queue)
+	{
+		renderQueueID = queue;
 	}
 
 	/*
 	* Get the render queue for this material
 	*/
-	RenderQueueType Material::GetRenderQueueType()
+	UInt32 Material::GetRenderQueue()
 	{
-		return renderQueueType;
+		return renderQueueID;
 	}
 
 	/*
