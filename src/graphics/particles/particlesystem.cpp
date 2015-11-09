@@ -40,7 +40,7 @@ namespace GTE
 
 		atlasModifier = nullptr;
 		colorModifier = nullptr;
-		alphModifier = nullptr;
+		alphaModifier = nullptr;
 		sizeModifier = nullptr;
 
 		// Particle position and position modifiers (velocity and acceleration)
@@ -80,7 +80,7 @@ namespace GTE
 
 	void ParticleSystem::Destroy()
 	{
-
+		DestroyParticleArray();
 	}
 
 	MaterialSharedPtr ParticleSystem::CreateMaterial(const std::string& shaderName, const std::string& materialName)
@@ -180,8 +180,6 @@ namespace GTE
 
 	void ParticleSystem::DestroyMesh()
 	{
-		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
-
 		NONFATAL_ASSERT(meshObject.IsValid(), "ParticleSystem::DestroyMesh -> Mesh object is not valid.", true);
 
 		Mesh3DFilterRef meshFilter = meshObject->GetMesh3DFilter();
@@ -192,9 +190,100 @@ namespace GTE
 		meshObject->RemoveMesh3DRenderer();
 
 		if(!mesh.IsValid())return;
-		
-		objectManager->DestroyMesh3D(mesh);
 
 		mesh = Mesh3DSharedPtr::Null();
+	}
+
+	Bool ParticleSystem::InitializeParticleArray()
+	{
+		DestroyParticleArray();
+
+		/*liveParticleArray = new(std::nothrow)Particle*[maxParticleCount];
+		ASSERT(liveParticleArray != nullptr, "ParticleSystem::InitializeParticleArray -> Unable to allocate live particle array.");
+
+		deadParticleArray = new(std::nothrow)Particle*[maxParticleCount];
+		ASSERT(deadParticleArray != nullptr, "ParticleSystem::InitializeParticleArray -> Unable to allocate dead particle array.");
+
+		_tempParticleArray = new(std::nothrow)Particle*[maxParticleCount];
+		ASSERT(_tempParticleArray != nullptr, "ParticleSystem::InitializeParticleArray -> Unable to allocate temp particle array.");
+
+		for ( UInt32 i = 0; i < maxParticleCount; i++ )
+		{
+			Particle& particle = liveParticleArray
+			this.initializeParticle( particle );
+			this.deadParticleArray[i] = particle;
+		}*/
+
+		liveParticleCount = 0;
+		deadParticleCount = maxParticleCount;
+
+		return true;
+	}
+
+	void ParticleSystem::DestroyParticleArray()
+	{
+		SAFE_DELETE(liveParticleArray);
+		SAFE_DELETE(deadParticleArray);
+		SAFE_DELETE(_tempParticleArray);
+	}
+
+	void ParticleSystem::BindAtlasModifier(ParticleModifier<UInt32> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindAtlasModifier -> Invalid modifier.", false, false);
+		atlasModifier = modifier;
+	}
+
+	void ParticleSystem::BindColorModifier(ParticleModifier<Color4> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindColorModifier -> Invalid modifier.", false, false);
+		colorModifier = modifier;
+	}
+
+	void ParticleSystem::BindAlphaModifier(ParticleModifier<Real> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindAlphaModifier -> Invalid modifier.", false, false);
+		alphaModifier = modifier;
+	}
+
+	void ParticleSystem::BindSizeModifier(ParticleModifier<Vector2> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindSizeModifier -> Invalid modifier.", false, false);
+		sizeModifier = modifier;
+	}
+
+	void ParticleSystem::BindPositionModifier(ParticleModifier<Vector3> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindPositionModifier -> Invalid modifier.", false, false);
+		positionModifier = modifier;
+	}
+
+	void ParticleSystem::BindVelocityModifier(ParticleModifier<Vector3> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindVelocityModifier -> Invalid modifier.", false, false);
+		velocityModifier = modifier;
+	}
+
+	void ParticleSystem::BindAccelerationModifier(ParticleModifier<Vector3> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindAccelerationModifier -> Invalid modifier.", false, false);
+		accelerationModifier = modifier;
+	}
+
+	void ParticleSystem::BindRotationModifier(ParticleModifier<Real> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindRotationModifier -> Invalid modifier.", false, false);
+		rotationModifier = modifier;
+	}
+
+	void ParticleSystem::BindRotationalSpeedModifier(ParticleModifier<Real> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindRotationalSpeedModifier -> Invalid modifier.", false, false);
+		rotationalSpeedModifier = modifier;
+	}
+
+	void ParticleSystem::BindRotationalAccelerationModifier(ParticleModifier<Real> * modifier)
+	{
+		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindRotationalAccelerationModifier -> Invalid modifier.", false, false);
+		rotationalAccelerationModifier = modifier;
 	}
 }

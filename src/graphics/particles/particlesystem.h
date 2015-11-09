@@ -18,6 +18,7 @@
 #include "geometry/matrix4x4.h"
 #include "geometry/quaternion.h"
 #include "graphics/color/color4.h"
+#include "particlemodifier.h"
 #include <vector>
 #include <string>
 
@@ -46,7 +47,7 @@ namespace GTE
 
 		ParticleModifier<UInt32>* atlasModifier;
 		ParticleModifier<Color4>* colorModifier;
-		ParticleModifier<Real>* alphModifier;
+		ParticleModifier<Real>* alphaModifier;
 		ParticleModifier<Vector2>* sizeModifier;
 
 		// Particle position and position modifiers (velocity and acceleration)
@@ -87,8 +88,23 @@ namespace GTE
 
 		void CalculateAverageParticleLifeSpan();
 		void CalculateMaxParticleCount();
+
 		Bool InitializeMesh();
 		void DestroyMesh();
+
+		void DestroyParticleArray();
+		Bool InitializeParticleArray();
+
+		void BindAtlasModifier(ParticleModifier<UInt32> * modifier);
+		void BindColorModifier(ParticleModifier<Color4> * modifier);
+		void BindAlphaModifier(ParticleModifier<Real> * modifier);
+		void BindSizeModifier(ParticleModifier<Vector2> * modifier);
+		void BindPositionModifier(ParticleModifier<Vector3> * modifier);
+		void BindVelocityModifier(ParticleModifier<Vector3> * modifier);
+		void BindAccelerationModifier(ParticleModifier<Vector3> * modifier);
+		void BindRotationModifier(ParticleModifier<Real> * modifier);
+		void BindRotationalSpeedModifier(ParticleModifier<Real> * modifier);
+		void BindRotationalAccelerationModifier(ParticleModifier<Real> * modifier);
 
 		public:
 
