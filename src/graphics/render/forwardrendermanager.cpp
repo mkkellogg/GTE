@@ -1678,22 +1678,24 @@ namespace GTE
 		{
 			// form the inverse transpose of [meshWorldTransform] for properly transforming
 			// vectors/normals into world space
-			Transform worldTransform = meshWorldTransformInverse;
-			worldTransform.GetMatrix().Transpose();
+			Transform worldTransformIT = meshWorldTransformInverse;
+			Matrix4x4& mat = worldTransformIT.GetMatrix();
+			mat.Transpose();
+			mat.D0 = mat.D1 = mat.D2 = 0.0f;
 		
 			// transform the extents of the mesh's bounding box by the inverse transpose of [meshWorldTransform]
 			Vector3 boundingBox = mesh.GetBoundingBox();
 			Vector3 axisX(boundingBox.x, 0.0f, 0.0f);
 			Vector3 axisY(0.0f, boundingBox.y, 0.0f);
 			Vector3 axisZ(0.0f, 0.0f, boundingBox.z);
-			worldTransform.TransformVector(axisX);
-			worldTransform.TransformVector(axisY);
-			worldTransform.TransformVector(axisZ);
+			worldTransformIT.TransformVector(axisX);
+			worldTransformIT.TransformVector(axisY);
+			worldTransformIT.TransformVector(axisZ);
 			
 			// transform the mesh's center into world space
 			Point3 localMeshCenter = mesh.GetCenter();
 			Point3 meshCenter = localMeshCenter;
-			worldTransform.TransformPoint(meshCenter);
+			meshWorldTransform.TransformPoint(meshCenter);
 
 			// use a corner of the bounding box to form a vector from the bounding box's center, and use the
 			// vector as the radius for a bounding sphere to do bounding sphere culling
@@ -1753,7 +1755,8 @@ namespace GTE
 			else if(light.GetType() == LightType::Point)
 			{
 				Real lightRange = light.GetRange();
-				Real maxRangeSquare = maxExtentSqr + (lightRange * lightRange);
+				Real lightRangeSqr = lightRange * lightRange;
+				Real maxRangeSquare = maxExtentSqr + lightRangeSqr;
 
 				Vector3 toCenter;
 				Point3::Subtract(meshCenter, lightPosition, toCenter);

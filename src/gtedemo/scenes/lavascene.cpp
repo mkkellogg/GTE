@@ -464,7 +464,7 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShared
 	renderer->AddMaterial(selflitMaterial);
 	spinningPointLightObject->SetMesh3DRenderer(renderer);
 	GTE::LightSharedPtr light = objectManager->CreateLight();
-	light->SetIntensity(1.7f);
+	light->SetIntensity(2.5f);
 	GTE::IntMask mergedMask = lavaIslandObjectsLayerMask;
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
 	light->SetCullingMask(mergedMask);

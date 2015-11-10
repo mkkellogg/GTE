@@ -41,7 +41,8 @@ namespace GTE
 	{
 		if(!attenuationOverride)
 		{
-			attenuation = 1.0f / range;
+			// multiplying by 0.95f causes the light to fully attenuate slightly before reaching maximum range
+			attenuation = 1.0f / (range * 0.95f);
 		}
 	}
 
@@ -104,6 +105,7 @@ namespace GTE
 	void Light::SetIntensity(Real intensity)
 	{
 		this->intensity = intensity;
+		CalcAttentuationForCurrentRange();
 	}
 
 	Real Light::GetIntensity() const
