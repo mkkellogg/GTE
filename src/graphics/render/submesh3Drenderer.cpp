@@ -937,7 +937,7 @@ namespace GTE
 		MaterialRef currentMaterial = Engine::Instance()->GetGraphicsSystem()->GetActiveMaterial();
 		ASSERT(ValidateMaterialForMesh(currentMaterial), "SubMesh3DRendererGL::Render -> Invalid material for the current mesh.");
 
-		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundAttributeBuffers, mesh->GetTotalVertexCount(), true);
+		Engine::Instance()->GetGraphicsSystem()->RenderTriangles(boundAttributeBuffers, mesh->GetRenderVertexCount(), true);
 	}
 
 	/*
