@@ -25,10 +25,13 @@ namespace GTE
 		SceneObjectComponent();
 		virtual ~SceneObjectComponent();
 
+		virtual void Update();
+		virtual void OnWillRender(CameraRef camera);
+
 	public:
 
 		SceneObjectRef GetSceneObject();
-		virtual void Update();
+	
 	};
 }
 

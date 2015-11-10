@@ -27,4 +27,9 @@ namespace GTE
 	{
 
 	}
+
+	void SceneObjectComponent::OnWillRender(CameraRef camera)
+	{
+
+	}
 }
