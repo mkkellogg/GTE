@@ -52,6 +52,7 @@ namespace GTE
 	{
 		standardAttributes = attributes;
 		totalVertexCount = 0;
+		renderVertexCount = 0;
 		normalsSmoothingThreshold = 90;
 
 		containerMesh = nullptr;
@@ -64,6 +65,7 @@ namespace GTE
 		buildFaces = true;
 		calculateNormals = true;
 		calculateTangents = true;
+		calculateBoundingBox = true;
 
 		customFloatAttributeBufferCount = 0;
 
@@ -459,9 +461,9 @@ namespace GTE
 	}
 
 	/*
-	 * Calculate the sphere of influence for this sub-mesh.
+	 * Calculate the bounding box for this sub-mesh.
 	 */
-	void SubMesh3D::CalcSphereOfInfluence()
+	void SubMesh3D::CalculateBoundingBox()
 	{
 		Real maxX, maxY, maxZ, minX, minY, minZ;
 		maxX = maxY = maxZ = minX = minY = minZ = 0;
@@ -486,14 +488,13 @@ namespace GTE
 		Real depth = maxZ - minZ;
 
 		// calculate the mesh's center
-		center.x = width / 2 + minX;
-		center.y = height / 2 + minY;
-		center.z = depth / 2 + minZ;
+		center.x = width / 2.0f + minX;
+		center.y = height / 2.0f + minY;
+		center.z = depth / 2.0f + minZ;
 
-		// form the sphere of influence vectors for each axis
-		sphereOfInfluenceX.Set(width * .6125f, 0, 0);
-		sphereOfInfluenceY.Set(0, height * .6125f, 0);
-		sphereOfInfluenceZ.Set(0, 0, depth * .6125f);
+		boundingBox.x = width / 2.0f;
+		boundingBox.y = height / 2.0f;
+		boundingBox.z = depth / 2.0f;
 	}
 
 	/*
@@ -597,6 +598,14 @@ namespace GTE
 	}
 
 	/*
+	* Tell this mesh whether or not to calculate its bounding box
+	*/
+	void SubMesh3D::SetCalculateBoundingBox(Bool calculate)
+	{
+		calculateBoundingBox = calculate;
+	}
+
+	/*
 	 * Does this mesh have face data?
 	 */
 	Bool SubMesh3D::HasFaces() const
@@ -622,27 +631,11 @@ namespace GTE
 	}
 
 	/*
-	 * Get the size of the sphere of influence along the local x-axis.
+	 * Get the bounding box for this mesh.
 	 */
-	const Vector3& SubMesh3D::GetSphereOfInfluenceX() const
+	const Vector3& SubMesh3D::GetBoundingBox() const
 	{
-		return sphereOfInfluenceX;
-	}
-
-	/*
-	 * Get the size of the sphere of influence along the local y-axis.
-	 */
-	const Vector3& SubMesh3D::GetSphereOfInfluenceY() const
-	{
-		return sphereOfInfluenceY;
-	}
-
-	/*
-	 * Get the size of the sphere of influence along the local z-axis.
-	 */
-	const Vector3& SubMesh3D::GetSphereOfInfluenceZ() const
-	{
-		return sphereOfInfluenceZ;
+		return boundingBox;
 	}
 
 	/*
@@ -658,16 +651,10 @@ namespace GTE
 			if (!BuildVertexCrossMap())return;
 		}
 
-		CalcSphereOfInfluence();
-
-		if (calculateNormals)CalculateNormals((GTE::Real)normalsSmoothingThreshold);
-		if (calculateTangents)CalculateTangents((GTE::Real)normalsSmoothingThreshold);
-		if (buildFaces)BuildFaces();
-
-		if (containerMesh != nullptr)
-		{
-			containerMesh->CalculateSphereOfInfluence();
-		}
+		if(calculateBoundingBox)CalculateBoundingBox();
+		if(calculateNormals)CalculateNormals((Real)normalsSmoothingThreshold);
+		if(calculateTangents)CalculateTangents((Real)normalsSmoothingThreshold);
+		if(buildFaces)BuildFaces();
 
 		UpdateUpdateCount();
 	}
@@ -687,6 +674,22 @@ namespace GTE
 	UInt32 SubMesh3D::GetTotalVertexCount() const
 	{
 		return totalVertexCount;
+	}
+
+	/*
+	* Set the total number of vertices that should be rendered.
+	*/
+	void SubMesh3D::SetRenderVertexCount(UInt32 count)
+	{
+		renderVertexCount = count;
+	}
+
+	/*
+	* Get the total number of vertices that should be rendered.
+	*/
+	UInt32 SubMesh3D::GetRenderVertexCount() const
+	{
+		return renderVertexCount;
 	}
 
 	/*
@@ -712,6 +715,7 @@ namespace GTE
 	Bool SubMesh3D::Init(UInt32 totalVertexCount)
 	{
 		this->totalVertexCount = totalVertexCount;
+		this->renderVertexCount = totalVertexCount;
 
 		Bool initSuccess = true;
 		Int32 errorMask = 0;
@@ -933,10 +937,11 @@ namespace GTE
 	* Add a custom set of floating-point vertex attribute data to this mesh, and
 	* link to the attribute specified by [name].
 	*/
-	Bool SubMesh3D::AddCustomFloatAttributeBuffer(UInt32 componentCount, const std::string& name)
+	AttributeID SubMesh3D::AddCustomFloatAttributeBuffer(UInt32 componentCount, const std::string& name)
 	{
 		AttributeID id = AttributeDirectory::RegisterVarID(name);
-		return AddCustomFloatAttributeBuffer(componentCount, id);
+		if(AddCustomFloatAttributeBuffer(componentCount, id))return id;
+		else return AttributeDirectory::VarID_Invalid;
 	}
 
 	/*

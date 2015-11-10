@@ -402,6 +402,10 @@ namespace GTE
 					}
 					else
 					{
+						// ensure light's direction is normalized
+						Vector3& lightDir = const_cast<Vector3&>(light->GetDirection());
+						lightDir.Normalize();
+
 						if (lightCount < MAX_LIGHTS)
 						{
 							// add non-ambient light
@@ -611,6 +615,8 @@ namespace GTE
 		descriptor.ProjectionTransformInverse = camera.GetInverseProjectionTransform();
 
 		descriptor.UniformWorldSceneObjectTransform = camera.GetUniformWorldSceneObjectTransform();
+		descriptor.UniformWorldSceneObjectTransformInverse = camera.GetUniformWorldSceneObjectTransform();
+		descriptor.UniformWorldSceneObjectTransformInverse.Invert();
 
 		descriptor.AmbientPassEnabled = camera.IsAmbientPassEnabled();
 		descriptor.DepthPassEnabled = camera.IsDepthPassEnabled();
@@ -885,10 +891,15 @@ namespace GTE
 					Transform sceneObjectWorldTransform;
 					sceneObjectWorldTransform.SetTo(sceneObject->GetAggregateTransform());
 					sceneObjectWorldTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
+					Transform sceneObjectWorldTransformInverse;
+					sceneObjectWorldTransformInverse.SetTo(viewDescriptor.UniformWorldSceneObjectTransformInverse);
+					sceneObjectWorldTransformInverse.PreTransformBy(sceneObject->GetAggregateTransformInverse());
 
-					// make sure the current mesh should not be culled from [light].
+					// make sure the current mesh should not be culled from [light] or from
+					// the current camera, whose culling mask is in [viewDescriptor].
 					if(!ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject) &&
-					   !ShouldCullFromLight(light, lightWorldPosition, *sceneObject, sceneObjectWorldTransform))
+					   !ShouldCullFromLightByLayer(light, *sceneObject) &&
+					   !ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform, sceneObjectWorldTransformInverse))
 					{
 						if(pass == ShadowVolumeRender) // shadow volume pass
 						{
@@ -1332,8 +1343,12 @@ namespace GTE
 					Transform sceneObjectWorldTransform;
 					sceneObjectWorldTransform.SetTo(sceneObject->GetAggregateTransform());
 
+					Transform sceneObjectWorldTransformInverse;
+					sceneObjectWorldTransformInverse.SetTo(sceneObject->GetAggregateTransformInverse());
+
 					// make sure the current mesh should not be culled from [light].
-					if(!ShouldCullFromLight(light, lightWorldPosition, *sceneObject, sceneObjectWorldTransform))
+					if(!ShouldCullFromLightByLayer(light, *sceneObject) &&
+					   !ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform, sceneObjectWorldTransformInverse))
 					{
 						BuildShadowVolumesForSceneObject(*sceneObject, light, lightWorldPosition, lightDirection);
 					}
@@ -1603,104 +1618,160 @@ namespace GTE
 	}
 
 	/*
-	 * Check if [sceneObject] should be rendered with [light], first based on the culling mask of the light and the layer to
-	 * which [sceneObject] belongs, and then based on the distance of the center of [sceneObject] from [lightPosition].
+	 * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].
 	 */
-	Bool ForwardRenderManager::ShouldCullFromLight(const Light& light, const Point3& lightWorldPosition, const SceneObject& sceneObject, const Transform& sceneObjectWorldTransform) const
+	Bool ForwardRenderManager::ShouldCullFromLightByPosition(const Light& light, const Point3& lightWorldPosition, const SubMesh3D& mesh, 
+															 const Transform& meshWorldTransform, const Transform& meshWorldTransformInverse) const
 	{
-		// exclude objects that have layer masks that are not compatible
-		// with the culling mask of the light contained in [lightingDescriptor].
-		IntMask layerMask = sceneObject.GetLayerMask();
-		IntMask cullingMask = light.GetCullingMask();
-		if (!Engine::Instance()->GetEngineObjectManager()->GetLayerManager().AtLeastOneLayerInCommon(layerMask, cullingMask))
-		{
-			return true;
-		}
-
-		if (light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient)
+		if(light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient)
 		{
 			return false;
 		}
 
-		SceneObject& sceneObj = const_cast<SceneObject&>(sceneObject);
-		Mesh3DRef meshRef = sceneObj.GetMesh3D();
+		LightCullType cullType = LightCullType::BoundingBox;
 
-		if (meshRef.IsValid())
+		switch (cullType)
 		{
-			Mesh3D& mesh = meshRef.GetRef();
-
-			switch (mesh.GetLightCullType())
-			{
 			case LightCullType::None:
 				return false;
 				break;
-			case LightCullType::SphereOfInfluence:
-				return ShouldCullBySphereOfInfluence(light, lightWorldPosition, sceneObjectWorldTransform, mesh);
+			case LightCullType::BoundingBox:
+				return ShouldCullByBoundingBox(light, lightWorldPosition, meshWorldTransform, meshWorldTransformInverse, mesh);
 				break;
 			case LightCullType::Tiled:
-				return ShouldCullByTile(light, lightWorldPosition, sceneObjectWorldTransform, mesh);
+				return ShouldCullByTile(light, lightWorldPosition, meshWorldTransform, meshWorldTransformInverse, mesh);
 				break;
 			default:
 				return false;
 				break;
-			}
 		}
 
 		return false;
 	}
 
 	/*
+	* Check if [sceneObject] should be rendered with [light], based on the culling mask of the light and the layer to
+	* which [sceneObject] belongs.
+	*/
+	Bool ForwardRenderManager::ShouldCullFromLightByLayer(const Light& light, const SceneObject& sceneObject) const
+	{
+		// exclude objects that have layer masks that are not compatible
+		// with the culling mask of [light].
+		IntMask cullingMask = light.GetCullingMask();
+		return ShouldCullByLayer(cullingMask, sceneObject);
+	}
+
+	/*
 	 * Cull light based on distance of center of [mesh] from [light]. Each mesh has
-	 * a sphere of influence based on maximum distance of the mesh's vertices from the mesh's center. If that
-	 * sphere does not intersect with the sphere that is formed by the light's range, then the light should
-	 * be culled from the meshes.
+	 * a bounding box and if that bounding box does not intersect with the sphere that is 
+	 * formed by the light's range, then the mesh should be culled from the light. This method cheats in
+	 * that it takes the distance to one of the corners of the bounding box and uses that as the radius for
+	 * a sphere to do bounding sphere culling.
 	 *
 	 * [lightPosition] - World space position of the light.
-	 * [meshWorldTransform] - Used to transform the sphere of influence of [mesh] from local to world space.
+	 * [meshWorldTransform] - Used to transform the bounding box of [mesh] from local to world space.
+	 * [meshWorldTransformInverse] - Used to transform the bounding box of [mesh] from world to local space.
 	 */
-	Bool ForwardRenderManager::ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const Mesh3D& mesh) const
+	Bool ForwardRenderManager::ShouldCullByBoundingBox(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
+															 const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const
 	{
-		// get the maximum distances from mesh center along each axis
-		Vector3 soiX = mesh.GetSphereOfInfluenceX();
-		Vector3 soiY = mesh.GetSphereOfInfluenceY();
-		Vector3 soiZ = mesh.GetSphereOfInfluenceZ();
+		if(light.GetType() == LightType::Planar || light.GetType() == LightType::Point)
+		{
+			// form the inverse transpose of [meshWorldTransform] for properly transforming
+			// vectors/normals into world space
+			Transform worldTransform = meshWorldTransformInverse;
+			worldTransform.GetMatrix().Transpose();
+		
+			// transform the extents of the mesh's bounding box by the inverse transpose of [meshWorldTransform]
+			Vector3 boundingBox = mesh.GetBoundingBox();
+			Vector3 axisX(boundingBox.x, 0.0f, 0.0f);
+			Vector3 axisY(0.0f, boundingBox.y, 0.0f);
+			Vector3 axisZ(0.0f, 0.0f, boundingBox.z);
+			worldTransform.TransformVector(axisX);
+			worldTransform.TransformVector(axisY);
+			worldTransform.TransformVector(axisZ);
+			
+			// transform the mesh's center into world space
+			Point3 localMeshCenter = mesh.GetCenter();
+			Point3 meshCenter = localMeshCenter;
+			worldTransform.TransformPoint(meshCenter);
 
-		// transform each distance vector by the full transform of the scene
-		// object that contains [mesh]
-		meshWorldTransform.TransformVector(soiX);
-		meshWorldTransform.TransformVector(soiY);
-		meshWorldTransform.TransformVector(soiZ);
+			// use a corner of the bounding box to form a vector from the bounding box's center, and use the
+			// vector as the radius for a bounding sphere to do bounding sphere culling
+			Point3 corner;
+			corner.Add(axisX);
+			corner.Add(axisY);
+			corner.Add(axisZ);
 
-		// get length of each transformed vector
-		Real xMag = soiX.QuickMagnitude();
-		Real yMag = soiY.QuickMagnitude();
-		Real zMag = soiZ.QuickMagnitude();
+			// get squared length of radius vector
+			Real maxExtentSqr = corner.x * corner.x + corner.y * corner.y + corner.z * corner.z;
 
-		// find maximum distance, which will be used as the radius for
-		// the sphere of influence
-		Real meshMag = xMag;
-		if (yMag > meshMag)meshMag = yMag;
-		if (zMag > meshMag)meshMag = zMag;
+			if(light.GetType() == LightType::Planar)
+			{
+				Vector3 lightDirection = light.GetDirection();
 
-		Vector3 toLight;
-		Point3 meshCenter = mesh.GetCenter();
-		meshWorldTransform.TransformPoint(meshCenter);
+				// project vector from origin to mesh center on light's direction vector
+				Real parallelPortion = meshCenter.x * lightDirection.x + meshCenter.y * lightDirection.y + meshCenter.z * lightDirection.z;
+				// get sqaured length of projected vector
+				Real parallelPortionSqr = parallelPortion * parallelPortion;
+				// max distance from the plane is based on attenuation, not the light's range
+				Real planarRange = light.GetIntensity() / light.GetAttenuation();
+				// get squared planar range
+				Real planarRangeSqr = planarRange * planarRange;
+				// calculate offset of planar light's position from origin
+				Real d = lightPosition.x * lightDirection.x + lightPosition.y * lightDirection.y + lightPosition.z * lightDirection.z;
+				// calculate squared offset
+				Real dSqr = d * d;
+				// check if mesh's center is within +/- (maxExtentSqr + planarRangeSqr) of the light's plane
+				if(parallelPortionSqr - dSqr > planarRangeSqr + maxExtentSqr)
+				{
+					return true;
+				}
 
-		// get the distance from the light to the mesh's center
-		Point3::Subtract(lightPosition, meshCenter, toLight);
+				// the radial range (max distance from the light's center in the light's plane) is
+				// based on the light's range value
+				Real radialRange = light.GetRange();
+				// calculate squared radial range
+				Real radialRangeSqr = radialRange * radialRange;
+				// calculate distance from mesh's center to light's position in the light's plane
+				Vector3 lightPosToCenter;
+				Point3::Subtract(meshCenter, lightPosition, lightPosToCenter);
+				// project [lightPosToCenter] on to the light's direction vector
+				parallelPortion = lightPosToCenter.x * lightDirection.x + lightPosToCenter.y * lightDirection.y + lightPosToCenter.z * lightDirection.z;
+				parallelPortionSqr = parallelPortion * parallelPortion;
+				// calculate squared distance of [lightPosToCenter]
+				Real lightPosToCenterLengthSqr = lightPosToCenter.x * lightPosToCenter.x + lightPosToCenter.y * lightPosToCenter.y + lightPosToCenter.z + lightPosToCenter.z;
+				// get suared projected sistance of [lightPosToCenter] in light's plane
+				Real portionPlanarSqr = lightPosToCenterLengthSqr - parallelPortionSqr;
+				// check if mesh's center is within +/- (radialRangeSqr + maxExtentSqr) of the light's position
+				if(portionPlanarSqr > radialRangeSqr + maxExtentSqr)
+				{
+					return true;
+				}
 
-		// if the distance from the mesh's center to the light is bigger
-		// than the radius of the sphere of influence + the light's range,
-		// the the mesh should be culled for the light.
-		if (toLight.QuickMagnitude() > meshMag + light.GetRange())return true;
+				return false;
+			}
+			else if(light.GetType() == LightType::Point)
+			{
+				Real lightRange = light.GetRange();
+				Real maxRangeSquare = maxExtentSqr + (lightRange * lightRange);
 
+				Vector3 toCenter;
+				Point3::Subtract(meshCenter, lightPosition, toCenter);
+				Real rangeSquare = toCenter.x * toCenter.x + toCenter.y * toCenter.y + toCenter.z * toCenter.z;
+
+				return rangeSquare > maxRangeSquare;
+			}
+		}
+		
 		return false;
 	}
 
 	/*
 	 * TODO: (Eventually) - Implement tile-base culling.
 	 */
-	Bool ForwardRenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const
+	Bool ForwardRenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
+												const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const
 	{
 		return false;
 	}

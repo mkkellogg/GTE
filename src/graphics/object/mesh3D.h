@@ -35,19 +35,6 @@ namespace GTE
 
 	protected:
 
-		// type of light culling to perform on this mesh
-		LightCullType lightCullType;
-
-		// local center position for entire mesh, calculated by averaging
-		// centers of each sub-mesh.
-		Point3 center;
-		// radius of the sphere of influence along the X-axis
-		Vector3 sphereOfInfluenceX;
-		// radius of the sphere of influence along the Y-axis
-		Vector3 sphereOfInfluenceY;
-		// radius of the sphere  of influence along the Z-axis
-		Vector3 sphereOfInfluenceZ;
-
 		// numnber of sub-meshes managed by the Mesh3D instance
 		UInt32 subMeshCount;
 		// container for the submeshes
@@ -57,8 +44,6 @@ namespace GTE
 		~Mesh3D();
 		void Destroy();
 
-		void CalculateSphereOfInfluence();
-
 	public:
 
 		UInt32 GetSubMeshCount() const;
@@ -67,12 +52,6 @@ namespace GTE
 		Bool Init();
 		void Update();
 
-
-		const Point3& GetCenter() const;
-		const Vector3& GetSphereOfInfluenceX() const;
-		const Vector3& GetSphereOfInfluenceY() const;
-		const Vector3& GetSphereOfInfluenceZ() const;
-		LightCullType GetLightCullType() const;
 	};
 }
 

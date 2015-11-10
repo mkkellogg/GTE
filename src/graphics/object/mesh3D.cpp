@@ -27,9 +27,8 @@ namespace GTE
 	*/
 	Mesh3D::Mesh3D(UInt32 subMeshCount)
 	{
-		if (subMeshCount <= 0)subMeshCount = 1;
+		if(subMeshCount <= 0)subMeshCount = 1;
 		this->subMeshCount = subMeshCount;
-		lightCullType = LightCullType::SphereOfInfluence;
 	}
 
 	/*
@@ -66,87 +65,12 @@ namespace GTE
 		Destroy();
 
 		// push-back (preallocated) [subMeshCount] entries in [subMeshes]
-		for (UInt32 i = 0; i < subMeshCount; i++)
+		for(UInt32 i = 0; i < subMeshCount; i++)
 		{
 			subMeshes.push_back(SubMesh3DSharedPtr::Null());
 		}
 
 		return true;
-	}
-
-	/*
-	 * Calculate the collective sphere (spheroid) of influence for all the sub-meshes in this
-	 * instance of Mesh3D,
-	 *
-	 * The sphere of influence is a less than perfect way to cull meshes from being rendered for
-	 * lights that are too far away. It is basically a sphere that is guaranteed to contain all the
-	 * sub-meshes in this Mesh3D object.
-	 */
-	void Mesh3D::CalculateSphereOfInfluence()
-	{
-		Point3 average;
-		UInt32 validSubMeshes = 0;
-
-		// loop through each sub-mesh to calculate average center position
-		for (UInt32 i = 0; i < subMeshCount; i++)
-		{
-			SubMesh3DSharedPtr subMesh = subMeshes[i];
-			if (subMesh.IsValid())
-			{
-				const Point3 temp = subMesh->GetCenter();
-				average.x += temp.x;
-				average.y += temp.y;
-				average.z += temp.z;
-				validSubMeshes++;
-			}
-		}
-
-		// calculate the average position
-		if (validSubMeshes > 0)
-		{
-			average.x /= (Real)validSubMeshes;
-			average.y /= (Real)validSubMeshes;
-			average.z /= (Real)validSubMeshes;
-		}
-
-		center = average;
-
-		Real maxSoiX = 0;
-		Real maxSoiY = 0;
-		Real maxSoiZ = 0;
-
-		// loop through each sub-mesh and determine the maximum distance away from
-		// the averaged center it extends along each axis. Store those values
-		// in [maxSoiX], [maxSoiY], and [maxSoiX] respectively.
-		for (UInt32 i = 0; i < subMeshCount; i++)
-		{
-			SubMesh3DRef subMesh = subMeshes[i];
-			if (subMesh.IsValid())
-			{
-				const Point3 temp = subMesh->GetCenter();
-
-				// calculate the distance from the averaged center to the sub-meshes center
-				Real offsetX = GTEMath::Abs(center.x - temp.x);
-				Real offsetY = GTEMath::Abs(center.y - temp.y);
-				Real offsetZ = GTEMath::Abs(center.z - temp.z);
-
-				// use the sphere of influence values already calculated for each sub-mesh
-				// and add them to the the center offset
-				Real soiX = offsetX + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().x);
-				Real soiY = offsetY + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().y);
-				Real soiZ = offsetZ + GTEMath::Abs(subMesh->GetSphereOfInfluenceX().z);
-
-				// compare to max values and update if necessary
-				if (soiX > maxSoiX)maxSoiX = soiX;
-				if (soiY > maxSoiY)maxSoiY = soiY;
-				if (soiZ > maxSoiZ)maxSoiZ = soiZ;
-			}
-		}
-
-		// set the final values for each axis
-		sphereOfInfluenceX.Set(maxSoiX, 0, 0);
-		sphereOfInfluenceY.Set(0, maxSoiY, 0);
-		sphereOfInfluenceZ.Set(0, 0, maxSoiZ);
 	}
 
 	/*
@@ -157,9 +81,9 @@ namespace GTE
 	 */
 	void Mesh3D::Update()
 	{
-		for (UInt32 i = 0; i < subMeshCount; i++)
+		for(UInt32 i = 0; i < subMeshCount; i++)
 		{
-			if (subMeshes[i].IsValid())
+			if(subMeshes[i].IsValid())
 			{
 				subMeshes[i]->Update();
 			}
@@ -173,7 +97,7 @@ namespace GTE
 	{
 		NONFATAL_ASSERT(mesh.IsValid(), "Mesh3D::SetSubMesh -> 'mesh' is null.", true);
 
-		if (index < subMeshCount)
+		if(index < subMeshCount)
 		{
 			subMeshes[index] = mesh;
 			mesh->SetContainerMesh(this);
@@ -192,7 +116,7 @@ namespace GTE
 	 */
 	SubMesh3DRef Mesh3D::GetSubMesh(UInt32 index)
 	{
-		if (index < subMeshCount)
+		if(index < subMeshCount)
 		{
 			return subMeshes[index];
 		}
@@ -201,46 +125,5 @@ namespace GTE
 			Debug::PrintError("Mesh3D::GetSubMesh -> Index out of range.");
 			return NullSubMesh3DRef;
 		}
-	}
-
-	/*
-	 * Get the calculated and averaged center of all sub-meshes contained by this
-	 * instance.
-	 */
-	const Point3& Mesh3D::GetCenter() const
-	{
-		return center;
-	}
-
-	/*
-	 * Get the size of the sphere of influence along the local x-axis.
-	 */
-	const Vector3& Mesh3D::GetSphereOfInfluenceX() const
-	{
-		return sphereOfInfluenceX;
-	}
-
-	/*
-	 * Get the size of the sphere of influence along the local y-axis.
-	 */
-	const Vector3& Mesh3D::GetSphereOfInfluenceY() const
-	{
-		return sphereOfInfluenceY;
-	}
-
-	/*
-	 * Get the size of the sphere of influence along the local z-axis.
-	 */
-	const Vector3& Mesh3D::GetSphereOfInfluenceZ() const
-	{
-		return sphereOfInfluenceZ;
-	}
-
-	/*
-	 * Get the type of light culling that should be used for this mesh.
-	 */
-	LightCullType Mesh3D::GetLightCullType() const
-	{
-		return lightCullType;
 	}
 }

@@ -102,6 +102,7 @@ namespace GTE
 			Transform ProjectionTransform;
 			Transform ProjectionTransformInverse;
 			Transform UniformWorldSceneObjectTransform;
+			Transform UniformWorldSceneObjectTransformInverse;
 
 			Bool AmbientPassEnabled;
 			Bool DepthPassEnabled;
@@ -244,9 +245,13 @@ namespace GTE
 		void SendActiveMaterialUniformsToShader() const;
 
 		Bool ShouldCullByLayer(IntMask cullingMask, const SceneObject& sceneObject) const;
-		Bool ShouldCullFromLight(const Light& light, const Point3& lightWorldPosition, const SceneObject& sceneObject, const Transform& sceneObjectWorldTransform) const;
-		Bool ShouldCullBySphereOfInfluence(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const Mesh3D& mesh) const;
-		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& fullTransform, const Mesh3D& mesh) const;
+		Bool ShouldCullFromLightByPosition(const Light& light, const Point3& lightWorldPosition, const SubMesh3D& mesh, 
+										   const Transform& meshWorldTransform, const Transform& meshWorldTransformInverse) const;
+		Bool ShouldCullFromLightByLayer(const Light& light, const SceneObject& sceneObject) const;
+		Bool ShouldCullByBoundingBox(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
+										   const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const;
+		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
+							  const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const;
 
 		void PushRenderTarget(RenderTargetRef renderTarget);
 		RenderTargetRef PopRenderTarget();

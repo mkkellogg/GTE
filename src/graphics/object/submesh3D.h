@@ -52,6 +52,8 @@ namespace GTE
 		StandardAttributeSet standardAttributes;
 		// total number of vertices in this mesh
 		UInt32 totalVertexCount;
+		// number of vertices to be rendered
+		UInt32 renderVertexCount;
 		// this sub-mesh's position in the containing Mesh3D instance's list of sub-meshes.
 		Int32 subIndex;
 
@@ -81,12 +83,8 @@ namespace GTE
 		Bool invertTangents;
 		// local center position for sub-mesh.
 		Point3 center;
-		// radius of the sphere of influence along the X-axis
-		Vector3 sphereOfInfluenceX;
-		// radius of the sphere of influence along the Y-axis
-		Vector3 sphereOfInfluenceY;
-		// radius of the sphere  of influence along the Z-axis
-		Vector3 sphereOfInfluenceZ;
+		// bounding box extents
+		Vector3 boundingBox;
 
 		// pointer to the containing Mesh3D object
 		Mesh3D * containerMesh;
@@ -102,6 +100,8 @@ namespace GTE
 		Bool calculateNormals;
 		// should tangents be calculated?
 		Bool calculateTangents;
+		// should bounding box be calculated
+		Bool calculateBoundingBox;
 
 		SubMesh3D();
 		SubMesh3D(StandardAttributeSet attributes);
@@ -121,7 +121,7 @@ namespace GTE
 		Int32 FindCommonFace(UInt32 excludeFace, UInt32 vaIndex, UInt32 vbIndex) const;
 		void BuildFaces();
 
-		void CalcSphereOfInfluence();
+		void CalculateBoundingBox();
 
 		void SetContainerMesh(Mesh3D * mesh);
 		void SetSubIndex(Int32 index);
@@ -138,25 +138,26 @@ namespace GTE
 		void SetCalculateNormals(Bool calculate);
 		void SetCalculateTangents(Bool calculate);
 		void SetBuildFaces(Bool build);
+		void SetCalculateBoundingBox(Bool calculate);
 		Bool HasFaces() const;
 
 		SubMesh3DFaces& GetFaces();
 
 		const Point3& GetCenter() const;
-		const Vector3& GetSphereOfInfluenceX() const;
-		const Vector3& GetSphereOfInfluenceY() const;
-		const Vector3& GetSphereOfInfluenceZ() const;
+		const Vector3& GetBoundingBox() const;
 		void SetNormalsSmoothingThreshold(UInt32 threshhold);
 		void Update();
 		void QuickUpdate();
 
 		Bool Init(UInt32 totalVertexCount);
 		UInt32 GetTotalVertexCount() const;
+		void SetRenderVertexCount(UInt32 count);
+		UInt32 GetRenderVertexCount() const;
 		StandardAttributeSet GetStandardAttributeSet() const;
 		UInt32 GetUpdateCount() const;
 
 		UInt32 GetCustomFloatAttributeBufferCount() const;
-		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, const std::string& name);
+		AttributeID AddCustomFloatAttributeBuffer(UInt32 componentCount, const std::string& name);
 		Bool AddCustomFloatAttributeBuffer(UInt32 componentCount, AttributeID id);
 		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByID(AttributeID id);
 		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByOrder(UInt32 id);
