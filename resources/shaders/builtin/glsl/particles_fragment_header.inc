@@ -1,3 +1,3 @@
 varying vec2 vUV;
 varying vec4 vColor;
-uniform sampler2D texture;
+uniform sampler2D PARTICLE_TEXTURE;

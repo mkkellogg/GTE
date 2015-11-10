@@ -2,7 +2,7 @@
 
 void main() 
 {
-	vColor = customColor;
+	vColor = COLOR;
 	vUV = uv;
 	vec4 quadPos = getQuadPosition();
 	gl_Position = projectionMatrix * viewMatrix * quadPos;

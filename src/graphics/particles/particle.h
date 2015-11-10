@@ -27,7 +27,7 @@ namespace GTE
 
 		public:
 
-		Vector3 Size;
+		Vector2 Size;
 		Color4 Color;
 		Real Alpha;
 		UInt32 AtlasIndex;
@@ -35,7 +35,7 @@ namespace GTE
 		Real Age;
 		Real LifeSpan;
 
-		Vector3 Position;
+		Point3 Position;
 		Vector3 Velocity;
 		Vector3 Acceleration;
 
