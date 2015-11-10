@@ -6,6 +6,7 @@
 
 #include "engine.h"
 #include "object/engineobjectmanager.h"
+#include "object/eventmanager.h"
 #include "graphics/graphics.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/animation/animationmanager.h"
@@ -36,6 +37,7 @@ namespace GTE
 		sceneManager = nullptr;
 		inputManager = nullptr;
 		errorManager = nullptr;
+		eventManager = nullptr;
 		callbacks = nullptr;
 
 		initialized = false;
@@ -54,6 +56,7 @@ namespace GTE
 		SAFE_DELETE(renderManager);
 		SAFE_DELETE(graphicsSystem);
 		SAFE_DELETE(errorManager);
+		SAFE_DELETE(eventManager);
 	}
 
 	EngineCallbacks::~EngineCallbacks()
@@ -127,6 +130,12 @@ namespace GTE
 
 		Bool sceneManagerInitSuccess = sceneManager->Init();
 		ASSERT(sceneManagerInitSuccess == true, "Engine::Init -> Unable to initialize scene manager.");
+
+		eventManager = new(std::nothrow) EventManager();
+		ASSERT(eventManager != nullptr, "Engine::Init -> Unable to create event manager.");
+
+		Bool eventManagerInitSuccess = eventManager->Init();
+		ASSERT(eventManagerInitSuccess == true, "Engine::Init -> Unable to initialize event manager.");
 
 		// TODO: add switch to detect correct type for platform
 		// for now, only support OpenGL
@@ -279,6 +288,14 @@ namespace GTE
 	ErrorManager * Engine::GetErrorManager()
 	{
 		return errorManager;
+	}
+
+	/*
+	* Access the EventManager component.
+	*/
+	EventManager * Engine::GetEventManager()
+	{
+		return eventManager;
 	}
 }
 

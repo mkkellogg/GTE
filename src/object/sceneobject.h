@@ -52,6 +52,7 @@ namespace GTE
 		Mesh3DRendererSharedPtr renderer3D;
 		SkinnedMesh3DRendererSharedPtr skinnedRenderer3D;
 		Mesh3DFilterSharedPtr mesh3DFilter;
+		ParticleSystemSharedPtr particleSystem;
 
 		SceneObject();
 		virtual ~SceneObject();
@@ -81,20 +82,22 @@ namespace GTE
 		Bool SetMesh3DFilter(Mesh3DFilterRef filter);
 		Bool SetCamera(CameraRef camera);
 		Bool SetLight(LightRef light);
+		Bool SetParticleSystem(ParticleSystemRef particleSystem);
 
 		Bool RemoveMesh3DRenderer();
 		Bool RemoveSkinnedMesh3DRenderer();
 		Bool RemoveMesh3DFilter();
 		Bool RemoveCamera();
 		Bool RemoveLight();
+		Bool RemoveParticleSystem();
 	
 		Mesh3DRef GetMesh3D();
 		Mesh3DFilterRef GetMesh3DFilter();
 		Mesh3DRendererRef GetMesh3DRenderer();
 		SkinnedMesh3DRendererRef GetSkinnedMesh3DRenderer();
-
 		CameraRef GetCamera();
 		LightRef GetLight();
+		ParticleSystemRef GetParticleSystem();
 
 		void AddChild(SceneObjectRef child);
 		void RemoveChild(SceneObjectRef child);

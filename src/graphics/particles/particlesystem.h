@@ -100,7 +100,7 @@ namespace GTE
 		void GetCameraWorldAxes(Camera& camera, Vector3& axisX, Vector3 axisY, Vector3& axisZ);
 		void GenerateXYAlignedQuadForParticle(Particle* particle, Vector3& axisX, Vector3 axisY, Vector3& axisZ, Point3& p1, Point3& p2, Point3& p3, Point3& p4);
 		void UpdateShaderWithParticleData();
-		void OnWillRender(CameraRef camera) override;
+		void OnWillRender() override;
 
 		Bool Initialize(MaterialRef material, AtlasRef atlas, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
 

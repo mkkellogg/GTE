@@ -6,7 +6,7 @@
 
 namespace GTE
 {
-	// forward declaration
+	// forward declarations
 	class SceneObjectComponent;
 	class SceneObject;
 
@@ -16,7 +16,10 @@ namespace GTE
 		// a friend of EngineObjectManager, and the constructor & destructor
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
-		friend class SceneObject;
+		// SceneObject needs access because it's the container class
+		friend class SceneObject;	
+		// Event manager needs to be able to call protected event functions
+		friend class EventManager;
 
 	protected:
 
@@ -25,8 +28,10 @@ namespace GTE
 		SceneObjectComponent();
 		virtual ~SceneObjectComponent();
 
+		virtual void Awake();
+		virtual void Start();
 		virtual void Update();
-		virtual void OnWillRender(CameraRef camera);
+		virtual void OnWillRender();
 
 	public:
 

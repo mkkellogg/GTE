@@ -202,7 +202,7 @@ namespace GTE
 		void DestroyRenderQueues();
 
 		void RenderSceneForCamera(UInt32 cameraIndex);
-		void RenderSceneForCamera(Camera& camera);
+		void RenderSceneForCamera(CameraRef camera);
 
 		void GetViewDescriptorForCamera(const Camera& camera, const Transform* altViewTransform, ViewDescriptor& descriptor);
 

@@ -251,6 +251,7 @@
     <ClCompile Include="src\object\engineobject.cpp" />
     <ClCompile Include="src\object\engineobjectmanager.cpp" />
     <ClCompile Include="src\object\enginetypes.cpp" />
+    <ClCompile Include="src\object\eventmanager.cpp" />
     <ClCompile Include="src\object\layermanager.cpp" />
     <ClCompile Include="src\object\objectpairkey.cpp" />
     <ClCompile Include="src\object\sceneobject.cpp" />
@@ -385,6 +386,7 @@
     <ClInclude Include="src\object\engineobject.h" />
     <ClInclude Include="src\object\engineobjectmanager.h" />
     <ClInclude Include="src\object\enginetypes.h" />
+    <ClInclude Include="src\object\eventmanager.h" />
     <ClInclude Include="src\object\layermanager.h" />
     <ClInclude Include="src\object\objectpairkey.h" />
     <ClInclude Include="src\object\sceneobject.h" />

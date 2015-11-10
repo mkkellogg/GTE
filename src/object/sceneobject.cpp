@@ -19,6 +19,7 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/mesh3Dfilter.h"
+#include "graphics/particles/particlesystem.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
 #include "global/assert.h"
@@ -195,6 +196,19 @@ namespace GTE
 		return true;
 	}
 
+	Bool SceneObject::SetParticleSystem(ParticleSystemRef particleSystem)
+	{
+		NONFATAL_ASSERT_RTRN(particleSystem.IsValid(), "SceneObject::SetParticleSystem -> 'particleSystem' is invalid.", false, true);
+
+		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
+		ASSERT(thisRef.IsValid(), "SceneObject::SetParticleSystem -> Could not find matching reference for scene object.");
+
+		particleSystem->sceneObject = thisRef;
+		this->particleSystem = particleSystem;
+
+		return true;
+	}
+
 	Bool SceneObject::RemoveMesh3DRenderer()
 	{
 		NONFATAL_ASSERT_RTRN(renderer3D.IsValid(), "SceneObject::RemoveMesh3DRenderer -> Scene object has no mesh renderer.", false, true);
@@ -245,6 +259,16 @@ namespace GTE
 
 	}
 
+	Bool SceneObject::RemoveParticleSystem()
+	{
+		NONFATAL_ASSERT_RTRN(particleSystem.IsValid(), "SceneObject::RemoveParticleSystem -> Scene object has no particle system.", false, true);
+
+		particleSystem->sceneObject = SceneObjectSharedPtr::Null();
+		this->particleSystem = ParticleSystemSharedPtr::Null();
+		return true;
+
+	}
+
 	Mesh3DRef SceneObject::GetMesh3D()
 	{
 		if (!mesh3DFilter.IsValid())return NullMesh3DRef;
@@ -274,6 +298,11 @@ namespace GTE
 	LightRef SceneObject::GetLight()
 	{
 		return light;
+	}
+
+	ParticleSystemRef SceneObject::GetParticleSystem()
+	{
+		return particleSystem;
 	}
 
 	void SceneObject::AddChild(SceneObjectRef child)

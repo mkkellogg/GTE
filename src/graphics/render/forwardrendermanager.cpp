@@ -580,15 +580,10 @@ namespace GTE
 		SceneObject* object = sceneCameras[cameraIndex];
 		NONFATAL_ASSERT(object != nullptr, "ForwardRenderManager::RenderSceneFromCamera -> Camera's scene object is not valid.", true);
 
-		CameraRef cameraRef = object->GetCamera();
-		NONFATAL_ASSERT(cameraRef.IsValid(), "ForwardRenderManager::RenderSceneFromCamera -> Camera is not valid.", true);
-		Camera& camera = cameraRef.GetRef();
-
 		SceneObjectRef sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "ForwardRenderManager::RenderSceneFromCamera -> sceneRoot is null.");
 
-		// currently we use forward rendering
-		RenderSceneForCamera(camera);
+		RenderSceneForCamera(object->GetCamera());
 	}
 
 	/*
@@ -653,8 +648,11 @@ namespace GTE
 	 * This method will activate the render target belonging to [camera] (which may just be the default render target),
 	 * and then pass control to ForwardRenderSceneForCameraAndCurrentRenderTarget.
 	 */
-	void ForwardRenderManager::RenderSceneForCamera(Camera& camera)
+	void ForwardRenderManager::RenderSceneForCamera(CameraRef cameraRef)
 	{
+		NONFATAL_ASSERT(cameraRef.IsValid(), "ForwardRenderManager::RenderSceneFromCamera -> Camera is not valid.", true);
+		Camera& camera = cameraRef.GetRef();
+
 		SceneObjectRef cameraObject = camera.GetSceneObject();
 		NONFATAL_ASSERT(cameraObject.IsValid(), "ForwardRenderManager::RenderSceneForCamera -> Camera is not attached to a scene object.", true);
 
@@ -666,8 +664,9 @@ namespace GTE
 		NONFATAL_ASSERT(cameraRenderTarget.IsValid(), "ForwardRenderManager::RenderSceneForCamera -> Camera's render target is not valid.", true);
 		PushRenderTarget(cameraRenderTarget);
 
-		ViewDescriptor viewDescriptor;
+		SetCurrentCamera(cameraRef);
 
+		ViewDescriptor viewDescriptor;
 		// get a reference to the engine's graphics system
 		Graphics* graphics = Engine::Instance()->GetGraphicsSystem();
 

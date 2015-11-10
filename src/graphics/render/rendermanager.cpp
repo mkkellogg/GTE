@@ -13,19 +13,23 @@
 
 namespace GTE
 {
-	/*
-	* Single default constructor
-	*/
 	RenderManager::RenderManager()
 	{
-		
+
 	}
 
-	/*
-	 * Clean up
-	 */
 	RenderManager::~RenderManager()
 	{
-		
+
+	}
+
+	void RenderManager::SetCurrentCamera(CameraRef camera)
+	{
+		currentCamera = camera;
+	}
+
+	CameraRef RenderManager::GetCurrentCamera()
+	{
+		return currentCamera;
 	}
 }

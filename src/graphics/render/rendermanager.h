@@ -3,7 +3,7 @@
  *
  * author: Mark Kellogg
  *
- * Base clss for all render managers.
+ * Base class for all render managers.
  */
 
 #ifndef _GTE_RENDER_MANAGER_H
@@ -19,17 +19,6 @@
 
 namespace GTE
 {
-	// forward declaration
-	class SceneObject;
-	class Graphics;
-	class EngineObjectManager;
-	class Transform;
-	class Material;
-	class SceneObjectComponent;
-	class SubMesh3D;
-	class Transform;
-	class Point3Array;
-
 	enum class RenderQueueType
 	{
 		Geometry = 1000,
@@ -40,12 +29,19 @@ namespace GTE
 	{
 		friend class Engine;
 
-		virtual void Update() = 0;
-
-		public:
+		protected:
 
 		RenderManager();
 		virtual ~RenderManager();
+
+		virtual void Update() = 0;
+
+		CameraSharedPtr currentCamera;
+		void SetCurrentCamera(CameraRef camera);
+
+		public:
+		
+		CameraRef GetCurrentCamera();
 
 		virtual void RenderScene() = 0;
 		virtual void ClearCaches() = 0;

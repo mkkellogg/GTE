@@ -92,6 +92,7 @@ namespace GTE
 	class AnimationInstance;
 	class AnimationPlayer;
 	class RenderTarget;
+	class ParticleSystem;
 
 	template <typename T> class EngineObjectSharedPtr : public std::shared_ptr<T>
 	{
@@ -171,6 +172,7 @@ namespace GTE
 	typedef EngineObjectSharedPtr<AnimationInstance> AnimationInstanceSharedPtr;
 	typedef EngineObjectSharedPtr<AnimationPlayer> AnimationPlayerSharedPtr;
 	typedef EngineObjectSharedPtr<RenderTarget> RenderTargetSharedPtr;
+	typedef EngineObjectSharedPtr<ParticleSystem> ParticleSystemSharedPtr;
 
 	typedef EngineObjectSharedPtr<const Shader> ShaderSharedConstPtr;
 	typedef EngineObjectSharedPtr<const SubMesh3DRenderer> SubMesh3DRendererSharedConstPtr;
@@ -190,6 +192,7 @@ namespace GTE
 	typedef EngineObjectSharedPtr<const AnimationInstance> AnimationInstanceSharedConstPtr;
 	typedef EngineObjectSharedPtr<const AnimationPlayer> AnimationPlayerSharedConstPtr;
 	typedef EngineObjectSharedPtr<const RenderTarget> RenderTargetSharedConstPtr;
+	typedef EngineObjectSharedPtr<const ParticleSystem> ParticleSystemSharedConstPtr;
 
 	typedef const ShaderSharedPtr& ShaderRef;
 	typedef const SubMesh3DRendererSharedPtr& SubMesh3DRendererRef;
@@ -209,6 +212,7 @@ namespace GTE
 	typedef const AnimationInstanceSharedPtr& AnimationInstanceRef;
 	typedef const AnimationPlayerSharedPtr& AnimationPlayerRef;
 	typedef const RenderTargetSharedPtr& RenderTargetRef;
+	typedef const ParticleSystemSharedPtr& ParticleSystemRef;
 
 	extern const ShaderSharedPtr& NullShaderRef;
 	extern const SubMesh3DRendererSharedPtr& NullSubMesh3DRendererRef;
@@ -228,6 +232,7 @@ namespace GTE
 	extern const AnimationInstanceSharedPtr& NullAnimationInstanceRef;
 	extern const AnimationPlayerSharedPtr& NullAnimationPlayerRef;
 	extern const RenderTargetSharedPtr& NullRenderTargetRef;
+	extern const ParticleSystemSharedPtr& NullparticleSystemRef;
 
 	typedef const ShaderSharedConstPtr& ShaderConstRef;
 	typedef const SubMesh3DRendererSharedConstPtr& SubMesh3DRendererConstRef;
@@ -247,6 +252,7 @@ namespace GTE
 	typedef const AnimationInstanceSharedConstPtr& AnimationInstanceConstRef;
 	typedef const AnimationPlayerSharedConstPtr& AnimationPlayerConstRef;
 	typedef const RenderTargetSharedConstPtr& RenderTargetConstRef;
+	typedef const ParticleSystemSharedConstPtr& ParticleSystemConstRef;
 }
 
 

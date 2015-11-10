@@ -28,6 +28,7 @@ namespace GTE
 	class ErrorManager;
 	class GraphicsAttributes;
 	class RenderManager;
+	class EventManager;
 
 	class EngineCallbacks
 	{
@@ -69,6 +70,10 @@ namespace GTE
 		// Manages/reports errors reported by any engine component
 		ErrorManager * errorManager;
 
+		// Manages dispatching of engine and object events
+		EventManager * eventManager;
+
+
 		// Registered call-backs for engine life-cycle events
 		EngineCallbacks * callbacks;
 
@@ -100,6 +105,7 @@ namespace GTE
 		AnimationManager * GetAnimationManager();
 		InputManager * GetInputManager();
 		ErrorManager * GetErrorManager();
+		EventManager * GetEventManager();
 	};
 }
 

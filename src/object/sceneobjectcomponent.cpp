@@ -23,12 +23,22 @@ namespace GTE
 		return sceneObject;
 	}
 
+	void SceneObjectComponent::Awake()
+	{
+
+	}
+
+	void SceneObjectComponent::Start()
+	{
+
+	}
+
 	void SceneObjectComponent::Update()
 	{
 
 	}
 
-	void SceneObjectComponent::OnWillRender(CameraRef camera)
+	void SceneObjectComponent::OnWillRender()
 	{
 
 	}

@@ -12,7 +12,7 @@
 #ifndef _GTE_MESH3D_H_
 #define _GTE_MESH3D_H_
 
-#include "object/engineobject.h"
+#include "object/sceneobjectcomponent.h"
 #include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -25,7 +25,7 @@ namespace GTE
 	class EngineObjectManager;
 	class SubMesh3D;
 
-	class Mesh3D : public EngineObject
+	class Mesh3D : public SceneObjectComponent
 	{
 		// Since this derives from EngineObject, we make this class
 		// a friend of EngineObjectManager, and the constructor & destructor
