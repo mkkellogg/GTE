@@ -43,6 +43,7 @@ namespace GTE
 		Bool isStatic;
 		SceneObjectTransform transform;
 		Transform processingTransform;
+		Transform processingTransformInverse;
 		std::vector<SceneObjectSharedPtr > children;
 		SceneObjectSharedPtr parent;
 		IntMask layerMask;
@@ -73,6 +74,7 @@ namespace GTE
 		SceneObjectTransform& GetTransform();
 		const SceneObjectTransform& GetConstTransform() const;
 		const Transform& GetAggregateTransform() const;
+		const Transform& GetAggregateTransformInverse() const;
 
 		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
 		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);

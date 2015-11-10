@@ -98,11 +98,18 @@ namespace GTE
 	void SceneObject::SetAggregateTransform(Transform& transform)
 	{
 		processingTransform.SetTo(transform);
+		processingTransformInverse.SetTo(transform);
+		processingTransformInverse.Invert();
 	}
 
 	const Transform& SceneObject::GetAggregateTransform() const
 	{
 		return processingTransform;
+	}
+
+	const Transform& SceneObject::GetAggregateTransformInverse() const
+	{
+		return processingTransformInverse;
 	}
 
 	void SceneObject::NotifyNewMesh3D()
