@@ -317,6 +317,32 @@ namespace GTE
 		return p;
 	}
 
+	void Quaternion::rotationMatrix(Matrix4x4& out) const
+	{
+		Real * outData = const_cast<Real*>(out.GetDataPtr());
+		
+		outData[0] = 1 - 2 * y()*y() - 2 * z()*z();
+		outData[1] = 2 * x()*y() + 2 * z()*w();
+		outData[2] = 2 * x()*z() - 2 * y()*w();
+		outData[3] = 0;
+		
+		outData[4] = 2 * x()*y() - 2 * z()*w();
+		outData[5] = 1 - 2 * x()*x() - 2 * z()*z();
+		outData[6] = 2 * y()*z() + 2 * x()*w();
+		outData[7] = 0;
+		
+		outData[8] = 2 * x()*z() + 2 * y()*w();
+		outData[9] = 2 * y()*z() - 2 * x()*w();
+		outData[10] = 1 - 2 * x()*x() - 2 * y()*y();
+		outData[11] = 0;
+		
+		outData[12] = 0;
+		outData[13] = 0;
+		outData[14] = 0;
+		outData[15] = 1;
+
+	}
+
 	/*
 	 * Based off the function Quaternion::fromRotationMatrix in the Ogre open source engine.
 	 */

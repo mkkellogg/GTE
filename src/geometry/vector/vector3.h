@@ -14,6 +14,9 @@
 
 namespace GTE
 {
+	//forward declarations
+	class Matrix4x4;
+
 	class Vector3 : public BaseVector4
 	{
 	protected:
@@ -51,7 +54,7 @@ namespace GTE
 		static void Multiply(const Vector3& a, const Vector3& b, Vector3& results);
 		void Lerp(const Vector3& v1, const Vector3& v2, Real t);
 		static void Lerp(const Vector3& v1, const Vector3& v2, Vector3& result, Real t);
-
+		void ApplyProjection(const Matrix4x4& mvpMatrix);
 		void Scale(Real magnitude);
 		void Normalize();
 		void QuickNormalize();

@@ -26,7 +26,7 @@ namespace GTE
 	enum class LightCullType
 	{
 		None,
-		SphereOfInfluence,
+		BoundingBox,
 		Tiled
 	};
 
@@ -70,7 +70,7 @@ namespace GTE
 		void SetColor(Color4 color);
 		void SetColor(Real r, Real g, Real b, Real a);
 
-		Vector3 GetDirection() const;
+		const Vector3& GetDirection() const;
 		const Vector3 * GetDirectionPtr() const;
 		void SetDirection(Vector3  direction);
 		void SetDirection(Real x, Real y, Real z);

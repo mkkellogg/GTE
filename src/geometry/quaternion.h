@@ -53,6 +53,7 @@ namespace GTE
 		void normalize();
 		Real norm() const;
 		Matrix4x4 rotationMatrix() const;
+		void rotationMatrix(Matrix4x4& out) const;
 		void FromMatrix(const Matrix4x4& matrix);
 		void FromAngleAxis(const Real rfAngle, const Vector3& rkAxis);
 		// Vector3 scaledAxis(void) const;

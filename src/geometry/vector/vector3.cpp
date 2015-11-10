@@ -5,12 +5,12 @@
 #include <math.h>
  
 #include "vector3.h"
-#include "gtemath/gtemath.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
+#include "geometry/matrix4x4.h"
 #include "engine.h"
 
 namespace GTE
@@ -192,6 +192,20 @@ namespace GTE
 		x *= magnitude;
 		y *= magnitude;
 		z *= magnitude;
+	}
+
+	/*
+	* Apply a projection using [mvpMatrix]. This means treating this vector
+	* as a 4-component vector, multiplying by [mvpMatrix] and then dividing
+	* through by the 4th component.
+	*/
+	void Vector3::ApplyProjection(const Matrix4x4& mvpMatrix)
+	{
+		mvpMatrix.Transform(*this);
+		Real w = GetDataPtr()[3];
+		x /= w;
+		y /= w;
+		z /= w;
 	}
 
 	/*

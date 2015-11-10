@@ -21,6 +21,7 @@ namespace GTE
 {
 	//forward declarations
 	class Vector3;
+	class Matrix4x4;
 
 	class Point3 : public BaseVector4
 	{
@@ -48,9 +49,11 @@ namespace GTE
 		Real MaxComponentMagnitude();
 
 		void Add(const Vector3& v);
-		void Add(const Point3& v);
+		void Add(const Point3& p);
+		void Subtract(const Vector3& v);
 		static void Add(const Point3& point, const Vector3& v, Point3& result);
 		static void Add(const Point3& point, const Point3& v, Point3& result);
+		static void Subtract(const Point3& p1, const Vector3& p2, Point3&  result);
 		static void Subtract(const Point3& p1, const Point3& p2, Vector3&  result);
 		void Multiply(const Point3& p);
 		static void Multiply(const Point3& a, const Point3& b, Point3& results);
@@ -59,6 +62,8 @@ namespace GTE
 
 		void Scale(Real magnitude);
 		void Normalize();		
+
+		void ApplyProjection(const Matrix4x4& mvpMatrix);
 
 		void AttachTo(Real * data) override;
 		void Detach() override;

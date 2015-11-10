@@ -60,7 +60,7 @@ namespace GTE
 		color.Set(r, g, b, a);
 	}
 
-	Vector3 Light::GetDirection() const
+	const Vector3& Light::GetDirection() const
 	{
 		return direction;
 	}

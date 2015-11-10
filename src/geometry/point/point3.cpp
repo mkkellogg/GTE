@@ -9,6 +9,7 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "geometry/vector/vector3.h"
+#include "geometry/matrix4x4.h"
 #include "engine.h"
 
 namespace GTE
@@ -163,6 +164,24 @@ namespace GTE
 	}
 
 	/*
+	* Subtract vector [v] from this point.
+	*/
+	void Point3::Subtract(const Vector3& v)
+	{
+		Subtract(*this, v, *this);
+	}
+
+	/*
+	* Subtract [v1] from [p1] and store the resulting point in [result]
+	*/
+	void Point3::Subtract(const Point3& p1, const Vector3& v1, Point3&  result)
+	{
+		result.x = p1.x - v1.x;
+		result.y = p1.y - v1.y;
+		result.z = p1.z - v1.z;
+	}
+
+	/*
 	 * Subtract [p2] from [p1] and store the resulting vector in [result]
 	 */
 	void Point3::Subtract(const Point3& p1, const Point3& p2, Vector3& result)
@@ -228,6 +247,20 @@ namespace GTE
 		{
 			Scale(1 / magnitude);
 		}
+	}
+
+	/*
+	* Apply a projection using [mvpMatrix]. This means treating this point
+	* as a 4-component vector, multiplying by [mvpMatrix] and then dividing 
+	* through by the 4th component.
+	*/
+	void Point3::ApplyProjection(const Matrix4x4& mvpMatrix)
+	{
+		mvpMatrix.Transform(*this);
+		Real w = GetDataPtr()[3];
+		x /= w;
+		y /= w;
+		z /= w;
 	}
 
 	/*
