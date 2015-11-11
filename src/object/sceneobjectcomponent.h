@@ -50,7 +50,8 @@ namespace GTE
 		virtual void Awake();
 		virtual void Start();
 		virtual void Update();
-		virtual void OnWillRender();
+		virtual void PreRender();
+		virtual void WillRender();
 
 	public:
 

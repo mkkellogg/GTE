@@ -284,7 +284,7 @@ namespace GTE
 		targetMesh->QuickUpdate();
 	}
 
-	void ParticleSystem::OnWillRender()
+	void ParticleSystem::WillRender()
 	{
 		CameraRef currentCamera = Engine::Instance()->GetRenderManager()->GetCurrentCamera();
 		this->currentCamera = currentCamera.GetPtr();

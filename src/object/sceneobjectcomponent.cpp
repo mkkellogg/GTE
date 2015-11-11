@@ -48,7 +48,12 @@ namespace GTE
 
 	}
 
-	void SceneObjectComponent::OnWillRender()
+	void SceneObjectComponent::PreRender()
+	{
+
+	}
+
+	void SceneObjectComponent::WillRender()
 	{
 
 	}

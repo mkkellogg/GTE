@@ -63,8 +63,11 @@ namespace GTE
 				case SceneObjectEvent::Update:
 					component.Update();
 				break;
+				case SceneObjectEvent::PreRender:
+					component.PreRender();
+				break;
 				case SceneObjectEvent::WillRender:
-					component.OnWillRender();
+					component.WillRender();
 				break;
 			}
 		}

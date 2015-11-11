@@ -367,8 +367,6 @@ namespace GTE
 			// only process active scene objects
 			if (child->IsActive())
 			{
-				SceneObjectProcessingDescriptor& processingDescriptor = child->GetProcessingDescriptor();
-
 				CameraRef camera = child->GetCamera();
 				if (camera.IsValid() && cameraCount < MAX_CAMERAS)
 				{

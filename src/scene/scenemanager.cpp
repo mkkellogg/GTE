@@ -208,12 +208,12 @@ namespace GTE
 			processingDesc.AggregateTransformInverse = aggregateTransform;
 			processingDesc.AggregateTransformInverse.Invert();
 
-			if(maxPhaseReached >= (UInt32)UpdatePhase::Awake)
+			if(maxPhaseReached >= (Int32)UpdatePhase::Awake)
 			{
 				ProcessSceneObjectUpdatePhase(UpdatePhase::Awake, object);
 			}
 
-			if(maxPhaseReached >= (UInt32)UpdatePhase::Start)
+			if(maxPhaseReached >= (Int32)UpdatePhase::Start)
 			{
 				ProcessSceneObjectUpdatePhase(UpdatePhase::Start, object);
 			}
@@ -231,12 +231,12 @@ namespace GTE
 		// only process components that belong to active scene objects
 		if(container->IsActive())
 		{
-			if(maxPhaseReached >= (UInt32)UpdatePhase::Awake)
+			if(maxPhaseReached >= (Int32)UpdatePhase::Awake)
 			{
 				ProcessSceneObjectComponentUpdatePhase(UpdatePhase::Awake, component);
 			}
 
-			if(maxPhaseReached >= (UInt32)UpdatePhase::Start)
+			if(maxPhaseReached >= (Int32)UpdatePhase::Start)
 			{
 				ProcessSceneObjectComponentUpdatePhase(UpdatePhase::Start, component);
 			}
