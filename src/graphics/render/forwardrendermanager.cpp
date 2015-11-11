@@ -1676,36 +1676,43 @@ namespace GTE
 	{
 		if(light.GetType() == LightType::Planar || light.GetType() == LightType::Point)
 		{
-			// form the inverse transpose of [meshWorldTransform] for properly transforming
-			// vectors/normals into world space
-			Transform worldTransformIT = meshWorldTransformInverse;
-			Matrix4x4& mat = worldTransformIT.GetMatrix();
-			mat.Transpose();
-			mat.D0 = mat.D1 = mat.D2 = 0.0f;
-		
-			// transform the extents of the mesh's bounding box by the inverse transpose of [meshWorldTransform]
-			Vector3 boundingBox = mesh.GetBoundingBox();
-			Vector3 axisX(boundingBox.x, 0.0f, 0.0f);
-			Vector3 axisY(0.0f, boundingBox.y, 0.0f);
-			Vector3 axisZ(0.0f, 0.0f, boundingBox.z);
-			worldTransformIT.TransformVector(axisX);
-			worldTransformIT.TransformVector(axisY);
-			worldTransformIT.TransformVector(axisZ);
-			
-			// transform the mesh's center into world space
 			Point3 localMeshCenter = mesh.GetCenter();
+
+			Vector3 boundingBox = mesh.GetBoundingBox();
+			Point3 corners[8];
+			corners[0].Set(boundingBox.x + localMeshCenter.x, boundingBox.y + localMeshCenter.y, boundingBox.z + localMeshCenter.z);
+			corners[1].Set(boundingBox.x + localMeshCenter.x, boundingBox.y + localMeshCenter.y, -boundingBox.z + localMeshCenter.z);
+			corners[2].Set(boundingBox.x + localMeshCenter.x, -boundingBox.y + localMeshCenter.y, -boundingBox.z + localMeshCenter.z);
+			corners[3].Set(boundingBox.x + localMeshCenter.x, -boundingBox.y + localMeshCenter.y, boundingBox.z + localMeshCenter.z);
+			corners[4].Set(-boundingBox.x + localMeshCenter.x, boundingBox.y + localMeshCenter.y, boundingBox.z + localMeshCenter.z);
+			corners[5].Set(-boundingBox.x + localMeshCenter.x, boundingBox.y + localMeshCenter.y, -boundingBox.z + localMeshCenter.z);
+			corners[6].Set(-boundingBox.x + localMeshCenter.x, -boundingBox.y + localMeshCenter.y, -boundingBox.z + localMeshCenter.z);
+			corners[7].Set(-boundingBox.x + localMeshCenter.x, -boundingBox.y + localMeshCenter.y, boundingBox.z + localMeshCenter.z);
+		
+			// transform the mesh's center into world space
 			Point3 meshCenter = localMeshCenter;
 			meshWorldTransform.TransformPoint(meshCenter);
 
-			// use a corner of the bounding box to form a vector from the bounding box's center, and use the
-			// vector as the radius for a bounding sphere to do bounding sphere culling
-			Point3 corner;
-			corner.Add(axisX);
-			corner.Add(axisY);
-			corner.Add(axisZ);
+			Real maxRadiusSqr = 0.0f;
+			Vector3 maxRadiusComponents;
+			for(UInt32 i = 0; i < 8; i++)
+			{
+				Point3& corner = corners[i];
+				meshWorldTransform.TransformPoint(corner);
 
-			// get squared length of radius vector
-			Real maxExtentSqr = corner.x * corner.x + corner.y * corner.y + corner.z * corner.z;
+				// use a corner of the bounding box to form a vector from the bounding box's center, and use the
+				// vector as the radius for a bounding sphere to do bounding sphere culling
+				Vector3 radius;
+				Point3::Subtract(corner, meshCenter, radius);
+
+				// check if this is the largest radius found so far
+				Real localRadiusSqr = radius.x * radius.x + radius.y * radius.y + radius.z * radius.z;
+				if(localRadiusSqr > maxRadiusSqr)
+				{
+					maxRadiusSqr = localRadiusSqr;
+					maxRadiusComponents = radius;
+				}
+			}
 
 			if(light.GetType() == LightType::Planar)
 			{
@@ -1723,8 +1730,9 @@ namespace GTE
 				Real d = lightPosition.x * lightDirection.x + lightPosition.y * lightDirection.y + lightPosition.z * lightDirection.z;
 				// calculate squared offset
 				Real dSqr = d * d;
-				// check if mesh's center is within +/- (maxExtentSqr + planarRangeSqr) of the light's plane
-				if(parallelPortionSqr - dSqr > planarRangeSqr + maxExtentSqr)
+				// check if mesh's center is within +/- (radiusSqr + planarRangeSqr) of the light's plane
+				if(GTE::GTEMath::QuickSquareRoot(parallelPortionSqr) - GTE::GTEMath::QuickSquareRoot(dSqr) > 
+				   GTE::GTEMath::QuickSquareRoot(planarRangeSqr) + GTE::GTEMath::QuickSquareRoot(maxRadiusSqr))
 				{
 					return true;
 				}
@@ -1744,8 +1752,8 @@ namespace GTE
 				Real lightPosToCenterLengthSqr = lightPosToCenter.x * lightPosToCenter.x + lightPosToCenter.y * lightPosToCenter.y + lightPosToCenter.z + lightPosToCenter.z;
 				// get suared projected sistance of [lightPosToCenter] in light's plane
 				Real portionPlanarSqr = lightPosToCenterLengthSqr - parallelPortionSqr;
-				// check if mesh's center is within +/- (radialRangeSqr + maxExtentSqr) of the light's position
-				if(portionPlanarSqr > radialRangeSqr + maxExtentSqr)
+				// check if mesh's center is within +/- (radialRangeSqr + radiusSqr) of the light's position
+				if(GTE::GTEMath::QuickSquareRoot(portionPlanarSqr) > GTE::GTEMath::QuickSquareRoot(radialRangeSqr) + GTE::GTEMath::QuickSquareRoot(maxRadiusSqr))
 				{
 					return true;
 				}
@@ -1755,14 +1763,14 @@ namespace GTE
 			else if(light.GetType() == LightType::Point)
 			{
 				Real lightRange = light.GetRange();
-				Real lightRangeSqr = lightRange * lightRange;
-				Real maxRangeSquare = maxExtentSqr + lightRangeSqr;
+				Real maxRange = GTE::GTEMath::QuickSquareRoot(maxRadiusSqr) + lightRange;
 
 				Vector3 toCenter;
 				Point3::Subtract(meshCenter, lightPosition, toCenter);
 				Real rangeSquare = toCenter.x * toCenter.x + toCenter.y * toCenter.y + toCenter.z * toCenter.z;
+				Real range = GTE::GTEMath::QuickSquareRoot(rangeSquare);
 
-				return rangeSquare > maxRangeSquare;
+				return range > maxRange;
 			}
 		}
 		
