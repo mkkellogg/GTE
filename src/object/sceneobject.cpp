@@ -36,8 +36,6 @@ namespace GTE
 		transform.SetIdentity();
 		transform.SetSceneObject(this);
 
-		processingTransform.SetIdentity();
-
 		layerMask = IntMaskUtil::CreateIntMask();
 	}
 
@@ -96,21 +94,9 @@ namespace GTE
 		return transform;
 	}
 
-	void SceneObject::SetAggregateTransform(Transform& transform)
+	SceneObjectProcessingDescriptor& SceneObject::GetProcessingDescriptor()
 	{
-		processingTransform.SetTo(transform);
-		processingTransformInverse.SetTo(transform);
-		processingTransformInverse.Invert();
-	}
-
-	const Transform& SceneObject::GetAggregateTransform() const
-	{
-		return processingTransform;
-	}
-
-	const Transform& SceneObject::GetAggregateTransformInverse() const
-	{
-		return processingTransformInverse;
+		return processingDesctiptor;
 	}
 
 	void SceneObject::NotifyNewMesh3D()

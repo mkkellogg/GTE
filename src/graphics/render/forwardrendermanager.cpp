@@ -439,7 +439,8 @@ namespace GTE
 							MaterialRef mat = renderer->GetMaterial(i % materialCount);
 							RenderQueue* targetRenderQueue = GetRenderQueue(mat->GetRenderQueue());
 
-							Transform * aggregateTransform = const_cast<Transform*>(&child->GetAggregateTransform());
+							SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
+							Transform * aggregateTransform = const_cast<Transform*>(&processingDesc.AggregateTransform);
 							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);
 						}
 					}
@@ -466,7 +467,8 @@ namespace GTE
 		{
 			SceneObject* child = renderableSceneObjects[s];
 
-			model.SetTo(child->GetAggregateTransform());
+			SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
+			model.SetTo(processingDesc.AggregateTransform);
 			modelInverse.SetTo(model);
 			modelInverse.Invert();
 
@@ -591,7 +593,8 @@ namespace GTE
 	*/
 	void ForwardRenderManager::GetViewDescriptorForCamera(const Camera& camera, const Transform* altViewTransform, ViewDescriptor& descriptor)
 	{
-		const Transform& cameraTransform = const_cast<Camera&>(camera).GetSceneObject()->GetAggregateTransform();
+		SceneObjectProcessingDescriptor& processingDesc = const_cast<Camera&>(camera).GetSceneObject()->GetProcessingDescriptor();
+		const Transform& cameraTransform = processingDesc.AggregateTransform;
 
 		descriptor.ClearBufferMask = camera.GetClearBufferMask();
 		descriptor.CullingMask = camera.GetCullingMask();
@@ -675,7 +678,8 @@ namespace GTE
 			cameraRenderTarget->GetColorTexture()->GetAttributes().IsCube)
 		{
 			Transform altViewTransform;
-			const Transform& cameraTransform = cameraObject->GetAggregateTransform();
+			SceneObjectProcessingDescriptor& processingDesc = cameraObject->GetProcessingDescriptor();
+			const Transform& cameraTransform = processingDesc.AggregateTransform;
 
 			// front
 			graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Front);
@@ -838,7 +842,8 @@ namespace GTE
 		Transform model;
 		Transform modelInverse;
 
-		Transform lightTransform = const_cast<Light&>(light).GetSceneObject()->GetAggregateTransform();
+		SceneObjectProcessingDescriptor& processingDesc = const_cast<Light&>(light).GetSceneObject()->GetProcessingDescriptor();
+		Transform lightTransform = processingDesc.AggregateTransform;
 		lightTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
 
 		Point3 lightWorldPosition;
@@ -887,12 +892,13 @@ namespace GTE
 					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
 
 					// copy the full world transform of the scene object, including those of all ancestors
+					SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
 					Transform sceneObjectWorldTransform;
-					sceneObjectWorldTransform.SetTo(sceneObject->GetAggregateTransform());
+					sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
 					sceneObjectWorldTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
 					Transform sceneObjectWorldTransformInverse;
 					sceneObjectWorldTransformInverse.SetTo(viewDescriptor.UniformWorldSceneObjectTransformInverse);
-					sceneObjectWorldTransformInverse.PreTransformBy(sceneObject->GetAggregateTransformInverse());
+					sceneObjectWorldTransformInverse.PreTransformBy(processingDesc.AggregateTransformInverse);
 
 					// make sure the current mesh should not be culled from [light] or from
 					// the current camera, whose culling mask is in [viewDescriptor].
@@ -1138,7 +1144,8 @@ namespace GTE
 
 		if(skipMesh)return;
 
-		model.SetTo(sceneObject->GetAggregateTransform());
+		SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
+		model.SetTo(processingDesc.AggregateTransform);
 		model.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
 
 		// concatenate model transform with inverted view transform, and then with
@@ -1225,7 +1232,8 @@ namespace GTE
 		NONFATAL_ASSERT(filter != nullptr, "ForwardRenderManager::RenderShadowVolumeForMesh -> Scene object has null mesh filter.", true);
 
 		// calculate model transform and inverse model transform
-		model.SetTo(sceneObject->GetAggregateTransform());
+		SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
+		model.SetTo(processingDesc.AggregateTransform);
 		model.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
 		modelInverse.SetTo(model);
 		modelInverse.Invert();
@@ -1304,7 +1312,8 @@ namespace GTE
 				if (lightRef->GetShadowsEnabled())
 				{
 					Transform lightWorldTransform;
-					lightWorldTransform.SetTo(lightRef->GetSceneObject()->GetAggregateTransform());
+					SceneObjectProcessingDescriptor& processingDesc = lightRef->GetSceneObject()->GetProcessingDescriptor();
+					lightWorldTransform.SetTo(processingDesc.AggregateTransform);
 					BuildShadowVolumesForLight(lightRef.GetRef(), lightWorldTransform);
 				}
 			}
@@ -1339,11 +1348,11 @@ namespace GTE
 				if(sceneObject->IsActive())
 				{
 					// copy the full world transform of the scene object, including those of all ancestors
+					SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
 					Transform sceneObjectWorldTransform;
-					sceneObjectWorldTransform.SetTo(sceneObject->GetAggregateTransform());
-
+					sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
 					Transform sceneObjectWorldTransformInverse;
-					sceneObjectWorldTransformInverse.SetTo(sceneObject->GetAggregateTransformInverse());
+					sceneObjectWorldTransformInverse.SetTo(processingDesc.AggregateTransformInverse);
 
 					// make sure the current mesh should not be culled from [light].
 					if(!ShouldCullFromLightByLayer(light, *sceneObject) &&
@@ -1392,7 +1401,8 @@ namespace GTE
 			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Renderer has no materials.", true);
 
 			// calculate model transform and inverse model transform
-			model.SetTo(sceneObject.GetAggregateTransform());
+			SceneObjectProcessingDescriptor& processingDesc = sceneObject.GetProcessingDescriptor();
+			model.SetTo(processingDesc.AggregateTransform);
 			modelInverse.SetTo(model);
 			modelInverse.Invert();
 

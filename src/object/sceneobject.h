@@ -23,14 +23,32 @@ namespace GTE
 	class SceneObject;
 	class Light;
 
+	class SceneObjectProcessingDescriptor
+	{
+		public:
+
+		Transform AggregateTransform;
+		Transform AggregateTransformInverse;
+		Bool Processed;
+		Bool Rendered;
+
+	};
+
 	class SceneObject : public EngineObject
 	{
 		// Since this ultimately derives from EngineObject, we make this class
 		// a friend of EngineObjectManager, and the constructor & destructor
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
+
+		// all render managers need access to the aggregate transform
 		friend class ForwardRenderManager;
+
+		// all scene managers need access to the aggregate transform
 		friend class SceneManager;
+
+		// SceneObjectSkeletonNode needs access to the aggregate transform
+		friend class SceneObjectSkeletonNode;
 
 		// Mesh3DFilter needs to be a friend so that it can update
 		// any attached renderer when its mesh is updated
@@ -38,12 +56,12 @@ namespace GTE
 
 	protected:
 
+		SceneObjectProcessingDescriptor processingDesctiptor;
+
 		std::string name;
 		Bool isActive;
 		Bool isStatic;
-		SceneObjectTransform transform;
-		Transform processingTransform;
-		Transform processingTransformInverse;
+		SceneObjectTransform transform;		
 		std::vector<SceneObjectSharedPtr > children;
 		SceneObjectSharedPtr parent;
 		IntMask layerMask;
@@ -57,7 +75,7 @@ namespace GTE
 		SceneObject();
 		virtual ~SceneObject();
 
-		void SetAggregateTransform(Transform& transform);
+		SceneObjectProcessingDescriptor& GetProcessingDescriptor();
 		void NotifyNewMesh3D();
 
 	public:
@@ -73,9 +91,7 @@ namespace GTE
 		IntMask GetLayerMask() const;
 
 		SceneObjectTransform& GetTransform();
-		const SceneObjectTransform& GetConstTransform() const;
-		const Transform& GetAggregateTransform() const;
-		const Transform& GetAggregateTransformInverse() const;
+		const SceneObjectTransform& GetConstTransform() const;		
 
 		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
 		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);

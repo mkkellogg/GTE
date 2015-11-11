@@ -36,7 +36,8 @@ namespace GTE
 	{
 		NONFATAL_ASSERT_RTRN(Target.IsValid(), "SceneObjectSkeletonNode::GetFullTransform -> Node does not have a valid target.", nullptr, true);
 
-		const Transform& ref = Target->GetAggregateTransform();
+		SceneObjectProcessingDescriptor& processingDesc = Target->GetProcessingDescriptor();
+		const Transform& ref = processingDesc.AggregateTransform;
 		return &ref;
 	}
 

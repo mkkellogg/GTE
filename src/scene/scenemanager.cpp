@@ -97,7 +97,10 @@ namespace GTE
 				aggregateTransform.TransformBy(localTransform);
 
 				// save the aggregate/global/world transform
-				child->SetAggregateTransform(aggregateTransform);
+				SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
+				processingDesc.AggregateTransform = aggregateTransform;
+				processingDesc.AggregateTransformInverse = aggregateTransform;
+				processingDesc.AggregateTransformInverse.Invert();
 
 				// process the child object
 				ProcessSceneObject(child.GetRef());
