@@ -296,6 +296,7 @@ void PoolScene::SetupTerrain(GTE::AssetImporter& importer)
 	ASSERT(modelSceneObject.IsValid(), "Could not load island model!\n");
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
+	GameUtil::SetAllObjectsCastShadows(modelSceneObject, false);
 
 	// place island in the scene
 	modelSceneObject->SetActive(true);
@@ -452,6 +453,7 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	GameUtil::SetAllObjectsStatic(modelSceneObject);
 
 	wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	wallBlockMeshObject->GetMesh3DFilter()->SetCastShadows(false);
 	wallBlockMesh = wallBlockMeshObject->GetMesh3D();
 	wallBlockMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(5);
 	wallBlockMesh->Update();
