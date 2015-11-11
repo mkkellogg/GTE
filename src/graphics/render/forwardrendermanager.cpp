@@ -48,7 +48,6 @@ namespace GTE
 		lightCount = 0;
 		ambientLightCount = 0;
 		cameraCount = 0;
-		renderQueueCount = 0;
 		renderableSceneObjectCount = 0;
 		forwardBlending = FowardBlendingMethod::Additive;
 	}
@@ -59,7 +58,6 @@ namespace GTE
 	ForwardRenderManager::~ForwardRenderManager()
 	{
 		DestroyCachedShadowVolumes();
-		DestroyRenderQueues();
 	}
 
 	/*
@@ -319,7 +317,8 @@ namespace GTE
 		ambientLightCount = 0;
 		cameraCount = 0;
 
-		ClearAllRenderQueues();
+		renderableSceneObjectCount = 0;
+		renderQueueManager.ClearAllRenderQueues();
 
 		SceneObjectRef sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
 		ASSERT(sceneRoot.IsValid(), "ForwardRenderManager::Update -> 'sceneRoot' is null.");
@@ -367,6 +366,10 @@ namespace GTE
 			// only process active scene objects
 			if (child->IsActive())
 			{
+				SceneObjectProcessingDescriptor& processingDescriptor = child->GetProcessingDescriptor();
+				processingDescriptor.Processed = false;
+				processingDescriptor.Rendered = false;
+
 				CameraRef camera = child->GetCamera();
 				if (camera.IsValid() && cameraCount < MAX_CAMERAS)
 				{
@@ -437,7 +440,7 @@ namespace GTE
 						for(UInt32 i = 0; i < subMeshCount; i++)
 						{
 							MaterialRef mat = renderer->GetMaterial(i % materialCount);
-							RenderQueue* targetRenderQueue = GetRenderQueue(mat->GetRenderQueue());
+							RenderQueue* targetRenderQueue = renderQueueManager.GetRenderQueueForID(mat->GetRenderQueue());
 
 							SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
 							Transform * aggregateTransform = const_cast<Transform*>(&processingDesc.AggregateTransform);
@@ -495,78 +498,6 @@ namespace GTE
 						}
 					}
 				}
-			}
-		}
-	}
-
-	/*
-	* Empty out all render queues.
-	*/
-	void ForwardRenderManager::ClearAllRenderQueues()
-	{
-		for(UInt32 i = 0; i < renderQueueCount; i++)
-		{
-			RenderQueue* queue = renderQueues[i];
-			NONFATAL_ASSERT(queue != nullptr, "ForwardRenderManager::ClearAllRenderQueues -> Null render queue encountered.", true);
-
-			queue->Clear();
-		}
-
-		renderableSceneObjectCount = 0;
-	}
-
-	/*
-	* Return the render queue that is linked to [renderQueueID]. If it doesn't
-	* yet exist, create it.
-	*/
-	RenderQueue* ForwardRenderManager::GetRenderQueue(UInt32 renderQueueID)
-	{
-		for(UInt32 i = 0; i < renderQueueCount; i++)
-		{
-			RenderQueue* queue = renderQueues[i];
-			NONFATAL_ASSERT_RTRN(queue != nullptr, "ForwardRenderManager::GetRenderQueue -> Null render queue encountered.", nullptr, true);
-
-			if(queue->GetID() == renderQueueID)
-			{
-				return queue;
-			}
-		}
-		ASSERT(renderQueueCount < MAX_RENDER_QUEUES, "ForwardRenderManager::GetRenderQueue -> Maximum number of render queues exceeded!");
-
-		// create new queue for [renderQueueID], since it doesn't yet exist
-		RenderQueue * newQueue = new(std::nothrow) RenderQueue(renderQueueID, 128, 128);
-		ASSERT(newQueue != nullptr, "ForwardRenderManager::GetRenderQueue -> Unable to allocate to render queue.");
-		renderQueues[renderQueueCount] = newQueue;
-		renderQueueCount++;
-
-		//TODO: sort more efficiently (quick sort would be best since it's in-place)
-		for(UInt32 i = 0; i < renderQueueCount; i++)
-		{
-			for(UInt32 j = 0; j < renderQueueCount; j++)
-			{
-				if(j < renderQueueCount - 1 && renderQueues[j] > renderQueues[j + 1])
-				{
-					RenderQueue * temp = renderQueues[j];
-					renderQueues[j] = renderQueues[j + 1];
-					renderQueues[j + 1] = temp;
-				}
-			}
-		}
-
-		return newQueue;
-	}
-
-	/*
-	* Deallocate & destroy all render queues.
-	*/
-	void ForwardRenderManager::DestroyRenderQueues()
-	{
-		for(UInt32 i = 0; i < renderQueueCount; i++)
-		{
-			if(renderQueues[i] != nullptr)
-			{
-				delete renderQueues[i];
-				renderQueues[i] = nullptr;
 			}
 		}
 	}
@@ -644,7 +575,6 @@ namespace GTE
 			descriptor.ClipPlane0Normal = Vector3(0.0, 0.0, 0.0);
 			descriptor.ClipPlane0Offset = 0.0f;
 		}
-
 	}
 
 	/*
@@ -875,65 +805,55 @@ namespace GTE
 					continue;
 			}
 
-			for(UInt32 i = 0; i < renderQueueCount; i++)
+			for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
 			{
-				RenderQueue* queue = renderQueues[i];
-				NONFATAL_ASSERT(queue != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue encountered.", true);
+				RenderQueueEntry* entry = *itr;
+				NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
 
-				// loop through each mesh in [queue]
-				for(UInt32 s = 0; s < queue->GetObjectCount(); s++)
+				SceneObject* sceneObject = entry->Container;
+				NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
+
+				Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
+
+				// copy the full world transform of the scene object, including those of all ancestors
+				SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
+				Transform sceneObjectWorldTransform;
+				sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
+				sceneObjectWorldTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
+
+				// make sure the current mesh should not be culled from [light] or from
+				// the current camera, whose culling mask is in [viewDescriptor].
+				if(!ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject) &&
+					!ShouldCullFromLightByLayer(light, *sceneObject) &&
+					!ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform))
 				{
-					RenderQueueEntry* entry = queue->GetObject(s);
-					NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
-
-					SceneObject* sceneObject = entry->Container;
-					NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
-
-					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
-
-					// copy the full world transform of the scene object, including those of all ancestors
-					SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
-					Transform sceneObjectWorldTransform;
-					sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
-					sceneObjectWorldTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
-					Transform sceneObjectWorldTransformInverse;
-					sceneObjectWorldTransformInverse.SetTo(viewDescriptor.UniformWorldSceneObjectTransformInverse);
-					sceneObjectWorldTransformInverse.PreTransformBy(processingDesc.AggregateTransformInverse);
-
-					// make sure the current mesh should not be culled from [light] or from
-					// the current camera, whose culling mask is in [viewDescriptor].
-					if(!ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject) &&
-					   !ShouldCullFromLightByLayer(light, *sceneObject) &&
-					   !ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform, sceneObjectWorldTransformInverse))
+					if(pass == ShadowVolumeRender) // shadow volume pass
 					{
-						if(pass == ShadowVolumeRender) // shadow volume pass
+						if(filter->GetCastShadows())
 						{
-							if(filter->GetCastShadows())
+							RenderShadowVolumeForMesh(*entry, light, lightWorldPosition, lightDirection, viewDescriptor);
+						}
+					}
+					else if(pass == StandardRender) // normal rendering pass
+					{
+						// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
+						if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && filter->GetReceiveShadows())
+						{
+							if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
 							{
-								RenderShadowVolumeForMesh(*entry, light, lightWorldPosition, lightDirection, viewDescriptor);
+								currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
+								Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
 							}
 						}
-						else if(pass == StandardRender) // normal rendering pass
+						else if(currentRenderMode != RenderMode::Standard)
 						{
-							// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
-							if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && filter->GetReceiveShadows())
-							{
-								if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
-								{
-									currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
-									Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
-								}
-							}
-							else if(currentRenderMode != RenderMode::Standard)
-							{
-								currentRenderMode = RenderMode::Standard;
-								Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
-							}
+							currentRenderMode = RenderMode::Standard;
+							Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
+						}
 
-							// set up lighting descriptor for non self-lit lighting
-							LightingDescriptor lightingDescriptor(&light, &lightWorldPosition, &lightDirection, true);
-							RenderMesh(*entry, lightingDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
-						}
+						// set up lighting descriptor for non self-lit lighting
+						LightingDescriptor lightingDescriptor(&light, &lightWorldPosition, &lightDirection, true);
+						RenderMesh(*entry, lightingDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
 					}
 				}
 			}
@@ -1069,33 +989,27 @@ namespace GTE
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
-		for(UInt32 i = 0; i < renderQueueCount; i++)
+		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
 		{
-			RenderQueue* queue = renderQueues[i];
-			NONFATAL_ASSERT(queue != nullptr, "ForwardRenderManager::RenderSceneWithoutLight -> Null render queue encountered.", true);
+			RenderQueueEntry* entry = *itr;
 
-			// loop through each mesh in [queue]
-			for(UInt32 s = 0; s < queue->GetObjectCount(); s++)
+			SceneObject* sceneObject = entry->Container;
+
+			// check if [sceneObject] should be rendered based on its layer
+			if(ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject))
 			{
-				RenderQueueEntry* entry = queue->GetObject(s);
-				SceneObject* sceneObject = entry->Container;
-
-				// check if [sceneObject] should be rendered based on its layer
-				if(ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject))
-				{
-					continue;
-				}
-
-				// execute filter function (if one is specified)
-				if(filterFunction != nullptr)
-				{
-					Bool filter = filterFunction(sceneObject);
-					if(filter)continue;
-				}
-
-				LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
-				RenderMesh(*entry, lightingDescriptor, viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter);
+				continue;
 			}
+
+			// execute filter function (if one is specified)
+			if(filterFunction != nullptr)
+			{
+				Bool filter = filterFunction(sceneObject);
+				if(filter)continue;
+			}
+
+			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
+			RenderMesh(*entry, lightingDescriptor, viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter);
 		}
 	}
 
@@ -1332,34 +1246,25 @@ namespace GTE
 		Vector3 lightDirection = light.GetDirection();
 		lightWorldTransform.TransformVector(lightDirection);
 
-		for(UInt32 i = 0; i < renderQueueCount; i++)
+		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
 		{
-			RenderQueue* queue = renderQueues[i];
-			NONFATAL_ASSERT(queue != nullptr, "ForwardRenderManager::BuildShadowVolumesForLight -> Null render queue encountered.", true);
+			RenderQueueEntry* entry = *itr;
+			NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::BuildShadowVolumesForLight -> Null render queue entry encountered.", true);
 
-			// loop through each mesh in [queue]
-			for(UInt32 s = 0; s < queue->GetObjectCount(); s++)
+			SceneObject* sceneObject = entry->Container;
+
+			if(sceneObject->IsActive())
 			{
-				RenderQueueEntry* entry = queue->GetObject(s);
-				NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::BuildShadowVolumesForLight -> Null render queue entry encountered.", true);
+				// copy the full world transform of the scene object, including those of all ancestors
+				SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
+				Transform sceneObjectWorldTransform;
+				sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
 
-				SceneObject* sceneObject = entry->Container;
-
-				if(sceneObject->IsActive())
+				// make sure the current mesh should not be culled from [light].
+				if(!ShouldCullFromLightByLayer(light, *sceneObject) &&
+					!ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform))
 				{
-					// copy the full world transform of the scene object, including those of all ancestors
-					SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
-					Transform sceneObjectWorldTransform;
-					sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
-					Transform sceneObjectWorldTransformInverse;
-					sceneObjectWorldTransformInverse.SetTo(processingDesc.AggregateTransformInverse);
-
-					// make sure the current mesh should not be culled from [light].
-					if(!ShouldCullFromLightByLayer(light, *sceneObject) &&
-					   !ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform, sceneObjectWorldTransformInverse))
-					{
-						BuildShadowVolumesForSceneObject(*sceneObject, light, lightWorldPosition, lightDirection);
-					}
+					BuildShadowVolumesForSceneObject(*sceneObject, light, lightWorldPosition, lightDirection);
 				}
 			}
 		}
@@ -1629,8 +1534,7 @@ namespace GTE
 	/*
 	 * Check if [mesh] should be rendered with [light], based on the distance of the center of [mesh] from [lightPosition].
 	 */
-	Bool ForwardRenderManager::ShouldCullFromLightByPosition(const Light& light, const Point3& lightWorldPosition, const SubMesh3D& mesh, 
-															 const Transform& meshWorldTransform, const Transform& meshWorldTransformInverse) const
+	Bool ForwardRenderManager::ShouldCullFromLightByPosition(const Light& light, const Point3& lightWorldPosition, const SubMesh3D& mesh, const Transform& meshWorldTransform) const
 	{
 		if(light.GetType() == LightType::Directional || light.GetType() == LightType::Ambient)
 		{
@@ -1645,10 +1549,10 @@ namespace GTE
 				return false;
 				break;
 			case LightCullType::BoundingBox:
-				return ShouldCullByBoundingBox(light, lightWorldPosition, meshWorldTransform, meshWorldTransformInverse, mesh);
+				return ShouldCullByBoundingBox(light, lightWorldPosition, meshWorldTransform, mesh);
 				break;
 			case LightCullType::Tiled:
-				return ShouldCullByTile(light, lightWorldPosition, meshWorldTransform, meshWorldTransformInverse, mesh);
+				return ShouldCullByTile(light, lightWorldPosition, meshWorldTransform, mesh);
 				break;
 			default:
 				return false;
@@ -1679,10 +1583,8 @@ namespace GTE
 	 *
 	 * [lightPosition] - World space position of the light.
 	 * [meshWorldTransform] - Used to transform the bounding box of [mesh] from local to world space.
-	 * [meshWorldTransformInverse] - Used to transform the bounding box of [mesh] from world to local space.
 	 */
-	Bool ForwardRenderManager::ShouldCullByBoundingBox(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
-															 const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const
+	Bool ForwardRenderManager::ShouldCullByBoundingBox(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const SubMesh3D& mesh) const
 	{
 		if(light.GetType() == LightType::Planar || light.GetType() == LightType::Point)
 		{
@@ -1790,8 +1692,7 @@ namespace GTE
 	/*
 	 * TODO: (Eventually) - Implement tile-base culling.
 	 */
-	Bool ForwardRenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
-												const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const
+	Bool ForwardRenderManager::ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const SubMesh3D& mesh) const
 	{
 		return false;
 	}

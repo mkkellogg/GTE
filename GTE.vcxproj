@@ -213,6 +213,7 @@
     <ClCompile Include="src\graphics\render\forwardrendermanager.cpp" />
     <ClCompile Include="src\graphics\render\rendermanager.cpp" />
     <ClCompile Include="src\graphics\render\renderqueue.cpp" />
+    <ClCompile Include="src\graphics\render\renderqueuemanager.cpp" />
     <ClCompile Include="src\graphics\render\rendertarget.cpp" />
     <ClCompile Include="src\graphics\render\rendertargetGL.cpp" />
     <ClCompile Include="src\graphics\render\skinnedmesh3Dattrtransformer.cpp" />
@@ -347,6 +348,7 @@
     <ClInclude Include="src\graphics\render\forwardrendermanager.h" />
     <ClInclude Include="src\graphics\render\rendermanager.h" />
     <ClInclude Include="src\graphics\render\renderqueue.h" />
+    <ClInclude Include="src\graphics\render\renderqueuemanager.h" />
     <ClInclude Include="src\graphics\render\rendertarget.h" />
     <ClInclude Include="src\graphics\render\rendertargetGL.h" />
     <ClInclude Include="src\graphics\render\skinnedmesh3Dattrtransformer.h" />

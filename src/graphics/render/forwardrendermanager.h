@@ -28,6 +28,7 @@
 #include "graphics/light/light.h"
 #include "geometry/transform.h"
 #include "renderqueue.h"
+#include "renderqueuemanager.h"
 
 namespace GTE
 {
@@ -162,8 +163,6 @@ namespace GTE
 
 		// number of renderable scene objects found during scene processing
 		UInt32 renderableSceneObjectCount;
-		// number active render queues
-		UInt32 renderQueueCount;
 		// number of lights found in the scene during PreProcessScene()
 		UInt32 lightCount;
 		// number of ambient lights found in the scene during  PreProcessScene()
@@ -171,10 +170,10 @@ namespace GTE
 		// number of cameras found in the scene during  PreProcessScene()
 		UInt32 cameraCount;
 
+		// render queue manager
+		RenderQueueManager renderQueueManager;
 		// scene objects that contain valid renderables
 		SceneObject* renderableSceneObjects[MAX_SCENE_MESHES];
-		// meshes that are valid for rendering
-		RenderQueue* renderQueues[MAX_RENDER_QUEUES];
 		// list of lights found in the scene during PreProcessScene()
 		SceneObject* sceneLights[MAX_LIGHTS];
 		// list of ambient lights found in the scene during PreProcessScene()
@@ -196,10 +195,6 @@ namespace GTE
 		void Update() override;
 		void PreProcessScene(SceneObject& parent, UInt32 recursionDepth);
 		void PreRenderScene();
-
-		void ClearAllRenderQueues();
-		RenderQueue* GetRenderQueue(UInt32 renderQueueID);
-		void DestroyRenderQueues();
 
 		void RenderSceneForCamera(UInt32 cameraIndex);
 		void RenderSceneForCamera(CameraRef camera);
@@ -245,13 +240,10 @@ namespace GTE
 		void SendActiveMaterialUniformsToShader() const;
 
 		Bool ShouldCullByLayer(IntMask cullingMask, const SceneObject& sceneObject) const;
-		Bool ShouldCullFromLightByPosition(const Light& light, const Point3& lightWorldPosition, const SubMesh3D& mesh, 
-										   const Transform& meshWorldTransform, const Transform& meshWorldTransformInverse) const;
+		Bool ShouldCullFromLightByPosition(const Light& light, const Point3& lightWorldPosition, const SubMesh3D& mesh, const Transform& meshWorldTransformInverse) const;
 		Bool ShouldCullFromLightByLayer(const Light& light, const SceneObject& sceneObject) const;
-		Bool ShouldCullByBoundingBox(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
-										   const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const;
-		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, 
-							  const Transform& meshWorldTransformInverse, const SubMesh3D& mesh) const;
+		Bool ShouldCullByBoundingBox(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const SubMesh3D& mesh) const;
+		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const SubMesh3D& mesh) const;
 
 		void PushRenderTarget(RenderTargetRef renderTarget);
 		RenderTargetRef PopRenderTarget();
