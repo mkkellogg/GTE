@@ -370,7 +370,7 @@ namespace GTE
 		}
 
 		subMesh->SetNormalsSmoothingThreshold(85);
-		mesh->Update();
+		mesh->UpdateAll();
 		return mesh;
 	}
 }

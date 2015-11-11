@@ -10,6 +10,7 @@ namespace GTE
 {
 	//forward declarations
 	class EngineObjectManager;
+	class SceneObject;
 	class SceneObjectComponent;
 
 	enum class SceneObjectEvent
@@ -17,13 +18,18 @@ namespace GTE
 		Awake = 0,
 		Start = 2,
 		Update = 3,
-		WillRender = 4
+		PreRender = 4,
+		WillRender = 5
 	};
 
 	class EventManager
 	{
+		// necessary to dispatch render events
 		friend class ForwardRenderManager;
+		// Engine is the manager class for EventManager. it needs to be able to instantiate it
 		friend class Engine;
+		// necessary to dispatch update events
+		friend class SceneManager;
 
 		protected:
 				
@@ -32,8 +38,8 @@ namespace GTE
 
 		Bool Init();
 
+		void DispatchSceneObjectComponentEvent(SceneObjectEvent evnt, SceneObjectComponent& component);
 		void DispatchSceneObjectEvent(SceneObjectEvent evnt, SceneObject& object);
-		void DispatchSceneObjectEvent(SceneObjectEvent evnt, SceneObjectComponent& object);
 
 		public:
 		

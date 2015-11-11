@@ -79,7 +79,7 @@ namespace GTE
 	 * update the corresponding sub-renderer in the Mesh3DRenderer attached to the same scene
 	 * object (if there is one).
 	 */
-	void Mesh3D::Update()
+	void Mesh3D::UpdateAll()
 	{
 		for(UInt32 i = 0; i < subMeshCount; i++)
 		{

@@ -314,7 +314,7 @@ namespace GTE
 		mesh = objectManager->CreateMesh3D(1);
 		mesh->Init();
 		mesh->SetSubMesh(subMesh, 0);
-		mesh->Update();
+		mesh->UpdateAll();
 
 		attributeSizeID = subMesh->AddCustomFloatAttributeBuffer(2, "PARTICLE_SIZE");
 		NONFATAL_ASSERT_RTRN(attributeSizeID != AttributeDirectory::VarID_Invalid, "ParticleSystem::InitializeMesh -> Could not add custom attribute 'PARTICLE_SIZE'.", false, false);

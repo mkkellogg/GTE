@@ -18,6 +18,16 @@ namespace GTE
 
 	}
 
+	SceneObjectComponentProcessingDescriptor& SceneObjectComponent::GetProcessingDescriptor()
+	{
+		return processingDescriptor;
+	}
+
+	void SceneObjectComponent::SetSceneObject(SceneObjectRef sceneObject)
+	{
+		this->sceneObject = sceneObject;
+	}
+
 	SceneObjectRef SceneObjectComponent::GetSceneObject()
 	{
 		return sceneObject;

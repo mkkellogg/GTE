@@ -21,7 +21,7 @@ class CustomEngineCallbacks : public GTE::EngineCallbacks
 
 	CustomEngineCallbacks() {}
 
-	void OnInit()
+	void OnAwake() override
 	{
 		// instantiate the main Game instance
 		game = new Game();
@@ -30,13 +30,18 @@ class CustomEngineCallbacks : public GTE::EngineCallbacks
 		game->Init();
 	}
 
-	void OnUpdate()
+	void OnStart() override
+	{
+
+	}
+
+	void OnUpdate() override
 	{
 		// pass the Update event to the main Game instance
 		game->Update();
 	}
 
-	void OnPreRender()
+	void OnPreRender() override
 	{
 		// pass the OnPreRender event to the main Game instance
 		game->OnPreRender();

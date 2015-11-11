@@ -102,6 +102,12 @@ namespace GTE
 		Bool engineObjectManagerInitSuccess = engineObjectManager->Init();
 		ASSERT(engineObjectManagerInitSuccess == true, "Engine::Init -> Unable to initialize engine object manager.");
 
+		sceneManager = new(std::nothrow) SceneManager();
+		ASSERT(sceneManager != nullptr, "Engine::Init -> Unable to create scene manager.");
+
+		Bool sceneManagerInitSuccess = sceneManager->Init();
+		ASSERT(sceneManagerInitSuccess == true, "Engine::Init -> Unable to initialize scene manager.");
+
 		// TODO: add switch to detect correct type for platform
 		// for now, only support OpenGL
 		graphicsSystem = new(std::nothrow) GraphicsGL();
@@ -110,6 +116,7 @@ namespace GTE
 		Bool graphicsInitSuccess = graphicsSystem->Init(graphicsAttributes);
 		ASSERT(graphicsInitSuccess == true, "Engine::Init -> Unable to initialize graphics engine.");
 
+		// by default use forward rendering
 		ForwardRenderManager* theRenderManager = new(std::nothrow) ForwardRenderManager();
 		renderManager = theRenderManager;
 		ASSERT(renderManager != nullptr, "Engine::Init -> Unable to allocate render manager.");
@@ -124,12 +131,6 @@ namespace GTE
 
 		animationManager = new(std::nothrow) AnimationManager();
 		ASSERT(animationManager != nullptr, "Engine::Init -> Unable to create animation manager.");
-
-		sceneManager = new(std::nothrow) SceneManager();
-		ASSERT(sceneManager != nullptr, "Engine::Init -> Unable to create scene manager.");
-
-		Bool sceneManagerInitSuccess = sceneManager->Init();
-		ASSERT(sceneManagerInitSuccess == true, "Engine::Init -> Unable to initialize scene manager.");
 
 		eventManager = new(std::nothrow) EventManager();
 		ASSERT(eventManager != nullptr, "Engine::Init -> Unable to create event manager.");
@@ -171,17 +172,20 @@ namespace GTE
 	{
 		if (!firstFrameEntered)
 		{
-			if (callbacks != nullptr)callbacks->OnInit();
 			Time::Update();
+			sceneManager->Awake();
+			if(callbacks != nullptr)callbacks->OnAwake();
+			sceneManager->Start();
+			if(callbacks != nullptr)callbacks->OnStart();
 			firstFrameEntered = true;
 		}
 
 		graphicsSystem->Update();
 		animationManager->Update();
 		inputManager->Update();
-		if (callbacks != nullptr)callbacks->OnUpdate();
 		sceneManager->Update();
-		renderManager->Update();
+		if(callbacks != nullptr)callbacks->OnUpdate();
+		renderManager->PreRender();
 		if (callbacks != nullptr)callbacks->OnPreRender();
 		renderManager->RenderScene();
 		graphicsSystem->PostRender();
@@ -296,6 +300,14 @@ namespace GTE
 	EventManager * Engine::GetEventManager()
 	{
 		return eventManager;
+	}
+
+	/*
+	* Access the SceneManager component.
+	*/
+	SceneManager * Engine::GetSceneManager()
+	{
+		return sceneManager;
 	}
 }
 

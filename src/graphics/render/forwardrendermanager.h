@@ -140,7 +140,6 @@ namespace GTE
 
 		static const UInt32 MAX_LIGHTS = 16;
 		static const UInt32 MAX_CAMERAS = 8;
-		static const UInt32 MAX_SCENE_MESHES = 128;
 		static const UInt32 MAX_RENDER_QUEUES = 128;
 
 		RenderQueueEntry skyboxEntry;
@@ -173,7 +172,7 @@ namespace GTE
 		// render queue manager
 		RenderQueueManager renderQueueManager;
 		// scene objects that contain valid renderables
-		SceneObject* renderableSceneObjects[MAX_SCENE_MESHES];
+		SceneObject* renderableSceneObjects[Constants::MaxSceneObjects];
 		// list of lights found in the scene during PreProcessScene()
 		SceneObject* sceneLights[MAX_LIGHTS];
 		// list of ambient lights found in the scene during PreProcessScene()
@@ -186,13 +185,13 @@ namespace GTE
 
 		// keep track of objects that have been rendered
 		// TODO: optimize usage of this hashing structure
-		std::unordered_map<ObjectPairKey, Bool, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> renderedObjects;
+		std::unordered_map<ObjectPairKey, Bool, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> renderedMeshes;
 		// cache shadow volumes that don't need to be constantly rebuilt
 		std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
 		std::stack<const RenderTargetSharedPtr*> renderTargetStack;
 
-		void Update() override;
+		void PreRender() override;
 		void PreProcessScene(SceneObject& parent, UInt32 recursionDepth);
 		void PreRenderScene();
 
@@ -200,6 +199,7 @@ namespace GTE
 		void RenderSceneForCamera(CameraRef camera);
 
 		void GetViewDescriptorForCamera(const Camera& camera, const Transform* altViewTransform, ViewDescriptor& descriptor);
+		void ClearRenderedStatus();
 
 		void RenderSceneForCurrentRenderTarget(const ViewDescriptor& viewDescriptor);
 		void RenderSkyboxForCamera(const ViewDescriptor& viewDescriptor);

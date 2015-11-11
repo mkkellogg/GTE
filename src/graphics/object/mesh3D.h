@@ -50,7 +50,7 @@ namespace GTE
 		void SetSubMesh(SubMesh3DRef mesh, UInt32 index);
 		SubMesh3DRef GetSubMesh(UInt32 index);
 		Bool Init();
-		void Update();
+		void UpdateAll();
 
 	};
 }

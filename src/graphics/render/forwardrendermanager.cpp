@@ -14,6 +14,7 @@
 #include "object/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "object/enginetypes.h"
+#include "object/eventmanager.h"
 #include "engine.h"
 #include "base/intmask.h"
 #include "graphics/shader/shader.h"
@@ -140,7 +141,7 @@ namespace GTE
 			p->x += 0.5;
 			p->y += 0.5;
 		}
-		fullScreenQuad->Update();
+		fullScreenQuad->UpdateAll();
 
 		// create camera for rendering to [fullScreenQuad]
 		fullScreenQuadCam = objectManager->CreateCamera();
@@ -309,9 +310,9 @@ namespace GTE
 	}
 
 	/*
-	 * Kick off the scene processing from the root of the scene.
+	 * Perform all scene processing that must occur before any rendering.
 	 */
-	void ForwardRenderManager::Update()
+	void ForwardRenderManager::PreRender()
 	{
 		lightCount = 0;
 		ambientLightCount = 0;
@@ -367,8 +368,6 @@ namespace GTE
 			if (child->IsActive())
 			{
 				SceneObjectProcessingDescriptor& processingDescriptor = child->GetProcessingDescriptor();
-				processingDescriptor.Processed = false;
-				processingDescriptor.Rendered = false;
 
 				CameraRef camera = child->GetCamera();
 				if (camera.IsValid() && cameraCount < MAX_CAMERAS)
@@ -431,7 +430,7 @@ namespace GTE
 					else if(skinnedMeshRenderer.IsValid())
 						renderer = skinnedMeshRenderer.GetPtr();
 
-					if(renderer != nullptr &&  mesh->GetSubMeshCount() == renderer->GetSubRendererCount() && renderer->GetMaterialCount() > 0 && renderableSceneObjectCount < MAX_SCENE_MESHES)
+					if(renderer != nullptr &&  mesh->GetSubMeshCount() == renderer->GetSubRendererCount() && renderer->GetMaterialCount() > 0 && renderableSceneObjectCount < Constants::MaxSceneObjects)
 					{
 						renderableSceneObjects[renderableSceneObjectCount] = child;
 						renderableSceneObjectCount++;
@@ -448,6 +447,9 @@ namespace GTE
 						}
 					}
 				}
+
+				// dispatch "PreRender" event
+				Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::PreRender, *child);
 
 				// continue recursion through child object
 				PreProcessScene(*child, recursionDepth + 1);
@@ -668,6 +670,28 @@ namespace GTE
 	}
 
 	/*
+	* Clear the 'rendered' status for each scene object found during scene processing, indicating that
+	* it has not yet been rendered.
+	*/
+	void ForwardRenderManager::ClearRenderedStatus()
+	{
+		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
+		{
+			RenderQueueEntry* entry = *itr;
+
+			SceneObject * sceneObject = entry->Container;
+
+			SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
+			processingDescriptor.Rendered = false;
+		}
+
+		// clear the list of objects that have been rendered at least once. this list is used to
+		// determine if additive blending should be turned on or off. if an object is being rendered for the
+		// first time, additive blending should be off; otherwise it should be on.
+		renderedMeshes.clear();
+	}
+
+	/*
 	 * Render all the meshes in the scene using forward rendering. The camera's inverted transform, which is
 	 * stored in [viewDescriptor] as "ViewTransformInverse", is used as the view transform. The reason the inverse 
 	 * is used is because on the GPU side of things the view transform is used to move the world relative to the camera, 
@@ -681,10 +705,8 @@ namespace GTE
 	 */
 	void ForwardRenderManager::RenderSceneForCurrentRenderTarget(const ViewDescriptor& viewDescriptor)
 	{
-		// clear the list of objects that have been rendered at least once. this list is used to
-		// determine if additive blending should be turned on or off. if an object is being rendered for the
-		// first time, additive blending should be off; otherwise it should be on.
-		renderedObjects.clear();
+		// clear 'rendered' status for each scene object
+		ClearRenderedStatus();
 
 		// clear the appropriate render buffers
 		ClearRenderBuffers(viewDescriptor.ClearBufferMask);
@@ -849,6 +871,14 @@ namespace GTE
 						{
 							currentRenderMode = RenderMode::Standard;
 							Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
+						}
+
+						// Dispatch "WillRender" event
+						SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
+						if(!processingDescriptor.Rendered)
+						{
+							Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
+							processingDescriptor.Rendered = true;
 						}
 
 						// set up lighting descriptor for non self-lit lighting
@@ -1042,7 +1072,7 @@ namespace GTE
 
 		// determine if this mesh has been rendered before
 		ObjectPairKey key(sceneObject->GetObjectID(), mesh->GetObjectID());
-		Bool rendered = renderedObjects[key];
+		Bool rendered = renderedMeshes[key];
 		
 		// if we have an override material, we use that for every mesh
 		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
@@ -1113,7 +1143,7 @@ namespace GTE
 		renderer->Render();
 
 		// flag the current scene object as being rendered (at least once)
-		if (flagRendered)renderedObjects[key] = true;
+		if (flagRendered)renderedMeshes[key] = true;
 	}
 
 	/*

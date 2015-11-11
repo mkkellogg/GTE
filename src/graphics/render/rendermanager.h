@@ -34,7 +34,7 @@ namespace GTE
 		RenderManager();
 		virtual ~RenderManager();
 
-		virtual void Update() = 0;
+		virtual void PreRender() = 0;
 
 		CameraSharedPtr currentCamera;
 		void SetCurrentCamera(CameraRef camera);

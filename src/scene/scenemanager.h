@@ -14,6 +14,7 @@
 
 #include "object/enginetypes.h"
 #include "object/engineobject.h"
+#include "global/constants.h"
 #include "util/datastack.h"
 #include "geometry/transform.h"
 #include <unordered_map>
@@ -22,11 +23,23 @@ namespace GTE
 {
 	// forward declaration
 	class SceneObject;
-	class Transform;
+	class SceneObjectComponent;
+	class Transform;	
 
 	class SceneManager
 	{
+		enum class UpdatePhase
+		{
+			Awake = 0,
+			Start = 1,
+			Update = 2
+		};
+
+		// necessary since Engine manages/owns any instance of SceneManager
 		friend class Engine;
+		// necessary since SceneObject will need to process instances of SceneObjectComponent
+		// as they are added
+		friend class SceneObject;
 
 		SceneManager();
 		~SceneManager();
@@ -34,15 +47,28 @@ namespace GTE
 		// transform stack used for processing scene hierarchy
 		DataStack<Matrix4x4> sceneProcessingStack;
 
+		Int32 maxPhaseReached;
+		UInt32 sceneObjectCount;
+		SceneObject* sceneObjectList[Constants::MaxSceneObjects];
+
+		void Update(UpdatePhase phase);
 		void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
-		void ProcessSceneObject(SceneObject& object);
 		void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
 		void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
+		void ProcessSceneObjectList(UpdatePhase phase);
+
+		void ProcessSceneObjectUpdatePhase(UpdatePhase phase, SceneObject& object);
+		void ProcessSceneObjectComponentUpdatePhase(UpdatePhase phase, SceneObjectComponent& component);
+
+		void ProcessSceneObjectAsNew(SceneObject& object);
+		void ProcessSceneObjectComponentAsNew(SceneObjectComponent& component);
 
 	public:
 
 		Bool Init();
 		void Update();
+		void Start();
+		void Awake();
 
 	};
 }

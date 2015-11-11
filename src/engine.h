@@ -34,7 +34,8 @@ namespace GTE
 	{
 	public:
 
-		virtual void OnInit() = 0;
+		virtual void OnAwake() = 0;
+		virtual void OnStart() = 0;
 		virtual void OnQuit() = 0;
 		virtual void OnUpdate() = 0;
 		virtual void OnPreRender() = 0;
@@ -106,6 +107,7 @@ namespace GTE
 		InputManager * GetInputManager();
 		ErrorManager * GetErrorManager();
 		EventManager * GetEventManager();
+		SceneManager * GetSceneManager();
 	};
 }
 

@@ -10,6 +10,7 @@
 #include "engineobject.h"
 #include "enginetypes.h"
 #include "engineobjectmanager.h"
+#include "scene/scenemanager.h"
 #include "graphics/graphics.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
@@ -52,6 +53,10 @@ namespace GTE
 	void SceneObject::SetActive(Bool active)
 	{
 		this->isActive = active;
+		if(active)
+		{
+			Engine::Instance()->GetSceneManager()->ProcessSceneObjectAsNew(*this);
+		}
 	}
 
 	Bool SceneObject::IsStatic()
@@ -96,7 +101,7 @@ namespace GTE
 
 	SceneObjectProcessingDescriptor& SceneObject::GetProcessingDescriptor()
 	{
-		return processingDesctiptor;
+		return processingDescriptor;
 	}
 
 	void SceneObject::NotifyNewMesh3D()
@@ -122,6 +127,8 @@ namespace GTE
 
 		NotifyNewMesh3D();
 
+		Engine::Instance()->GetSceneManager()->ProcessSceneObjectComponentAsNew(renderer.GetRef());
+
 		return true;
 	}
 
@@ -138,6 +145,8 @@ namespace GTE
 
 		NotifyNewMesh3D();
 
+		Engine::Instance()->GetSceneManager()->ProcessSceneObjectComponentAsNew(renderer.GetRef());
+
 		return true;
 	}
 
@@ -153,6 +162,8 @@ namespace GTE
 
 		NotifyNewMesh3D();
 
+		Engine::Instance()->GetSceneManager()->ProcessSceneObjectComponentAsNew(filter.GetRef());
+
 		return true;
 	}
 
@@ -165,6 +176,8 @@ namespace GTE
 
 		camera->sceneObject = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
 		this->camera = camera;
+
+		Engine::Instance()->GetSceneManager()->ProcessSceneObjectComponentAsNew(camera.GetRef());
 
 		return true;
 	}
@@ -179,6 +192,8 @@ namespace GTE
 		light->sceneObject = thisRef;
 		this->light = light;
 
+		Engine::Instance()->GetSceneManager()->ProcessSceneObjectComponentAsNew(light.GetRef());
+
 		return true;
 	}
 
@@ -191,6 +206,8 @@ namespace GTE
 
 		particleSystem->sceneObject = thisRef;
 		this->particleSystem = particleSystem;
+
+		Engine::Instance()->GetSceneManager()->ProcessSceneObjectComponentAsNew(particleSystem.GetRef());
 
 		return true;
 	}

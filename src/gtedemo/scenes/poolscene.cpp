@@ -402,7 +402,7 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 
 	singleStoneMesh->GetSubMesh(0)->SetCalculateNormals(true);
 	singleStoneMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(25);
-	singleStoneMesh->Update();
+	singleStoneMesh->UpdateAll();
 
 
 	// load castle wall model for pool walls
@@ -456,7 +456,7 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	wallBlockMeshObject->GetMesh3DFilter()->SetCastShadows(false);
 	wallBlockMesh = wallBlockMeshObject->GetMesh3D();
 	wallBlockMesh->GetSubMesh(0)->SetNormalsSmoothingThreshold(5);
-	wallBlockMesh->Update();
+	wallBlockMesh->UpdateAll();
 
 	// place pool floor in scene
 	modelSceneObject->SetActive(true);

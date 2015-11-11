@@ -29,9 +29,12 @@ namespace GTE
 
 		Transform AggregateTransform;
 		Transform AggregateTransformInverse;
-		Bool Processed;
 		Bool Rendered;
 
+		SceneObjectProcessingDescriptor()
+		{
+			Rendered = false;
+		}
 	};
 
 	class SceneObject : public EngineObject
@@ -56,7 +59,7 @@ namespace GTE
 
 	protected:
 
-		SceneObjectProcessingDescriptor processingDesctiptor;
+		SceneObjectProcessingDescriptor processingDescriptor;
 
 		std::string name;
 		Bool isActive;

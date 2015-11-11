@@ -11,6 +11,8 @@ namespace GTE
 	{
 	public:
 
+		static const UInt32 MaxSceneObjects = 4096;
+		
 		static const Real PI;
 		static const Real TwoPI;
 		static const Real PIOver360;

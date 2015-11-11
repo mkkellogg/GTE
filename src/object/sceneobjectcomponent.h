@@ -10,6 +10,20 @@ namespace GTE
 	class SceneObjectComponent;
 	class SceneObject;
 
+	class SceneObjectComponentProcessingDescriptor
+	{
+		public:
+
+		Bool Awake;
+		Bool Started;
+
+		SceneObjectComponentProcessingDescriptor()
+		{
+			Awake = false;
+			Started = false;
+		}
+	};
+
 	class SceneObjectComponent : public EngineObject
 	{
 		// Since this derives from EngineObject, we make this class
@@ -23,10 +37,15 @@ namespace GTE
 
 	protected:
 
+		SceneObjectComponentProcessingDescriptor processingDescriptor;
 		SceneObjectSharedPtr sceneObject;
+
+		SceneObjectComponentProcessingDescriptor& GetProcessingDescriptor();
 
 		SceneObjectComponent();
 		virtual ~SceneObjectComponent();
+
+		void SetSceneObject(SceneObjectRef sceneObject);
 
 		virtual void Awake();
 		virtual void Start();

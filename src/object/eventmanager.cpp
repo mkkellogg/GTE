@@ -15,6 +15,8 @@
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/particles/particlesystem.h"
+#include "engine.h"
+#include "global/assert.h"
 
 namespace GTE
 {
@@ -33,49 +35,69 @@ namespace GTE
 		return true;
 	}
 
-	void EventManager::DispatchSceneObjectEvent(SceneObjectEvent evnt, SceneObject& object)
+	void EventManager::DispatchSceneObjectComponentEvent(SceneObjectEvent evnt, SceneObjectComponent& component)
 	{
-		CameraRef camera = object.GetCamera();
-		if(camera.IsValid())
-		{
-			DispatchSceneObjectEvent(evnt, camera.GetRef());
-		}
+		SceneObjectRef container = component.GetSceneObject();
+		NONFATAL_ASSERT(container.IsValid(), "EventManager::DispatchSceneObjectComponentEvent -> Component's container is not valid!", true);
 
-		LightRef light = object.GetLight();
-		if(light.IsValid())
+		// only process components that belong to active scene objects
+		if(container->IsActive())
 		{
-			DispatchSceneObjectEvent(evnt, light.GetRef());
-		}
-
-		Mesh3DRef mesh = object.GetMesh3D();
-		if(mesh.IsValid())
-		{
-			DispatchSceneObjectEvent(evnt, mesh.GetRef());
-		}
-
-		ParticleSystemRef particleSystem = object.GetParticleSystem();
-		if(particleSystem.IsValid())
-		{
-			DispatchSceneObjectEvent(evnt, particleSystem.GetRef());
+			SceneObjectComponentProcessingDescriptor& processingDesc = component.GetProcessingDescriptor();
+			switch(evnt)
+			{
+				case SceneObjectEvent::Awake:
+				if(!processingDesc.Awake)
+				{
+					component.Awake();
+					processingDesc.Awake = true;
+				}
+				break;
+				case SceneObjectEvent::Start:
+				if(!processingDesc.Started)
+				{
+					component.Start();
+					processingDesc.Started = true;
+				}
+				break;
+				case SceneObjectEvent::Update:
+					component.Update();
+				break;
+				case SceneObjectEvent::WillRender:
+					component.OnWillRender();
+				break;
+			}
 		}
 	}
 
-	void EventManager::DispatchSceneObjectEvent(SceneObjectEvent evnt, SceneObjectComponent& object)
+	void EventManager::DispatchSceneObjectEvent(SceneObjectEvent evnt, SceneObject& object)
 	{
-		switch(evnt)
+		// only process active scene objects
+		if(object.IsActive())
 		{
-			case SceneObjectEvent::Awake:
-				object.Awake();
-			break;
-			case SceneObjectEvent::Start:
-				object.Start();
-			break;
-			case SceneObjectEvent::Update:
-				object.Update();
-			break;
-			case SceneObjectEvent::WillRender:
-				object.OnWillRender();
-			break;
+			CameraRef camera = object.GetCamera();
+			if(camera.IsValid())
+			{
+				DispatchSceneObjectComponentEvent(evnt, camera.GetRef());
+			}
+
+			LightRef light = object.GetLight();
+			if(light.IsValid())
+			{
+				DispatchSceneObjectComponentEvent(evnt, light.GetRef());
+			}
+
+			Mesh3DFilterRef filter = object.GetMesh3DFilter();
+			if(filter.IsValid())
+			{
+				DispatchSceneObjectComponentEvent(evnt, filter.GetRef());
+			}
+
+			ParticleSystemRef particleSystem = object.GetParticleSystem();
+			if(particleSystem.IsValid())
+			{
+				DispatchSceneObjectComponentEvent(evnt, particleSystem.GetRef());
+			}
 		}
 	}
 }
