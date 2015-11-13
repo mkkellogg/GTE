@@ -229,8 +229,9 @@ SceneObjectSharedPtr ModelImporter::ProcessModelScene(const std::string& modelPa
 	for(UInt32 s = 0; s < createdSceneObjects.size(); s++)
 	{
 		// does the SceneObject instance have a SkinnedMesh3DRenderer ?
-		SkinnedMesh3DRendererSharedPtr renderer = createdSceneObjects[s]->GetSkinnedMesh3DRenderer();
-		if(renderer.IsValid())
+
+		SkinnedMesh3DRendererSharedPtr skinnedRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::SkinnedMesh3DRenderer>(createdSceneObjects[s]->GetRenderer());
+		if(skinnedRenderer.IsValid())
 		{
 			// clone [skeleton]
 			SkeletonSharedPtr skeletonClone = objectManager->CloneSkeleton(skeleton);
@@ -241,7 +242,7 @@ SceneObjectSharedPtr ModelImporter::ProcessModelScene(const std::string& modelPa
 			}
 
 			// assign the clones skeleton to [renderer]
-			renderer->SetSkeleton(skeletonClone);
+			skinnedRenderer->SetSkeleton(skeletonClone);
 
 			Matrix4x4 mat;
 			createdSceneObjects[s]->GetTransform().CopyMatrix(mat);
@@ -249,7 +250,7 @@ SceneObjectSharedPtr ModelImporter::ProcessModelScene(const std::string& modelPa
 			// if the transformation matrix for this scene object has an inverted scale, we need to process the
 			// vertex bone map in reverse order. we pass the [reverseVertexOrder] flag to SetupVertexBoneMapForRenderer()
 			Bool reverseVertexOrder = HasOddReflections(mat);
-			SetupVertexBoneMapForRenderer(scene, skeletonClone, renderer, reverseVertexOrder);
+			SetupVertexBoneMapForRenderer(scene, skeletonClone, skinnedRenderer, reverseVertexOrder);
 		}
 	}
 	return root;
@@ -398,12 +399,12 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 				if(boneCounts[n] > 0)skinnedMeshRenderer->MapSubMeshToVertexBoneMap(n, node.mMeshes[n]);
 			}
 
-			sceneObject->SetSkinnedMesh3DRenderer(skinnedMeshRenderer);
+			sceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::SkinnedMesh3DRenderer, GTE::Renderer>(skinnedMeshRenderer));
 		}
 		// set the Mesh3DRenderer instance and Mesh3D instance
 		else
 		{
-			sceneObject->SetMesh3DRenderer(meshRenderer);
+			sceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(meshRenderer));
 		}
 	}
 

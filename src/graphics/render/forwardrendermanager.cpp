@@ -161,7 +161,7 @@ namespace GTE
 
 		Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 		ASSERT(filter.IsValid(), "ForwardRenderManager::InitFullScreenQuad -> Unable to renderer for full screen quad.");
-		fullScreenQuadObject->SetMesh3DRenderer(renderer);
+		fullScreenQuadObject->SetRenderer(DynamicCastEngineObject<Mesh3DRenderer, Renderer>(renderer));
 
 		fullScreenQuadObject->SetActive(false);
 
@@ -294,7 +294,7 @@ namespace GTE
 		fullScreenQuadObject->SetActive(true);
 
 		// set [material] to be the material for the full screen quad mesh
-		Mesh3DRendererRef renderer = fullScreenQuadObject->GetMesh3DRenderer();
+		Mesh3DRendererRef renderer = DynamicCastEngineObject<Renderer, Mesh3DRenderer>(fullScreenQuadObject->GetRenderer());
 		if (renderer->GetMaterialCount() > 0)renderer->SetMaterial(0, material);
 		else renderer->AddMaterial(material);
 
@@ -415,39 +415,38 @@ namespace GTE
 					}
 				}
 
-				Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
+				RendererRef baseRenderer = child->GetRenderer();
 				Mesh3DFilterRef meshFilter = child->GetMesh3DFilter();
 				Mesh3DRef mesh = child->GetMesh3D();
-				SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
-
-				if(meshFilter.IsValid() && mesh.IsValid() && (meshRenderer.IsValid() || skinnedMeshRenderer.IsValid()))
+			
+				if(baseRenderer.IsValid())
 				{
-					Mesh3DRenderer * renderer = nullptr;
-					if(meshRenderer.IsValid())
-						renderer = meshRenderer.GetPtr();
-					else if(skinnedMeshRenderer.IsValid())
-						renderer = skinnedMeshRenderer.GetPtr();
-
-					if(renderer != nullptr &&  mesh->GetSubMeshCount() == renderer->GetSubRendererCount() && renderer->GetMaterialCount() > 0 && renderableSceneObjectCount < Constants::MaxSceneObjects)
+					Mesh3DRenderer * meshRenderer = dynamic_cast<SkinnedMesh3DRenderer*>(baseRenderer.GetPtr());
+					if(meshRenderer == nullptr)
 					{
-						renderableSceneObjects[renderableSceneObjectCount] = child;
-						renderableSceneObjectCount++;
-						UInt32 materialCount = renderer->GetMaterialCount();
-						UInt32 subMeshCount = mesh->GetSubMeshCount();
-						for(UInt32 i = 0; i < subMeshCount; i++)
-						{
-							MaterialRef mat = renderer->GetMaterial(i % materialCount);
-							RenderQueue* targetRenderQueue = renderQueueManager.GetRenderQueueForID(mat->GetRenderQueue());
+						meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer.GetPtr());
+					}
 
-							SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
-							Transform * aggregateTransform = const_cast<Transform*>(&processingDesc.AggregateTransform);
-							targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), renderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);
+					if(meshRenderer != nullptr)
+					{
+						if(meshFilter.IsValid() && mesh.IsValid() &&  mesh->GetSubMeshCount() == meshRenderer->GetSubRendererCount() && meshRenderer->GetMaterialCount() > 0 && renderableSceneObjectCount < Constants::MaxSceneObjects)
+						{
+							renderableSceneObjects[renderableSceneObjectCount] = child;
+							renderableSceneObjectCount++;
+							UInt32 materialCount = meshRenderer->GetMaterialCount();
+							UInt32 subMeshCount = mesh->GetSubMeshCount();
+							for(UInt32 i = 0; i < subMeshCount; i++)
+							{
+								MaterialRef mat = meshRenderer->GetMaterial(i % materialCount);
+								RenderQueue* targetRenderQueue = renderQueueManager.GetRenderQueueForID(mat->GetRenderQueue());
+
+								SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
+								Transform * aggregateTransform = const_cast<Transform*>(&processingDesc.AggregateTransform);
+								targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), meshRenderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);
+							}
 						}
 					}
 				}
-
-				// dispatch "PreRender" event
-				Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::PreRender, *child);
 
 				// continue recursion through child object
 				PreProcessScene(*child, recursionDepth + 1);
@@ -475,30 +474,25 @@ namespace GTE
 			modelInverse.SetTo(model);
 			modelInverse.Invert();
 
-			Mesh3DRendererRef meshRenderer = child->GetMesh3DRenderer();
-			SkinnedMesh3DRendererRef skinnedMeshRenderer = child->GetSkinnedMesh3DRenderer();
-
-			if(meshRenderer.IsValid() || skinnedMeshRenderer.IsValid())
+			RendererRef baseRenderer = child->GetRenderer();
+			Mesh3DRenderer * meshRenderer = dynamic_cast<SkinnedMesh3DRenderer*>(baseRenderer.GetPtr());
+			if(meshRenderer == nullptr)
 			{
-				Mesh3DRenderer * renderer = nullptr;
-				if(meshRenderer.IsValid())
-					renderer = meshRenderer.GetPtr();
-				else if(skinnedMeshRenderer.IsValid())
-					renderer = skinnedMeshRenderer.GetPtr();
+				meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer.GetPtr());
+			}
 
-				if(renderer != nullptr)
+			if(meshRenderer != nullptr)
+			{
+				// for each sub-renderer, call the PreRender() method
+				for(UInt32 r = 0; r < meshRenderer->GetSubRendererCount(); r++)
 				{
-					// for each sub-renderer, call the PreRender() method
-					for(UInt32 r = 0; r < renderer->GetSubRendererCount(); r++)
+					SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(r);
+					if(subRenderer.IsValid())
 					{
-						SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(r);
-						if(subRenderer.IsValid())
-						{
-							subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
-						}
+						subRenderer->PreRender(model.GetConstMatrix(), modelInverse.GetConstMatrix());
 					}
 				}
-			}
+		}
 		}
 	}
 
@@ -686,7 +680,7 @@ namespace GTE
 		// clear the list of objects that have been rendered at least once. this list is used to
 		// determine if additive blending should be turned on or off. if an object is being rendered for the
 		// first time, additive blending should be off; otherwise it should be on.
-		renderedMeshes.clear();
+		renderedObjects.clear();
 	}
 
 	/*
@@ -902,13 +896,9 @@ namespace GTE
 			SceneObject* skyboxObject = viewDescriptor.SkyboxObject;
 			NONFATAL_ASSERT(skyboxObject != nullptr, "ForwardRenderManager::RenderSkyboxForCamera -> View descriptor has invalid skybox scene object.", true);
 
-			Mesh3DRendererRef meshRenderer = skyboxObject->GetMesh3DRenderer();
-			SkinnedMesh3DRendererRef skinnedmeshRenderer = skyboxObject->GetSkinnedMesh3DRenderer();
+			Mesh3DRendererRef meshRenderer = DynamicCastEngineObject<Renderer, Mesh3DRenderer>(skyboxObject->GetRenderer());
 			Mesh3DRenderer * renderer = nullptr;
-			if(meshRenderer.IsValid())
-				renderer = meshRenderer.GetPtr();
-			else if(skinnedmeshRenderer.IsValid())
-				renderer = skinnedmeshRenderer.GetPtr();
+			if(meshRenderer.IsValid())renderer = meshRenderer.GetPtr();
 
 			NONFATAL_ASSERT(renderer != nullptr, "ForwardRenderManager::RenderSkyboxForCamera -> Could not find valid renderer for skybox.", true);
 		
@@ -982,8 +972,8 @@ namespace GTE
 		ssaoOutlineMaterial->SetMatrix4x4(projectionInvMat, "INV_PROJECTION_MATRIX");
 		ssaoOutlineMaterial->SetUniform1f(.5f, "DISTANCE_THRESHHOLD");
 		ssaoOutlineMaterial->SetUniform2f(.3f, .75f, "FILTER_RADIUS");
-		ssaoOutlineMaterial->SetUniform1f((GTE::Real)depthRenderTarget->GetWidth(), "SCREEN_WIDTH");
-		ssaoOutlineMaterial->SetUniform1f((GTE::Real)depthRenderTarget->GetHeight(), "SCREEN_HEIGHT");
+		ssaoOutlineMaterial->SetUniform1f((Real)depthRenderTarget->GetWidth(), "SCREEN_WIDTH");
+		ssaoOutlineMaterial->SetUniform1f((Real)depthRenderTarget->GetHeight(), "SCREEN_HEIGHT");
 
 		FowardBlendingMethod currentFoward = GetForwardBlending();
 
@@ -1062,15 +1052,12 @@ namespace GTE
 	
 		SceneObject* sceneObject = entry.Container;
 		SubMesh3DRenderer* renderer = entry.Renderer;
-		SubMesh3D* mesh = entry.Mesh;
 
-		NONFATAL_ASSERT(mesh != nullptr, "ForwardRenderManager::RenderMesh -> Renderer returned null mesh.", true);
 		NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderMesh -> Scene object is not valid.", true);
 		NONFATAL_ASSERT(renderer != nullptr, "ForwardRenderManager::RenderMesh -> Null sub renderer encountered.", true);
 
 		// determine if this mesh has been rendered before
-		ObjectPairKey key(sceneObject->GetObjectID(), mesh->GetObjectID());
-		Bool rendered = renderedMeshes[key];
+		Bool rendered = renderedObjects[renderer->GetObjectID()];
 		
 		// if we have an override material, we use that for every mesh
 		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
@@ -1141,7 +1128,7 @@ namespace GTE
 		renderer->Render();
 
 		// flag the current scene object as being rendered (at least once)
-		if (flagRendered)renderedMeshes[key] = true;
+		if (flagRendered)renderedObjects[renderer->GetObjectID()] = true;
 	}
 
 	/*
@@ -1304,34 +1291,27 @@ namespace GTE
 	 */
 	void ForwardRenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection)
 	{
-		Mesh3DRenderer * renderer = nullptr;
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
 		Transform modelInverse;
 
-		Mesh3DRendererRef mesh3DRenderer = sceneObject.GetMesh3DRenderer();
-		SkinnedMesh3DRendererRef skinnedMesh3DRenderer = sceneObject.GetSkinnedMesh3DRenderer();
-
-		// check if [sceneObject] has a mesh & renderer
-		if (mesh3DRenderer.IsValid())
+		RendererRef baseRenderer = sceneObject.GetRenderer();
+		Mesh3DRenderer * meshRenderer = dynamic_cast<SkinnedMesh3DRenderer*>(baseRenderer.GetPtr());
+		if(meshRenderer == nullptr)
 		{
-			renderer = const_cast<Mesh3DRenderer *>(mesh3DRenderer.GetConstPtr());
-		}
-		else if (skinnedMesh3DRenderer.IsValid())
-		{
-			renderer = const_cast<SkinnedMesh3DRenderer *>(skinnedMesh3DRenderer.GetConstPtr());
+			meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer.GetPtr());
 		}
 
-		if (renderer != nullptr)
+		if (meshRenderer != nullptr)
 		{
-			Mesh3DRef mesh = renderer->GetTargetMesh();
+			Mesh3DRef mesh = meshRenderer->GetTargetMesh();
 			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
 
 			NONFATAL_ASSERT(mesh.IsValid(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
 			NONFATAL_ASSERT(filter.IsValid(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
-			NONFATAL_ASSERT(mesh->GetSubMeshCount() == renderer->GetSubRendererCount(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
-			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Renderer has no materials.", true);
+			NONFATAL_ASSERT(mesh->GetSubMeshCount() == meshRenderer->GetSubRendererCount(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
+			NONFATAL_ASSERT(meshRenderer->GetMaterialCount() > 0, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Renderer has no materials.", true);
 
 			// calculate model transform and inverse model transform
 			SceneObjectProcessingDescriptor& processingDesc = sceneObject.GetProcessingDescriptor();
@@ -1347,9 +1327,9 @@ namespace GTE
 			modelInverse.TransformVector(modelLocalLightDir);
 
 			// loop through each sub-renderer and render the shadow volume for its sub-mesh
-			for (UInt32 i = 0; i < renderer->GetSubRendererCount(); i++)
+			for (UInt32 i = 0; i < meshRenderer->GetSubRendererCount(); i++)
 			{
-				SubMesh3DRendererRef subRenderer = renderer->GetSubRenderer(i);
+				SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(i);
 				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
 
 				// if mesh doesn't have face data, it can't have a shadow volume
@@ -1671,8 +1651,8 @@ namespace GTE
 				// calculate squared offset
 				Real dSqr = d * d;
 				// check if mesh's center is within +/- (radiusSqr + planarRangeSqr) of the light's plane
-				if(GTE::GTEMath::QuickSquareRoot(parallelPortionSqr) - GTE::GTEMath::QuickSquareRoot(dSqr) > 
-				   GTE::GTEMath::QuickSquareRoot(planarRangeSqr) + GTE::GTEMath::QuickSquareRoot(maxRadiusSqr))
+				if(GTEMath::QuickSquareRoot(parallelPortionSqr) - GTEMath::QuickSquareRoot(dSqr) > 
+				   GTEMath::QuickSquareRoot(planarRangeSqr) + GTEMath::QuickSquareRoot(maxRadiusSqr))
 				{
 					return true;
 				}
@@ -1693,7 +1673,7 @@ namespace GTE
 				// get suared projected sistance of [lightPosToCenter] in light's plane
 				Real portionPlanarSqr = lightPosToCenterLengthSqr - parallelPortionSqr;
 				// check if mesh's center is within +/- (radialRangeSqr + radiusSqr) of the light's position
-				if(GTE::GTEMath::QuickSquareRoot(portionPlanarSqr) > GTE::GTEMath::QuickSquareRoot(radialRangeSqr) + GTE::GTEMath::QuickSquareRoot(maxRadiusSqr))
+				if(GTEMath::QuickSquareRoot(portionPlanarSqr) > GTEMath::QuickSquareRoot(radialRangeSqr) + GTEMath::QuickSquareRoot(maxRadiusSqr))
 				{
 					return true;
 				}
@@ -1703,12 +1683,12 @@ namespace GTE
 			else if(light.GetType() == LightType::Point)
 			{
 				Real lightRange = light.GetRange();
-				Real maxRange = GTE::GTEMath::QuickSquareRoot(maxRadiusSqr) + lightRange;
+				Real maxRange = GTEMath::QuickSquareRoot(maxRadiusSqr) + lightRange;
 
 				Vector3 toCenter;
 				Point3::Subtract(meshCenter, lightPosition, toCenter);
 				Real rangeSquare = toCenter.x * toCenter.x + toCenter.y * toCenter.y + toCenter.z * toCenter.z;
-				Real range = GTE::GTEMath::QuickSquareRoot(rangeSquare);
+				Real range = GTEMath::QuickSquareRoot(rangeSquare);
 
 				return range > maxRange;
 			}

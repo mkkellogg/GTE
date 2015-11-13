@@ -42,7 +42,11 @@ GTE::SkinnedMesh3DRendererSharedPtr GameUtil::FindFirstSkinnedMeshRenderer(GTE::
 {
 	if(!ref.IsValid())return GTE::SkinnedMesh3DRendererSharedPtr::Null();
 
-	if(ref->GetSkinnedMesh3DRenderer().IsValid())return ref->GetSkinnedMesh3DRenderer();
+	if(ref->GetRenderer().IsValid())
+	{
+		GTE::SkinnedMesh3DRendererSharedPtr skinnedMeshRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::SkinnedMesh3DRenderer>(ref->GetRenderer());
+		return skinnedMeshRenderer;
+	}
 
 	for(GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++)
 	{
@@ -193,7 +197,7 @@ GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GT
 	meshSceneObject->SetMesh3DFilter(meshFilter);
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
-	meshSceneObject->SetMesh3DRenderer(renderer);
+	meshSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 
 	meshSceneObject->GetTransform().Scale(sx, sy, sz, false);
 	if(ra != 0)meshSceneObject->GetTransform().Rotate(rx, ry, rz, ra, false);

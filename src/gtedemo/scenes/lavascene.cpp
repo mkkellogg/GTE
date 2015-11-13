@@ -233,7 +233,7 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 	// extract mesh & material from stone model
 	GTE::SceneObjectSharedPtr stone1MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr stone1Mesh = stone1MeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr stone1Renderer = stone1MeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr stone1Renderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(stone1MeshObject->GetRenderer());
 	GTE::MaterialSharedPtr stone1Material = stone1Renderer->GetMaterial(0);
 
 	// place initial stone in scene
@@ -307,7 +307,7 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from mushroom house model
 	GTE::SceneObjectSharedPtr mushroomHouseMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr mushroomHouseMesh = mushroomHouseMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr mushroomHouseMeshRenderer = mushroomHouseMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr mushroomHouseMeshRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(mushroomHouseMeshObject->GetRenderer());
 	GTE::Mesh3DFilterSharedPtr mushroomHouseMeshFilter = mushroomHouseMeshObject->GetMesh3DFilter();
 
 	// place mushroom house in the scene
@@ -343,7 +343,7 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 	GTE::SceneObjectSharedPtr woodBridgeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DFilterSharedPtr woodBridgeMeshFilter = woodBridgeMeshObject->GetMesh3DFilter();
 	GTE::Mesh3DSharedPtr woodBridgeMesh = woodBridgeMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr woodBridgeRenderer = woodBridgeMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr woodBridgeRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(woodBridgeMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr woodBridgeMaterial = woodBridgeRenderer->GetMaterial(0);
 	woodBridgeMeshFilter->SetUseBackSetShadowVolume(false);
 	woodBridgeMeshFilter->SetUseCustomShadowVolumeOffset(true);
@@ -420,7 +420,7 @@ void LavaScene::SetupExtra(GTE::AssetImporter& importer)
 	// create the cube mesh's renderer
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
-	cubeSceneObject->SetMesh3DRenderer(renderer);
+	cubeSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 
 	// scale the cube and move to its position in the scene
 	cubeSceneObject->GetTransform().Scale(1.5f, 1.5f, 1.5f, false);
@@ -466,7 +466,7 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShared
 	filter->SetCastShadows(false);
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(selflitMaterial);
-	spinningPointLightObject->SetMesh3DRenderer(renderer);
+	spinningPointLightObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 	GTE::LightSharedPtr light = objectManager->CreateLight();
 	light->SetIntensity(2.5f);
 	GTE::IntMask mergedMask = lavaIslandObjectsLayerMask;
@@ -538,6 +538,9 @@ void LavaScene::SetupParticleSystems(GTE::AssetImporter& importer)
 	GTE::SceneObjectRef particleSystemObject = objectManager->CreateSceneObject();
 	ASSERT(particleSystemObject.IsValid(), "Unable to create flame particle system object!\n");
 	particleSystemObject->SetParticleSystem(flameSystem);*/
+
+	//GTE::Mesh3DRendererRef meshRenderer = objectManager->CreateMesh3DRenderer();
+	//GTE::RendererRef baseRenderer = GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(meshRenderer);
 }
 
 /*

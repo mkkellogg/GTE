@@ -204,7 +204,7 @@ GTE::Bool LavaField::Init()
 	renderer->AddMaterial(lavaMaterial);
 
 	lavaFieldObject->SetMesh3DFilter(meshFilter);
-	lavaFieldObject->SetMesh3DRenderer(renderer);
+	lavaFieldObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 	lavaFieldObject->SetActive(true);
 	lavaFieldObject->SetStatic(false);
 	lavaFieldObject->GetTransform().Rotate(1, 0, 0, -90, false);

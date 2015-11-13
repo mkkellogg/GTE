@@ -185,7 +185,7 @@ namespace GTE
 
 		// keep track of objects that have been rendered
 		// TODO: optimize usage of this hashing structure
-		std::unordered_map<ObjectPairKey, Bool, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> renderedMeshes;
+		std::unordered_map<UInt32, Bool> renderedObjects;
 		// cache shadow volumes that don't need to be constantly rebuilt
 		std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 

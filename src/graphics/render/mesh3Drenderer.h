@@ -22,6 +22,7 @@
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "object/sceneobjectcomponent.h"
+#include "renderer.h"
 #include <vector>
 
 namespace GTE
@@ -33,7 +34,7 @@ namespace GTE
 	class Material;
 	class Mesh3D;
 
-	class Mesh3DRenderer : public SceneObjectComponent
+	class Mesh3DRenderer : public Renderer
 	{
 		// Since this ultimately derives from EngineObject, we make this class
 		// a friend of EngineObjectManager, and the constructor & destructor

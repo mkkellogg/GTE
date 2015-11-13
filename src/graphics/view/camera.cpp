@@ -102,7 +102,8 @@ namespace GTE
 			skyboxMeshRenderer = objectManager->CreateMesh3DRenderer();
 			ASSERT(skyboxMeshRenderer.IsValid(), "Camera::SetSkybox -> Unable to create skybox mesh renderer.");
 			skyboxMeshRenderer->AddMaterial(skyboxMaterial);
-			skyboxSceneObject->SetMesh3DRenderer(skyboxMeshRenderer);
+
+			skyboxSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(skyboxMeshRenderer));
 
 			skyboxSetup = true;
 		}

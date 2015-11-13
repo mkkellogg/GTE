@@ -73,11 +73,12 @@ namespace GTE
 {
 	//forward declarations
 	class Shader;
-	class SubMesh3DRenderer;
-	class SubMesh3D;
+	class Renderer;
 	class Mesh3DRenderer;
+	class SubMesh3DRenderer;
 	class SkinnedMesh3DRenderer;
 	class Mesh3D;
+	class SubMesh3D;
 	class Mesh3DFilter;
 	class Camera;
 	class SceneObject;
@@ -105,6 +106,11 @@ namespace GTE
 		EngineObjectSharedPtr(const EngineObjectSharedPtr<T>& ref) : std::shared_ptr<T>(ref){}
 		EngineObjectSharedPtr(const std::shared_ptr<T>& ref) : std::shared_ptr<T>(ref){}
 		EngineObjectSharedPtr(T * ptr, std::function<void(T*)> deleter) : std::shared_ptr<T>(ptr, deleter){}
+
+		operator std::shared_ptr<T>() const
+		{
+			return std::shared_ptr<T>(std::shared_ptr<T>(*this));
+		}
 
 		operator EngineObjectSharedPtr<const T>() const
 		{ 
@@ -173,6 +179,7 @@ namespace GTE
 	typedef EngineObjectSharedPtr<AnimationPlayer> AnimationPlayerSharedPtr;
 	typedef EngineObjectSharedPtr<RenderTarget> RenderTargetSharedPtr;
 	typedef EngineObjectSharedPtr<ParticleSystem> ParticleSystemSharedPtr;
+	typedef EngineObjectSharedPtr<Renderer> RendererSharedPtr;
 
 	typedef EngineObjectSharedPtr<const Shader> ShaderSharedConstPtr;
 	typedef EngineObjectSharedPtr<const SubMesh3DRenderer> SubMesh3DRendererSharedConstPtr;
@@ -193,6 +200,7 @@ namespace GTE
 	typedef EngineObjectSharedPtr<const AnimationPlayer> AnimationPlayerSharedConstPtr;
 	typedef EngineObjectSharedPtr<const RenderTarget> RenderTargetSharedConstPtr;
 	typedef EngineObjectSharedPtr<const ParticleSystem> ParticleSystemSharedConstPtr;
+	typedef EngineObjectSharedPtr<const Renderer> RendererSharedConstPtr;
 
 	typedef const ShaderSharedPtr& ShaderRef;
 	typedef const SubMesh3DRendererSharedPtr& SubMesh3DRendererRef;
@@ -213,6 +221,7 @@ namespace GTE
 	typedef const AnimationPlayerSharedPtr& AnimationPlayerRef;
 	typedef const RenderTargetSharedPtr& RenderTargetRef;
 	typedef const ParticleSystemSharedPtr& ParticleSystemRef;
+	typedef const RendererSharedPtr& RendererRef;
 
 	extern const ShaderSharedPtr& NullShaderRef;
 	extern const SubMesh3DRendererSharedPtr& NullSubMesh3DRendererRef;
@@ -232,7 +241,8 @@ namespace GTE
 	extern const AnimationInstanceSharedPtr& NullAnimationInstanceRef;
 	extern const AnimationPlayerSharedPtr& NullAnimationPlayerRef;
 	extern const RenderTargetSharedPtr& NullRenderTargetRef;
-	extern const ParticleSystemSharedPtr& NullparticleSystemRef;
+	extern const ParticleSystemSharedPtr& NullParticleSystemRef;
+	extern const RendererSharedPtr& NullRendererRef;
 
 	typedef const ShaderSharedConstPtr& ShaderConstRef;
 	typedef const SubMesh3DRendererSharedConstPtr& SubMesh3DRendererConstRef;
@@ -253,7 +263,15 @@ namespace GTE
 	typedef const AnimationPlayerSharedConstPtr& AnimationPlayerConstRef;
 	typedef const RenderTargetSharedConstPtr& RenderTargetConstRef;
 	typedef const ParticleSystemSharedConstPtr& ParticleSystemConstRef;
-}
+	typedef const RendererSharedConstPtr& RendererConstRef;
 
+	template<typename T, typename U> EngineObjectSharedPtr<U> DynamicCastEngineObject(const EngineObjectSharedPtr<T>& src)
+	{
+		const std::shared_ptr<T>& s1 = src;
+		const std::shared_ptr<U>& s2 = std::dynamic_pointer_cast<U>(s1);
+
+		return EngineObjectSharedPtr<U>(s2);
+	}
+}
 
 #endif

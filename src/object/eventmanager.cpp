@@ -96,6 +96,12 @@ namespace GTE
 				DispatchSceneObjectComponentEvent(evnt, filter.GetRef());
 			}
 
+			RendererRef renderer = object.GetRenderer();
+			if(renderer.IsValid())
+			{
+				DispatchSceneObjectComponentEvent(evnt, renderer.GetRef());
+			}
+
 			ParticleSystemRef particleSystem = object.GetParticleSystem();
 			if(particleSystem.IsValid())
 			{

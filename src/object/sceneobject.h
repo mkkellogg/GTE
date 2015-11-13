@@ -64,14 +64,13 @@ namespace GTE
 		std::string name;
 		Bool isActive;
 		Bool isStatic;
-		SceneObjectTransform transform;		
-		std::vector<SceneObjectSharedPtr > children;
+		SceneObjectTransform transform;
+		std::vector<SceneObjectSharedPtr> children;
 		SceneObjectSharedPtr parent;
 		IntMask layerMask;
 		CameraSharedPtr camera;
 		LightSharedPtr light;
-		Mesh3DRendererSharedPtr renderer3D;
-		SkinnedMesh3DRendererSharedPtr skinnedRenderer3D;
+		RendererSharedPtr renderer;
 		Mesh3DFilterSharedPtr mesh3DFilter;
 		ParticleSystemSharedPtr particleSystem;
 
@@ -94,17 +93,15 @@ namespace GTE
 		IntMask GetLayerMask() const;
 
 		SceneObjectTransform& GetTransform();
-		const SceneObjectTransform& GetConstTransform() const;		
+		const SceneObjectTransform& GetConstTransform() const;
 
-		Bool SetMesh3DRenderer(Mesh3DRendererRef renderer);
-		Bool SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer);
+		Bool SetRenderer(RendererRef renderer);
 		Bool SetMesh3DFilter(Mesh3DFilterRef filter);
 		Bool SetCamera(CameraRef camera);
 		Bool SetLight(LightRef light);
 		Bool SetParticleSystem(ParticleSystemRef particleSystem);
 
-		Bool RemoveMesh3DRenderer();
-		Bool RemoveSkinnedMesh3DRenderer();
+		Bool RemoveRenderer();
 		Bool RemoveMesh3DFilter();
 		Bool RemoveCamera();
 		Bool RemoveLight();
@@ -112,8 +109,7 @@ namespace GTE
 	
 		Mesh3DRef GetMesh3D();
 		Mesh3DFilterRef GetMesh3DFilter();
-		Mesh3DRendererRef GetMesh3DRenderer();
-		SkinnedMesh3DRendererRef GetSkinnedMesh3DRenderer();
+		RendererRef GetRenderer();
 		CameraRef GetCamera();
 		LightRef GetLight();
 		ParticleSystemRef GetParticleSystem();

@@ -107,41 +107,24 @@ namespace GTE
 	void SceneObject::NotifyNewMesh3D()
 	{
 		Mesh3DSharedPtr mesh = GetMesh3D();
-		Mesh3DRendererSharedPtr mesh3DRenderer = GetMesh3DRenderer();
-		if (mesh3DRenderer.IsValid() && mesh.IsValid())mesh3DRenderer->InitializeForMesh();
 
-		SkinnedMesh3DRendererSharedPtr skinnedMesh3DRenderer = GetSkinnedMesh3DRenderer();
+		Mesh3DRendererSharedPtr mesh3DRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(renderer);
+		SkinnedMesh3DRendererSharedPtr skinnedMesh3DRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::SkinnedMesh3DRenderer>(renderer);
+
+		if (mesh3DRenderer.IsValid() && mesh.IsValid())mesh3DRenderer->InitializeForMesh();
 		if (skinnedMesh3DRenderer.IsValid() && mesh.IsValid())skinnedMesh3DRenderer->InitializeForMesh();
 	}
 
-	Bool SceneObject::SetMesh3DRenderer(Mesh3DRendererRef renderer)
+	Bool SceneObject::SetRenderer(RendererRef renderer)
 	{
-		if (this->renderer3D == renderer)return true;
-		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::SetMeshRenderer3D -> 'renderer' is invalid.", false, true);
+		if(this->renderer == renderer)return true;
+		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::SetRenderer -> 'renderer' is invalid.", false, true);
 
 		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-		ASSERT(thisRef.IsValid(), "SceneObject::SetMeshRenderer3D -> Could not find matching reference for scene object");
+		ASSERT(thisRef.IsValid(), "SceneObject::SetRenderer -> Could not find matching reference for scene object");
 
 		renderer->sceneObject = thisRef;
-		this->renderer3D = renderer;
-
-		NotifyNewMesh3D();
-
-		Engine::Instance()->GetSceneManager()->ProcessSceneObjectComponentAsNew(renderer.GetRef());
-
-		return true;
-	}
-
-	Bool SceneObject::SetSkinnedMesh3DRenderer(SkinnedMesh3DRendererRef renderer)
-	{
-		if (this->skinnedRenderer3D == renderer)return true;
-		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::SkinnedMesh3DRendererRef -> 'renderer' is invalid.", false, true);
-
-		SceneObjectRef thisRef = Engine::Instance()->GetEngineObjectManager()->FindSceneObjectInDirectory(GetObjectID());
-		ASSERT(thisRef.IsValid(), "SceneObject::SkinnedMesh3DRendererRef -> Could not find matching reference for scene object.");
-
-		renderer->sceneObject = thisRef;
-		this->skinnedRenderer3D = renderer;
+		this->renderer = renderer;
 
 		NotifyNewMesh3D();
 
@@ -212,22 +195,12 @@ namespace GTE
 		return true;
 	}
 
-	Bool SceneObject::RemoveMesh3DRenderer()
+	Bool SceneObject::RemoveRenderer()
 	{
-		NONFATAL_ASSERT_RTRN(renderer3D.IsValid(), "SceneObject::RemoveMesh3DRenderer -> Scene object has no mesh renderer.", false, true);
+		NONFATAL_ASSERT_RTRN(renderer.IsValid(), "SceneObject::RemoveRenderer -> Scene object has no renderer.", false, true);
 
-		renderer3D->sceneObject = SceneObjectSharedPtr::Null();
-		this->renderer3D = Mesh3DRendererSharedPtr::Null();
-
-		return true;
-	}
-
-	Bool SceneObject::RemoveSkinnedMesh3DRenderer()
-	{
-		NONFATAL_ASSERT_RTRN(skinnedRenderer3D.IsValid(), "SceneObject::RemoveSkinnedMesh3DRenderer -> Scene object has no skinned mesh renderer.", false, true);
-
-		skinnedRenderer3D->sceneObject = SceneObjectSharedPtr::Null();
-		this->skinnedRenderer3D = SkinnedMesh3DRendererSharedPtr::Null();
+		renderer->sceneObject = SceneObjectSharedPtr::Null();
+		this->renderer = RendererSharedPtr::Null();
 
 		return true;
 	}
@@ -283,14 +256,9 @@ namespace GTE
 		return mesh3DFilter;
 	}
 
-	Mesh3DRendererRef SceneObject::GetMesh3DRenderer()
+	RendererRef SceneObject::GetRenderer()
 	{
-		return renderer3D;
-	}
-
-	SkinnedMesh3DRendererRef SceneObject::GetSkinnedMesh3DRenderer()
-	{
-		return skinnedRenderer3D;
+		return renderer;
 	}
 
 	CameraRef SceneObject::GetCamera()

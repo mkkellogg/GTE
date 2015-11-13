@@ -440,7 +440,7 @@ namespace GTE
 		NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "ParticleSystem::InitializeMesh -> Could not create mesh renderer.", false, false);
 		NONFATAL_ASSERT_RTRN(particleMaterial.IsValid(), "ParticleSystem::InitializeMesh -> Particle material is not valid.", false, false);
 		meshRenderer->AddMaterial(particleMaterial);
-		meshObject->SetMesh3DRenderer(meshRenderer);
+		meshObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(meshRenderer));
 
 		meshObject->SetActive(false);
 
@@ -457,7 +457,7 @@ namespace GTE
 			{
 				meshFilter->RemoveMesh3D();
 				meshObject->RemoveMesh3DFilter();
-				meshObject->RemoveMesh3DRenderer();
+				meshObject->RemoveRenderer();
 			}
 
 			if(!mesh.IsValid())return;

@@ -329,7 +329,7 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from castle tower model
 	GTE::SceneObjectSharedPtr tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr tower2Mesh = tower2MeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr towerRenderer = tower2MeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr towerRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(tower2MeshObject->GetRenderer());
 	GTE::MaterialSharedPtr towerMaterial = towerRenderer->GetMaterial(0);
 
 	// place initial castle tower in scene
@@ -355,7 +355,7 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from castle tower model
 	GTE::SceneObjectSharedPtr singleStoneMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr singleStoneMesh = singleStoneMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr singleStoneRenderer = singleStoneMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr singleStoneRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(singleStoneMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr singleStoneMaterial = singleStoneRenderer->GetMaterial(0);
 
 	// place initial single stone in scene
@@ -414,7 +414,7 @@ void PoolScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from castle wall model
 	GTE::SceneObjectSharedPtr wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr wallBlockRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(wallBlockMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr wallBlockMaterial = wallBlockRenderer->GetMaterial(0);
 
 	// place initial pool wall in scene
@@ -490,7 +490,7 @@ void PoolScene::SetupPlants(GTE::AssetImporter& importer)
 	// extract tree mesh & material
 	GTE::SceneObjectSharedPtr treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr treeMesh = treeMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr treeRenderer = treeMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr treeRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(treeMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr treeMaterial = treeRenderer->GetMaterial(0);
 
 
@@ -551,7 +551,7 @@ void PoolScene::SetupExtra(GTE::AssetImporter& importer)
 	// extract fence mesh & material
 	GTE::SceneObjectSharedPtr fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr fenceMesh = fenceMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr fenceRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(fenceMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr fenceMaterial = fenceRenderer->GetMaterial(0);
 
 	// place initial fence in the scene
@@ -678,7 +678,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	// create a renderer for the water mesh
 	GTE::Mesh3DRendererSharedPtr waterMeshRenderer = objectManager->CreateMesh3DRenderer();
 	waterMeshRenderer->AddMaterial(waterMaterial);
-	waterSurfaceSceneObject->SetMesh3DRenderer(waterMeshRenderer);
+	waterSurfaceSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(waterMeshRenderer));
 
 	// apply rotation of -90 degrees around positive x-axis to water mesh
 	GTE::Transform rot90;
@@ -835,7 +835,7 @@ void PoolScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShared
 	filter->SetMesh3D(poolLightMesh);
 	GTE::Mesh3DRendererSharedPtr lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(poolLightMeshMaterial);
-	poolLightObject->SetMesh3DRenderer(lanterLightRenderer);
+	poolLightObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(lanterLightRenderer));
 
 	pointLights.push_back(poolLightObject);
 }

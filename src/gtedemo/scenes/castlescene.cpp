@@ -190,7 +190,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from castle tower model
 	GTE::SceneObjectSharedPtr tower2MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr tower2Mesh = tower2MeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr towerRenderer = tower2MeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr towerRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(tower2MeshObject->GetRenderer());
 	GTE::Mesh3DFilterSharedPtr towerMeshFilter = tower2MeshObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 
@@ -240,7 +240,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from left archway model
 	GTE::SceneObjectSharedPtr archwayMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr archwayMesh = archwayMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr archwayRenderer = archwayMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr archwayRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(archwayMeshObject->GetRenderer());
 	GTE::Mesh3DFilterSharedPtr archwayMeshFilter = archwayMeshObject->GetMesh3DFilter();
 	archwayMeshFilter->SetUseBackSetShadowVolume(false);
 
@@ -265,7 +265,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from right archway model
 	archwayMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	archwayMesh = archwayMeshObject->GetMesh3D();
-	archwayRenderer = archwayMeshObject->GetMesh3DRenderer();
+	archwayRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(archwayMeshObject->GetRenderer());
 	archwayMeshFilter = archwayMeshObject->GetMesh3DFilter();
 	archwayMeshFilter->SetUseBackSetShadowVolume(false);
 
@@ -293,7 +293,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	// extract mesh & material from castle wall model
 	GTE::SceneObjectSharedPtr wallBlockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr wallBlockMesh = wallBlockMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr wallBlockRenderer = wallBlockMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr wallBlockRenderer =  GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(wallBlockMeshObject->GetRenderer());
 	GTE::Mesh3DFilterSharedPtr wallMeshFilter = wallBlockMeshObject->GetMesh3DFilter();
 	wallMeshFilter->SetUseBackSetShadowVolume(false);
 
@@ -370,7 +370,7 @@ void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 	// extract tree mesh & material
 	GTE::SceneObjectSharedPtr treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr treeMesh = treeMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr treeRenderer = treeMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr treeRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(treeMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr treeMaterial = treeRenderer->GetMaterial(0);
 
 	// place initial tree in the scene
@@ -426,7 +426,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	// extract fence mesh & material
 	GTE::SceneObjectSharedPtr fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr fenceMesh = fenceMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr fenceRenderer = fenceMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr fenceRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(fenceMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr fenceMaterial = fenceRenderer->GetMaterial(0);
 
 	// place initial fence in the scene
@@ -483,7 +483,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	// extract barrel mesh and material
 	GTE::SceneObjectSharedPtr barrelMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr barrelMesh = barrelMeshObject->GetMesh3D();
-	GTE::Mesh3DRendererSharedPtr barrelRenderer = barrelMeshObject->GetMesh3DRenderer();
+	GTE::Mesh3DRendererSharedPtr barrelRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(barrelMeshObject->GetRenderer());
 	GTE::MaterialSharedPtr barrelMaterial = barrelRenderer->GetMaterial(0);
 
 	// place initial barrel in the scene
@@ -553,7 +553,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	// create the floor mesh's renderer
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 	renderer->AddMaterial(material);
-	cubeSceneObject->SetMesh3DRenderer(renderer);
+	cubeSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 
 	// scale the floor and move to its position in the scene
 	cubeSceneObject->GetTransform().Scale(12, 1.5f, 10, false);
@@ -616,8 +616,8 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShar
 	filter->SetMesh3D(lanternLightMesh);
 	GTE::Mesh3DRendererSharedPtr lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
-	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
-	pointLights.push_back(lanternObject);
+	lanternObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(lanterLightRenderer));
+	pointLights.push_back(lanternObject); 
 	movingLightA = lanternObject;
 
 	// create castle side lantern
@@ -641,7 +641,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShar
 	filter->SetMesh3D(lanternLightMesh);
 	lanterLightRenderer = objectManager->CreateMesh3DRenderer();
 	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
-	lanternObject->SetMesh3DRenderer(lanterLightRenderer);
+	lanternObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(lanterLightRenderer));
 	pointLights.push_back(lanternObject);
 }
 
