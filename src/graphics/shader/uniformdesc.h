@@ -57,6 +57,7 @@ namespace GTE
 		UniformType Type;
 
 		Bool IsSet;
+		Bool IsDelayedSet;
 		UInt32 SetSize;
 		UniformID RegisteredUniformID;
 		TextureSharedPtr SamplerData;

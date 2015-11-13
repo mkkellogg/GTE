@@ -32,7 +32,7 @@ namespace GTE
 
 	class ParticleSystem : public SceneObjectComponent
 	{
-		friend class Graphics;
+		friend class EngineObjectManager;
 		
 		private:
 	
@@ -48,7 +48,6 @@ namespace GTE
 
 		Bool zSort;
 		Bool simulateInLocalSpace;
-
 		Bool releaseAtOnce;
 		UInt32 releaseAtOnceCount = 0;
 		Bool hasInitialReleaseOccurred;
@@ -69,7 +68,7 @@ namespace GTE
 		ParticleModifier<Real>* rotationalSpeedModifier;
 		ParticleModifier<Real>* rotationalAccelerationModifier;
 
-		UInt32 particleReleaseRate;
+		Real particleReleaseRate;
 		Real particleLifeSpan;
 		Real averageParticleLifeSpan;
 
@@ -81,14 +80,16 @@ namespace GTE
 		Particle** liveParticleArray;
 		Particle** deadParticleArray;
 
-		Particle** _tempParticleArray;
-
 		Real timeSinceLastEmit;
 		Bool emitting;
 		Real age;
-		Real lifespan;
+		Real systemLifeSpan;
+
+		UInt32 renderCount;
 
 		// temporary storage 
+		Real lastDeltaTime;
+		Particle** _tempParticleArray;
 		Vector3 _tempVector3;
 		Quaternion _tempQuaternion;
 		Matrix4x4 _tempMatrix4;
@@ -100,9 +101,13 @@ namespace GTE
 		void GetCameraWorldAxes(Camera& camera, Vector3& axisX, Vector3 axisY, Vector3& axisZ);
 		void GenerateXYAlignedQuadForParticle(Particle* particle, Vector3& axisX, Vector3 axisY, Vector3& axisZ, Point3& p1, Point3& p2, Point3& p3, Point3& p4);
 		void UpdateShaderWithParticleData();
-		void WillRender() override;
 
-		Bool Initialize(MaterialRef material, AtlasRef atlas, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
+		void Awake() override;
+		void Start() override;
+		void WillRender() override;
+		void Update() override;
+
+		Bool Initialize(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
 
 		Bool InitializeMesh();
 		void DestroyMesh();
@@ -124,6 +129,7 @@ namespace GTE
 
 		void KillParticle(Particle * particle);
 		void ActivateParticle(Particle* particle);
+		void ActivateParticles(UInt32 count);
 		void CleanupDeadParticles();
 
 		void SortParticleArray(const Matrix4x4& mvpMatrix);

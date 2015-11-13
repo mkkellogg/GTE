@@ -44,6 +44,8 @@ namespace GTE
 		// a friend of EngineObjectManager, and the constructor & destructor
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
+
+		// necessary since Mesh3D acts as a container for SubMesh3D
 		friend class Mesh3D;
 
 		static const int MAX_CUSTOM_ATTRIBUTES = 16;

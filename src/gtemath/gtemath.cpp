@@ -84,6 +84,12 @@ namespace GTE
 		else return b;
 	}
 
+	Int32 GTEMath::Max(Int32 a, Int32 b)
+	{
+		if(a > b)return a;
+		else return b;
+	}
+
 	Real GTEMath::Lerp(Real a, Real b, Real t)
 	{
 		return (b - a) * t + a;

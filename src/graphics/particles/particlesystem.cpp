@@ -29,6 +29,7 @@
 #include "graphics/view/camera.h"
 #include "graphics/texture/atlas.h"
 #include "engine.h"
+#include "util/time.h"
 
 namespace GTE
 {
@@ -80,7 +81,9 @@ namespace GTE
 		timeSinceLastEmit = 0.0f;
 		emitting = true;
 		age = 0.0f;
-		lifespan = 0.0f;
+		systemLifeSpan = 0.0f;
+
+		renderCount = 0;
 	}
 
 	ParticleSystem::~ParticleSystem()
@@ -134,26 +137,11 @@ namespace GTE
 		else
 		{
 			Real minLifeSpan = particleLifeSpan;
-			if(lifespan != 0 && lifespan  < minLifeSpan) minLifeSpan = lifespan;
+			if(systemLifeSpan != 0 && systemLifeSpan  < minLifeSpan) minLifeSpan = systemLifeSpan;
 			maxParticleCount = (UInt32)GTEMath::Max(particleReleaseRate * minLifeSpan * 2, 1.0f);
 		}
 
 		vertexCount = maxParticleCount * (UInt32)ParticleConstants::VerticesPerParticle;
-	}
-
-	Bool ParticleSystem::Initialize(MaterialRef material, AtlasRef atlas, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan)
-	{
-		timeSinceLastEmit = 0.0f;
-		age = 0.0;
-		emitting = true;
-		this->particleMaterial = material;
-
-		CalculateAverageParticleLifeSpan();
-		CalculateMaxParticleCount();
-		Bool particleArraySuccess = InitializeParticleArray();
-		Bool meshSuccess = InitializeMesh();
-
-		return particleArraySuccess && meshSuccess;
 	}
 
 	void ParticleSystem::GetCameraWorldAxes(Camera& camera, Vector3& axisX, Vector3 axisY, Vector3& axisZ)
@@ -284,16 +272,131 @@ namespace GTE
 		targetMesh->QuickUpdate();
 	}
 
+	void ParticleSystem::Awake()
+	{
+		printf("awake!\n");
+	}
+
+	void ParticleSystem::Start()
+	{
+		printf("started!\n");
+	}
+
 	void ParticleSystem::WillRender()
 	{
+		printf("will render!\n");
+
 		CameraRef currentCamera = Engine::Instance()->GetRenderManager()->GetCurrentCamera();
 		this->currentCamera = currentCamera.GetPtr();
+
+		SceneObjectRef cameraObject = currentCamera->GetSceneObject();
+		NONFATAL_ASSERT(cameraObject.IsValid(), "ParticleSystem::WillRender -> Camera is not attached to a valid scene object.", true);
+
+		SceneObjectRef thisSceneObject = GetSceneObject();
+		NONFATAL_ASSERT(thisSceneObject.IsValid(), "ParticleSystem::WillRender -> Particle system is not attached to a valid scene object.", true);
+
+		Transform thisWorldTransform;
+		SceneObjectTransform::GetWorldTransform(thisWorldTransform, thisSceneObject, true, false);
+
+		if(zSort)
+		{
+			Transform cameraTransform;
+			SceneObjectTransform::GetWorldTransform(cameraTransform, cameraObject, true, false);
+			cameraTransform.Invert();
+			cameraTransform.TransformBy(thisWorldTransform);
+			cameraTransform.PreTransformBy(currentCamera->GetProjectionTransform());
+			SortParticleArray(cameraTransform.GetMatrix());
+		}
+		UpdateShaderWithParticleData();
+		
+
+		age += lastDeltaTime;
+		if(systemLifeSpan != 0.0f && age > systemLifeSpan)
+		{
+			emitting = false;
+		}
+
+		if(!simulateInLocalSpace)
+		{
+			//meshObject->GetTransform().SetTo(thisWorldTransform);
+		}
+
+		renderCount++;
+	}
+
+	void ParticleSystem::Update()
+	{
+		printf("update!\n");
+
+		SceneObjectRef thisSceneObject = GetSceneObject();
+		NONFATAL_ASSERT(thisSceneObject.IsValid(), "ParticleSystem::Update -> Particle system is not atached to a valid scene object.", true);
+
+		SceneObjectRef meshObjectParent = meshObject->GetParent();
+		if(!meshObjectParent.IsValid() || meshObjectParent->GetObjectID() != thisSceneObject->GetObjectID())
+		{
+			printf("adding child!\n");
+			thisSceneObject->AddChild(meshObject);
+			meshObject->SetActive(true);
+		}
+
+		renderCount = 0;
+
+		if(!emitting)return;
+		if(!isActive)return;
+
+		lastDeltaTime = Time::GetDeltaTime();
+		timeSinceLastEmit += lastDeltaTime;
+
+		if(releaseAtOnce)
+		{
+			Real waitTime = averageParticleLifeSpan;
+
+			if(!hasInitialReleaseOccurred || (timeSinceLastEmit > waitTime && liveParticleCount <= 0))
+			{
+				ActivateParticles(maxParticleCount);
+				timeSinceLastEmit = 0.0f;
+				hasInitialReleaseOccurred = true;
+			}
+		}
+		else
+		{
+			Real emitUnitTime = 1.0f / particleReleaseRate;
+			if(!hasInitialReleaseOccurred || timeSinceLastEmit > emitUnitTime)
+			{
+				Int32 releaseCount = GTEMath::Max(1, (Int32)(timeSinceLastEmit / emitUnitTime));
+				ActivateParticles(releaseCount);
+				timeSinceLastEmit = 0.0f;
+				hasInitialReleaseOccurred = true;
+			}
+		}
+
+		AdvanceParticles(lastDeltaTime);
+	}
+	
+	Bool ParticleSystem::Initialize(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan)
+	{
+		timeSinceLastEmit = 0.0f;
+		age = 0.0;
+		emitting = true;
+
+		this->particleMaterial = material;
+		this->atlas = atlas;
+		this->zSort = zSort;
+		this->particleReleaseRate = releaseRate;
+		this->particleLifeSpan = particleLifeSpan;
+		this->systemLifeSpan = systemLifeSpan;
+
+		CalculateAverageParticleLifeSpan();
+		CalculateMaxParticleCount();
+		Bool particleArraySuccess = InitializeParticleArray();
+		Bool meshSuccess = InitializeMesh();
+		return particleArraySuccess && meshSuccess;
 	}
 
 	Bool ParticleSystem::InitializeMesh()
 	{
 		DestroyMesh();
-
+		
 		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
 
 		meshObject = objectManager->CreateSceneObject();
@@ -304,6 +407,7 @@ namespace GTE
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::Normal);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::FaceNormal);
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::VertexColor);
+		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 		
 		SubMesh3DSharedPtr subMesh = objectManager->CreateSubMesh3D(meshAttributes);
 		subMesh->SetBuildFaces(false);
@@ -334,32 +438,38 @@ namespace GTE
 
 		Mesh3DRendererSharedPtr meshRenderer = objectManager->CreateMesh3DRenderer();
 		NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "ParticleSystem::InitializeMesh -> Could not create mesh renderer.", false, false);
+		NONFATAL_ASSERT_RTRN(particleMaterial.IsValid(), "ParticleSystem::InitializeMesh -> Particle material is not valid.", false, false);
 		meshRenderer->AddMaterial(particleMaterial);
 		meshObject->SetMesh3DRenderer(meshRenderer);
+
+		meshObject->SetActive(false);
 
 		return true;
 	}
 
 	void ParticleSystem::DestroyMesh()
 	{
-		NONFATAL_ASSERT(meshObject.IsValid(), "ParticleSystem::DestroyMesh -> Mesh object is not valid.", true);
+		if(meshObject.IsValid())
+		{
+			Mesh3DFilterRef meshFilter = meshObject->GetMesh3DFilter();
 
-		Mesh3DFilterRef meshFilter = meshObject->GetMesh3DFilter();
-		NONFATAL_ASSERT(meshObject.IsValid(), "ParticleSystem::DestroyMesh -> Mesh filter object is not valid.", true);
+			if(meshFilter.IsValid())
+			{
+				meshFilter->RemoveMesh3D();
+				meshObject->RemoveMesh3DFilter();
+				meshObject->RemoveMesh3DRenderer();
+			}
 
-		meshFilter->RemoveMesh3D();
-		meshObject->RemoveMesh3DFilter();
-		meshObject->RemoveMesh3DRenderer();
+			if(!mesh.IsValid())return;
 
-		if(!mesh.IsValid())return;
-
-		mesh = Mesh3DSharedPtr::Null();
+			mesh = Mesh3DSharedPtr::Null();
+			meshObject = SceneObjectSharedPtr::Null();
+		}
 	}
 
 	Bool ParticleSystem::InitializeParticleArray()
 	{
 		DestroyParticleArray();
-
 		liveParticleArray = new(std::nothrow)Particle*[maxParticleCount];
 		ASSERT(liveParticleArray != nullptr, "ParticleSystem::InitializeParticleArray -> Unable to allocate live particle array.");
 
@@ -373,7 +483,7 @@ namespace GTE
 		{
 			Particle* particle = new(std::nothrow) Particle();
 			ASSERT(particle != nullptr, "ParticleSystem::InitializeParticleArray -> Unable to allocate live particle array.");
-
+			
 			InitializeParticle(particle);
 			deadParticleArray[i] = particle;
 		}
@@ -386,16 +496,21 @@ namespace GTE
 
 	void ParticleSystem::DestroyParticleArray()
 	{
-		for(UInt32 i = 0; i < maxParticleCount; i++)
+		if(liveParticleArray != nullptr &&
+		   deadParticleArray != nullptr &&
+		   _tempParticleArray != nullptr)
 		{
-			SAFE_DELETE(liveParticleArray[i]);
-			SAFE_DELETE(deadParticleArray[i]);
-			SAFE_DELETE(_tempParticleArray[i]);
-		}
+			for(UInt32 i = 0; i < maxParticleCount; i++)
+			{
+				SAFE_DELETE(liveParticleArray[i]);
+				SAFE_DELETE(deadParticleArray[i]);
+				SAFE_DELETE(_tempParticleArray[i]);
+			}
 
-		SAFE_DELETE(liveParticleArray);
-		SAFE_DELETE(deadParticleArray);
-		SAFE_DELETE(_tempParticleArray);
+			SAFE_DELETE(liveParticleArray);
+			SAFE_DELETE(deadParticleArray);
+			SAFE_DELETE(_tempParticleArray);
+		}
 	}
 
 	Bool ParticleSystem::InitializeParticle(Particle * particle)
@@ -450,14 +565,14 @@ namespace GTE
 
 		if(!simulateInLocalSpace)
 		{
-			SceneObjectRef containerObject = this->GetSceneObject();
+			/*SceneObjectRef containerObject = this->GetSceneObject();
 			Transform worldTransform;
 			SceneObjectTransform::GetWorldTransform(worldTransform, containerObject, true, false);
 
 			Point3 origin;
 			worldTransform.TransformPoint(origin);
 			Vector3 offset(origin.x, origin.y, origin.z);
-			particle->Position.Add(offset);
+			particle->Position.Add(offset);*/
 		}
 
 		if(velocityModifier != nullptr)
@@ -603,6 +718,26 @@ namespace GTE
 		ResetParticle(particle);
 		particle->LifeSpan = particleLifeSpan;
 		particle->Alive = true;
+	}
+
+	void ParticleSystem::ActivateParticles(UInt32 count)
+	{
+		for(UInt32 i = 0; i < count; i++)
+		{
+			if(liveParticleCount < maxParticleCount && deadParticleCount > 0)
+			{
+				Particle* newParticle = deadParticleArray[deadParticleCount - 1];
+				liveParticleArray[liveParticleCount] = newParticle;
+				deadParticleCount--;
+				liveParticleCount++;
+
+				ActivateParticle(newParticle);
+			}
+			else
+			{
+				break;
+			}
+		}
 	}
 
 	void ParticleSystem::CleanupDeadParticles()

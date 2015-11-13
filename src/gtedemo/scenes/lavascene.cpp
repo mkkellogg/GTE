@@ -6,7 +6,12 @@
 
 #include "lavascene.h"
 #include "gtedemo/lavafield.h"
+#include "object/enginetypes.h"
+#include "object/engineobject.h"
+#include "global/global.h"
+#include "global/constants.h"
 #include "engine.h"
+#include "global/assert.h"
 #include "input/inputmanager.h"
 #include "gtedemo/gameutil.h"
 #include "asset/assetimporter.h"
@@ -22,6 +27,7 @@
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
 #include "graphics/shader/shadersource.h"
+#include "graphics/particles/particlesystem.h"
 #include "base/basevector4.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/quaternion.h"
@@ -37,9 +43,6 @@
 #include "object/layermanager.h"
 #include "util/time.h"
 #include "util/engineutility.h"
-#include "global/global.h"
-#include "global/assert.h"
-#include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
 
@@ -142,6 +145,7 @@ void LavaScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr am
 	SetupStructures(importer);
 	SetupExtra(importer);
 	SetupLights(importer, playerObject);
+	SetupParticleSystems(importer);
 }
 
 /*
@@ -505,6 +509,35 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShared
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandObjectsLayerMask);
 	lavaLight->SetCullingMask(mergedMask);
 
+}
+
+void LavaScene::SetupParticleSystems(GTE::AssetImporter& importer)
+{
+	// get reference to the engine's object manager
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+
+	// create material for rendering flame particles
+	std::string shaderName = "particles_unlit";
+	std::string materialName = "ParticlesUnlit";
+	GTE::MaterialRef flameMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
+	ASSERT(flameMaterial.IsValid(), "Unable to create flame material!\n");
+
+	// load texture for the the flame's atlas
+	GTE::TextureAttributes texAttributes;
+	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
+	texAttributes.MipMapLevel = 2;
+	GTE::TextureRef flameTexture = objectManager->CreateTexture("resources/textures/particles/fireloop3.jpg", texAttributes);
+	ASSERT(flameTexture.IsValid(), "Unable to load flame texture!\n");
+
+	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0, 1.0, 1.0, 0.0, 8, 8, false, true);
+	ASSERT(flameAtlas.IsValid(), "Unable to create flame atlas!\n");
+
+	/*GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
+	ASSERT(flameSystem.IsValid(), "Unable to create flame particle system!\n");
+
+	GTE::SceneObjectRef particleSystemObject = objectManager->CreateSceneObject();
+	ASSERT(particleSystemObject.IsValid(), "Unable to create flame particle system object!\n");
+	particleSystemObject->SetParticleSystem(flameSystem);*/
 }
 
 /*

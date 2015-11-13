@@ -573,40 +573,43 @@ namespace GTE
 		{
 			UniformDescriptor& desc = localUniformDescriptors[index];
 		
-			if (desc.Type == UniformType::Sampler2D)
+			if(desc.IsDelayedSet)
 			{
-				shader->SendUniformToShader(desc.ShaderVarID, desc.SamplerUnitIndex, desc.SamplerData);
-				SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Sampler2D));
-			}
-			if (desc.Type == UniformType::SamplerCube)
-			{
-				shader->SendUniformToShader(desc.ShaderVarID, desc.SamplerUnitIndex, desc.SamplerData);
-				SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::SamplerCube));
-			}
-			else if (desc.Type == UniformType::Float)
-			{
-				shader->SendUniformToShader(desc.ShaderVarID, desc.BasicFloatData[0]);
-				SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float));
-			}
-			else if (desc.Type == UniformType::Float2)
-			{
-				shader->SendUniformToShader2(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1]);
-				SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float2));
-			}
-			else if (desc.Type == UniformType::Float3)
-			{
-				shader->SendUniformToShader3(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2]);
-				SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float3));
-			}
-			else if (desc.Type == UniformType::Float4)
-			{
-				shader->SendUniformToShader4(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2], desc.BasicFloatData[3]);
-				SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float4));
-			}
-			else if (desc.Type == UniformType::Matrix4x4)
-			{
-				shader->SendUniformToShader(desc.ShaderVarID, &desc.MatrixData);
-				SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Matrix4x4));
+				if(desc.Type == UniformType::Sampler2D)
+				{
+					shader->SendUniformToShader(desc.ShaderVarID, desc.SamplerUnitIndex, desc.SamplerData);
+					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Sampler2D));
+				}
+				if(desc.Type == UniformType::SamplerCube)
+				{
+					shader->SendUniformToShader(desc.ShaderVarID, desc.SamplerUnitIndex, desc.SamplerData);
+					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::SamplerCube));
+				}
+				else if(desc.Type == UniformType::Float)
+				{
+					shader->SendUniformToShader(desc.ShaderVarID, desc.BasicFloatData[0]);
+					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float));
+				}
+				else if(desc.Type == UniformType::Float2)
+				{
+					shader->SendUniformToShader2(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1]);
+					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float2));
+				}
+				else if(desc.Type == UniformType::Float3)
+				{
+					shader->SendUniformToShader3(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2]);
+					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float3));
+				}
+				else if(desc.Type == UniformType::Float4)
+				{
+					shader->SendUniformToShader4(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2], desc.BasicFloatData[3]);
+					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float4));
+				}
+				else if(desc.Type == UniformType::Matrix4x4)
+				{
+					shader->SendUniformToShader(desc.ShaderVarID, &desc.MatrixData);
+					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Matrix4x4));
+				}
 			}
 		}
 	}
@@ -651,7 +654,8 @@ namespace GTE
 		else desc.Type = UniformType::Sampler2D;
 		desc.SamplerData = texture;
 		desc.SamplerUnitIndex = ReserveSamplerUnitForUniform(uniform);
-		desc.IsSet = true;
+		desc.IsDelayedSet = true;
+
 	}
 
 	/*
@@ -678,7 +682,7 @@ namespace GTE
 		UniformDescriptor& desc = localUniformDescriptors[index];
 		desc.Type = UniformType::Matrix4x4;
 		desc.MatrixData = mat;
-		desc.IsSet = true;
+		desc.IsDelayedSet = true;
 	}
 
 	/*
@@ -705,7 +709,7 @@ namespace GTE
 		UniformDescriptor & desc = localUniformDescriptors[index];
 		desc.Type = UniformType::Float;
 		desc.BasicFloatData[0] = val;
-		desc.IsSet = true;
+		desc.IsDelayedSet = true;
 	}
 
 	/*
@@ -733,7 +737,7 @@ namespace GTE
 		desc.Type = UniformType::Float2;
 		desc.BasicFloatData[0] = v1;
 		desc.BasicFloatData[1] = v2;
-		desc.IsSet = true;
+		desc.IsDelayedSet = true;
 	}
 
 	/*
@@ -763,7 +767,7 @@ namespace GTE
 		desc.BasicFloatData[1] = v2;
 		desc.BasicFloatData[2] = v3;
 		desc.BasicFloatData[3] = v4;
-		desc.IsSet = true;
+		desc.IsDelayedSet = true;
 	}
 
 	/* Find a uniform with the name specified by [varName] and set its
@@ -791,7 +795,7 @@ namespace GTE
 		desc.BasicFloatData[1] = color.g;
 		desc.BasicFloatData[2] = color.b;
 		desc.BasicFloatData[3] = color.a;
-		desc.IsSet = true;
+		desc.IsDelayedSet = true;
 	}
 
 	/*

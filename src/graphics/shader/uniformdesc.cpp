@@ -19,6 +19,7 @@ namespace GTE
 		RegisteredUniformID = UniformDirectory::VarID_Invalid;
 		ExtendedFloatData = nullptr;
 		IsSet = false;
+		IsDelayedSet = false;
 		SetSize = 0;
 
 		memset(BasicFloatData, 0, sizeof(Real) * 4);

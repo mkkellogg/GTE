@@ -22,11 +22,13 @@
 #include "graphics/object/mesh3Dfilter.h"
 #include "graphics/stdattributes.h"
 #include "graphics/texture/texture.h"
+#include "graphics/texture/atlas.h"
 #include "graphics/image/rawimage.h"
 #include "graphics/animation/skeleton.h"
 #include "graphics/animation/animation.h"
 #include "graphics/animation/animationinstance.h"
 #include "graphics/animation/animationplayer.h"
+#include "graphics/particles/particlesystem.h"
 #include "asset/assetimporter.h"
 #include "debug/gtedebug.h"
 #include "graphics/view/camera.h"
@@ -588,8 +590,22 @@ namespace GTE
 		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
 		ASSERT(graphics != nullptr, "EngineObjectManager::CreateAtlas -> Graphics system is null.");
 
-		Atlas* atlas = graphics->CreateAtlas(texture, createFirstFullImage);
-		NONFATAL_ASSERT_RTRN(atlas != nullptr, "EngineObjectManager::CreateAtlas -> Could create new Atlas object.", AtlasSharedPtr::Null(), false);
+		Atlas* atlas = new(std::nothrow)Atlas(texture, createFirstFullImage);
+		NONFATAL_ASSERT_RTRN(atlas != nullptr, "EngineObjectManager::CreateAtlas -> Could not create new Atlas object.", AtlasSharedPtr::Null(), false);
+
+		return AtlasSharedPtr(atlas, [=](Atlas * atlas)
+		{
+			DeleteAtlas(atlas);
+		});
+	}
+
+	AtlasSharedPtr EngineObjectManager::CreateGridAtlas(TextureSharedPtr texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY)
+	{
+		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
+		ASSERT(graphics != nullptr, "EngineObjectManager::CreateGridAtlas -> Graphics system is null.");
+
+		Atlas* atlas = Atlas::CreateGridAtlas(texture, left, top, right, bottom, xCount, yCount, reverseX, reverseY);
+		NONFATAL_ASSERT_RTRN(atlas != nullptr, "EngineObjectManager::CreateGridAtlas -> Could not create new Atlas object.", AtlasSharedPtr::Null(), false);
 
 		return AtlasSharedPtr(atlas, [=](Atlas * atlas)
 		{
@@ -606,10 +622,7 @@ namespace GTE
 	{
 		ASSERT(atlas != nullptr, "EngineObjectManager::DeleteAtlas -> 'atlas' is null.");
 
-		Graphics * graphics = Engine::Instance()->GetGraphicsSystem();
-		ASSERT(graphics != nullptr, "EngineObjectManager::DeleteAtlas -> Graphics system is null.");
-
-		graphics->DestroyAtlas(atlas);
+		delete atlas;
 	}
 
 
@@ -764,6 +777,33 @@ namespace GTE
 	{
 		ASSERT(light != nullptr, "EngineObjectManager::DeleteLight -> 'light' is null.");
 		delete light;
+	}
+
+	ParticleSystemSharedPtr EngineObjectManager::CreateParticleSystem(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan)
+	{
+		ParticleSystem * system = new(std::nothrow) ParticleSystem();
+		ASSERT(system != nullptr, "EngineObjectManager::CreateParticleSystem -> Could not create new particle system.");
+
+		Bool initSuccess = system->Initialize(material, atlas, zSort, releaseRate, particleLifeSpan, systemLifeSpan);
+		NONFATAL_ASSERT_RTRN(initSuccess == true, "EngineObjectManager::CreateParticleSystem -> Could not initialize particle system.", ParticleSystemSharedPtr::Null(), false);
+
+		system->SetObjectID(GetNextObjectID());
+
+		return ParticleSystemSharedPtr(system, [=](ParticleSystem * system)
+		{
+			DeleteParticleSystem(system);
+		});
+	}
+
+	void EngineObjectManager::DestroyParticleSystem(ParticleSystemSharedPtr system)
+	{
+		system.ForceDelete();
+	}
+
+	void EngineObjectManager::DeleteParticleSystem(ParticleSystem * system)
+	{
+		ASSERT(system != nullptr, "EngineObjectManager::DeleteParticleSystem -> 'system' is null.");
+		delete system;
 	}
 }
 

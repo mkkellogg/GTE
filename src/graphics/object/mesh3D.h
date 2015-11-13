@@ -25,13 +25,12 @@ namespace GTE
 	class EngineObjectManager;
 	class SubMesh3D;
 
-	class Mesh3D : public SceneObjectComponent
+	class Mesh3D : public EngineObject
 	{
 		// Since this derives from EngineObject, we make this class
 		// a friend of EngineObjectManager, and the constructor & destructor
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
-		friend class SubMesh3D;
 
 	protected:
 

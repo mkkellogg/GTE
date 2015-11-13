@@ -15,7 +15,7 @@
 
 namespace GTE
 {
-	Atlas::Atlas(TextureSharedPtr texture, Bool createFirstFullFrame)
+	Atlas::Atlas(TextureRef texture, Bool createFirstFullFrame)
 	{
 		this->texture = texture;
 		imageCount = 0;
@@ -43,14 +43,15 @@ namespace GTE
 		return &images[index];
 	}
 
-	TextureSharedPtr Atlas::GetTexture()
+	TextureRef Atlas::GetTexture()
 	{
 		return texture;
 	}
 
-	Atlas* Atlas::CreateGridAtlas(TextureSharedPtr texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY)
+	Atlas* Atlas::CreateGridAtlas(TextureRef texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY)
 	{
 		Atlas * atlas = new(std::nothrow) Atlas(texture, false);
+		ASSERT(atlas != nullptr, "Atlas::CreateGridAtlas -> Unable to allocate atlas.");
 
 		Real width = right - left;
 		Real height = top - bottom;

@@ -38,6 +38,7 @@ namespace GTE
 	class AnimationInstance;
 	class RenderTarget;
 	class ShaderSource;
+	class ParticleSystem;
 
 	class EngineObjectManager
 	{
@@ -77,6 +78,7 @@ namespace GTE
 		void DeleteAnimation(Animation * animation);
 		void DeleteAnimationInstance(AnimationInstance * animation);
 		void DeleteAnimationPlayer(AnimationPlayer * player);
+		void DeleteParticleSystem(ParticleSystem * system);
 
 		Bool InitBuiltinShaders();
 
@@ -139,6 +141,7 @@ namespace GTE
 			RawImage * bottomData, RawImage * leftData, RawImage * rightData);
 		void DestroyTexture(TextureSharedPtr texture);
 		AtlasSharedPtr CreateAtlas(TextureSharedPtr texture, Bool createFirstFullImage);
+		AtlasSharedPtr CreateGridAtlas(TextureSharedPtr texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY);
 		void DestroyAtlas(AtlasSharedPtr atlas);
 		RenderTargetSharedPtr CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 			const TextureAttributes& colorTextureAttributes,
@@ -148,6 +151,9 @@ namespace GTE
 		MaterialSharedPtr CreateMaterial(const std::string& name, ShaderSharedPtr shader);
 		MaterialSharedPtr CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
 		void DestroyMaterial(MaterialSharedPtr material);
+
+		ParticleSystemSharedPtr CreateParticleSystem(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
+		void DestroyParticleSystem(ParticleSystemSharedPtr system);
 
 		CameraSharedPtr CreateCamera();
 		void DestroyCamera(CameraSharedPtr camera);

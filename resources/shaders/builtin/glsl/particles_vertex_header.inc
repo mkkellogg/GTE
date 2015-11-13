@@ -1,14 +1,22 @@
-attribute vec4 COLOR;
-attribute vec2 PARTICLE_SIZE;
-attribute float PARTICLE_ROTATION;
-attribute float PARTICLE_INDEX;
+#version 150
 
+in vec2 PARTICLE_SIZE;
+in float PARTICLE_ROTATION;
+in float PARTICLE_INDEX;
+in vec4 POSITION;
+in vec4 COLOR;
+in vec2 UVTEXTURE0;
+
+uniform mat4 MODEL_MATRIX;
+uniform mat4 MODEL_MATRIX_INVERSE_TRANSPOSE;
+uniform mat4 PROJECTION_MATRIX;
+uniform mat4 VIEW_MATRIX;
 uniform vec3 VIEW_AXIS_X;
 uniform vec3 VIEW_AXIS_Y;
 uniform vec3 VIEW_AXIS_Z;
 
-varying vec2 vUV;
-varying vec4 vColor;
+out vec2 vUV;
+out vec4 vColor;
 
 vec4 getQuadPosition()
 {
@@ -32,5 +40,5 @@ vec4 getQuadPosition()
 	axisX *= PARTICLE_SIZE.x * xFactor;
 	axisY *= PARTICLE_SIZE.y * yFactor;
 
-	return ( modelMatrix * vec4( position, 1.0 ) ) + vec4( axisX + axisY, 0.0 );
+	return ( MODEL_MATRIX * POSITION ) + vec4( axisX + axisY, 0.0 );
 }

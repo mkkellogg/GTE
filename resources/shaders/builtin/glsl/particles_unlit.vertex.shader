@@ -3,7 +3,7 @@
 void main() 
 {
 	vColor = COLOR;
-	vUV = uv;
+	vUV = UVTEXTURE0;
 	vec4 quadPos = getQuadPosition();
-	gl_Position = projectionMatrix * viewMatrix * quadPos;
+	gl_Position = PROJECTION_MATRIX * VIEW_MATRIX * quadPos;
 }
