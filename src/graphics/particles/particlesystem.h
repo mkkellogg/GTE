@@ -32,7 +32,13 @@ namespace GTE
 
 	class ParticleSystem : public SceneObjectComponent
 	{
+		// Since this ultimately derives from EngineObject, we make this class
+		// a friend of EngineObjectManager, and the constructor & destructor
+		// protected so its life-cycle can be handled completely by EngineObjectManager
 		friend class EngineObjectManager;
+
+		// necessary so ParticleMeshRenderer can forward WillRender event
+		friend class ParticleMeshRenderer;
 		
 		private:
 	

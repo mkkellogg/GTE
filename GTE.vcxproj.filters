@@ -378,6 +378,9 @@
     <ClCompile Include="src\graphics\render\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\graphics\particles\particlemeshrenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\asset\assetimporter.h">
@@ -786,6 +789,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\render\renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\particles\particlemeshrenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -179,7 +179,7 @@ namespace GTE
 			if(callbacks != nullptr)callbacks->OnStart();
 			firstFrameEntered = true;
 		}
-
+	
 		graphicsSystem->Update();
 		animationManager->Update();
 		inputManager->Update();

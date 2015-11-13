@@ -13,6 +13,7 @@
 
 #include "mesh3D.h"
 #include "object/sceneobjectcomponent.h"
+#include "customfloatattributebuffer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/materialvardirectory.h"
 #include "geometry/point/point3.h"
@@ -36,7 +37,6 @@ namespace GTE
 	class UV2;
 	class EngineObjectManager;
 	class SubMesh3DRenderer;
-	class CustomFloatAttributeBuffer;
 
 	class SubMesh3D : public EngineObject
 	{
@@ -73,7 +73,7 @@ namespace GTE
 		UV2Array uvs1;
 
 		UInt32 customFloatAttributeBufferCount;
-		std::vector<CustomFloatAttributeBuffer> customFloatAttributeBuffers;
+		std::vector<CustomFloatAttributeBuffer*> customFloatAttributeBuffers;
 
 		Bool isDirty;
 		// inter-face angle above which smoothing/average of vertex normals should

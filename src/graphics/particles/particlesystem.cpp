@@ -7,6 +7,7 @@
 #include "particlesystem.h"
 #include "particleutil.h"
 #include "particle.h"
+#include "particlemeshrenderer.h"
 #include "object/enginetypes.h"
 #include "global/global.h"
 #include "global/assert.h"
@@ -339,6 +340,18 @@ namespace GTE
 			meshObject->SetActive(true);
 		}
 
+		RendererRef renderer = meshObject->GetRenderer();
+		if(renderer.IsValid())
+		{
+			Renderer* baseRenderer = renderer.GetPtr();
+			ParticleMeshRenderer * meshRenderer = dynamic_cast<ParticleMeshRenderer*>(baseRenderer);
+
+			if(meshRenderer != nullptr)
+			{
+				meshRenderer->SetTargetSystemObject(GetSceneObject());
+			}
+		}
+
 		renderCount = 0;
 
 		if(!emitting)return;
@@ -410,6 +423,7 @@ namespace GTE
 		StandardAttributes::AddAttribute(&meshAttributes, StandardAttribute::UVTexture0);
 		
 		SubMesh3DSharedPtr subMesh = objectManager->CreateSubMesh3D(meshAttributes);
+		NONFATAL_ASSERT_RTRN(subMesh.IsValid(), "ParticleSystem::InitializeMesh -> Could not create sub mesh object.", false, false);
 		subMesh->SetBuildFaces(false);
 		subMesh->SetCalculateTangents(false);
 		subMesh->SetCalculateNormals(false);
@@ -419,7 +433,7 @@ namespace GTE
 		mesh->Init();
 		mesh->SetSubMesh(subMesh, 0);
 		mesh->UpdateAll();
-
+		
 		attributeSizeID = subMesh->AddCustomFloatAttributeBuffer(2, "PARTICLE_SIZE");
 		NONFATAL_ASSERT_RTRN(attributeSizeID != AttributeDirectory::VarID_Invalid, "ParticleSystem::InitializeMesh -> Could not add custom attribute 'PARTICLE_SIZE'.", false, false);
 
@@ -436,14 +450,13 @@ namespace GTE
 		filter->SetCastShadows(false);
 		filter->SetReceiveShadows(false);
 
-		Mesh3DRendererSharedPtr meshRenderer = objectManager->CreateMesh3DRenderer();
+		ParticleMeshRendererSharedPtr meshRenderer = objectManager->CreateParticleMeshRenderer();
 		NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "ParticleSystem::InitializeMesh -> Could not create mesh renderer.", false, false);
 		NONFATAL_ASSERT_RTRN(particleMaterial.IsValid(), "ParticleSystem::InitializeMesh -> Particle material is not valid.", false, false);
 		meshRenderer->AddMaterial(particleMaterial);
-		meshObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(meshRenderer));
-
+		meshObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::ParticleMeshRenderer, GTE::Renderer>(meshRenderer));
 		meshObject->SetActive(false);
-
+		
 		return true;
 	}
 
@@ -470,9 +483,10 @@ namespace GTE
 	Bool ParticleSystem::InitializeParticleArray()
 	{
 		DestroyParticleArray();
+		
 		liveParticleArray = new(std::nothrow)Particle*[maxParticleCount];
 		ASSERT(liveParticleArray != nullptr, "ParticleSystem::InitializeParticleArray -> Unable to allocate live particle array.");
-
+	
 		deadParticleArray = new(std::nothrow)Particle*[maxParticleCount];
 		ASSERT(deadParticleArray != nullptr, "ParticleSystem::InitializeParticleArray -> Unable to allocate dead particle array.");
 
@@ -500,11 +514,14 @@ namespace GTE
 		   deadParticleArray != nullptr &&
 		   _tempParticleArray != nullptr)
 		{
-			for(UInt32 i = 0; i < maxParticleCount; i++)
+			for(UInt32 i = 0; i < liveParticleCount; i++)
 			{
 				SAFE_DELETE(liveParticleArray[i]);
+			}
+
+			for(UInt32 i = 0; i < deadParticleCount; i++)
+			{
 				SAFE_DELETE(deadParticleArray[i]);
-				SAFE_DELETE(_tempParticleArray[i]);
 			}
 
 			SAFE_DELETE(liveParticleArray);

@@ -516,6 +516,10 @@ void LavaScene::SetupParticleSystems(GTE::AssetImporter& importer)
 	// get reference to the engine's object manager
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 
+	GTE::SceneObjectRef particleSystemObject = objectManager->CreateSceneObject();
+	ASSERT(particleSystemObject.IsValid(), "Unable to create flame particle system object!\n");
+	//sceneRoot->AddChild(particleSystemObject);
+
 	// create material for rendering flame particles
 	std::string shaderName = "particles_unlit";
 	std::string materialName = "ParticlesUnlit";
@@ -532,15 +536,9 @@ void LavaScene::SetupParticleSystems(GTE::AssetImporter& importer)
 	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0, 1.0, 1.0, 0.0, 8, 8, false, true);
 	ASSERT(flameAtlas.IsValid(), "Unable to create flame atlas!\n");
 
-	/*GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
+	GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
 	ASSERT(flameSystem.IsValid(), "Unable to create flame particle system!\n");
-
-	GTE::SceneObjectRef particleSystemObject = objectManager->CreateSceneObject();
-	ASSERT(particleSystemObject.IsValid(), "Unable to create flame particle system object!\n");
-	particleSystemObject->SetParticleSystem(flameSystem);*/
-
-	//GTE::Mesh3DRendererRef meshRenderer = objectManager->CreateMesh3DRenderer();
-	//GTE::RendererRef baseRenderer = GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(meshRenderer);
+	particleSystemObject->SetParticleSystem(flameSystem);
 }
 
 /*

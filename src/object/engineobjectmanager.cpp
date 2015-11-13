@@ -29,6 +29,7 @@
 #include "graphics/animation/animationinstance.h"
 #include "graphics/animation/animationplayer.h"
 #include "graphics/particles/particlesystem.h"
+#include "graphics/particles/particlemeshrenderer.h"
 #include "asset/assetimporter.h"
 #include "debug/gtedebug.h"
 #include "graphics/view/camera.h"
@@ -804,6 +805,30 @@ namespace GTE
 	{
 		ASSERT(system != nullptr, "EngineObjectManager::DeleteParticleSystem -> 'system' is null.");
 		delete system;
+	}
+
+	ParticleMeshRendererSharedPtr EngineObjectManager::CreateParticleMeshRenderer()
+	{
+		ParticleMeshRenderer * renderer = new(std::nothrow) ParticleMeshRenderer();
+		ASSERT(system != nullptr, "EngineObjectManager::CreateParticleMeshRenderer -> Could not create new particle mesh renderer.");
+
+		renderer->SetObjectID(GetNextObjectID());
+
+		return ParticleMeshRendererSharedPtr(renderer, [=](ParticleMeshRenderer * renderer)
+		{
+			DeleteParticleMeshRenderer(renderer);
+		});
+	}
+
+	void EngineObjectManager::DestroyParticleMeshRenderer(ParticleMeshRendererSharedPtr renderer)
+	{
+		renderer.ForceDelete();
+	}
+
+	void EngineObjectManager::DeleteParticleMeshRenderer(ParticleMeshRenderer * renderer)
+	{
+		ASSERT(renderer != nullptr, "EngineObjectManager::DeleteParticleMeshRenderer -> 'renderer' is null.");
+		delete renderer;
 	}
 }
 

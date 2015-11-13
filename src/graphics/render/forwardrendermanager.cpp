@@ -421,12 +421,7 @@ namespace GTE
 			
 				if(baseRenderer.IsValid())
 				{
-					Mesh3DRenderer * meshRenderer = dynamic_cast<SkinnedMesh3DRenderer*>(baseRenderer.GetPtr());
-					if(meshRenderer == nullptr)
-					{
-						meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer.GetPtr());
-					}
-
+					Mesh3DRenderer * meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer.GetPtr());
 					if(meshRenderer != nullptr)
 					{
 						if(meshFilter.IsValid() && mesh.IsValid() &&  mesh->GetSubMeshCount() == meshRenderer->GetSubRendererCount() && meshRenderer->GetMaterialCount() > 0 && renderableSceneObjectCount < Constants::MaxSceneObjects)

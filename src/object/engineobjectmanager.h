@@ -18,12 +18,13 @@ namespace GTE
 	// forward declarations
 	class EngineObject;
 	class SceneObject;
-	class Shader;
-	class SubMesh3D;
+	class Shader;	
 	class Mesh3D;
+	class SubMesh3D;
 	class Mesh3DFilter;
-	class SubMesh3DRenderer;
 	class Mesh3DRenderer;
+	class SkinnedMesh3DRenderer;
+	class SubMesh3DRenderer;
 	class EngineObjectManager;
 	class Material;
 	class Camera;
@@ -39,6 +40,7 @@ namespace GTE
 	class RenderTarget;
 	class ShaderSource;
 	class ParticleSystem;
+	class ParticleMeshRenderer;
 
 	class EngineObjectManager
 	{
@@ -79,6 +81,7 @@ namespace GTE
 		void DeleteAnimationInstance(AnimationInstance * animation);
 		void DeleteAnimationPlayer(AnimationPlayer * player);
 		void DeleteParticleSystem(ParticleSystem * system);
+		void DeleteParticleMeshRenderer(ParticleMeshRenderer * system);
 
 		Bool InitBuiltinShaders();
 
@@ -140,9 +143,11 @@ namespace GTE
 		TextureSharedPtr CreateCubeTexture(RawImage * frontData, RawImage * backData, RawImage * topData,
 			RawImage * bottomData, RawImage * leftData, RawImage * rightData);
 		void DestroyTexture(TextureSharedPtr texture);
+
 		AtlasSharedPtr CreateAtlas(TextureSharedPtr texture, Bool createFirstFullImage);
 		AtlasSharedPtr CreateGridAtlas(TextureSharedPtr texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY);
 		void DestroyAtlas(AtlasSharedPtr atlas);
+
 		RenderTargetSharedPtr CreateRenderTarget(Bool hasColor, Bool hasDepth, Bool enableStencilBuffer,
 			const TextureAttributes& colorTextureAttributes,
 			UInt32 width, UInt32 height);
@@ -154,9 +159,12 @@ namespace GTE
 
 		ParticleSystemSharedPtr CreateParticleSystem(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
 		void DestroyParticleSystem(ParticleSystemSharedPtr system);
+		ParticleMeshRendererSharedPtr CreateParticleMeshRenderer();
+		void DestroyParticleMeshRenderer(ParticleMeshRendererSharedPtr renderer);
 
 		CameraSharedPtr CreateCamera();
 		void DestroyCamera(CameraSharedPtr camera);
+
 		LightSharedPtr CreateLight();
 		void DestroyLight(LightSharedPtr light);
 	};

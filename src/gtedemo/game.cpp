@@ -165,7 +165,6 @@ void Game::SetupScene(GTE::AssetImporter& importer, Scenes scene)
 		scenes[(GTE::UInt32)Scenes::LavaScene] = lavaScene;
 		lavaScene->SetPlayerObjectLayerMask(playerObjectLayerMask);
 		lavaScene->Setup(importer, ambientLightObject, directionalLightObject, playerObject);
-
 		break;
 	case Scenes::CastleScene:
 		castleScene = new(std::nothrow) CastleScene();

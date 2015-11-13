@@ -30,8 +30,8 @@ namespace GTE
 
 		this->componentCount = componentCount;
 		this->size = size;
-		data = new(std::nothrow) Real[componentCount * size];
 
+		data = new(std::nothrow) Real[componentCount * size];
 		ASSERT(data != nullptr, "CustomFloatAttributeBuffer::Init -> Unable to allocate data.");
 
 		return true;
