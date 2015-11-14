@@ -59,7 +59,7 @@ namespace GTE
 			attributeBuffers[i] = nullptr;
 		}
 
-		storedVertexCount = 0;
+		totalVertexCount = 0;
 		storedAttributes = StandardAttributes::CreateAttributeSet();
 
 		this->buffersOnGPU = buffersOnGPU;
@@ -479,7 +479,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetPositionData(Point3Array * points)
 	{
-		attributeBuffers[(Int32)StandardAttribute::Position]->SetData(points->GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::Position, points->GetDataPtr());
 	}
 
 	/*
@@ -487,7 +487,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetNormalData(Vector3Array * normals)
 	{
-		attributeBuffers[(Int32)StandardAttribute::Normal]->SetData(normals->GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::Normal, normals->GetDataPtr());
 	}
 
 	/*
@@ -495,7 +495,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetFaceNormalData(Vector3Array * faceNormals)
 	{
-		attributeBuffers[(Int32)StandardAttribute::FaceNormal]->SetData(faceNormals->GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::FaceNormal, faceNormals->GetDataPtr());
 	}
 
 	/*
@@ -503,7 +503,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetTangentData(Vector3Array * tangents)
 	{
-		attributeBuffers[(Int32)StandardAttribute::Tangent]->SetData(tangents->GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::Tangent, tangents->GetDataPtr());
 	}
 
 	/*
@@ -511,7 +511,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetVertexColorData(Color4Array * colors)
 	{
-		attributeBuffers[(Int32)StandardAttribute::VertexColor]->SetData(colors->GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::VertexColor, colors->GetDataPtr());
 	}
 
 	/*
@@ -519,7 +519,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetUV1Data(UV2Array * uvs)
 	{
-		attributeBuffers[(Int32)StandardAttribute::UVTexture0]->SetData(uvs->GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::UVTexture0, uvs->GetDataPtr());
 	}
 
 	/*
@@ -527,14 +527,18 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetUV2Data(UV2Array * uvs)
 	{
-		attributeBuffers[(Int32)StandardAttribute::UVTexture1]->SetData(uvs->GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::UVTexture1, uvs->GetDataPtr());
 	}
 
 	/*
 	* Set the vertex attribute buffer data at [index] in [attributeBuffers] with [data].
 	*/
-	void SubMesh3DRenderer::SetAttributeData(UInt32 index, Real * data)
+	void SubMesh3DRenderer::SetAttributeData(UInt32 index, const Real * data)
 	{
+		SubMesh3DRef mesh = containerRenderer->GetSubMesh(targetSubMeshIndex);
+		ASSERT(mesh.IsValid(), "SubMesh3DRenderer::SetAttributeData -> Could not find matching sub mesh for sub renderer.");
+
+		attributeBuffers[index]->SetRenderVertexCount(mesh->GetRenderVertexCount());
 		attributeBuffers[index]->SetData(data);
 	}
 
@@ -588,13 +592,13 @@ namespace GTE
 		}
 
 		// update the local vertex count
-		storedVertexCount = mesh->GetTotalVertexCount();
+		totalVertexCount = mesh->GetTotalVertexCount();
 
 		// TODO: current shadow volume data memory is allocated for all mesh renderers, regardless if they cast a
 		// shadow or not. This could be quite wasteful, so implement a way to avoid this excess memory usage.
 		Bool shadowVolumeInitSuccess = true;
-		shadowVolumeInitSuccess = shadowVolumePositions.Init(storedVertexCount * 8);
-		shadowVolumeInitSuccess &= InitAttributeData((UInt32)StandardAttribute::ShadowPosition, storedVertexCount * 8, 4, 0, nullptr);
+		shadowVolumeInitSuccess = shadowVolumePositions.Init(totalVertexCount * 8);
+		shadowVolumeInitSuccess &= InitAttributeData((UInt32)StandardAttribute::ShadowPosition, totalVertexCount * 8, 4, 0, nullptr);
 		ASSERT(shadowVolumeInitSuccess, "SubMesh3DRenderer::UpdateMeshAttributeBuffers -> Error occurred while initializing shadow volume array.");
 
 		boundShadowVolumeAttributeBuffers.clear();
@@ -760,7 +764,7 @@ namespace GTE
 
 		// if the vertex count of this sub-renderer does not match that of the target sub-mesh, call
 		// the UpdateMeshAttributeBuffers() method to resize
-		if (mesh->GetTotalVertexCount() != storedVertexCount || mesh->GetStandardAttributeSet() != storedAttributes)
+		if (mesh->GetTotalVertexCount() != totalVertexCount || mesh->GetStandardAttributeSet() != storedAttributes)
 		{
 			updateSuccess = updateSuccess && UpdateMeshAttributeBuffers();
 		}

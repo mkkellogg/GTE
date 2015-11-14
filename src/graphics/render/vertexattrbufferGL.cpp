@@ -32,17 +32,33 @@ namespace GTE
 	/*
 	 * Calculate the number of floating-point entries in the buffer.
 	 */
-	Int32 VertexAttrBufferGL::CalcFloatCount() const
+	Int32 VertexAttrBufferGL::CalcTotalFloatCount() const
 	{
-		return (componentCount + stride) * vertexCount;
+		return (componentCount + stride) * totalVertexCount;
 	}
 
 	/*
 	 * Calculate the total size (in bytes) of the buffer.
 	 */
-	Int32 VertexAttrBufferGL::CalcFullSize() const
+	Int32 VertexAttrBufferGL::CalcTotalFullSize() const
 	{
-		return CalcFloatCount() * sizeof(Real);
+		return CalcTotalFloatCount() * sizeof(Real);
+	}
+
+	/*
+	* Calculate the number of floating-point entries to be rendered.
+	*/
+	Int32 VertexAttrBufferGL::CalcRenderFloatCount() const
+	{
+		return (componentCount + stride) * renderVertexCount;
+	}
+
+	/*
+	* Calculate the size (in bytes) of the buffer to be rendered.
+	*/
+	Int32 VertexAttrBufferGL::CalcRenderFullSize() const
+	{
+		return CalcRenderFloatCount() * sizeof(Real);
 	}
 
 	/*
@@ -55,19 +71,20 @@ namespace GTE
 	 * [dataOnGPU] - Make this a VBO.
 	 * [srcData] - Data to be copied into the buffer after initialization.
 	 */
-	Bool VertexAttrBufferGL::Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, const Real *srcData)
+	Bool VertexAttrBufferGL::Init(Int32 totalVertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, const Real *srcData)
 	{
 		// if this buffer has already be initialized we need to destroy it and start fresh
 		Destroy();
 
 		this->componentCount = componentCount;
-		this->vertexCount = vertexCount;
+		this->totalVertexCount = totalVertexCount;
+		this->renderVertexCount = totalVertexCount;
 		this->stride = stride;
 
 		// calculate number of bytes in the buffer
-		Int32 fullDataSize = CalcFullSize();
+		Int32 fullDataSize = CalcTotalFullSize();
 
-		data = new(std::nothrow) Real[CalcFloatCount()];
+		data = new(std::nothrow) Real[CalcTotalFloatCount()];
 		ASSERT(data != nullptr, "VertexAttrBufferGL::Init -> Could not allocate VertexAttrBufferGL data.");
 
 		// zero out the buffer
@@ -95,7 +112,7 @@ namespace GTE
 
 	void VertexAttrBufferGL::InitData(const Real * srcData)
 	{
-		Int32 fullDataSize = CalcFullSize();		
+		Int32 fullDataSize = CalcTotalFullSize();
 
 		if (dataOnGPU)
 		{
@@ -112,7 +129,7 @@ namespace GTE
 	 */
 	void VertexAttrBufferGL::SetData(const Real * srcData)
 	{
-		Int32 fullDataSize = CalcFullSize();
+		Int32 fullDataSize = CalcRenderFullSize();
 
 		if (dataOnGPU)
 		{
@@ -178,13 +195,5 @@ namespace GTE
 	GLuint VertexAttrBufferGL::GetGPUBufferID() const
 	{
 		return gpuBufferID;
-	}
-
-	/*
-	 * Public accessor to the full size (in bytes) of the buffer.
-	 */
-	UInt32 VertexAttrBufferGL::GetFullSize() const
-	{
-		return CalcFullSize();
 	}
 }

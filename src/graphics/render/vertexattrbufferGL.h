@@ -38,8 +38,10 @@ namespace GTE
 		virtual ~VertexAttrBufferGL();
 
 		void Destroy();
-		Int32 CalcFullSize() const;
-		Int32 CalcFloatCount() const;
+		Int32 CalcTotalFullSize() const;
+		Int32 CalcTotalFloatCount() const;
+		Int32 CalcRenderFullSize() const;
+		Int32 CalcRenderFloatCount() const;
 		void InitData(const Real * srcData);
 
 	public:
@@ -49,7 +51,6 @@ namespace GTE
 		const Real * GetDataPtr() const;
 		Bool IsGPUBuffer() const;
 		GLuint GetGPUBufferID() const;
-		UInt32 GetFullSize() const;
 	};
 }
 

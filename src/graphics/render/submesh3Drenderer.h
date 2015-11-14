@@ -74,8 +74,8 @@ namespace GTE
 		std::vector<VertexAttrBufferBinding> boundAttributeBuffers;
 		std::vector<VertexAttrBufferBinding> boundShadowVolumeAttributeBuffers;
 
-		// number of vertices for which vertex attributes in [attributeBuffers] are stored
-		UInt32 storedVertexCount;
+		// number of vertices for which storage vertex attributes in [attributeBuffers] is allocated
+		UInt32 totalVertexCount;
 		// mask that describes the different types of attributes stored in [storedAttributes]
 		StandardAttributeSet storedAttributes;
 		// are the vertex attributes stored in GPU-based buffers?
@@ -132,7 +132,7 @@ namespace GTE
 		void SetVertexColorData(Color4Array * colors);
 		void SetUV1Data(UV2Array * uvs);
 		void SetUV2Data(UV2Array * uvs);
-		void SetAttributeData(UInt32 index, Real * data);
+		void SetAttributeData(UInt32 index, const Real * data);
 
 		Bool ValidateMaterialForMesh(MaterialRef material);
 		Bool UpdateMeshAttributeBuffers();

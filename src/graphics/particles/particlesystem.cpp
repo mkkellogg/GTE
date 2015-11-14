@@ -112,6 +112,8 @@ namespace GTE
 		material->SetDepthBufferFunction(RenderState::DepthBufferFunction::LessThanOrEqual);
 		material->SetBlendingMode(RenderState::BlendingMode::Additive);
 
+		//material->SetFaceCulling(RenderState::FaceCulling::None);
+
 		return material;
 	}
 
@@ -213,6 +215,11 @@ namespace GTE
 
 			UInt32 baseIndex = p * (UInt32)ParticleConstants::VerticesPerParticle;
 
+			//position.Set(0.0f, 5.0f, 0.0f);
+			//particle->Size.x = 10;
+			//particle->Size.y = 10;
+
+
 			Point3Array * positions = targetMesh->GetPostions();
 			positions->GetPoint(baseIndex)->SetTo(position);
 			positions->GetPoint(baseIndex + 1)->SetTo(position);
@@ -275,18 +282,16 @@ namespace GTE
 
 	void ParticleSystem::Awake()
 	{
-		printf("awake!\n");
+
 	}
 
 	void ParticleSystem::Start()
 	{
-		printf("started!\n");
+
 	}
 
 	void ParticleSystem::WillRender()
 	{
-		printf("will render!\n");
-
 		CameraRef currentCamera = Engine::Instance()->GetRenderManager()->GetCurrentCamera();
 		this->currentCamera = currentCamera.GetPtr();
 
@@ -327,15 +332,12 @@ namespace GTE
 
 	void ParticleSystem::Update()
 	{
-		printf("update!\n");
-
 		SceneObjectRef thisSceneObject = GetSceneObject();
 		NONFATAL_ASSERT(thisSceneObject.IsValid(), "ParticleSystem::Update -> Particle system is not atached to a valid scene object.", true);
 
 		SceneObjectRef meshObjectParent = meshObject->GetParent();
 		if(!meshObjectParent.IsValid() || meshObjectParent->GetObjectID() != thisSceneObject->GetObjectID())
 		{
-			printf("adding child!\n");
 			thisSceneObject->AddChild(meshObject);
 			meshObject->SetActive(true);
 		}

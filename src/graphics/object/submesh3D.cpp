@@ -104,7 +104,7 @@ namespace GTE
 	 */
 	void SubMesh3D::CalculateFaceNormal(UInt32 faceIndex, Vector3& result) const
 	{
-		NONFATAL_ASSERT(faceIndex < totalVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> 'faceIndex' is out range.", true);
+		NONFATAL_ASSERT(faceIndex < renderVertexCount - 2, "SubMesh3D::CalculateFaceNormal -> 'faceIndex' is out range.", true);
 
 		Vector3 a, b, c;
 
@@ -139,7 +139,7 @@ namespace GTE
 
 		// loop through each triangle in this mesh's vertices
 		// and calculate normals for each
-		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
+		for (UInt32 v = 0; v < renderVertexCount - 2; v += 3)
 		{
 			Vector3 normal;
 			CalculateFaceNormal(v, normal);
@@ -159,7 +159,7 @@ namespace GTE
 		// loop through each vertex and lookup the associated list of
 		// normals associated with that vertex, and then calculate the
 		// average normal from that list.
-		for (UInt32 v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
 			// get existing normal for this vertex
 			Vector3 oNormal;
@@ -218,7 +218,7 @@ namespace GTE
 
 		// loop through each vertex and assign the average normal
 		// calculated for that vertex
-		for (UInt32 v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
 			Vector3 avg = averageNormals[v];
 			avg.Normalize();
@@ -292,7 +292,7 @@ namespace GTE
 
 		// loop through each triangle in this mesh's vertices
 		// and calculate tangents for each
-		for (UInt32 v = 0; v < totalVertexCount - 2; v += 3)
+		for (UInt32 v = 0; v < renderVertexCount - 2; v += 3)
 		{
 			Vector3 t0, t1, t2;
 
@@ -311,7 +311,7 @@ namespace GTE
 		// loop through each vertex and lookup the associated list of
 		// tangents associated with that vertex, and then calculate the
 		// average tangents from that list.
-		for (UInt32 v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
 			// get existing normal for this vertex
 			Vector3 oNormal;
@@ -378,7 +378,7 @@ namespace GTE
 
 		// loop through each vertex and assign the average tangent
 		// calculated for that vertex
-		for (UInt32 v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
 			Vector3 avg = averageTangents[v];
 			avg.Normalize();
@@ -470,7 +470,7 @@ namespace GTE
 
 		// get the maximum and minimum extents of the mesh
 		// along each axis.
-		for (UInt32 v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
 			Point3 * point = positions.GetPoint(v);
 			if (point->x > maxX || v == 0)maxX = point->x;
@@ -526,7 +526,7 @@ namespace GTE
 		if (vertexCrossMap != nullptr)
 		{
 			std::unordered_map<std::vector<UInt32>*, Bool> deleted;
-			for (UInt32 i = 0; i < totalVertexCount; i++)
+			for (UInt32 i = 0; i < renderVertexCount; i++)
 			{
 				std::vector<UInt32>* list = vertexCrossMap[i];
 				if (list != nullptr && !deleted[list])
@@ -555,12 +555,12 @@ namespace GTE
 		// vertices, so this structure is used to store indices in [positions] for those vertices.
 		std::unordered_map<Point3, std::vector<UInt32>*, Point3::Point3Hasher, Point3::Point3Eq> vertexGroups;
 
-		vertexCrossMap = new(std::nothrow) std::vector<UInt32>*[totalVertexCount];
+		vertexCrossMap = new(std::nothrow) std::vector<UInt32>*[renderVertexCount];
 		ASSERT(vertexCrossMap != nullptr, "SubMesh3D::BuildVertexCrossMap -> Could not allocate vertexCrossMap.");
 
 		// loop through each vertex in the mesh and add the index in [position] for that vertex to the
 		// appropriate vertex group.
-		for (UInt32 v = 0; v < totalVertexCount; v++)
+		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
 			Point3 * point = positions.GetPoint(v);
 			Point3 targetPoint = *point;
@@ -685,6 +685,7 @@ namespace GTE
 	*/
 	void SubMesh3D::SetRenderVertexCount(UInt32 count)
 	{
+		if(count > totalVertexCount)count = totalVertexCount;
 		renderVertexCount = count;
 	}
 
@@ -787,7 +788,7 @@ namespace GTE
 	 */
 	void SubMesh3D::ReverseAttributeComponentOrder()
 	{
-		for (UInt32 i = 0; i < totalVertexCount; i += 3)
+		for (UInt32 i = 0; i < renderVertexCount; i += 3)
 		{
 			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Position))
 			{
@@ -871,7 +872,7 @@ namespace GTE
 	{
 		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Normal))
 		{
-			for (UInt32 i = 0; i < totalVertexCount; i++)
+			for (UInt32 i = 0; i < renderVertexCount; i++)
 			{
 				Vector3 * n1 = vertexNormals.GetVector(i);
 				n1->Invert();
@@ -888,7 +889,7 @@ namespace GTE
 	{
 		if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Tangent))
 		{
-			for (UInt32 i = 0; i < totalVertexCount; i++)
+			for (UInt32 i = 0; i < renderVertexCount; i++)
 			{
 				Vector3 * n1 = vertexTangents.GetVector(i);
 				n1->Invert();

@@ -547,7 +547,7 @@ namespace GTE
 		if (varID >= 0)
 		{
 			shader->SendBufferToShader(varID, buffer);
-			SetAttributeSetValue(varID, buffer->GetVertexCount());
+			SetAttributeSetValue(varID, buffer->GetRenderVertexCount());
 		}
 	}
 

@@ -12,7 +12,7 @@ namespace GTE
 	/*
 	 * Single constructor.
 	 */
-	VertexAttrBuffer::VertexAttrBuffer() : componentCount(0), vertexCount(0), stride(0)
+	VertexAttrBuffer::VertexAttrBuffer() : componentCount(0), totalVertexCount(0), renderVertexCount(0), stride(0)
 	{
 
 	}
@@ -29,9 +29,23 @@ namespace GTE
 	/*
 	 * Get the number of vertices in this buffer.
 	 */
-	Int32 VertexAttrBuffer::GetVertexCount() const
+	Int32 VertexAttrBuffer::GetTotalVertexCount() const
 	{
-		return vertexCount;
+		return totalVertexCount;
+	}
+
+	void VertexAttrBuffer::SetRenderVertexCount(UInt32 count)
+	{
+		if(count > totalVertexCount)count = totalVertexCount;
+		renderVertexCount = count;
+	}
+
+	/*
+	* Get the number of vertices that should be rendered.
+	*/
+	Int32 VertexAttrBuffer::GetRenderVertexCount() const
+	{
+		return renderVertexCount;
 	}
 
 	/*
