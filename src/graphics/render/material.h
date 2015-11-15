@@ -187,6 +187,8 @@ namespace GTE
 		void SetUniform1f(Real val, UniformID uniformID);
 		void SetUniform2f(Real v1, Real v2, const std::string& varName);
 		void SetUniform2f(Real v1, Real v2, UniformID uniformID);
+		void SetUniform3f(Real v1, Real v2, Real v3, const std::string& varName);
+		void SetUniform3f(Real v1, Real v2, Real v3, UniformID uniformID);
 		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName);
 		void SetUniform4f(Real v1, Real v2, Real v3, Real v4, UniformID uniformID);
 		void SetColor(const Color4& color, const std::string& varName);

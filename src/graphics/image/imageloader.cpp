@@ -23,8 +23,8 @@ namespace GTE
 			ASSERT(ilGetInteger(IL_VERSION_NUM) >= IL_VERSION, "AssetImporter::ProcessMaterials -> wrong DevIL version");
 
 			ilInit(); /// Initialization of DevIL
+			ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 			ilEnable(IL_ORIGIN_SET);
-			ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 			ImageLoader::ilInitialized = true;
 		}
 
@@ -33,8 +33,18 @@ namespace GTE
 
 	RawImage * ImageLoader::LoadImageU(const std::string& fullPath)
 	{
+		return LoadImageU(fullPath, false);
+	}
+
+	RawImage * ImageLoader::LoadImageU(const std::string& fullPath, Bool reverseOrigin)
+	{
 		Bool initializeSuccess = Initialize();
 		NONFATAL_ASSERT_RTRN(initializeSuccess, "ImageLoader::LoadImage -> Error occurred while initializing image loader.", nullptr, false);
+
+		if(reverseOrigin)
+		{
+			ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
+		}
 
 		std::string extension = GetFileExtension(fullPath);
 
@@ -78,6 +88,12 @@ namespace GTE
 
 		// Because we have already copied image data into texture data we can release memory used by image.
 		ilDeleteImages(1, imageIds);
+
+		if(reverseOrigin)
+		{
+			ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+		}
+
 		return rawImage;
 	}
 

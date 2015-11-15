@@ -32,6 +32,7 @@ public:
 	void Update();
 	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject);
 
+	void SetupParticleSystems(GTE::AssetImporter& importer);
 	void SetupTerrain(GTE::AssetImporter& importer);
 	void SetupStructures(GTE::AssetImporter& importer);
 	void SetupPlants(GTE::AssetImporter& importer);

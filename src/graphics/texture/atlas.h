@@ -47,7 +47,7 @@ namespace GTE
 
 		TextureSharedPtr texture;
 		UInt32 imageCount; 
-		std::vector<ImageDescriptor> images;
+		std::vector<ImageDescriptor> imageDescriptors;
 
 		protected:
 

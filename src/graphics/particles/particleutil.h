@@ -63,6 +63,8 @@ namespace GTE
 			target.Lerp(a, b, t);
 		}
 	};
+
+	template <> static void ParticleUtil::Lerp<Real>(const Real& a, const Real& b, Real& target, Real t);
 }
 
 #endif

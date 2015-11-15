@@ -701,6 +701,10 @@ namespace GTE
 		// we have not yet rendered any ambient lights
 		Bool renderedAmbient = false;
 
+		//===============================
+		// Render AMBIENT
+		//===============================
+
 		// loop through each ambient light and render the scene for that light
 		if (viewDescriptor.AmbientPassEnabled)
 		{
@@ -731,7 +735,12 @@ namespace GTE
 			RenderSceneSSAO(viewDescriptor);
 		}
 
-		// loop through each regular light and render scene for that light
+
+		//===============================
+		// Render OPAQUE obejcts
+		//===============================
+
+		// Render opaque geometry render queues for each light -> this means everything below RenderQueueType::Transparent
 		for (UInt32 l = 0; l < lightCount; l++)
 		{
 			SceneObject* lightObject = sceneLights[l];
@@ -741,7 +750,7 @@ namespace GTE
 			ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light is not valid.");
 
 			// render all objects in the scene that have materials that use lighting
-			RenderSceneForLight(lightRef.GetRef(), viewDescriptor);
+			RenderSceneForLight(lightRef.GetRef(), viewDescriptor, true, 0, (UInt32)RenderQueueType::Transparent - 1);
 		}
 
 		// perform the screen-space ambient occlusion pass as an outline effect
@@ -750,166 +759,77 @@ namespace GTE
 			RenderSceneSSAO(viewDescriptor);
 		}
 
-		// render all objects in the scene that have materials which DO NOT use lighting. in this case each 
-		// object is rendered only once, with no need for additive blending.
-		RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr);
+		// Render OPAQUE geometry render queues for meshes that have materials which DO NOT use lighting.
+		RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr, true, 0, (UInt32)RenderQueueType::Transparent - 1);
+
+
+		//===============================
+		// Render TRANSPARENT obejcts
+		//===============================
+
+		// Render transparent render queues and above for each light
+		for(UInt32 l = 0; l < lightCount; l++)
+		{
+			SceneObject* lightObject = sceneLights[l];
+			ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light's scene object is not valid.");
+
+			LightRef lightRef = lightObject->GetLight();
+			ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light is not valid.");
+
+			// render all objects in the scene that have materials that use lighting
+			RenderSceneForLight(lightRef.GetRef(), viewDescriptor, true, (UInt32)RenderQueueType::Transparent, (UInt32)RenderQueueType::MaxQueue);
+		}
+
+		// Render TRANSPARENT render queues and above for meshes that have materials which DO NOT use lighting.
+		RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr, true, (UInt32)RenderQueueType::Transparent, (UInt32)RenderQueueType::MaxQueue);
+
 
 		// render the skybox if it is setup & enabled
 		if (viewDescriptor.SkyboxEnabled)
 		{
 			RenderSkyboxForCamera(viewDescriptor);
 		}
+
+
+		// restore default graphics state
+		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 	}
 
 	/*
-	 * Forward-Render the scene for a single light [light] from the perspective
-	 * specified in [viewDescriptor].
-	 *
-	 * This method performs two passes:
-	 *
-	 * Pass 1: If [light] is not ambient, render shadow volumes for all meshes in the scene for [light] into the stencil buffer.
-	 * Pass 2: Perform actual rendering of all meshes in the scene for [light]. If [light] is not ambient, this pass will
-	 *         exclude screen pixels that are hidden from [light] based on the stencil buffer contents from pass 0. Is [light]
-	 *         is ambient, then this pass will perform a standard render of all meshes in the scene.
-	 *
-	 * [viewDescriptor.UniformWorldSceneObjectTransform] is pre-multiplied with the transform of each rendered scene object & light
-	 */
-
-	void ForwardRenderManager::RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor)
-	{
-		Transform modelView;
-		Transform model;
-		Transform modelInverse;
-
-		SceneObjectProcessingDescriptor& processingDesc = const_cast<Light&>(light).GetSceneObject()->GetProcessingDescriptor();
-		Transform lightTransform = processingDesc.AggregateTransform;
-		lightTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
-
-		Point3 lightWorldPosition;
-		lightTransform.TransformPoint(lightWorldPosition);
-
-		Vector3 lightDirection = light.GetDirection();
-		lightTransform.TransformVector(lightDirection);
-
-		RenderMode currentRenderMode = RenderMode::None;
-
-		enum RenderPass
-		{
-			ShadowVolumeRender = 0,
-			StandardRender = 1,
-			_PassCount = 2
-		};
-
-		for (Int32 pass = 0; pass < RenderPass::_PassCount; pass++)
-		{
-			if (pass == ShadowVolumeRender) // shadow volume pass
-			{
-				// check if this light can cast shadows; if not we skip this pass
-				if (light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
-				{
-					currentRenderMode = RenderMode::ShadowVolumeRender;
-					Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::ShadowVolumeRender);
-				}
-				else
-					continue;
-			}
-
-			for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
-			{
-				RenderQueueEntry* entry = *itr;
-				NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
-
-				SceneObject* sceneObject = entry->Container;
-				NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
-
-				Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
-
-				// copy the full world transform of the scene object, including those of all ancestors
-				SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
-				Transform sceneObjectWorldTransform;
-				sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
-				sceneObjectWorldTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
-
-				// make sure the current mesh should not be culled from [light] or from
-				// the current camera, whose culling mask is in [viewDescriptor].
-				if(!ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject) &&
-					!ShouldCullFromLightByLayer(light, *sceneObject) &&
-					!ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform))
-				{
-					if(pass == ShadowVolumeRender) // shadow volume pass
-					{
-						if(filter->GetCastShadows())
-						{
-							RenderShadowVolumeForMesh(*entry, light, lightWorldPosition, lightDirection, viewDescriptor);
-						}
-					}
-					else if(pass == StandardRender) // normal rendering pass
-					{
-						// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
-						if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && filter->GetReceiveShadows())
-						{
-							if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
-							{
-								currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
-								Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
-							}
-						}
-						else if(currentRenderMode != RenderMode::Standard)
-						{
-							currentRenderMode = RenderMode::Standard;
-							Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
-						}
-
-						// Dispatch "WillRender" event
-						SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
-						if(!processingDescriptor.Rendered)
-						{
-							Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
-							processingDescriptor.Rendered = true;
-						}
-
-						// set up lighting descriptor for non self-lit lighting
-						LightingDescriptor lightingDescriptor(&light, &lightWorldPosition, &lightDirection, true);
-						RenderMesh(*entry, lightingDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
-					}
-				}
-			}
-		}
-	}
-
-	/*
-	 * Render the skybox for the view specified by [viewDescriptor].
-	 */
+	* Render the skybox for the view specified by [viewDescriptor].
+	*/
 	void ForwardRenderManager::RenderSkyboxForCamera(const ViewDescriptor& viewDescriptor)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
 		// ensure that a skybox has been enabled for this view
-		if (viewDescriptor.SkyboxEnabled)
+		if(viewDescriptor.SkyboxEnabled)
 		{
 			// retrieve the scene object that contains the skybox mesh
 			SceneObject* skyboxObject = viewDescriptor.SkyboxObject;
 			NONFATAL_ASSERT(skyboxObject != nullptr, "ForwardRenderManager::RenderSkyboxForCamera -> View descriptor has invalid skybox scene object.", true);
 
-			Mesh3DRendererRef meshRenderer = DynamicCastEngineObject<Renderer, Mesh3DRenderer>(skyboxObject->GetRenderer());
-			Mesh3DRenderer * renderer = nullptr;
-			if(meshRenderer.IsValid())renderer = meshRenderer.GetPtr();
+			RendererRef renderer = skyboxObject->GetRenderer();
+			Renderer* baseRenderer = nullptr;
+			if(renderer.IsValid())baseRenderer = renderer.GetPtr();
 
-			NONFATAL_ASSERT(renderer != nullptr, "ForwardRenderManager::RenderSkyboxForCamera -> Could not find valid renderer for skybox.", true);
-		
-			Mesh3DRef mesh = renderer->GetTargetMesh();
+			Mesh3DRenderer* meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer);
+
+			NONFATAL_ASSERT(meshRenderer != nullptr, "ForwardRenderManager::RenderSkyboxForCamera -> Could not find valid renderer for skybox.", true);
+
+			Mesh3DRef mesh = meshRenderer->GetTargetMesh();
 			NONFATAL_ASSERT(mesh.IsValid(), "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has invalid mesh.", true);
 			NONFATAL_ASSERT(mesh->GetSubMeshCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has empty mesh.", true);
-			NONFATAL_ASSERT(renderer->GetSubRendererCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has no renderers.", true);
-			NONFATAL_ASSERT(renderer->GetMaterialCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has no material.", true);
-			
+			NONFATAL_ASSERT(meshRenderer->GetSubRendererCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has no renderers.", true);
+			NONFATAL_ASSERT(meshRenderer->GetMaterialCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has no material.", true);
+
 			skyboxObject->SetActive(true);
 
 			// set up single render queue entry for skybox
 			skyboxEntry.Container = skyboxObject;
 			skyboxEntry.Mesh = mesh->GetSubMesh(0).GetPtr();
-			skyboxEntry.Renderer = renderer->GetSubRenderer(0).GetPtr();
-			skyboxEntry.RenderMaterial = const_cast<MaterialSharedPtr*>(&renderer->GetMaterial(0));
+			skyboxEntry.Renderer = meshRenderer->GetSubRenderer(0).GetPtr();
+			skyboxEntry.RenderMaterial = const_cast<MaterialSharedPtr*>(&meshRenderer->GetMaterial(0));
 
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 
@@ -921,18 +841,18 @@ namespace GTE
 	}
 
 	/*
-	 * Render the scene to only the depth-buffer. Render from the perspective
-	 * of the view specified by [viewDescriptor].
-	 */
+	* Render the scene to only the depth-buffer. Render from the perspective
+	* of the view specified by [viewDescriptor].
+	*/
 	void ForwardRenderManager::RenderDepthBuffer(const ViewDescriptor& viewDescriptor)
 	{
 		RenderSceneWithoutLight(viewDescriptor, depthOnlyMaterial, false, false, FowardBlendingFilter::Never, nullptr);
 	}
 
 	/*
-	 * Render the screen-space ambient occlusion for the scene.  Render from the perspective
-	 * of the view specified by [viewDescriptor].
-	 */
+	* Render the screen-space ambient occlusion for the scene.  Render from the perspective
+	* of the view specified by [viewDescriptor].
+	*/
 	void ForwardRenderManager::RenderSceneSSAO(const ViewDescriptor& viewDescriptor)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
@@ -943,8 +863,8 @@ namespace GTE
 
 		// clear the relevant buffers in the off-screen render target
 		IntMask clearMask = IntMaskUtil::CreateIntMask();
-		if (depthRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Color);
-		if (depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Depth);
+		if(depthRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Color);
+		if(depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Depth);
 		Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearMask);
 
 		// render the depth values for the scene to the off-screen color texture (filter out non-static objects)
@@ -985,26 +905,161 @@ namespace GTE
 		SetForwardBlending(currentFoward);
 	}
 
+
+	void ForwardRenderManager::RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor)
+	{
+		RenderSceneForLight(light, viewDescriptor, false, 0, 0);
+	}
 	/*
-	 * Render all objects in the scene with lighting. If [material] is a valid Material, then it will be used as a 
-	 * replacement material to render all scene objects. If it is not vali,d then only meshes with materials that have
-	 * the "use lighting" flag will be rendered. All objects will be rendered from the perspective
-	 * of the view specified by [viewDescriptor].
+	 * Forward-Render the scene for a single light [light] from the perspective
+	 * specified in [viewDescriptor].
 	 *
-	 * [flagRendered] - If true, each mesh will be flagged as rendered after it is rendered, which affects how blending
-	 *                  works for that mesh on future rendering passes.
-	 * [renderMoreThanOnce] - If true, meshes can be rendered more than once (meaning in the additive passes).
-	 * [blendingFilter] - Determines how forward-rendering blending will be applied.
-	 * [filterFunction] - Used to filter out select scene objects.
+	 * This method performs two passes:
+	 *
+	 * Pass 1: If [light] is not ambient, render shadow volumes for all meshes in the scene for [light] into the stencil buffer.
+	 * Pass 2: Perform actual rendering of all meshes in the scene for [light]. If [light] is not ambient, this pass will
+	 *         exclude screen pixels that are hidden from [light] based on the stencil buffer contents from pass 0. Is [light]
+	 *         is ambient, then this pass will perform a standard render of all meshes in the scene.
+	 *
+	 * [viewDescriptor.UniformWorldSceneObjectTransform] is pre-multiplied with the transform of each rendered scene object & light
 	 */
-	void ForwardRenderManager::RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
+	void ForwardRenderManager::RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue)
+	{
+		Transform modelView;
+		Transform model;
+		Transform modelInverse;
+
+		SceneObjectProcessingDescriptor& processingDesc = const_cast<Light&>(light).GetSceneObject()->GetProcessingDescriptor();
+		Transform lightTransform = processingDesc.AggregateTransform;
+		lightTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
+
+		Point3 lightWorldPosition;
+		lightTransform.TransformPoint(lightWorldPosition);
+
+		Vector3 lightDirection = light.GetDirection();
+		lightTransform.TransformVector(lightDirection);
+
+		RenderMode currentRenderMode = RenderMode::None;
+
+		enum RenderPass
+		{
+			ShadowVolumeRender = 0,
+			StandardRender = 1,
+			_PassCount = 2
+		};
+
+		for (Int32 pass = 0; pass < RenderPass::_PassCount; pass++)
+		{
+			if (pass == ShadowVolumeRender) // shadow volume pass
+			{
+				// check if this light can cast shadows; if not we skip this pass
+				if (light.GetShadowsEnabled() && light.GetType() != LightType::Ambient)
+				{
+					currentRenderMode = RenderMode::ShadowVolumeRender;
+					Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::ShadowVolumeRender);
+				}
+				else
+					continue;
+			}
+
+			for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(limitQueues, minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
+			{				
+				RenderQueueEntry* entry = *itr;
+				NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
+
+				if((*entry->RenderMaterial)->UseLighting())
+				{
+
+					SceneObject* sceneObject = entry->Container;
+					NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
+
+					Mesh3DFilterRef filter = sceneObject->GetMesh3DFilter();
+
+					// copy the full world transform of the scene object, including those of all ancestors
+					SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
+					Transform sceneObjectWorldTransform;
+					sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
+					sceneObjectWorldTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
+
+					// make sure the current mesh should not be culled from [light] or from
+					// the current camera, whose culling mask is in [viewDescriptor].
+					if(!ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject) &&
+					   !ShouldCullFromLightByLayer(light, *sceneObject) &&
+					   !ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform))
+					{
+						if(pass == ShadowVolumeRender) // shadow volume pass
+						{
+							if(filter->GetCastShadows())
+							{
+								RenderShadowVolumeForMesh(*entry, light, lightWorldPosition, lightDirection, viewDescriptor);
+							}
+						}
+						else if(pass == StandardRender) // normal rendering pass
+						{
+							// check if this light can cast shadows and the mesh can receive shadows, if not do standard (shadow-less) rendering
+							if(light.GetShadowsEnabled() && light.GetType() != LightType::Ambient && filter->GetReceiveShadows())
+							{
+								if(currentRenderMode != RenderMode::StandardWithShadowVolumeTest)
+								{
+									currentRenderMode = RenderMode::StandardWithShadowVolumeTest;
+									Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::StandardWithShadowVolumeTest);
+								}
+							}
+							else if(currentRenderMode != RenderMode::Standard)
+							{
+								currentRenderMode = RenderMode::Standard;
+								Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
+							}
+
+							// Dispatch "WillRender" event
+							SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
+							if(!processingDescriptor.Rendered)
+							{
+								Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
+								processingDescriptor.Rendered = true;
+							}
+
+							// set up lighting descriptor for non self-lit lighting
+							LightingDescriptor lightingDescriptor(&light, &lightWorldPosition, &lightDirection, true);
+							RenderMesh(*entry, lightingDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void ForwardRenderManager::RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce,
 													   FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction)
+	{
+		RenderSceneWithoutLight(viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter, filterFunction, false, 0, 0);
+	}
+
+	/*
+	* Render all objects in the scene without lighting. If [material] is a valid Material, then it will be used as a
+	* replacement material to render all scene objects. If it is not valiid then only meshes with materials that have
+	* the "use lighting" flag set to false will be rendered. All objects will be rendered from the perspective
+	* of the view specified by [viewDescriptor].
+	*
+	* [flagRendered] - If true, each mesh will be flagged as rendered after it is rendered, which affects how blending
+	*                  works for that mesh on future rendering passes.
+	* [renderMoreThanOnce] - If true, meshes can be rendered more than once (meaning in the additive passes).
+	* [blendingFilter] - Determines how forward-rendering blending will be applied.
+	* [filterFunction] - Used to filter out select scene objects.
+	*/
+	void ForwardRenderManager::RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
+													   FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
-		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
+		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(limitQueues, minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
 		{
 			RenderQueueEntry* entry = *itr;
+
+			if(!material.IsValid() && (*entry->RenderMaterial)->UseLighting())
+			{
+				continue;
+			}
 
 			SceneObject* sceneObject = entry->Container;
 
@@ -1019,6 +1074,14 @@ namespace GTE
 			{
 				Bool filter = filterFunction(sceneObject);
 				if(filter)continue;
+			}
+
+			// Dispatch "WillRender" event
+			SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
+			if(!processingDescriptor.Rendered)
+			{
+				Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
+				processingDescriptor.Rendered = true;
 			}
 
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
@@ -1060,13 +1123,7 @@ namespace GTE
 
 		NONFATAL_ASSERT(currentMaterial != nullptr, "ForwardRenderManager::RenderMesh -> Null material encountered.", true);
 
-		Bool skipMesh = false;
-		// current material is self-lit, the we only want to render if the
-		//lighting descriptor specifies self-lit and vice-versa
-		if(currentMaterial->UseLighting() != lightingDescriptor.UseLighting)skipMesh = true;
-		if(rendered && !renderMoreThanOnce)skipMesh = true;
-
-		if(skipMesh)return;
+		if(rendered && !renderMoreThanOnce)return;
 
 		SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
 		model.SetTo(processingDesc.AggregateTransform);
@@ -1098,25 +1155,29 @@ namespace GTE
 		// send view attributes to the active shader
 		SendViewAttributesToShader(viewDescriptor);
 
-		// if this sub mesh has already been rendered by this camera, then we want to use
-		// additive blending to combine it with the output from other lights. Otherwise
-		// turn off blending and render.
-		if ((rendered && blendingFilter == FowardBlendingFilter::OnlyIfRendered) || (blendingFilter == FowardBlendingFilter::Always))
+		// apply additive or subtractive blending ONLY if the material has not specified its own blending mode
+		if(currentMaterial->GetBlendingMode() == RenderState::BlendingMode::None)
 		{
-			if (GetForwardBlending() == FowardBlendingMethod::Subtractive)
+			// if this sub mesh has already been rendered by this camera, then we want to use
+			// additive blending to combine it with the output from other lights. Otherwise
+			// turn off blending and render.
+			if ((rendered && blendingFilter == FowardBlendingFilter::OnlyIfRendered) || (blendingFilter == FowardBlendingFilter::Always))
 			{
-				Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
-				Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::Zero, RenderState::BlendingMethod::SrcAlpha);
+				if (GetForwardBlending() == FowardBlendingMethod::Subtractive)
+				{
+					Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
+					Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::Zero, RenderState::BlendingMethod::SrcAlpha);
+				}
+				else
+				{
+					Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
+					Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::One, RenderState::BlendingMethod::One);
+				}
 			}
 			else
 			{
-				Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(true);
-				Engine::Instance()->GetGraphicsSystem()->SetBlendingFunction(RenderState::BlendingMethod::One, RenderState::BlendingMethod::One);
+				Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(false);
 			}
-		}
-		else
-		{
-			Engine::Instance()->GetGraphicsSystem()->SetBlendingEnabled(false);
 		}
 
 		// render the current mesh

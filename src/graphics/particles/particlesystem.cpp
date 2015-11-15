@@ -95,6 +95,23 @@ namespace GTE
 	void ParticleSystem::Destroy()
 	{
 		DestroyParticleArray();
+		DestroyModifiers();
+	}
+
+	void ParticleSystem::DestroyModifiers()
+	{
+		SAFE_DELETE(atlasModifier);
+		SAFE_DELETE(colorModifier);
+		SAFE_DELETE(alphaModifier);
+		SAFE_DELETE(sizeModifier);
+
+		SAFE_DELETE(positionModifier);
+		SAFE_DELETE(velocityModifier);
+		SAFE_DELETE(accelerationModifier);
+
+		SAFE_DELETE(rotationModifier);
+		SAFE_DELETE(rotationalSpeedModifier);
+		SAFE_DELETE(rotationalAccelerationModifier);
 	}
 
 	MaterialSharedPtr ParticleSystem::CreateMaterial(const std::string& shaderName, const std::string& materialName)
@@ -111,8 +128,7 @@ namespace GTE
 		material->SetDepthBufferWriteEnabled(false);
 		material->SetDepthBufferFunction(RenderState::DepthBufferFunction::LessThanOrEqual);
 		material->SetBlendingMode(RenderState::BlendingMode::Additive);
-
-		//material->SetFaceCulling(RenderState::FaceCulling::None);
+		material->SetFaceCulling(RenderState::FaceCulling::None);
 
 		return material;
 	}
@@ -199,9 +215,17 @@ namespace GTE
 
 		GetCameraWorldAxes(*currentCamera, vectorX, vectorY, vectorZ);
 
-		particleMaterial->SetUniform4f(vectorX.x, vectorX.y, vectorX.z, 0.0f, "VIEW_AXIS_X");
-		particleMaterial->SetUniform4f(vectorY.x, vectorY.y, vectorY.z, 0.0f, "VIEW_AXIS_Y");
-		particleMaterial->SetUniform4f(vectorZ.x, vectorZ.y, vectorZ.z, 0.0f, "VIEW_AXIS_Z");
+
+		/////////////////////////////////
+		//vectorX.Set(1, 0, 0);
+		//vectorY.Set(0, 1, 0);
+		//vectorZ.Set(0, 0, 1);
+		///////////////////////////////////
+
+
+		particleMaterial->SetUniform3f(vectorX.x, vectorX.y, vectorX.z, "VIEW_AXIS_X");
+		particleMaterial->SetUniform3f(vectorY.x, vectorY.y, vectorY.z, "VIEW_AXIS_Y");
+		particleMaterial->SetUniform3f(vectorZ.x, vectorZ.y, vectorZ.z, "VIEW_AXIS_Z");
 		particleMaterial->SetTexture(atlas->GetTexture(), "PARTICLE_TEXTURE");
 
 		SubMesh3DRef targetMesh = mesh->GetSubMesh(0);
@@ -215,11 +239,6 @@ namespace GTE
 
 			UInt32 baseIndex = p * (UInt32)ParticleConstants::VerticesPerParticle;
 
-			//position.Set(0.0f, 5.0f, 0.0f);
-			//particle->Size.x = 10;
-			//particle->Size.y = 10;
-
-
 			Point3Array * positions = targetMesh->GetPostions();
 			positions->GetPoint(baseIndex)->SetTo(position);
 			positions->GetPoint(baseIndex + 1)->SetTo(position);
@@ -228,14 +247,25 @@ namespace GTE
 			positions->GetPoint(baseIndex + 4)->SetTo(position);
 			positions->GetPoint(baseIndex + 5)->SetTo(position);
 
+
+			/////////////////////////////////////////////////////		
+			//positions->GetPoint(baseIndex)->Set(-1, 1, 0);
+			//positions->GetPoint(baseIndex + 1)->Set(1, 1, 0);
+			//positions->GetPoint(baseIndex + 2)->Set(-1, -1, 0);
+			//positions->GetPoint(baseIndex + 3)->Set(-1, -1, 0);
+			//positions->GetPoint(baseIndex + 4)->Set(1, 1, 0);
+			//positions->GetPoint(baseIndex + 5)->Set(1, -1, 0);
+			/////////////////////////////////////////////////////////////////
+
+		
 			Atlas::ImageDescriptor * imageDesc = atlas->GetImageDescriptor(particle->AtlasIndex);
 			UV2Array * uvs = targetMesh->GetUVs0();
 			uvs->GetCoordinate(baseIndex)->Set(imageDesc->Left, imageDesc->Top);
-			uvs->GetCoordinate(baseIndex + 1)->Set(imageDesc->Left, imageDesc->Bottom);
-			uvs->GetCoordinate(baseIndex + 2)->Set(imageDesc->Right, imageDesc->Top);
+			uvs->GetCoordinate(baseIndex + 1)->Set(imageDesc->Right, imageDesc->Top);
+			uvs->GetCoordinate(baseIndex + 2)->Set(imageDesc->Left, imageDesc->Bottom);
 			uvs->GetCoordinate(baseIndex + 3)->Set(imageDesc->Left, imageDesc->Bottom);
-			uvs->GetCoordinate(baseIndex + 4)->Set(imageDesc->Right, imageDesc->Bottom);
-			uvs->GetCoordinate(baseIndex + 5)->Set(imageDesc->Right, imageDesc->Top);
+			uvs->GetCoordinate(baseIndex + 4)->Set(imageDesc->Right, imageDesc->Top);
+			uvs->GetCoordinate(baseIndex + 5)->Set(imageDesc->Right, imageDesc->Bottom);
 
 			Color4Array * colors = targetMesh->GetColors();
 			Color4 color = particle->Color;
@@ -269,11 +299,11 @@ namespace GTE
 			Real* indexData = indexAttribute->GetDataPtr();
 			UInt32 indexComponents = indexAttribute->GetComponentCount();
 			indexData[indexComponents * (baseIndex)] = 0;
-			indexData[indexComponents * (baseIndex + 1)] = 1;
-			indexData[indexComponents * (baseIndex + 2)] = 3;
-			indexData[indexComponents * (baseIndex + 4)] = 1;
+			indexData[indexComponents * (baseIndex + 1)] = 3;
+			indexData[indexComponents * (baseIndex + 2)] = 1;
+			indexData[indexComponents * (baseIndex + 3)] = 1;
+			indexData[indexComponents * (baseIndex + 4)] = 3;
 			indexData[indexComponents * (baseIndex + 5)] = 2;
-			indexData[indexComponents * (baseIndex + 6)] = 3;
 		}
 
 		targetMesh->SetRenderVertexCount(liveParticleCount * (UInt32)ParticleConstants::VerticesPerParticle);
@@ -287,7 +317,8 @@ namespace GTE
 
 	void ParticleSystem::Start()
 	{
-
+		isActive = true;
+		emitting = true;
 	}
 
 	void ParticleSystem::WillRender()
@@ -341,7 +372,7 @@ namespace GTE
 			thisSceneObject->AddChild(meshObject);
 			meshObject->SetActive(true);
 		}
-
+		
 		RendererRef renderer = meshObject->GetRenderer();
 		if(renderer.IsValid())
 		{
@@ -632,12 +663,12 @@ namespace GTE
 	{
 		particle->Age += deltaTime;
 
-		AdvanceParticleDisplayAttributes(particle);
-		AdvanceParticlePositionData(particle);
-		AdvanceParticleRotationData(particle);
+		AdvanceParticleDisplayAttributes(particle, deltaTime);
+		AdvanceParticlePositionData(particle, deltaTime);
+		AdvanceParticleRotationData(particle, deltaTime);
 	}
 
-	void ParticleSystem::AdvanceParticleDisplayAttributes(Particle * particle)
+	void ParticleSystem::AdvanceParticleDisplayAttributes(Particle * particle, Real deltaTime)
 	{
 		if(atlasModifier != nullptr && !atlasModifier->RunOnce())
 		{
@@ -660,43 +691,54 @@ namespace GTE
 		}
 	}
 
-	void ParticleSystem::AdvanceParticlePositionData(Particle * particle)
+	void ParticleSystem::AdvanceParticlePositionData(Particle * particle, Real deltaTime)
 	{
-		particle->Position.Set(0, 0, 0);
-		particle->Velocity.Set(0, 0, 0);
-		particle->Acceleration.Set(0, 0, 0);
-
 		if(positionModifier != nullptr && !positionModifier->RunOnce())
 		{
 			positionModifier->Update(*particle, particle->Position, particle->Age);
+		}
+		else
+		{
+			Vector3 velocity = particle->Velocity;
+			velocity.Scale(deltaTime);
+			particle->Position.Add(velocity);
 		}
 
 		if(velocityModifier != nullptr && !velocityModifier->RunOnce())
 		{
 			velocityModifier->Update(*particle, particle->Velocity, particle->Age);
 		}
+		else
+		{
+			Vector3 acceleration = particle->Acceleration;
+			acceleration.Scale(deltaTime);
+			particle->Velocity.Add(acceleration);
+		}
 
 		if(accelerationModifier != nullptr && !accelerationModifier->RunOnce())
 		{
 			accelerationModifier->Update(*particle, particle->Acceleration, particle->Age);
 		}
-
 	}
 
-	void ParticleSystem::AdvanceParticleRotationData(Particle * particle)
+	void ParticleSystem::AdvanceParticleRotationData(Particle * particle, Real deltaTime)
 	{
-		particle->Rotation = 0.0f;
-		particle->RotationalSpeed = 0.0f;
-		particle->RotationalAcceleration = 0.0f;
-
 		if(rotationModifier != nullptr && !rotationModifier->RunOnce())
 		{
 			rotationModifier->Update(*particle, particle->Rotation, particle->Age);
+		}
+		else
+		{
+			particle->Rotation += particle->RotationalSpeed * deltaTime;
 		}
 
 		if(rotationalSpeedModifier != nullptr && !rotationalSpeedModifier->RunOnce())
 		{
 			rotationalSpeedModifier->Update(*particle, particle->RotationalSpeed, particle->Age);
+		}
+		else
+		{
+			particle->RotationalSpeed += particle->RotationalAcceleration * deltaTime;
 		}
 
 		if(rotationalAccelerationModifier != nullptr && !rotationalAccelerationModifier->RunOnce())
@@ -839,63 +881,83 @@ namespace GTE
 			QuickSortParticleArray(particleArray, i, right);
 	}
 
-	void ParticleSystem::BindAtlasModifier(ParticleModifier<UInt32> * modifier)
+	Bool ParticleSystem::BindAtlasModifier(const ParticleModifier<UInt32>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindAtlasModifier -> Invalid modifier.", false, false);
-		atlasModifier = modifier;
+		SAFE_DELETE(atlasModifier);
+		atlasModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(atlasModifier != nullptr, "ParticleSystem::BindAtlasModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindColorModifier(ParticleModifier<Color4> * modifier)
+	Bool ParticleSystem::BindColorModifier(const ParticleModifier<Color4>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindColorModifier -> Invalid modifier.", false, false);
-		colorModifier = modifier;
+		SAFE_DELETE(colorModifier);
+		colorModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(colorModifier != nullptr, "ParticleSystem::BindColorModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindAlphaModifier(ParticleModifier<Real> * modifier)
+	Bool ParticleSystem::BindAlphaModifier(const ParticleModifier<Real>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindAlphaModifier -> Invalid modifier.", false, false);
-		alphaModifier = modifier;
+		SAFE_DELETE(alphaModifier);
+		alphaModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(alphaModifier != nullptr, "ParticleSystem::BindAlphaModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindSizeModifier(ParticleModifier<Vector2> * modifier)
+	Bool ParticleSystem::BindSizeModifier(const ParticleModifier<Vector2>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindSizeModifier -> Invalid modifier.", false, false);
-		sizeModifier = modifier;
+		SAFE_DELETE(sizeModifier);
+		sizeModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(sizeModifier != nullptr, "ParticleSystem::BindSizeModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindPositionModifier(ParticleModifier<Point3> * modifier)
+	Bool ParticleSystem::BindPositionModifier(const ParticleModifier<Point3>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindPositionModifier -> Invalid modifier.", false, false);
-		positionModifier = modifier;
+		SAFE_DELETE(positionModifier);
+		positionModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(positionModifier != nullptr, "ParticleSystem::BindPositionModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindVelocityModifier(ParticleModifier<Vector3> * modifier)
+	Bool ParticleSystem::BindVelocityModifier(const ParticleModifier<Vector3>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindVelocityModifier -> Invalid modifier.", false, false);
-		velocityModifier = modifier;
+		SAFE_DELETE(velocityModifier);
+		velocityModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(velocityModifier != nullptr, "ParticleSystem::BindVelocityModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindAccelerationModifier(ParticleModifier<Vector3> * modifier)
+	Bool ParticleSystem::BindAccelerationModifier(const ParticleModifier<Vector3>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindAccelerationModifier -> Invalid modifier.", false, false);
-		accelerationModifier = modifier;
+		SAFE_DELETE(accelerationModifier);
+		accelerationModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(accelerationModifier != nullptr, "ParticleSystem::BindAccelerationModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindRotationModifier(ParticleModifier<Real> * modifier)
+	Bool ParticleSystem::BindRotationModifier(const ParticleModifier<Real>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindRotationModifier -> Invalid modifier.", false, false);
-		rotationModifier = modifier;
+		SAFE_DELETE(rotationModifier);
+		rotationModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(rotationModifier != nullptr, "ParticleSystem::BindRotationModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindRotationalSpeedModifier(ParticleModifier<Real> * modifier)
+	Bool ParticleSystem::BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindRotationalSpeedModifier -> Invalid modifier.", false, false);
-		rotationalSpeedModifier = modifier;
+		SAFE_DELETE(rotationalSpeedModifier);
+		rotationalSpeedModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(rotationalSpeedModifier != nullptr, "ParticleSystem::BindRotationalSpeedModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 
-	void ParticleSystem::BindRotationalAccelerationModifier(ParticleModifier<Real> * modifier)
+	Bool ParticleSystem::BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier)
 	{
-		NONFATAL_ASSERT(modifier != nullptr, "ParticleSystem::BindRotationalAccelerationModifier -> Invalid modifier.", false, false);
-		rotationalAccelerationModifier = modifier;
+		SAFE_DELETE(rotationalAccelerationModifier);
+		rotationalAccelerationModifier = modifier.Clone();
+		NONFATAL_ASSERT_RTRN(rotationalAccelerationModifier != nullptr, "ParticleSystem::BindRotationalAccelerationModifier -> Unable to clone modifier.", false, false);
+		return true;
 	}
 }

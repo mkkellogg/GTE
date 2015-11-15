@@ -33,6 +33,7 @@ namespace GTE
 	public:
 
 		static RawImage * LoadImageU(const std::string& fullPath);
+		static RawImage * LoadImageU(const std::string& fullPath, Bool reverseOrigin);
 		static RawImage * GetRawImageFromILData(const ILubyte * data, UInt32 width, UInt32 height);
 		static void DestroyRawImage(RawImage * image);
 		static std::string GetFileExtension(const std::string& filePath);

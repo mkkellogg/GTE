@@ -128,9 +128,9 @@ namespace GTE
 		void ResetParticleRotationData(Particle * particle);
 
 		void AdvanceParticle(Particle* particle, Real deltaTime);
-		void AdvanceParticleDisplayAttributes(Particle * particle);
-		void AdvanceParticlePositionData(Particle * particle);
-		void AdvanceParticleRotationData(Particle * particle);
+		void AdvanceParticleDisplayAttributes(Particle * particle, Real deltaTime);
+		void AdvanceParticlePositionData(Particle * particle, Real deltaTime);
+		void AdvanceParticleRotationData(Particle * particle, Real deltaTime);
 		void AdvanceParticles(Real deltaTime);
 
 		void KillParticle(Particle * particle);
@@ -141,22 +141,25 @@ namespace GTE
 		void SortParticleArray(const Matrix4x4& mvpMatrix);
 		void QuickSortParticleArray(Particle** array, UInt32 left, UInt32 right);
 
-		void BindAtlasModifier(ParticleModifier<UInt32> * modifier);
-		void BindColorModifier(ParticleModifier<Color4> * modifier);
-		void BindAlphaModifier(ParticleModifier<Real> * modifier);
-		void BindSizeModifier(ParticleModifier<Vector2> * modifier);
-		void BindPositionModifier(ParticleModifier<Point3> * modifier);
-		void BindVelocityModifier(ParticleModifier<Vector3> * modifier);
-		void BindAccelerationModifier(ParticleModifier<Vector3> * modifier);
-		void BindRotationModifier(ParticleModifier<Real> * modifier);
-		void BindRotationalSpeedModifier(ParticleModifier<Real> * modifier);
-		void BindRotationalAccelerationModifier(ParticleModifier<Real> * modifier);
-
-		public:
-
 		ParticleSystem();
 		virtual ~ParticleSystem();
 		void Destroy();
+		void DestroyModifiers();
+
+		public:
+
+		Bool BindPositionModifier(const ParticleModifier<Point3>& modifier);
+		Bool BindVelocityModifier(const ParticleModifier<Vector3>& modifier);
+		Bool BindAccelerationModifier(const ParticleModifier<Vector3>& modifier);
+		
+		Bool BindRotationModifier(const ParticleModifier<Real>& modifier);
+		Bool BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier);
+		Bool BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier);
+
+		Bool BindAtlasModifier(const ParticleModifier<UInt32>& modifier);
+		Bool BindColorModifier(const ParticleModifier<Color4>& modifier);
+		Bool BindAlphaModifier(const ParticleModifier<Real>& modifier);
+		Bool BindSizeModifier(const ParticleModifier<Vector2>& modifier);
 
 		static MaterialSharedPtr CreateMaterial(const std::string& shaderName, const std::string& materialName);
 	};

@@ -33,14 +33,16 @@ namespace GTE
 
 	void Atlas::AddImageDescriptor(Real left, Real top, Real right, Real bottom)
 	{
-
+		ImageDescriptor newDesc(left, top, right, bottom);
+		imageDescriptors.push_back(newDesc);
+		imageCount++;
 	}
 
 	Atlas::ImageDescriptor* Atlas::GetImageDescriptor(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < imageCount, "Atlas::GetImageDescriptor -> 'index' is out of range.", nullptr, true);
 
-		return &images[index];
+		return &imageDescriptors[index];
 	}
 
 	TextureRef Atlas::GetTexture()

@@ -741,6 +741,35 @@ namespace GTE
 	}
 
 	/*
+	* Find a uniform with the name specified by [varName] and set its
+	* value to the vector made up of v1 & v2 & v3.
+	*/
+	void Material::SetUniform3f(Real v1, Real v2, Real v3, const std::string& varName)
+	{
+		UniformID uniform = UniformDirectory::RegisterVarID(varName);
+		SetUniform3f(v1, v2, v3, uniform);
+	}
+
+	/*
+	* Find a uniform with the name specified by [uniform] and set its
+	* value to the vector made up of v1 & v2 & v.
+	*/
+	void Material::SetUniform3f(Real v1, Real v2, Real v3,  UniformID uniform)
+	{
+		NONFATAL_ASSERT(shader.IsValid(), "Material::SetUniform3f -> 'shader' is null.", true);
+
+		Int32 index = GetLocalUniformDescriptorIndexByUniformID(uniform);
+		NONFATAL_ASSERT(index >= 0, "Material::SetUniform3f -> Invalid uniform.", true);
+
+		UniformDescriptor& desc = localUniformDescriptors[index];
+		desc.Type = UniformType::Float3;
+		desc.BasicFloatData[0] = v1;
+		desc.BasicFloatData[1] = v2;
+		desc.BasicFloatData[2] = v3;
+		desc.IsDelayedSet = true;
+	}
+
+	/*
 	 * Find a uniform with the name specified by [varName] and set its
 	 * value to the vector made up of v1 & v2 & v3 &v4.
 	 */

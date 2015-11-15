@@ -442,6 +442,13 @@ void Game::SetupCamera()
 		"resources/textures/skyboxes/nightsky/nightsky_west.png",
 		"resources/textures/skyboxes/nightsky/nightsky_east.png");
 
+	/*GTE::TextureSharedPtr skyboxTexture = objectManager->CreateCubeTexture("resources/textures/skyboxes/named/front.png",
+																		   "resources/textures/skyboxes/named/back.png",
+																		   "resources/textures/skyboxes/named/up.png",
+																		   "resources/textures/skyboxes/named/down.png",
+																		   "resources/textures/skyboxes/named/left.png",
+																		   "resources/textures/skyboxes/named/right.png");*/
+
 	// activate skybox
 	camera->SetupSkybox(skyboxTexture);
 	camera->SetSkyboxEnabled(true);

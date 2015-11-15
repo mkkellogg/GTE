@@ -760,12 +760,12 @@ namespace GTE
 	Texture * GraphicsGL::CreateCubeTexture(const std::string& front, const std::string& back, const std::string& top,
 		const std::string& bottom, const std::string& left, const std::string& right)
 	{
-		RawImage * rawFront = ImageLoader::LoadImageU(front);
-		RawImage * rawBack = ImageLoader::LoadImageU(back);
-		RawImage * rawTop = ImageLoader::LoadImageU(top);
-		RawImage * rawBottom = ImageLoader::LoadImageU(bottom);
-		RawImage * rawLeft = ImageLoader::LoadImageU(left);
-		RawImage * rawRight = ImageLoader::LoadImageU(right);
+		RawImage * rawFront = ImageLoader::LoadImageU(front, true);
+		RawImage * rawBack = ImageLoader::LoadImageU(back, true);
+		RawImage * rawTop = ImageLoader::LoadImageU(top, true);
+		RawImage * rawBottom = ImageLoader::LoadImageU(bottom, true);
+		RawImage * rawLeft = ImageLoader::LoadImageU(left, true);
+		RawImage * rawRight = ImageLoader::LoadImageU(right, true);
 
 		TextureGL * tex = nullptr;
 

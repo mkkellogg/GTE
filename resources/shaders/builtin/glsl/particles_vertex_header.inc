@@ -41,4 +41,6 @@ vec4 getQuadPosition()
 	axisY *= PARTICLE_SIZE.y * yFactor;
 
 	return ( MODEL_MATRIX * POSITION ) + vec4( axisX + axisY, 0.0 );
+
+
 }

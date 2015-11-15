@@ -17,6 +17,10 @@
 #include "particlemodifier.h"
 #include "particleutil.h"
 #include "particles.h"
+#include "global/global.h"
+#include "global/constants.h"
+#include "engine.h"
+#include "global/assert.h"
 #include <vector>
 #include <string>
 
@@ -25,13 +29,13 @@ namespace GTE
 	template <typename T> class RandomModifier : public ParticleModifier<T>
 	{
 		T offset;
-		T range;		
+		T range;
 		ParticleRangeType rangeType;
 		Bool edgeClamp;
 
 		public:
 
-		RandomModifier(T& offset, T& range, ParticleRangeType rangeType, Bool edgeClamp, Bool runOnce) : ParticleModifier<T>(runOnce)
+		RandomModifier(const T& offset, const T& range, ParticleRangeType rangeType, Bool edgeClamp, Bool runOnce) : ParticleModifier<T>(runOnce)
 		{
 			this->offset = offset;
 			this->range = range;
@@ -55,6 +59,13 @@ namespace GTE
 			{
 				ParticleUtil::GetRandom(offset, range, targetAttribute, edgeClamp, rangeType);
 			}
+		}
+
+		ParticleModifier<T>* Clone() const override
+		{
+			RandomModifier<T> * baseClone = new RandomModifier<T>(offset, range, rangeType, edgeClamp, runOnce);
+			ASSERT(baseClone != nullptr, "RandomModifer<T>::Clone -> Could not clone modifier.");
+			return static_cast<ParticleModifier<T>*>(baseClone);
 		}
 	};
 }

@@ -272,7 +272,7 @@ namespace GTE
 		points->GetPoint(33)->Set(-1, -1, -1);
 		points->GetPoint(34)->Set(1, -1, 1);
 		points->GetPoint(35)->Set(1, -1, -1);
-
+		
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))
 		{
 			Color4Array * colors = subMesh->GetColors();
@@ -289,64 +289,64 @@ namespace GTE
 
 			// --- Cube UVs -------
 			// cube front, triangle 1
-			uvs->GetCoordinate(0)->Set(0, 0);
-			uvs->GetCoordinate(1)->Set(1, 0);
-			uvs->GetCoordinate(2)->Set(0, 1);
+			uvs->GetCoordinate(0)->Set(0, 1);
+			uvs->GetCoordinate(1)->Set(1, 1);
+			uvs->GetCoordinate(2)->Set(0, 0);
 
 			// cube front, triangle 2
-			uvs->GetCoordinate(3)->Set(1, 0);
-			uvs->GetCoordinate(4)->Set(1, 1);
-			uvs->GetCoordinate(5)->Set(0, 1);
+			uvs->GetCoordinate(3)->Set(1, 1);
+			uvs->GetCoordinate(4)->Set(1, 0);
+			uvs->GetCoordinate(5)->Set(0, 0);
 
 			// cube right, triangle 1
-			uvs->GetCoordinate(6)->Set(0, 0);
-			uvs->GetCoordinate(7)->Set(1, 0);
-			uvs->GetCoordinate(8)->Set(0, 1);
+			uvs->GetCoordinate(6)->Set(0, 1);
+			uvs->GetCoordinate(7)->Set(1, 1);
+			uvs->GetCoordinate(8)->Set(0, 0);
 
 			// cube right, triangle 2
-			uvs->GetCoordinate(9)->Set(1, 0);
-			uvs->GetCoordinate(10)->Set(1, 1);
-			uvs->GetCoordinate(11)->Set(0, 1);
+			uvs->GetCoordinate(9)->Set(1, 1);
+			uvs->GetCoordinate(10)->Set(1, 0);
+			uvs->GetCoordinate(11)->Set(0, 0);
 
 			// cube left, triangle 1
-			uvs->GetCoordinate(12)->Set(0, 0);
-			uvs->GetCoordinate(13)->Set(1, 0);
-			uvs->GetCoordinate(14)->Set(0, 1);
+			uvs->GetCoordinate(12)->Set(0, 1);
+			uvs->GetCoordinate(13)->Set(1, 1);
+			uvs->GetCoordinate(14)->Set(0, 0);
 
 			// cube left, triangle 2
-			uvs->GetCoordinate(15)->Set(1, 0);
-			uvs->GetCoordinate(16)->Set(1, 1);
-			uvs->GetCoordinate(17)->Set(0, 1);
+			uvs->GetCoordinate(15)->Set(1, 1);
+			uvs->GetCoordinate(16)->Set(1, 0);
+			uvs->GetCoordinate(17)->Set(0, 0);
 
 			// cube top, triangle 1
-			uvs->GetCoordinate(18)->Set(0, 0);
-			uvs->GetCoordinate(19)->Set(1, 0);
-			uvs->GetCoordinate(20)->Set(0, 1);
+			uvs->GetCoordinate(18)->Set(0, 1);
+			uvs->GetCoordinate(19)->Set(1, 1);
+			uvs->GetCoordinate(20)->Set(0, 0);
 
 			// cube top, triangle 2
-			uvs->GetCoordinate(21)->Set(1, 0);
-			uvs->GetCoordinate(22)->Set(1, 1);
-			uvs->GetCoordinate(23)->Set(0, 1);
+			uvs->GetCoordinate(21)->Set(1, 1);
+			uvs->GetCoordinate(22)->Set(1, 0);
+			uvs->GetCoordinate(23)->Set(0, 0);
 
 			// cube back, triangle 1
-			uvs->GetCoordinate(24)->Set(0, 0);
-			uvs->GetCoordinate(25)->Set(1, 0);
-			uvs->GetCoordinate(26)->Set(0, 1);
+			uvs->GetCoordinate(24)->Set(0, 1);
+			uvs->GetCoordinate(25)->Set(1, 1);
+			uvs->GetCoordinate(26)->Set(0, 0);
 
 			// cube back, triangle 2
-			uvs->GetCoordinate(27)->Set(1, 0);
-			uvs->GetCoordinate(28)->Set(1, 1);
-			uvs->GetCoordinate(29)->Set(0, 1);
+			uvs->GetCoordinate(27)->Set(1, 1);
+			uvs->GetCoordinate(28)->Set(1, 0);
+			uvs->GetCoordinate(29)->Set(0, 0);
 
 			// cube back, triangle 1
-			uvs->GetCoordinate(30)->Set(0, 0);
-			uvs->GetCoordinate(31)->Set(1, 0);
-			uvs->GetCoordinate(32)->Set(0, 1);
+			uvs->GetCoordinate(30)->Set(0, 1);
+			uvs->GetCoordinate(31)->Set(1, 1);
+			uvs->GetCoordinate(32)->Set(0, 0);
 
 			// cube back, triangle 2
-			uvs->GetCoordinate(33)->Set(1, 0);
-			uvs->GetCoordinate(34)->Set(1, 1);
-			uvs->GetCoordinate(35)->Set(0, 1);
+			uvs->GetCoordinate(33)->Set(1, 1);
+			uvs->GetCoordinate(34)->Set(1, 0);
+			uvs->GetCoordinate(35)->Set(0, 0);
 		}
 
 		if (doCCW)

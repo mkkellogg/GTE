@@ -28,6 +28,10 @@
 #include "graphics/texture/texture.h"
 #include "graphics/shader/shadersource.h"
 #include "graphics/particles/particlesystem.h"
+#include "graphics/particles/particlemodifier.h"
+#include "graphics/particles/randommodifier.h"
+#include "graphics/particles/framesetmodifier.h"
+#include "graphics/particles/evenintervalindexmodifier.h"
 #include "base/basevector4.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/quaternion.h"
@@ -518,7 +522,7 @@ void LavaScene::SetupParticleSystems(GTE::AssetImporter& importer)
 
 	GTE::SceneObjectRef particleSystemObject = objectManager->CreateSceneObject();
 	ASSERT(particleSystemObject.IsValid(), "Unable to create flame particle system object!\n");
-	//sceneRoot->AddChild(particleSystemObject);
+	sceneRoot->AddChild(particleSystemObject);
 
 	// create material for rendering flame particles
 	std::string shaderName = "particles_unlit";
@@ -533,12 +537,39 @@ void LavaScene::SetupParticleSystems(GTE::AssetImporter& importer)
 	GTE::TextureRef flameTexture = objectManager->CreateTexture("resources/textures/particles/fireloop3.jpg", texAttributes);
 	ASSERT(flameTexture.IsValid(), "Unable to load flame texture!\n");
 
-	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0, 1.0, 1.0, 0.0, 8, 8, false, true);
+	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0f, 1.0f, 1.0f, 0.0f, 8, 8, false, true);
 	ASSERT(flameAtlas.IsValid(), "Unable to create flame atlas!\n");
 
 	GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
 	ASSERT(flameSystem.IsValid(), "Unable to create flame particle system!\n");
 	particleSystemObject->SetParticleSystem(flameSystem);
+	
+	GTE::RandomModifier<GTE::Point3> positionModifier(GTE::Point3(50.0f, -5.0f, 50.0f), GTE::Point3(0.0f, 0.0f, 0.0f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector3> velocityModifier(GTE::Vector3(0.0f, 2.3f, 0.0f), GTE::Vector3(0.9f, 0.4f, 0.9f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::EvenIntervalIndexModifier atlasModifier(64);
+
+	GTE::FrameSetModifier<GTE::Vector2> sizeModifier;
+	sizeModifier.AddFrame(0.0f, GTE::Vector2(2.0f, 2.5f));
+	sizeModifier.AddFrame(3.0f, GTE::Vector2(2.0f, 2.5f));
+
+	GTE::FrameSetModifier<GTE::Real> alphaModifier;
+	alphaModifier.AddFrame(0.0f, 0.0f);
+	alphaModifier.AddFrame(0.2f, 0.3f);
+	alphaModifier.AddFrame(1.2f, 1.0f);
+	alphaModifier.AddFrame(2.0f, 1.0f);
+	alphaModifier.AddFrame(3.0f, 0.0f);
+
+	GTE::FrameSetModifier<GTE::Color4> colorModifier;
+	colorModifier.AddFrame(0.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+	colorModifier.AddFrame(0.2f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+	colorModifier.AddFrame(3.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	flameSystem->BindPositionModifier(positionModifier);
+	flameSystem->BindVelocityModifier(velocityModifier);
+	flameSystem->BindSizeModifier(sizeModifier);
+	flameSystem->BindAlphaModifier(alphaModifier);
+	flameSystem->BindColorModifier(colorModifier);
+	flameSystem->BindAtlasModifier(atlasModifier);
 }
 
 /*

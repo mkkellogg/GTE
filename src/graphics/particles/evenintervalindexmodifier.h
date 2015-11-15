@@ -15,6 +15,7 @@
 #include "object/engineobject.h"
 #include "object/enginetypes.h"
 #include "particlemodifier.h"
+#include "particle.h"
 #include <vector>
 #include <string>
 
@@ -26,7 +27,7 @@ namespace GTE
 
 		public:
 
-		EvenIntervalIndexModifier(UInt32 totalSteps, Bool runOnce) : ParticleModifier<UInt32>(runOnce)
+		EvenIntervalIndexModifier(UInt32 totalSteps) : ParticleModifier<UInt32>(false)
 		{
 			this->totalSteps = totalSteps;
 		}
@@ -50,6 +51,13 @@ namespace GTE
 				if(step == totalSteps && step > 0) step--;
 				targetAttribute = step;
 			}
+		}
+
+		ParticleModifier<UInt32>* Clone() const override
+		{
+			EvenIntervalIndexModifier* baseClone = new EvenIntervalIndexModifier(totalSteps);
+			ASSERT(baseClone != nullptr, "EvenIntervalIndexModifier::Clone -> Could not clone modifier.");
+			return static_cast<ParticleModifier<UInt32>*>(baseClone);
 		}
 	};
 }

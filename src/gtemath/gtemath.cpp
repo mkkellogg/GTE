@@ -97,6 +97,6 @@ namespace GTE
 
 	Real GTEMath::Random()
 	{
-		return (Real)rand();
+		return (Real)rand() / (Real)RAND_MAX;
 	}
 }

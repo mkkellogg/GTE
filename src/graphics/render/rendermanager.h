@@ -22,7 +22,8 @@ namespace GTE
 	enum class RenderQueueType
 	{
 		Geometry = 1000,
-		Transparent = 2000
+		Transparent = 2000,
+		MaxQueue = 10000
 	};
 
 	class RenderManager

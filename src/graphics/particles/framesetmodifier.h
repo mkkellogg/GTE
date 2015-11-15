@@ -29,7 +29,7 @@ namespace GTE
 
 		public:
 
-		FrameSetModifier(Bool runOnce) : ParticleModifier<T>(runOnce)
+		FrameSetModifier() : ParticleModifier<T>(false)
 		{
 
 		}
@@ -37,6 +37,11 @@ namespace GTE
 		virtual ~FrameSetModifier()
 		{
 
+		}
+
+		void AddFrame(Real time, T value)
+		{
+			frameSet.AddKeyFrame(time, value);
 		}
 
 		void Initialize(Particle& particle, T& targetAttribute) override
@@ -47,9 +52,17 @@ namespace GTE
 		void Update(Particle& particle, T& targetAttribute, Real t) override
 		{
 			if(!this->runOnce)
-			{
+			{				
 				frameSet.InterpolateFrameValues(t, targetAttribute);
 			}
+		}
+
+		ParticleModifier<T>* Clone() const override
+		{
+			FrameSetModifier<T> * baseClone = new FrameSetModifier<T>();
+			ASSERT(baseClone != nullptr, "FrameSetModifier<T>::Clone -> Could not clone modifier.");
+			baseClone->frameSet = frameSet;
+			return static_cast<ParticleModifier<T>*>(baseClone);
 		}
 	};
 }

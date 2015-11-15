@@ -51,6 +51,7 @@ namespace GTE
 
 		virtual void Initialize(Particle& particle, T& targetAttribute) = 0;
 		virtual void Update(Particle& particle, T& targetAttribute, Real t) = 0;
+		virtual ParticleModifier<T>* Clone() const = 0;
 	};
 }
 

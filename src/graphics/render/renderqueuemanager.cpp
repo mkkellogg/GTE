@@ -17,6 +17,8 @@ namespace GTE
 	RenderQueueManager::RenderQueueManager()
 	{
 		renderQueueCount = 0;
+		minQueue = 0;
+		maxQueue = 0;
 	}
 
 	RenderQueueManager::~RenderQueueManager()
@@ -44,6 +46,17 @@ namespace GTE
 	*/
 	RenderQueue* RenderQueueManager::GetRenderQueueForID(UInt32 renderQueueID)
 	{
+		if(renderQueueCount == 0)
+		{
+			minQueue = renderQueueID;
+			maxQueue = renderQueueID;
+		}
+		else
+		{
+			if(renderQueueID < minQueue)minQueue = renderQueueID;
+			if(renderQueueID > maxQueue)maxQueue = renderQueueID;
+		}
+
 		for(UInt32 i = 0; i < renderQueueCount; i++)
 		{
 			RenderQueue* queue = renderQueues[i];
@@ -67,7 +80,7 @@ namespace GTE
 		{
 			for(UInt32 j = 0; j < renderQueueCount; j++)
 			{
-				if(j < renderQueueCount - 1 && renderQueues[j] > renderQueues[j + 1])
+				if(j < renderQueueCount - 1 && renderQueues[j]->GetID() > renderQueues[j + 1]->GetID())
 				{
 					RenderQueue * temp = renderQueues[j];
 					renderQueues[j] = renderQueues[j + 1];
@@ -113,7 +126,18 @@ namespace GTE
 
 	RenderQueueManager::ConstIterator& RenderQueueManager::Begin()
 	{
-		theIterator.Init(this);
+		return BeginWithRange(this->minQueue, this->maxQueue);
+	}
+
+	RenderQueueManager::ConstIterator& RenderQueueManager::Begin(Bool limitQueue, UInt32 minQueue, UInt32 maxQueue)
+	{
+		if(limitQueue)return BeginWithRange(minQueue, maxQueue);
+		else return BeginWithRange(this->minQueue, this->maxQueue);
+	}
+
+	RenderQueueManager::ConstIterator& RenderQueueManager::BeginWithRange(UInt32 minQueue, UInt32 maxQueue)
+	{
+		theIterator.Init(this, minQueue, maxQueue);
 		return theIterator;
 	}
 

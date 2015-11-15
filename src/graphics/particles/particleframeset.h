@@ -79,7 +79,7 @@ namespace GTE
 		{
 			UInt32 nextFrameIndex = FindNextFrameForTimeValue(t);
 			UInt32 currentFrameIndex = nextFrameIndex - 1;
-
+			
 			if(nextFrameIndex == 0)
 			{
 				target = frames[0].Value;

@@ -83,7 +83,7 @@ namespace GTE
 			{
 				vertexColorsIndex = -1;
 				shaderProperties = 0L;
-				invertVCoords = true;
+				invertVCoords = false;
 			}
 
 			Bool UVMappingHasKey(TextureType key)

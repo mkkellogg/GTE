@@ -207,9 +207,12 @@ namespace GTE
 		void RenderSceneSSAO(const ViewDescriptor& viewDescriptor);
 		
 		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor);
+		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue);
 
 		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
 									 FowardBlendingFilter blendingFilter,  std::function<Bool(SceneObject*)> filterFunction);
+		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce,
+									 FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue);
 
 		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const ViewDescriptor& viewDescriptor, 
 						MaterialRef materialOverride, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
