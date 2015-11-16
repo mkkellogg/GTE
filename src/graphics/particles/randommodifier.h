@@ -63,7 +63,7 @@ namespace GTE
 
 		ParticleModifier<T>* Clone() const override
 		{
-			RandomModifier<T> * baseClone = new RandomModifier<T>(offset, range, rangeType, edgeClamp, runOnce);
+			RandomModifier<T> * baseClone = new RandomModifier<T>(offset, range, rangeType, edgeClamp, ParticleModifier<T>::runOnce);
 			ASSERT(baseClone != nullptr, "RandomModifer<T>::Clone -> Could not clone modifier.");
 			return static_cast<ParticleModifier<T>*>(baseClone);
 		}

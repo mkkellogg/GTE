@@ -299,7 +299,7 @@ namespace GTE
 			UInt32 rotationComponents = rotationAttribute->GetComponentCount();
 			for(UInt32 i = 0; i < (UInt32)ParticleConstants::VerticesPerParticle; i++)
 			{
-				rotationData[rotationComponents * (baseIndex + i)] = particle->Rotation * Constants::DegreesToRads;
+				rotationData[rotationComponents * (baseIndex + i)] = rotation * Constants::DegreesToRads;
 			}
 
 			Real* indexData = indexAttribute->GetDataPtr();

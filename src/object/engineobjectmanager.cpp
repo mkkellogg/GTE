@@ -810,7 +810,7 @@ namespace GTE
 	ParticleMeshRendererSharedPtr EngineObjectManager::CreateParticleMeshRenderer()
 	{
 		ParticleMeshRenderer * renderer = new(std::nothrow) ParticleMeshRenderer();
-		ASSERT(system != nullptr, "EngineObjectManager::CreateParticleMeshRenderer -> Could not create new particle mesh renderer.");
+		ASSERT(renderer != nullptr, "EngineObjectManager::CreateParticleMeshRenderer -> Could not create new particle mesh renderer.");
 
 		renderer->SetObjectID(GetNextObjectID());
 
