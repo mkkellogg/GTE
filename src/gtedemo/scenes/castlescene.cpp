@@ -460,12 +460,12 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 5, true);
 
 	// fence on left side of castle
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 51, -10, -16, true, true, true);
+	/*modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 51, -10, -16, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, -120, true);
 	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 55, -10, -25, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject->GetTransform().Rotate(0, 0, 1, -110, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, -110, true);*/
 	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 59.9f, -10, -33.3f, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, -135, true);
@@ -819,7 +819,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 	// move campfire to its final location
 	//fireParentObject->GetTransform().Translate(2.0f, -10.0f, -10.0f, false);
-	fireParentObject->GetTransform().Translate(63.0f, -10.0f, -30.0f, false);
+	fireParentObject->GetTransform().Translate(66.0f, -10.0f, -28.0f, false);
 	//fireParentObject->GetTransform().Translate(50.0f, -10.0f, -5.0f, false);
 }
 
@@ -839,7 +839,7 @@ void CastleScene::FlickerCampFireLightLight()
 		intensityAdjuster *= deltaTime * 220.0f;
 		positionAdjuster.Scale(deltaTime * 50.0f);
 
-		GTE::Real diff = (intensityAdjuster - lastCampFireLightIntenistyAdjuster) * .2f;
+		GTE::Real diff = (intensityAdjuster - lastCampFireLightIntenistyAdjuster) * 0.2f;
 		intensityAdjuster = lastCampFireLightIntenistyAdjuster + diff;
 
 		GTE::Real intensity = 3.0f;
