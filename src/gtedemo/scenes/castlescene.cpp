@@ -837,7 +837,7 @@ void CastleScene::FlickerCampFireLightLight()
 
 		GTE::Real deltaTime = GTE::Time::GetDeltaTime();
 		intensityAdjuster *= deltaTime * 220.0f;
-		positionAdjuster.Scale(deltaTime * 120.0f);
+		positionAdjuster.Scale(deltaTime * 50.0f);
 
 		GTE::Real diff = (intensityAdjuster - lastCampFireLightIntenistyAdjuster) * .2f;
 		intensityAdjuster = lastCampFireLightIntenistyAdjuster + diff;
