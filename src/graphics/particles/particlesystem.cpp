@@ -85,6 +85,8 @@ namespace GTE
 		systemLifeSpan = 0.0f;
 
 		renderCount = 0;
+
+		premultiplyAlpha = false;
 	}
 
 	ParticleSystem::~ParticleSystem()
@@ -270,6 +272,10 @@ namespace GTE
 			Color4Array * colors = targetMesh->GetColors();
 			Color4 color = particle->Color;
 			color.a = particle->Alpha;
+			if(premultiplyAlpha)
+			{
+				color.Scale(particle->Alpha);
+			}
 			colors->GetColor(baseIndex)->SetTo(color);
 			colors->GetColor(baseIndex + 1)->SetTo(color);
 			colors->GetColor(baseIndex + 2)->SetTo(color);
@@ -353,9 +359,9 @@ namespace GTE
 			emitting = false;
 		}
 
-		if(!simulateInLocalSpace)
+		if(simulateInLocalSpace)
 		{
-			//meshObject->GetTransform().SetTo(thisWorldTransform);
+			meshObject->GetTransform().SetIdentity();
 		}
 
 		renderCount++;
@@ -371,6 +377,7 @@ namespace GTE
 		{
 			thisSceneObject->AddChild(meshObject);
 			meshObject->SetActive(true);
+			meshObject->GetTransform().SetIdentity();
 		}
 		
 		RendererRef renderer = meshObject->GetRenderer();
@@ -959,5 +966,10 @@ namespace GTE
 		rotationalAccelerationModifier = modifier.Clone();
 		NONFATAL_ASSERT_RTRN(rotationalAccelerationModifier != nullptr, "ParticleSystem::BindRotationalAccelerationModifier -> Unable to clone modifier.", false, false);
 		return true;
+	}
+
+	void ParticleSystem::SetPremultiplyAlpha(Bool premultiply)
+	{
+		premultiplyAlpha = premultiply;
 	}
 }

@@ -93,6 +93,8 @@ namespace GTE
 
 		UInt32 renderCount;
 
+		Bool premultiplyAlpha;
+
 		// temporary storage 
 		Real lastDeltaTime;
 		Particle** _tempParticleArray;
@@ -160,6 +162,8 @@ namespace GTE
 		Bool BindColorModifier(const ParticleModifier<Color4>& modifier);
 		Bool BindAlphaModifier(const ParticleModifier<Real>& modifier);
 		Bool BindSizeModifier(const ParticleModifier<Vector2>& modifier);
+
+		void SetPremultiplyAlpha(Bool premultiply);
 
 		static MaterialSharedPtr CreateMaterial(const std::string& shaderName, const std::string& materialName);
 	};

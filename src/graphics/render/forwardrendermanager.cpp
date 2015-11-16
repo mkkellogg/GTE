@@ -764,6 +764,15 @@ namespace GTE
 
 
 		//===============================
+		// Render SKYBOX (if enabled)
+		//===============================
+		if(viewDescriptor.SkyboxEnabled)
+		{
+			RenderSkyboxForCamera(viewDescriptor);
+		}
+
+
+		//===============================
 		// Render TRANSPARENT obejcts
 		//===============================
 
@@ -783,12 +792,6 @@ namespace GTE
 		// Render TRANSPARENT render queues and above for meshes that have materials which DO NOT use lighting.
 		RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr, true, (UInt32)RenderQueueType::Transparent, (UInt32)RenderQueueType::MaxQueue);
 
-
-		// render the skybox if it is setup & enabled
-		if (viewDescriptor.SkyboxEnabled)
-		{
-			RenderSkyboxForCamera(viewDescriptor);
-		}
 
 
 		// restore default graphics state

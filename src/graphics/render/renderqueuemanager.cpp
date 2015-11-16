@@ -144,6 +144,8 @@ namespace GTE
 	RenderQueueManager::ConstIterator& RenderQueueManager::End()
 	{
 		endIterator.valid = false;
+		endIterator.entryIndex = 0;
+		endIterator.queueIndex = 0;
 		return endIterator;
 	}
 }

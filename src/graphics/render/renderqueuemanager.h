@@ -55,24 +55,49 @@ namespace GTE
 				entryIndex = 0;
 				valid = false;
 
-				if(manager != nullptr && manager->GetRenderQueueCount() > 0)
+				if(manager != nullptr)
 				{
-					for(UInt32 i = 0; i < manager->GetRenderQueueCount(); i++)
+					while(queueIndex < manager->GetRenderQueueCount())
 					{
-						if(manager->GetRenderQueueAtIndex(i)->GetID() < minQueue)
+						currentQueue = manager->GetRenderQueueAtIndex(queueIndex);
+						if(currentQueue->GetObjectCount() > 0 && currentQueue->GetID() >= minQueue && currentQueue->GetID() <= maxQueue)
 						{
-							queueIndex++;
+							valid = true;
+							break;
 						}
+						queueIndex++;
+					}
+				}
+
+				if(queueIndex >= manager->GetRenderQueueCount())
+				{
+					StopIteration();
+				}
+			}
+
+			void Advance() const
+			{
+				entryIndex++;
+				if(entryIndex >= currentQueue->GetObjectCount())
+				{
+					queueIndex++;
+					while(queueIndex < manager->GetRenderQueueCount())
+					{
+						currentQueue = manager->GetRenderQueueAtIndex(queueIndex);
+						if(currentQueue->GetObjectCount() > 0)
+						{
+							break;
+						}
+						queueIndex++;
 					}
 
-					if(queueIndex < manager->GetRenderQueueCount())
+					if(queueIndex >= manager->GetRenderQueueCount() || currentQueue->GetID() > maxQueue)
 					{
-						RenderQueue * firstQueue = manager->GetRenderQueueAtIndex(queueIndex);
-						if(firstQueue != nullptr && firstQueue->GetObjectCount() > 0)
-						{
-							currentQueue = firstQueue;
-							valid = true;
-						}
+						StopIteration();
+					}
+					else
+					{
+						entryIndex = 0;
 					}
 				}
 			}
@@ -83,7 +108,6 @@ namespace GTE
 				queueIndex = 0;
 				entryIndex = 0;
 				valid = false;
-			
 			}
 
 			public:
@@ -92,27 +116,7 @@ namespace GTE
 			{
 				if(valid)
 				{
-					entryIndex++;
-					if(entryIndex >= currentQueue->GetObjectCount())
-					{
-						queueIndex ++;
-						if(queueIndex >= manager->GetRenderQueueCount())
-						{
-							StopIteration();
-						}
-						else
-						{
-							currentQueue = manager->GetRenderQueueAtIndex(queueIndex);
-							if(currentQueue->GetID() > maxQueue)
-							{
-								StopIteration();
-							}
-							else
-							{
-								entryIndex = 0;
-							}
-						}
-					}
+					Advance();
 				}
 				return *this;
 			}
@@ -122,7 +126,9 @@ namespace GTE
 				if(valid)
 					return currentQueue->GetObject(entryIndex);
 				else
+				{
 					return nullptr;
+				}
 			}
 
 			Bool operator ==(const Iterator& other) const
@@ -138,7 +144,6 @@ namespace GTE
 						other.queueIndex != queueIndex ||
 						other.entryIndex != entryIndex;
 			}
-
 		};
 
 		typedef const RenderQueueManager::Iterator ConstIterator;
