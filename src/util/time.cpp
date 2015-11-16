@@ -10,6 +10,7 @@
 
 namespace GTE
 {
+	Real Time::timeScale = 1.0f;
 	Bool Time::initialized = false;
 	unsigned long long Time::startupTime = 0;
 	Real Time::lastRecordedTime = 0;
@@ -46,6 +47,11 @@ namespace GTE
 		UInt64 d = (UInt64)std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 		Real f = (Real)((RealDouble)d / (RealDouble)1000000.0);
 		return f;
+	}
+
+	Real Time::GetTime()
+	{
+		return GetRealTimeSinceStartup() * timeScale;
 	}
 
 	void Time::Update()

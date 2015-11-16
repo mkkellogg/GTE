@@ -17,6 +17,8 @@ namespace GTE
 {
 	class Time
 	{
+		static Real timeScale;
+
 		static Bool initialized;
 		static unsigned long long startupTime;
 		static std::chrono::high_resolution_clock::time_point _startupTime;
@@ -35,6 +37,7 @@ namespace GTE
 		static void Update();
 
 		static Real GetRealTimeSinceStartup();
+		static Real GetTime();
 		static Real GetDeltaTime();
 	};
 }
