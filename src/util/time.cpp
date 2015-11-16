@@ -10,11 +10,13 @@
 
 namespace GTE
 {
-	Real Time::timeScale = 1.0f;
+	Real Time::timeScale = 1.5f;
 	Bool Time::initialized = false;
 	unsigned long long Time::startupTime = 0;
 	Real Time::lastRecordedTime = 0;
+	Real Time::lastRecordedRealTime = 0;
 	Real Time::deltaTime = 0;
+	Real Time::realDeltaTime = 0;
 	std::chrono::high_resolution_clock::time_point Time::_startupTime;
 
 	Time::Time()
@@ -57,8 +59,15 @@ namespace GTE
 	void Time::Update()
 	{
 		Initialize();
-		deltaTime = GetRealTimeSinceStartup() - lastRecordedTime;
-		lastRecordedTime = GetRealTimeSinceStartup();
+
+		Real timeVal = GetRealTimeSinceStartup();
+		Real scaledTimeVal = timeVal * timeScale;
+
+		realDeltaTime = timeVal - lastRecordedRealTime;
+		deltaTime = scaledTimeVal - lastRecordedTime;
+
+		lastRecordedTime = scaledTimeVal;
+		lastRecordedRealTime = timeVal;
 	}
 
 	Real Time::GetDeltaTime()
@@ -67,4 +76,9 @@ namespace GTE
 		return deltaTime;
 	}
 
+	Real Time::GetRealDeltaTime()
+	{
+		Initialize();
+		return realDeltaTime;
+	}
 }

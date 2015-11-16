@@ -50,8 +50,8 @@ PoolScene::PoolScene() : Scene()
 {
 	currentHeightMapIndex = 0;
 	shouldTripperDrop = false;
-	lastWaterDropTime = GTE::Time::GetRealTimeSinceStartup();
-	lastWaterSimAdvanceTime = GTE::Time::GetRealTimeSinceStartup();
+	lastWaterDropTime = GTE::Time::GetTime();
+	lastWaterSimAdvanceTime = GTE::Time::GetTime();
 
 	uniform_WATER_HEIGHT_MAP = GTE::UniformDirectory::RegisterVarID("WATER_HEIGHT_MAP");
 	uniform_PIXEL_DISTANCE = GTE::UniformDirectory::RegisterVarID("PIXEL_DISTANCE");
@@ -146,7 +146,7 @@ void PoolScene::UpdateRippleSimulation()
 	GTE::Graphics* graphics = GTE::Engine::Instance()->GetGraphicsSystem();
 
 	// calculate the time difference between ripple simulation frames
-	GTE::Real simAdvanceTimeDiff = GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime;
+	GTE::Real simAdvanceTimeDiff = GTE::Time::GetTime() - lastWaterSimAdvanceTime;
 
 	// make sure the ripple simulation runs at a max of 60 iterations per second
 	if(simAdvanceTimeDiff > simFrameTime)
@@ -155,7 +155,7 @@ void PoolScene::UpdateRippleSimulation()
 		GTE::UInt32 renderHeightMap = 0;
 
 		// add water drop if enough time has passed since the last drop
-		if(GTE::Time::GetRealTimeSinceStartup() - lastWaterDropTime > waterDropFrequency || shouldTripperDrop)
+		if(GTE::Time::GetTime() - lastWaterDropTime > waterDropFrequency || shouldTripperDrop)
 		{
 			shouldTripperDrop = false;
 			// calculate drop position and drop size
@@ -183,7 +183,7 @@ void PoolScene::UpdateRippleSimulation()
 			graphics->RebuildMipMaps(waterHeights[renderHeightMap]->GetColorTexture());
 			++currentHeightMapIndex %= 2;
 
-			lastWaterDropTime = GTE::Time::GetRealTimeSinceStartup();
+			lastWaterDropTime = GTE::Time::GetTime();
 		}
 
 		// update water height map
@@ -219,7 +219,7 @@ void PoolScene::UpdateRippleSimulation()
 			waterMaterial->SetUniform1f(.2f, uniform_REFRACTED_COLOR_FACTOR);
 		}
 
-		while(GTE::Time::GetRealTimeSinceStartup() - lastWaterSimAdvanceTime > simFrameTime)
+		while(GTE::Time::GetTime() - lastWaterSimAdvanceTime > simFrameTime)
 		{
 			lastWaterSimAdvanceTime += simFrameTime;
 		}

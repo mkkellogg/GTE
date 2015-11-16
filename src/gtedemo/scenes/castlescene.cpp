@@ -825,7 +825,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 void CastleScene::FlickerCampFireLightLight()
 {
-	GTE::Real time = GTE::Time::GetRealTimeSinceStartup();
+	GTE::Real time = GTE::Time::GetTime();
 	GTE::Real elapsedTime = time - lastFlickerTime;
 
 	if(elapsedTime > 1.0f / 30.0f)

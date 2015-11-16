@@ -23,7 +23,9 @@ namespace GTE
 		static unsigned long long startupTime;
 		static std::chrono::high_resolution_clock::time_point _startupTime;
 		static Real lastRecordedTime;
+		static Real lastRecordedRealTime;
 		static Real deltaTime;
+		static Real realDeltaTime;
 
 		static void Initialize();
 
@@ -38,7 +40,9 @@ namespace GTE
 
 		static Real GetRealTimeSinceStartup();
 		static Real GetTime();
+		static Real GetRealDeltaTime();
 		static Real GetDeltaTime();
+
 	};
 }
 

@@ -300,7 +300,7 @@ void Game::TransitionToScene(Scenes scene)
 	{
 		sceneTransitionSrc = currentScene;
 		sceneTransitionDest = scene;
-		sceneTransitionStartTime = GTE::Time::GetRealTimeSinceStartup();
+		sceneTransitionStartTime = GTE::Time::GetTime();
 		sceneTransitioning = true;
 		currentScene = scene;
 		scenes[(GTE::UInt32)scene]->OnActivate();
@@ -330,7 +330,7 @@ void Game::UpdateSceneTransition()
 		// total time transition should last
 		GTE::Real transitionTime = .25f;
 		// full elapsed time
-		GTE::Real elapsedTime = GTE::Time::GetRealTimeSinceStartup() - sceneTransitionStartTime;
+		GTE::Real elapsedTime = GTE::Time::GetTime() - sceneTransitionStartTime;
 		// elapsed time scaled to the range 0..1
 		GTE::Real normalizedElapsedTime = elapsedTime / transitionTime;
 
@@ -854,7 +854,7 @@ void Game::UpdatePlayerVerticalSpeed()
 	// has been in the jump state for a sufficient amount of time
 	if(playerIsGrounded && playerState == PlayerState::Jump)
 	{
-		GTE::Real jumpTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(GTE::Int32)PlayerState::Jump];
+		GTE::Real jumpTime = GTE::Time::GetTime() - stateActivationTime[(GTE::Int32)PlayerState::Jump];
 		if(jumpTime > .2)
 		{
 			playerVerticalSpeed = 50;
@@ -976,7 +976,7 @@ void Game::UpdatePlayerAnimation()
  */
 void Game::ManagePlayerState()
 {
-	GTE::Real currentStateTime = GTE::Time::GetRealTimeSinceStartup() - stateActivationTime[(GTE::UInt32)playerState];
+	GTE::Real currentStateTime = GTE::Time::GetTime() - stateActivationTime[(GTE::UInt32)playerState];
 	switch(playerType)
 	{
 	case PlayerType::Koopa:
@@ -1338,6 +1338,6 @@ void Game::UpdatePlayerFollowCamera()
 void Game::ActivatePlayerState(PlayerState state)
 {
 	playerState = state;
-	stateActivationTime[(GTE::Int32)state] = GTE::Time::GetRealTimeSinceStartup();
+	stateActivationTime[(GTE::Int32)state] = GTE::Time::GetTime();
 }
 

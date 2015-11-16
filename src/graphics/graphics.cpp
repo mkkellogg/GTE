@@ -84,7 +84,7 @@ namespace GTE
 	 */
 	void Graphics::UpdateFPS()
 	{
-		currentFPSSpanTime += Time::GetDeltaTime();
+		currentFPSSpanTime += Time::GetRealDeltaTime();
 		framesInFPSSpan++;
 		if (currentFPSSpanTime >= 1)
 		{
