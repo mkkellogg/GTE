@@ -58,7 +58,6 @@ public:
 	void SetupStructures(GTE::AssetImporter& importer);
 	void SetupExtra(GTE::AssetImporter& importer);
 	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
-	void SetupParticleSystems(GTE::AssetImporter& importer);
 
 	GTE::SceneObjectSharedPtr GetSpinningPointLightObject();
 	std::vector<GTE::SceneObjectSharedPtr>& GetLavaLightObjects();

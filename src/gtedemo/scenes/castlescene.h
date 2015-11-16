@@ -21,6 +21,18 @@ class CastleScene : public Scene
 	GTE::SceneObjectSharedPtr directionalLightObject;
 	// moving light A
 	GTE::SceneObjectSharedPtr movingLightA;
+	// temp variable used to help flicker the camp fire light intensity
+	GTE::Real lastCampFireLightIntenistyAdjuster;
+	// temp variable used to help flicker the camp fire light position
+	GTE::Vector3 lastCampFireLightPositionAdjuster;
+	// local offset of the campfire light relative to the campfire model
+	GTE::Vector3 campFireLightLocalOffset;
+	// camp fire light's scene object
+	GTE::SceneObjectSharedPtr campFireLightObject;
+	// camp fire's light
+	GTE::LightSharedPtr campFireLight;
+	// last time light flickering was updated
+	GTE::Real lastFlickerTime;
 
 public:
 
@@ -32,12 +44,13 @@ public:
 	void Update();
 	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject);
 
-	void SetupParticleSystems(GTE::AssetImporter& importer);
 	void SetupTerrain(GTE::AssetImporter& importer);
 	void SetupStructures(GTE::AssetImporter& importer);
 	void SetupPlants(GTE::AssetImporter& importer);
 	void SetupExtra(GTE::AssetImporter& importer);
 	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
+	void SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
+	void FlickerCampFireLightLight();
 
 	std::vector<GTE::SceneObjectSharedPtr>& GetPointLights();
 };

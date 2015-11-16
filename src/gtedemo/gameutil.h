@@ -27,6 +27,7 @@ public:
 	static void SetAllMeshesStandardShadowVolume(GTE::SceneObjectSharedPtr root);
 	static void SetAllMeshesShadowVolumeOffset(GTE::SceneObjectSharedPtr root, GTE::Real offset);
 	static void SetAllObjectsCastShadows(GTE::SceneObjectSharedPtr root, GTE::Bool castShadows);
+	static void SetAllObjectsReceiveShadows(GTE::SceneObjectSharedPtr root, GTE::Bool receiveShadows);
 
 	static GTE::SceneObjectSharedPtr AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
 											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows);

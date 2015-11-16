@@ -149,7 +149,6 @@ void LavaScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr am
 	SetupStructures(importer);
 	SetupExtra(importer);
 	SetupLights(importer, playerObject);
-	SetupParticleSystems(importer);
 }
 
 /*
@@ -513,128 +512,6 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShared
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, lavaIslandObjectsLayerMask);
 	lavaLight->SetCullingMask(mergedMask);
 
-}
-
-void LavaScene::SetupParticleSystems(GTE::AssetImporter& importer)
-{
-	// get reference to the engine's object manager
-	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
-
-
-	GTE::SceneObjectRef fireParentObject = objectManager->CreateSceneObject();
-	ASSERT(fireParentObject.IsValid(), "Unable to create flame particle system parent object!\n");
-	sceneRoot->AddChild(fireParentObject);	
-
-	GTE::SceneObjectRef flameSystemObject = objectManager->CreateSceneObject();
-	ASSERT(flameSystemObject.IsValid(), "Unable to create flame particle system object!\n");
-	fireParentObject->AddChild(flameSystemObject);
-
-	// create material for rendering flame particles
-	std::string shaderName = "particles_unlit";
-	std::string materialName = "ParticlesUnlit";
-	GTE::MaterialRef flameMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
-	ASSERT(flameMaterial.IsValid(), "Unable to create flame material!\n");
-
-	// load texture for the flame's atlas
-	GTE::TextureAttributes texAttributes;
-	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
-	texAttributes.MipMapLevel = 2;
-	GTE::TextureRef flameTexture = objectManager->CreateTexture("resources/textures/particles/fireloop3.jpg", texAttributes);
-	ASSERT(flameTexture.IsValid(), "Unable to load flame texture!\n");
-
-	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0f, 1.0f, 1.0f, 0.0f, 8, 8, false, true);
-	ASSERT(flameAtlas.IsValid(), "Unable to create flame atlas!\n");
-
-	//GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
-	GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.5f, 3.0f, 0.0f);
-	ASSERT(flameSystem.IsValid(), "Unable to create flame particle system!\n");
-	flameSystemObject->SetParticleSystem(flameSystem);
-	flameSystem->SetPremultiplyAlpha(true);
-	
-	GTE::RandomModifier<GTE::Point3> flamePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.0f, 0.0f, 0.0f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> flameVelocityModifier(GTE::Vector3(0.0f, 2.3f, 0.0f), GTE::Vector3(0.9f, 0.4f, 0.9f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::EvenIntervalIndexModifier flameAtlasModifier(64);
-
-	GTE::FrameSetModifier<GTE::Vector2> flameSizeModifier;
-	flameSizeModifier.AddFrame(0.0f, GTE::Vector2(2.0f, 2.5f));
-	flameSizeModifier.AddFrame(1.0f, GTE::Vector2(2.0f, 2.5f));
-
-	/*GTE::FrameSetModifier<GTE::Vector2> sizeModifier;
-	sizeModifier.AddFrame(0.0f, GTE::Vector2(1.0f, 1.25f));
-	sizeModifier.AddFrame(1.0f, GTE::Vector2(2.0f, 2.5f));
-	sizeModifier.AddFrame(2.0f, GTE::Vector2(1.0f, 1.25f));*/
-
-	GTE::FrameSetModifier<GTE::Real> flameAlphaModifier;
-	flameAlphaModifier.AddFrame(0.0f, 0.0f);
-	flameAlphaModifier.AddFrame(0.2f, 0.3f);
-	flameAlphaModifier.AddFrame(1.2f, 1.0f);
-	flameAlphaModifier.AddFrame(2.0f, 1.0f);
-	flameAlphaModifier.AddFrame(3.0f, 0.0f);
-
-	GTE::FrameSetModifier<GTE::Color4> flameColorModifier;
-	flameColorModifier.AddFrame(0.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
-	flameColorModifier.AddFrame(0.2f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
-	flameColorModifier.AddFrame(3.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
-
-	flameSystem->BindPositionModifier(flamePositionModifier);
-	flameSystem->BindVelocityModifier(flameVelocityModifier);
-	flameSystem->BindSizeModifier(flameSizeModifier);
-	flameSystem->BindAlphaModifier(flameAlphaModifier);
-	flameSystem->BindColorModifier(flameColorModifier);
-	flameSystem->BindAtlasModifier(flameAtlasModifier);
-
-
-
-	GTE::SceneObjectRef emberSystemObject = objectManager->CreateSceneObject();
-	ASSERT(emberSystemObject.IsValid(), "Unable to create ember particle system object!\n");
-	fireParentObject->AddChild(emberSystemObject);
-
-	// create material for rendering ember particles
-	shaderName = "particles_unlit";
-	materialName = "ParticlesUnlit";
-	GTE::MaterialRef emberMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
-	ASSERT(emberMaterial.IsValid(), "Unable to create ember material!\n");
-
-	// load texture for the ember particle
-	GTE::TextureRef emberTexture = objectManager->CreateTexture("resources/textures/particles/puff.png", texAttributes);
-	ASSERT(emberTexture.IsValid(), "Unable to load ember texture!\n");
-
-	GTE::AtlasRef emberAtlas = objectManager->CreateAtlas(emberTexture, true);
-	ASSERT(emberAtlas.IsValid(), "Unable to create ember atlas!\n");
-
-	GTE::ParticleSystemRef emberSystem = objectManager->CreateParticleSystem(emberMaterial, emberAtlas, false, 9.0f, 3.0f, 0.0f);
-	ASSERT(emberSystem.IsValid(), "Unable to create ember particle system!\n");
-	emberSystemObject->SetParticleSystem(emberSystem);
-	emberSystem->SetPremultiplyAlpha(true);
-
-	GTE::RandomModifier<GTE::Point3> emberPositionModifier(GTE::Point3(0.0f, 2.0f, 0.0f), GTE::Point3(0.4f, 0.0f, 0.4f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> emberVelocityModifier(GTE::Vector3(0.0f, 5.0f, 0.0f), GTE::Vector3(3.0f, 5.0f, 3.0f), GTE::ParticleRangeType::Sphere, true, true);
-	GTE::RandomModifier<GTE::Vector3> emberAccelerationModifier(GTE::Vector3(0.0f, 3.0f, 0.0f), GTE::Vector3(75.0f, 65.0f, 75.0f), GTE::ParticleRangeType::Sphere, true, false);
-	GTE::EvenIntervalIndexModifier emberAtlasModifier(1);
-	GTE::RandomModifier<GTE::Vector2> emberSizeModifier(GTE::Vector2(0.05f, 0.05f), GTE::Vector2(0.01f, 0.01f), GTE::ParticleRangeType::Sphere, false, true);
-
-	GTE::FrameSetModifier<GTE::Real> emberAlphaModifier;
-	emberAlphaModifier.AddFrame(0.0f, 0.0f);
-	emberAlphaModifier.AddFrame(0.2f, 1.0f);
-	emberAlphaModifier.AddFrame(1.2f, 1.0f);
-	emberAlphaModifier.AddFrame(2.0f, 1.0f);
-	emberAlphaModifier.AddFrame(3.0f, 0.0f);
-
-	GTE::FrameSetModifier<GTE::Color4> emberColorModifier;
-	emberColorModifier.AddFrame(0.0f, GTE::Color4(1.3f, 1.3f, 0.0f, 1.0f));
-	emberColorModifier.AddFrame(0.2f, GTE::Color4(0.75f, 0.4f, 0.4f, 1.0f));
-	emberColorModifier.AddFrame(3.0f, GTE::Color4(0.6f, 0.6f, 0.6f, 0.0f));
-
-	emberSystem->BindPositionModifier(emberPositionModifier);
-	emberSystem->BindVelocityModifier(emberVelocityModifier);
-	emberSystem->BindSizeModifier(emberSizeModifier);
-	emberSystem->BindAlphaModifier(emberAlphaModifier);
-	emberSystem->BindColorModifier(emberColorModifier);
-	emberSystem->BindAtlasModifier(emberAtlasModifier);
-	emberSystem->BindAccelerationModifier(emberAccelerationModifier);
-
-
-	fireParentObject->GetTransform().Translate(50.0f, -9.0f, 50.0f, false);
 }
 
 /*

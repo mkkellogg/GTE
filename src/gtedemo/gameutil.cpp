@@ -169,6 +169,23 @@ void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectSharedPtr root, GTE::Boo
 	});
 }
 
+/*
+* Set any mesh encountered in the scene hierarchy beginning with [root]
+* to set shadow receiving to [castShadows].
+*/
+void GameUtil::SetAllObjectsReceiveShadows(GTE::SceneObjectSharedPtr root, GTE::Bool receiveShadows)
+{
+	ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current)
+	{
+		GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
+		if(filter.IsValid())
+		{
+			filter->SetReceiveShadows(receiveShadows);
+		}
+	});
+}
+
+
 GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
 	GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
 {

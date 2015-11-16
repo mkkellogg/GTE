@@ -52,7 +52,8 @@
  */
 CastleScene::CastleScene() : Scene()
 {
-
+	lastCampFireLightIntenistyAdjuster = 0.0f;
+	lastFlickerTime = 0.0f;
 }
 
 /*
@@ -88,6 +89,8 @@ void CastleScene::Update()
 	GTE::Point3 lightRotatePoint(-14, 1, 17);
 	// rotate the point light around [lightRotatePoint]
 	movingLightA->GetTransform().RotateAround(lightRotatePoint.x, lightRotatePoint.y, lightRotatePoint.z, 0, 1, 0, 60 * GTE::Time::GetDeltaTime(), false);
+
+	FlickerCampFireLightLight();
 }
 
 /*
@@ -114,70 +117,12 @@ void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr 
 	SetupPlants(importer);
 	SetupExtra(importer);
 	SetupLights(importer, playerObject);
-	//SetupParticleSystems(importer);
+	SetupCampfire(importer, playerObject);
 
 	sceneRoot->GetTransform().Rotate(0, 1, 0, 155, true);
 	sceneRoot->GetTransform().Translate(-44.3f, 0, 52, false);
 
 	this->directionalLightObject = directionalLightObject;
-}
-
-void CastleScene::SetupParticleSystems(GTE::AssetImporter& importer)
-{
-	// get reference to the engine's object manager
-	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
-
-	GTE::SceneObjectRef particleSystemObject = objectManager->CreateSceneObject();
-	ASSERT(particleSystemObject.IsValid(), "Unable to create flame particle system object!\n");
-	//sceneRoot->AddChild(particleSystemObject);
-
-	// create material for rendering flame particles
-	std::string shaderName = "particles_unlit";
-	std::string materialName = "ParticlesUnlit";
-	GTE::MaterialRef flameMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
-	ASSERT(flameMaterial.IsValid(), "Unable to create flame material!\n");
-	flameMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Additive);
-
-	// load texture for the the flame's atlas
-	GTE::TextureAttributes texAttributes;
-	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
-	texAttributes.MipMapLevel = 2;
-	GTE::TextureRef flameTexture = objectManager->CreateTexture("resources/textures/particles/fireloop3.jpg", texAttributes);
-	ASSERT(flameTexture.IsValid(), "Unable to load flame texture!\n");
-
-	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0f, 1.0f, 1.0f, 0.0f, 8, 8, false, true);
-	ASSERT(flameAtlas.IsValid(), "Unable to create flame atlas!\n");
-
-	GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
-	ASSERT(flameSystem.IsValid(), "Unable to create flame particle system!\n");
-	particleSystemObject->SetParticleSystem(flameSystem);
-
-	GTE::RandomModifier<GTE::Point3> positionModifier(GTE::Point3(50.0f, -5.0f, 50.0f), GTE::Point3(0.0f, 0.0f, 0.0f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> velocityModifier(GTE::Vector3(0.0f, 2.3f, 0.0f), GTE::Vector3(0.9f, 0.4f, 0.9f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::EvenIntervalIndexModifier atlasModifier(64);
-
-	GTE::FrameSetModifier<GTE::Vector2> sizeModifier;
-	sizeModifier.AddFrame(0.0f, GTE::Vector2(2.0f, 2.5f));
-	sizeModifier.AddFrame(3.0f, GTE::Vector2(2.0f, 2.5f));
-
-	GTE::FrameSetModifier<GTE::Real> alphaModifier;
-	alphaModifier.AddFrame(0.0f, 0.0f);
-	alphaModifier.AddFrame(0.2f, 0.3f);
-	alphaModifier.AddFrame(1.2f, 1.0f);
-	alphaModifier.AddFrame(2.0f, 1.0f);
-	alphaModifier.AddFrame(3.0f, 0.0f);
-
-	GTE::FrameSetModifier<GTE::Color4> colorModifier;
-	colorModifier.AddFrame(0.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
-	colorModifier.AddFrame(0.2f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
-	colorModifier.AddFrame(3.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
-
-	flameSystem->BindPositionModifier(positionModifier);
-	flameSystem->BindVelocityModifier(velocityModifier);
-	flameSystem->BindSizeModifier(sizeModifier);
-	flameSystem->BindAlphaModifier(alphaModifier);
-	flameSystem->BindColorModifier(colorModifier);
-	flameSystem->BindAtlasModifier(atlasModifier);
 }
 
 /*
@@ -447,8 +392,8 @@ void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .10f, .10f, .10f, 1, 0, 0, -85, 57, -10, 24, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15f, .15f, .20f, 1, 0, 0, -94, 61, -9, -15, true, true, true);
-	sceneRoot->AddChild(modelSceneObject);
+	//modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .15f, .15f, .20f, 1, 0, 0, -94, 61, -9, -15, true, true, true);
+	//sceneRoot->AddChild(modelSceneObject);
 	GameUtil::SetAllMeshesStandardShadowVolume(modelSceneObject);
 	modelSceneObject = GameUtil::AddMeshToScene(treeMesh, treeMaterial, .20f, .20f, .30f, 1, 0, 0, -93, 80, -9, -15, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
@@ -707,6 +652,211 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShar
 	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
 	lanternObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(lanterLightRenderer));
 	pointLights.push_back(lanternObject);
+}
+
+void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject)
+{
+	// get reference to the engine's object manager
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+
+
+	//================================
+	// Setup flame particle system
+	//================================
+
+	GTE::SceneObjectRef fireParentObject = objectManager->CreateSceneObject();
+	ASSERT(fireParentObject.IsValid(), "Unable to create flame particle system parent object!\n");
+	sceneRoot->AddChild(fireParentObject);
+
+	GTE::SceneObjectRef flameSystemObject = objectManager->CreateSceneObject();
+	ASSERT(flameSystemObject.IsValid(), "Unable to create flame particle system object!\n");
+	flameSystemObject->GetTransform().Translate(0, 1, 0, true);
+	fireParentObject->AddChild(flameSystemObject);
+
+	// create material for rendering flame particles
+	std::string shaderName = "particles_unlit";
+	std::string materialName = "ParticlesUnlit";
+	GTE::MaterialRef flameMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
+	ASSERT(flameMaterial.IsValid(), "Unable to create flame material!\n");
+
+	// load texture for the flame's atlas
+	GTE::TextureAttributes texAttributes;
+	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
+	texAttributes.MipMapLevel = 2;
+	GTE::TextureRef flameTexture = objectManager->CreateTexture("resources/textures/particles/fireloop3.jpg", texAttributes);
+	ASSERT(flameTexture.IsValid(), "Unable to load flame texture!\n");
+
+	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0f, 1.0f, 1.0f, 0.0f, 8, 8, false, true);
+	ASSERT(flameAtlas.IsValid(), "Unable to create flame atlas!\n");
+
+	//GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
+	GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.5f, 3.0f, 0.0f);
+	ASSERT(flameSystem.IsValid(), "Unable to create flame particle system!\n");
+	flameSystemObject->SetParticleSystem(flameSystem);
+	flameSystem->SetPremultiplyAlpha(true);
+
+	GTE::RandomModifier<GTE::Point3> flamePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.0f, 0.0f, 0.0f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector3> flameVelocityModifier(GTE::Vector3(0.0f, 2.3f, 0.0f), GTE::Vector3(0.9f, 0.4f, 0.9f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::EvenIntervalIndexModifier flameAtlasModifier(64);
+
+	GTE::FrameSetModifier<GTE::Vector2> flameSizeModifier;
+	flameSizeModifier.AddFrame(0.0f, GTE::Vector2(2.0f, 2.5f));
+	flameSizeModifier.AddFrame(1.0f, GTE::Vector2(2.0f, 2.5f));
+
+	GTE::FrameSetModifier<GTE::Real> flameAlphaModifier;
+	flameAlphaModifier.AddFrame(0.0f, 0.0f);
+	flameAlphaModifier.AddFrame(0.2f, 0.3f);
+	flameAlphaModifier.AddFrame(1.2f, 1.0f);
+	flameAlphaModifier.AddFrame(2.0f, 1.0f);
+	flameAlphaModifier.AddFrame(3.0f, 0.0f);
+
+	GTE::FrameSetModifier<GTE::Color4> flameColorModifier;
+	flameColorModifier.AddFrame(0.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+	flameColorModifier.AddFrame(0.2f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+	flameColorModifier.AddFrame(3.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	flameSystem->BindPositionModifier(flamePositionModifier);
+	flameSystem->BindVelocityModifier(flameVelocityModifier);
+	flameSystem->BindSizeModifier(flameSizeModifier);
+	flameSystem->BindAlphaModifier(flameAlphaModifier);
+	flameSystem->BindColorModifier(flameColorModifier);
+	flameSystem->BindAtlasModifier(flameAtlasModifier);
+
+
+	//================================
+	// Setup ember particle system
+	//================================
+
+	GTE::SceneObjectRef emberSystemObject = objectManager->CreateSceneObject();
+	ASSERT(emberSystemObject.IsValid(), "Unable to create ember particle system object!\n");
+	fireParentObject->AddChild(emberSystemObject);
+
+	// create material for rendering ember particles
+	shaderName = "particles_unlit";
+	materialName = "ParticlesUnlit";
+	GTE::MaterialRef emberMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
+	ASSERT(emberMaterial.IsValid(), "Unable to create ember material!\n");
+
+	// load texture for the ember particle
+	GTE::TextureRef emberTexture = objectManager->CreateTexture("resources/textures/particles/puff.png", texAttributes);
+	ASSERT(emberTexture.IsValid(), "Unable to load ember texture!\n");
+
+	GTE::AtlasRef emberAtlas = objectManager->CreateAtlas(emberTexture, true);
+	ASSERT(emberAtlas.IsValid(), "Unable to create ember atlas!\n");
+
+	GTE::ParticleSystemRef emberSystem = objectManager->CreateParticleSystem(emberMaterial, emberAtlas, false, 9.0f, 3.0f, 0.0f);
+	ASSERT(emberSystem.IsValid(), "Unable to create ember particle system!\n");
+	emberSystemObject->SetParticleSystem(emberSystem);
+	emberSystem->SetPremultiplyAlpha(true);
+
+	GTE::RandomModifier<GTE::Point3> emberPositionModifier(GTE::Point3(0.0f, 2.0f, 0.0f), GTE::Point3(0.4f, 0.0f, 0.4f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector3> emberVelocityModifier(GTE::Vector3(0.0f, 5.0f, 0.0f), GTE::Vector3(3.0f, 5.0f, 3.0f), GTE::ParticleRangeType::Sphere, true, true);
+	GTE::RandomModifier<GTE::Vector3> emberAccelerationModifier(GTE::Vector3(0.0f, 3.0f, 0.0f), GTE::Vector3(75.0f, 65.0f, 75.0f), GTE::ParticleRangeType::Sphere, true, false);
+	GTE::EvenIntervalIndexModifier emberAtlasModifier(1);
+	GTE::RandomModifier<GTE::Vector2> emberSizeModifier(GTE::Vector2(0.05f, 0.05f), GTE::Vector2(0.01f, 0.01f), GTE::ParticleRangeType::Sphere, false, true);
+
+	GTE::FrameSetModifier<GTE::Real> emberAlphaModifier;
+	emberAlphaModifier.AddFrame(0.0f, 0.0f);
+	emberAlphaModifier.AddFrame(0.2f, 1.0f);
+	emberAlphaModifier.AddFrame(1.2f, 1.0f);
+	emberAlphaModifier.AddFrame(2.0f, 1.0f);
+	emberAlphaModifier.AddFrame(3.0f, 0.0f);
+
+	GTE::FrameSetModifier<GTE::Color4> emberColorModifier;
+	emberColorModifier.AddFrame(0.0f, GTE::Color4(1.3f, 1.3f, 0.0f, 1.0f));
+	emberColorModifier.AddFrame(0.2f, GTE::Color4(0.75f, 0.4f, 0.4f, 1.0f));
+	emberColorModifier.AddFrame(3.0f, GTE::Color4(0.6f, 0.6f, 0.6f, 0.0f));
+
+	emberSystem->BindPositionModifier(emberPositionModifier);
+	emberSystem->BindVelocityModifier(emberVelocityModifier);
+	emberSystem->BindSizeModifier(emberSizeModifier);
+	emberSystem->BindAlphaModifier(emberAlphaModifier);
+	emberSystem->BindColorModifier(emberColorModifier);
+	emberSystem->BindAtlasModifier(emberAtlasModifier);
+	emberSystem->BindAccelerationModifier(emberAccelerationModifier);
+
+
+	//================================
+	// Setup campfire light
+	//================================
+
+	campFireLightObject = objectManager->CreateSceneObject();
+	fireParentObject->AddChild(campFireLightObject);
+	campFireLightObject->SetStatic(false);
+	campFireLight = objectManager->CreateLight();
+	campFireLight->SetIntensity(1.8f);
+	campFireLight->SetRange(20);
+	campFireLight->SetColor(1.0f, 0.6f, 0.0f, 1.0f);
+	GTE::IntMask mergedMask = campFireLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
+	campFireLight->SetCullingMask(mergedMask);
+	campFireLight->SetShadowsEnabled(true);
+	campFireLight->SetType(GTE::LightType::Point);
+	campFireLightObject->SetLight(campFireLight);
+	pointLights.push_back(campFireLightObject);
+	campFireLightLocalOffset.Set(0, 5, 0);
+	campFireLightObject->GetTransform().Translate(campFireLightLocalOffset, true);
+
+
+	//================================
+	// Load campfire model
+	//================================
+
+	GTE::SceneObjectRef campfireSceneObject = importer.LoadModelDirect("resources/models/toonlevel/campfire/campfire01.fbx");
+	ASSERT(campfireSceneObject.IsValid(), "Could not load campfire model!\n");
+	campfireSceneObject->GetTransform().Scale(0.8f, 0.6f, 0.8f, true);
+	fireParentObject->AddChild(campfireSceneObject);
+	campfireSceneObject->SetActive(true);
+	GameUtil::SetAllObjectsStatic(campfireSceneObject);
+	GameUtil::SetAllObjectsCastShadows(campfireSceneObject, true);
+	GameUtil::SetAllObjectsReceiveShadows(campfireSceneObject, false);
+
+	GTE::SceneObjectSharedPtr campfireMeshObject = GameUtil::FindFirstSceneObjectWithMesh(campfireSceneObject);
+	GTE::Mesh3DSharedPtr campFireMesh = campfireMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr campfireRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(campfireMeshObject->GetRenderer());
+	GTE::MaterialSharedPtr campfireMaterial = campfireRenderer->GetMaterial(0);
+	campfireMaterial->SetFaceCulling(GTE::RenderState::FaceCulling::None);
+
+	// move campfire to its final location
+	//fireParentObject->GetTransform().Translate(2.0f, -10.0f, -10.0f, false);
+	fireParentObject->GetTransform().Translate(63.0f, -10.0f, -30.0f, false);
+	//fireParentObject->GetTransform().Translate(50.0f, -10.0f, -5.0f, false);
+}
+
+void CastleScene::FlickerCampFireLightLight()
+{
+	GTE::Real time = GTE::Time::GetRealTimeSinceStartup();
+	GTE::Real elapsedTime = time - lastFlickerTime;
+
+	if(elapsedTime > 1.0f / 30.0f)
+	{
+		lastFlickerTime = time;
+
+		GTE::Real intensityAdjuster = (GTE::GTEMath::Random() - 0.5f);
+		GTE::Vector3 positionAdjuster(GTE::GTEMath::Random() - 0.5f, GTE::GTEMath::Random() - 0.5f, GTE::GTEMath::Random() - 0.5f);
+
+		GTE::Real deltaTime = GTE::Time::GetDeltaTime();
+		intensityAdjuster *= deltaTime * 220.0f;
+		positionAdjuster.Scale(deltaTime * 120.0f);
+
+		GTE::Real diff = (intensityAdjuster - lastCampFireLightIntenistyAdjuster) * .2f;
+		intensityAdjuster = lastCampFireLightIntenistyAdjuster + diff;
+
+		GTE::Real intensity = 3.0f;
+		intensity += intensityAdjuster * 3.0f;
+		campFireLight->SetIntensity(intensity);
+
+		campFireLightObject->GetTransform().SetIdentity();
+		campFireLightObject->GetTransform().Translate(campFireLightLocalOffset, true);
+
+		positionAdjuster.Add(lastCampFireLightPositionAdjuster);
+		positionAdjuster.Scale(0.5f);
+
+		campFireLightObject->GetTransform().Translate(positionAdjuster, true);
+
+		lastCampFireLightPositionAdjuster = positionAdjuster;
+		lastCampFireLightIntenistyAdjuster = intensityAdjuster;
+	}
 }
 
 std::vector<GTE::SceneObjectSharedPtr>& CastleScene::GetPointLights()
