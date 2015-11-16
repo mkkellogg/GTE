@@ -9,6 +9,7 @@ GTE is a basic graphics engine developed in C++ that currently supports the foll
 * Dynamic per-pixel lighting with directional lights and point lights
 * Skeletal animation with animation blending and vertex skinning
 * Dynamic shadows with shadow volumes
+* Particle systems
 * Model loading capabilities through the inclusion of the Assimp library
 * Screen-Space Ambient Occlusion (alpha stage)
 * Multisample Anti-aliasing (MSAA)
