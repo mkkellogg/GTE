@@ -361,7 +361,7 @@ namespace GTE
 
 		if(simulateInLocalSpace)
 		{
-			meshObject->GetTransform().SetIdentity();
+			//meshObject->GetTransform().SetIdentity();
 		}
 
 		renderCount++;

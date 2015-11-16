@@ -10,7 +10,7 @@
 
 namespace GTE
 {
-	Real Time::timeScale = 1.5f;
+	Real Time::timeScale = 1.0f;
 	Bool Time::initialized = false;
 	unsigned long long Time::startupTime = 0;
 	Real Time::lastRecordedTime = 0;

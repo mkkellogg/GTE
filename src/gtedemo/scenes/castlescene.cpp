@@ -349,7 +349,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	// front and back
 	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 64.7f, -10, -9.25f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
+	modelSceneObject->GetTransform().Rotate(0, 0, 1, 270, true);
 	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 90, -10, .25f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
@@ -460,12 +460,6 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 5, true);
 
 	// fence on left side of castle
-	/*modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 51, -10, -16, true, true, true);
-	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject->GetTransform().Rotate(0, 0, 1, -120, true);
-	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 55, -10, -25, true, true, true);
-	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject->GetTransform().Rotate(0, 0, 1, -110, true);*/
 	modelSceneObject = GameUtil::AddMeshToScene(fenceMesh, fenceMaterial, .6f, .6f, .6f, 1, 0, 0, -90, 59.9f, -10, -33.3f, true, true, true);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, -135, true);
