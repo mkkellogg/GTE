@@ -635,11 +635,28 @@ namespace GTE
 	}
 
 	/*
+	* Set the center of this sub-mesh, which should be the average of the vertex
+	* positions.
+	*/
+	void SubMesh3D::SetCenter(Point3& center)
+	{
+		this->center = center;
+	}
+
+	/*
 	 * Get the bounding box for this mesh.
 	 */
 	const Vector3& SubMesh3D::GetBoundingBox() const
 	{
 		return boundingBox;
+	}
+
+	/*
+	* Set the bounding box for this mesh.
+	*/
+	void SubMesh3D::SetBoundingBox(Vector3& boundingBox)
+	{
+		this->boundingBox = boundingBox;
 	}
 
 	/*

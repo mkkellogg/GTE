@@ -146,7 +146,9 @@ namespace GTE
 		SubMesh3DFaces& GetFaces();
 
 		const Point3& GetCenter() const;
+		void SetCenter(Point3& center);
 		const Vector3& GetBoundingBox() const;
+		void SetBoundingBox(Vector3& boundingBox);
 		void SetNormalsSmoothingThreshold(UInt32 threshhold);
 		void Update();
 		void QuickUpdate();
