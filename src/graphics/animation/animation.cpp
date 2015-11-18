@@ -14,8 +14,8 @@
 namespace GTE
 {
 	/*
-* Simple constructor, calls the main constructor with [startOffsetTicks] = 0 && [earlyEndTicks] = [durationTicks]
-*/
+	 * Simple constructor, calls the main constructor with [startOffsetTicks] = 0 && [earlyEndTicks] = [durationTicks]
+	 */
 	Animation::Animation(Real durationTicks, Real ticksPerSecond) : Animation(durationTicks, ticksPerSecond, 0, durationTicks)
 	{
 

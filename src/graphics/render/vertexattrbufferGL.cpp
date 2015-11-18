@@ -32,7 +32,7 @@ namespace GTE
 	/*
 	 * Calculate the number of floating-point entries in the buffer.
 	 */
-	Int32 VertexAttrBufferGL::CalcTotalFloatCount() const
+	UInt32 VertexAttrBufferGL::CalcTotalFloatCount() const
 	{
 		return (componentCount + stride) * totalVertexCount;
 	}
@@ -40,7 +40,7 @@ namespace GTE
 	/*
 	 * Calculate the total size (in bytes) of the buffer.
 	 */
-	Int32 VertexAttrBufferGL::CalcTotalFullSize() const
+	UInt32 VertexAttrBufferGL::CalcTotalFullSize() const
 	{
 		return CalcTotalFloatCount() * sizeof(Real);
 	}
@@ -48,7 +48,7 @@ namespace GTE
 	/*
 	* Calculate the number of floating-point entries to be rendered.
 	*/
-	Int32 VertexAttrBufferGL::CalcRenderFloatCount() const
+	UInt32 VertexAttrBufferGL::CalcRenderFloatCount() const
 	{
 		return (componentCount + stride) * renderVertexCount;
 	}
@@ -56,7 +56,7 @@ namespace GTE
 	/*
 	* Calculate the size (in bytes) of the buffer to be rendered.
 	*/
-	Int32 VertexAttrBufferGL::CalcRenderFullSize() const
+	UInt32 VertexAttrBufferGL::CalcRenderFullSize() const
 	{
 		return CalcRenderFloatCount() * sizeof(Real);
 	}
@@ -71,7 +71,7 @@ namespace GTE
 	 * [dataOnGPU] - Make this a VBO.
 	 * [srcData] - Data to be copied into the buffer after initialization.
 	 */
-	Bool VertexAttrBufferGL::Init(Int32 totalVertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, const Real *srcData)
+	Bool VertexAttrBufferGL::Init(UInt32 totalVertexCount, UInt32 componentCount, UInt32 stride, Bool dataOnGPU, const Real *srcData)
 	{
 		// if this buffer has already be initialized we need to destroy it and start fresh
 		Destroy();

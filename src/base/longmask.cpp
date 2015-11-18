@@ -51,7 +51,7 @@ namespace GTE
 
 	LongMask LongMaskUtil::IndexToMaskValue(UInt16 index)
 	{
-		return 0x0000000000000001L << index;
+		return (LongMask)0x0000000000000001L << index;
 	}
 
 	void LongMaskUtil::SetBit(LongMask * target, UInt16 index)

@@ -233,11 +233,21 @@ namespace GTE
 		SubMesh3DRef targetMesh = mesh->GetSubMesh(0);
 		NONFATAL_ASSERT(targetMesh.IsValid(), "ParticleSystem::UpdateShaderWithParticleData -> Target mesh is invalid.", true);
 
+		Real maxX, maxY, maxZ, minX, minY, minZ;
+		maxX = maxY = maxZ = minX = minY = minZ = 0;
+
 		for(UInt32 p = 0; p < liveParticleCount; p++)
 		{
 			Particle* particle = liveParticleArray[p];
 			Point3& position = particle->Position;
 			Real rotation = particle->Rotation;
+
+			if(position.x > maxX || p == 0)maxX = position.x;
+			if(position.x < minX || p == 0)minX = position.x;
+			if(position.y > maxY || p == 0)maxY = position.y;
+			if(position.y < minY || p == 0)minY = position.y;
+			if(position.z > maxZ || p == 0)maxZ = position.z;
+			if(position.z < minZ || p == 0)minZ = position.z;
 
 			UInt32 baseIndex = p * (UInt32)ParticleConstants::VerticesPerParticle;
 
@@ -250,7 +260,7 @@ namespace GTE
 			positions->GetPoint(baseIndex + 5)->SetTo(position);
 
 
-			/////////////////////////////////////////////////////		
+			/////////////////////////////////////////////////////
 			//positions->GetPoint(baseIndex)->Set(-1, 1, 0);
 			//positions->GetPoint(baseIndex + 1)->Set(1, 1, 0);
 			//positions->GetPoint(baseIndex + 2)->Set(-1, -1, 0);
@@ -312,6 +322,26 @@ namespace GTE
 			indexData[indexComponents * (baseIndex + 5)] = 2;
 		}
 
+		// get the dimensions of the rectangular volume formed by the
+		// maximum extents
+		Real width = maxX - minX;
+		Real height = maxY - minY;
+		Real depth = maxZ - minZ;
+
+		// calculate the mesh's center
+		Point3 center;
+		center.x = width / 2.0f + minX;
+		center.y = height / 2.0f + minY;
+		center.z = depth / 2.0f + minZ;
+
+		Vector3 boundingBox;
+		boundingBox.x = width / 2.0f;
+		boundingBox.y = height / 2.0f;
+		boundingBox.z = depth / 2.0f;
+
+		targetMesh->SetBoundingBox(boundingBox);
+		targetMesh->SetCenter(center);
+
 		targetMesh->SetRenderVertexCount(liveParticleCount * (UInt32)ParticleConstants::VerticesPerParticle);
 		targetMesh->QuickUpdate();
 	}
@@ -359,11 +389,6 @@ namespace GTE
 			emitting = false;
 		}
 
-		if(simulateInLocalSpace)
-		{
-			//meshObject->GetTransform().SetIdentity();
-		}
-
 		renderCount++;
 	}
 
@@ -378,6 +403,16 @@ namespace GTE
 			thisSceneObject->AddChild(meshObject);
 			meshObject->SetActive(true);
 			meshObject->GetTransform().SetIdentity();
+		}
+
+		if(simulateInLocalSpace)
+		{
+			meshObject->SetInheritsTransform(true);
+			meshObject->GetTransform().SetIdentity();
+		}
+		else
+		{
+			meshObject->SetInheritsTransform(false);
 		}
 		
 		RendererRef renderer = meshObject->GetRenderer();
@@ -622,14 +657,14 @@ namespace GTE
 
 		if(!simulateInLocalSpace)
 		{
-			/*SceneObjectRef containerObject = this->GetSceneObject();
+			SceneObjectRef containerObject = this->GetSceneObject();
 			Transform worldTransform;
 			SceneObjectTransform::GetWorldTransform(worldTransform, containerObject, true, false);
 
 			Point3 origin;
 			worldTransform.TransformPoint(origin);
 			Vector3 offset(origin.x, origin.y, origin.z);
-			particle->Position.Add(offset);*/
+			particle->Position.Add(offset);
 		}
 
 		if(velocityModifier != nullptr)

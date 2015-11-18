@@ -38,7 +38,7 @@ namespace GTE
 	/*
 	 * Assignment operator
 	 */
-	Color4 & Color4::operator= (const Color4 & source)
+	Color4 & Color4::operator= (const Color4& source)
 	{
 		if (this == &source)return *this;
 		BaseVector4::operator=(source);

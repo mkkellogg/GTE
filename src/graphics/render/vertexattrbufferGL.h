@@ -38,15 +38,15 @@ namespace GTE
 		virtual ~VertexAttrBufferGL();
 
 		void Destroy();
-		Int32 CalcTotalFullSize() const;
-		Int32 CalcTotalFloatCount() const;
-		Int32 CalcRenderFullSize() const;
-		Int32 CalcRenderFloatCount() const;
+		UInt32 CalcTotalFullSize() const;
+		UInt32 CalcTotalFloatCount() const;
+		UInt32 CalcRenderFullSize() const;
+		UInt32 CalcRenderFloatCount() const;
 		void InitData(const Real * srcData);
 
 	public:
 
-		Bool Init(Int32 vertexCount, Int32 componentCount, Int32 stride, Bool dataOnGPU, const Real *srcData);
+		Bool Init(UInt32 vertexCount, UInt32 componentCount, UInt32 stride, Bool dataOnGPU, const Real *srcData);
 		void SetData(const Real * srcData);
 		const Real * GetDataPtr() const;
 		Bool IsGPUBuffer() const;
