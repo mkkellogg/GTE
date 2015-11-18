@@ -133,6 +133,9 @@ void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 	// multi-use reference
 	GTE::SceneObjectSharedPtr modelSceneObject;
 
+	// get reference to the engine's object manager
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+
 	//========================================================
 	//
 	// Islands
@@ -149,6 +152,38 @@ void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 	modelSceneObject->SetActive(true);
 	modelSceneObject->GetTransform().Scale(.07f, .07f, .07f, false);
 	modelSceneObject->GetTransform().Translate(80, -10, -10, false);
+
+	// load shader for scaled diffuse
+	GTE::ShaderSource scaledDiffuseSource;
+	importer.LoadBuiltInShaderSource("diffuse_texture_scaled", scaledDiffuseSource);
+
+	// load an alternative grass texture for the island
+	GTE::TextureAttributes texAttributes;
+	texAttributes.FilterMode = GTE::TextureFilter::TriLinear;
+	texAttributes.MipMapLevel = 4;
+	GTE::TextureSharedPtr altGrass = objectManager->CreateTexture("resources/textures/cartoonseamless/cartoonTex07a.png", texAttributes);
+
+	// load an alternative rock texture for the island
+	GTE::TextureSharedPtr altRock = objectManager->CreateTexture("resources/textures/cartoonseamless/Rock02.png", texAttributes);
+
+	// replace the grass texture for the island
+	GTE::MaterialSharedPtr scaledDiffuseIslandTop = objectManager->CreateMaterial(std::string("ScaledDiffuseIslandTop"), scaledDiffuseSource);
+	GTE::SceneObjectSharedPtr islandTopMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	islandTopMeshObject = islandTopMeshObject->GetParent()->GetChildAt(1);
+	GTE::Mesh3DSharedPtr islandTopMesh = islandTopMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr islandTopRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(islandTopMeshObject->GetRenderer());
+	scaledDiffuseIslandTop->SetUniform2f(8.0f, 8.0f, "UV_SCALE");
+	islandTopRenderer->SetMaterial(0, scaledDiffuseIslandTop);
+	scaledDiffuseIslandTop->SetTexture(altGrass, "TEXTURE0");
+
+	// replace the rock texture for the island
+	GTE::MaterialSharedPtr scaledDiffuseIslandRock = objectManager->CreateMaterial(std::string("ScaledDiffuseIslandRock"), scaledDiffuseSource);
+	GTE::SceneObjectSharedPtr islandRockMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
+	GTE::Mesh3DSharedPtr islandRockMesh = islandRockMeshObject->GetMesh3D();
+	GTE::Mesh3DRendererSharedPtr islandRockRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(islandRockMeshObject->GetRenderer());
+	scaledDiffuseIslandRock->SetUniform2f(4.0f, 4.0f, "UV_SCALE");
+	islandRockRenderer->SetMaterial(0, scaledDiffuseIslandRock);
+	scaledDiffuseIslandRock->SetTexture(altRock, "TEXTURE0");
 }
 
 /*
@@ -161,8 +196,6 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 
 	// get reference to the engine's object manager
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
-
-
 
 	// load texture for the castle
 	GTE::TextureAttributes texAttributes;
@@ -180,9 +213,6 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	castleNormalMaterial->SetUniform1f(1.0f, "USCALE");
 	castleNormalMaterial->SetUniform1f(1.0f, "VSCALE");
 	castleNormalMaterial->SetUniform1f(0.25f, "SPECULAR_FACTOR");
-
-
-
 
 	//========================================================
 	//
@@ -564,7 +594,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 }
 
 /*
-* Set up the lights that belong to thsi scene.
+* Set up the lights that belong to this scene.
 */
 void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject)
 {
@@ -776,7 +806,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 	campFireLightObject = objectManager->CreateSceneObject();
 	fireParentObject->AddChild(campFireLightObject);
-	campFireLightObject->SetStatic(false);
+	campFireLightObject->SetStatic(true);
 	campFireLight = objectManager->CreateLight();
 	campFireLight->SetIntensity(1.8f);
 	campFireLight->SetRange(20);
