@@ -57,21 +57,18 @@ namespace GTE
 
 				if(manager != nullptr)
 				{
-					while(queueIndex < manager->GetRenderQueueCount())
+					UInt32 testQueueIndex = 0;
+					while(testQueueIndex < manager->GetRenderQueueCount())
 					{
-						currentQueue = manager->GetRenderQueueAtIndex(queueIndex);
+						currentQueue = manager->GetRenderQueueAtIndex(testQueueIndex);
 						if(currentQueue->GetObjectCount() > 0 && currentQueue->GetID() >= minQueue && currentQueue->GetID() <= maxQueue)
 						{
+							queueIndex = testQueueIndex;
 							valid = true;
 							break;
 						}
-						queueIndex++;
+						testQueueIndex++;
 					}
-				}
-
-				if(queueIndex >= manager->GetRenderQueueCount())
-				{
-					StopIteration();
 				}
 			}
 
@@ -159,14 +156,12 @@ namespace GTE
 		UInt32 minQueue;
 		UInt32 maxQueue;
 
-		Iterator theIterator;
-		Iterator endIterator;
-
 		public:
 		
 		RenderQueueManager();
 		virtual ~RenderQueueManager();
 
+		Int32 GetRenderQueueID(UInt32 index);
 		RenderQueue* GetRenderQueueForID(UInt32 id);
 		RenderQueue* GetRenderQueueAtIndex(UInt32 index);
 		void ClearAllRenderQueues();
@@ -174,10 +169,13 @@ namespace GTE
 
 		UInt32 GetRenderQueueCount() const;
 
-		ConstIterator& Begin();
-		ConstIterator& Begin(Bool limitQueue, UInt32 minQueue, UInt32 maxQueue);
-		ConstIterator& BeginWithRange(UInt32 minQueue, UInt32 maxQueue);
-		ConstIterator& End();
+		UInt32 GetMaxQueue() const;
+		UInt32 GetMinQueue() const;
+
+		ConstIterator Begin();
+		ConstIterator Begin(UInt32 minQueue, UInt32 maxQueue);
+		ConstIterator BeginWithRange(UInt32 minQueue, UInt32 maxQueue);
+		ConstIterator End();
 	};
 }
 

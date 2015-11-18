@@ -21,8 +21,10 @@ namespace GTE
 {
 	enum class RenderQueueType
 	{
-		Geometry = 1000,
-		Transparent = 2000,
+		Opaque = 1000,
+		OpaquePostSSAO = 2000,
+		Skybox = 3000,
+		Transparent = 4000,
 		MaxQueue = 10000
 	};
 

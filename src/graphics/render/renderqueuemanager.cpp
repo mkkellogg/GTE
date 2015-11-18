@@ -41,6 +41,16 @@ namespace GTE
 	}
 
 	/*
+	* Get the queue ID of the render queue at [index].
+	*/
+	Int32 RenderQueueManager::GetRenderQueueID(UInt32 index)
+	{
+		NONFATAL_ASSERT_RTRN(index < renderQueueCount, "RenderQueueManager::GetRenderQueueID -> Index is out of range.", -1, true);
+
+		return renderQueues[index]->GetID();
+	}
+
+	/*
 	* Return the render queue that is linked to [renderQueueID]. If it doesn't
 	* yet exist, create it.
 	*/
@@ -124,28 +134,41 @@ namespace GTE
 		return renderQueueCount;
 	}
 
-	RenderQueueManager::ConstIterator& RenderQueueManager::Begin()
+	/*
+	* Get the largest queue ID managed by this render queue manager;
+	*/
+	UInt32 RenderQueueManager::GetMaxQueue() const
+	{
+		return maxQueue;
+	}
+
+	/*
+	* Get the smallest queue ID managed by this render queue manager;
+	*/
+	UInt32 RenderQueueManager::GetMinQueue() const
+	{
+		return minQueue;
+	}
+
+	RenderQueueManager::ConstIterator RenderQueueManager::Begin()
 	{
 		return BeginWithRange(this->minQueue, this->maxQueue);
 	}
 
-	RenderQueueManager::ConstIterator& RenderQueueManager::Begin(Bool limitQueue, UInt32 minQueue, UInt32 maxQueue)
+	RenderQueueManager::ConstIterator RenderQueueManager::Begin( UInt32 minQueue, UInt32 maxQueue)
 	{
-		if(limitQueue)return BeginWithRange(minQueue, maxQueue);
-		else return BeginWithRange(this->minQueue, this->maxQueue);
+		return BeginWithRange(minQueue, maxQueue);
 	}
 
-	RenderQueueManager::ConstIterator& RenderQueueManager::BeginWithRange(UInt32 minQueue, UInt32 maxQueue)
+	RenderQueueManager::ConstIterator RenderQueueManager::BeginWithRange(UInt32 minQueue, UInt32 maxQueue)
 	{
-		theIterator.Init(this, minQueue, maxQueue);
-		return theIterator;
+		Iterator begin;
+		begin.Init(this, minQueue, maxQueue);
+		return begin;
 	}
 
-	RenderQueueManager::ConstIterator& RenderQueueManager::End()
+	RenderQueueManager::ConstIterator RenderQueueManager::End()
 	{
-		endIterator.valid = false;
-		endIterator.entryIndex = 0;
-		endIterator.queueIndex = 0;
-		return endIterator;
+		return Iterator();
 	}
 }

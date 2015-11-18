@@ -41,7 +41,7 @@ namespace GTE
 		uniformsSetAndVerified = false;
 
 		useLighting = true;
-		renderQueueID = (UInt32)RenderQueueType::Geometry;
+		renderQueueID = (UInt32)RenderQueueType::Opaque;
 		blendingMode = RenderState::BlendingMode::None;
 		sourceBlendingMethod = RenderState::BlendingMethod::SrcAlpha;
 		destBlendingMethod = RenderState::BlendingMethod::OneMinusSrcAlpha;

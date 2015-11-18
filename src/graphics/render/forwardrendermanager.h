@@ -207,12 +207,12 @@ namespace GTE
 		void RenderSceneSSAO(const ViewDescriptor& viewDescriptor);
 		
 		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor);
-		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue);
+		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Int32 queueID);
 
 		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
 									 FowardBlendingFilter blendingFilter,  std::function<Bool(SceneObject*)> filterFunction);
 		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce,
-									 FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue);
+									 FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction, Int32 queueID);
 
 		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const ViewDescriptor& viewDescriptor, 
 						MaterialRef materialOverride, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
@@ -224,7 +224,7 @@ namespace GTE
 										   Transform& outTransform, Real xScale, Real yScale) const;
 		void BuildSceneShadowVolumes();
 		void BuildShadowVolumesForLight(const Light& light, const Transform& lightWorldTransform);
-		void BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection);
+		void BuildShadowVolumesForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection);
 		void CacheShadowVolume(const ObjectPairKey& key, const Point3Array * positions);
 		void ClearCachedShadowVolume(const ObjectPairKey& key);
 		Bool HasCachedShadowVolume(const ObjectPairKey& key)  const;

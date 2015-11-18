@@ -662,7 +662,7 @@ namespace GTE
 	*/
 	void ForwardRenderManager::ClearRenderedStatus()
 	{
-		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
+		for(RenderQueueManager::ConstIterator itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
 		{
 			RenderQueueEntry* entry = *itr;
 
@@ -698,101 +698,109 @@ namespace GTE
 		// clear the appropriate render buffers
 		ClearRenderBuffers(viewDescriptor.ClearBufferMask);
 
-		// we have not yet rendered any ambient lights
+		UInt32 renderQueueCount = renderQueueManager.GetRenderQueueCount();
+
+		// ===========================================
+		// BASE PASS (PRE-SSAO AMBIENT-ONLY PASS)
+		// ===========================================
+
+		// Render all objects that can receive ambient light in render queues preceeding RenderQueueType::Transparent.
+		// These are the objects for which SSAO can be applied, so their ambient pass must be rendered completely
+		// before the SSAO effect, which is screen-space. Objects in render queues greater than or equal to 
+		// RenderQueueType::Transparent will not get SSAO.
 		Bool renderedAmbient = false;
-
-		//===============================
-		// Render AMBIENT
-		//===============================
-
-		// loop through each ambient light and render the scene for that light
-		if (viewDescriptor.AmbientPassEnabled)
+		for(UInt32 queueIndex = 0; queueIndex < renderQueueCount; queueIndex++)
 		{
-			for (UInt32 l = 0; l < ambientLightCount; l++)
+			Int32 queueID = renderQueueManager.GetRenderQueueID(queueIndex);
+
+			if(queueID >= (Int32)RenderQueueType::Transparent)break;
+
+			// loop through each ambient light and render objects in render queue [queueID] for it
+			if(viewDescriptor.AmbientPassEnabled)
 			{
-				SceneObject* lightObject = sceneAmbientLights[l];
-				ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light's scene object is not valid.");
+				for(UInt32 l = 0; l < ambientLightCount; l++)
+				{
+					SceneObject* lightObject = sceneAmbientLights[l];
+					ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Base pass: Ambient light's scene object is not valid.");
 
-				LightRef lightRef = lightObject->GetLight();
-				ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light is not valid.");
+					LightRef lightRef = lightObject->GetLight();
+					ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Base pass: Ambient light is not valid.");
 
-				// render all objects in the scene that have materials the use lighting
-				RenderSceneForLight(lightRef.GetRef(), viewDescriptor);
-				renderedAmbient = true;
+					// render all objects in the scene that have materials the use lighting
+					RenderSceneForLight(lightRef.GetRef(), viewDescriptor, queueID);
+					renderedAmbient = true;
+				}
 			}
 		}
 
 		// we need to fill the depth buffer with the scene to allow
 		// for proper shadow volume rendering and depth-buffer culling
-		if (viewDescriptor.DepthPassEnabled)
+		if(viewDescriptor.DepthPassEnabled)
 		{
 			RenderDepthBuffer(viewDescriptor);
 		}
 
 		// perform the standard screen-space ambient occlusion pass
-		if (renderedAmbient && viewDescriptor.SSAOEnabled && viewDescriptor.SSAOMode == SSAORenderMode::Standard)
+		if(renderedAmbient && viewDescriptor.SSAOEnabled && viewDescriptor.SSAOMode == SSAORenderMode::Standard)
 		{
 			RenderSceneSSAO(viewDescriptor);
 		}
 
+		// =============================
+		// STANDARD PASS 
+		// =============================
 
-		//===============================
-		// Render OPAQUE obejcts
-		//===============================
-
-		// Render opaque geometry render queues for each light -> this means everything below RenderQueueType::Transparent
-		for (UInt32 l = 0; l < lightCount; l++)
+		// Render all objects (both lit an self-lit) in render queues above or equal to RenderQueueType::Transparent.
+		// These are the objects for which SSAO will NOT be applied.
+		Bool skyboxPassComplete = false;
+		for(UInt32 queueIndex = 0; queueIndex < renderQueueCount; queueIndex++)
 		{
-			SceneObject* lightObject = sceneLights[l];
-			ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light's scene object is not valid.");
+			Int32 queueID = renderQueueManager.GetRenderQueueID(queueIndex);
 
-			LightRef lightRef = lightObject->GetLight();
-			ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light is not valid.");
+			// loop through each ambient light and render objects in render queue [queueID] for it
+			if(viewDescriptor.AmbientPassEnabled && queueID >= (Int32)RenderQueueType::Transparent)
+			{
+				for(UInt32 l = 0; l < ambientLightCount; l++)
+				{
+					SceneObject* lightObject = sceneAmbientLights[l];
+					ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light's scene object is not valid.");
 
-			// render all objects in the scene that have materials that use lighting
-			RenderSceneForLight(lightRef.GetRef(), viewDescriptor, true, 0, (UInt32)RenderQueueType::Transparent - 1);
+					LightRef lightRef = lightObject->GetLight();
+					ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light is not valid.");
+
+					// render all objects in the scene that have materials the use lighting
+					RenderSceneForLight(lightRef.GetRef(), viewDescriptor, queueID);
+					renderedAmbient = true;
+				}
+			}
+
+			// Render objects in render queue [queueID] for each light for  -> this means everything below RenderQueueType::Transparent
+			for(UInt32 l = 0; l < lightCount; l++)
+			{
+				SceneObject* lightObject = sceneLights[l];
+				ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light's scene object is not valid.");
+
+				LightRef lightRef = lightObject->GetLight();
+				ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light is not valid.");
+
+				RenderSceneForLight(lightRef.GetRef(), viewDescriptor, queueID);
+			}
+
+			// Render objects in render queue [queueID] for meshes that have materials which DO NOT use lighting.
+			RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr, queueID);
+
+			if(!skyboxPassComplete && (queueIndex == renderQueueCount - 1 || renderQueueManager.GetRenderQueueID(queueIndex + 1) >= (Int32)RenderQueueType::Skybox))
+			{
+				// perform the screen-space ambient occlusion pass as an outline effect
+				if(viewDescriptor.SSAOEnabled && viewDescriptor.SSAOMode == SSAORenderMode::Outline)
+				{
+					RenderSceneSSAO(viewDescriptor);
+				}
+
+				skyboxPassComplete = true;
+				RenderSkyboxForCamera(viewDescriptor);
+			}
 		}
-
-		// perform the screen-space ambient occlusion pass as an outline effect
-		if (viewDescriptor.SSAOEnabled && viewDescriptor.SSAOMode == SSAORenderMode::Outline)
-		{
-			RenderSceneSSAO(viewDescriptor);
-		}
-
-		// Render OPAQUE geometry render queues for meshes that have materials which DO NOT use lighting.
-		RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr, true, 0, (UInt32)RenderQueueType::Transparent - 1);
-
-
-		//===============================
-		// Render SKYBOX (if enabled)
-		//===============================
-		if(viewDescriptor.SkyboxEnabled)
-		{
-			RenderSkyboxForCamera(viewDescriptor);
-		}
-
-
-		//===============================
-		// Render TRANSPARENT obejcts
-		//===============================
-
-		// Render transparent render queues and above for each light
-		for(UInt32 l = 0; l < lightCount; l++)
-		{
-			SceneObject* lightObject = sceneLights[l];
-			ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light's scene object is not valid.");
-
-			LightRef lightRef = lightObject->GetLight();
-			ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light is not valid.");
-
-			// render all objects in the scene that have materials that use lighting
-			RenderSceneForLight(lightRef.GetRef(), viewDescriptor, true, (UInt32)RenderQueueType::Transparent, (UInt32)RenderQueueType::MaxQueue);
-		}
-
-		// Render TRANSPARENT render queues and above for meshes that have materials which DO NOT use lighting.
-		RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr, true, (UInt32)RenderQueueType::Transparent, (UInt32)RenderQueueType::MaxQueue);
-
-
 
 		// restore default graphics state
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
@@ -911,7 +919,7 @@ namespace GTE
 
 	void ForwardRenderManager::RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor)
 	{
-		RenderSceneForLight(light, viewDescriptor, false, 0, 0);
+		RenderSceneForLight(light, viewDescriptor, -1);
 	}
 	/*
 	 * Forward-Render the scene for a single light [light] from the perspective
@@ -926,7 +934,7 @@ namespace GTE
 	 *
 	 * [viewDescriptor.UniformWorldSceneObjectTransform] is pre-multiplied with the transform of each rendered scene object & light
 	 */
-	void ForwardRenderManager::RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue)
+	void ForwardRenderManager::RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Int32 queueID)
 	{
 		Transform modelView;
 		Transform model;
@@ -965,7 +973,15 @@ namespace GTE
 					continue;
 			}
 
-			for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(limitQueues, minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
+			UInt32 minQueue = renderQueueManager.GetMinQueue();
+			UInt32 maxQueue = renderQueueManager.GetMaxQueue();
+
+			if(queueID >= 0)
+			{
+				minQueue = maxQueue = queueID;
+			}
+
+			for(RenderQueueManager::ConstIterator itr = renderQueueManager.Begin(minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
 			{				
 				RenderQueueEntry* entry = *itr;
 				NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
@@ -1035,7 +1051,7 @@ namespace GTE
 	void ForwardRenderManager::RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce,
 													   FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction)
 	{
-		RenderSceneWithoutLight(viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter, filterFunction, false, 0, 0);
+		RenderSceneWithoutLight(viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter, filterFunction, -1);
 	}
 
 	/*
@@ -1051,11 +1067,19 @@ namespace GTE
 	* [filterFunction] - Used to filter out select scene objects.
 	*/
 	void ForwardRenderManager::RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
-													   FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction, Bool limitQueues, UInt32 minQueue, UInt32 maxQueue)
+													   FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction, Int32 queueID)
 	{
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 
-		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(limitQueues, minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
+		UInt32 minQueue = renderQueueManager.GetMinQueue();
+		UInt32 maxQueue = renderQueueManager.GetMaxQueue();
+
+		if(queueID >= 0)
+		{
+			minQueue = maxQueue = queueID;
+		}
+
+		for(RenderQueueManager::ConstIterator itr = renderQueueManager.Begin(minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
 		{
 			RenderQueueEntry* entry = *itr;
 
@@ -1320,7 +1344,7 @@ namespace GTE
 		Vector3 lightDirection = light.GetDirection();
 		lightWorldTransform.TransformVector(lightDirection);
 
-		for(RenderQueueManager::ConstIterator& itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
+		for(RenderQueueManager::ConstIterator itr = renderQueueManager.Begin(); itr != renderQueueManager.End(); ++itr)
 		{
 			RenderQueueEntry* entry = *itr;
 			NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::BuildShadowVolumesForLight -> Null render queue entry encountered.", true);
@@ -1338,7 +1362,7 @@ namespace GTE
 				if(!ShouldCullFromLightByLayer(light, *sceneObject) &&
 					!ShouldCullFromLightByPosition(light, lightWorldPosition, *entry->Mesh, sceneObjectWorldTransform))
 				{
-					BuildShadowVolumesForSceneObject(*sceneObject, light, lightWorldPosition, lightDirection);
+					BuildShadowVolumesForMesh(*entry, light, lightWorldPosition, lightDirection);
 				}
 			}
 		}
@@ -1348,101 +1372,88 @@ namespace GTE
 	 * Build (and cache) shadow volumes for the meshes attached to [sceneObject] for [light], using
 	 * [lightPosition] as the light's world position.
 	 */
-	void ForwardRenderManager::BuildShadowVolumesForSceneObject(SceneObject& sceneObject, const Light& light, const Point3& lightPosition, const Vector3& lightDirection)
+	void ForwardRenderManager::BuildShadowVolumesForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection)
 	{
+		SubMesh3DRenderer *renderer = entry.Renderer;
+		NONFATAL_ASSERT(renderer != nullptr, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Null renderer encountered.", true);
+
+		SceneObject * container = entry.Container;
+		NONFATAL_ASSERT(container != nullptr, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Null scene object encountered.", true);
+
+		SubMesh3D * mesh = entry.Mesh;
+		Mesh3DFilterRef filter = container->GetMesh3DFilter();
+
+		NONFATAL_ASSERT(mesh != nullptr, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Null mesh encountere.", true);
+		NONFATAL_ASSERT(filter != nullptr, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Null mesh filter encountered.", true);
+
+		// if mesh doesn't have face data, it can't have a shadow volume
+		if(!mesh->HasFaces())return;
+
+		Light& castLight = const_cast<Light&>(light);
+		SceneObjectRef lightObject = castLight.GetSceneObject();
+
+		// a shadow volume is dynamic if the light's scene object is not static or the mesh's
+		// scene object is not static
+		Bool dynamic = !(container->IsStatic()) || !(lightObject->IsStatic());
+
+		ObjectPairKey cacheKey;
+		Bool cached = false;
+
+		// form cache key from sub-renderer's object ID and light's object ID
+		cacheKey.ObjectAID = renderer->GetObjectID();
+		cacheKey.ObjectBID = light.GetObjectID();
+
+		const Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
+
+		// check if this shadow volume is already cached
+		if(cachedShadowVolume != nullptr)
+		{
+			cached = true;
+		}
+
+		// if the mesh is dynamic we must always rebuild the shadow volume
+		if(cached && !dynamic)
+		{
+			return;
+		}
+
 		Transform modelViewProjection;
 		Transform modelView;
 		Transform model;
 		Transform modelInverse;
 
-		RendererRef baseRenderer = sceneObject.GetRenderer();
-		Mesh3DRenderer * meshRenderer = dynamic_cast<SkinnedMesh3DRenderer*>(baseRenderer.GetPtr());
-		if(meshRenderer == nullptr)
+		// calculate model transform and inverse model transform
+		SceneObjectProcessingDescriptor& processingDesc = container->GetProcessingDescriptor();
+		model.SetTo(processingDesc.AggregateTransform);
+		modelInverse.SetTo(model);
+		modelInverse.Invert();
+
+		// calculate the position and/or direction of [light]
+		// in the mesh's local space
+		Point3 modelLocalLightPos = lightPosition;
+		Vector3 modelLocalLightDir = lightDirection;
+		modelInverse.TransformPoint(modelLocalLightPos);
+		modelInverse.TransformVector(modelLocalLightDir);
+
+		Vector3 lightPosDir;
+		if (light.GetType() == LightType::Directional)
 		{
-			meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer.GetPtr());
+			lightPosDir.x = modelLocalLightDir.x;
+			lightPosDir.y = modelLocalLightDir.y;
+			lightPosDir.z = modelLocalLightDir.z;
+		}
+		else
+		{
+			lightPosDir.x = modelLocalLightPos.x;
+			lightPosDir.y = modelLocalLightPos.y;
+			lightPosDir.z = modelLocalLightPos.z;
 		}
 
-		if (meshRenderer != nullptr)
-		{
-			Mesh3DRef mesh = meshRenderer->GetTargetMesh();
-			Mesh3DFilterRef filter = sceneObject.GetMesh3DFilter();
+		// calculate shadow volume geometry
+		renderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional || light.GetType() == LightType::Planar, filter->GetUseBackSetShadowVolume());
 
-			NONFATAL_ASSERT(mesh.IsValid(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Renderer returned null mesh.", true);
-			NONFATAL_ASSERT(filter.IsValid(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Scene object has null mesh filter.", true);
-			NONFATAL_ASSERT(mesh->GetSubMeshCount() == meshRenderer->GetSubRendererCount(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Sub mesh count does not match sub renderer count!.", true);
-			NONFATAL_ASSERT(meshRenderer->GetMaterialCount() > 0, "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Renderer has no materials.", true);
-
-			// calculate model transform and inverse model transform
-			SceneObjectProcessingDescriptor& processingDesc = sceneObject.GetProcessingDescriptor();
-			model.SetTo(processingDesc.AggregateTransform);
-			modelInverse.SetTo(model);
-			modelInverse.Invert();
-
-			// calculate the position and/or direction of [light]
-			// in the mesh's local space
-			Point3 modelLocalLightPos = lightPosition;
-			Vector3 modelLocalLightDir = lightDirection;
-			modelInverse.TransformPoint(modelLocalLightPos);
-			modelInverse.TransformVector(modelLocalLightDir);
-
-			// loop through each sub-renderer and render the shadow volume for its sub-mesh
-			for (UInt32 i = 0; i < meshRenderer->GetSubRendererCount(); i++)
-			{
-				SubMesh3DRendererRef subRenderer = meshRenderer->GetSubRenderer(i);
-				SubMesh3DRef subMesh = mesh->GetSubMesh(i);
-
-				// if mesh doesn't have face data, it can't have a shadow volume
-				if (!subMesh->HasFaces())continue;
-
-				NONFATAL_ASSERT(subRenderer.IsValid(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Null sub renderer encountered.", true);
-				NONFATAL_ASSERT(subMesh.IsValid(), "ForwardRenderManager::BuildShadowVolumesForSceneObject -> Null sub mesh encountered.", true);
-
-				Vector3 lightPosDir;
-				if (light.GetType() == LightType::Directional)
-				{
-					lightPosDir.x = modelLocalLightDir.x;
-					lightPosDir.y = modelLocalLightDir.y;
-					lightPosDir.z = modelLocalLightDir.z;
-				}
-				else
-				{
-					lightPosDir.x = modelLocalLightPos.x;
-					lightPosDir.y = modelLocalLightPos.y;
-					lightPosDir.z = modelLocalLightPos.z;
-				}
-
-				Light& castLight = const_cast<Light&>(light);
-				SceneObjectRef lightObject = castLight.GetSceneObject();
-
-				ObjectPairKey cacheKey;
-				Bool cached = false;
-
-				// a shadow volume is dynamic if the light's scene object is not static or the mesh's
-				// scene object is not static
-				Bool dynamic = !(sceneObject.IsStatic()) || !(lightObject->IsStatic());
-
-				// form cache key from sub-renderer's object ID and light's object ID
-				cacheKey.ObjectAID = subRenderer->GetObjectID();
-				cacheKey.ObjectBID = light.GetObjectID();
-
-				const Point3Array * cachedShadowVolume = GetCachedShadowVolume(cacheKey);
-
-				// check if this shadow volume is already cached
-				if (cachedShadowVolume != nullptr)
-				{
-					cached = true;
-				}
-
-				if (!cached || dynamic) // always rebuild dynamic shadow volumes
-				{
-					// calculate shadow volume geometry
-					subRenderer->BuildShadowVolume(lightPosDir, light.GetType() == LightType::Directional || light.GetType() == LightType::Planar, filter->GetUseBackSetShadowVolume());
-
-					// cache shadow volume for later rendering
-					CacheShadowVolume(cacheKey, subRenderer->GetShadowVolumePositions());
-				}
-			}
-		}
+		// cache shadow volume for later rendering
+		CacheShadowVolume(cacheKey, renderer->GetShadowVolumePositions());
 	}
 
 	/*
