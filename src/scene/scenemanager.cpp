@@ -128,6 +128,10 @@ namespace GTE
 
 				// concatenate the current view transform with that of the current scene object
 				Transform& localTransform = child->GetTransform();
+				if(!child->InheritsTransform())
+				{
+					aggregateTransform.SetIdentity();
+				}
 				aggregateTransform.TransformBy(localTransform);
 
 				// save the aggregate/global/world transform

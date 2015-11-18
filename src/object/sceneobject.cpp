@@ -33,6 +33,7 @@ namespace GTE
 	{
 		isActive = true;
 		isStatic = false;
+		inheritTransform = true;
 
 		transform.SetIdentity();
 		transform.SetSceneObject(this);
@@ -67,6 +68,16 @@ namespace GTE
 	void SceneObject::SetStatic(Bool isStatic)
 	{
 		this->isStatic = isStatic;
+	}
+
+	Bool SceneObject::InheritsTransform() const
+	{
+		return inheritTransform;
+	}
+
+	void SceneObject::SetInheritsTransform(Bool inherit)
+	{
+		this->inheritTransform = inheritTransform;
 	}
 
 	void SceneObject::SetName(const std::string& name)

@@ -100,12 +100,14 @@ namespace GTE
 		Transform full;
 		if (includeSelf)full.SetTo(sceneObject->GetConstTransform());
 		SceneObjectSharedPtr parent = sceneObject->GetParent();
-		while (parent.IsValid())
+		Bool inheritsTransform = sceneObject->InheritsTransform();
+		while (parent.IsValid() && inheritsTransform)
 		{
 			// Since we are processing the ancestors in reverse order (going up the tree)
 			// we pre-multiply, to have the end effect of post-multiplication in
 			// the normal order
 			full.PreTransformBy(parent->GetTransform());
+			inheritsTransform = parent->InheritsTransform();
 			parent = parent->GetParent();
 		}
 		// optionally invert

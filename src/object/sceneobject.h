@@ -64,6 +64,7 @@ namespace GTE
 		std::string name;
 		Bool isActive;
 		Bool isStatic;
+		Bool inheritTransform;
 		SceneObjectTransform transform;
 		std::vector<SceneObjectSharedPtr> children;
 		SceneObjectSharedPtr parent;
@@ -86,6 +87,8 @@ namespace GTE
 		void SetActive(Bool active);
 		Bool IsStatic();
 		void SetStatic(Bool isStatic);
+		Bool InheritsTransform() const;
+		void SetInheritsTransform(Bool inherit);
 		void SetName(const std::string& name);
 		const std::string& GetName();
 
