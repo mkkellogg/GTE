@@ -22,8 +22,10 @@ vec4 getQuadPosition()
 	vec3 axisY = VIEW_AXIS_Y;
 	vec3 axisZ = VIEW_AXIS_Z;
 
-	axisX *= cos( PARTICLE_ROTATION );
-	axisY *= sin( PARTICLE_ROTATION );
+	float rotation = PARTICLE_ROTATION;
+
+	axisX *= cos( rotation );
+	axisY *= sin( rotation );
 
 	axisX += axisY;
 	axisY = cross( axisZ, axisX );

@@ -1169,11 +1169,17 @@ void Game::HandleGeneralInput()
 		break;
 	}
 
+	// trigger water ripple in pool scene
 	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::SpaceBar))
 	{
 		poolScene->TriggerRippleDrop();
 	}
 
+	// toggle smoke in castle scene
+	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::M))
+	{
+		castleScene->ToggleSmoke();
+	}
 
 	// toggle skybox
 	if(inputManager->ShouldHandleOnKeyDown(GTE::Key::S))

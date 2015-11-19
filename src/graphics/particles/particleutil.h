@@ -64,6 +64,7 @@ namespace GTE
 		}
 	};
 
+	template <> void ParticleUtil::GetRandom<Real>(const Real& offset, const Real& range, Real& target, Bool edgeClamp, ParticleRangeType rangeType);
 	template <> void ParticleUtil::Lerp<Real>(const Real& a, const Real& b, Real& target, Real t);
 }
 

@@ -705,6 +705,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	std::string materialName = "ParticlesUnlit";
 	GTE::MaterialRef flameMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
 	ASSERT(flameMaterial.IsValid(), "Unable to create flame material!\n");
+	flameMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent);
 
 	// load texture for the flame's atlas
 	GTE::TextureAttributes texAttributes;
@@ -806,7 +807,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	// Setup smoke particle system
 	//================================
 
-	GTE::SceneObjectRef smokeSystemObject = objectManager->CreateSceneObject();
+	smokeSystemObject = objectManager->CreateSceneObject();
 	ASSERT(smokeSystemObject.IsValid(), "Unable to create smoke particle system object!\n");
 	fireParentObject->AddChild(smokeSystemObject);
 
@@ -835,19 +836,30 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	smokeSystem->SetZSort(true);
 
 	GTE::RandomModifier<GTE::Point3> smokePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.5f, 0.0f, 0.5f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> smokeVelocityModifier(GTE::Vector3(0.0f, 9.0f, 0.0f), GTE::Vector3(0.5f, 2.6f, 2.5f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector3> smokeVelocityModifier(GTE::Vector3(0.0f, 9.0f, 0.0f), GTE::Vector3(0.5f, 2.6f, 0.5f), GTE::ParticleRangeType::Sphere, false, true);
 	GTE::RandomModifier<GTE::Vector3> smokeAccelerationModifier(GTE::Vector3(0.0f, -1.8f, 0.0f), GTE::Vector3(3.5f, 2.0f, 3.5f), GTE::ParticleRangeType::Cube, false, true);
+
+	GTE::RandomModifier<GTE::Real> smokeRotationModifier(0.0f, 360.0f, GTE::ParticleRangeType::Linear, false, true);
+	GTE::RandomModifier<GTE::Real> smokeRotationalSpeedModifier(50.0f, 400.0f, GTE::ParticleRangeType::Linear, false, true);
+
 	GTE::EvenIntervalIndexModifier smokeAtlasModifier(1);
 
 	GTE::FrameSetModifier<GTE::Vector2> smokeSizeModifier;
 	smokeSizeModifier.AddFrame(0.0f, GTE::Vector2(1.0f, 1.0f));
 	smokeSizeModifier.AddFrame(4.0f, GTE::Vector2(5.0f, 5.0f));
 
-	GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
+	/*GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
 	smokeAlphaModifier.AddFrame(0.0f, 0.0f);
 	smokeAlphaModifier.AddFrame(1.0f, 0.16f);
 	smokeAlphaModifier.AddFrame(2.0f, 0.32f);
 	smokeAlphaModifier.AddFrame(3.0f, 0.16f);
+	smokeAlphaModifier.AddFrame(4.0f, 0.0f);*/
+
+	GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
+	smokeAlphaModifier.AddFrame(0.0f, 0.0f);
+	smokeAlphaModifier.AddFrame(1.0f, 0.10f);
+	smokeAlphaModifier.AddFrame(2.0f, 0.20f);
+	smokeAlphaModifier.AddFrame(3.0f, 0.20f);
 	smokeAlphaModifier.AddFrame(4.0f, 0.0f);
 
 	GTE::FrameSetModifier<GTE::Color4> smokeColorModifier;
@@ -857,11 +869,14 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 	smokeSystem->BindPositionModifier(smokePositionModifier);
 	smokeSystem->BindVelocityModifier(smokeVelocityModifier);
+	smokeSystem->BindAccelerationModifier(smokeAccelerationModifier);
+	smokeSystem->BindRotationModifier(smokeRotationModifier);
+	smokeSystem->BindRotationalSpeedModifier(smokeRotationalSpeedModifier);
 	smokeSystem->BindSizeModifier(smokeSizeModifier);
 	smokeSystem->BindAlphaModifier(smokeAlphaModifier);
 	smokeSystem->BindColorModifier(smokeColorModifier);
 	smokeSystem->BindAtlasModifier(smokeAtlasModifier);
-	smokeSystem->BindAccelerationModifier(smokeAccelerationModifier);
+	
 
 	GTE::LayerManager& layerManager = objectManager->GetLayerManager();
 	GTE::Int32 smokeLayerIndex = layerManager.AddLayer(SmokeLayer);
@@ -952,4 +967,9 @@ void CastleScene::FlickerCampFireLightLight()
 std::vector<GTE::SceneObjectSharedPtr>& CastleScene::GetPointLights()
 {
 	return pointLights;
+}
+
+void CastleScene::ToggleSmoke()
+{
+	smokeSystemObject->SetActive(!smokeSystemObject->IsActive());
 }

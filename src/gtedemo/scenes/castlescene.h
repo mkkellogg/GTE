@@ -33,8 +33,18 @@ class CastleScene : public Scene
 	GTE::LightSharedPtr campFireLight;
 	// last time light flickering was updated
 	GTE::Real lastFlickerTime;
+	// scene obejct that contains the smoke particle system
+	GTE::SceneObjectSharedPtr smokeSystemObject;
 
 	static const std::string SmokeLayer;
+
+	void FlickerCampFireLightLight();
+	void SetupTerrain(GTE::AssetImporter& importer);
+	void SetupStructures(GTE::AssetImporter& importer);
+	void SetupPlants(GTE::AssetImporter& importer);
+	void SetupExtra(GTE::AssetImporter& importer);
+	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
+	void SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
 
 public:
 
@@ -45,16 +55,8 @@ public:
 	void OnActivate();
 	void Update();
 	void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject, GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject);
-
-	void SetupTerrain(GTE::AssetImporter& importer);
-	void SetupStructures(GTE::AssetImporter& importer);
-	void SetupPlants(GTE::AssetImporter& importer);
-	void SetupExtra(GTE::AssetImporter& importer);
-	void SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
-	void SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr playerObject);
-	void FlickerCampFireLightLight();
-
 	std::vector<GTE::SceneObjectSharedPtr>& GetPointLights();
+	void ToggleSmoke();
 };
 
 #endif

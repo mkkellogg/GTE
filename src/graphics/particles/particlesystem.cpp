@@ -165,7 +165,7 @@ namespace GTE
 		vertexCount = maxParticleCount * (UInt32)ParticleConstants::VerticesPerParticle;
 	}
 
-	void ParticleSystem::GetCameraWorldAxes(Camera& camera, Vector3& axisX, Vector3 axisY, Vector3& axisZ)
+	void ParticleSystem::GetCameraWorldAxes(Camera& camera, Vector3& axisX, Vector3& axisY, Vector3& axisZ)
 	{
 		SceneObjectRef cameraSceneObject = camera.GetSceneObject();
 		Transform cameraWorld;
@@ -178,9 +178,13 @@ namespace GTE
 		cameraWorld.TransformVector(axisY);
 
 		Vector3::Cross(axisY, axisZ, axisX);
+
+		axisY.Normalize();
+		axisX.Normalize();
+		axisZ.Normalize();
 	}
 
-	void ParticleSystem::GenerateXYAlignedQuadForParticle(Particle* particle, Vector3& axisX, Vector3 axisY, Vector3& axisZ, Point3& p1, Point3& p2, Point3& p3, Point3& p4)
+	void ParticleSystem::GenerateXYAlignedQuadForParticle(Particle* particle, Vector3& axisX, Vector3& axisY, Vector3& axisZ, Point3& p1, Point3& p2, Point3& p3, Point3& p4)
 	{
 		Point3 position = particle->Position;
 		Real rotation = particle->Rotation;
@@ -217,14 +221,6 @@ namespace GTE
 
 		GetCameraWorldAxes(*currentCamera, vectorX, vectorY, vectorZ);
 
-
-		/////////////////////////////////
-		//vectorX.Set(1, 0, 0);
-		//vectorY.Set(0, 1, 0);
-		//vectorZ.Set(0, 0, 1);
-		///////////////////////////////////
-
-
 		particleMaterial->SetUniform3f(vectorX.x, vectorX.y, vectorX.z, "VIEW_AXIS_X");
 		particleMaterial->SetUniform3f(vectorY.x, vectorY.y, vectorY.z, "VIEW_AXIS_Y");
 		particleMaterial->SetUniform3f(vectorZ.x, vectorZ.y, vectorZ.z, "VIEW_AXIS_Z");
@@ -258,17 +254,6 @@ namespace GTE
 			positions->GetPoint(baseIndex + 3)->SetTo(position);
 			positions->GetPoint(baseIndex + 4)->SetTo(position);
 			positions->GetPoint(baseIndex + 5)->SetTo(position);
-
-
-			/////////////////////////////////////////////////////
-			//positions->GetPoint(baseIndex)->Set(-1, 1, 0);
-			//positions->GetPoint(baseIndex + 1)->Set(1, 1, 0);
-			//positions->GetPoint(baseIndex + 2)->Set(-1, -1, 0);
-			//positions->GetPoint(baseIndex + 3)->Set(-1, -1, 0);
-			//positions->GetPoint(baseIndex + 4)->Set(1, 1, 0);
-			//positions->GetPoint(baseIndex + 5)->Set(1, -1, 0);
-			/////////////////////////////////////////////////////////////////
-
 		
 			Atlas::ImageDescriptor * imageDesc = atlas->GetImageDescriptor(particle->AtlasIndex);
 			UV2Array * uvs = targetMesh->GetUVs0();
