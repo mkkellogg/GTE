@@ -34,6 +34,8 @@ class CastleScene : public Scene
 	// last time light flickering was updated
 	GTE::Real lastFlickerTime;
 
+	static const std::string SmokeLayer;
+
 public:
 
 	CastleScene();

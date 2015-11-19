@@ -14,6 +14,7 @@
 #include "object/enginetypes.h"
 #include "gtemath/gtemath.h"
 #include "geometry/vector/vector3.h"
+#include "geometry/point/point3.h"
 #include "graphics/color/color4.h"
 #include "particles.h"
 #include <vector>
@@ -23,7 +24,10 @@ namespace GTE
 {
 	class Particle
 	{
+		friend class ParticleSystem;
+
 		Vector3 _tempVector3;
+		Point3 _tempPoint3;
 
 		public:
 
@@ -47,7 +51,7 @@ namespace GTE
 		{
 			Alpha = 1.0f;
 			Age = 0.0f;
-			AtlasIndex = 1;
+			AtlasIndex = 0;
 			Alive = false;
 			LifeSpan = 0.0f;
 

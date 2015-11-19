@@ -141,7 +141,9 @@ namespace GTE
 		void CleanupDeadParticles();
 
 		void SortParticleArray(const Matrix4x4& mvpMatrix);
-		void QuickSortParticleArray(Particle** array, UInt32 left, UInt32 right);
+		void QuickSortParticleArray(Particle** array, Int32 left, Int32 right);
+		void QuickSortSwap(Particle** particleArray, Int32 a, Int32 b);
+		UInt32 QuickSortPartition(Particle** particleArray, Int32 left, Int32 right);
 
 		ParticleSystem();
 		virtual ~ParticleSystem();
@@ -164,6 +166,9 @@ namespace GTE
 		Bool BindSizeModifier(const ParticleModifier<Vector2>& modifier);
 
 		void SetPremultiplyAlpha(Bool premultiply);
+		void SetZSort(Bool sort);
+
+		SceneObjectRef GetMeshSceneObject();
 
 		static MaterialSharedPtr CreateMaterial(const std::string& shaderName, const std::string& materialName);
 	};

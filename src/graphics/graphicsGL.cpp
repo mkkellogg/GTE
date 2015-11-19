@@ -946,9 +946,10 @@ namespace GTE
 			{
 				// OpenGL call to activate the shader for [material]
 				glUseProgram(shaderGL->GetProgramID());
-			}
-			SetupStateForMaterial(material, reverseFaceCulling);
+			}			
 		}
+
+		SetupStateForMaterial(material, reverseFaceCulling);
 	}
 
 	/*

@@ -47,6 +47,9 @@
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
 
+
+const std::string CastleScene::SmokeLayer = "Smoke";
+
 /*
  * Constructor - initialize member variables.
  */
@@ -799,6 +802,70 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	emberSystem->BindAtlasModifier(emberAtlasModifier);
 	emberSystem->BindAccelerationModifier(emberAccelerationModifier);
 
+	//================================
+	// Setup smoke particle system
+	//================================
+
+	GTE::SceneObjectRef smokeSystemObject = objectManager->CreateSceneObject();
+	ASSERT(smokeSystemObject.IsValid(), "Unable to create smoke particle system object!\n");
+	fireParentObject->AddChild(smokeSystemObject);
+
+	// create material for rendering smoke particles
+	shaderName = "particles_lit";
+	materialName = "ParticlesLit";
+	GTE::MaterialRef smokeMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
+	ASSERT(smokeMaterial.IsValid(), "Unable to create smoke material!\n");
+	smokeMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
+	smokeMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
+	smokeMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
+	smokeMaterial->SetUseLighting(true);
+	smokeMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
+
+	// load texture for the smoke particle
+	GTE::TextureRef smokeTexture = objectManager->CreateTexture("resources/textures/particles/smokeparticle.png", texAttributes);
+	ASSERT(smokeTexture.IsValid(), "Unable to load smoke texture!\n");
+
+	GTE::AtlasRef smokeAtlas = objectManager->CreateAtlas(smokeTexture, true);
+	ASSERT(smokeAtlas.IsValid(), "Unable to create smoke atlas!\n");
+
+	GTE::ParticleSystemRef smokeSystem = objectManager->CreateParticleSystem(smokeMaterial, smokeAtlas, false, 150.0f, 4.0f, 0.0f);
+	ASSERT(smokeSystem.IsValid(), "Unable to create smoke particle system!\n");
+	smokeSystemObject->SetParticleSystem(smokeSystem);
+	smokeSystem->SetPremultiplyAlpha(false);
+	smokeSystem->SetZSort(true);
+
+	GTE::RandomModifier<GTE::Point3> smokePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.5f, 0.0f, 0.5f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector3> smokeVelocityModifier(GTE::Vector3(0.0f, 7.5f, 0.0f), GTE::Vector3(0.5f, 2.6f, 2.5f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector3> smokeAccelerationModifier(GTE::Vector3(0.0f, -1.8f, 0.0f), GTE::Vector3(3.5f, 2.0f, 3.5f), GTE::ParticleRangeType::Cube, false, true);
+	GTE::EvenIntervalIndexModifier smokeAtlasModifier(1);
+
+	GTE::FrameSetModifier<GTE::Vector2> smokeSizeModifier;
+	smokeSizeModifier.AddFrame(0.0f, GTE::Vector2(1.0f, 1.0f));
+	smokeSizeModifier.AddFrame(4.0f, GTE::Vector2(5.0f, 5.0f));
+
+	GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
+	smokeAlphaModifier.AddFrame(0.0f, 0.0f);
+	smokeAlphaModifier.AddFrame(1.0f, 0.04f);
+	smokeAlphaModifier.AddFrame(2.0f, 0.08f);
+	smokeAlphaModifier.AddFrame(4.0f, 0.0f);
+
+	GTE::FrameSetModifier<GTE::Color4> smokeColorModifier;
+	smokeColorModifier.AddFrame(0.0f, GTE::Color4(0.4f, 0.4f, 0.4f, 1.0f));
+	smokeColorModifier.AddFrame(1.5f, GTE::Color4(0.6f, 0.6f, 0.6f, 1.0f));
+	smokeColorModifier.AddFrame(4.0f, GTE::Color4(0.8f, 0.8f, 0.8f, 1.0f));
+
+	smokeSystem->BindPositionModifier(smokePositionModifier);
+	smokeSystem->BindVelocityModifier(smokeVelocityModifier);
+	smokeSystem->BindSizeModifier(smokeSizeModifier);
+	smokeSystem->BindAlphaModifier(smokeAlphaModifier);
+	smokeSystem->BindColorModifier(smokeColorModifier);
+	smokeSystem->BindAtlasModifier(smokeAtlasModifier);
+	smokeSystem->BindAccelerationModifier(smokeAccelerationModifier);
+
+	GTE::LayerManager& layerManager = objectManager->GetLayerManager();
+	GTE::Int32 smokeLayerIndex = layerManager.AddLayer(SmokeLayer);
+	GTE::IntMask smokeLayerMask = layerManager.GetLayerMask(smokeLayerIndex);
+	smokeSystem->GetMeshSceneObject()->SetLayerMask(smokeLayerMask);
 
 	//================================
 	// Setup campfire light
@@ -813,6 +880,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	campFireLight->SetColor(1.0f, 0.6f, 0.0f, 1.0f);
 	GTE::IntMask mergedMask = campFireLight->GetCullingMask();
 	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, playerObject->GetLayerMask());
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, smokeLayerMask);
 	campFireLight->SetCullingMask(mergedMask);
 	campFireLight->SetShadowsEnabled(true);
 	campFireLight->SetType(GTE::LightType::Point);
@@ -820,7 +888,6 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	pointLights.push_back(campFireLightObject);
 	campFireLightLocalOffset.Set(0, 5, 0);
 	campFireLightObject->GetTransform().Translate(campFireLightLocalOffset, true);
-
 
 	//================================
 	// Load campfire model
@@ -842,9 +909,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	campfireMaterial->SetFaceCulling(GTE::RenderState::FaceCulling::None);
 
 	// move campfire to its final location
-	//fireParentObject->GetTransform().Translate(2.0f, -10.0f, -10.0f, false);
 	fireParentObject->GetTransform().Translate(66.0f, -10.0f, -28.0f, false);
-	//fireParentObject->GetTransform().Translate(50.0f, -10.0f, -5.0f, false);
 }
 
 void CastleScene::FlickerCampFireLightLight()

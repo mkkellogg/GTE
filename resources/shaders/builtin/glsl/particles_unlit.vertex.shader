@@ -1,3 +1,5 @@
+#version 150
+
 #include "particles_vertex_header.inc"
 
 void main() 

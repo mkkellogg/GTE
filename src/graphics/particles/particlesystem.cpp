@@ -381,7 +381,6 @@ namespace GTE
 			SortParticleArray(cameraTransform.GetMatrix());
 		}
 		UpdateShaderWithParticleData();
-		
 
 		age += lastDeltaTime;
 		if(systemLifeSpan != 0.0f && age > systemLifeSpan)
@@ -879,49 +878,59 @@ namespace GTE
 
 	void ParticleSystem::SortParticleArray(const Matrix4x4& mvpMatrix)
 	{
-		memcpy(_tempParticleArray, liveParticleArray, liveParticleCount * sizeof(Particle));
+		memcpy(_tempParticleArray, liveParticleArray, liveParticleCount * sizeof(Particle*));
 
 		// perform full MVP projection on each particle's position so that we can sort by Z in
 		// normalized device coordinates
 		for(UInt32 i = 0; i < liveParticleCount; i++)
 		{
-			_tempParticleArray[i]->Position.ApplyProjection(mvpMatrix);
+			_tempParticleArray[i]->_tempPoint3 = _tempParticleArray[i]->Position;
+			_tempParticleArray[i]->_tempPoint3.ApplyProjection(mvpMatrix);
 		}
 
-		QuickSortParticleArray(_tempParticleArray, 0, liveParticleCount);
+		QuickSortParticleArray(_tempParticleArray, 0, liveParticleCount-1);
 		
-		memcpy(liveParticleArray, _tempParticleArray, liveParticleCount * sizeof(Particle));
+		memcpy(liveParticleArray, _tempParticleArray, liveParticleCount * sizeof(Particle*));
 	}
 
-	void ParticleSystem::QuickSortParticleArray(Particle** particleArray, UInt32 left, UInt32 right)
+	void ParticleSystem::QuickSortParticleArray(Particle** particleArray, Int32 left, Int32 right)
 	{
-		UInt32 i = left, j = right;
-		Particle * tmp;
-		Real pivot = particleArray[(left + right) / 2]->Position.z;
-
-		/* partition */
-		while(i <= j)
+		if(left < right)
 		{
-			while(particleArray[i]->Position.z < pivot)
-				i++;
-			while(particleArray[j]->Position.z > pivot)
-				j--;
-			if(i <= j)
-			{
-				tmp = particleArray[i];
-				particleArray[i] = particleArray[j];
-				particleArray[j] = tmp;
-				i++;
-				j--;
-			}
-		};
-
-		/* recursion */
-		if(left < j)
-			QuickSortParticleArray(particleArray, left, j);
-		if(i < right)
-			QuickSortParticleArray(particleArray, i, right);
+			Int32 p = QuickSortPartition(particleArray, left, right); /* Partitioning index */
+			QuickSortParticleArray(particleArray, left, p - 1);
+			QuickSortParticleArray(particleArray, p + 1, right);
+		}
 	}
+
+	// A utility function to swap two elements
+	void ParticleSystem::QuickSortSwap(Particle** particleArray, Int32 a, Int32 b)
+	{
+		Particle* t = particleArray[a];
+		particleArray[a] = particleArray[b];
+		particleArray[b] = t;
+	}
+
+	/* This function takes last element as pivot, places the pivot element at its
+	correct position in sorted array, and places all smaller (smaller than pivot)
+	to left of pivot and all greater elements to right of pivot */
+	UInt32 ParticleSystem::QuickSortPartition(Particle** particleArray, Int32 l, Int32 h)
+	{
+		Real x = particleArray[h]->_tempPoint3.z; // pivot
+		Int32 i = (l - 1); // Index of smaller element
+		for(Int32 j = l; j <= h - 1; j++)
+		{
+			// If current element is smaller than or equal to pivot 
+			if(particleArray[j]->_tempPoint3.z <= x)
+			{
+				i++;    // increment index of smaller element
+				QuickSortSwap(particleArray, i, j);  // Swap current element with index
+			}
+		}
+		QuickSortSwap(particleArray, i + 1, h);
+		return (i + 1);
+	}
+
 
 	Bool ParticleSystem::BindAtlasModifier(const ParticleModifier<UInt32>& modifier)
 	{
@@ -1006,5 +1015,15 @@ namespace GTE
 	void ParticleSystem::SetPremultiplyAlpha(Bool premultiply)
 	{
 		premultiplyAlpha = premultiply;
+	}
+
+	void ParticleSystem::SetZSort(Bool sort)
+	{
+		zSort = sort;
+	}
+
+	SceneObjectRef ParticleSystem::GetMeshSceneObject()
+	{
+		return meshObject;
 	}
 }

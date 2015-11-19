@@ -1,5 +1,3 @@
-#version 150
-
 in vec2 PARTICLE_SIZE;
 in float PARTICLE_ROTATION;
 in float PARTICLE_INDEX;
