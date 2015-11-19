@@ -174,6 +174,10 @@ Arrow keys: Move the knight around the environment. Physics are not incorporated
 	
 	'I' Key: Toggle between standard SSAO, where SSAO is applied right after ambient lighting, to 'Outline SSAO', where SSAO is applied after all lighting, and produces an interesting outlining effect (and some undesirable side-effects).
 
+	'M' Key: Toggle the smoke effect in the castle scene (it has a significant effect on performance).
+	
+	Spacebar: Add a ripple/drop in the reflecting pool scene.
+	
 	Lighting functionality:
 	
 	'A' Key: Select ambient lighting.
