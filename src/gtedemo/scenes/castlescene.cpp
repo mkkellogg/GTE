@@ -835,7 +835,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	smokeSystem->SetZSort(true);
 
 	GTE::RandomModifier<GTE::Point3> smokePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.5f, 0.0f, 0.5f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> smokeVelocityModifier(GTE::Vector3(0.0f, 7.5f, 0.0f), GTE::Vector3(0.5f, 2.6f, 2.5f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector3> smokeVelocityModifier(GTE::Vector3(0.0f, 9.0f, 0.0f), GTE::Vector3(0.5f, 2.6f, 2.5f), GTE::ParticleRangeType::Sphere, false, true);
 	GTE::RandomModifier<GTE::Vector3> smokeAccelerationModifier(GTE::Vector3(0.0f, -1.8f, 0.0f), GTE::Vector3(3.5f, 2.0f, 3.5f), GTE::ParticleRangeType::Cube, false, true);
 	GTE::EvenIntervalIndexModifier smokeAtlasModifier(1);
 
@@ -845,14 +845,15 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 	GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
 	smokeAlphaModifier.AddFrame(0.0f, 0.0f);
-	smokeAlphaModifier.AddFrame(1.0f, 0.04f);
-	smokeAlphaModifier.AddFrame(2.0f, 0.08f);
+	smokeAlphaModifier.AddFrame(1.0f, 0.16f);
+	smokeAlphaModifier.AddFrame(2.0f, 0.32f);
+	smokeAlphaModifier.AddFrame(3.0f, 0.16f);
 	smokeAlphaModifier.AddFrame(4.0f, 0.0f);
 
 	GTE::FrameSetModifier<GTE::Color4> smokeColorModifier;
 	smokeColorModifier.AddFrame(0.0f, GTE::Color4(0.4f, 0.4f, 0.4f, 1.0f));
-	smokeColorModifier.AddFrame(1.5f, GTE::Color4(0.6f, 0.6f, 0.6f, 1.0f));
-	smokeColorModifier.AddFrame(4.0f, GTE::Color4(0.8f, 0.8f, 0.8f, 1.0f));
+	smokeColorModifier.AddFrame(1.5f, GTE::Color4(0.4f, 0.4f, 0.4f, 1.0f));
+	smokeColorModifier.AddFrame(4.0f, GTE::Color4(0.6f, 0.6f, 0.6f, 1.0f));
 
 	smokeSystem->BindPositionModifier(smokePositionModifier);
 	smokeSystem->BindVelocityModifier(smokeVelocityModifier);
@@ -932,7 +933,7 @@ void CastleScene::FlickerCampFireLightLight()
 		intensityAdjuster = lastCampFireLightIntenistyAdjuster + diff;
 
 		GTE::Real intensity = 3.0f;
-		intensity += intensityAdjuster * 3.0f;
+		intensity += intensityAdjuster * 1.5f;
 		campFireLight->SetIntensity(intensity);
 
 		campFireLightObject->GetTransform().SetIdentity();

@@ -23,9 +23,10 @@ void main()
 		vLightDir = normalize(LIGHT_DIRECTION.xyz);
 	}
 
-	vPosition = MODEL_MATRIX * POSITION;
+	
 	vColor = COLOR;
 	vUV = UVTEXTURE0;
 	vec4 quadPos = getQuadPosition();
+	vPosition = quadPos;
 	gl_Position = PROJECTION_MATRIX * VIEW_MATRIX * quadPos;
 }
