@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#include "engine.h"
 #include "animationplayer.h"
 #include "bone.h"
-#include "engine.h"
-#include "object/enginetypes.h"
 #include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
 #include "geometry/vector/vector3.h"
@@ -24,6 +24,7 @@
 #include "global/constants.h"
 #include "debug/gtedebug.h"
 #include "util/time.h"
+
 #include <string>
 #include <unordered_map>
 

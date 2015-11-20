@@ -11,8 +11,9 @@
 #ifndef _GTE_PARTICLE_MODIFIER_H_
 #define _GTE_PARTICLE_MODIFIER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
+
 #include <vector>
 #include <string>
 
@@ -49,8 +50,8 @@ namespace GTE
 			return runOnce;
 		}
 
-		virtual void Initialize(Particle& particle, T& targetAttribute) = 0;
-		virtual void Update(Particle& particle, T& targetAttribute, Real t) = 0;
+		virtual void Initialize(Particle& particle, T& targetAttribute) const = 0;
+		virtual void Update(Particle& particle, T& targetAttribute, Real t) const = 0;
 		virtual ParticleModifier<T>* Clone() const = 0;
 	};
 }

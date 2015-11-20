@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "engine.h"
 #include "keyframe.h"
-#include "object/enginetypes.h"
+
 #include <string>
 
 namespace GTE

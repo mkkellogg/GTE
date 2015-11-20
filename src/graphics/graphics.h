@@ -25,14 +25,15 @@
 #ifndef _GTE_GRAPHICS_H_
 #define _GTE_GRAPHICS_H_
 
-#include <string>
+#include "engine.h"
 #include "graphicsattr.h"
 #include "renderstate.h"
-#include "object/enginetypes.h"
 #include "base/intmask.h"
 #include "render/rendertarget.h"
 #include "render/material.h"
 #include "global/global.h"
+
+#include <string>
 
 namespace GTE
 {

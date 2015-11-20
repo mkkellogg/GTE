@@ -10,7 +10,7 @@
 
 #ifndef _GTE_LAVAFIELD_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "graphics/image/rawimage.h"
 #include "graphics/image/imageloader.h"
 

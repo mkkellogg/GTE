@@ -1,20 +1,21 @@
 #ifndef _GTE_TREE_H_
 #define _GTE_TREE_H_
 
+#include "engine.h"
+#include "global/global.h"
+#include "global/assert.h"
+#include "debug/gtedebug.h"
+
 #include <memory>
 #include <vector>
 #include <stack>
 #include <string>
-#include "object/enginetypes.h"
-#include "global/global.h"
-#include "global/assert.h"
-#include "debug/gtedebug.h"
 
 namespace GTE
 {
 	template <class T> class Tree
 	{
-	public:
+		public:
 
 		class TreeNode
 		{
@@ -22,7 +23,7 @@ namespace GTE
 			std::vector<TreeNode *> children;
 			TreeNode * parent = nullptr;
 
-		public:
+			public:
 
 			T Data;
 
@@ -69,7 +70,7 @@ namespace GTE
 			}
 		};
 
-	private:
+		private:
 
 		TreeNode* root;
 
@@ -78,7 +79,7 @@ namespace GTE
 		std::function<Bool(TreeNode*)> fullTraversalCallback;
 
 
-	public:
+		public:
 
 		Tree()
 		{

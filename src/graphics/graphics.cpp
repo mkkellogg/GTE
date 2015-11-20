@@ -16,7 +16,7 @@
 #include "geometry/transform.h"
 #include "render/submesh3Drenderer.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobject.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
 #include "util/time.h"

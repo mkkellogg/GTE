@@ -11,17 +11,18 @@
 #ifndef _GTE_BONE_H_
 #define _GTE_BONE_H_
 
-#include <vector>
-#include <string>
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "geometry/matrix4x4.h"
 
-//forward declarations
-class Transform;
-class SkeletonNode;
+#include <vector>
+#include <string>
 
 namespace GTE
 {
+	//forward declarations
+	class Transform;
+	class SkeletonNode;
+
 	class Bone
 	{
 	public:

@@ -1,8 +1,9 @@
 #ifndef _GTE_OBJECTPAIRKEY_H_
 #define _GTE_OBJECTPAIRKEY_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
+
 #include <vector>
 #include <unordered_map>
 #include <memory>

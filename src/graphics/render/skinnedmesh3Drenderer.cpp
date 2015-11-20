@@ -4,12 +4,12 @@
 #include <memory.h>
 #include <math.h>
 
+#include "engine.h"
 #include "skinnedmesh3Drenderer.h"
 #include "submesh3Drenderer.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobjectcomponent.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobjectcomponent.h"
+#include "scene/sceneobject.h"
 #include "graphics/animation/vertexbonemap.h"
 #include "graphics/stdattributes.h"
 #include "graphics/animation/skeleton.h"
@@ -19,7 +19,6 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {

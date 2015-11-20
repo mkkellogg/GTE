@@ -67,13 +67,13 @@ FILESYSTEMSRC= src/filesys
 FILESYSTEMSRCS= $(call toFullPath,$(FILESYSTEMSRC),filesystem.cpp filesystemIX.cpp)
 FILESYSTEMOBJ= $(call srcFilesToObjFiles,$(FILESYSTEMSRCS),$(FILESYSTEMSRC),$(OUTPUTDIR))
 
-$(FILESYSTEMOBJ): 
+$(FILESYSTEMOBJ):
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(FILESYSTEMSRC),$@,$(OUTPUTDIR)) 
 
-	
+
 # ==================================
 # Input
-# ==================================	
+# ==================================
 
 INPUTSRC= src/input
 INPUTSRCS= $(call toFullPath,$(INPUTSRC),inputmanager.cpp inputmanagerGL.cpp)
@@ -81,31 +81,31 @@ INPUTOBJ= $(call srcFilesToObjFiles,$(INPUTSRCS),$(INPUTSRC),$(OUTPUTDIR))
 	
 $(INPUTOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(INPUTSRC),$@,$(OUTPUTDIR)) 
-	
+
 # ==================================
 # Engine
-# ==================================	
+# ==================================
 
 ENGINESRC= src
-ENGINESRCS= $(ENGINESRC)/engine.cpp
+ENGINESRCS= $(ENGINESRC)/engine.cpp  $(ENGINESRC)/enginetypes.cpp
 ENGINEOBJ = $(OUTPUTDIR)/engine.o
 
 $(ENGINEOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ENGINESRC),$@,$(OUTPUTDIR)) 
-	
-	
+
+
 # ==================================
 # EngineObjects
 # ==================================
 
 ENGINEOBJECTSRC= src/object
-ENGINEOBJECTSRCS= $(call toFullPath,$(ENGINEOBJECTSRC),sceneobjectcomponent.cpp engineobjectmanager.cpp eventmanager.cpp engineobject.cpp sceneobject.cpp shaderorganizer.cpp objectpairkey.cpp layermanager.cpp enginetypes.cpp)
+ENGINEOBJECTSRCS= $(call toFullPath,$(ENGINEOBJECTSRC),engineobjectmanager.cpp engineobject.cpp shaderorganizer.cpp objectpairkey.cpp)
 ENGINEOBJECTOBJ= $(call srcFilesToObjFiles,$(ENGINEOBJECTSRCS),$(ENGINEOBJECTSRC),$(OUTPUTDIR))
 		
 $(ENGINEOBJECTOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ENGINEOBJECTSRC),$@,$(OUTPUTDIR)) 
-	
-	
+
+
 # ==================================
 # Asset
 # ==================================
@@ -143,11 +143,11 @@ $(PARTICLEOBJ):
 
 
 # ==================================
-# Scene manager
+# Scene
 # ==================================	
 
 SCENESRC= src/scene
-SCENESRCS= $(call toFullPath,$(SCENESRC),scenemanager.cpp)
+SCENESRCS= $(call toFullPath,$(SCENESRC),sceneobject.cpp sceneobjectcomponent.cpp scenemanager.cpp eventmanager.cpp layermanager.cpp)
 SCENEOBJ= $(call srcFilesToObjFiles,$(SCENESRCS),$(SCENESRC),$(OUTPUTDIR))
 	
 $(SCENEOBJ): 

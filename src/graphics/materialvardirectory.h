@@ -1,10 +1,11 @@
 #ifndef _GTE_MATERIAL_VAR_DIRECTORY_H_
 #define _GTE_MATERIAL_VAR_DIRECTORY_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "base/intmask.h"
 #include "stduniforms.h"
 #include "stdattributes.h"
+
 #include <unordered_map>
 #include <string>
 

@@ -1,5 +1,4 @@
-/********************************************* 
-*
+/*
 * class: Matrix4x4
 *
 * author: Mark Kellogg, with significant portions derived from the Android
@@ -25,8 +24,8 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
+#include "engine.h"
 #include "global/global.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

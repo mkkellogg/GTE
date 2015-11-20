@@ -1,8 +1,3 @@
-#include <functional>
-#include <vector>
-#include <iostream>
-#include <memory>
-#include <functional>
 #include "engine.h"
 #include "input/inputmanager.h"
 #include "gtedemo/gameutil.h"
@@ -32,9 +27,8 @@
 #include "geometry/point/point3array.h"
 #include "debug/gtedebug.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
-#include "object/layermanager.h"
+#include "scene/sceneobject.h"
+#include "scene/layermanager.h"
 #include "util/time.h"
 #include "util/engineutility.h"
 #include "global/global.h"
@@ -42,6 +36,12 @@
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
+
+#include <functional>
+#include <vector>
+#include <iostream>
+#include <memory>
+#include <functional>
 
 /*
  * Constructor - initialize member variables.

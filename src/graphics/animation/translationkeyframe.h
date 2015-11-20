@@ -11,10 +11,10 @@
 #ifndef _GTE_TRANSLATION_KEYFRAME_H_
 #define _GTE_TRANSLATION_KEYFRAME_H_
 
+#include "engine.h"
 #include "keyframe.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

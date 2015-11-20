@@ -3,11 +3,8 @@
 #include <memory.h>
 #include <math.h>
 
-#include <iostream>
-#include <memory>
-#include <functional>
-#include "game.h"
 #include "engine.h"
+#include "game.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/object/mesh3Dfilter.h"
 #include "graphics/object/mesh3D.h"
@@ -29,9 +26,12 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobject.h"
 #include "gameutil.h"
+
+#include <iostream>
+#include <memory>
+#include <functional>
 
 /*
  * Recursively search the scene hierarchy starting at [ref] for an

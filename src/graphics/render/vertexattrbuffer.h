@@ -16,7 +16,7 @@
 #ifndef _GTE_VERTEX_ATTR_BUFFER_H_
 #define _GTE_VERTEX_ATTR_BUFFER_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 
 namespace GTE
 {

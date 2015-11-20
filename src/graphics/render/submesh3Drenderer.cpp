@@ -4,7 +4,7 @@
 #include <memory.h>
 #include <math.h>
 
-#include "object/sceneobjectcomponent.h"
+#include "scene/sceneobjectcomponent.h"
 #include "submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/object/submesh3Dface.h"
@@ -24,7 +24,7 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2.h"
 #include "graphics/uv/uv2array.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "attributetransformer.h"
 #include "util/time.h"

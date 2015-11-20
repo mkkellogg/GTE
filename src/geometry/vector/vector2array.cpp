@@ -1,8 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
 
 #include "vector2array.h"
 #include "vector2.h"

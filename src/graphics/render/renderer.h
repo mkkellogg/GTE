@@ -9,9 +9,10 @@
 #ifndef _GTE_RENDERER_H_
 #define _GTE_RENDERER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
-#include "object/sceneobjectcomponent.h"
+#include "scene/sceneobjectcomponent.h"
+
 #include <vector>
 
 namespace GTE

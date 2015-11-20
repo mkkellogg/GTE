@@ -1,13 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-
+#include "engine.h"
 #include "assetimporter.h"
 #include "shadersourceloaderGL.h"
-#include "object/enginetypes.h"
 #include "modelimporter.h"
 #include "global/global.h"
 #include "global/assert.h"

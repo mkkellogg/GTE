@@ -5,12 +5,11 @@
 #include <math.h>
 #include <memory>
 
-#include "sceneobject.h"
 #include "engine.h"
-#include "engineobject.h"
-#include "enginetypes.h"
-#include "engineobjectmanager.h"
-#include "scene/scenemanager.h"
+#include "object/engineobject.h"
+#include "object/engineobjectmanager.h"
+#include "sceneobject.h"
+#include "scenemanager.h"
 #include "graphics/graphics.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"

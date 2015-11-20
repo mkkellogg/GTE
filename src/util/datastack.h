@@ -1,7 +1,7 @@
 #ifndef _GTE_DATASTACK_
 #define _GTE_DATASTACK_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "global/global.h"
 #include "global/assert.h"
 

@@ -1,20 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include <string>
-
-#include <IL/il.h>
 #include "importutil.h"
-#include "assimp/cimport.h"
-#include "assimp/scene.h"
 #include "geometry/matrix4x4.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"
 #include "global/assert.h"
-#include "graphics/image/rawimage.h"
 
 namespace GTE
 {

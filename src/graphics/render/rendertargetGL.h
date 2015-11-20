@@ -11,8 +11,8 @@
 #ifndef _GTE_RENDER_TARGET_GL_H_
 #define _GTE_RENDER_TARGET_GL_H_
 
+#include "engine.h"
 #include "graphics/gl_include.h"
-#include "object/enginetypes.h"
 #include "rendertarget.h"
 #include "base/intmask.h"
 

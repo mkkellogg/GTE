@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#include "animationmanager.h"
 #include "engine.h"
-#include "object/enginetypes.h"
+#include "animationmanager.h"
 #include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
 #include "geometry/vector/vector3.h"
@@ -20,6 +18,7 @@
 #include "global/constants.h"
 #include "util/time.h"
 #include "debug/gtedebug.h"
+
 #include <string>
 #include <unordered_map>
 

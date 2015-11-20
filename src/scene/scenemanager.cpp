@@ -2,14 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "scenemanager.h"
 #include "engine.h"
-#include "object/enginetypes.h"
+#include "scenemanager.h"
 #include "object/engineobject.h"
-#include "object/sceneobject.h"
-#include "object/sceneobjectcomponent.h"
+#include "scene/sceneobject.h"
+#include "scene/sceneobjectcomponent.h"
 #include "object/engineobjectmanager.h"
-#include "object/eventmanager.h"
+#include "scene/eventmanager.h"
 #include "geometry/sceneobjecttransform.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
@@ -20,6 +19,7 @@
 #include "global/constants.h"
 #include "util/datastack.h"
 #include "debug/gtedebug.h"
+
 #include <string>
 #include <unordered_map>
 

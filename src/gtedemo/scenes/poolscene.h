@@ -1,13 +1,14 @@
 #ifndef _GTE_POOLSCENE_H_
 #define _GTE_POOLSCENE_H_
 
+#include "engine.h"
 #include "gtedemo/scene.h"
-#include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/transform.h"
 #include "base/intmask.h"
 #include "graphics/materialvardirectory.h"
+
 #include <functional>
 #include <vector>
 

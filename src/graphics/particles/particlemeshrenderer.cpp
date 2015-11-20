@@ -1,15 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
 
 #include "engine.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobjectcomponent.h"
-#include "object/eventmanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobjectcomponent.h"
+#include "scene/eventmanager.h"
+#include "scene/sceneobject.h"
 #include "particlemeshrenderer.h"
 #include "particlesystem.h"
 #include "global/global.h"

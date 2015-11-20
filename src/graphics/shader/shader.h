@@ -15,9 +15,10 @@
 #ifndef _GTE_SHADER_H_
 #define _GTE_SHADER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "shadersource.h"
+
 #include <string>
 
 namespace GTE

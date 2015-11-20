@@ -9,14 +9,15 @@
 #ifndef _GTE_RENDER_QUEUE_MANAGER_H
 #define _GTE_RENDER_QUEUE_MANAGER_H
 
+#include "engine.h"
+#include "object/engineobject.h"
+#include "renderqueue.h"
+
 #include <vector>
 #include <map>
 #include <unordered_map>
 #include <memory>
 #include <stack>
-#include "object/engineobject.h"
-#include "object/enginetypes.h"
-#include "renderqueue.h"
 
 namespace GTE
 {

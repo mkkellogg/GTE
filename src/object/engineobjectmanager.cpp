@@ -6,8 +6,7 @@
 
 #include "engine.h"
 #include "engineobjectmanager.h"
-#include "sceneobject.h"
-#include "enginetypes.h"
+#include "scene/sceneobject.h"
 #include "scene/scenemanager.h"
 #include "graphics/graphics.h"
 #include "graphics/shader/shader.h"

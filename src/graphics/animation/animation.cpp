@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "animation.h"
 #include "skeleton.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "engine.h"
+
 #include <string>
 
 namespace GTE

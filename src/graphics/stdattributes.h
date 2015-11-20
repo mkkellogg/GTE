@@ -1,7 +1,7 @@
 #ifndef _GTE_ATTRIBUTES_H_
 #define _GTE_ATTRIBUTES_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "base/intmask.h"
 #include <unordered_map>
 #include <string>

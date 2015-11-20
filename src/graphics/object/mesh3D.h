@@ -12,11 +12,12 @@
 #ifndef _GTE_MESH3D_H_
 #define _GTE_MESH3D_H_
 
-#include "object/sceneobjectcomponent.h"
-#include "object/enginetypes.h"
+#include "engine.h"
+#include "scene/sceneobjectcomponent.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "graphics/light/light.h"
+
 #include <vector>
 
 namespace GTE

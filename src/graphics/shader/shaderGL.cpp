@@ -5,8 +5,8 @@
 #include <memory.h>
 #include <math.h>
 
+#include "engine.h"
 #include "graphics/gl_include.h"
-#include "object/enginetypes.h"
 #include "shader.h"
 #include "shaderGL.h"
 #include "shadersource.h"
@@ -23,6 +23,7 @@
 #include "global/assert.h"
 #include "uniformdesc.h"
 #include "attributedesc.h"
+
 #include <string>
 
 namespace GTE

@@ -6,9 +6,8 @@
 
 #include "engine.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobjectcomponent.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobjectcomponent.h"
+#include "scene/sceneobject.h"
 #include "mesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "submesh3Drenderer.h"

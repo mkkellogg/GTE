@@ -1,10 +1,3 @@
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
- 
 #include "shadersourceloaderGL.h"
 #include "graphics/shader/shadersource.h"
 #include "filesys/filesystem.h"

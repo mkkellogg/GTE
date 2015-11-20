@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "engine.h"
 #include "customfloatattributebuffer.h"
 #include "gtemath/gtemath.h"
-#include "object/enginetypes.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "util/engineutility.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 
 namespace GTE

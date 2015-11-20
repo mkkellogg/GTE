@@ -12,11 +12,12 @@
 #ifndef _GTE_SCENE_MANAGER_H_
 #define _GTE_SCENE_MANAGER_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "object/engineobject.h"
 #include "global/constants.h"
 #include "util/datastack.h"
 #include "geometry/transform.h"
+
 #include <unordered_map>
 
 namespace GTE

@@ -4,17 +4,16 @@
 #include <memory.h>
 #include <math.h>
 
-#include <vector>
+#include "engine.h"
 #include "forwardrendermanager.h"
 #include "material.h"
 #include "geometry/transform.h"
 #include "geometry/point/point3array.h"
 #include "geometry/quaternion.h"
 #include "geometry/sceneobjecttransform.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobject.h"
 #include "object/engineobjectmanager.h"
-#include "object/enginetypes.h"
-#include "object/eventmanager.h"
+#include "scene/eventmanager.h"
 #include "engine.h"
 #include "base/intmask.h"
 #include "graphics/shader/shader.h"
@@ -38,6 +37,8 @@
 #include "global/assert.h"
 #include "global/constants.h"
 #include "debug/gtedebug.h"
+
+#include <vector>
 
 namespace GTE
 {

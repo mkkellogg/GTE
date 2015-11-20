@@ -10,13 +10,14 @@
 #ifndef _GTE_PARTICLE_H_
 #define _GTE_PARTICLE_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "gtemath/gtemath.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3.h"
 #include "graphics/color/color4.h"
 #include "particles.h"
+
 #include <vector>
 #include <string>
 

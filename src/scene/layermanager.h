@@ -1,10 +1,12 @@
 #ifndef _GTE_LAYERMANAGER_H_
 #define _GTE_LAYERMANAGER_H_
 
+#include "engine.h"
+#include "base/intmask.h"
+
 #include <string>
 #include <map>
-#include "base/intmask.h"
-#include "object/enginetypes.h"
+
 
 namespace GTE
 {

@@ -1,10 +1,11 @@
 #ifndef _GTE_EVENTMANAGER_H_
 #define _GTE_EVENTMANAGER_H_
 
+#include "engine.h"
+#include "base/intmask.h"
+
 #include <string>
 #include <map>
-#include "base/intmask.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

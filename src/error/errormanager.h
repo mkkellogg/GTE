@@ -1,7 +1,8 @@
 #ifndef _GTE_ERRORMANAGER_H_
 #define _GTE_ERRORMANAGER_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
+
 #include <vector>
 #include <string>
 
@@ -19,7 +20,7 @@ namespace GTE
 	{
 		friend class Engine;
 
-	protected:
+		protected:
 
 		std::string errorMessage;
 		Int32 errorCode;
@@ -27,7 +28,7 @@ namespace GTE
 		ErrorManager();
 		~ErrorManager();
 
-	public:
+		public:
 
 		void SetError(Int32 code, const std::string& message);
 		void SetError(Int32 code, const Char * message);

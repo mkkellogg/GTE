@@ -1,9 +1,10 @@
 #ifndef _GTE_CONSTANTS_H_
 #define _GTE_CONSTANTS_H_
 
-#include <string>
+#include "engine.h"
 #include "global/global.h"
-#include "object/enginetypes.h"
+
+#include <string>
 
 namespace GTE
 {

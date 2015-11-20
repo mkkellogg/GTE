@@ -1,7 +1,7 @@
 #ifndef _GTE_INTMASK_H_
 #define _GTE_INTMASK_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "global/global.h"
 
 namespace GTE

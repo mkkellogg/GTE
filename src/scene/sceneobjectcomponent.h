@@ -1,8 +1,8 @@
 #ifndef _GTE_SCENEOBJECTCOMPONENT_H_
 #define _GTE_SCENEOBJECTCOMPONENT_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

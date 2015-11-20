@@ -1,7 +1,7 @@
 #ifndef _GTE_ENGINEOBJECT_H_
 #define _GTE_ENGINEOBJECT_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 
 namespace GTE
 {

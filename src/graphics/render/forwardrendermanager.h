@@ -14,14 +14,9 @@
 #ifndef _GTE_FORWARD_RENDER_MANAGER_H
 #define _GTE_FORWARD_RENDER_MANAGER_H
 
-#include <vector>
-#include <map>
-#include <unordered_map>
-#include <memory>
-#include <stack>
+#include "engine.h"
 #include "rendermanager.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "object/objectpairkey.h"
 #include "util/datastack.h"
 #include "graphics/view/camera.h"
@@ -29,6 +24,12 @@
 #include "geometry/transform.h"
 #include "renderqueue.h"
 #include "renderqueuemanager.h"
+
+#include <vector>
+#include <map>
+#include <unordered_map>
+#include <memory>
+#include <stack>
 
 namespace GTE
 {

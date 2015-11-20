@@ -14,10 +14,11 @@
 #ifndef _GTE_FRAMESET_MODIFIER_H_
 #define _GTE_FRAMESET_MODIFIER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "particlemodifier.h"
 #include "particleframeset.h"
+
 #include <vector>
 #include <string>
 
@@ -44,12 +45,12 @@ namespace GTE
 			frameSet.AddKeyFrame(time, value);
 		}
 
-		void Initialize(Particle& particle, T& targetAttribute) override
+		void Initialize(Particle& particle, T& targetAttribute) const override
 		{
 			frameSet.InterpolateFrameValues(0.0f, targetAttribute);
 		}
 
-		void Update(Particle& particle, T& targetAttribute, Real t) override
+		void Update(Particle& particle, T& targetAttribute, Real t) const override
 		{
 			if(!this->runOnce)
 			{				

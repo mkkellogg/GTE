@@ -3,16 +3,17 @@
  *
  * author: Mark Kellogg
  *
- * General utility class
+ * General utility class for the engine.
  *
  */
 
 #ifndef _GTE_ENGINEUTIL_H_
 #define _GTE_ENGINEUTIL_H_
 
-#include <string>
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "graphics/stdattributes.h"
+
+#include <string>
 
 namespace GTE
 {

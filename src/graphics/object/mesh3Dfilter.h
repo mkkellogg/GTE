@@ -10,9 +10,10 @@
 #ifndef _GTE_MESH3D_FILTER_H_
 #define _GTE_MESH3D_FILTER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/sceneobjectcomponent.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobjectcomponent.h"
+
 #include <vector>
 
 namespace GTE

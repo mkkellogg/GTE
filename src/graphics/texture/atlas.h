@@ -11,8 +11,9 @@
 #ifndef _GTE_ATLAS_H_
 #define _GTE_ATLAS_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
+
 #include <vector>
 #include <string>
 

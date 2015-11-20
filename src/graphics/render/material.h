@@ -21,16 +21,17 @@
 #ifndef _GTE_MATERIAL_H_
 #define _GTE_MATERIAL_H_
 
+#include "engine.h"
 #include "graphics/stdattributes.h"
 #include "graphics/renderstate.h"
 #include "graphics/stduniforms.h"
 #include "graphics/materialvardirectory.h"
 #include "graphics/color/color4.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "graphics/shader/uniformdesc.h"
 #include "graphics/shader/attributedesc.h"
 #include "rendermanager.h"
+
 #include <vector>
 #include <map>
 #include <string>

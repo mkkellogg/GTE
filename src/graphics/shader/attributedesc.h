@@ -10,8 +10,9 @@
 #ifndef _GTE_ATTRIBUTE_DESCRIPTOR_H_
 #define _GTE_ATTRIBUTE_DESCRIPTOR_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "graphics/materialvardirectory.h"
+
 #include <string>
 
 namespace GTE

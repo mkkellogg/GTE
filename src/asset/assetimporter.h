@@ -1,10 +1,11 @@
 #ifndef _GTE_ASSET_IMPORTER_H_
 #define _GTE_ASSET_IMPORTER_H_
 
-#include "object/engineobjectmanager.h"
-#include "object/enginetypes.h"
-#include "global/global.h"
 #include <string>
+
+#include "engine.h"
+#include "object/engineobjectmanager.h"
+#include "global/global.h"
 
 namespace GTE
 {

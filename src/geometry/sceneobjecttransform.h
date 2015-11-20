@@ -11,7 +11,7 @@
 #ifndef _GTE_SCENEOBJECT_TRANSFORM_H_
 #define _GTE_SCENEOBJECT_TRANSFORM_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "global/global.h"
 #include "transform.h"
 #include "matrix4x4.h"

@@ -11,10 +11,12 @@
 #ifndef _GTE_BLENDOP_H_
 #define _GTE_BLENDOP_H_
 
+#include "engine.h"
+#include "global/global.h"
+
 #include <vector>
 #include <string>
-#include "object/enginetypes.h"
-#include "global/global.h"
+
 
 namespace GTE
 {

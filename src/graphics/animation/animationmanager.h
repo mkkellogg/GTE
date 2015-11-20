@@ -12,8 +12,9 @@
 #ifndef _GTE_ANIMATION_MANAGER_H_
 #define _GTE_ANIMATION_MANAGER_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "object/engineobject.h"
+
 #include <unordered_map>
 
 namespace GTE

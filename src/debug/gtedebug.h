@@ -1,7 +1,8 @@
 #ifndef _GTE_DEBUG_H_
 #define _GTE_DEBUG_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
+
 #include <string>
 
 namespace GTE

@@ -1,9 +1,10 @@
 #ifndef _GTE_INPUT_MANAGER_H_
 #define _GTE_INPUT_MANAGER_H_
 
-#include <string>
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "global/global.h"
+
+#include <string>
 
 namespace GTE
 {

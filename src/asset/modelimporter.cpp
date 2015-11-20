@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include <memory>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -13,7 +6,6 @@
 #include <unordered_map>
 
 #include "graphics/stdattributes.h"
-#include <IL/il.h>
 #include "assimp/cimport.h"
 #include "assimp/config.h"
 #include "assimp/scene.h"
@@ -22,14 +14,13 @@
 #include "assimp/DefaultLogger.hpp"
 #include "assimp/LogStream.hpp"
 
+#include "engine.h"
 #include "modelimporter.h"
 #include "importutil.h"
-#include "engine.h"
 #include "object/engineobjectmanager.h"
 #include "object/shaderorganizer.h"
-#include "object/sceneobjectcomponent.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobjectcomponent.h"
+#include "scene/sceneobject.h"
 #include "graphics/animation/skeleton.h"
 #include "graphics/animation/bone.h"
 #include "graphics/animation/vertexbonemap.h"

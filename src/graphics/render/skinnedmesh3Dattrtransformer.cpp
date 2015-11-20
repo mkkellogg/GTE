@@ -17,7 +17,7 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3array.h"
 #include "geometry/vector/vector3.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobject.h"
 #include "global/assert.h"
 #include "util/time.h"
 

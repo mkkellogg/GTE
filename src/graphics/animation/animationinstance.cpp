@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "engine.h"
 #include "animationinstance.h"
-#include "object/enginetypes.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/animation/animation.h"
 #include "graphics/animation/skeleton.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
+
 #include <string>
 
 namespace GTE

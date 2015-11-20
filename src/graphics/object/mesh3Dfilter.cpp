@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "engine.h"
-#include "object/sceneobjectcomponent.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobjectcomponent.h"
+#include "scene/sceneobject.h"
 #include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
 #include "mesh3Dfilter.h"

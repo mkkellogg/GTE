@@ -6,7 +6,7 @@
 
 #include "engine.h"
 #include "object/engineobjectmanager.h"
-#include "object/eventmanager.h"
+#include "scene/eventmanager.h"
 #include "graphics/graphics.h"
 #include "graphics/graphicsGL.h"
 #include "graphics/animation/animationmanager.h"

@@ -1,7 +1,6 @@
 #ifndef _GTE_BASEVECTOR4ARRAY_H_
 #define _GTE_BASEVECTOR4ARRAY_H_
 
-#include "object/enginetypes.h"
 #include "global/global.h"
 #include "basevector4.h"
 

@@ -1,8 +1,8 @@
 #ifndef _GTE_LAVASCENE_H_
 #define _GTE_LAVASCENE_H_
 
+#include "engine.h"
 #include "gtedemo/scene.h"
-#include "object/enginetypes.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "asset/assetimporter.h"

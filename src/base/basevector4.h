@@ -10,7 +10,7 @@
 #ifndef _GTE_BASEVECTOR4_H_
 #define _GTE_BASEVECTOR4_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "global/constants.h"
 #include "global/global.h"
 

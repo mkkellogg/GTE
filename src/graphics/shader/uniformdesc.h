@@ -10,9 +10,10 @@
 #ifndef _GTE_UNIFORM_DESCRIPTOR_H_
 #define _GTE_UNIFORM_DESCRIPTOR_H_
 
-#include "object/enginetypes.h"
+#include <vector>
 #include "geometry/matrix4x4.h"
 #include "graphics/materialvardirectory.h"
+
 #include <string>
 
 namespace GTE

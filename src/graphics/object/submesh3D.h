@@ -11,8 +11,9 @@
 #ifndef _GTE_SUBMESH3D_H_
 #define _GTE_SUBMESH3D_H_
 
+#include "engine.h"
 #include "mesh3D.h"
-#include "object/sceneobjectcomponent.h"
+#include "scene/sceneobjectcomponent.h"
 #include "customfloatattributebuffer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/materialvardirectory.h"
@@ -25,8 +26,6 @@
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
 #include "global/global.h"
-#include "object/enginetypes.h"
-
 
 namespace GTE
 {

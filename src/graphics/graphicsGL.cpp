@@ -29,7 +29,7 @@
 #include "image/rawimage.h"
 #include "view/camera.h"
 #include "base/intmask.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "geometry/transform.h"
 #include "global/global.h"
@@ -439,30 +439,6 @@ namespace GTE
 			stencilTestEnabled = enabled;
 		}
 	}
-
-
-	/*
-	void GraphicsGL::SetRenderBufferEnabled(RenderBufferType buffer, Bool enabled) const
-	{
-	if(buffer == RenderBufferType::Color && enabled != colorBufferEnabled)
-	{
-	if(enabled)glColorMask(1,1,1,1);
-	else glColorMask(0,0,0,0);
-	colorBufferEnabled = enabled;
-	}
-	else if(buffer == RenderBufferType::Depth && enabled != depthBufferEnabled)
-	{
-	if(enabled)glDepthMask(GL_TRUE);
-	else glDepthMask(GL_FALSE);
-	depthBufferEnabled = enabled;
-	}
-	else if(buffer == RenderBufferType::Stencil && enabled != stencilBufferEnabled)
-	{
-	if(enabled)glStencilMask(GL_TRUE);
-	else glStencilMask(GL_FALSE);
-	stencilBufferEnabled = enabled;
-	}
-	}*/
 
 	/*
 	 * Create an OpenGL-specific vertex attribute buffer.

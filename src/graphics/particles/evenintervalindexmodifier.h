@@ -12,10 +12,11 @@
 #ifndef _GTE_EVENINTERVALINDEX_MODIFIER_H_
 #define _GTE_EVENINTERVALINDEX_MODIFIER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "particlemodifier.h"
 #include "particle.h"
+
 #include <vector>
 #include <string>
 
@@ -37,12 +38,12 @@ namespace GTE
 
 		}
 
-		void Initialize(Particle& particle, UInt32& targetAttribute) override
+		void Initialize(Particle& particle, UInt32& targetAttribute) const override
 		{
 			targetAttribute = 0;
 		}
 
-		void Update(Particle& particle, UInt32& targetAttribute, Real t) override
+		void Update(Particle& particle, UInt32& targetAttribute, Real t) const override
 		{
 			if(!runOnce)
 			{

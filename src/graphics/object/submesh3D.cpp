@@ -8,8 +8,8 @@
 #include <vector>
 #include <memory>
 
-#include "object/sceneobjectcomponent.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobjectcomponent.h"
+#include "scene/sceneobject.h"
 #include "submesh3D.h"
 #include "mesh3D.h"
 #include "submesh3Dface.h"

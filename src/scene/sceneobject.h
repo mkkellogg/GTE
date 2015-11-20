@@ -1,9 +1,9 @@
 #ifndef _GTE_SCENEOBJECT_H_
 #define _GTE_SCENEOBJECT_H_
 
+#include "engine.h"
 #include "geometry/sceneobjecttransform.h"
-#include "engineobject.h"
-#include "enginetypes.h"
+#include "object/engineobject.h"
 #include "base/intmask.h"
 #include <vector>
 #include <memory>

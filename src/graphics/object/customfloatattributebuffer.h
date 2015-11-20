@@ -10,10 +10,11 @@
 #ifndef _GTE_CUSTOM_FLOAT_ATTRIBUTE_BUFFER_H_
 #define _GTE_CUSTOM_FLOAT_ATTRIBUTE_BUFFER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "gtemath/gtemath.h"
 #include "graphics/materialvardirectory.h"
+
 #include <vector>
 #include <string>
 

@@ -9,13 +9,14 @@
 #ifndef _GTE_RENDER_MANAGER_H
 #define _GTE_RENDER_MANAGER_H
 
+#include "engine.h"
+#include "object/engineobject.h"
+
 #include <vector>
 #include <map>
 #include <unordered_map>
 #include <memory>
 #include <stack>
-#include "object/engineobject.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

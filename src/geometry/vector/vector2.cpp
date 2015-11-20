@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
  
 #include "vector2.h"
 #include "gtemath/gtemath.h"
+
 namespace GTE
 {
 	Vector2::Vector2() : BaseVector2(), x(data[0]), y(data[1])

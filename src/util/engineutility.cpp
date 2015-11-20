@@ -5,9 +5,9 @@
 #include <math.h>
 #include <string>
 
+#include "engine.h"
 #include "engineutility.h"
 #include "geometry/matrix4x4.h"
-#include "engine.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
@@ -28,9 +28,7 @@
 #include "geometry/point/point3array.h"
 #include "object/engineobjectmanager.h"
 #include "error/errormanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
-#include "engine.h"
+#include "scene/sceneobject.h"
 
 namespace GTE
 {

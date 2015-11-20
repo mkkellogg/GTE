@@ -11,8 +11,8 @@
 #ifndef _GTE_TEXTUREATTR_H_
 #define _GTE_TEXTUREATTR_H_
 
+#include "engine.h"
 #include "global/global.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

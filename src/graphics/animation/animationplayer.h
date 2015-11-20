@@ -11,11 +11,12 @@
 #ifndef _GTE_ANIMATION_PLAYER_H_
 #define _GTE_ANIMATION_PLAYER_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "object/engineobject.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
 #include "keyframeset.h"
+
 #include <vector>
 #include <queue>
 #include <unordered_map>
@@ -90,7 +91,7 @@ namespace GTE
 		void Pause(UInt32  animationIndex);
 		void Resume(UInt32  animationIndex);
 
-	public:
+		public:
 
 		void AddAnimation(AnimationConstRef animation);
 		void SetSpeed(AnimationConstRef animation, Real speedFactor);

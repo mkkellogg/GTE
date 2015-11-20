@@ -1,12 +1,13 @@
 #ifndef _GTE_LIGHT_H_
 #define _GTE_LIGHT_H_
 
-#include "object/enginetypes.h"
-#include "object/sceneobjectcomponent.h"
+#include "engine.h"
+#include "scene/sceneobjectcomponent.h"
 #include "graphics/color/color4.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "base/intmask.h"
+
 #include <memory>
 
 namespace GTE

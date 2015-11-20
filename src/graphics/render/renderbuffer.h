@@ -1,8 +1,8 @@
 #ifndef _GTE_RENDER_BUFFER_H_
 #define _GTE_RENDER_BUFFER_H_
 
+#include "engine.h"
 #include "base/intmask.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

@@ -25,9 +25,8 @@
 #ifndef _GTE_SUBMESH3D_RENDERER_H_
 #define _GTE_SUBMESH3D_RENDERER_H_
 
-#include <vector>
-#include "object/sceneobjectcomponent.h"
-#include "object/enginetypes.h"
+#include "engine.h"
+#include "scene/sceneobjectcomponent.h"
 #include "submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/render/material.h"
@@ -35,6 +34,8 @@
 #include "geometry/vector/vector3array.h"
 #include "geometry/point/point3array.h"
 #include "geometry/point/point3.h"
+
+#include <vector>
 
 namespace GTE
 {

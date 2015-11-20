@@ -19,20 +19,17 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
  
-#include "debug/gtedebug.h"
+
 #include "matrix4x4.h"
 #include "quaternion.h"
 #include "point/point3.h"
 #include "vector/vector3.h"
+#include "debug/gtedebug.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
-#include "engine.h"
 
 #define I(_i, _j) ((_j)+ DIM_SIZE*(_i))
 #define PI 3.14159265

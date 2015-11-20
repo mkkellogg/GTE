@@ -4,12 +4,11 @@
 #include <memory.h>
 #include <math.h>
 
+#include "engine.h"
 #include "rawimage.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "object/enginetypes.h"
-#include "engine.h"
 
 namespace GTE
 {

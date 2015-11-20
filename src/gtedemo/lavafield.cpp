@@ -9,7 +9,7 @@
 #include "engine.h"
 #include "asset/assetimporter.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
+#include "scene/sceneobject.h"
 #include "graphics/stdattributes.h"
 #include "graphics/shader/shadersource.h"
 #include "graphics/render/material.h"

@@ -1,11 +1,10 @@
 #include <iostream>
 #include <math.h>
 
-#include "camera.h"
 #include "engine.h"
+#include "camera.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobject.h"
 #include "graphics/render/rendertarget.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/graphics.h"

@@ -1,7 +1,8 @@
 #ifndef _GTE_SHADER_SOURCE_LINES_H_
 #define _GTE_SHADER_SOURCE_LINES_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
+
 #include <string>
 #include <vector>
 

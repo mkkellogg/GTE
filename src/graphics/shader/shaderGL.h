@@ -22,9 +22,10 @@
 #ifndef _GTE_SHADER_GL_H_
 #define _GTE_SHADER_GL_H_
 
+#include "engine.h"
 #include "graphics/gl_include.h"
-#include "object/enginetypes.h"
 #include "shader.h"
+
 #include <string>
 
 namespace GTE

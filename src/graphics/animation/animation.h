@@ -12,13 +12,14 @@
 #ifndef _GTE_ANIMATION_H_
 #define _GTE_ANIMATION_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "keyframeset.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
 #include "geometry/matrix4x4.h"
 #include "global/global.h"
+
 #include <vector>
 
 namespace GTE

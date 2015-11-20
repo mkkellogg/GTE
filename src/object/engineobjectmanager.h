@@ -4,10 +4,11 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+
+#include "engine.h"
 #include "graphics/stdattributes.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
-#include "object/layermanager.h"
+#include "scene/sceneobject.h"
+#include "scene/layermanager.h"
 #include "graphics/texture/textureattr.h"
 #include "shaderorganizer.h"
 #include "base/longmask.h"

@@ -12,12 +12,12 @@
 #ifndef _GTE_SKINNEDMESH_ATTRIBUTE_TRANSFORMER_H
 #define _GTE_SKINNEDMESH_ATTRIBUTE_TRANSFORMER_H
 
+#include "engine.h"
 #include "attributetransformer.h"
 #include "skinnedmesh3Dattrtransformer.h"
 #include "geometry/point/point3array.h"
 #include "geometry/vector/vector3array.h"
 #include "graphics/stdattributes.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

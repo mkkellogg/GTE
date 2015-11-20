@@ -11,7 +11,8 @@
 #ifndef _GTE_IMAGE_LOADER_H_
 #define _GTE_IMAGE_LOADER_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
+
 #include <IL/il.h>
 #include <string>
 

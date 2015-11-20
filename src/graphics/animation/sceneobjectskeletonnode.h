@@ -12,8 +12,9 @@
 #ifndef _GTE_SCENEOBJECT_BONE_H_
 #define _GTE_SCENEOBJECT_BONE_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "skeletonnode.h"
+
 #include <vector>
 #include <string>
 

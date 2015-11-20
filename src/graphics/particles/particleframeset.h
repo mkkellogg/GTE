@@ -14,9 +14,10 @@
 #ifndef _GTE_PARTICLE_FRAMESET_H_
 #define _GTE_PARTICLE_FRAMESET_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "particleutil.h"
+
 #include <vector>
 #include <string>
 
@@ -53,7 +54,7 @@ namespace GTE
 
 		}
 
-		UInt32 FindNextFrameForTimeValue(Real t)
+		UInt32 FindNextFrameForTimeValue(Real t) const
 		{
 			UInt32 frameIndex = 0;
 			while(frameIndex < frames.size() && frames[frameIndex].Time < t)
@@ -64,7 +65,7 @@ namespace GTE
 			return frameIndex;
 		}
 
-		Real CalculateFraction(Real a, Real b, Real z)
+		Real CalculateFraction(Real a, Real b, Real z) const
 		{
 			return (z - a) / (b - a);
 		}
@@ -75,7 +76,7 @@ namespace GTE
 			frames.push_back(newFrame);
 		}
 
-		void InterpolateFrameValues(Real t, T& target)
+		void InterpolateFrameValues(Real t, T& target) const
 		{
 			UInt32 nextFrameIndex = FindNextFrameForTimeValue(t);
 			UInt32 currentFrameIndex = nextFrameIndex - 1;

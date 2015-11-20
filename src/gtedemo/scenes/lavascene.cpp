@@ -4,13 +4,12 @@
 #include <memory>
 #include <functional>
 
+#include "engine.h"
 #include "lavascene.h"
 #include "gtedemo/lavafield.h"
-#include "object/enginetypes.h"
 #include "object/engineobject.h"
 #include "global/global.h"
 #include "global/constants.h"
-#include "engine.h"
 #include "global/assert.h"
 #include "input/inputmanager.h"
 #include "gtedemo/gameutil.h"
@@ -42,9 +41,8 @@
 #include "geometry/point/point3array.h"
 #include "debug/gtedebug.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
-#include "object/layermanager.h"
+#include "scene/sceneobject.h"
+#include "scene/layermanager.h"
 #include "util/time.h"
 #include "util/engineutility.h"
 #include "gtemath/gtemath.h"

@@ -11,10 +11,11 @@
 #ifndef _GTE_PARTICLE_UTIL_H_
 #define _GTE_PARTICLE_UTIL_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "gtemath/gtemath.h"
 #include "particles.h"
+
 #include <vector>
 #include <string>
 

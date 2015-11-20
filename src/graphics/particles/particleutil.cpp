@@ -5,10 +5,10 @@
 #include <cmath>
 #include <string>
 
+#include "engine.h"
 #include "particleutil.h"
 #include "particles.h"
 #include "gtemath/gtemath.h"
-#include "object/enginetypes.h"
 #include "base/basevector4.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/vector/vector2.h"
@@ -18,7 +18,6 @@
 #include "global/assert.h"
 #include "util/engineutility.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {

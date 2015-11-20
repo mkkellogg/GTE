@@ -15,7 +15,7 @@
 #define _GTE_ENGINE_H_
 
 #include <string>
-#include "object/enginetypes.h"
+#include "enginetypes.h"
 
 namespace GTE
 {
@@ -73,7 +73,6 @@ namespace GTE
 
 		// Manages dispatching of engine and object events
 		EventManager * eventManager;
-
 
 		// Registered call-backs for engine life-cycle events
 		EngineCallbacks * callbacks;

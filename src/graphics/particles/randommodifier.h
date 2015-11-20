@@ -12,8 +12,8 @@
 #ifndef _GTE_RANDOM_MODIFIER_H_
 #define _GTE_RANDOM_MODIFIER_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "particlemodifier.h"
 #include "particleutil.h"
 #include "particles.h"
@@ -21,6 +21,7 @@
 #include "global/constants.h"
 #include "engine.h"
 #include "global/assert.h"
+
 #include <vector>
 #include <string>
 
@@ -48,12 +49,12 @@ namespace GTE
 
 		}
 
-		void Initialize(Particle& particle, T& targetAttribute) override
+		void Initialize(Particle& particle, T& targetAttribute) const override
 		{
 			ParticleUtil::GetRandom(offset, range, targetAttribute, edgeClamp, rangeType);
 		}
 
-		void Update(Particle& particle, T& targetAttribute, Real t) override
+		void Update(Particle& particle, T& targetAttribute, Real t) const override
 		{
 			if(!this->runOnce)
 			{

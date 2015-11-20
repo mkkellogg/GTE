@@ -1,12 +1,12 @@
 #ifndef _GTE_CAMERA_H_
 #define _GTE_CAMERA_H_
 
+#include "engine.h"
 #include "geometry/transform.h"
 #include "geometry/vector/vector3.h"
-#include "object/sceneobjectcomponent.h"
+#include "scene/sceneobjectcomponent.h"
 #include "graphics/render/rendertarget.h"
 #include "graphics/graphics.h"
-#include "object/enginetypes.h"
 #include "base/intmask.h"
 #include "global/constants.h"
 

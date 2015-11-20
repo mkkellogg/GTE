@@ -1,8 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
 
 #include "point3.h"
 #include "debug/gtedebug.h"
@@ -10,7 +7,6 @@
 #include "global/assert.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
-#include "engine.h"
 
 namespace GTE
 {

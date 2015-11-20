@@ -3,12 +3,9 @@
 #include <memory.h>
 #include <math.h>
 
-#include <iostream>
-#include <memory>
-#include <functional>
+#include "engine.h"
 #include "game.h"
 #include "lavafield.h"
-#include "engine.h"
 #include "input/inputmanager.h"
 #include "gameutil.h"
 #include "scenes/lavascene.h"
@@ -37,9 +34,8 @@
 #include "geometry/point/point3array.h"
 #include "debug/gtedebug.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
-#include "object/layermanager.h"
+#include "scene/sceneobject.h"
+#include "scene/layermanager.h"
 #include "util/time.h"
 #include "util/engineutility.h"
 #include "global/global.h"
@@ -47,6 +43,10 @@
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
+
+#include <iostream>
+#include <memory>
+#include <functional>
 
 const std::string Game::PlayerObjectLayer = "Player";
 

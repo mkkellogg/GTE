@@ -11,9 +11,10 @@
 #ifndef _GTE_RENDER_QUEUE_H_
 #define _GTE_RENDER_QUEUE_H_
 
+#include "engine.h"
 #include "base/intmask.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
+
 #include <vector>
 
 namespace GTE

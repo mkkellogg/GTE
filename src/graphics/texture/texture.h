@@ -10,9 +10,10 @@
 #ifndef _GTE_TEXTURE_H_
 #define _GTE_TEXTURE_H_
 
-#include "textureattr.h"
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
+#include "textureattr.h"
+
 #include <vector>
 #include <string>
 

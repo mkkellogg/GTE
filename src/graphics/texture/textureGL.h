@@ -10,8 +10,9 @@
 #ifndef _GTE_TEXTURE_GL_H_
 #define _GTE_TEXTURE_GL_H_
 
+#include "engine.h"
 #include "graphics/gl_include.h"
-#include "object/enginetypes.h"
+
 #include "texture.h"
 #include <string>
 

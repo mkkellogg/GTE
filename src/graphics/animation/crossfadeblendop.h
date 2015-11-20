@@ -11,9 +11,10 @@
 #ifndef _GTE_CROSSFADE_BLENDOP_H_
 #define _GTE_CROSSFADE_BLENDOP_H_
 
+#include "engine.h"
 #include "blendop.h"
-#include "object/enginetypes.h"
 #include "global/global.h"
+
 #include <vector>
 #include <string>
 #include <memory>

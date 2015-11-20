@@ -11,8 +11,9 @@
 #ifndef _GTE_FILE_SYSTEM_H_
 #define _GTE_FILE_SYSTEM_H_
 
+#include "engine.h"
 #include "global/global.h"
-#include "object/enginetypes.h"
+
 #include <string>
 
 namespace GTE
@@ -21,12 +22,12 @@ namespace GTE
 	{
 		static FileSystem * theInstance;
 
-	protected:
+		protected:
 
 		FileSystem();
 		virtual ~FileSystem();
 
-	public:
+		public:
 
 		static FileSystem * Instance();
 

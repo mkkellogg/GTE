@@ -1,6 +1,6 @@
+#include "engine.h"
 #include "constants.h"
 #include "global/global.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

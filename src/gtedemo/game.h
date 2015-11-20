@@ -9,13 +9,14 @@
 #ifndef _GTE_GAME_H_
 #define _GTE_GAME_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/transform.h"
 #include "asset/assetimporter.h"
 #include "scene.h"
 #include "base/intmask.h"
+
 #include <functional>
 #include <vector>
 

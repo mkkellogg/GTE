@@ -2,6 +2,7 @@
 #define _GTE_SHADER_SOURCE_LOADER_GL_H_
 
 #include <string>
+
 #include "shadersourceloader.h"
 #include "global/global.h"
 

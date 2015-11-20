@@ -10,12 +10,9 @@
 #ifndef _GTE_POINT3_H_
 #define _GTE_POINT3_H_
 
+#include "engine.h"
 #include "base/basevector4.h"
 #include "gtemath/gtemath.h"
-#include <functional>
-#include <unordered_map>
-#include <iostream>
-#include <string>
 
 namespace GTE
 {

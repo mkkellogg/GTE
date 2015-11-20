@@ -4,11 +4,11 @@
 #include <math.h>
 #include <string>
 
+#include "engine.h"
 #include "particlesystem.h"
 #include "particleutil.h"
 #include "particle.h"
 #include "particlemeshrenderer.h"
-#include "object/enginetypes.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
@@ -29,7 +29,6 @@
 #include "geometry/quaternion.h"
 #include "graphics/view/camera.h"
 #include "graphics/texture/atlas.h"
-#include "engine.h"
 #include "util/time.h"
 
 namespace GTE

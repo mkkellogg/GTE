@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "object/sceneobject.h"
+#include "scene/sceneobject.h"
 #include "sceneobjectskeletonnode.h"
 #include "global/global.h"
 #include "global/assert.h"

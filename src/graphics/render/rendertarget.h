@@ -11,10 +11,10 @@
 #ifndef _GTE_RENDER_TARGET_H_
 #define _GTE_RENDER_TARGET_H_
 
+#include "engine.h"
 #include "base/intmask.h"
 #include "renderbuffer.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
 #include "graphics/texture/textureattr.h"
 
 namespace GTE

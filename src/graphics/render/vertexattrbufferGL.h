@@ -10,9 +10,9 @@
 #ifndef _GTE_VERTEX_ATTR_BUFFER_GL_H_
 #define _GTE_VERTEX_ATTR_BUFFER_GL_H_
 
+#include "engine.h"
 #include "graphics/gl_include.h"
 #include "vertexattrbuffer.h"
-#include "object/enginetypes.h"
 
 namespace GTE
 {

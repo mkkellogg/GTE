@@ -4,12 +4,11 @@
 #include <memory.h>
 #include <math.h>
 
-#include "renderer.h"
 #include "engine.h"
+#include "renderer.h"
 #include "object/engineobjectmanager.h"
-#include "object/sceneobjectcomponent.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
+#include "scene/sceneobjectcomponent.h"
+#include "scene/sceneobject.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"

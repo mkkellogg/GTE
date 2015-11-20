@@ -12,9 +12,10 @@
 #ifndef _GTE_ANIMATION_INSTANCE_H_
 #define _GTE_ANIMATION_INSTANCE_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "animationplayer.h"
 #include "global/global.h"
+
 #include <vector>
 #include <string>
 
@@ -26,7 +27,7 @@ namespace GTE
 		friend class AnimationManager;
 		friend class AnimationPlayer;
 
-	public:
+		public:
 
 		/*
 		 * The FrameState class is used to keep track of the state of the animation for
@@ -35,7 +36,7 @@ namespace GTE
 		 */
 		class FrameState
 		{
-		public:
+			public:
 
 			// index of the current translation key for the node
 			UInt32 TranslationKeyIndex;
@@ -59,7 +60,7 @@ namespace GTE
 			}
 		};
 
-	private:
+		private:
 
 		// map each node in [Target] to a channel in [SourceAnimation]
 		Int32 * NodeToChannelMap;
@@ -117,7 +118,7 @@ namespace GTE
 		void Stop();
 		void Pause();
 
-	public:
+		public:
 
 		Bool Init();
 		void Reset();

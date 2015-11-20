@@ -10,7 +10,7 @@
 #ifndef _GTE_GRAPHICSATTR_H_
 #define _GTE_GRAPHICSATTR_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "global/global.h"
 
 namespace GTE

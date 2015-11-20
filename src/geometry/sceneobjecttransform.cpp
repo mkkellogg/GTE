@@ -1,11 +1,5 @@
-#include <iostream>
-#include <math.h>
-#include <memory.h>
 #include "sceneobjecttransform.h"
-#include "object/sceneobject.h"
-#include "object/enginetypes.h"
-#include "transform.h"
-#include "matrix4x4.h"
+#include "scene/sceneobject.h"
 #include "debug/gtedebug.h"
 #include "global/constants.h"
 #include "global/global.h"
@@ -13,7 +7,6 @@
 #include "vector/vector3.h"
 #include "point/point3.h"
 #include "util/datastack.h"
-#include "engine.h"
 
 namespace GTE
 {

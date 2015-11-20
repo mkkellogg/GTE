@@ -11,9 +11,13 @@
 #ifndef _GTE_MODEL_IMPORTER_H_
 #define _GTE_MODEL_IMPORTER_H_
 
-#include "object/sceneobjectcomponent.h"
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "engine.h"
+#include "scene/sceneobjectcomponent.h"
 #include "object/shaderorganizer.h"
-#include "object/enginetypes.h"
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
 #include "assimp/scene.h"
@@ -21,9 +25,6 @@
 #include "base/longmask.h"
 #include "global/global.h"
 
-#include <memory>
-#include <string>
-#include <vector>
 
 namespace GTE
 {

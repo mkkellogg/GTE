@@ -1,7 +1,7 @@
 #ifndef _GTE_BASEVECTOR2_FACTORY_H_
 #define _GTE_BASEVECTOR2_FACTORY_H_
 
-#include "object/enginetypes.h"
+#include "engine.h"
 #include "global/global.h"
 
 namespace GTE

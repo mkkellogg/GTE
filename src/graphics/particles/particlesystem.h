@@ -10,9 +10,9 @@
 #ifndef _GTE_PARTICLE_SYSTEM_H_
 #define _GTE_PARTICLE_SYSTEM_H_
 
+#include "engine.h"
 #include "object/engineobject.h"
-#include "object/enginetypes.h"
-#include "object/sceneobjectcomponent.h"
+#include "scene/sceneobjectcomponent.h"
 #include "particlemodifier.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
@@ -22,6 +22,7 @@
 #include "graphics/color/color4.h"
 #include "particlemodifier.h"
 #include "graphics/materialvardirectory.h"
+
 #include <vector>
 #include <string>
 
