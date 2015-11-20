@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
- 
 #include "basevector4.h"
 #include "global/global.h"
 #include "global/assert.h"

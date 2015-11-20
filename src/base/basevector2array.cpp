@@ -1,13 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "basevector2array.h"
 #include "basevector2.h"
 #include "basevector2factory.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {
