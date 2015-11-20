@@ -1,3 +1,5 @@
+#include <memory.h>
+
 #include "engine.h"
 #include "transform.h"
 #include "matrix4x4.h"
@@ -323,7 +325,7 @@ namespace GTE
 	void Transform::BuildPerspectiveProjectionMatrix(Matrix4x4& matrix, Real fov, Real ratio, Real nearP, Real farP)
 	{
 		// convert fov to radians
-		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 * .5f);
+		Real f = 1.0f / GTEMath::Tan(fov * Constants::TwoPIOver360 * .5f);
 
 		matrix.SetIdentity();
 
@@ -350,7 +352,7 @@ namespace GTE
 	void Transform::BuildPerspectiveProjectionMatrixInfiniteFar(Matrix4x4& matrix, Real fov, Real ratio, Real nearP)
 	{
 		// convert fov to radians
-		Real f = 1.0f / tan(fov * Constants::TwoPIOver360 * .5f);
+		Real f = 1.0f / GTEMath::Tan(fov * Constants::TwoPIOver360 * .5f);
 
 		matrix.SetIdentity();
 

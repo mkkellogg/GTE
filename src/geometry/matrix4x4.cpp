@@ -17,9 +17,7 @@
 *
 ***********************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
- 
+#include <memory.h>
 
 #include "matrix4x4.h"
 #include "quaternion.h"

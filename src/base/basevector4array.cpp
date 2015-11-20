@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <memory.h>
 
 #include "basevector4array.h"
 #include "basevector4.h"

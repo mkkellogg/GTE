@@ -67,6 +67,11 @@ namespace GTE
 		return sin(n);
 	}
 
+	Real GTEMath::Tan(Real n)
+	{
+		return tan(n);
+	}
+
 	Real GTEMath::Abs(Real n)
 	{
 		return fabs(n);

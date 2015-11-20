@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <memory.h>
 
 #include "vector3factory.h"
 #include "vector3.h"

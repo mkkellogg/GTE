@@ -1,3 +1,5 @@
+#include <memory.h>
+
 #include "basevector2array.h"
 #include "basevector2.h"
 #include "basevector2factory.h"

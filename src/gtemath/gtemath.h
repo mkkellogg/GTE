@@ -18,6 +18,7 @@ namespace GTE
 		static Real Cos(Real n);
 		static Real ACos(Real n);
 		static Real Sin(Real n);
+		static Real Tan(Real n);
 		static Real Abs(Real n);
 		static Real Min(Real a, Real b);
 		static Real Max(Real a, Real b);

@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <memory.h>
 
 #include "vector2factory.h"
 #include "vector2.h"

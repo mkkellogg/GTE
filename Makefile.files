@@ -87,8 +87,8 @@ $(INPUTOBJ):
 # ==================================
 
 ENGINESRC= src
-ENGINESRCS= $(ENGINESRC)/engine.cpp  $(ENGINESRC)/enginetypes.cpp
-ENGINEOBJ = $(OUTPUTDIR)/engine.o
+ENGINESRCS= $(ENGINESRC)/engine.cpp $(ENGINESRC)/enginetypes.cpp
+ENGINEOBJ = $(OUTPUTDIR)/engine.o $(OUTPUTDIR)/enginetypes.o
 
 $(ENGINEOBJ): 
 	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(ENGINESRC),$@,$(OUTPUTDIR)) 

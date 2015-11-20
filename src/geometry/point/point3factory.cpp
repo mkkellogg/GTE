@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <memory.h>
 
 #include "point3factory.h"
 #include "point3.h"
