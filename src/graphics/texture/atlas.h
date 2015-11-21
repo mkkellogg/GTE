@@ -11,11 +11,10 @@
 #ifndef _GTE_ATLAS_H_
 #define _GTE_ATLAS_H_
 
+#include <vector>
+
 #include "engine.h"
 #include "object/engineobject.h"
-
-#include <vector>
-#include <string>
 
 namespace GTE
 {

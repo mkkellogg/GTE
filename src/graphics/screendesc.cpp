@@ -1,6 +1,3 @@
-#include <iostream>
-#include <math.h>
-
 #include "screendesc.h"
 
 namespace GTE

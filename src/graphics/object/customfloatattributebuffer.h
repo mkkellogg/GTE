@@ -15,9 +15,6 @@
 #include "gtemath/gtemath.h"
 #include "graphics/materialvardirectory.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	class CustomFloatAttributeBuffer

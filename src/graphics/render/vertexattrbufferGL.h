@@ -18,11 +18,8 @@ namespace GTE
 {
 	class VertexAttrBufferGL : public GTE::VertexAttrBuffer
 	{
-		/*
-		 * The constructor and destructor are protected so that no class besides GraphicsGL or SubMesh3DRendererGL can
-		 * instantiate or destroy a VertexAttrBufferGL object.
-		 */
 		friend class SubMesh3DRendererGL;
+		// necessary during rendering
 		friend class GraphicsGL;
 
 		// raw pointer to the buffer data

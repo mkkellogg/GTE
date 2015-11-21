@@ -1,10 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-
-#include "engine.h"
 #include "atlas.h"
 #include "graphics/image/rawimage.h"
 #include "graphics/image/imageloader.h"

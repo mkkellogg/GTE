@@ -1,8 +1,6 @@
 #ifndef _GTE_QUATERNION_H
 #define _GTE_QUATERNION_H
 
-#include <math.h>
-
 #include "engine.h"
 #include "geometry/vector/vector3.h"
 #include "global/constants.h"

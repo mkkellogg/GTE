@@ -1,10 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "engine.h"
 #include "keyframe.h"
-
-#include <string>
 
 namespace GTE
 {

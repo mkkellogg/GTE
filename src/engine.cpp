@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
 #include "engine.h"
 #include "object/engineobjectmanager.h"
 #include "scene/eventmanager.h"

@@ -16,9 +16,6 @@
 #include "animationplayer.h"
 #include "global/global.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	class AnimationInstance

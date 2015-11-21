@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "engine.h"
 #include "animation.h"
 #include "skeleton.h"
@@ -8,8 +5,6 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 #include "engine.h"
-
-#include <string>
 
 namespace GTE
 {

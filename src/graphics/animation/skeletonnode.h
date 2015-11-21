@@ -16,13 +16,13 @@
 #ifndef _GTE_SKELETON_NODE_H_
 #define _GTE_SKELETON_NODE_H_
 
+#include <vector>
+#include <string>
+
 #include "engine.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
-
-#include <vector>
-#include <string>
 
 namespace GTE
 {

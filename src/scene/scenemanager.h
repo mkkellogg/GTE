@@ -18,8 +18,6 @@
 #include "util/datastack.h"
 #include "geometry/transform.h"
 
-#include <unordered_map>
-
 namespace GTE
 {
 	// forward declaration

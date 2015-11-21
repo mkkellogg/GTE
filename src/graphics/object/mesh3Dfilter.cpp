@@ -1,21 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <unordered_map>
-#include <functional>
-#include <vector>
-
 #include "engine.h"
-#include "scene/sceneobjectcomponent.h"
-#include "scene/sceneobject.h"
-#include "object/engineobject.h"
-#include "object/engineobjectmanager.h"
 #include "mesh3Dfilter.h"
-#include "mesh3D.h"
-#include "graphics/render/mesh3Drenderer.h"
-#include "graphics/render/skinnedmesh3Drenderer.h"
+#include "scene/sceneobject.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"

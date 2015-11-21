@@ -12,6 +12,8 @@
 #ifndef _GTE_ANIMATION_H_
 #define _GTE_ANIMATION_H_
 
+#include <string>
+
 #include "engine.h"
 #include "object/engineobject.h"
 #include "keyframeset.h"
@@ -26,7 +28,11 @@ namespace GTE
 {
 	class Animation : public EngineObject
 	{
+		// Since this ultimately derives from EngineObject, we make this class
+		// a friend of EngineObjectManager, and the constructor & destructor
+		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
+		// needed when loading animations
 		friend class ModelImporter;
 
 		// A KeyFrameSet for each node in the target skeleton

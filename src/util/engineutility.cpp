@@ -1,11 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-
-#include "engine.h"
 #include "engineutility.h"
 #include "geometry/matrix4x4.h"
 #include "graphics/object/submesh3D.h"

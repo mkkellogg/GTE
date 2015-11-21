@@ -1,11 +1,11 @@
 #ifndef _GTE_UNIFORMS_H_
 #define _GTE_UNIFORMS_H_
 
-#include "engine.h"
-#include "base/intmask.h"
-
 #include <unordered_map>
 #include <string>
+
+#include "engine.h"
+#include "base/intmask.h"
 
 namespace GTE
 {

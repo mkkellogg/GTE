@@ -11,16 +11,16 @@
 #ifndef _GTE_ANIMATION_PLAYER_H_
 #define _GTE_ANIMATION_PLAYER_H_
 
+#include <vector>
+#include <queue>
+#include <unordered_map>
+#include <string>
+
 #include "engine.h"
 #include "object/engineobject.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
 #include "keyframeset.h"
-
-#include <vector>
-#include <queue>
-#include <unordered_map>
-#include <string>
 
 namespace GTE
 {

@@ -12,12 +12,6 @@
 #include "engine.h"
 #include "object/engineobject.h"
 
-#include <vector>
-#include <map>
-#include <unordered_map>
-#include <memory>
-#include <stack>
-
 namespace GTE
 {
 	enum class RenderQueueType

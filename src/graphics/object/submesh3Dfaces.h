@@ -16,9 +16,6 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	// forward declarations

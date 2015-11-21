@@ -1,10 +1,11 @@
 #ifndef _GTE_SHADER_SOURCE_H_
 #define _GTE_SHADER_SOURCE_H_
 
+#include <string>
+#include <vector>
+
 #include "engine.h"
 #include "shadersourcelines.h"
-
-#include <string>
 
 namespace GTE
 {

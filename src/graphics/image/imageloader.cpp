@@ -1,9 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
 #include "imageloader.h"
 #include "rawimage.h"
 #include "global/global.h"

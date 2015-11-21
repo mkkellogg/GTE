@@ -19,9 +19,6 @@
 
 namespace GTE
 {
-	// forward declarations
-	class TextureAttributes;
-
 	class RenderTarget : public EngineObject
 	{
 	protected:

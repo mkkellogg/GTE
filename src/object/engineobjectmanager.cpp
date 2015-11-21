@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include "engine.h"
 #include "engineobjectmanager.h"
 #include "scene/sceneobject.h"
 #include "scene/scenemanager.h"
@@ -29,16 +22,15 @@
 #include "graphics/animation/animationplayer.h"
 #include "graphics/particles/particlesystem.h"
 #include "graphics/particles/particlemeshrenderer.h"
+#include "graphics/view/camera.h"
 #include "asset/assetimporter.h"
 #include "debug/gtedebug.h"
-#include "graphics/view/camera.h"
 #include "base/longmask.h"
 #include "base/intmask.h"
 #include "util/engineutility.h"
 #include "filesys/filesystem.h"
 #include "global/constants.h"
 #include "global/assert.h"
-#include <string>
 
 namespace GTE
 {

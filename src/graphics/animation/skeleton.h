@@ -19,14 +19,14 @@
 #ifndef _GTE_SKELETON_H_
 #define _GTE_SKELETON_H_
 
+#include <vector>
+#include <string>
+#include <unordered_map>
+
 #include "engine.h"
 #include "object/engineobject.h"
 #include "skeletonnode.h"
 #include "util/tree.h"
-
-#include <vector>
-#include <string>
-#include <unordered_map>
 
 namespace GTE
 {

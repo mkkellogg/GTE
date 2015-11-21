@@ -10,9 +10,9 @@
 #ifndef _GTE_TIME_H_
 #define _GTE_TIME_H_
 
-#include "engine.h"
-
 #include <chrono>
+
+#include "engine.h"
 
 namespace GTE
 {

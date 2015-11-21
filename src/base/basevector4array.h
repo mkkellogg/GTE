@@ -1,8 +1,9 @@
 #ifndef _GTE_BASEVECTOR4ARRAY_H_
 #define _GTE_BASEVECTOR4ARRAY_H_
 
-#include "global/global.h"
+#include "engine.h"
 #include "basevector4.h"
+#include "global/global.h"
 
 namespace GTE
 {

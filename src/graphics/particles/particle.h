@@ -18,9 +18,6 @@
 #include "graphics/color/color4.h"
 #include "particles.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	class Particle

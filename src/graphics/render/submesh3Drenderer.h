@@ -25,17 +25,16 @@
 #ifndef _GTE_SUBMESH3D_RENDERER_H_
 #define _GTE_SUBMESH3D_RENDERER_H_
 
+#include <vector>
+
 #include "engine.h"
 #include "scene/sceneobjectcomponent.h"
-#include "submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/render/material.h"
 #include "attributetransformer.h"
 #include "geometry/vector/vector3array.h"
 #include "geometry/point/point3array.h"
 #include "geometry/point/point3.h"
-
-#include <vector>
 
 namespace GTE
 {
@@ -55,8 +54,8 @@ namespace GTE
 		// need to set Mesh3DRenderer as a friend so it can call the
 		// protected method SetContainerRenderer()
 		friend class Mesh3DRenderer;
+		// necessary since this derives from EngineObject and needs to be managed by EngineObjectManager
 		friend class EngineObjectManager;
-
 		// needed for special access during rendering
 		friend class ForwardRenderManager;
 

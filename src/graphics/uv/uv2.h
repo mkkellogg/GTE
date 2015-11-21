@@ -1,6 +1,7 @@
 #ifndef _GTE_UV2_H_
 #define _GTE_UV2_H_
 
+#include "engine.h"
 #include "uv2.h"
 #include "base/basevector2.h"
 

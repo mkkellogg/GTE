@@ -4,9 +4,6 @@
 #include "engine.h"
 #include "base/intmask.h"
 
-#include <string>
-#include <map>
-
 namespace GTE
 {
 	//forward declarations

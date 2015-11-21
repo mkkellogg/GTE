@@ -1,5 +1,5 @@
-#include <iostream>
 #include <math.h>
+#include <cmath>
 
 #include "quaternion.h"
 #include "matrix4x4.h"
@@ -8,7 +8,6 @@
 #include "base/basevector4.h"
 #include "debug/gtedebug.h"
 #include "global/constants.h"
-#include <cmath>
 
 namespace GTE
 {

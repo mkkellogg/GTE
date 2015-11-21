@@ -1,10 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "blendop.h"
 #include "util/time.h"
-#include <string>
 
 namespace GTE
 {

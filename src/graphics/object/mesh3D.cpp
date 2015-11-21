@@ -1,12 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <unordered_map>
-#include <functional>
-#include <vector>
-
 #include "engine.h"
 #include "scene/sceneobjectcomponent.h"
 #include "scene/sceneobject.h"

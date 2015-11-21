@@ -15,7 +15,6 @@
 #include "textureattr.h"
 
 #include <vector>
-#include <string>
 
 namespace GTE
 {

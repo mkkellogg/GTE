@@ -14,9 +14,6 @@
 #include "engine.h"
 #include "object/engineobject.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	//forward declarations

@@ -15,6 +15,7 @@
 #define _GTE_ENGINE_H_
 
 #include <string>
+
 #include "enginetypes.h"
 
 namespace GTE

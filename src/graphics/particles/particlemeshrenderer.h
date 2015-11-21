@@ -15,8 +15,6 @@
 #include "scene/sceneobjectcomponent.h"
 #include "graphics/render/mesh3Drenderer.h"
 
-#include <vector>
-
 namespace GTE
 {
 	//forward declarations

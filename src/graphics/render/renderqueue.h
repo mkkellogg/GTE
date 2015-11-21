@@ -15,8 +15,6 @@
 #include "base/intmask.h"
 #include "object/engineobject.h"
 
-#include <vector>
-
 namespace GTE
 {
 	// forward declarations

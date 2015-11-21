@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
- 
 #include "vector3.h"
 #include "debug/gtedebug.h"
 #include "global/global.h"

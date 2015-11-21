@@ -1,22 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
- 
-#include "engine.h"
 #include "graphics.h"
 #include "stdattributes.h"
 #include "stduniforms.h"
 #include "global/global.h"
 #include "global/assert.h"
-#include "texture/atlas.h"
-#include "shader/shader.h"
-#include "render/material.h"
-#include "geometry/transform.h"
-#include "render/submesh3Drenderer.h"
 #include "object/engineobjectmanager.h"
-#include "scene/sceneobject.h"
 #include "global/global.h"
 #include "debug/gtedebug.h"
 #include "util/time.h"

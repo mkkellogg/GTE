@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include <vector>
 #include "renderqueuemanager.h"
 #include "engine.h"
 #include "global/global.h"

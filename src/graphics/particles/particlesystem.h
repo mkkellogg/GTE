@@ -23,9 +23,6 @@
 #include "particlemodifier.h"
 #include "graphics/materialvardirectory.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	// forward declarations

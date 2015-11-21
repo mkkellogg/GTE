@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
 #include "uv2array.h"
 #include "uv2.h"
 #include "uv2factory.h"

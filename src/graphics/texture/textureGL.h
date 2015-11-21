@@ -10,11 +10,11 @@
 #ifndef _GTE_TEXTURE_GL_H_
 #define _GTE_TEXTURE_GL_H_
 
+#include <string>
+
 #include "engine.h"
 #include "graphics/gl_include.h"
-
 #include "texture.h"
-#include <string>
 
 namespace GTE
 {

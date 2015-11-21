@@ -10,12 +10,10 @@
 #ifndef _GTE_SHADER_MANAGER_H_
 #define _GTE_SHADER_MANAGER_H_
 
-#include "engine.h"
-#include "assimp/scene.h"
-#include "base/longmask.h"
-
-#include <string>
 #include <map>
+
+#include "engine.h"
+#include "base/longmask.h"
 
 namespace GTE
 {

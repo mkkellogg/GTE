@@ -1,14 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <string>
 #include "submesh3Dface.h"
 #include "submesh3Dfaces.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {

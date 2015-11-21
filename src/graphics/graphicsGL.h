@@ -19,10 +19,12 @@
 #ifndef _GTE_GRAPHICS_GL_H_
 #define _GTE_GRAPHICS_GL_H_
 
+#include <string>
+
+#include "engine.h"
 #include "graphics/gl_include.h"
 #include "graphics.h"
 #include "base/intmask.h"
-#include <string>
 
 #define GL_GLEXT_PROTOTYPES
 

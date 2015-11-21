@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
 #include "eventmanager.h"
 #include "sceneobject.h"
 #include "sceneobjectcomponent.h"
@@ -15,7 +9,6 @@
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/particles/particlesystem.h"
-#include "engine.h"
 #include "global/assert.h"
 
 namespace GTE

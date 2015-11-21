@@ -11,6 +11,7 @@
 #ifndef _GTE_ROTATION_KEYFRAME_H_
 #define _GTE_ROTATION_KEYFRAME_H_
 
+#include "engine.h"
 #include "global/global.h"
 #include "keyframe.h"
 #include "geometry/quaternion.h"

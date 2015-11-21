@@ -1,6 +1,5 @@
-#include <math.h>
-#include "graphics/gl_include.h"
 #include "rendertargetGL.h"
+#include "graphics/gl_include.h"
 #include "object/engineobjectmanager.h"
 #include "base/intmask.h"
 #include "global/global.h"
@@ -9,7 +8,6 @@
 #include "graphics/graphics.h"
 #include "graphics/texture/texture.h"
 #include "graphics/texture/textureGL.h"
-#include "engine.h"
 
 namespace GTE
 {

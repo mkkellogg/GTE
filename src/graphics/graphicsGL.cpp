@@ -1,15 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-
-#include "graphics/gl_include.h"
-#include "engine.h"
 #include "graphicsGL.h"
+#include "graphics/gl_include.h"
 #include "graphics/screendesc.h"
-#include "graphics/animation/animationmanager.h"
 #include "render/material.h"
 #include "debug/gtedebug.h"
 #include "shader/shaderGL.h"

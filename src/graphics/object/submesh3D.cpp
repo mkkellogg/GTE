@@ -1,27 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <unordered_map>
-#include <functional>
-#include <vector>
-#include <memory>
-
 #include "scene/sceneobjectcomponent.h"
 #include "scene/sceneobject.h"
 #include "submesh3D.h"
 #include "mesh3D.h"
 #include "submesh3Dface.h"
-#include "graphics/render/submesh3Drenderer.h"
 #include "graphics/stdattributes.h"
-#include "graphics/graphics.h"
-#include "graphics/render/submesh3Drenderer.h"
 #include "graphics/color/color4array.h"
 #include "graphics/uv/uv2array.h"
-#include "graphics/color/color4.h"
-#include "graphics/uv/uv2.h"
-#include "graphics/light/light.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/point/point3array.h"

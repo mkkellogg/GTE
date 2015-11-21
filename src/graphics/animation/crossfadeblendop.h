@@ -11,13 +11,13 @@
 #ifndef _GTE_CROSSFADE_BLENDOP_H_
 #define _GTE_CROSSFADE_BLENDOP_H_
 
-#include "engine.h"
-#include "blendop.h"
-#include "global/global.h"
-
 #include <vector>
 #include <string>
 #include <memory>
+
+#include "engine.h"
+#include "blendop.h"
+#include "global/global.h"
 
 namespace GTE
 {
@@ -27,6 +27,7 @@ namespace GTE
 
 	class CrossFadeBlendOp : public BlendOp
 	{
+		// necessary since AnimationPlayer directly controls this class
 		friend class AnimationPlayer;
 
 		UInt32 targetIndex;

@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "longmask.h"
 #include "debug/gtedebug.h"
 

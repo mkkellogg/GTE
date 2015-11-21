@@ -1,17 +1,5 @@
-#include <functional>
-#include <vector>
-#include <iostream>
-#include <memory>
-#include <functional>
-
-#include "engine.h"
 #include "lavascene.h"
 #include "gtedemo/lavafield.h"
-#include "object/engineobject.h"
-#include "global/global.h"
-#include "global/constants.h"
-#include "global/assert.h"
-#include "input/inputmanager.h"
 #include "gtedemo/gameutil.h"
 #include "asset/assetimporter.h"
 #include "graphics/graphics.h"
@@ -31,22 +19,19 @@
 #include "graphics/particles/randommodifier.h"
 #include "graphics/particles/framesetmodifier.h"
 #include "graphics/particles/evenintervalindexmodifier.h"
-#include "base/basevector4.h"
-#include "geometry/matrix4x4.h"
-#include "geometry/quaternion.h"
 #include "geometry/transform.h"
-#include "geometry/sceneobjecttransform.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
-#include "geometry/point/point3array.h"
 #include "debug/gtedebug.h"
 #include "object/engineobjectmanager.h"
 #include "scene/sceneobject.h"
 #include "scene/layermanager.h"
 #include "util/time.h"
 #include "util/engineutility.h"
+#include "global/global.h"
+#include "global/assert.h"
+#include "global/constants.h"
 #include "gtemath/gtemath.h"
-#include "filesys/filesystem.h"
 
 const std::string LavaScene::LavaWallLayer = "LavaWall";
 const std::string LavaScene::LavaIslandObjectsLayer = "LavaIslandObjects";

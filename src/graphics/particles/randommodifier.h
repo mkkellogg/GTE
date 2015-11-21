@@ -22,9 +22,6 @@
 #include "engine.h"
 #include "global/assert.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	template <typename T> class RandomModifier : public ParticleModifier<T>

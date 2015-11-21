@@ -1,10 +1,10 @@
 #ifndef _GTE_ERRORMANAGER_H_
 #define _GTE_ERRORMANAGER_H_
 
-#include "engine.h"
-
 #include <vector>
 #include <string>
+
+#include "engine.h"
 
 namespace GTE
 {

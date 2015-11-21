@@ -1,11 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-#include <iostream>
-
 #include "material.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/point/point3.h"
@@ -23,9 +15,6 @@
 #include "debug/gtedebug.h"
 #include "global/global.h"
 #include "global/assert.h"
-#include "base/basevector4.h"
-#include "engine.h"
-#include <string>
 
 namespace GTE
 {

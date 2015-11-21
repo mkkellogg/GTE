@@ -1,25 +1,10 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-
 #include "shaderorganizer.h"
 #include "graphics/stduniforms.h"
-#include "assimp/scene.h"
-#include "assimp/cimport.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-#include "assimp/Importer.hpp"
-#include "assimp/DefaultLogger.hpp"
-#include "assimp/LogStream.hpp"
 #include "graphics/shader/shader.h"
 #include "base/longmask.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {

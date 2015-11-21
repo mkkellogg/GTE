@@ -13,8 +13,6 @@
 #include "object/engineobject.h"
 #include "scene/sceneobjectcomponent.h"
 
-#include <vector>
-
 namespace GTE
 {
 	//forward declarations

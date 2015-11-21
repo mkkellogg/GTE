@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <memory.h>
 
-#include "engine.h"
 #include "scenemanager.h"
 #include "object/engineobject.h"
 #include "scene/sceneobject.h"
@@ -19,9 +16,6 @@
 #include "global/constants.h"
 #include "util/datastack.h"
 #include "debug/gtedebug.h"
-
-#include <string>
-#include <unordered_map>
 
 namespace GTE
 {

@@ -19,9 +19,6 @@
 #include "particlemodifier.h"
 #include "particleframeset.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	template <typename T> class FrameSetModifier : public ParticleModifier<T>

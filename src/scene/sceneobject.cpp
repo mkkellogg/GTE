@@ -1,14 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <memory>
-
-#include "engine.h"
+#include "sceneobject.h"
 #include "object/engineobject.h"
 #include "object/engineobjectmanager.h"
-#include "sceneobject.h"
 #include "scenemanager.h"
 #include "graphics/graphics.h"
 #include "graphics/view/camera.h"

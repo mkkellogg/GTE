@@ -10,11 +10,11 @@
 #ifndef _GTE_GAMEUTIL_H_
 #define _GTE_GAMEUTIL_H_
 
+#include <functional>
+
 #include "engine.h"
 #include "graphics/stdattributes.h"
 #include "base/intmask.h"
-
-#include <functional>
 
 class GameUtil
 {

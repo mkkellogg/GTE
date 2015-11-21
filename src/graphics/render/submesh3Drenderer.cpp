@@ -1,11 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <memory.h>
-#include <math.h>
 
-#include "scene/sceneobjectcomponent.h"
 #include "submesh3Drenderer.h"
+#include "scene/sceneobjectcomponent.h"
 #include "graphics/object/submesh3D.h"
 #include "graphics/object/submesh3Dface.h"
 #include "graphics/object/submesh3Dfaces.h"
@@ -31,7 +27,6 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {

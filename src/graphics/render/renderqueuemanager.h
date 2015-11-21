@@ -13,12 +13,6 @@
 #include "object/engineobject.h"
 #include "renderqueue.h"
 
-#include <vector>
-#include <map>
-#include <unordered_map>
-#include <memory>
-#include <stack>
-
 namespace GTE
 {
 	class RenderQueueManager

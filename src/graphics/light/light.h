@@ -8,8 +8,6 @@
 #include "geometry/vector/vector3.h"
 #include "base/intmask.h"
 
-#include <memory>
-
 namespace GTE
 {
 	//forward declarations

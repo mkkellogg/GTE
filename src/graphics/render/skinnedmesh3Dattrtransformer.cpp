@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "attributetransformer.h"
 #include "skinnedmesh3Dattrtransformer.h"
 #include "skinnedmesh3Drenderer.h"

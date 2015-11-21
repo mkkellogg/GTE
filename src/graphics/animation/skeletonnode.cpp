@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <vector>
-#include <memory>
 #include "skeleton.h"
 #include "skeletonnode.h"
 #include "bone.h"

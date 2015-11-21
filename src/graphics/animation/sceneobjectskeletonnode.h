@@ -12,11 +12,10 @@
 #ifndef _GTE_SCENEOBJECT_BONE_H_
 #define _GTE_SCENEOBJECT_BONE_H_
 
+#include <string>
+
 #include "engine.h"
 #include "skeletonnode.h"
-
-#include <vector>
-#include <string>
 
 namespace GTE
 {

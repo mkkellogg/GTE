@@ -1,14 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include "engine.h"
+#include "mesh3Drenderer.h"
 #include "object/engineobjectmanager.h"
 #include "scene/sceneobjectcomponent.h"
 #include "scene/sceneobject.h"
-#include "mesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"

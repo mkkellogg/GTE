@@ -1,13 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <math.h>
-
-#include <memory>
-#include "engine.h"
+#include "gtedemo.h"
 #include "debug/gtedebug.h"
 #include "graphics/graphics.h"
-#include "gtedemo.h"
 #include "gtedemo/game.h"
 
 /*

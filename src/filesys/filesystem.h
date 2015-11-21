@@ -11,10 +11,10 @@
 #ifndef _GTE_FILE_SYSTEM_H_
 #define _GTE_FILE_SYSTEM_H_
 
+#include <string>
+
 #include "engine.h"
 #include "global/global.h"
-
-#include <string>
 
 namespace GTE
 {

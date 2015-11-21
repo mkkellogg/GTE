@@ -1,11 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <memory.h>
-#include <math.h>
-#include <cmath>
-#include <string>
-
-#include "engine.h"
 #include "particleutil.h"
 #include "particles.h"
 #include "gtemath/gtemath.h"

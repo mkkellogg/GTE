@@ -17,9 +17,6 @@
 #include "particlemodifier.h"
 #include "particle.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	class EvenIntervalIndexModifier : public ParticleModifier<UInt32>

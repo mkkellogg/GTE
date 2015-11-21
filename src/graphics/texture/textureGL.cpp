@@ -1,12 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-
-#include "graphics/gl_include.h"
 #include "textureGL.h"
+#include "graphics/gl_include.h"
 #include "textureattr.h"
 #include "global/global.h"
 #include "global/assert.h"

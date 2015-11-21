@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <string>
 
 #include "engine.h"
 #include "graphics/stdattributes.h"

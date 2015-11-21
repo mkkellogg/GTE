@@ -1,6 +1,9 @@
 #ifndef _GTE_LAVASCENE_H_
 #define _GTE_LAVASCENE_H_
 
+#include <functional>
+#include <vector>
+
 #include "engine.h"
 #include "gtedemo/scene.h"
 #include "geometry/point/point3.h"
@@ -8,8 +11,6 @@
 #include "asset/assetimporter.h"
 #include "geometry/transform.h"
 #include "base/intmask.h"
-#include <functional>
-#include <vector>
 
 //forward declarations
 class LavaField;

@@ -1,15 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <math.h>
-
-#include <memory>
-#include "graphics/graphics.h"
 #include "lavafield.h"
-#include "engine.h"
 #include "asset/assetimporter.h"
 #include "object/engineobjectmanager.h"
 #include "scene/sceneobject.h"
+#include "graphics/graphics.h"
 #include "graphics/stdattributes.h"
 #include "graphics/shader/shadersource.h"
 #include "graphics/render/material.h"

@@ -18,9 +18,6 @@
 #include "object/engineobject.h"
 #include "particleutil.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	template <typename T> class ParticleFrameSet

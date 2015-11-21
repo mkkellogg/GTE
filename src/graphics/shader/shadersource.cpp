@@ -1,14 +1,10 @@
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <iterator>
-#include <numeric>
+#include <vector>
 #include <memory.h>
-#include <math.h>
 
 #include "shadersource.h"
 #include "filesys/filesystem.h"

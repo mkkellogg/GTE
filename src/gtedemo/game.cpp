@@ -1,9 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <math.h>
-
-#include "engine.h"
 #include "game.h"
 #include "lavafield.h"
 #include "input/inputmanager.h"
@@ -43,10 +37,6 @@
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
 #include "filesys/filesystem.h"
-
-#include <iostream>
-#include <memory>
-#include <functional>
 
 const std::string Game::PlayerObjectLayer = "Player";
 

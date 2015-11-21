@@ -4,10 +4,6 @@
 #include "engine.h"
 #include "object/engineobject.h"
 
-#include <vector>
-#include <unordered_map>
-#include <memory>
-
 namespace GTE
 {
 	/*

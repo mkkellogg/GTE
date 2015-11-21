@@ -1,14 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "scene/sceneobject.h"
 #include "sceneobjectskeletonnode.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
-#include <string>
 
 namespace GTE
 {

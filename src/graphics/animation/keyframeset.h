@@ -11,11 +11,13 @@
 #ifndef _GTE_KEYFRAMESET_H_
 #define _GTE_KEYFRAMESET_H_
 
+#include <vector>
+
+#include "engine.h"
 #include "translationkeyframe.h"
 #include "scalekeyframe.h"
 #include "rotationkeyframe.h"
 #include "global/global.h"
-#include <vector>
 
 namespace GTE
 {

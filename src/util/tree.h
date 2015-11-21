@@ -6,7 +6,6 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 
-#include <memory>
 #include <vector>
 #include <stack>
 #include <string>

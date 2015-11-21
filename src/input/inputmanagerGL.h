@@ -4,8 +4,6 @@
 #include "engine.h"
 #include "inputmanager.h"
 
-#include <string>
-
 namespace GTE
 {
 

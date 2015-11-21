@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "vector3array.h"
 #include "vector3.h"
 #include "vector3factory.h"

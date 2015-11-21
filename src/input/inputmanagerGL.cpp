@@ -1,18 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include "graphics/gl_include.h"
 #include "inputmanagerGL.h"
+#include "graphics/gl_include.h"
 #include "graphics/graphics.h"
 #include "graphics/graphicsGL.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "util/time.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {

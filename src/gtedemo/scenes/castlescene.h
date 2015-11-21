@@ -1,6 +1,9 @@
 #ifndef _GTE_CASTLESCENE_H_
 #define _GTE_CASTLESCENE_H_
 
+#include <functional>
+#include <vector>
+
 #include "engine.h"
 #include "gtedemo/scene.h"
 #include "geometry/point/point3.h"
@@ -8,9 +11,6 @@
 #include "geometry/transform.h"
 #include "asset/assetimporter.h"
 #include "base/intmask.h"
-
-#include <functional>
-#include <vector>
 
 class CastleScene : public Scene
 {

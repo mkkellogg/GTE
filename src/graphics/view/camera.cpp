@@ -1,7 +1,3 @@
-#include <iostream>
-#include <math.h>
-
-#include "engine.h"
 #include "camera.h"
 #include "object/engineobjectmanager.h"
 #include "scene/sceneobject.h"

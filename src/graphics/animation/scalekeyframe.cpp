@@ -1,10 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "scalekeyframe.h"
 #include "geometry/vector/vector3.h"
-#include <string>
 
 namespace GTE
 {

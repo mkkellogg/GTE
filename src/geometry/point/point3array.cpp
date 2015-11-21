@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "point3array.h"
 #include "point3.h"
 #include "point3factory.h"

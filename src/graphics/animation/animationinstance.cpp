@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "engine.h"
 #include "animationinstance.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
@@ -9,8 +6,6 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-
-#include <string>
 
 namespace GTE
 {

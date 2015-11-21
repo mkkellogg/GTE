@@ -10,9 +10,10 @@
 #ifndef _GTE_FILE_SYSTEM_WIN_H_
 #define _GTE_FILE_SYSTEM_WIN_H_
 
+#include <string>
+
 #include "engine.h"
 #include "filesystem.h"
-#include <string>
 
 namespace GTE
 {

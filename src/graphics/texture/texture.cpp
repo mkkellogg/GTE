@@ -1,10 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include "engine.h"
 #include "texture.h"
 #include "textureattr.h"
 #include "graphics/image/rawimage.h"
@@ -12,8 +5,6 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-
-#include <string>
 
 namespace GTE
 {

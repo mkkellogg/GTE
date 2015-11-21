@@ -16,9 +16,6 @@
 #include "gtemath/gtemath.h"
 #include "particles.h"
 
-#include <vector>
-#include <string>
-
 namespace GTE
 {
 	// forward declarations

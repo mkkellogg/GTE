@@ -13,6 +13,8 @@
 #ifndef _GTE_VERTEX_BONE_MAP_H_
 #define _GTE_VERTEX_BONE_MAP_H_
 
+#include <memory.h>
+
 #include "engine.h"
 #include "geometry/matrix4x4.h"
 #include "global/global.h"

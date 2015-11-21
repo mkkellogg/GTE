@@ -10,10 +10,10 @@
 #ifndef _GTE_ENGINEUTIL_H_
 #define _GTE_ENGINEUTIL_H_
 
+#include <string>
+
 #include "engine.h"
 #include "graphics/stdattributes.h"
-
-#include <string>
 
 namespace GTE
 {

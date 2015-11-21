@@ -1,11 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-#include <string>
-#include <iostream>
-
 #include "light.h"
 #include "graphics/color/color4.h"
 #include "geometry/point/point3.h"

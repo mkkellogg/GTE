@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include <vector>
 #include "rendermanager.h"
 #include "global/global.h"
 #include "global/assert.h"

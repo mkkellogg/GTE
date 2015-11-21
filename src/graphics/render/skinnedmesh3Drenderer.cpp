@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <memory.h>
-#include <math.h>
-
-#include "engine.h"
 #include "skinnedmesh3Drenderer.h"
 #include "submesh3Drenderer.h"
 #include "object/engineobjectmanager.h"

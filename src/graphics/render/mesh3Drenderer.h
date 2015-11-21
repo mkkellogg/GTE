@@ -42,8 +42,6 @@ namespace GTE
 		// protected so its life-cycle can be handled completely by EngineObjectManager.
 		friend class EngineObjectManager;
 
-		friend class ForwardRenderManager;
-
 	protected:
 
 		// list of materials that will be used to render the sub-meshes

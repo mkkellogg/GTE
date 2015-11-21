@@ -25,6 +25,8 @@
 #ifndef _GTE_GRAPHICS_H_
 #define _GTE_GRAPHICS_H_
 
+#include <string>
+
 #include "engine.h"
 #include "graphicsattr.h"
 #include "renderstate.h"
@@ -32,8 +34,6 @@
 #include "render/rendertarget.h"
 #include "render/material.h"
 #include "global/global.h"
-
-#include <string>
 
 namespace GTE
 {
@@ -64,10 +64,17 @@ namespace GTE
 
 	class Graphics
 	{
+		// necessary to trigger life-cycle events
 		friend class Engine;
+		// necessary so that the EngineObjectManager can create objects like textures and render targets
+		// that it needs to manager
 		friend class EngineObjectManager;
+		// necessary so that the ForwardRenderManager can activate materials and send material uniforms and
+		// attributes to the active shader
 		friend class ForwardRenderManager;
+		// necessary so that SubMesh3DRenderer can directly call rendering methods
 		friend class SubMesh3DRenderer;
+		// the Camera class needs to be able to access information about the default & active render targets
 		friend class Camera;
 
 	protected:

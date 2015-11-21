@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <vector>
-#include <memory>
-
-#include "engine.h"
 #include "skeleton.h"
 #include "skeletonnode.h"
 #include "bone.h"
@@ -13,7 +6,6 @@
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
-#include "engine.h"
 
 namespace GTE
 {

@@ -11,11 +11,10 @@
 #ifndef _GTE_BONE_H_
 #define _GTE_BONE_H_
 
+#include <string>
+
 #include "engine.h"
 #include "geometry/matrix4x4.h"
-
-#include <vector>
-#include <string>
 
 namespace GTE
 {

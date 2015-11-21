@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "engine.h"
 #include "intmask.h"
 #include "debug/gtedebug.h"
