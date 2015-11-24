@@ -29,6 +29,7 @@ namespace GTE
 	class SubMesh3DRenderer;
 	class EngineObjectManager;
 	class Material;
+	class MultiMaterial;
 	class Camera;
 	class TextureAttributes;
 	class Texture;
@@ -74,6 +75,7 @@ namespace GTE
 		void DeleteSubMesh3D(SubMesh3D * mesh);
 		void DeleteSubMesh3DRenderer(SubMesh3DRenderer * renderer);
 		void DeleteMaterial(Material * material);
+		void DeleteMultiMaterial(MultiMaterial * material);
 		void DeleteTexture(Texture * texture);
 		void DeleteAtlas(Atlas * atlas);
 		void DeleteRenderTarget(RenderTarget * target);
@@ -158,6 +160,8 @@ namespace GTE
 		MaterialSharedPtr CreateMaterial(const std::string& name, ShaderSharedPtr shader);
 		MaterialSharedPtr CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
 		void DestroyMaterial(MaterialSharedPtr material);
+		MultiMaterialSharedPtr CreateMultiMaterial();
+		void DestroyMultiMaterial(MultiMaterialSharedPtr material);
 
 		ParticleSystemSharedPtr CreateParticleSystem(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
 		void DestroyParticleSystem(ParticleSystemSharedPtr system);

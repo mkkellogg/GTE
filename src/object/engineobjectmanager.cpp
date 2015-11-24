@@ -5,6 +5,7 @@
 #include "graphics/shader/shader.h"
 #include "graphics/light/light.h"
 #include "graphics/render/material.h"
+#include "graphics/render/multimaterial.h"
 #include "graphics/render/submesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/skinnedmesh3Drenderer.h"
@@ -716,6 +717,30 @@ namespace GTE
 		ASSERT(shader.IsValid(), "EngineObjectManager::DeleteMaterial -> 'shader' is null.");
 		DestroyShader(shader);
 
+		delete material;
+	}
+
+	MultiMaterialSharedPtr EngineObjectManager::CreateMultiMaterial()
+	{
+		MultiMaterial * m = new(std::nothrow) MultiMaterial();
+		ASSERT(m != nullptr, "EngineObjectManager::CreateMultiMaterial -> Unable to allocate material.");
+
+		m->SetObjectID(GetNextObjectID());
+
+		return MultiMaterialSharedPtr(m, [=](MultiMaterial * m)
+		{
+			DeleteMultiMaterial(m);
+		});
+	}
+
+	void EngineObjectManager::DestroyMultiMaterial(MultiMaterialSharedPtr material)
+	{
+		material.ForceDelete();
+	}
+
+	void EngineObjectManager::DeleteMultiMaterial(MultiMaterial * material)
+	{
+		ASSERT(material != nullptr, "EngineObjectManager::DeleteMultiMaterial -> 'material' is null.");
 		delete material;
 	}
 

@@ -31,9 +31,11 @@ namespace GTE
 
 		useLighting = true;
 		renderQueueID = (UInt32)RenderQueueType::Opaque;
+
 		blendingMode = RenderState::BlendingMode::None;
 		sourceBlendingMethod = RenderState::BlendingMethod::SrcAlpha;
 		destBlendingMethod = RenderState::BlendingMethod::OneMinusSrcAlpha;
+
 		faceCulling = RenderState::FaceCulling::Back;
 		depthBufferWriteEnabled = true;
 		depthBufferFunction = RenderState::DepthBufferFunction::LessThanOrEqual;

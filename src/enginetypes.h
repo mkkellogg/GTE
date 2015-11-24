@@ -85,6 +85,7 @@ namespace GTE
 	class Light;
 	class EngineObjectManager;
 	class Material;
+	class MultiMaterial;
 	class Texture;
 	class Atlas;
 	class Transform;
@@ -173,6 +174,7 @@ namespace GTE
 	typedef EngineObjectSharedPtr<Light> LightSharedPtr;
 	typedef EngineObjectSharedPtr<SceneObject> SceneObjectSharedPtr;
 	typedef EngineObjectSharedPtr<Material> MaterialSharedPtr;
+	typedef EngineObjectSharedPtr<MultiMaterial> MultiMaterialSharedPtr;
 	typedef EngineObjectSharedPtr<Texture> TextureSharedPtr;
 	typedef EngineObjectSharedPtr<Atlas> AtlasSharedPtr;
 	typedef EngineObjectSharedPtr<Skeleton> SkeletonSharedPtr;
@@ -195,6 +197,7 @@ namespace GTE
 	typedef EngineObjectSharedPtr<const Light> LightSharedConstPtr;
 	typedef EngineObjectSharedPtr<const SceneObject> SceneObjectSharedConstPtr;
 	typedef EngineObjectSharedPtr<const Material> MaterialSharedConstPtr;
+	typedef EngineObjectSharedPtr<const MultiMaterial> MultiMaterialSharedConstPtr;
 	typedef EngineObjectSharedPtr<const Texture> TextureSharedConstPtr;
 	typedef EngineObjectSharedPtr<const Atlas> AtlasSharedConstPtr;
 	typedef EngineObjectSharedPtr<const Skeleton> SkeletonSharedConstPtr;
@@ -217,6 +220,7 @@ namespace GTE
 	typedef const LightSharedPtr& LightRef;
 	typedef const SceneObjectSharedPtr& SceneObjectRef;
 	typedef const MaterialSharedPtr& MaterialRef;
+	typedef const MultiMaterialSharedPtr& MultiMaterialRef;
 	typedef const TextureSharedPtr& TextureRef;
 	typedef const AtlasSharedPtr& AtlasRef;
 	typedef const SkeletonSharedPtr& SkeletonRef;
@@ -227,7 +231,6 @@ namespace GTE
 	typedef const ParticleSystemSharedPtr& ParticleSystemRef;
 	typedef const ParticleMeshRendererSharedPtr& ParticleMeshRendererRef;
 	
-
 	extern const ShaderSharedPtr& NullShaderRef;
 	extern const RendererSharedPtr& NullRendererRef;	
 	extern const Mesh3DRendererSharedPtr& NullMesh3DRendererRef;
@@ -240,6 +243,7 @@ namespace GTE
 	extern const LightSharedPtr& NullLightRef;
 	extern const SceneObjectSharedPtr& NullSceneObjectRef;
 	extern const MaterialSharedPtr& NullMaterialRef;
+	extern const MultiMaterialSharedPtr& NullMultiMaterialRef;
 	extern const TextureSharedPtr& NullTextureRef;
 	extern const AtlasSharedPtr& NullAtlasRef;
 	extern const SkeletonSharedPtr& NullSkeletonRef;
@@ -250,7 +254,6 @@ namespace GTE
 	extern const ParticleSystemSharedPtr& NullParticleSystemRef;
 	extern const ParticleMeshRendererSharedPtr& NullParticleMeshRendererRef;
 	
-
 	typedef const ShaderSharedConstPtr& ShaderConstRef;
 	typedef const RendererSharedConstPtr& RendererConstRef;
 	typedef const Mesh3DRendererSharedConstPtr& Mesh3DRendererConstRef;
@@ -263,6 +266,7 @@ namespace GTE
 	typedef const LightSharedConstPtr& LightConstRef;
 	typedef const SceneObjectSharedConstPtr& SceneObjectConstRef;
 	typedef const MaterialSharedConstPtr& MaterialConstRef;
+	typedef const MultiMaterialSharedConstPtr& MultiMaterialConstRef;
 	typedef const TextureSharedConstPtr& TextureConstRef;
 	typedef const AtlasSharedConstPtr& AtlasConstRef;
 	typedef const SkeletonSharedConstPtr& SkeletonConstRef;
@@ -273,7 +277,6 @@ namespace GTE
 	typedef const ParticleSystemSharedConstPtr& ParticleSystemConstRef;
 	typedef const ParticleMeshRendererSharedConstPtr& ParticleMeshRendererConstRef;
 	
-
 	template<typename T, typename U> EngineObjectSharedPtr<U> DynamicCastEngineObject(const EngineObjectSharedPtr<T>& src)
 	{
 		const std::shared_ptr<T>& s1 = src;

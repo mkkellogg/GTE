@@ -101,6 +101,9 @@ void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr 
 
 	sceneRoot->GetTransform().Translate(50, 0, -15, false);
 
+	this->directionalLightObject = directionalLightObject;
+	this->ambientLightObject = ambientLightObject;
+
 	SetupTerrain(importer);
 	SetupStructures(importer);
 	SetupPlants(importer);
@@ -110,8 +113,6 @@ void CastleScene::Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr 
 
 	sceneRoot->GetTransform().Rotate(0, 1, 0, 155, true);
 	sceneRoot->GetTransform().Translate(-44.3f, 0, 52, false);
-
-	this->directionalLightObject = directionalLightObject;
 }
 
 /*
@@ -801,12 +802,12 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	shaderName = "particles_lit";
 	materialName = "ParticlesLit";
 	GTE::MaterialRef smokeMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
-	ASSERT(smokeMaterial.IsValid(), "Unable to create smoke material!\n");
+	ASSERT(smokeMaterial.IsValid(), "Unable to create smoke material!\n");	
+	smokeMaterial->SetUseLighting(true);
+	smokeMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
 	smokeMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
 	smokeMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
 	smokeMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
-	smokeMaterial->SetUseLighting(true);
-	smokeMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
 
 	// load texture for the smoke particle
 	GTE::TextureRef smokeTexture = objectManager->CreateTexture("resources/textures/particles/smokeparticle.png", texAttributes);
@@ -890,6 +891,13 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	pointLights.push_back(campFireLightObject);
 	campFireLightLocalOffset.Set(0, 5, 0);
 	campFireLightObject->GetTransform().Translate(campFireLightLocalOffset, true);
+
+	// enable smoke to bit lit by ambient lighting
+	ASSERT(ambientLightObject.IsValid(), "Lava scene -> Ambient light object is not valid!\n");
+	GTE::LightRef ambientLight =  ambientLightObject->GetLight();
+	mergedMask = ambientLight->GetCullingMask();
+	mergedMask = objectManager->GetLayerManager().MergeLayerMask(mergedMask, smokeLayerMask);
+	ambientLight->SetCullingMask(mergedMask);
 
 	//================================
 	// Load campfire model

@@ -20,6 +20,8 @@ class CastleScene : public Scene
 	std::vector<GTE::SceneObjectSharedPtr> pointLights;
 	// global directional light
 	GTE::SceneObjectSharedPtr directionalLightObject;
+	// global ambient light
+	GTE::SceneObjectSharedPtr ambientLightObject;
 	// moving light A
 	GTE::SceneObjectSharedPtr movingLightA;
 	// temp variable used to help flicker the camp fire light intensity

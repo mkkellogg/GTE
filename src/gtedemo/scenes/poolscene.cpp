@@ -13,11 +13,6 @@
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
 #include "graphics/shader/shadersource.h"
-#include "graphics/particles/particlesystem.h"
-#include "graphics/particles/particlemodifier.h"
-#include "graphics/particles/randommodifier.h"
-#include "graphics/particles/framesetmodifier.h"
-#include "graphics/particles/evenintervalindexmodifier.h"
 #include "graphics/view/camera.h"
 #include "geometry/transform.h"
 #include "geometry/point/point3.h"
@@ -62,6 +57,7 @@ PoolScene::~PoolScene()
 {
 
 }
+
 
 /*
  * Get the SceneObject instance at the root of the scene.
@@ -149,13 +145,13 @@ void PoolScene::UpdateRippleSimulation()
 		{
 			shouldTripperDrop = false;
 			// calculate drop position and drop size
-			GTE::Real dropRadius = 8.0f / (GTE::Real)waterHeightMapResolution * ((((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 0.7f) + 0.3f);
-			GTE::Real x = 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX - .8f;
-			GTE::Real y = .8f - 1.6f * (GTE::Real)rand() / (GTE::Real)RAND_MAX;
+			GTE::Real dropRadius = 8.0f / (GTE::Real)waterHeightMapResolution * (GTE::GTEMath::Random() * 0.7f + 0.3f);
+			GTE::Real x = 1.6f * GTE::GTEMath::Random() - .8f;
+			GTE::Real y = .8f - 1.6f * GTE::GTEMath::Random();
 
 			GTE::Real dropStrength = 2.3f;
 
-			dropStrength = (((GTE::Real)rand() / (GTE::Real)RAND_MAX) * 1.0f) + 0.5f;
+			dropStrength = GTE::GTEMath::Random() + 0.5f;
 			dropRadius = dropStrength / 35.0f;
 
 			dropStrength = 0.4f;

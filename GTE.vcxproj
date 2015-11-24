@@ -212,6 +212,7 @@
     <ClCompile Include="src\graphics\render\mesh3Drenderer.cpp" />
     <ClCompile Include="src\graphics\render\forwardrendermanager.cpp" />
     <ClCompile Include="src\graphics\particles\particlemeshrenderer.cpp" />
+    <ClCompile Include="src\graphics\render\multimaterial.cpp" />
     <ClCompile Include="src\graphics\render\renderer.cpp" />
     <ClCompile Include="src\graphics\render\rendermanager.cpp" />
     <ClCompile Include="src\graphics\render\renderqueue.cpp" />
@@ -347,6 +348,7 @@
     <ClInclude Include="src\graphics\render\material.h" />
     <ClInclude Include="src\graphics\render\mesh3Drenderer.h" />
     <ClInclude Include="src\graphics\particles\particlemeshrenderer.h" />
+    <ClInclude Include="src\graphics\render\multimaterial.h" />
     <ClInclude Include="src\graphics\render\renderbuffer.h" />
     <ClInclude Include="src\graphics\render\forwardrendermanager.h" />
     <ClInclude Include="src\graphics\render\renderer.h" />

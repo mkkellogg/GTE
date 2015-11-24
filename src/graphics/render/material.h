@@ -116,6 +116,7 @@ namespace GTE
 		RenderState::BlendingMode blendingMode;
 		RenderState::BlendingMethod sourceBlendingMethod;
 		RenderState::BlendingMethod destBlendingMethod;
+
 		RenderState::FaceCulling faceCulling;
 		Bool depthBufferWriteEnabled;
 		RenderState::DepthBufferFunction depthBufferFunction;
@@ -202,12 +203,14 @@ namespace GTE
 		void SetRenderQueue(RenderQueueType queue);
 		void SetRenderQueue(UInt32 queue);
 		UInt32 GetRenderQueue();
+
 		void SetBlendingMode(RenderState::BlendingMode mode);
 		RenderState::BlendingMode GetBlendingMode();
 		void SetSourceBlendingMethod(RenderState::BlendingMethod method);
 		RenderState::BlendingMethod GetSourceBlendingMethod();
 		void SetDestBlendingMethod(RenderState::BlendingMethod method);
 		RenderState::BlendingMethod GetDestBlendingMethod();
+
 		void SetFaceCulling(RenderState::FaceCulling mode);
 		RenderState::FaceCulling GetFaceCulling();
 		void SetDepthBufferWriteEnabled(Bool enabled);
