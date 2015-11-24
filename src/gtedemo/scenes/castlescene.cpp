@@ -9,6 +9,7 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/material.h"
+#include "graphics/render/multimaterial.h"
 #include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
@@ -163,7 +164,8 @@ void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 	GTE::Mesh3DSharedPtr islandTopMesh = islandTopMeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr islandTopRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(islandTopMeshObject->GetRenderer());
 	scaledDiffuseIslandTop->SetUniform2f(8.0f, 8.0f, "UV_SCALE");
-	islandTopRenderer->SetMaterial(0, scaledDiffuseIslandTop);
+	GTE::MultiMaterialRef islandTopMultiMaterial = objectManager->CreateMultiMaterial(scaledDiffuseIslandTop);
+	islandTopRenderer->SetMultiMaterial(0, islandTopMultiMaterial);
 	scaledDiffuseIslandTop->SetTexture(altGrass, "TEXTURE0");
 
 	// replace the rock texture for the island
@@ -172,7 +174,8 @@ void CastleScene::SetupTerrain(GTE::AssetImporter& importer)
 	GTE::Mesh3DSharedPtr islandRockMesh = islandRockMeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr islandRockRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(islandRockMeshObject->GetRenderer());
 	scaledDiffuseIslandRock->SetUniform2f(4.0f, 4.0f, "UV_SCALE");
-	islandRockRenderer->SetMaterial(0, scaledDiffuseIslandRock);
+	GTE::MultiMaterialRef islandRockMultiMaterial = objectManager->CreateMultiMaterial(scaledDiffuseIslandRock);
+	islandRockRenderer->SetMultiMaterial(0, islandRockMultiMaterial);
 	scaledDiffuseIslandRock->SetTexture(altRock, "TEXTURE0");
 }
 
@@ -227,7 +230,8 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	tower2Mesh->GetSubMesh(0)->SetCalculateNormals(true);
 	tower2Mesh->GetSubMesh(0)->SetCalculateTangents(true);
 	tower2Mesh->UpdateAll();
-	towerRenderer->SetMaterial(0, castleNormalMaterial);
+	GTE::MultiMaterialRef castleNormalMultiMaterial = objectManager->CreateMultiMaterial(castleNormalMaterial);
+	towerRenderer->SetMultiMaterial(0, castleNormalMultiMaterial);
 
 	// place initial castle tower in scene
 	modelSceneObject->SetActive(true);
@@ -235,15 +239,15 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	modelSceneObject->GetTransform().Translate(65, -10, -15, false);
 
 	// re-use the castle tower mesh & material for multiple instances
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 89, -10, -15, true, true, true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMultiMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 89, -10, -15, true, true, true);
 	towerMeshFilter = modelSceneObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 65, -10, 6, true, true, true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMultiMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 65, -10, 6, true, true, true);
 	towerMeshFilter = modelSceneObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 89, -10, 6, true, true, true);
+	modelSceneObject = GameUtil::AddMeshToScene(tower2Mesh, castleNormalMultiMaterial, .04f, .04f, .03f, 1, 0, 0, -90, 89, -10, 6, true, true, true);
 	towerMeshFilter = modelSceneObject->GetMesh3DFilter();
 	towerMeshFilter->SetUseBackSetShadowVolume(true);
 	sceneRoot->AddChild(modelSceneObject);
@@ -278,7 +282,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	archwayMesh->GetSubMesh(0)->SetCalculateNormals(true);
 	archwayMesh->GetSubMesh(0)->SetCalculateTangents(true);
 	archwayMesh->UpdateAll();
-	archwayRenderer->SetMaterial(0, castleNormalMaterial);
+	archwayRenderer->SetMultiMaterial(0, castleNormalMultiMaterial);
 	modelSceneObject->SetActive(false);
 
 	// load and place castle entrance arch-way right side
@@ -303,7 +307,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	archwayMesh->GetSubMesh(0)->SetCalculateNormals(true);
 	archwayMesh->GetSubMesh(0)->SetCalculateTangents(true);
 	archwayMesh->UpdateAll();
-	archwayRenderer->SetMaterial(0, castleNormalMaterial);
+	archwayRenderer->SetMultiMaterial(0, castleNormalMultiMaterial);
 	modelSceneObject->SetActive(false);
 
 
@@ -330,7 +334,7 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	wallBlockMesh->GetSubMesh(0)->SetCalculateNormals(true);
 	wallBlockMesh->GetSubMesh(0)->SetCalculateTangents(true);
 	wallBlockMesh->UpdateAll();
-	wallBlockRenderer->SetMaterial(0, castleNormalMaterial);
+	wallBlockRenderer->SetMultiMaterial(0, castleNormalMultiMaterial);
 
 	// place initial castle wall in scene (on right side)
 	modelSceneObject->SetActive(true);
@@ -339,38 +343,38 @@ void CastleScene::SetupStructures(GTE::AssetImporter& importer)
 	modelSceneObject->GetTransform().Rotate(0, 1, 0, 180, true);
 
 	// right side
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, 6.5f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, 6.5f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, 6.5f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, 6.5f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 
 	// extra right side
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 70, -10, 10.0f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 70, -10, 10.0f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, 10.0f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, 10.0f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, 10.0f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, 10.0f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
 
 	// left side
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 70, -10, -15.5f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 70, -10, -15.5f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, -15.5f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 78, -10, -15.5f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, -15.5f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .06f, .04f, .05f, 1, 0, 0, -90, 86, -10, -15.5f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 180, true);
 
 	// front and back
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 64.7f, -10, -9.25f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 64.7f, -10, -9.25f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 270, true);
-	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 90, -10, .25f, true, true, true, false);
+	modelSceneObject = GameUtil::AddMeshToScene(wallBlockMesh, castleNormalMultiMaterial, .04f, .067f, .05f, 1, 0, 0, -90, 90, -10, .25f, true, true, true, false);
 	sceneRoot->AddChild(modelSceneObject);
 	modelSceneObject->GetTransform().Rotate(0, 0, 1, 90, true);
 }
@@ -400,7 +404,7 @@ void CastleScene::SetupPlants(GTE::AssetImporter& importer)
 	GTE::SceneObjectSharedPtr treeMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr treeMesh = treeMeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr treeRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(treeMeshObject->GetRenderer());
-	GTE::MaterialSharedPtr treeMaterial = treeRenderer->GetMaterial(0);
+	GTE::MaterialSharedPtr treeMaterial = treeRenderer->GetMultiMaterial(0)->GetMaterial(0);
 
 	// place initial tree in the scene
 	modelSceneObject->SetActive(true);
@@ -456,7 +460,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GTE::SceneObjectSharedPtr fenceMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr fenceMesh = fenceMeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr fenceRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(fenceMeshObject->GetRenderer());
-	GTE::MaterialSharedPtr fenceMaterial = fenceRenderer->GetMaterial(0);
+	GTE::MaterialSharedPtr fenceMaterial = fenceRenderer->GetMultiMaterial(0)->GetMaterial(0);
 
 	// place initial fence in the scene
 	modelSceneObject->SetActive(true);
@@ -507,7 +511,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 	GTE::SceneObjectSharedPtr barrelMeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr barrelMesh = barrelMeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr barrelRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(barrelMeshObject->GetRenderer());
-	GTE::MaterialSharedPtr barrelMaterial = barrelRenderer->GetMaterial(0);
+	GTE::MaterialSharedPtr barrelMaterial = barrelRenderer->GetMultiMaterial(0)->GetMaterial(0);
 
 	// place initial barrel in the scene
 	modelSceneObject->SetActive(true);
@@ -575,7 +579,7 @@ void CastleScene::SetupExtra(GTE::AssetImporter& importer)
 
 	// create the floor mesh's renderer
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(material);
+	renderer->AddMultiMaterial(material);
 	cubeSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 
 	// scale the floor and move to its position in the scene
@@ -638,7 +642,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShar
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);
 	GTE::Mesh3DRendererSharedPtr lanterLightRenderer = objectManager->CreateMesh3DRenderer();
-	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
+	lanterLightRenderer->AddMultiMaterial(lanterLightMeshMaterial);
 	lanternObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(lanterLightRenderer));
 	pointLights.push_back(lanternObject); 
 	movingLightA = lanternObject;
@@ -663,7 +667,7 @@ void CastleScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShar
 	lanternObject->SetMesh3DFilter(filter);
 	filter->SetMesh3D(lanternLightMesh);
 	lanterLightRenderer = objectManager->CreateMesh3DRenderer();
-	lanterLightRenderer->AddMaterial(lanterLightMeshMaterial);
+	lanterLightRenderer->AddMultiMaterial(lanterLightMeshMaterial);
 	lanternObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(lanterLightRenderer));
 	pointLights.push_back(lanternObject);
 }
@@ -704,8 +708,9 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	GTE::AtlasRef flameAtlas = objectManager->CreateGridAtlas(flameTexture, 0.0f, 1.0f, 1.0f, 0.0f, 8, 8, false, true);
 	ASSERT(flameAtlas.IsValid(), "Unable to create flame atlas!\n");
 
-	//GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
-	GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMaterial, flameAtlas, false, 3.5f, 3.0f, 0.0f);
+	GTE::MultiMaterialRef flameMultiMaterial = objectManager->CreateMultiMaterial(flameMaterial);
+	//GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMultiMaterial, flameAtlas, false, 3.0f, 3.0f, 0.0f);
+	GTE::ParticleSystemRef flameSystem = objectManager->CreateParticleSystem(flameMultiMaterial, flameAtlas, false, 3.5f, 3.0f, 0.0f);
 	ASSERT(flameSystem.IsValid(), "Unable to create flame particle system!\n");
 	flameSystemObject->SetParticleSystem(flameSystem);
 	flameSystem->SetPremultiplyAlpha(true);
@@ -759,7 +764,8 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	GTE::AtlasRef emberAtlas = objectManager->CreateAtlas(emberTexture, true);
 	ASSERT(emberAtlas.IsValid(), "Unable to create ember atlas!\n");
 
-	GTE::ParticleSystemRef emberSystem = objectManager->CreateParticleSystem(emberMaterial, emberAtlas, false, 9.0f, 3.0f, 0.0f);
+	GTE::MultiMaterialRef emberMultiMaterial = objectManager->CreateMultiMaterial(emberMaterial);
+	GTE::ParticleSystemRef emberSystem = objectManager->CreateParticleSystem(emberMultiMaterial, emberAtlas, false, 9.0f, 3.0f, 0.0f);
 	ASSERT(emberSystem.IsValid(), "Unable to create ember particle system!\n");
 	emberSystemObject->SetParticleSystem(emberSystem);
 	emberSystem->SetPremultiplyAlpha(true);
@@ -798,16 +804,31 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	ASSERT(smokeSystemObject.IsValid(), "Unable to create smoke particle system object!\n");
 	fireParentObject->AddChild(smokeSystemObject);
 
-	// create material for rendering smoke particles
+	// create base lit material for rendering smoke particles
 	shaderName = "particles_lit";
 	materialName = "ParticlesLit";
-	GTE::MaterialRef smokeMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
-	ASSERT(smokeMaterial.IsValid(), "Unable to create smoke material!\n");	
-	smokeMaterial->SetUseLighting(true);
-	smokeMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
-	smokeMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
-	smokeMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
-	smokeMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
+	GTE::MaterialRef smokeBaseMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
+	ASSERT(smokeBaseMaterial.IsValid(), "Unable to create base smoke material!\n");
+	smokeBaseMaterial->SetUseLighting(true);
+	smokeBaseMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
+	smokeBaseMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
+	smokeBaseMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
+	smokeBaseMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
+	smokeBaseMaterial->SetForwardRenderPass(GTE::ForwardRenderPass::Base);
+
+	// create additive lit material for rendering smoke particles
+	//shaderName = "particles_lit_additive";
+	//materialName = "ParticlesLitAdditive";
+	shaderName = "particles_lit";
+	materialName = "ParticlesLit";
+	GTE::MaterialRef smokeAdditiveMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
+	ASSERT(smokeAdditiveMaterial.IsValid(), "Unable to create additive smoke material!\n");
+	smokeAdditiveMaterial->SetUseLighting(true);
+	smokeAdditiveMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
+	smokeAdditiveMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
+	smokeAdditiveMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
+	smokeAdditiveMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
+	smokeAdditiveMaterial->SetForwardRenderPass(GTE::ForwardRenderPass::Additive);
 
 	// load texture for the smoke particle
 	GTE::TextureRef smokeTexture = objectManager->CreateTexture("resources/textures/particles/smokeparticle.png", texAttributes);
@@ -816,7 +837,9 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	GTE::AtlasRef smokeAtlas = objectManager->CreateAtlas(smokeTexture, true);
 	ASSERT(smokeAtlas.IsValid(), "Unable to create smoke atlas!\n");
 
-	GTE::ParticleSystemRef smokeSystem = objectManager->CreateParticleSystem(smokeMaterial, smokeAtlas, false, 150.0f, 4.0f, 0.0f);
+	GTE::MultiMaterialRef smokeMultiMaterial = objectManager->CreateMultiMaterial(smokeBaseMaterial);
+	smokeMultiMaterial->AddMaterial(smokeAdditiveMaterial);
+	GTE::ParticleSystemRef smokeSystem = objectManager->CreateParticleSystem(smokeMultiMaterial, smokeAtlas, false, 150.0f, 4.0f, 0.0f);
 	ASSERT(smokeSystem.IsValid(), "Unable to create smoke particle system!\n");
 	smokeSystemObject->SetParticleSystem(smokeSystem);
 	smokeSystem->SetPremultiplyAlpha(false);
@@ -844,7 +867,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 	GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
 	smokeAlphaModifier.AddFrame(0.0f, 0.0f);
-	smokeAlphaModifier.AddFrame(1.0f, 0.10f);
+	smokeAlphaModifier.AddFrame(1.0f, 0.05f);
 	smokeAlphaModifier.AddFrame(2.0f, 0.20f);
 	smokeAlphaModifier.AddFrame(3.0f, 0.20f);
 	smokeAlphaModifier.AddFrame(4.0f, 0.0f);
@@ -915,7 +938,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	GTE::SceneObjectSharedPtr campfireMeshObject = GameUtil::FindFirstSceneObjectWithMesh(campfireSceneObject);
 	GTE::Mesh3DSharedPtr campFireMesh = campfireMeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr campfireRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(campfireMeshObject->GetRenderer());
-	GTE::MaterialSharedPtr campfireMaterial = campfireRenderer->GetMaterial(0);
+	GTE::MaterialSharedPtr campfireMaterial = campfireRenderer->GetMultiMaterial(0)->GetMaterial(0);
 	campfireMaterial->SetFaceCulling(GTE::RenderState::FaceCulling::None);
 
 	// move campfire to its final location

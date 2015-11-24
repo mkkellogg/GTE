@@ -16,6 +16,7 @@
 #include "asset/assetimporter.h"
 #include "graphics/shader/shadersource.h"
 #include "graphics/render/material.h"
+#include "graphics/render/multimaterial.h"
 #include "graphics/renderstate.h"
 #include "graphics/stdattributes.h"
 #include "graphics/object/submesh3D.h"
@@ -216,10 +217,14 @@ namespace GTE
 
 		GetCameraWorldAxes(*currentCamera, vectorX, vectorY, vectorZ);
 
-		particleMaterial->SetUniform3f(vectorX.x, vectorX.y, vectorX.z, "VIEW_AXIS_X");
-		particleMaterial->SetUniform3f(vectorY.x, vectorY.y, vectorY.z, "VIEW_AXIS_Y");
-		particleMaterial->SetUniform3f(vectorZ.x, vectorZ.y, vectorZ.z, "VIEW_AXIS_Z");
-		particleMaterial->SetTexture(atlas->GetTexture(), "PARTICLE_TEXTURE");
+		for(UInt32 i = 0; i < particleMaterial->GetMaterialCount(); i++)
+		{
+			MaterialRef mat = particleMaterial->GetMaterial(i);
+			mat->SetUniform3f(vectorX.x, vectorX.y, vectorX.z, "VIEW_AXIS_X");
+			mat->SetUniform3f(vectorY.x, vectorY.y, vectorY.z, "VIEW_AXIS_Y");
+			mat->SetUniform3f(vectorZ.x, vectorZ.y, vectorZ.z, "VIEW_AXIS_Z");
+			mat->SetTexture(atlas->GetTexture(), "PARTICLE_TEXTURE");
+		}
 
 		SubMesh3DRef targetMesh = mesh->GetSubMesh(0);
 		NONFATAL_ASSERT(targetMesh.IsValid(), "ParticleSystem::UpdateShaderWithParticleData -> Target mesh is invalid.", true);
@@ -440,7 +445,7 @@ namespace GTE
 		AdvanceParticles(lastDeltaTime);
 	}
 	
-	Bool ParticleSystem::Initialize(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan)
+	Bool ParticleSystem::Initialize(MultiMaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan)
 	{
 		timeSinceLastEmit = 0.0f;
 		age = 0.0;
@@ -507,7 +512,7 @@ namespace GTE
 		ParticleMeshRendererSharedPtr meshRenderer = objectManager->CreateParticleMeshRenderer();
 		NONFATAL_ASSERT_RTRN(meshRenderer.IsValid(), "ParticleSystem::InitializeMesh -> Could not create mesh renderer.", false, false);
 		NONFATAL_ASSERT_RTRN(particleMaterial.IsValid(), "ParticleSystem::InitializeMesh -> Particle material is not valid.", false, false);
-		meshRenderer->AddMaterial(particleMaterial);
+		meshRenderer->AddMultiMaterial(particleMaterial);
 		meshObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::ParticleMeshRenderer, GTE::Renderer>(meshRenderer));
 		meshObject->SetActive(false);
 		

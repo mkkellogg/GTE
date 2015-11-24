@@ -10,6 +10,7 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/material.h"
+#include "graphics/render/multimaterial.h"
 #include "graphics/light/light.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
@@ -215,7 +216,7 @@ void LavaScene::SetupTerrain(GTE::AssetImporter& importer)
 	GTE::SceneObjectSharedPtr stone1MeshObject = GameUtil::FindFirstSceneObjectWithMesh(modelSceneObject);
 	GTE::Mesh3DSharedPtr stone1Mesh = stone1MeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr stone1Renderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(stone1MeshObject->GetRenderer());
-	GTE::MaterialSharedPtr stone1Material = stone1Renderer->GetMaterial(0);
+	GTE::MaterialSharedPtr stone1Material = stone1Renderer->GetMultiMaterial(0)->GetMaterial(0);
 
 	// place initial stone in scene
 	modelSceneObject->SetActive(true);
@@ -325,7 +326,7 @@ void LavaScene::SetupStructures(GTE::AssetImporter& importer)
 	GTE::Mesh3DFilterSharedPtr woodBridgeMeshFilter = woodBridgeMeshObject->GetMesh3DFilter();
 	GTE::Mesh3DSharedPtr woodBridgeMesh = woodBridgeMeshObject->GetMesh3D();
 	GTE::Mesh3DRendererSharedPtr woodBridgeRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::Mesh3DRenderer>(woodBridgeMeshObject->GetRenderer());
-	GTE::MaterialSharedPtr woodBridgeMaterial = woodBridgeRenderer->GetMaterial(0);
+	GTE::MaterialSharedPtr woodBridgeMaterial = woodBridgeRenderer->GetMultiMaterial(0)->GetMaterial(0);
 	woodBridgeMeshFilter->SetUseBackSetShadowVolume(false);
 	woodBridgeMeshFilter->SetUseCustomShadowVolumeOffset(true);
 	woodBridgeMeshFilter->SetCustomShadowVolumeOffset(0.6f);
@@ -400,7 +401,7 @@ void LavaScene::SetupExtra(GTE::AssetImporter& importer)
 
 	// create the cube mesh's renderer
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(material);
+	renderer->AddMultiMaterial(material);
 	cubeSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 
 	// scale the cube and move to its position in the scene
@@ -446,7 +447,7 @@ void LavaScene::SetupLights(GTE::AssetImporter& importer, GTE::SceneObjectShared
 	filter->SetMesh3D(pointLightCubeMesh);
 	filter->SetCastShadows(false);
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(selflitMaterial);
+	renderer->AddMultiMaterial(selflitMaterial);
 	spinningPointLightObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 	GTE::LightSharedPtr light = objectManager->CreateLight();
 	light->SetIntensity(2.5f);

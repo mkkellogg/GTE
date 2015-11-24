@@ -13,6 +13,7 @@ namespace GTE
 	const LightSharedPtr& NullLightRef = LightSharedPtr::NullRef;
 	const SceneObjectSharedPtr& NullSceneObjectRef = SceneObjectSharedPtr::NullRef;
 	const MaterialSharedPtr& NullMaterialRef = MaterialSharedPtr::NullRef;
+	const MultiMaterialSharedPtr& NullMultiMaterialRef = MultiMaterialSharedPtr::NullRef;
 	const TextureSharedPtr& NullTextureRef = TextureSharedPtr::NullRef;
 	const AtlasSharedPtr& NullAtlasRef = AtlasSharedPtr::NullRef;
 	const SkeletonSharedPtr& NullSkeletonRef = SkeletonSharedPtr::NullRef;

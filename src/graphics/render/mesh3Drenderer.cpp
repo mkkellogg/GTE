@@ -1,9 +1,10 @@
 #include "mesh3Drenderer.h"
+#include "submesh3Drenderer.h"
+#include "multimaterial.h"
 #include "object/engineobjectmanager.h"
 #include "scene/sceneobjectcomponent.h"
 #include "scene/sceneobject.h"
 #include "graphics/object/mesh3D.h"
-#include "submesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "global/global.h"
 #include "global/assert.h"
@@ -60,7 +61,7 @@ namespace GTE
 	/*
 	 * Get the number of materials attached to this instance.
 	 */
-	UInt32 Mesh3DRenderer::GetMaterialCount() const
+	UInt32 Mesh3DRenderer::GetMultiMaterialCount() const
 	{
 		return (UInt32)materials.size();
 	}
@@ -68,27 +69,42 @@ namespace GTE
 	/*
 	 * Get a reference to the material at [index] in the member list of materials, [materials].
 	 */
-	MaterialRef Mesh3DRenderer::GetMaterial(UInt32 index)
+	MultiMaterialRef Mesh3DRenderer::GetMultiMaterial(UInt32 index)
 	{
-		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", NullMaterialRef, true);
+		NONFATAL_ASSERT_RTRN(index < GetMultiMaterialCount(), "Mesh3DRenderer::GetMaterial -> 'index' is out of range.", NullMultiMaterialRef, true);
 		return materials[index];
 	}
 
 	/*
 	 * Set the material at [index] in the member list of materials, [materials].
 	 */
-	void Mesh3DRenderer::SetMaterial(UInt32 index, MaterialRef material)
+	void Mesh3DRenderer::SetMultiMaterial(UInt32 index, MultiMaterialRef material)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "Mesh3DRenderer::SetMaterial -> 'material' is null.", true);
-		NONFATAL_ASSERT(index < GetMaterialCount(), "Mesh3DRenderer::SetMaterial -> 'index' is out of range.", true);
+		NONFATAL_ASSERT(index < GetMultiMaterialCount(), "Mesh3DRenderer::SetMaterial -> 'index' is out of range.", true);
 
 		materials[index] = material;
 	}
 
 	/*
+	* Create a multi-material to hold [material] and then add to [materials].
+	*/
+	void Mesh3DRenderer::AddMultiMaterial(MaterialRef material)
+	{
+		EngineObjectManager * objectManager = Engine::Instance()->GetEngineObjectManager();
+
+		MultiMaterialRef multiMaterial = objectManager->CreateMultiMaterial();
+		NONFATAL_ASSERT(multiMaterial.IsValid(), "Mesh3DRenderer::AddMaterial -> Unable to create MultiMaterial to hold 'material'.", true);
+
+		multiMaterial->AddMaterial(material);
+
+		AddMultiMaterial(multiMaterial);
+	}
+
+	/*
 	 * Add a material to the member list of materials, [materials].
 	 */
-	void Mesh3DRenderer::AddMaterial(MaterialRef material)
+	void Mesh3DRenderer::AddMultiMaterial(MultiMaterialRef material)
 	{
 		NONFATAL_ASSERT(material.IsValid(), "Mesh3DRenderer::AddMaterial -> 'material' is null.", true);
 		materials.push_back(material);

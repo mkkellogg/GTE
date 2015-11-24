@@ -25,6 +25,13 @@ namespace GTE
 		materials.push_back(material);
 	}
 
+	void MultiMaterial::SetMaterial(UInt32 index, MaterialRef material)
+	{
+		NONFATAL_ASSERT(index < GetMaterialCount(), "MultiMaterial::GetMaterial -> 'shader' is null.", true);
+
+		materials[index] = material;
+	}
+
 	MaterialRef MultiMaterial::GetMaterial(UInt32 index)
 	{
 		NONFATAL_ASSERT_RTRN(index < GetMaterialCount(), "MultiMaterial::GetMaterial -> 'shader' is null.", NullMaterialRef, true);

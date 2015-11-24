@@ -35,6 +35,12 @@ public:
 
 	static GTE::SceneObjectSharedPtr AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
 											  GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume);
+
+	static GTE::SceneObjectSharedPtr AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MultiMaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+													GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows);
+
+	static GTE::SceneObjectSharedPtr AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MultiMaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+													GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume);
 };
 
 #endif

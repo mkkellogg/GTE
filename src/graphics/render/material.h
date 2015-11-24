@@ -67,6 +67,13 @@ namespace GTE
 		}
 	};
 
+	enum class ForwardRenderPass
+	{
+		All = 0,
+		Base = 1,
+		Additive = 2
+	};
+
 	class Material : public EngineObject
 	{
 		// Since this derives from EngineObject, we make this class
@@ -110,6 +117,9 @@ namespace GTE
 
 		// does this material require a light to be rendered?
 		Bool useLighting;
+
+		// for which pass in forward rending is this material used?
+		ForwardRenderPass forwardRenderPass;
 
 		UInt32 renderQueueID;
 
@@ -200,6 +210,10 @@ namespace GTE
 
 		void SetUseLighting(Bool selfLit);
 		Bool UseLighting();
+
+		void SetForwardRenderPass(ForwardRenderPass pass);
+		ForwardRenderPass GetForwardRenderPass();
+
 		void SetRenderQueue(RenderQueueType queue);
 		void SetRenderQueue(UInt32 queue);
 		UInt32 GetRenderQueue();

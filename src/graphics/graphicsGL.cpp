@@ -158,6 +158,8 @@ namespace GTE
 		glClearColor(0, 0, 0, 1);
 		glFrontFace(GL_CW);
 		glEnable(GL_POINT_SPRITE);
+		glBlendEquation(GL_ADD);
+		glBlendColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		// disable blending by default
 		SetBlendingEnabled(false);
@@ -865,6 +867,18 @@ namespace GTE
 			break;
 		case RenderState::BlendingMethod::Zero:
 			return GL_ZERO;
+			break;
+		case RenderState::BlendingMethod::DstColor:
+			return GL_DST_COLOR;
+			break;
+		case RenderState::BlendingMethod::OneMinusDstColor:
+			return GL_ONE_MINUS_DST_COLOR;
+			break;
+		case RenderState::BlendingMethod::SrcColor:
+			return GL_SRC_COLOR;
+			break;
+		case RenderState::BlendingMethod::OneMinusSrcColor:
+			return GL_ONE_MINUS_SRC_COLOR;
 			break;
 		default:
 			return (GLenum)0xFFFFFFFF;

@@ -43,18 +43,6 @@ namespace GTE
 			Bool calculateNormals, Bool calculateTangents, Bool buildFaces);
 		static Mesh3DSharedPtr CreateCubeMesh(StandardAttributeSet meshAttributes, Bool doCCW);
 		static Mesh3DSharedPtr CreateCubeMesh(StandardAttributeSet meshAttributes);
-		/*template <class B, class D> static Bool EngineUtility::InstanceOf(B& base)
-		{
-			try
-			{
-				D& d = dynamic_cast<D&>(base);
-				return true;
-			}
-			catch(std::bad_cast e)
-			{
-				return false;
-			}
-		}*/
 	};
 }
 

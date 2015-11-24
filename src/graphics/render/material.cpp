@@ -25,6 +25,8 @@ namespace GTE
 	{
 		this->materialName = materialName;
 
+		forwardRenderPass = ForwardRenderPass::All;
+
 		allSetUniformsandAttributesVerified = false;
 		attributesSetAndVerified = false;
 		uniformsSetAndVerified = false;
@@ -1090,6 +1092,22 @@ namespace GTE
 	Bool Material::UseLighting()
 	{
 		return useLighting;
+	}
+
+	/*
+	* Set the forward rendering pass for which this material should be used.
+	*/
+	void Material::SetForwardRenderPass(ForwardRenderPass pass)
+	{
+		forwardRenderPass = pass;
+	}
+
+	/*
+	* Get the forward rendering pass for which this material should be used.
+	*/
+	ForwardRenderPass Material::GetForwardRenderPass()
+	{
+		return forwardRenderPass;
 	}
 
 	/*

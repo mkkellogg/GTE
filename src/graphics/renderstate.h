@@ -33,7 +33,11 @@ namespace GTE
 			OneMinusSrcAlpha,
 			DstAlpha,
 			OneMinusDstAlpha,
-			Zero
+			Zero,
+			DstColor,
+			OneMinusDstColor,
+			SrcColor,
+			OneMinusSrcColor
 		};
 
 		enum class FaceCulling

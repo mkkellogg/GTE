@@ -24,6 +24,7 @@ namespace GTE
 
 		UInt32 GetMaterialCount();
 		void AddMaterial(MaterialRef material);
+		void SetMaterial(UInt32 index, MaterialRef material);
 		MaterialRef GetMaterial(UInt32 index);
 
 	};

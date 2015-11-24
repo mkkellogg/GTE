@@ -45,7 +45,7 @@ namespace GTE
 	protected:
 
 		// list of materials that will be used to render the sub-meshes
-		std::vector <MaterialSharedPtr> materials;
+		std::vector <MultiMaterialSharedPtr> materials;
 		// the renderers for each of the sub-meshes
 		std::vector <SubMesh3DRendererSharedPtr> subRenderers;
 
@@ -56,10 +56,11 @@ namespace GTE
 
 	public:
 
-		UInt32 GetMaterialCount() const;
-		MaterialRef GetMaterial(UInt32 index);
-		void SetMaterial(UInt32 index, MaterialRef material);
-		void AddMaterial(MaterialRef material);
+		UInt32 GetMultiMaterialCount() const;
+		MultiMaterialRef GetMultiMaterial(UInt32 index);
+		void SetMultiMaterial(UInt32 index, MultiMaterialRef material);
+		void AddMultiMaterial(MaterialRef material);
+		void AddMultiMaterial(MultiMaterialRef material);
 
 		virtual void InitializeForMesh();
 		void InitializeForMesh(Mesh3DConstRef mesh);

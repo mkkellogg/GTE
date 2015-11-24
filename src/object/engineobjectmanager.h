@@ -161,9 +161,10 @@ namespace GTE
 		MaterialSharedPtr CreateMaterial(const std::string& name, const ShaderSource& shaderSource);
 		void DestroyMaterial(MaterialSharedPtr material);
 		MultiMaterialSharedPtr CreateMultiMaterial();
+		MultiMaterialSharedPtr CreateMultiMaterial(MaterialRef material);
 		void DestroyMultiMaterial(MultiMaterialSharedPtr material);
 
-		ParticleSystemSharedPtr CreateParticleSystem(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
+		ParticleSystemSharedPtr CreateParticleSystem(MultiMaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
 		void DestroyParticleSystem(ParticleSystemSharedPtr system);
 		ParticleMeshRendererSharedPtr CreateParticleMeshRenderer();
 		void DestroyParticleMeshRenderer(ParticleMeshRendererSharedPtr renderer);

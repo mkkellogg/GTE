@@ -42,7 +42,7 @@ namespace GTE
 	
 		SceneObjectSharedPtr meshObject;
 		Mesh3DSharedPtr mesh;
-		MaterialSharedPtr particleMaterial;
+		MultiMaterialSharedPtr particleMaterial;
 		AtlasSharedPtr atlas;
 		Camera* currentCamera;
 
@@ -113,7 +113,7 @@ namespace GTE
 		void WillRender() override;
 		void Update() override;
 
-		Bool Initialize(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
+		Bool Initialize(MultiMaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
 
 		Bool InitializeMesh();
 		void DestroyMesh();

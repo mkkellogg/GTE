@@ -1,5 +1,6 @@
 #include "forwardrendermanager.h"
 #include "material.h"
+#include "multimaterial.h"
 #include "geometry/transform.h"
 #include "geometry/point/point3array.h"
 #include "geometry/quaternion.h"
@@ -286,8 +287,11 @@ namespace GTE
 
 		// set [material] to be the material for the full screen quad mesh
 		Mesh3DRendererRef renderer = DynamicCastEngineObject<Renderer, Mesh3DRenderer>(fullScreenQuadObject->GetRenderer());
-		if (renderer->GetMaterialCount() > 0)renderer->SetMaterial(0, material);
-		else renderer->AddMaterial(material);
+		if(renderer->GetMultiMaterialCount() > 0)
+		{
+			renderer->GetMultiMaterial(0)->SetMaterial(0, material);
+		}
+		else renderer->AddMultiMaterial(material);
 
 		// render the full screen quad mesh
 		for (UInt32 i = 0; i < fullScreenQuad->GetSubMeshCount(); i++)
@@ -415,20 +419,24 @@ namespace GTE
 					Mesh3DRenderer * meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer.GetPtr());
 					if(meshRenderer != nullptr)
 					{
-						if(meshFilter.IsValid() && mesh.IsValid() &&  mesh->GetSubMeshCount() == meshRenderer->GetSubRendererCount() && meshRenderer->GetMaterialCount() > 0 && renderableSceneObjectCount < Constants::MaxSceneObjects)
+						if(meshFilter.IsValid() && mesh.IsValid() &&  mesh->GetSubMeshCount() == meshRenderer->GetSubRendererCount() && meshRenderer->GetMultiMaterialCount() > 0 && renderableSceneObjectCount < Constants::MaxSceneObjects)
 						{
 							renderableSceneObjects[renderableSceneObjectCount] = child;
 							renderableSceneObjectCount++;
-							UInt32 materialCount = meshRenderer->GetMaterialCount();
+							UInt32 materialCount = meshRenderer->GetMultiMaterialCount();
 							UInt32 subMeshCount = mesh->GetSubMeshCount();
 							for(UInt32 i = 0; i < subMeshCount; i++)
 							{
-								MaterialRef mat = meshRenderer->GetMaterial(i % materialCount);
-								RenderQueue* targetRenderQueue = renderQueueManager.GetRenderQueueForID(mat->GetRenderQueue());
+								MultiMaterialRef multiMat = meshRenderer->GetMultiMaterial(i % materialCount);
+								for(UInt32 m = 0; m < multiMat->GetMaterialCount(); m++)
+								{
+									MaterialRef mat = multiMat->GetMaterial(m);
+									RenderQueue* targetRenderQueue = renderQueueManager.GetRenderQueueForID(mat->GetRenderQueue());
 
-								SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
-								Transform * aggregateTransform = const_cast<Transform*>(&processingDesc.AggregateTransform);
-								targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), meshRenderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);
+									SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
+									Transform * aggregateTransform = const_cast<Transform*>(&processingDesc.AggregateTransform);
+									targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), meshRenderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);
+								}
 							}
 						}
 					}
@@ -823,7 +831,7 @@ namespace GTE
 			NONFATAL_ASSERT(mesh.IsValid(), "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has invalid mesh.", true);
 			NONFATAL_ASSERT(mesh->GetSubMeshCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has empty mesh.", true);
 			NONFATAL_ASSERT(meshRenderer->GetSubRendererCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has no renderers.", true);
-			NONFATAL_ASSERT(meshRenderer->GetMaterialCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has no material.", true);
+			NONFATAL_ASSERT(meshRenderer->GetMultiMaterialCount() > 0, "ForwardRenderManager::RenderSkyboxForCamera -> Skybox has no material.", true);
 
 			skyboxObject->SetActive(true);
 
@@ -831,7 +839,7 @@ namespace GTE
 			skyboxEntry.Container = skyboxObject;
 			skyboxEntry.Mesh = mesh->GetSubMesh(0).GetPtr();
 			skyboxEntry.Renderer = meshRenderer->GetSubRenderer(0).GetPtr();
-			skyboxEntry.RenderMaterial = const_cast<MaterialSharedPtr*>(&meshRenderer->GetMaterial(0));
+			skyboxEntry.RenderMaterial = const_cast<MaterialSharedPtr*>(&meshRenderer->GetMultiMaterial(0)->GetMaterial(0));
 
 			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
 
@@ -1142,6 +1150,10 @@ namespace GTE
 		NONFATAL_ASSERT(currentMaterial != nullptr, "ForwardRenderManager::RenderMesh -> Null material encountered.", true);
 
 		if(rendered && !renderMoreThanOnce)return;
+
+		ForwardRenderPass forwardRenderPass = currentMaterial->GetForwardRenderPass();
+		if(rendered && forwardRenderPass != ForwardRenderPass::All && forwardRenderPass != ForwardRenderPass::Additive)return;
+		if(!rendered && forwardRenderPass != ForwardRenderPass::All && forwardRenderPass != ForwardRenderPass::Base)return;
 
 		SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
 		model.SetTo(processingDesc.AggregateTransform);

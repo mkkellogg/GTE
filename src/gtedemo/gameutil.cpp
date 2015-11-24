@@ -7,6 +7,7 @@
 #include "graphics/render/mesh3Drenderer.h"
 #include "graphics/render/rendertarget.h"
 #include "graphics/render/material.h"
+#include "graphics/render/multimaterial.h"
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
 #include "graphics/color/color4.h"
@@ -21,6 +22,9 @@
 #include "geometry/point/point3array.h"
 #include "object/engineobjectmanager.h"
 #include "scene/sceneobject.h"
+#include "global/global.h"
+#include "global/assert.h"
+#include "debug/gtedebug.h"
 
 /*
  * Recursively search the scene hierarchy starting at [ref] for an
@@ -182,15 +186,38 @@ GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GT
 }
 
 /*
- * Given an instance of Mesh3D [mesh] and and instance of Material [material], create an instance of SceneObject that
- * contains [mesh] and renders it using [material]. Scale the scene object's transform by [sx], [sy], [sz] in world
- * space, then rotate by [ra] degrees around the world space axis [rx], [ry], [rz], and then translate in world space by
- * [tx], [ty], tz]. If [isStatic] == true, then set the root SceneObject instance and all children to be static.
- *
- * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
+ * Create an instance of MultiMaterial to hold [material] and then pass the result onto the overload of AddMeshToScene() thta accepts
+ * MultiMaterial instances.
  */
 GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
 	GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume)
+{
+	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+	GTE::MultiMaterialRef multiMaterial = objectManager->CreateMultiMaterial();
+	ASSERT(multiMaterial.IsValid(), "GameUtil::AddMeshToScene -> Unable to create MultiMaterial to hold 'material'.");
+
+	multiMaterial->AddMaterial(material);
+	GTE::SceneObjectSharedPtr object =  AddMeshToScene(mesh, multiMaterial, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, useBackSetShadowVolume);
+	return object;
+}
+
+
+GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MultiMaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+												   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
+{
+	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
+}
+
+/*
+* Given an instance of Mesh3D [mesh] and and instance of Material [material], create an instance of SceneObject that
+* contains [mesh] and renders it using [material]. Scale the scene object's transform by [sx], [sy], [sz] in world
+* space, then rotate by [ra] degrees around the world space axis [rx], [ry], [rz], and then translate in world space by
+* [tx], [ty], tz]. If [isStatic] == true, then set the root SceneObject instance and all children to be static.
+*
+* This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
+*/
+GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MultiMaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
+												   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume)
 {
 	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
 	GTE::SceneObjectSharedPtr meshSceneObject = objectManager->CreateSceneObject();
@@ -202,7 +229,7 @@ GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GT
 	meshFilter->SetReceiveShadows(receiveShadows);
 	meshSceneObject->SetMesh3DFilter(meshFilter);
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMaterial(material);
+	renderer->AddMultiMaterial(material);
 	meshSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 
 	meshSceneObject->GetTransform().Scale(sx, sy, sz, false);

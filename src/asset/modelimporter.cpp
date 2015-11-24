@@ -358,7 +358,7 @@ void ModelImporter::RecursiveProcessModelScene(const aiScene& scene,
 			NONFATAL_ASSERT(material.IsValid(),"ModelImporter::RecursiveProcessModelScene -> nullptr Material object encountered.", true);
 
 			// add the material to the mesh renderer
-			rendererPtr->AddMaterial(material);
+			rendererPtr->AddMultiMaterial(material);
 
 			// if the transformation matrix for this node has an inverted scale, we need to process the mesh
 			// differently or else it won't display correctly. we pass the [invert] flag to ConvertAssimpMesh()

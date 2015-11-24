@@ -733,6 +733,17 @@ namespace GTE
 		});
 	}
 
+	MultiMaterialSharedPtr EngineObjectManager::CreateMultiMaterial(MaterialRef material)
+	{
+		MultiMaterialSharedPtr multiMaterial = CreateMultiMaterial();
+		if(multiMaterial.IsValid())
+		{
+			multiMaterial->AddMaterial(material);
+		}
+
+		return multiMaterial;
+	}
+
 	void EngineObjectManager::DestroyMultiMaterial(MultiMaterialSharedPtr material)
 	{
 		material.ForceDelete();
@@ -796,7 +807,7 @@ namespace GTE
 		delete light;
 	}
 
-	ParticleSystemSharedPtr EngineObjectManager::CreateParticleSystem(MaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan)
+	ParticleSystemSharedPtr EngineObjectManager::CreateParticleSystem(MultiMaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan)
 	{
 		ParticleSystem * system = new(std::nothrow) ParticleSystem();
 		ASSERT(system != nullptr, "EngineObjectManager::CreateParticleSystem -> Could not create new particle system.");

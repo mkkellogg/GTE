@@ -194,7 +194,7 @@ GTE::Bool LavaField::Init()
 	// set up renderer
 	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
 	ASSERT(renderer.IsValid(), "LavaField::Init -> Could not create lava field renderer.");
-	renderer->AddMaterial(lavaMaterial);
+	renderer->AddMultiMaterial(lavaMaterial);
 
 	lavaFieldObject->SetMesh3DFilter(meshFilter);
 	lavaFieldObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
