@@ -9,19 +9,6 @@
 
 namespace GTE
 {
-	enum class StandardAttributeMaskComponent
-	{
-		Position = 1,
-		ShadowPosition = 2,
-		Normal = 4,
-		FaceNormal = 8,
-		Tangent = 16,
-		VertexColor = 32,
-		UVTexture0 = 64,
-		UVTexture1 = 128,
-		UVNormalMap = 256
-	};
-
 	enum class StandardAttribute
 	{
 		Position = 0,
@@ -35,6 +22,19 @@ namespace GTE
 		UVNormalMap = 8,
 		_Last = 9, // always keep as second to last entry
 		_None = 10 // always keep as last entry
+	};
+
+	enum class StandardAttributeMaskComponent
+	{
+		Position = (UInt32)StandardAttribute::Position << 1,
+		ShadowPosition = (UInt32)StandardAttribute::ShadowPosition << 1,
+		Normal = (UInt32)StandardAttribute::Normal << 1,
+		FaceNormal = (UInt32)StandardAttribute::FaceNormal << 1,
+		Tangent = (UInt32)StandardAttribute::Tangent << 1,
+		VertexColor = (UInt32)StandardAttribute::VertexColor << 1,
+		UVTexture0 = (UInt32)StandardAttribute::UVTexture0 << 1,
+		UVTexture1 = (UInt32)StandardAttribute::UVTexture1 << 1,
+		UVNormalMap = (UInt32)StandardAttribute::UVNormalMap << 1
 	};
 
 	typedef IntMask StandardAttributeSet;

@@ -80,6 +80,18 @@ namespace GTE
 		else return b;
 	}
 
+	Int32 GTEMath::Min(Int32 a, Int32 b)
+	{
+		if(a < b)return a;
+		else return b;
+	}
+
+	UInt32 GTEMath::Min(UInt32 a, UInt32 b)
+	{
+		if(a < b)return a;
+		else return b;
+	}
+
 	Real GTEMath::Max(Real a, Real b)
 	{
 		if (a > b)return a;
@@ -87,6 +99,12 @@ namespace GTE
 	}
 
 	Int32 GTEMath::Max(Int32 a, Int32 b)
+	{
+		if(a > b)return a;
+		else return b;
+	}
+
+	UInt32 GTEMath::Max(UInt32 a, UInt32 b)
 	{
 		if(a > b)return a;
 		else return b;

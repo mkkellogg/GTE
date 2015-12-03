@@ -64,6 +64,7 @@ namespace GTE
 		Matrix4x4 MatrixData;
 		Real BasicFloatData[4];
 		Real * ExtendedFloatData;
+		Bool RequiresVerification;
 	};
 }
 

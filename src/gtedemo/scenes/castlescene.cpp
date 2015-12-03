@@ -804,31 +804,17 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	ASSERT(smokeSystemObject.IsValid(), "Unable to create smoke particle system object!\n");
 	fireParentObject->AddChild(smokeSystemObject);
 
-	// create base lit material for rendering smoke particles
-	shaderName = "particles_lit";
-	materialName = "ParticlesLit";
-	GTE::MaterialRef smokeBaseMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
-	ASSERT(smokeBaseMaterial.IsValid(), "Unable to create base smoke material!\n");
-	smokeBaseMaterial->SetUseLighting(true);
-	smokeBaseMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
-	smokeBaseMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
-	smokeBaseMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
-	smokeBaseMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
-	smokeBaseMaterial->SetForwardRenderPass(GTE::ForwardRenderPass::Base);
-
-	// create additive lit material for rendering smoke particles
-	//shaderName = "particles_lit_additive";
-	//materialName = "ParticlesLitAdditive";
-	shaderName = "particles_lit";
-	materialName = "ParticlesLit";
-	GTE::MaterialRef smokeAdditiveMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
-	ASSERT(smokeAdditiveMaterial.IsValid(), "Unable to create additive smoke material!\n");
-	smokeAdditiveMaterial->SetUseLighting(true);
-	smokeAdditiveMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
-	smokeAdditiveMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
-	smokeAdditiveMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
-	smokeAdditiveMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
-	smokeAdditiveMaterial->SetForwardRenderPass(GTE::ForwardRenderPass::Additive);
+	// create multi-light material for rendering smoke particles
+	shaderName = "particles_lit_multi";
+	materialName = "ParticlesLitMulti";
+	GTE::MaterialRef smokeMaterial = GTE::ParticleSystem::CreateMaterial(shaderName, materialName);
+	ASSERT(smokeMaterial.IsValid(), "Unable to create additive smoke material!\n");
+	smokeMaterial->SetUseLighting(true);
+	smokeMaterial->SetRenderQueue((GTE::UInt32)GTE::RenderQueueType::Transparent + 1);
+	smokeMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
+	smokeMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
+	smokeMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
+	smokeMaterial->SetAllLightsSinglePass(true);
 
 	// load texture for the smoke particle
 	GTE::TextureRef smokeTexture = objectManager->CreateTexture("resources/textures/particles/smokeparticle.png", texAttributes);
@@ -837,8 +823,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	GTE::AtlasRef smokeAtlas = objectManager->CreateAtlas(smokeTexture, true);
 	ASSERT(smokeAtlas.IsValid(), "Unable to create smoke atlas!\n");
 
-	GTE::MultiMaterialRef smokeMultiMaterial = objectManager->CreateMultiMaterial(smokeBaseMaterial);
-	smokeMultiMaterial->AddMaterial(smokeAdditiveMaterial);
+	GTE::MultiMaterialRef smokeMultiMaterial = objectManager->CreateMultiMaterial(smokeMaterial);
 	GTE::ParticleSystemRef smokeSystem = objectManager->CreateParticleSystem(smokeMultiMaterial, smokeAtlas, false, 150.0f, 4.0f, 0.0f);
 	ASSERT(smokeSystem.IsValid(), "Unable to create smoke particle system!\n");
 	smokeSystemObject->SetParticleSystem(smokeSystem);
@@ -867,16 +852,21 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 	GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
 	smokeAlphaModifier.AddFrame(0.0f, 0.0f);
-	smokeAlphaModifier.AddFrame(0.5f, 0.025f);
-	smokeAlphaModifier.AddFrame(1.0f, 0.05f);
+	smokeAlphaModifier.AddFrame(0.5f, 0.05f);
+	smokeAlphaModifier.AddFrame(1.0f, 0.1f);
 	smokeAlphaModifier.AddFrame(2.0f, 0.20f);
 	smokeAlphaModifier.AddFrame(3.0f, 0.20f);
 	smokeAlphaModifier.AddFrame(4.0f, 0.0f);
 
 	GTE::FrameSetModifier<GTE::Color4> smokeColorModifier;
-	smokeColorModifier.AddFrame(0.0f, GTE::Color4(0.4f, 0.4f, 0.4f, 1.0f));
-	smokeColorModifier.AddFrame(1.5f, GTE::Color4(0.4f, 0.4f, 0.4f, 1.0f));
-	smokeColorModifier.AddFrame(4.0f, GTE::Color4(0.6f, 0.6f, 0.6f, 1.0f));
+	smokeColorModifier.AddFrame(0.0f, GTE::Color4(0.3f, 0.3f, 0.3f, 1.0f));
+	smokeColorModifier.AddFrame(1.5f, GTE::Color4(0.3f, 0.3f, 0.3f, 1.0f));
+	smokeColorModifier.AddFrame(4.0f, GTE::Color4(0.45f, 0.45f, 0.45f, 1.0f));
+
+	/*smokeColorModifier.AddFrame(0.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+	smokeColorModifier.AddFrame(1.5f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
+	smokeColorModifier.AddFrame(4.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));*/
+
 
 	smokeSystem->BindPositionModifier(smokePositionModifier);
 	smokeSystem->BindVelocityModifier(smokeVelocityModifier);

@@ -132,7 +132,9 @@ namespace GTE
 		for (UInt32 i = 0; i < uniformCount; i++)
 		{
 			const UniformDescriptor * desc = shader->GetUniformDescriptor(i);
-			localUniformDescriptors.push_back(*desc);
+			UniformDescriptor copy = *desc;
+
+			localUniformDescriptors.push_back(copy);
 		}
 
 		return true;
@@ -953,14 +955,14 @@ namespace GTE
 
 	void Material::SendLightToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
 			   	   	   	   	   	     const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
-									 const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations)
+									 const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, const Int32* enabled)
 	{
-		SendLightsToShader(positions, directions, lightTypes, colors, intensities, ranges, attenuations, parallelAngleAttenuations, orthoAngleAttenuations, 1);
+		SendLightsToShader(positions, directions, lightTypes, colors, intensities, ranges, attenuations, parallelAngleAttenuations, orthoAngleAttenuations, enabled, 1);
 	}
 
 	void Material::SendLightsToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
 			   	   	   	   	   	     const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
-									 const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, UInt32 count)
+									 const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, const Int32* enabled, UInt32 count)
 	{
 		if(count == 0)return;
 
@@ -974,13 +976,14 @@ namespace GTE
 		NONFATAL_ASSERT(attenuations != nullptr, "Material::SendLightToShader -> 'attenuations' is null.", true);
 		NONFATAL_ASSERT(parallelAngleAttenuations != nullptr, "Material::SendLightToShader -> 'parallelAngleAttenuations' is null.", true);
 		NONFATAL_ASSERT(orthoAngleAttenuations != nullptr, "Material::SendLightToShader -> 'orthoAngleAttenuations' is null.", true);
+		NONFATAL_ASSERT(enabled != nullptr, "Material::SendLightToShader -> 'enabled' is null.", true);
 
 		Int32 varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightType));
 		if (varID >= 0)
 		{
 			if(count == 1)shader->SendUniformToShader(varID, lightTypes[0]);
 			else shader->SendUniformToShader1IV(varID, lightTypes, count);
-			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
+			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightPosition));
@@ -1046,6 +1049,14 @@ namespace GTE
 			else shader->SendUniformToShader1IV(varID, orthoAngleAttenuations, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
 		}
+
+		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightEnabled));
+		if(varID >= 0)
+		{
+			if(count == 1)shader->SendUniformToShader(varID, enabled[0]);
+			else shader->SendUniformToShader1IV(varID, enabled, count);
+			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
+		}
 	}
 
 	/*
@@ -1067,8 +1078,9 @@ namespace GTE
 		Real attenuation = light->GetAttenuation();
 		Int32 parallelAngleAttenuation = (Int32)light->GetParallelAngleAttenuationType();
 		Int32 orthoAngleAttenuationType = (Int32)light->GetOrthoAngleAttenuationType();
+		Int32 enabled = 1;
 
-		SendLightToShader(positionData, altDirection != nullptr ? altDirectionData : directionData, &lightType, colorData, &intensity, &range, &attenuation, &parallelAngleAttenuation, &orthoAngleAttenuationType);
+		SendLightToShader(positionData, altDirection != nullptr ? altDirectionData : directionData, &lightType, colorData, &intensity, &range, &attenuation, &parallelAngleAttenuation, &orthoAngleAttenuationType, &enabled);
 
 	}
 
@@ -1096,7 +1108,7 @@ namespace GTE
 		for (UInt32 i = 0; i < shader->GetAttributeCount(); i++)
 		{
 			const AttributeDescriptor& desc = localAttributeDescriptors[i];
-			if (desc.SetSize != vertexCount)
+			if (desc.SetSize != vertexCount && desc.RequiresVerification)
 			{
 				std::string msg = "Material::VerifySetVars -> Attribute '";
 				msg += desc.Name + std::string("' set incorrectly: size is ") + std::to_string(desc.SetSize);
@@ -1112,7 +1124,7 @@ namespace GTE
 			const UniformDescriptor& desc = localUniformDescriptors[i];
 			UInt32 requiredSize = GetRequiredUniformSize(desc.Type);
 
-			if (desc.SetSize != requiredSize)
+			if (desc.SetSize != requiredSize && desc.RequiresVerification)
 			{
 				std::string msg = "Material::VerifySetVars -> Uniform '";
 				msg += desc.Name + std::string("' set incorrectly: size is ") + std::to_string(desc.SetSize);

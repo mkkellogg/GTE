@@ -191,10 +191,10 @@ namespace GTE
 		void SendMVPMatrixToShader(const Matrix4x4 * mat);
 		void SendLightToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
 							   const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
-							   const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations);
+							   const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, const Int32* enabled);
 		void SendLightsToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
 				   	   	   	    const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
-								const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, UInt32 count);
+								const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, const Int32* enabled, UInt32 count);
 		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
 		void SendEyePositionToShader(const Point3 * position);
 

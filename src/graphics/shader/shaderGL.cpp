@@ -371,6 +371,13 @@ namespace GTE
 				}
 
 				desc->Name = name;
+
+				auto arrayCharacterPos = desc->Name.find('[');
+				if(arrayCharacterPos != std::string::npos)
+				{
+					desc->Name = desc->Name.substr(0, arrayCharacterPos);
+				}
+
 			}
 
 			uniformCount = totalUniforms;
@@ -427,6 +434,12 @@ namespace GTE
 				}
 
 				desc->Name = name;
+
+				auto arrayCharacterPos = desc->Name.find('[');
+				if(arrayCharacterPos != std::string::npos)
+				{
+					desc->Name = desc->Name.substr(0, arrayCharacterPos);
+				}
 			}
 
 			attributeCount = totalAttributes;

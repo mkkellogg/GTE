@@ -17,6 +17,7 @@ namespace GTE
 		IsSet = false;
 		IsDelayedSet = false;
 		SetSize = 0;
+		RequiresVerification = true;
 
 		memset(BasicFloatData, 0, sizeof(Real) * 4);
 	}

@@ -21,8 +21,11 @@ namespace GTE
 		static Real Tan(Real n);
 		static Real Abs(Real n);
 		static Real Min(Real a, Real b);
+		static Int32 Min(Int32 a, Int32 b);
+		static UInt32 Min(UInt32 a, UInt32 b);
 		static Real Max(Real a, Real b);
 		static Int32 Max(Int32 a, Int32 b);
+		static UInt32 Max(UInt32 a, UInt32 b);
 		static Real Lerp(Real a, Real b, Real t);
 		static Real Random();
 	};

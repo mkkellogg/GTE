@@ -674,13 +674,10 @@ namespace GTE
 			SceneObject * sceneObject = entry->Container;
 
 			SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
-			processingDescriptor.Rendered = false;
-		}
+			processingDescriptor.WillRenderCalled = false;
 
-		// clear the list of objects that have been rendered at least once. this list is used to
-		// determine if additive blending should be turned on or off. if an object is being rendered for the
-		// first time, additive blending should be off; otherwise it should be on.
-		renderedObjects.clear();
+			renderedSubRenderers.clear();
+		}
 	}
 
 	/*
@@ -961,6 +958,7 @@ namespace GTE
 		singleLightDescriptor.LightObjects[0] = const_cast<Light*>(&light);
 		singleLightDescriptor.Positions[0] = lightWorldPosition;
 		singleLightDescriptor.Directions[0] = lightDirection;
+		singleLightDescriptor.Enabled[0] = true;
 		singleLightDescriptor.UseLighting = true;
 
 		RenderMode currentRenderMode = RenderMode::None;
@@ -1044,10 +1042,10 @@ namespace GTE
 							}
 
 							// Dispatch "WillRender" event
-							if(!processingDesc.Rendered)
+							if(!processingDesc.WillRenderCalled)
 							{
 								Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
-								processingDesc.Rendered = true;
+								processingDesc.WillRenderCalled = true;
 							}
 
 							RenderMesh(*entry, singleLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
@@ -1074,18 +1072,39 @@ namespace GTE
 			RenderQueueEntry* entry = *itr;
 			NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForMultiLight -> Null render queue entry encountered.", true);
 
+			SubMesh3DRenderer * subRenderer = entry->Renderer;
+			NONFATAL_ASSERT(subRenderer != nullptr, "ForwardRenderManager::RenderSceneForMultiLight -> Null sub renderer encountered.", true);
+
 			MaterialRef entryMaterial = *entry->RenderMaterial;
-			if(entryMaterial->UseLighting() && entryMaterial->AllLightsSinglePass())
+			NONFATAL_ASSERT(entryMaterial.IsValid(), "ForwardRenderManager::RenderSceneForMultiLight -> Null material encountered.", true);
+
+			Bool rendered = renderedSubRenderers[subRenderer->GetObjectID()];
+
+			if(entryMaterial->UseLighting() && entryMaterial->AllLightsSinglePass() && !rendered)
 			{
 				SceneObject* sceneObject = entry->Container;
 				NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
 
 				// set up lighting descriptor for multiple lights
-				multiLightDescriptor.LightCount = lightCount;
+				multiLightDescriptor.LightCount = GTEMath::Min(Constants::MaxShaderLights, lightCount + ambientLightCount);
 				multiLightDescriptor.UseLighting = true;
-				for(UInt32 l = 0; l < lightCount; l++)
+				for(UInt32 l = 0; l < Constants::MaxShaderLights; l++)
 				{
-					SceneObject* lightObject = sceneLights[l];
+					multiLightDescriptor.Enabled[l] = 0;
+				}
+				for(UInt32 l = 0; l < multiLightDescriptor.LightCount; l++)
+				{
+					SceneObject* lightObject = nullptr;
+
+					if(l >= ambientLightCount)
+					{
+						lightObject = sceneLights[l - ambientLightCount];
+					}
+					else
+					{
+						lightObject = sceneAmbientLights[l];
+					}
+
 					if(lightObject == nullptr) continue;
 					LightRef lightRef = lightObject->GetLight();
 					if(!lightRef.IsValid())continue;
@@ -1095,7 +1114,7 @@ namespace GTE
 					SceneObjectProcessingDescriptor& processingDesc = light.GetSceneObject()->GetProcessingDescriptor();
 					Transform lightTransform = processingDesc.AggregateTransform;
 
-					multiLightDescriptor.LightObjects[0] = &light;
+					multiLightDescriptor.LightObjects[l] = &light;
 
 					multiLightDescriptor.Positions[l].Set(0, 0, 0);
 					multiLightDescriptor.Directions[l] = light.GetDirection();
@@ -1126,6 +1145,8 @@ namespace GTE
 					multiLightDescriptor.Attenuations[l] = lightRef->GetAttenuation();
 					multiLightDescriptor.ParallelAngleAttenuations[l] = (Int32)lightRef->GetParallelAngleAttenuationType();
 					multiLightDescriptor.OrthoAngleAttenuations[l] = (Int32)lightRef->GetOrthoAngleAttenuationType();
+
+					multiLightDescriptor.Enabled[l] = 1;
 				}
 
 				// copy the full world transform of the scene object, including those of all ancestors
@@ -1138,15 +1159,14 @@ namespace GTE
 				{
 					for(UInt32 l = 0; l < multiLightDescriptor.LightCount; l++)
 					{
-						Light& light = *multiLightDescriptor.LightObjects[0];
-						const SceneObject& lightSceneObject = light.GetSceneObject().GetRef();
+						Light& light = *multiLightDescriptor.LightObjects[l];
 
-						Bool shouldCull = ShouldCullFromLightByLayer(light, lightSceneObject) ||
+						Bool shouldCull = ShouldCullFromLightByLayer(light, *sceneObject) ||
 										  ShouldCullFromLightByPosition(light, multiLightDescriptor.Positions[l], *entry->Mesh, sceneObjectWorldTransform);
 
 						if(shouldCull)
 						{
-							// TODO: implement culling for multi lights
+							multiLightDescriptor.Enabled[l] = 0;
 						}
 					}
 
@@ -1157,10 +1177,10 @@ namespace GTE
 					}
 
 					// Dispatch "WillRender" event
-					if(!processingDesc.Rendered)
+					if(!processingDesc.WillRenderCalled)
 					{
 						Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
-						processingDesc.Rendered = true;
+						processingDesc.WillRenderCalled = true;
 					}
 
 					RenderMesh(*entry, multiLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
@@ -1228,10 +1248,10 @@ namespace GTE
 
 			// Dispatch "WillRender" event
 			SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
-			if(!processingDescriptor.Rendered)
+			if(!processingDescriptor.WillRenderCalled)
 			{
 				Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
-				processingDescriptor.Rendered = true;
+				processingDescriptor.WillRenderCalled = true;
 			}
 
 			RenderMesh(*entry, singleLightDescriptor, viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter);
@@ -1264,7 +1284,7 @@ namespace GTE
 		NONFATAL_ASSERT(renderer != nullptr, "ForwardRenderManager::RenderMesh -> Null sub renderer encountered.", true);
 
 		// determine if this mesh has been rendered before
-		Bool rendered = renderedObjects[renderer->GetObjectID()];
+		Bool rendered = renderedSubRenderers[renderer->GetObjectID()];
 		
 		// if we have an override material, we use that for every mesh
 		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
@@ -1304,7 +1324,7 @@ namespace GTE
 				currentMaterial->SendLightsToShader(lightingDescriptor.PositionDatas, lightingDescriptor.DirectionDatas, lightingDescriptor.Types,
 												   lightingDescriptor.ColorDatas, lightingDescriptor.Intensities, lightingDescriptor.Ranges,
 												   lightingDescriptor.Attenuations, lightingDescriptor.ParallelAngleAttenuations,
-												   lightingDescriptor.OrthoAngleAttenuations, lightingDescriptor.LightCount);
+												   lightingDescriptor.OrthoAngleAttenuations, lightingDescriptor.Enabled, lightingDescriptor.LightCount);
 			}
 			else
 			{
@@ -1346,8 +1366,8 @@ namespace GTE
 		// render the current mesh
 		renderer->Render();
 
-		// flag the current scene object as being rendered (at least once)
-		if (flagRendered)renderedObjects[renderer->GetObjectID()] = true;
+		// flag the current mesh & renderer combo as being rendered (at least once)
+		if(flagRendered) renderedSubRenderers[renderer->GetObjectID()] = true;
 	}
 
 	/*

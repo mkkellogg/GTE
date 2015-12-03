@@ -49,6 +49,7 @@ namespace GTE
 		Bool IsSet;
 		UInt32 SetSize;
 		Real * FloatData;
+		Bool RequiresVerification;
 	};
 }
 

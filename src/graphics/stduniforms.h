@@ -9,33 +9,6 @@
 
 namespace GTE
 {
-	enum class StandardUniformMaskComponent
-	{
-		ModelMatrix = 1,
-		ModelMatrixInverseTranspose = 2,
-		ModelViewMatrix = 4,
-		ModelViewProjectionMatrix = 8,
-		ProjectionMatrix = 16,
-		ViewMatrix = 32,
-		EyePosition = 64,
-		LightPosition = 128,
-		LightDirection = 256,
-		LightColor = 512,
-		LightIntensity = 1024,
-		LightAttenuation = 2048,
-		LightType = 4096,
-		LightRange = 8192,
-		LightParallelAngleAttenuation = 16384,
-		LightOrthoAngleAttenuation = 32768,
-		EmissiveColor = 65536,
-		Texture0 = 131072,
-		Texture1 = 262144,
-		NormalMap = 524288,
-		DoShadowVolumeRender = 1048576,
-		ClipPlaneCount = 2097152,
-		ClipPlane0 = 4194304
-	};
-
 	enum class StandardUniform
 	{
 		ModelMatrix = 0,
@@ -54,15 +27,44 @@ namespace GTE
 		LightRange = 13,
 		LightParallelAngleAttenuation = 14,
 		LightOrthoAngleAttenuation = 15,
-		EmissiveColor = 16,
-		Texture0 = 17,
-		Texture1 = 18,
-		NormalMap = 19,
-		DoShadowVolumeRender = 20,
-		ClipPlaneCount = 21,
-		ClipPlane0 = 22,
-		_Last = 23, // always keep as last entry (before _None)
-		_None = 24
+		LightEnabled = 16,
+		EmissiveColor = 17,
+		Texture0 = 18,
+		Texture1 = 19,
+		NormalMap = 20,
+		DoShadowVolumeRender = 21,
+		ClipPlaneCount = 22,
+		ClipPlane0 = 23,
+		_Last = 24, // always keep as last entry (before _None)
+		_None = 25
+	};
+
+	enum class StandardUniformMaskComponent
+	{
+		ModelMatrix = (UInt32)StandardUniform::ModelMatrix << 1,
+		ModelMatrixInverseTranspose = (UInt32)StandardUniform::ModelMatrixInverseTranspose << 1,
+		ModelViewMatrix = (UInt32)StandardUniform::ModelViewMatrix << 1,
+		ModelViewProjectionMatrix = (UInt32)StandardUniform::ModelViewProjectionMatrix << 1,
+		ProjectionMatrix = (UInt32)StandardUniform::ProjectionMatrix << 1,
+		ViewMatrix = (UInt32)StandardUniform::ViewMatrix << 1,
+		EyePosition = (UInt32)StandardUniform::EyePosition << 1,
+		LightPosition = (UInt32)StandardUniform::LightPosition << 1,
+		LightDirection = (UInt32)StandardUniform::LightDirection << 1,
+		LightColor = (UInt32)StandardUniform::LightColor << 1,
+		LightIntensity = (UInt32)StandardUniform::LightIntensity << 1,
+		LightAttenuation = (UInt32)StandardUniform::LightAttenuation << 1,
+		LightType = (UInt32)StandardUniform::LightType << 1,
+		LightRange = (UInt32)StandardUniform::LightRange << 1,
+		LightParallelAngleAttenuation = (UInt32)StandardUniform::LightParallelAngleAttenuation << 1,
+		LightOrthoAngleAttenuation = (UInt32)StandardUniform::LightOrthoAngleAttenuation << 1,
+		LightEnabled = (UInt32)StandardUniform::LightEnabled << 1,
+		EmissiveColor = (UInt32)StandardUniform::EmissiveColor << 1,
+		Texture0 = (UInt32)StandardUniform::Texture0 << 1,
+		Texture1 = (UInt32)StandardUniform::Texture1 << 1,
+		NormalMap = (UInt32)StandardUniform::NormalMap << 1,
+		DoShadowVolumeRender = (UInt32)StandardUniform::DoShadowVolumeRender << 1,
+		ClipPlaneCount = (UInt32)StandardUniform::ClipPlaneCount << 1,
+		ClipPlane0 = (UInt32)StandardUniform::ClipPlane0 << 1
 	};
 
 	typedef IntMask StandardUniformSet;

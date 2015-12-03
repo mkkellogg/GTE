@@ -86,6 +86,7 @@ namespace GTE
 			Real* Attenuations;
 			Int32* ParallelAngleAttenuations;
 			Int32* OrthoAngleAttenuations;
+			Int32* Enabled;
 
 			Bool UseLighting;
 
@@ -107,6 +108,8 @@ namespace GTE
 				Attenuations = nullptr;
 				ParallelAngleAttenuations = nullptr;
 				OrthoAngleAttenuations = nullptr;
+
+				Enabled = nullptr;
 
 				initialized = false;
 				UseLighting = true;
@@ -145,6 +148,8 @@ namespace GTE
 				SAFE_DELETE(Attenuations);
 				SAFE_DELETE(ParallelAngleAttenuations);
 				SAFE_DELETE(OrthoAngleAttenuations);
+
+				SAFE_DELETE(Enabled);
 			}
 
 			Bool Init(UInt32 maxLights)
@@ -189,6 +194,9 @@ namespace GTE
 
 					ParallelAngleAttenuations = new Int32[maxLights];
 					ASSERT(ParallelAngleAttenuations != nullptr, "LightingDescriptor::Init -> Unable to allocate light parallel angle attenuations.");
+
+					Enabled = new Int32[maxLights];
+					ASSERT(Enabled != nullptr, "LightingDescriptor::Init -> Unable to allocate 'Enabled' array.");
 
 					initialized = true;
 				}
@@ -305,7 +313,7 @@ namespace GTE
 
 		// keep track of objects that have been rendered
 		// TODO: optimize usage of this hashing structure
-		std::unordered_map<UInt32, Bool> renderedObjects;
+		std::unordered_map<UInt32, Bool> renderedSubRenderers;
 		// cache shadow volumes that don't need to be constantly rebuilt
 		std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 

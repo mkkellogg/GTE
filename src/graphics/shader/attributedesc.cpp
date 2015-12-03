@@ -13,6 +13,7 @@ namespace GTE
 		IsSet = false;
 		SetSize = 0;
 		RegisteredAttributeID = AttributeDirectory::VarID_Invalid;
+		RequiresVerification = true;
 	}
 
 	AttributeDescriptor::~AttributeDescriptor()

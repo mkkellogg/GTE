@@ -29,11 +29,11 @@ namespace GTE
 
 		Transform AggregateTransform;
 		Transform AggregateTransformInverse;
-		Bool Rendered;
+		Bool WillRenderCalled;
 
 		SceneObjectProcessingDescriptor()
 		{
-			Rendered = false;
+			WillRenderCalled = false;
 		}
 	};
 
