@@ -57,19 +57,22 @@ namespace GTE
 
 		virtual void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture) = 0;
 		virtual void SendUniformToShader(Int32 varID, const Matrix4x4 * mat) = 0;
-		virtual void SendUniformToShader(Int32 varID, const Point3 * point) = 0;
-		virtual void SendUniformToShader(Int32 varID, const Vector3 * vector) = 0;
-		virtual void SendUniformToShader(Int32 varID, const Color4 * color) = 0;
 
-		virtual void SendUniformToShader4v(Int32 varID, const Real * data) = 0;
-		virtual void SendUniformToShader3v(Int32 varID, const Real * data) = 0;
-		virtual void SendUniformToShader2v(Int32 varID, const Real * data) = 0;
-		virtual void SendUniformToShader4(Int32 varID, Real x, Real y, Real z, Real w) = 0;
-		virtual void SendUniformToShader3(Int32 varID, Real x, Real y, Real z) = 0;
-		virtual void SendUniformToShader2(Int32 varID, Real x, Real y) = 0;
+		virtual void SendUniformToShader(Int32 varID, Real x, Real y, Real z, Real w) = 0;
+		virtual void SendUniformToShader(Int32 varID, Real x, Real y, Real z) = 0;
+		virtual void SendUniformToShader(Int32 varID, Real x, Real y) = 0;
 		virtual void SendUniformToShader(Int32 varID, Real  data) = 0;
-
 		virtual void SendUniformToShader(Int32 varID, Int32  data) = 0;
+
+		virtual void SendUniformToShader4FV(Int32 varID, const Real * data, UInt32 count) = 0;
+		virtual void SendUniformToShader3FV(Int32 varID, const Real * data, UInt32 count) = 0;
+		virtual void SendUniformToShader2FV(Int32 varID, const Real * data, UInt32 count) = 0;
+		virtual void SendUniformToShader1FV(Int32 varID, const Real * data, UInt32 count) = 0;
+		virtual void SendUniformToShader4IV(Int32 varID, const Int32 * data, UInt32 count) = 0;
+		virtual void SendUniformToShader3IV(Int32 varID, const Int32 * data, UInt32 count) = 0;
+		virtual void SendUniformToShader2IV(Int32 varID, const Int32 * data, UInt32 count) = 0;
+		virtual void SendUniformToShader1IV(Int32 varID, const Int32 * data, UInt32 count) = 0;
+		virtual void SendUniformToShaderM4x4V(Int32 varID, const Matrix4x4 * mat, UInt32 count) = 0;
 
 		virtual UInt32 GetUniformCount() const = 0;
 		virtual const UniformDescriptor * GetUniformDescriptor(UInt32 index) const = 0;

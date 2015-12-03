@@ -24,6 +24,7 @@
 #include "geometry/transform.h"
 #include "renderqueue.h"
 #include "renderqueuemanager.h"
+#include "assert.h"
 
 #include <vector>
 #include <unordered_map>
@@ -61,24 +62,138 @@ namespace GTE
 		friend class Engine;
 
 		/*
-		 * Data structure that is passed to RenderSceneObjectMeshes() that describes the kind of
-		 * lighting to be used (or not used) during rendering.
+		 * Data structure that is passed to RenderSceneObjectMeshes() that describes lighting
+		 * information to be used (or not used) during rendering.
 		 */
 		class LightingDescriptor
 		{
+			Bool initialized;
+
 		public:
 
-			const Light* LightObject;
-			const Point3* LightPosition;
-			const Vector3* LightDirection;
+			UInt32 LightCount;
+			Light** LightObjects;
+
+			Real* PositionDatas;
+			Real* DirectionDatas;
+			Real* ColorDatas;
+			Point3 * Positions;
+			Vector3 * Directions;
+			Color4 * Colors;
+			Int32* Types;
+			Real* Intensities;
+			Real* Ranges;
+			Real* Attenuations;
+			Int32* ParallelAngleAttenuations;
+			Int32* OrthoAngleAttenuations;
+
 			Bool UseLighting;
 
-			LightingDescriptor(const Light* lightObject, const Point3* lightPosition, const Vector3 * lightDirection, Bool useLighting) : LightObject(lightObject),
-				LightPosition(lightPosition),
-				LightDirection(lightDirection)
+			LightingDescriptor()
 			{
-				this->UseLighting = useLighting;
+				LightObjects = nullptr;
+
+				Positions = nullptr;
+				Directions = nullptr;
+				Colors = nullptr;
+
+				PositionDatas = nullptr;
+				DirectionDatas = nullptr;
+				ColorDatas = nullptr;
+
+				Types = nullptr;
+				Intensities = nullptr;
+				Ranges = nullptr;
+				Attenuations = nullptr;
+				ParallelAngleAttenuations = nullptr;
+				OrthoAngleAttenuations = nullptr;
+
+				initialized = false;
+				UseLighting = true;
+				LightCount = 0;
+			}
 			
+			~LightingDescriptor()
+			{
+				SAFE_DELETE(LightObjects);
+
+				if(Positions != nullptr)
+				{
+					delete[] Positions;
+					Positions = nullptr;
+				}
+
+				if(Directions != nullptr)
+				{
+					delete[] Directions;
+					Directions = nullptr;
+				}
+
+				if(Colors != nullptr)
+				{
+					delete[] Colors;
+					Colors = nullptr;
+				}
+
+				SAFE_DELETE(PositionDatas);
+				SAFE_DELETE(DirectionDatas);
+				SAFE_DELETE(ColorDatas);
+
+				SAFE_DELETE(Types);
+				SAFE_DELETE(Intensities);
+				SAFE_DELETE(Ranges);
+				SAFE_DELETE(Attenuations);
+				SAFE_DELETE(ParallelAngleAttenuations);
+				SAFE_DELETE(OrthoAngleAttenuations);
+			}
+
+			Bool Init(UInt32 maxLights)
+			{
+				if(!initialized)
+				{
+					LightObjects = new Light*[maxLights];
+					ASSERT(LightObjects != nullptr, "LightingDescriptor::Init -> Unable to allocate light objects.");
+
+					Positions = new Point3[maxLights];
+					ASSERT(Positions != nullptr, "LightingDescriptor::Init -> Unable to allocate light positions.");
+
+					Directions = new Vector3[maxLights];
+					ASSERT(Directions != nullptr, "LightingDescriptor::Init -> Unable to allocate light directions.");
+
+					Colors = new Color4[maxLights];
+					ASSERT(Colors != nullptr, "LightingDescriptor::Init -> Unable to allocate light colors.");
+
+					PositionDatas = new Real[maxLights * 4];
+					ASSERT(PositionDatas != nullptr, "LightingDescriptor::Init -> Unable to allocate light position data.");
+
+					DirectionDatas = new Real[maxLights * 4];
+					ASSERT(DirectionDatas != nullptr, "LightingDescriptor::Init -> Unable to allocate light direction data.");
+
+					ColorDatas = new Real[maxLights * 4];
+					ASSERT(ColorDatas != nullptr, "LightingDescriptor::Init -> Unable to allocate light color data.");
+
+					Types = new Int32[maxLights];
+					ASSERT(Types != nullptr, "LightingDescriptor::Init -> Unable to allocate light types.");
+
+					Intensities = new Real[maxLights];
+					ASSERT(Intensities != nullptr, "LightingDescriptor::Init -> Unable to allocate light intensities.");
+
+					Ranges = new Real[maxLights];
+					ASSERT(Ranges != nullptr, "LightingDescriptor::Init -> Unable to allocate light ranges.");
+
+					Attenuations = new Real[maxLights];
+					ASSERT(Attenuations != nullptr, "LightingDescriptor::Init -> Unable to allocate light attenuations.");
+
+					OrthoAngleAttenuations = new Int32[maxLights];
+					ASSERT(OrthoAngleAttenuations != nullptr, "LightingDescriptor::Init -> Unable to allocate light ortho-angle attenuations.");
+
+					ParallelAngleAttenuations = new Int32[maxLights];
+					ASSERT(ParallelAngleAttenuations != nullptr, "LightingDescriptor::Init -> Unable to allocate light parallel angle attenuations.");
+
+					initialized = true;
+				}
+
+				return true;
 			}
 		};
 
@@ -131,6 +246,7 @@ namespace GTE
 				SSAOEnabled = true;
 				SSAOMode = SSAORenderMode::Standard;
 
+				SkyboxEnabled = false;
 				SkyboxObject = nullptr;
 
 				ClipPlaneCount = 0;
@@ -138,9 +254,13 @@ namespace GTE
 			}
 		};
 
-		static const UInt32 MAX_LIGHTS = 16;
 		static const UInt32 MAX_CAMERAS = 8;
 		static const UInt32 MAX_RENDER_QUEUES = 128;
+
+		// describes parameters of a single light
+		LightingDescriptor singleLightDescriptor;
+		// describes parameters of a set of lights
+		LightingDescriptor multiLightDescriptor;
 
 		RenderQueueEntry skyboxEntry;
 		// mesh for doing full screen effects
@@ -174,9 +294,9 @@ namespace GTE
 		// scene objects that contain valid renderables
 		SceneObject* renderableSceneObjects[Constants::MaxSceneObjects];
 		// list of lights found in the scene during PreProcessScene()
-		SceneObject* sceneLights[MAX_LIGHTS];
+		SceneObject* sceneLights[Constants::MaxSceneLights];
 		// list of ambient lights found in the scene during PreProcessScene()
-		SceneObject* sceneAmbientLights[MAX_LIGHTS];
+		SceneObject* sceneAmbientLights[Constants::MaxSceneLights];
 		// list of cameras found in the scene during PreProcessScene()
 		SceneObject* sceneCameras[MAX_CAMERAS];
 
@@ -205,9 +325,9 @@ namespace GTE
 		void RenderSkyboxForCamera(const ViewDescriptor& viewDescriptor);
 		void RenderDepthBuffer(const ViewDescriptor& viewDescriptor);
 		void RenderSceneSSAO(const ViewDescriptor& viewDescriptor);
-		
-		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor);
+
 		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Int32 queueID);
+		void RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID);
 
 		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
 									 FowardBlendingFilter blendingFilter,  std::function<Bool(SceneObject*)> filterFunction);

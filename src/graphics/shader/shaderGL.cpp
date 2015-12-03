@@ -544,82 +544,128 @@ namespace GTE
 	}
 
 	/*
-	 * Set the value for a position uniform (corresponds 3-component vector).
-	 *
-	 * [varID] - ID/location of the shader uniform for which the value is to be set.
-	 * [point] - Holds position data to be sent.
-	 */
-	void ShaderGL::SendUniformToShader(Int32 varID, const Point3 * point)
-	{
-		glUniform4f(varID, point->x, point->y, point->z, 1);
-	}
-
-	/*
-	 * Set the value for a vector uniform (corresponds 3-component vector).
-	 *
-	 * [varID] - ID/location of the shader uniform for which the value is to be set.
-	 * [vector] - Holds vector data to be sent.
-	 */
-	void ShaderGL::SendUniformToShader(Int32 varID, const Vector3 * vector)
-	{
-		glUniform4f(varID, vector->x, vector->y, vector->z, 0);
-	}
-
-	/*
-	 * Set the value for a color uniform (corresponds 4-component vector).
-	 *
-	 * [varID] - ID/location of the shader uniform for which the value is to be set.
-	 * [color] - Holds color data to be sent.
-	 */
-	void ShaderGL::SendUniformToShader(Int32 varID, const Color4 * color)
-	{
-		glUniform4f(varID, color->r, color->g, color->b, color->a);
-	}
-
-	/*
-	 * Set the value for a 4-component vector uniform.
+	 * Set the value for a 4-component float vector array uniform.
 	 *
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
+	 * [count] - Length of the array.
 	 */
-	void ShaderGL::SendUniformToShader4v(Int32 varID, const Real * data)
+	void ShaderGL::SendUniformToShader4FV(Int32 varID, const Real * data, UInt32 count)
 	{
 
 #ifdef _GTE_Real_DoublePrecision
 		glUniform4dv(varID, 1, data);
 #else
-		glUniform4fv(varID, 1, data);
+		glUniform4fv(varID, count, data);
 #endif
 	}
 
 	/*
-	 * Set the value for a 3-component vector uniform.
+	 * Set the value for a 3-component float vector   uniform.
 	 *
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
+	 * [count] - Length of the array.
 	 */
-	void ShaderGL::SendUniformToShader3v(Int32 varID, const Real * data)
+	void ShaderGL::SendUniformToShader3FV(Int32 varID, const Real * data, UInt32 count)
 	{
 #ifdef _GTE_Real_DoublePrecision
 		glUniform3dv(varID, 1, data);
 #else
-		glUniform3fv(varID, 1, data);
+		glUniform3fv(varID, count, data);
 #endif
 	}
 
 	/*
-	 * Set the value for a 2-component vector uniform.
+	 * Set the value for a 2-component float vector array uniform.
 	 *
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
+	 * [count] - Length of the array.
 	 */
-	void ShaderGL::SendUniformToShader2v(Int32 varID, const Real * data)
+	void ShaderGL::SendUniformToShader2FV(Int32 varID, const Real * data, UInt32 count)
 	{
 #ifdef _GTE_Real_DoublePrecision
 		glUniform2dv(varID, 1, data);
 #else
-		glUniform2fv(varID, 1, data);
+		glUniform2fv(varID, count, data);
 #endif
+	}
+
+	/*
+	 * Set the value for a float array uniform.
+	 *
+	 * [varID] - ID/location of the shader uniform for which the value is to be set.
+	 * [data] - Holds float data to be sent.
+	 * [count] - Length of the array.
+	 */
+	void ShaderGL::SendUniformToShader1FV(Int32 varID, const Real * data, UInt32 count)
+	{
+#ifdef _GTE_Real_DoublePrecision
+		glUniform2dv(varID, 1, data);
+#else
+		glUniform1fv(varID, count, data);
+#endif
+	}
+
+	/*
+	 * Set the value for a 4-component integer vector array uniform.
+	 *
+	 * [varID] - ID/location of the shader uniform for which the value is to be set.
+	 * [data] - Holds vector data to be sent.
+	 * [count] - Length of the array.
+	 */
+	void ShaderGL::SendUniformToShader4IV(Int32 varID, const Int32 * data, UInt32 count)
+	{
+		glUniform4iv(varID, count, data);
+	}
+
+	/*
+	 * Set the value for a 3-component integer vector array uniform.
+	 *
+	 * [varID] - ID/location of the shader uniform for which the value is to be set.
+	 * [data] - Holds vector data to be sent.
+	 * [count] - Length of the array.
+	 */
+	void ShaderGL::SendUniformToShader3IV(Int32 varID, const Int32 * data, UInt32 count)
+	{
+		glUniform3iv(varID, count, data);
+	}
+
+	/*
+	 * Set the value for a 2-component integer vector array uniform.
+	 *
+	 * [varID] - ID/location of the shader uniform for which the value is to be set.
+	 * [data] - Holds vector data to be sent.
+	 * [count] - Length of the array.
+	 */
+	void ShaderGL::SendUniformToShader2IV(Int32 varID, const Int32 * data, UInt32 count)
+	{
+		glUniform2iv(varID, count, data);
+	}
+
+	/*
+	 * Set the value for a integer array uniform.
+	 *
+	 * [varID] - ID/location of the shader uniform for which the value is to be set.
+	 * [data] - Holds float data to be sent.
+	 * [count] - Length of the array.
+	 */
+	void ShaderGL::SendUniformToShader1IV(Int32 varID, const Int32 * data, UInt32 count)
+	{
+		glUniform1iv(varID, count, data);
+	}
+
+
+	/* Set the value for a 4x4 matrix array uniform.
+	 *
+	 * [varID] - ID/location of the shader uniform for which the value is to be set.
+	 * [data] - Holds vector data to be sent.
+	 * [count] - Length of the array.
+	 */
+	void ShaderGL::SendUniformToShaderM4x4V(Int32 varID, const Matrix4x4 * mat, UInt32 count)
+	{
+		glUniformMatrix4fv(varID, count, false, mat->GetDataPtr());
 	}
 
 	/*
@@ -628,7 +674,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader4(Int32 varID, Real x, Real y, Real z, Real w)
+	void ShaderGL::SendUniformToShader(Int32 varID, Real x, Real y, Real z, Real w)
 	{
 		glUniform4f(varID, x, y, z, w);
 	}
@@ -639,7 +685,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader3(Int32 varID, Real x, Real y, Real z)
+	void ShaderGL::SendUniformToShader(Int32 varID, Real x, Real y, Real z)
 	{
 		glUniform3f(varID, x, y, z);
 	}
@@ -650,7 +696,7 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [data] - Holds vector data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader2(Int32 varID, Real x, Real y)
+	void ShaderGL::SendUniformToShader(Int32 varID, Real x, Real y)
 	{
 		glUniform2f(varID, x, y);
 	}

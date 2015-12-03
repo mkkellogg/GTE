@@ -32,7 +32,7 @@ void main()
 	vec4 diffuseColor = vec4(0, 0, 0, 0);
 	vec3 normal = normalize(vNormal);
 
-	DiffuseTerm = calcDiffuseTermForLight(normal, vPosition, LIGHT_POSITION, vLightDir, LIGHT_INTENSITY, LIGHT_ATTENUATION, LIGHT_RANGE, LIGHT_PARALLEL_ATTENUATION, LIGHT_ORTHO_ATTENUATION);
+	DiffuseTerm = calcDiffuseTermForLight(LIGHT_TYPE, normal, vPosition, LIGHT_POSITION, vLightDir, LIGHT_INTENSITY, LIGHT_ATTENUATION, LIGHT_RANGE, LIGHT_PARALLEL_ATTENUATION, LIGHT_ORTHO_ATTENUATION);
 
 	diffuseColor = LIGHT_COLOR * texColor;
 	outputF = (DiffuseTerm * diffuseColor);

@@ -55,7 +55,7 @@ void main()
 	vec3 surfaceNormal = normalize(vNormal);
 	vec4 position = vPosition;
 
-	calcBlinnPhongTermsForLight(position, calcMappedNormal(), surfaceNormal, LIGHT_POSITION, vLightDir, EYE_POSITION, LIGHT_INTENSITY, LIGHT_ATTENUATION, LIGHT_RANGE, 
+	calcBlinnPhongTermsForLight(LIGHT_TYPE, position, calcMappedNormal(), surfaceNormal, LIGHT_POSITION, vLightDir, EYE_POSITION, LIGHT_INTENSITY, LIGHT_ATTENUATION, LIGHT_RANGE, 
 							    LIGHT_PARALLEL_ATTENUATION, LIGHT_ORTHO_ATTENUATION, SPECULAR_FACTOR, DiffuseTerm, SpecularTerm);
 
 	diffuseColor = LIGHT_COLOR * texColor;

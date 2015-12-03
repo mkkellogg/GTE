@@ -24,7 +24,7 @@ namespace GTE
 		cullingMask = IntMaskUtil::CreateIntMask();
 	}
 
-	Color4 Light::GetColor() const
+	const Color4& Light::GetColor() const
 	{
 		return color;
 	}

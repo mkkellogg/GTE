@@ -13,26 +13,26 @@ float calcSpecularTerm(float attenuationFactor, vec3 lightVector, vec3 normal, v
  	return specularTerm;
 }
 
-float calcSpecularTermForLight(in vec4 position, in vec3 normal, in vec3 surfaceNormal, in vec4 lightPosition, in vec3 lightDir, in vec4 eyePosition, in float lightIntensity, 
+float calcSpecularTermForLight(in int lightType, in vec4 position, in vec3 normal, in vec3 surfaceNormal, in vec4 lightPosition, in vec3 lightDir, in vec4 eyePosition, in float lightIntensity,
 							   in float baseAttenuation, in float lightRange, in int parallelAttenuationType, in int orthoAttenuationType, in float specularFactor)
 {
 	float specularTerm = 0.0;
 	vec3 lightVector = vec3(0, 0, 0);
 	float attenuation = 0.0;
-	if(LIGHT_TYPE == LIGHT_TYPE_AMBIENT)
+	if(lightType == LIGHT_TYPE_AMBIENT)
 	{
 		specularTerm = 0.0;
 	}
-	else if (LIGHT_TYPE == LIGHT_TYPE_DIRECTIONAL)
+	else if (lightType == LIGHT_TYPE_DIRECTIONAL)
 	{
 		specularTerm = calcSpecularTerm(1.0, lightDir, normal, surfaceNormal, eyePosition, position, lightIntensity, specularFactor);
 	}
-	else if (LIGHT_TYPE == LIGHT_TYPE_POINT)
+	else if (lightType == LIGHT_TYPE_POINT)
 	{
 		calcPointLightParameters(position, lightPosition, baseAttenuation, lightVector, attenuation);
 		specularTerm = calcSpecularTerm(attenuation, lightVector, normal, surfaceNormal, eyePosition, position, lightIntensity, specularFactor);
 	}
-	else if (LIGHT_TYPE == LIGHT_TYPE_PLANAR)
+	else if (lightType == LIGHT_TYPE_PLANAR)
 	{
 		calcPlanarLightParameters(position, normal, lightPosition, lightDir, baseAttenuation, lightRange, parallelAttenuationType, orthoAttenuationType, lightVector, attenuation);
 		specularTerm = calcSpecularTerm(attenuation, lightVector, normal, surfaceNormal, eyePosition, position, lightIntensity, specularFactor);

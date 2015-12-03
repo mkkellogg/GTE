@@ -91,23 +91,25 @@ namespace GTE
 		Int32 GetUniformVarID(const std::string& varName) const;
 		GLuint GetProgramID() const;
 
-		void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer);
+		void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer)  override;
 
-		void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture);
-		void SendUniformToShader(Int32 varID, const Matrix4x4 * mat);
-		void SendUniformToShader(Int32 varID, const Point3 * point);
-		void SendUniformToShader(Int32 varID, const Vector3 * vector);
-		void SendUniformToShader(Int32 varID, const Color4 * color);
+		void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture) override;
+		void SendUniformToShader(Int32 varID, const Matrix4x4 * mat) override;
+		void SendUniformToShader(Int32 varID, Real x, Real y, Real z, Real w) override;
+		void SendUniformToShader(Int32 varID, Real x, Real y, Real z) override;
+		void SendUniformToShader(Int32 varID, Real x, Real y) override;
+		void SendUniformToShader(Int32 varID, Real  data) override;
+		void SendUniformToShader(Int32 varID, Int32  data) override;
 
-		void SendUniformToShader4v(Int32 varID, const Real * data);
-		void SendUniformToShader3v(Int32 varID, const Real * data);
-		void SendUniformToShader2v(Int32 varID, const Real * data);
-		void SendUniformToShader4(Int32 varID, Real x, Real y, Real z, Real w);
-		void SendUniformToShader3(Int32 varID, Real x, Real y, Real z);
-		void SendUniformToShader2(Int32 varID, Real x, Real y);
-		void SendUniformToShader(Int32 varID, Real  data);
-
-		void SendUniformToShader(Int32 varID, Int32  data);
+		void SendUniformToShader4FV(Int32 varID, const Real * data, UInt32 count) override;
+		void SendUniformToShader3FV(Int32 varID, const Real * data, UInt32 count) override;
+		void SendUniformToShader2FV(Int32 varID, const Real * data, UInt32 count) override;
+		void SendUniformToShader1FV(Int32 varID, const Real * data, UInt32 count) override;
+		void SendUniformToShader4IV(Int32 varID, const Int32 * data, UInt32 count) override;
+		void SendUniformToShader3IV(Int32 varID, const Int32 * data, UInt32 count) override;
+		void SendUniformToShader2IV(Int32 varID, const Int32 * data, UInt32 count) override;
+		void SendUniformToShader1IV(Int32 varID, const Int32 * data, UInt32 count) override;
+		void SendUniformToShaderM4x4V(Int32 varID, const Matrix4x4 * mat, UInt32 count) override;
 
 		UInt32 GetUniformCount() const;
 		const UniformDescriptor * GetUniformDescriptor(UInt32 index) const;

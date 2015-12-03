@@ -64,7 +64,7 @@ namespace GTE
 
 	public:
 
-		Color4 GetColor() const;
+		const Color4& GetColor() const;
 		const Color4 * GetColorPtr() const;
 		void SetColor(Color4 color);
 		void SetColor(Real r, Real g, Real b, Real a);

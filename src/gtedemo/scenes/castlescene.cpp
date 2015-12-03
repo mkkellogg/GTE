@@ -867,6 +867,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 
 	GTE::FrameSetModifier<GTE::Real> smokeAlphaModifier;
 	smokeAlphaModifier.AddFrame(0.0f, 0.0f);
+	smokeAlphaModifier.AddFrame(0.5f, 0.025f);
 	smokeAlphaModifier.AddFrame(1.0f, 0.05f);
 	smokeAlphaModifier.AddFrame(2.0f, 0.20f);
 	smokeAlphaModifier.AddFrame(3.0f, 0.20f);

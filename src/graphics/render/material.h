@@ -30,6 +30,7 @@
 #include "object/engineobject.h"
 #include "graphics/shader/uniformdesc.h"
 #include "graphics/shader/attributedesc.h"
+#include "graphics/light/light.h"
 #include "rendermanager.h"
 
 #include <vector>
@@ -134,6 +135,8 @@ namespace GTE
 		UInt32 GetRequiredUniformSize(UniformType uniformType);
 		Bool allSetUniformsandAttributesVerified;
 
+		Bool allLightsSinglePass;
+
 		void BindVars();
 
 		Bool InitializeUniformDescriptors();
@@ -186,6 +189,12 @@ namespace GTE
 		void SendViewMatrixToShader(const Matrix4x4 * mat);
 		void SendProjectionMatrixToShader(const Matrix4x4 * mat);
 		void SendMVPMatrixToShader(const Matrix4x4 * mat);
+		void SendLightToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
+							   const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
+							   const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations);
+		void SendLightsToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
+				   	   	   	    const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
+								const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, UInt32 count);
 		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
 		void SendEyePositionToShader(const Point3 * position);
 
@@ -231,6 +240,9 @@ namespace GTE
 		Bool GetDepthBufferWriteEnabled();
 		void SetDepthBufferFunction(RenderState::DepthBufferFunction function);
 		RenderState::DepthBufferFunction GetDepthBufferFunction();
+
+		void SetAllLightsSinglePass(Bool allLightsSinglePass);
+		Bool AllLightsSinglePass();
 	};
 }
 

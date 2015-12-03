@@ -27,6 +27,9 @@ namespace GTE
 		static const UInt32 MaxBonesPerVertex = 4;
 		static const UInt32 MaxClipPlanes = 1;
 
+		static const UInt32 MaxSceneLights = 16;
+		static const UInt32 MaxShaderLights = 8;
+
 		static const Real RealToDoubleRatio;
 	};
 }

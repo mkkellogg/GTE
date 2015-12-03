@@ -43,6 +43,8 @@ namespace GTE
 		depthBufferFunction = RenderState::DepthBufferFunction::LessThanOrEqual;
 
 		currentSamplerUnitIndex = 0;
+
+		allLightsSinglePass = false;
 	}
 
 	/*
@@ -585,17 +587,17 @@ namespace GTE
 				}
 				else if(desc.Type == UniformType::Float2)
 				{
-					shader->SendUniformToShader2(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1]);
+					shader->SendUniformToShader(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1]);
 					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float2));
 				}
 				else if(desc.Type == UniformType::Float3)
 				{
-					shader->SendUniformToShader3(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2]);
+					shader->SendUniformToShader(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2]);
 					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float3));
 				}
 				else if(desc.Type == UniformType::Float4)
 				{
-					shader->SendUniformToShader4(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2], desc.BasicFloatData[3]);
+					shader->SendUniformToShader(desc.ShaderVarID, desc.BasicFloatData[0], desc.BasicFloatData[1], desc.BasicFloatData[2], desc.BasicFloatData[3]);
 					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Float4));
 				}
 				else if(desc.Type == UniformType::Matrix4x4)
@@ -763,9 +765,9 @@ namespace GTE
 	}
 
 	/*
-	 * Find a uniform with the name specified by [varName] and set its
-	 * value to the vector made up of v1 & v2 & v3 &v4.
-	 */
+	* Find a uniform with the name specified by [varName] and set its
+	* value to the vector made up of v1 & v2 & v3 &v4.
+	*/
 	void Material::SetUniform4f(Real v1, Real v2, Real v3, Real v4, const std::string& varName)
 	{
 		UniformID uniform = UniformDirectory::RegisterVarID(varName);
@@ -792,7 +794,8 @@ namespace GTE
 		desc.IsDelayedSet = true;
 	}
 
-	/* Find a uniform with the name specified by [varName] and set its
+	/*
+	* Find a uniform with the name specified by [varName] and set its
 	* value to the color [color].
 	*/
 	void Material::SetColor(const Color4& color, const std::string& varName)
@@ -801,7 +804,8 @@ namespace GTE
 		SetColor(color, uniform);
 	}
 
-	/* Find a uniform with the name specified by [uniform] and set its
+	/*
+	* Find a uniform with the name specified by [uniform] and set its
 	* value to the color [color].
 	*/
 	void Material::SetColor(const Color4& color, UniformID uniform)
@@ -846,7 +850,7 @@ namespace GTE
 		Int32 varID = GetUniformBinding(UniformDirectory::GetStandardVarID((StandardUniform)((UInt32)StandardUniform::ClipPlane0 + index)));
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader4(varID, eq1, eq2, eq3, eq4);
+			shader->SendUniformToShader(varID, eq1, eq2, eq3, eq4);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 	}
@@ -947,79 +951,125 @@ namespace GTE
 		}
 	}
 
-	/*
-	 * Send the light data in [light] to this material's shader using
-	 * several standard uniforms: LIGHT_POSITION, LIGHT_DIRECTION, LIGHT_ATTENUATION, and LIGHT_COLOR.
-	 */
-	void Material::SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection)
+	void Material::SendLightToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
+			   	   	   	   	   	     const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
+									 const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations)
 	{
+		SendLightsToShader(positions, directions, lightTypes, colors, intensities, ranges, attenuations, parallelAngleAttenuations, orthoAngleAttenuations, 1);
+	}
+
+	void Material::SendLightsToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
+			   	   	   	   	   	     const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
+									 const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, UInt32 count)
+	{
+		if(count == 0)return;
+
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendLightToShader -> 'shader' is null.", true);
-		NONFATAL_ASSERT(light != nullptr, "Material::SendLightToShader -> 'light' is null.", true);
-		NONFATAL_ASSERT(position != nullptr, "Material::SendLightToShader -> 'position' is null.", true);
+		NONFATAL_ASSERT(directions != nullptr, "Material::SendLightToShader -> 'directions' is null.", true);
+		NONFATAL_ASSERT(positions != nullptr, "Material::SendLightToShader -> 'positions' is null.", true);
+		NONFATAL_ASSERT(lightTypes != nullptr, "Material::SendLightToShader -> 'lightTypes' is null.", true);
+		NONFATAL_ASSERT(colors != nullptr, "Material::SendLightToShader -> 'colors' is null.", true);
+		NONFATAL_ASSERT(intensities != nullptr, "Material::SendLightToShader -> 'intensities' is null.", true);
+		NONFATAL_ASSERT(ranges != nullptr, "Material::SendLightToShader -> 'ranges' is null.", true);
+		NONFATAL_ASSERT(attenuations != nullptr, "Material::SendLightToShader -> 'attenuations' is null.", true);
+		NONFATAL_ASSERT(parallelAngleAttenuations != nullptr, "Material::SendLightToShader -> 'parallelAngleAttenuations' is null.", true);
+		NONFATAL_ASSERT(orthoAngleAttenuations != nullptr, "Material::SendLightToShader -> 'orthoAngleAttenuations' is null.", true);
 
 		Int32 varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightType));
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, (Int32)light->GetType());
+			if(count == 1)shader->SendUniformToShader(varID, lightTypes[0]);
+			else shader->SendUniformToShader1IV(varID, lightTypes, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightPosition));
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, position);
+			if(count == 1)shader->SendUniformToShader(varID, positions[0], positions[1], positions[2], positions[3]);
+			else shader->SendUniformToShader4FV(varID, positions, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightDirection));
 		if (varID >= 0)
 		{
-			if (altDirection != nullptr)shader->SendUniformToShader(varID, altDirection);
-			else shader->SendUniformToShader(varID, light->GetDirectionPtr());
+			if(count == 1)shader->SendUniformToShader(varID, directions[0], directions[1], directions[2], directions[3]);
+			else shader->SendUniformToShader4FV(varID, directions, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightColor));
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, light->GetColorPtr());
+			if(count == 1)shader->SendUniformToShader(varID, colors[0], colors[1], colors[2], colors[3]);
+			else shader->SendUniformToShader4FV(varID, colors, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightIntensity));
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, light->GetIntensity());
+			if(count == 1)shader->SendUniformToShader(varID, intensities[0]);
+			else shader->SendUniformToShader1FV(varID, intensities, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightRange));
 		if(varID >= 0)
 		{
-			shader->SendUniformToShader(varID, light->GetRange());
+			if(count == 1)shader->SendUniformToShader(varID, ranges[0]);
+			else shader->SendUniformToShader1FV(varID, ranges, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightAttenuation));
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, light->GetAttenuation());
+			if(count <= 1)shader->SendUniformToShader(varID, attenuations[0]);
+			else shader->SendUniformToShader1FV(varID, attenuations, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightParallelAngleAttenuation));
 		if(varID >= 0)
 		{
-			shader->SendUniformToShader(varID, (Int32)light->GetParallelAngleAttenuationType());
+			if(count == 1)shader->SendUniformToShader(varID, parallelAngleAttenuations[0]);
+			else shader->SendUniformToShader1IV(varID, parallelAngleAttenuations, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
 		}
 
 		varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::LightOrthoAngleAttenuation));
 		if(varID >= 0)
 		{
-			shader->SendUniformToShader(varID, (Int32)light->GetOrthoAngleAttenuationType());
+			if(count == 1)shader->SendUniformToShader(varID, orthoAngleAttenuations[0]);
+			else shader->SendUniformToShader1IV(varID, orthoAngleAttenuations, count);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Int));
 		}
+	}
+
+	/*
+	 * Send the light data in [light] to this material's shader.
+	 */
+	void Material::SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection)
+	{
+		NONFATAL_ASSERT(light != nullptr, "Material::SendLightToShader -> 'light' is null.", true);
+		NONFATAL_ASSERT(position != nullptr, "Material::SendLightToShader -> 'position' is null.", true);
+
+		Real* positionData = const_cast<Point3*>(position)->GetDataPtr();
+		Real* directionData = const_cast<Vector3&>(light->GetDirection()).GetDataPtr();
+		Real* altDirectionData = altDirection != nullptr ? const_cast<Vector3*>(altDirection)->GetDataPtr() : nullptr;
+		Real* colorData = const_cast<Color4&>(light->GetColor()).GetDataPtr();
+		Color4 color = light->GetColor();
+		Int32 lightType = (Int32)light->GetType();
+		Real intensity = light->GetIntensity();
+		Real range = light->GetRange();
+		Real attenuation = light->GetAttenuation();
+		Int32 parallelAngleAttenuation = (Int32)light->GetParallelAngleAttenuationType();
+		Int32 orthoAngleAttenuationType = (Int32)light->GetOrthoAngleAttenuationType();
+
+		SendLightToShader(positionData, altDirection != nullptr ? altDirectionData : directionData, &lightType, colorData, &intensity, &range, &attenuation, &parallelAngleAttenuation, &orthoAngleAttenuationType);
+
 	}
 
 	void Material::SendEyePositionToShader(const Point3 * position)
@@ -1029,7 +1079,7 @@ namespace GTE
 		Int32 varID = GetUniformBinding(UniformDirectory::GetStandardVarID(StandardUniform::EyePosition));
 		if (varID >= 0)
 		{
-			shader->SendUniformToShader(varID, position);
+			shader->SendUniformToShader(varID, position->x, position->y, position->z, 1);
 			SetUniformSetValue(varID, GetRequiredUniformSize(UniformType::Float4));
 		}
 	}
@@ -1228,6 +1278,23 @@ namespace GTE
 	RenderState::DepthBufferFunction Material::GetDepthBufferFunction()
 	{
 		return depthBufferFunction;
+	}
+
+	/*
+	 * Set whether or not the renderer should send all lights to this this material
+	 * at once to let it use them all in one pass.
+	 */
+	void Material::SetAllLightsSinglePass(Bool allLightsSinglePass)
+	{
+		this->allLightsSinglePass = allLightsSinglePass;
+	}
+
+	/*
+	 * Should all lights be sent to this material at once?
+	 */
+	Bool Material::AllLightsSinglePass()
+	{
+		return allLightsSinglePass;
 	}
 }
 

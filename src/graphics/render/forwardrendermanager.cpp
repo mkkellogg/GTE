@@ -106,6 +106,12 @@ namespace GTE
 
 		if (!InitFullScreenQuad())return false;
 
+		Bool singleLightInit = singleLightDescriptor.Init(1);
+		ASSERT(singleLightInit, "ForwardRenderManager::Init -> Unable to initialize single light descriptor.");
+
+		Bool multiLightInit = multiLightDescriptor.Init(Constants::MaxShaderLights);
+		ASSERT(multiLightInit, "ForwardRenderManager::Init -> Unable to initialize multi-light descriptor.");
+
 		return true;
 	}
 
@@ -388,7 +394,7 @@ namespace GTE
 				{
 					if (light->GetType() == LightType::Ambient)
 					{
-						if (ambientLightCount < MAX_LIGHTS)
+						if (ambientLightCount < Constants::MaxSceneLights)
 						{
 							// add ambient light
 							sceneAmbientLights[ambientLightCount] = child;
@@ -401,7 +407,7 @@ namespace GTE
 						Vector3& lightDir = const_cast<Vector3&>(light->GetDirection());
 						lightDir.Normalize();
 
-						if (lightCount < MAX_LIGHTS)
+						if (lightCount < Constants::MaxSceneLights)
 						{
 							// add non-ambient light
 							sceneLights[lightCount] = child;
@@ -714,6 +720,9 @@ namespace GTE
 
 			if(queueID >= (Int32)RenderQueueType::Transparent)break;
 
+			// render objects whose materials have the "allLightsSinglePass" flag set
+			RenderSceneForMultiLight(viewDescriptor, queueID);
+
 			// loop through each ambient light and render objects in render queue [queueID] for it
 			if(viewDescriptor.AmbientPassEnabled)
 			{
@@ -755,6 +764,9 @@ namespace GTE
 		for(UInt32 queueIndex = 0; queueIndex < renderQueueCount; queueIndex++)
 		{
 			Int32 queueID = renderQueueManager.GetRenderQueueID(queueIndex);
+
+			// render objects whose materials have the "allLightsSinglePass" flag set
+			RenderSceneForMultiLight(viewDescriptor, queueID);
 
 			// loop through each ambient light and render objects in render queue [queueID] for it
 			if(viewDescriptor.AmbientPassEnabled && queueID >= (Int32)RenderQueueType::Transparent)
@@ -841,10 +853,10 @@ namespace GTE
 			skyboxEntry.Renderer = meshRenderer->GetSubRenderer(0).GetPtr();
 			skyboxEntry.RenderMaterial = const_cast<MaterialSharedPtr*>(&meshRenderer->GetMultiMaterial(0)->GetMaterial(0));
 
-			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
+			singleLightDescriptor.UseLighting = false;
 
 			// render the skybox
-			RenderMesh(skyboxEntry, lightingDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::Never);
+			RenderMesh(skyboxEntry, singleLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::Never);
 
 			skyboxObject->SetActive(false);
 		}
@@ -916,10 +928,6 @@ namespace GTE
 	}
 
 
-	void ForwardRenderManager::RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor)
-	{
-		RenderSceneForLight(light, viewDescriptor, -1);
-	}
 	/*
 	 * Forward-Render the scene for a single light [light] from the perspective
 	 * specified in [viewDescriptor].
@@ -943,11 +951,17 @@ namespace GTE
 		Transform lightTransform = processingDesc.AggregateTransform;
 		lightTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
 
-		Point3 lightWorldPosition;
+		Point3 lightWorldPosition(0, 0, 0);
 		lightTransform.TransformPoint(lightWorldPosition);
 
 		Vector3 lightDirection = light.GetDirection();
 		lightTransform.TransformVector(lightDirection);
+
+		// set up lighting descriptor for single light
+		singleLightDescriptor.LightObjects[0] = const_cast<Light*>(&light);
+		singleLightDescriptor.Positions[0] = lightWorldPosition;
+		singleLightDescriptor.Directions[0] = lightDirection;
+		singleLightDescriptor.UseLighting = true;
 
 		RenderMode currentRenderMode = RenderMode::None;
 
@@ -985,9 +999,9 @@ namespace GTE
 				RenderQueueEntry* entry = *itr;
 				NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
 
-				if((*entry->RenderMaterial)->UseLighting())
+				MaterialRef entryMaterial = *entry->RenderMaterial;
+				if(entryMaterial->UseLighting() && !entryMaterial->AllLightsSinglePass())
 				{
-
 					SceneObject* sceneObject = entry->Container;
 					NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
 
@@ -1030,18 +1044,126 @@ namespace GTE
 							}
 
 							// Dispatch "WillRender" event
-							SceneObjectProcessingDescriptor& processingDescriptor = sceneObject->GetProcessingDescriptor();
-							if(!processingDescriptor.Rendered)
+							if(!processingDesc.Rendered)
 							{
 								Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
-								processingDescriptor.Rendered = true;
+								processingDesc.Rendered = true;
 							}
 
-							// set up lighting descriptor for non self-lit lighting
-							LightingDescriptor lightingDescriptor(&light, &lightWorldPosition, &lightDirection, true);
-							RenderMesh(*entry, lightingDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
+							RenderMesh(*entry, singleLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
 						}
 					}
+				}
+			}
+		}
+	}
+
+	void ForwardRenderManager::RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID)
+	{
+		UInt32 minQueue = renderQueueManager.GetMinQueue();
+		UInt32 maxQueue = renderQueueManager.GetMaxQueue();
+
+		if(queueID >= 0)
+		{
+			minQueue = maxQueue = queueID;
+		}
+
+		Bool renderModeEntered = false;
+		for(RenderQueueManager::ConstIterator itr = renderQueueManager.Begin(minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
+		{
+			RenderQueueEntry* entry = *itr;
+			NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForMultiLight -> Null render queue entry encountered.", true);
+
+			MaterialRef entryMaterial = *entry->RenderMaterial;
+			if(entryMaterial->UseLighting() && entryMaterial->AllLightsSinglePass())
+			{
+				SceneObject* sceneObject = entry->Container;
+				NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
+
+				// set up lighting descriptor for multiple lights
+				multiLightDescriptor.LightCount = lightCount;
+				multiLightDescriptor.UseLighting = true;
+				for(UInt32 l = 0; l < lightCount; l++)
+				{
+					SceneObject* lightObject = sceneLights[l];
+					if(lightObject == nullptr) continue;
+					LightRef lightRef = lightObject->GetLight();
+					if(!lightRef.IsValid())continue;
+
+					Light& light = const_cast<Light&>(lightRef.GetRef());
+
+					SceneObjectProcessingDescriptor& processingDesc = light.GetSceneObject()->GetProcessingDescriptor();
+					Transform lightTransform = processingDesc.AggregateTransform;
+
+					multiLightDescriptor.LightObjects[0] = &light;
+
+					multiLightDescriptor.Positions[l].Set(0, 0, 0);
+					multiLightDescriptor.Directions[l] = light.GetDirection();
+					lightTransform.TransformPoint(multiLightDescriptor.Positions[l]);
+					lightTransform.TransformVector(multiLightDescriptor.Directions[l]);
+
+					multiLightDescriptor.Colors[l] = light.GetColor();
+
+					Real* positionDatas = multiLightDescriptor.PositionDatas;
+					Real* directionDatas = multiLightDescriptor.DirectionDatas;
+					Real* colorDatas = multiLightDescriptor.ColorDatas;
+
+					Real* thisPositionDatas = multiLightDescriptor.Positions[l].GetDataPtr();
+					Real* thisDirectionDatas = multiLightDescriptor.Directions[l].GetDataPtr();
+					Real* thisColorDatas = multiLightDescriptor.Colors[l].GetDataPtr();
+
+					for(UInt32 i = 0; i < 4; i++)
+					{
+						UInt32 dataIndex = l * 4 + i;
+						positionDatas[dataIndex] = thisPositionDatas[i];
+						directionDatas[dataIndex] = thisDirectionDatas[i];
+						colorDatas[dataIndex] = thisColorDatas[i];
+					}
+
+					multiLightDescriptor.Types[l] = (Int32)lightRef->GetType();
+					multiLightDescriptor.Intensities[l] = lightRef->GetIntensity();
+					multiLightDescriptor.Ranges[l] = lightRef->GetRange();
+					multiLightDescriptor.Attenuations[l] = lightRef->GetAttenuation();
+					multiLightDescriptor.ParallelAngleAttenuations[l] = (Int32)lightRef->GetParallelAngleAttenuationType();
+					multiLightDescriptor.OrthoAngleAttenuations[l] = (Int32)lightRef->GetOrthoAngleAttenuationType();
+				}
+
+				// copy the full world transform of the scene object, including those of all ancestors
+				SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
+				Transform sceneObjectWorldTransform;
+				sceneObjectWorldTransform.SetTo(processingDesc.AggregateTransform);
+				sceneObjectWorldTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
+
+				if(!ShouldCullByLayer(viewDescriptor.CullingMask, *sceneObject))
+				{
+					for(UInt32 l = 0; l < multiLightDescriptor.LightCount; l++)
+					{
+						Light& light = *multiLightDescriptor.LightObjects[0];
+						const SceneObject& lightSceneObject = light.GetSceneObject().GetRef();
+
+						Bool shouldCull = ShouldCullFromLightByLayer(light, lightSceneObject) ||
+										  ShouldCullFromLightByPosition(light, multiLightDescriptor.Positions[l], *entry->Mesh, sceneObjectWorldTransform);
+
+						if(shouldCull)
+						{
+							// TODO: implement culling for multi lights
+						}
+					}
+
+					if(!renderModeEntered)
+					{
+						Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
+						renderModeEntered = true;
+					}
+
+					// Dispatch "WillRender" event
+					if(!processingDesc.Rendered)
+					{
+						Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::WillRender, *sceneObject);
+						processingDesc.Rendered = true;
+					}
+
+					RenderMesh(*entry, multiLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
 				}
 			}
 		}
@@ -1055,7 +1177,7 @@ namespace GTE
 
 	/*
 	* Render all objects in the scene without lighting. If [material] is a valid Material, then it will be used as a
-	* replacement material to render all scene objects. If it is not valiid then only meshes with materials that have
+	* replacement material to render all scene objects. If it is not valid then only meshes with materials that have
 	* the "use lighting" flag set to false will be rendered. All objects will be rendered from the perspective
 	* of the view specified by [viewDescriptor].
 	*
@@ -1077,6 +1199,8 @@ namespace GTE
 		{
 			minQueue = maxQueue = queueID;
 		}
+
+		singleLightDescriptor.UseLighting = false;
 
 		for(RenderQueueManager::ConstIterator itr = renderQueueManager.Begin(minQueue, maxQueue); itr != renderQueueManager.End(); ++itr)
 		{
@@ -1110,8 +1234,7 @@ namespace GTE
 				processingDescriptor.Rendered = true;
 			}
 
-			LightingDescriptor lightingDescriptor(nullptr, nullptr, nullptr, false);
-			RenderMesh(*entry, lightingDescriptor, viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter);
+			RenderMesh(*entry, singleLightDescriptor, viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter);
 		}
 	}
 
@@ -1176,7 +1299,17 @@ namespace GTE
 		// send light data to the active shader (if it needs it)
 		if (lightingDescriptor.UseLighting)
 		{
-			currentMaterial->SendLightToShader(lightingDescriptor.LightObject, lightingDescriptor.LightPosition, lightingDescriptor.LightDirection);
+			if(currentMaterial->AllLightsSinglePass())
+			{
+				currentMaterial->SendLightsToShader(lightingDescriptor.PositionDatas, lightingDescriptor.DirectionDatas, lightingDescriptor.Types,
+												   lightingDescriptor.ColorDatas, lightingDescriptor.Intensities, lightingDescriptor.Ranges,
+												   lightingDescriptor.Attenuations, lightingDescriptor.ParallelAngleAttenuations,
+												   lightingDescriptor.OrthoAngleAttenuations, lightingDescriptor.LightCount);
+			}
+			else
+			{
+				currentMaterial->SendLightToShader(lightingDescriptor.LightObjects[0], &lightingDescriptor.Positions[0], &lightingDescriptor.Directions[0]);
+			}
 		}
 
 		// pass relevant transforms to shader

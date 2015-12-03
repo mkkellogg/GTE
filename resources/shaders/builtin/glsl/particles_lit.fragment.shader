@@ -23,9 +23,7 @@ void main()
 	vec4 diffuseColor = textureColor;
 
 	vec3 normal = normalize((LIGHT_POSITION - vPosition).xyz);
-	DiffuseTerm = calcDiffuseTermForLight(normal, vPosition, LIGHT_POSITION, vLightDir, LIGHT_INTENSITY, LIGHT_ATTENUATION, LIGHT_RANGE, LIGHT_PARALLEL_ATTENUATION, LIGHT_ORTHO_ATTENUATION);
-	//DiffuseTerm = max(1.0 - length((LIGHT_POSITION - vPosition).xyz) * LIGHT_ATTENUATION, 0.0);
-	//DiffuseTerm = 1.0;
+	DiffuseTerm = calcDiffuseTermForLight(LIGHT_TYPE, normal, vPosition, LIGHT_POSITION, vLightDir, LIGHT_INTENSITY, LIGHT_ATTENUATION, LIGHT_RANGE, LIGHT_PARALLEL_ATTENUATION, LIGHT_ORTHO_ATTENUATION);
 	diffuseColor = vColor * LIGHT_COLOR * textureColor;
 
 	out_color = vec4(diffuseColor.xyz * DiffuseTerm, diffuseColor.a);
