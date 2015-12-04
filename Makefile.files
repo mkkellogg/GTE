@@ -295,7 +295,7 @@ $(BASEGEOMETRYOBJ):
 # ==================================
 
 BASESRC= src/base
-BASESRCS= $(call toFullPath,$(BASESRC),basevector4.cpp basevector2.cpp intmask.cpp longmask.cpp)
+BASESRCS= $(call toFullPath,$(BASESRC), intmask.cpp longmask.cpp)
 BASEOBJ= $(call srcFilesToObjFiles,$(BASESRCS),$(BASESRC),$(OUTPUTDIR))
 
 $(BASEOBJ): 

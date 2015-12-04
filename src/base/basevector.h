@@ -14,7 +14,7 @@
 #include "basevectortraits.h"
 #include "global/constants.h"
 #include "global/global.h"
-
+#include "debug/gtedebug.h"
 
 #ifdef _GTE_Real_DoublePrecision
 #define BaseVector4_QuickCopy(source, dest)		\
@@ -96,7 +96,7 @@ namespace GTE
 		* backing storage array. If [permAttach] is false, then this base vector can attach and
 		* re-attach to various different backing storage arrays.
 		*/
-		void BaseVector::Init(Real *target, Bool permAttach)
+		void Init(Real *target, Bool permAttach)
 		{
 			data = baseData;
 
@@ -170,7 +170,7 @@ namespace GTE
 		/*
 		* Clean up
 		*/
-		virtual BaseVector::~BaseVector()
+		virtual ~BaseVector()
 		{
 			if(!attached)data = nullptr;
 		}
