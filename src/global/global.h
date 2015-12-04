@@ -12,4 +12,16 @@
 	}                                      \
 }
 
+#define SAFE_DELETE_ARRAY(ptr)             \
+{                                          \
+	if((ptr) != nullptr){                  \
+	delete[] (ptr);					       \
+	(ptr) = nullptr;					   \
+	}									   \
+	else                                   \
+	{                                      \
+	}                                      \
+}
+
+
 #endif

@@ -24,7 +24,7 @@ namespace GTE
 		if (objects != nullptr)baseFactory->DestroyArray(objects, count);
 		objects = nullptr;
 
-		SAFE_DELETE(data);
+		SAFE_DELETE_ARRAY(data);
 	}
 
 	Bool BaseVector2Array::Init(Int32 count)

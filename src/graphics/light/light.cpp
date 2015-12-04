@@ -66,11 +66,13 @@ namespace GTE
 	void Light::SetDirection(Vector3  direction)
 	{
 		this->direction = direction;
+		this->direction.Normalize();
 	}
 
 	void Light::SetDirection(Real x, Real y, Real z)
 	{
 		direction.Set(x, y, z);
+		direction.Normalize();
 	}
 
 	LightType Light::GetType() const

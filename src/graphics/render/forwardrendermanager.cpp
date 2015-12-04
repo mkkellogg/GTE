@@ -132,10 +132,13 @@ namespace GTE
 		fullScreenQuad = EngineUtility::CreateRectangularMesh(meshAttributes, 1, 1, 1, 1, true, true, false);
 		ASSERT(fullScreenQuad.IsValid(), "ForwardRenderManager::InitFullScreenQuad -> Unable to create full screen quad.");
 
+		// access position data
+		Point3Array * positions = fullScreenQuad->GetSubMesh(0)->GetPostions();
+
 		// transform full-screen quad to: X: [0..1], Y: [0..1]
-		for (UInt32 i = 0; i < fullScreenQuad->GetSubMesh(0)->GetPostions()->GetCount(); i++)
+		for (UInt32 i = 0; i < positions->GetCount(); i++)
 		{
-			Point3 * p = fullScreenQuad->GetSubMesh(0)->GetPostions()->GetPoint(i);
+			Point3 * p = positions->GetPoint(i);
 			p->x += 0.5;
 			p->y += 0.5;
 		}
@@ -179,7 +182,7 @@ namespace GTE
 	 */
 	void ForwardRenderManager::PushRenderTarget(RenderTargetRef renderTarget)
 	{
-		renderTargetStack.push(&renderTarget);
+		renderTargetStack.push(renderTarget);
 		// activate the new render target
 		Engine::Instance()->GetGraphicsSystem()->ActivateRenderTarget(renderTarget);
 	}
@@ -188,18 +191,19 @@ namespace GTE
 	 * Pop the current render target off the stack and activate the one below it.
 	 * If there is none below, activate the default render target.
 	 */
-	RenderTargetRef ForwardRenderManager::PopRenderTarget()
+	RenderTargetSharedPtr ForwardRenderManager::PopRenderTarget()
 	{
-		const RenderTargetSharedPtr* old = nullptr;
-		if (renderTargetStack.size() > 0)
+		if(renderTargetStack.size() <= 0)
 		{
-			old = renderTargetStack.top();
-			renderTargetStack.pop();
+			return NullRenderTargetRef;
 		}
+
+		RenderTargetSharedPtr old = renderTargetStack.top();
+		renderTargetStack.pop();
 
 		if (renderTargetStack.size() > 0)
 		{
-			RenderTargetRef top = *renderTargetStack.top();
+			RenderTargetRef top = renderTargetStack.top();
 			// activate the new render target
 			Engine::Instance()->GetGraphicsSystem()->ActivateRenderTarget(top);
 		}
@@ -209,8 +213,7 @@ namespace GTE
 			Engine::Instance()->GetGraphicsSystem()->RestoreDefaultRenderTarget();
 		}
 		
-		return old == nullptr ? NullRenderTargetRef : *old;
-
+		return old;
 	}
 
 	/*
@@ -257,11 +260,6 @@ namespace GTE
 	 */
 	void ForwardRenderManager::RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers)
 	{
-		Transform model;
-		Transform modelView;
-		Transform projection;
-		Transform modelViewProjection;
-
 		NONFATAL_ASSERT(renderTarget.IsValid(), "ForwardRenderManager::RenderFullScreenQuad -> Invalid render target.", true);
 		NONFATAL_ASSERT(material.IsValid(), "ForwardRenderManager::RenderFullScreenQuad -> Invalid material.", true);
 
@@ -311,14 +309,13 @@ namespace GTE
 	}
 
 	/*
-	 * Perform all scene processing that must occur before any rendering.
+	 * Perform all actions that must occur before any rendering.
 	 */
 	void ForwardRenderManager::PreRender()
 	{
 		lightCount = 0;
 		ambientLightCount = 0;
 		cameraCount = 0;
-
 		renderableSceneObjectCount = 0;
 		renderQueueManager.ClearAllRenderQueues();
 
@@ -340,13 +337,14 @@ namespace GTE
 	 *
 	 *   1. Scene objects that contain instances of Camera -> saved to [sceneCameras]
 	 *   2. Scene objects that contain instances of Light -> saved to [sceneAmbientLights] or [sceneLights]
-	 *   3. Scene objects that contain instances of Mesh3DRenderer or SkinnedMesh3DRenderer -> saved to [sceneMeshObjects]
+	 *   3. Scene objects that contain instances of Renderer will be saved to [renderableSceneObjects]
 	 *
-	 * Later, the entire scene is rendered from the perspective of each camera in that list via RenderSceneFromCamera().
+	 * Additionally for each instance of Renderer encountered, render queue entries will be created for each sub-renderer.
 	 *
-	 * For each Mesh3DRender and SkinnedMesh3DRenderer that is visited, the method loops through each sub-renderer
-	 * and calls the SubMesh3DRenderer::PreRender() Method. For skinned meshes, this method will (indirectly) perform the
-	 * vertex skinning transformation.
+	 * Later, the entire scene is rendered from the perspective of each camera in [sceneCameras] list via RenderSceneFromCamera().
+	 *
+	 * For each scene obejct in [renderableSceneObjects], the PreRenderScene() method will call the PreRender() method of each sub-renderer
+	 * in that scene object's Renderer component. For skinned meshes, this method will (indirectly) perform the vertex skinning transformation.
 	 */
 	void ForwardRenderManager::PreProcessScene(SceneObject& parent, UInt32 recursionDepth)
 	{
@@ -378,11 +376,11 @@ namespace GTE
 					{
 						if (i == cameraCount || sceneCameras[i]->GetCamera()->GetRenderOrderIndex() > camera->GetRenderOrderIndex())
 						{
-							for (UInt32 ii = cameraCount; ii > i; ii--)
+							for(UInt32 ii = cameraCount; ii > i; ii--)
+							{
 								sceneCameras[ii] = sceneCameras[ii - 1];
-
+							}
 							sceneCameras[i] = child;
-
 							cameraCount++;
 							break;
 						}
@@ -390,29 +388,19 @@ namespace GTE
 				}
 
 				LightRef light = child->GetLight();
-				if (light.IsValid())
+				if (light.IsValid() && ambientLightCount + lightCount < Constants::MaxSceneLights)
 				{
 					if (light->GetType() == LightType::Ambient)
 					{
-						if (ambientLightCount < Constants::MaxSceneLights)
-						{
-							// add ambient light
-							sceneAmbientLights[ambientLightCount] = child;
-							ambientLightCount++;
-						}
+						// add ambient light
+						sceneAmbientLights[ambientLightCount] = child;
+						ambientLightCount++;
 					}
 					else
 					{
-						// ensure light's direction is normalized
-						Vector3& lightDir = const_cast<Vector3&>(light->GetDirection());
-						lightDir.Normalize();
-
-						if (lightCount < Constants::MaxSceneLights)
-						{
-							// add non-ambient light
-							sceneLights[lightCount] = child;
-							lightCount++;
-						}
+						// add non-ambient light
+						sceneLights[lightCount] = child;
+						lightCount++;
 					}
 				}
 
@@ -431,9 +419,15 @@ namespace GTE
 							renderableSceneObjectCount++;
 							UInt32 materialCount = meshRenderer->GetMultiMaterialCount();
 							UInt32 subMeshCount = mesh->GetSubMeshCount();
+
+							// for each sub mesh in [mesh], create a render queue entry for each material in the
+							// corresponding multi-material
 							for(UInt32 i = 0; i < subMeshCount; i++)
 							{
+								// get the multi material that corresponds to this sub-mesh
 								MultiMaterialRef multiMat = meshRenderer->GetMultiMaterial(i % materialCount);
+
+								// for each material in [multiMat], create a render queue entry
 								for(UInt32 m = 0; m < multiMat->GetMaterialCount(); m++)
 								{
 									MaterialRef mat = multiMat->GetMaterial(m);
@@ -455,7 +449,7 @@ namespace GTE
 	}
 
 	/*
-	 * Iterate through all (active) mesh renderers in the scene all call their
+	 * Iterate through all (active) Renderer components in the scene all call their
 	 * respective PreRender() methods. This is typically where vertex skinning will
 	 * happen.
 	 */

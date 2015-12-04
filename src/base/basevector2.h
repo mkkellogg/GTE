@@ -23,7 +23,6 @@ namespace GTE
 		BaseVector2(Bool permAttached, Real * target);
 		BaseVector2(Real x, Real y);
 		BaseVector2(const BaseVector2& baseVector);
-		BaseVector2(const Real * copyData);
 		virtual ~BaseVector2();
 
 		BaseVector2 & operator= (const BaseVector2 & source);

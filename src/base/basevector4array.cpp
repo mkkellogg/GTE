@@ -24,7 +24,7 @@ namespace GTE
 		if (objects != nullptr)baseFactory->DestroyArray(objects, reservedCount);
 		objects = nullptr;
 
-		SAFE_DELETE(data);
+		SAFE_DELETE_ARRAY(data);
 	}
 
 	Bool BaseVector4Array::Init(UInt32 reservedCount)

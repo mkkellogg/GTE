@@ -42,7 +42,7 @@ namespace GTE
 				array[i] = nullptr;
 			}
 		}
-		delete array;
+		delete[] array;
 	}
 }
 

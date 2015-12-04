@@ -119,7 +119,7 @@ namespace GTE
 		// cache shadow volumes that don't need to be constantly rebuilt
 		std::unordered_map<ObjectPairKey, Point3Array*, ObjectPairKey::ObjectPairKeyHasher, ObjectPairKey::ObjectPairKeyEq> shadowVolumeCache;
 
-		std::stack<const RenderTargetSharedPtr*> renderTargetStack;
+		std::stack<RenderTargetSharedPtr> renderTargetStack;
 
 		void PreRender() override;
 		void PreProcessScene(SceneObject& parent, UInt32 recursionDepth);
@@ -179,7 +179,7 @@ namespace GTE
 		Bool ShouldCullByTile(const Light& light, const Point3& lightPosition, const Transform& meshWorldTransform, const SubMesh3D& mesh) const;
 
 		void PushRenderTarget(RenderTargetRef renderTarget);
-		RenderTargetRef PopRenderTarget();
+		RenderTargetSharedPtr PopRenderTarget();
 		void ClearRenderTargetStack();
 
 		Bool InitFullScreenQuad();

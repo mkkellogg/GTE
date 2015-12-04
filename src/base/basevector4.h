@@ -15,12 +15,12 @@
 #include "global/global.h"
 
 #ifdef _GTE_Real_DoublePrecision
-#define BaseVector4_QuickCopy(source, dest)									\
-{																			\
-	*(dest) = *(source);(source)++;(dest)++;   	   							\
-	*(dest) = *(source);(source)++;(dest)++;								\
-	*(dest) = *(source);(source)++;(dest)++;	   							\
-	*(dest) = *(source);(source)-=3;(dest)-=3;	   							\
+#define BaseVector4_QuickCopy(source, dest)		\
+{												\
+	*(dest) = *(source);(source)++;(dest)++;	\
+	*(dest) = *(source);(source)++;(dest)++;	\
+	*(dest) = *(source);(source)++;(dest)++;	\
+	*(dest) = *(source);(source)-=3;(dest)-=3;	\
 }
 #else
 #define BaseVector4_QuickCopy(source, dest)														\
@@ -31,12 +31,12 @@
 #endif
 
 #ifdef _GTE_Real_DoublePrecision
-#define BaseVector4_QuickCopy_IncDest(source, dest)							\
-{																			\
-	*(dest) = *(source);(source)++;(dest)++;   	   							\
-	*(dest) = *(source);(source)++;(dest)++;								\
-	*(dest) = *(source);(source)++;(dest)++;	   							\
-	*(dest) = *(source);(source)-=3;(dest)++;								\
+#define BaseVector4_QuickCopy_IncDest(source, dest)		\
+{														\
+	*(dest) = *(source);(source)++;(dest)++;			\
+	*(dest) = *(source);(source)++;(dest)++;			\
+	*(dest) = *(source);(source)++;(dest)++;			\
+	*(dest) = *(source);(source)-=3;(dest)++;			\
 }
 #else
 #define BaseVector4_QuickCopy_IncDest(source, dest)												\
@@ -47,12 +47,12 @@
 #endif
 
 #ifdef _GTE_Real_DoublePrecision
-#define BaseVector4_QuickCopy_ZeroW(source, dest)							\
-{																			\
-	*(dest) = *(source);(source)++;(dest)++;   	   							\
-	*(dest) = *(source);(source)++;(dest)++;								\
-	*(dest) = *(source);(source)++;(dest)++;	   							\
-	*(dest) = 0;(source)-=3;(dest)-=3;			 							\
+#define BaseVector4_QuickCopy_ZeroW(source, dest)	\
+{													\
+	*(dest) = *(source);(source)++;(dest)++;		\
+	*(dest) = *(source);(source)++;(dest)++;		\
+	*(dest) = *(source);(source)++;(dest)++;		\
+	*(dest) = 0;(source)-=3;(dest)-=3;				\
 }
 #else
 #define BaseVector4_QuickCopy_ZeroW(source, dest)												\
@@ -64,12 +64,12 @@
 #endif
 
 #ifdef _GTE_Real_DoublePrecision
-#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)					\
-{																			\
-	*(dest) = *(source);(source)++;(dest)++;   	   							\
-	*(dest) = *(source);(source)++;(dest)++;								\
-	*(dest) = *(source);(source)++;(dest)++;	   							\
-	*(dest) = 0;(source)-=3;(dest)++;			 							\
+#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)\
+{														\
+	*(dest) = *(source);(source)++;(dest)++;			\
+	*(dest) = *(source);(source)++;(dest)++;			\
+	*(dest) = *(source);(source)++;(dest)++;			\
+	*(dest) = 0;(source)-=3;(dest)++;					\
 }
 #else
 #define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)										\
@@ -101,7 +101,6 @@ namespace GTE
 		BaseVector4(Bool permAttached, Real * target);
 		BaseVector4(Real x, Real y, Real z, Real w);
 		BaseVector4(const BaseVector4& baseVector);
-		BaseVector4(const Real * copyData);
 		virtual ~BaseVector4();
 
 		BaseVector4& operator=(const BaseVector4& source);
