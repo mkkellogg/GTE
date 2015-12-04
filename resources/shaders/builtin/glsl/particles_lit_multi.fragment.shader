@@ -16,7 +16,7 @@ uniform int LIGHT_ORTHO_ATTENUATION[MAX_SHADER_LIGHTS];
 uniform int LIGHT_ENABLED[MAX_SHADER_LIGHTS];
 
 in vec4 vPosition;
-in vec3 vLightDir;
+in vec3 vLightDir[MAX_SHADER_LIGHTS];
 
 void main()
 {
@@ -29,7 +29,7 @@ void main()
 		if(LIGHT_ENABLED[i] == 1)
 		{
 			vec3 normal = normalize((LIGHT_POSITION[i] - vPosition).xyz);
-			DiffuseTerm = calcDiffuseTermForLight(LIGHT_TYPE[i], normal, vPosition, LIGHT_POSITION[i], vLightDir, LIGHT_INTENSITY[i], LIGHT_ATTENUATION[i],
+			DiffuseTerm = calcDiffuseTermForLight(LIGHT_TYPE[i], normal, vPosition, LIGHT_POSITION[i], vLightDir[i], LIGHT_INTENSITY[i], LIGHT_ATTENUATION[i],
 												  LIGHT_RANGE[i], LIGHT_PARALLEL_ATTENUATION[i], LIGHT_ORTHO_ATTENUATION[i]);
 			vec4 diffuseColor = vColor * LIGHT_COLOR[i] * textureColor * DiffuseTerm;
 
