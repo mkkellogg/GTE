@@ -168,8 +168,8 @@ UVSRC= $(BASEGRAPHICSSRC)/uv
 LIGHTSRCS= $(call toFullPath,$(LIGHTSRC),light.cpp)
 TEXTURESRCS= $(call toFullPath,$(TEXTURESRC),texture.cpp textureattr.cpp textureGL.cpp atlas.cpp)
 VIEWSYSSRCS= $(call toFullPath,$(VIEWSYSSRC),camera.cpp)
-COLORSRCS= $(call toFullPath,$(COLORSRC),color4.cpp color4factory.cpp color4array.cpp)
-UVSRCS= $(call toFullPath,$(UVSRC),uv2.cpp uv2factory.cpp uv2array.cpp)
+COLORSRCS= $(call toFullPath,$(COLORSRC),color4.cpp color4array.cpp)
+UVSRCS= $(call toFullPath,$(UVSRC),uv2.cpp uv2array.cpp)
 BASEGRAPHICSSRCS= $(call toFullPath,$(BASEGRAPHICSSRC),graphics.cpp stdattributes.cpp stduniforms.cpp screendesc.cpp graphicsGL.cpp)
 
 ALLGRAPHICSSRCS= $(BASEGRAPHICSSRCS) $(LIGHTSRCS) $(TEXTURESRCS) $(VIEWSYSSRCS) $(COLORSRCS) $(UVSRCS) 
@@ -271,8 +271,8 @@ POINTSRC= $(GEOMETRYBASESRC)/point
 VECTORSRC= $(GEOMETRYBASESRC)/vector
 
 GEOMETRYBASESRCS= $(call toFullPath,$(GEOMETRYBASESRC),matrix4x4.cpp quaternion.cpp transform.cpp sceneobjecttransform.cpp)
-POINTSRCS= $(call toFullPath,$(POINTSRC),point3.cpp point3factory.cpp point3array.cpp) 
-VECTORSRCS= $(call toFullPath,$(VECTORSRC),vector3.cpp vector3factory.cpp vector3array.cpp vector2.cpp vector2factory.cpp vector2array.cpp)
+POINTSRCS= $(call toFullPath,$(POINTSRC),point3.cpp point3array.cpp)
+VECTORSRCS= $(call toFullPath,$(VECTORSRC),vector3.cpp vector3array.cpp vector2.cpp vector2array.cpp)
 
 ALLGEOMETRYSRCS= $(GEOMETRYBASESRCS) $(POINTSRCS) $(VECTORSRCS)
 
@@ -295,7 +295,7 @@ $(BASEGEOMETRYOBJ):
 # ==================================
 
 BASESRC= src/base
-BASESRCS= $(call toFullPath,$(BASESRC),basevector4.cpp basevector2.cpp basevector2factory.cpp basevector4factory.cpp basevector2array.cpp basevector4array.cpp intmask.cpp longmask.cpp)
+BASESRCS= $(call toFullPath,$(BASESRC),basevector4.cpp basevector2.cpp intmask.cpp longmask.cpp)
 BASEOBJ= $(call srcFilesToObjFiles,$(BASESRCS),$(BASESRC),$(OUTPUTDIR))
 
 $(BASEOBJ): 
