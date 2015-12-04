@@ -725,5 +725,8 @@
     <ClInclude Include="src\base\basevector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\base\basevectortraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
