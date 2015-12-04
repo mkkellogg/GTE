@@ -24,12 +24,6 @@
     <ClCompile Include="src\asset\shadersourceloaderGL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\base\basevector2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\base\basevector4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\base\intmask.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -363,24 +357,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\asset\shadersourceloaderGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\basevector2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\basevector2array.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\basevector2factory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\basevector4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\basevector4array.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\basevector4factory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\base\intmask.h">
@@ -738,6 +714,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\render\viewdescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\base\basevectorfactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\base\basevectorarray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\base\basevector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -147,8 +147,6 @@
     <ClCompile Include="src\asset\modelimporter.cpp" />
     <ClCompile Include="src\asset\shadersourceloader.cpp" />
     <ClCompile Include="src\asset\shadersourceloaderGL.cpp" />
-    <ClCompile Include="src\base\basevector2.cpp" />
-    <ClCompile Include="src\base\basevector4.cpp" />
     <ClCompile Include="src\base\intmask.cpp" />
     <ClCompile Include="src\base\longmask.cpp" />
     <ClCompile Include="src\debug\gtedebug.cpp" />
@@ -260,12 +258,9 @@
     <ClInclude Include="src\asset\modelimporter.h" />
     <ClInclude Include="src\asset\shadersourceloader.h" />
     <ClInclude Include="src\asset\shadersourceloaderGL.h" />
-    <ClInclude Include="src\base\basevector2.h" />
-    <ClInclude Include="src\base\basevector2array.h" />
-    <ClInclude Include="src\base\basevector2factory.h" />
-    <ClInclude Include="src\base\basevector4.h" />
-    <ClInclude Include="src\base\basevector4array.h" />
-    <ClInclude Include="src\base\basevector4factory.h" />
+    <ClInclude Include="src\base\basevector.h" />
+    <ClInclude Include="src\base\basevectorarray.h" />
+    <ClInclude Include="src\base\basevectorfactory.h" />
     <ClInclude Include="src\base\intmask.h" />
     <ClInclude Include="src\base\longmask.h" />
     <ClInclude Include="src\debug\gtedebug.h" />

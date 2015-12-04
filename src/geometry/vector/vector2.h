@@ -2,17 +2,17 @@
 #define _GTE_VECTOR2_H_
 
 #include "vector2.h"
-#include "base/basevector2.h"
-#include "base/basevector2array.h"
+#include "base/basevector.h"
+#include "base/basevectorarray.h"
 
 namespace GTE
 {
-	class Vector2 : public BaseVector2
+	class Vector2 : public BaseVector<Vector2>
 	{
 	protected:
 
 	public:
-
+	
 		Real &x;
 		Real &y;
 
@@ -23,7 +23,7 @@ namespace GTE
 		~Vector2();
 
 		Vector2 & operator= (const Vector2 & source);
-		BaseVector2& operator= (const BaseVector2& source);
+		BaseVector<Vector2>& operator= (const BaseVector<Vector2>& source);
 		void Set(Real x, Real y);
 		Real MaxComponentMagnitude();
 
@@ -43,7 +43,7 @@ namespace GTE
 		virtual void Detach();
 	};
 
-	typedef BaseVector2Array<Vector2> Vector2Array;
+	typedef BaseVectorArray<Vector2> Vector2Array;
 }
 
 #endif

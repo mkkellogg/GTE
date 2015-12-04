@@ -11,8 +11,8 @@
 #define _GTE_POINT3_H_
 
 #include "engine.h"
-#include "base/basevector4.h"
-#include "base/basevector4array.h"
+#include "base/basevector.h"
+#include "base/basevectorarray.h"
 #include "gtemath/gtemath.h"
 
 namespace GTE
@@ -21,7 +21,7 @@ namespace GTE
 	class Vector3;
 	class Matrix4x4;
 
-	class Point3 : public BaseVector4
+	class Point3 : public BaseVector<Point3>
 	{
 	protected:
 
@@ -86,7 +86,7 @@ namespace GTE
 		} Point3Eq;
 	};
 
-	typedef BaseVector4Array<Point3> Point3Array;
+	typedef BaseVectorArray<Point3> Point3Array;
 }
 
 #endif

@@ -10,7 +10,7 @@ namespace GTE
 	/*
 	 * Default constructor
 	 */
-	Point3::Point3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
+	Point3::Point3() : BaseVector<Point3>(), x(data[0]), y(data[1]), z(data[2])
 	{
 		data[3] = 1;
 	}
@@ -18,7 +18,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	Point3::Point3(Bool permAttached, Real * target) : BaseVector4(permAttached, target), x(data[0]), y(data[1]), z(data[2])
+	Point3::Point3(Bool permAttached, Real * target) : BaseVector<Point3>(permAttached, target), x(data[0]), y(data[1]), z(data[2])
 	{
 		data[3] = 1;
 	}
@@ -26,15 +26,15 @@ namespace GTE
 	/*
 	 * Constructor with initialization values
 	 */
-	Point3::Point3(Real x, Real y, Real z) : BaseVector4(x, y, z, 1), x(data[0]), y(data[1]), z(data[2])
+	Point3::Point3(Real x, Real y, Real z) : BaseVector<Point3>(), x(data[0]), y(data[1]), z(data[2])
 	{
-
+		Set(x, y, z);
 	}
 
 	/*
 	 * Copy constructor
 	 */
-	Point3::Point3(const Point3& point) : BaseVector4(point), x(data[0]), y(data[1]), z(data[2])
+	Point3::Point3(const Point3& point) : BaseVector<Point3>(point), x(data[0]), y(data[1]), z(data[2])
 	{
 
 	}
@@ -53,7 +53,7 @@ namespace GTE
 	Point3& Point3::operator= (const Point3& source)
 	{
 		if(this == &source)return *this;
-		BaseVector4::operator=(source);
+		BaseVector<Point3>::operator=(source);
 		return *this;
 	}
 
@@ -109,7 +109,10 @@ namespace GTE
 	*/
 	void Point3::Set(Real x, Real y, Real z)
 	{
-		BaseVector4::Set(x, y, z, 1);
+		this->data[0] = x;
+		this->data[1] = y;
+		this->data[2] = z;
+		this->data[3] = 1;
 	}
 
 	/*
@@ -257,7 +260,7 @@ namespace GTE
 	}
 
 	/*
-	* Override BaseVector4::AttachTo() and force it to DO NOTHING. If we allowed the backing storage
+	* Override BaseVector::AttachTo() and force it to DO NOTHING. If we allowed the backing storage
 	* to change then the references x, y, & z would point to invalid locations.
 	*/
 	void Point3::AttachTo(Real * data)
@@ -266,7 +269,7 @@ namespace GTE
 	}
 
 	/*
-	* Override BaseVector4::Detach() and force it to DO NOTHING. If we allowed the backing storage
+	* Override BaseVector::Detach() and force it to DO NOTHING. If we allowed the backing storage
 	* to change then the references x, y, & z would point to invalid locations.
 	*/
 	void Point3::Detach()

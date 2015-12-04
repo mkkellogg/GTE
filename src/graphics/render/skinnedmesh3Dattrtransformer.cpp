@@ -6,7 +6,7 @@
 #include "graphics/animation/skeleton.h"
 #include "graphics/animation/sceneobjectskeletonnode.h"
 #include "graphics/animation/bone.h"
-#include "base/basevector4array.h"
+#include "base/basevectorarray.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
 #include "geometry/point/point3.h"

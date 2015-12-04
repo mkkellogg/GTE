@@ -3,23 +3,23 @@
 
 namespace GTE
 {
-	Color4::Color4() : BaseVector4(), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	Color4::Color4() : BaseVector<Color4>(), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 	{
 
 	}
 
-	Color4::Color4(Bool permAttached, Real * target) : BaseVector4(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	Color4::Color4(Bool permAttached, Real * target) : BaseVector<Color4>(permAttached, target), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 	{
 
 
 	}
 
-	Color4::Color4(Real r, Real g, Real b, Real a) : BaseVector4(r, g, b, a), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	Color4::Color4(Real r, Real g, Real b, Real a) : BaseVector<Color4>(), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 	{
-
+		Set(r, g, b, a);
 	}
 
-	Color4::Color4(const Color4& color) : BaseVector4(color), r(data[0]), g(data[1]), b(data[2]), a(data[3])
+	Color4::Color4(const Color4& color) : BaseVector<Color4>(color), r(data[0]), g(data[1]), b(data[2]), a(data[3])
 	{
 
 	}
@@ -35,17 +35,17 @@ namespace GTE
 	Color4 & Color4::operator= (const Color4& source)
 	{
 		if (this == &source)return *this;
-		BaseVector4::operator=(source);
+		BaseVector<Color4>::operator=(source);
 		return *this;
 	}
 
 	/*
 	 * Over-ridden assignment operator from BaseVector4
 	 */
-	BaseVector4& Color4::operator= (const BaseVector4& source)
+	BaseVector<Color4>& Color4::operator= (const BaseVector<Color4>& source)
 	{
 		if (this == &source)return *this;
-		BaseVector4::operator=(source);
+		BaseVector<Color4>::operator=(source);
 		return *this;
 	}
 
@@ -54,7 +54,10 @@ namespace GTE
 	*/
 	void Color4::Set(Real r, Real g, Real b, Real a)
 	{
-		BaseVector4::Set(r, g, b, a);
+		data[0] = r;
+		data[1] = g;
+		data[2] = b;
+		data[3] = a;
 	}
 
 	/*

@@ -5,7 +5,7 @@
 #include "matrix4x4.h"
 #include "gtemath/gtemath.h"
 #include "vector/vector3.h"
-#include "base/basevector4.h"
+#include "base/basevector.h"
 #include "debug/gtedebug.h"
 #include "global/constants.h"
 
@@ -25,15 +25,6 @@ namespace GTE
 		mData[1] = v.y;
 		mData[2] = v.z;
 		mData[3] = w;
-	}
-
-	Quaternion::Quaternion(const BaseVector4& v)
-	{
-		Real * data = const_cast<BaseVector4 *>(&v)->GetDataPtr();
-		mData[0] = data[0];
-		mData[1] = data[1];
-		mData[2] = data[2];
-		mData[3] = data[3];
 	}
 
 	Quaternion::Quaternion(const Real* array)

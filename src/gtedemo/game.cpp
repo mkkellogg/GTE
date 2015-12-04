@@ -18,7 +18,7 @@
 #include "graphics/render/material.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
-#include "base/basevector4.h"
+#include "base/basevector.h"
 #include "geometry/matrix4x4.h"
 #include "geometry/quaternion.h"
 #include "geometry/transform.h"

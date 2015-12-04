@@ -10,15 +10,15 @@
 #ifndef _GTE_Vector3_H_
 #define _GTE_Vector3_H_
 
-#include "base/basevector4.h"
-#include "base/basevector4array.h"
+#include "base/basevector.h"
+#include "base/basevectorarray.h"
 
 namespace GTE
 {
 	//forward declarations
 	class Matrix4x4;
 
-	class Vector3 : public BaseVector4
+	class Vector3 : public BaseVector<Vector3>
 	{
 	protected:
 
@@ -78,7 +78,7 @@ namespace GTE
 		virtual void Detach();
 	};
 
-	typedef BaseVector4Array<Vector3> Vector3Array;
+	typedef BaseVectorArray<Vector3> Vector3Array;
 }
 
 #endif

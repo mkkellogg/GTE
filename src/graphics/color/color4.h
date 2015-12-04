@@ -1,13 +1,13 @@
 #ifndef _GTE_COLOR4_H_
 #define _GTE_COLOR4_H_
 
-#include "base/basevector4.h"
-#include "base/basevector4array.h"
+#include "base/basevector.h"
+#include "base/basevectorarray.h"
 #include "global/global.h"
 
 namespace GTE
 {
-	class Color4 : public BaseVector4
+	class Color4 : public BaseVector<Color4>
 	{
 	protected:
 
@@ -25,7 +25,7 @@ namespace GTE
 		~Color4();
 
 		Color4& operator= (const Color4& source);
-		BaseVector4& operator= (const BaseVector4& source);
+		BaseVector<Color4>& operator= (const BaseVector<Color4>& source);
 		void Set(Real r, Real g, Real b, Real a);
 		Real MaxComponentMagnitude();
 
@@ -44,7 +44,7 @@ namespace GTE
 		virtual void Detach();
 	};
 
-	typedef BaseVector4Array<Color4> Color4Array;
+	typedef BaseVectorArray<Color4> Color4Array;
 }
 
 #endif

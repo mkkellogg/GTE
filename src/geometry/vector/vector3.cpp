@@ -20,7 +20,7 @@ namespace GTE
 	/*
 	 * Default constructor
 	 */
-	Vector3::Vector3() : BaseVector4(), x(data[0]), y(data[1]), z(data[2])
+	Vector3::Vector3() : BaseVector<Vector3>(), x(data[0]), y(data[1]), z(data[2])
 	{
 
 	}
@@ -28,7 +28,7 @@ namespace GTE
 	/*
 	 * Constructor will alternate backing storage
 	 */
-	Vector3::Vector3(Bool permAttached, Real * target) : BaseVector4(permAttached, target), x(data[0]), y(data[1]), z(data[2])
+	Vector3::Vector3(Bool permAttached, Real * target) : BaseVector<Vector3>(permAttached, target), x(data[0]), y(data[1]), z(data[2])
 	{
 
 
@@ -37,15 +37,15 @@ namespace GTE
 	/*
 	 * Constructor with initialization values
 	 */
-	Vector3::Vector3(Real x, Real y, Real z) : BaseVector4(x, y, z, 0), x(data[0]), y(data[1]), z(data[2])
+	Vector3::Vector3(Real x, Real y, Real z) : BaseVector<Vector3>(), x(data[0]), y(data[1]), z(data[2])
 	{
-
+		Set(x, y, z);
 	}
 
 	/*
 	 * Copy constructor
 	 */
-	Vector3::Vector3(const Vector3& vector) : BaseVector4(vector), x(data[0]), y(data[1]), z(data[2])
+	Vector3::Vector3(const Vector3& vector) : BaseVector<Vector3>(vector), x(data[0]), y(data[1]), z(data[2])
 	{
 
 	}
@@ -56,7 +56,7 @@ namespace GTE
 	Vector3& Vector3::operator=(const Vector3& source)
 	{
 		if (this == &source)return *this;
-		BaseVector4::operator=(source);
+		BaseVector<Vector3>::operator=(source);
 		return *this;
 	}
 
@@ -102,7 +102,9 @@ namespace GTE
 	*/
 	void Vector3::Set(Real x, Real y, Real z)
 	{
-		BaseVector4::Set(x, y, z, 0);
+		data[0] = x;
+		data[1] = y;
+		data[2] = z;
 	}
 
 	/*

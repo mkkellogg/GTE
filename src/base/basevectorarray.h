@@ -1,28 +1,27 @@
-#ifndef _GTE_BASEVECTOR4ARRAY_H_
-#define _GTE_BASEVECTOR4ARRAY_H_
+#ifndef _GTE_BASEVECTORARRAY_H_
+#define _GTE_BASEVECTORARRAY_H_
 
 #include "engine.h"
-#include "basevector4.h"
-#include "basevector4factory.h"
+#include "basevectorfactory.h"
 #include "global/global.h"
 
 namespace GTE
 {
-	template <class T> class BaseVector4Array
+	template <class T> class BaseVectorArray
 	{
 	public:
 
 		class Iterator
 		{
-			friend class BaseVector4Factory<T>;
+			friend class BaseVectorFactory<T>;
 
 		protected:
 
-			BaseVector4Array<T>& targetArray;
+			BaseVectorArray<T>& targetArray;
 			T& targetVector;
 			Int32 currentIndex;
 
-			Iterator(BaseVector4Array<T>& targetArray, T& targetVector) : targetArray(targetArray), targetVector(targetVector)
+			Iterator(BaseVectorArray<T>& targetArray, T& targetVector) : targetArray(targetArray), targetVector(targetVector)
 			{
 				currentIndex = -1;
 			}
@@ -38,7 +37,7 @@ namespace GTE
 			{
 				if (!HasNext())return false;
 				currentIndex++;
-				targetVector.AttachTo(targetArray.data + (currentIndex * 4));
+				targetVector.AttachTo(targetArray.data + (currentIndex * BaseVectorTraits<T>::VectorSize));
 				return true;
 			}
 		};
@@ -49,7 +48,7 @@ namespace GTE
 		UInt32 count;
 		Real * data;
 		T ** objects;
-		BaseVector4Factory<T> * baseFactory;
+		BaseVectorFactory<T> * baseFactory;
 
 		void Destroy()
 		{
@@ -61,17 +60,17 @@ namespace GTE
 
 	public:
 
-		BaseVector4Array() : BaseVector4Array(new BaseVector4Factory<T>())
+		BaseVectorArray() : BaseVectorArray(new BaseVectorFactory<T>())
 		{
 
 		}
 
-		BaseVector4Array(BaseVector4Factory<T> * factory) : reservedCount(0), count(0), data(nullptr), objects(nullptr), baseFactory(factory)
+		BaseVectorArray	(BaseVectorFactory<T> * factory) : reservedCount(0), count(0), data(nullptr), objects(nullptr), baseFactory(factory)
 		{
 
 		}
 
-		virtual ~BaseVector4Array()
+		virtual ~BaseVectorArray()
 		{
 			Destroy();
 		}
@@ -83,11 +82,11 @@ namespace GTE
 			this->reservedCount = reservedCount;
 			this->count = reservedCount;
 
-			data = new(std::nothrow) Real[reservedCount * 4];
-			ASSERT(data != nullptr, "Could not allocate data memory for BaseVector4Array");
+			data = new(std::nothrow) Real[reservedCount * BaseVectorTraits<T>::VectorSize];
+			ASSERT(data != nullptr, "Could not allocate data memory for BaseVectorArray");
 
 			objects = baseFactory->CreateArray(reservedCount);
-			ASSERT(objects != nullptr, "Could not allocate objects memory for BaseVector4Array");
+			ASSERT(objects != nullptr, "Could not allocate objects memory for BaseVectorArray");
 
 			Real *dataPtr = data;
 
@@ -95,16 +94,16 @@ namespace GTE
 			while(index < reservedCount)
 			{
 				T * currentObject = (T*)baseFactory->CreatePermAttached(dataPtr);
-				ASSERT(currentObject != nullptr, "Could not allocate BaseVector4 for BaseVector4Array");
+				ASSERT(currentObject != nullptr, "Could not allocate element for BaseVectorArray");
 
 				objects[index] = currentObject;
 
-				dataPtr[0] = 0;
-				dataPtr[1] = 0;
-				dataPtr[2] = 0;
-				dataPtr[3] = 0;
+				for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
+				{
+					dataPtr[i] = 0;
+				}
 
-				dataPtr += 4;
+				dataPtr += BaseVectorTraits<T>::VectorSize;
 				index++;
 			}
 
@@ -113,7 +112,7 @@ namespace GTE
 
 		T * GetBaseVector(UInt32 index)
 		{
-			NONFATAL_ASSERT_RTRN(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", nullptr, true);
+			NONFATAL_ASSERT_RTRN(index < count, "BaseVectorArray::GetBaseVector -> Index is out of range.", nullptr, true);
 
 			return objects[index];
 		}
@@ -153,17 +152,17 @@ namespace GTE
 			return count;
 		}
 
-		Bool CopyTo(BaseVector4Array<T> * dest) const
+		Bool CopyTo(BaseVectorArray<T> * dest) const
 		{
-			NONFATAL_ASSERT_RTRN(dest != nullptr, " BaseVector4Array::CopyTo -> 'dest' is null.", false, true);
+			NONFATAL_ASSERT_RTRN(dest != nullptr, " BaseVectorArray::CopyTo -> 'dest' is null.", false, true);
 
 			if(dest->GetCount() != count)
 			{
-				Debug::PrintError("BaseVector4Array::CopyTo -> Source count does not match destination count.");
+				Debug::PrintError("BaseVectorArray::CopyTo -> Source count does not match destination count.");
 				return false;
 			}
 
-			memcpy(dest->data, data, count * sizeof(Real) * 4);
+			memcpy(dest->data, data, count * sizeof(Real) * BaseVectorTraits<T>::VectorSize);
 
 			return true;
 		}

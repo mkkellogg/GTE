@@ -25,7 +25,6 @@ namespace GTE
 		Quaternion();
 		Quaternion(const Matrix4x4& matrix);
 		Quaternion(const Vector3& v, Real w);
-		Quaternion(const BaseVector4& v);
 		Quaternion(const Real* array);
 		Quaternion(Real x, Real y, Real z, Real w);
 		void Set(Real x, Real y, Real z, Real w);

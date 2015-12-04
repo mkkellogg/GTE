@@ -3,19 +3,20 @@
 
 namespace GTE
 {
-	Vector2::Vector2() : BaseVector2(), x(data[0]), y(data[1])
+	Vector2::Vector2() : BaseVector<Vector2>(), x(data[0]), y(data[1])
 	{
 	}
 
-	Vector2::Vector2(Bool permAttached, Real * target) : BaseVector2(permAttached, target), x(data[0]), y(data[1])
+	Vector2::Vector2(Bool permAttached, Real * target) : BaseVector<Vector2>(permAttached, target), x(data[0]), y(data[1])
 	{
 	}
 
-	Vector2::Vector2(Real u, Real v) : BaseVector2(u, v), x(data[0]), y(data[1])
+	Vector2::Vector2(Real x, Real y) : BaseVector<Vector2>(), x(data[0]), y(data[1])
 	{
+		Set(x, y);
 	}
 
-	Vector2::Vector2(const Vector2& uv) : BaseVector2(uv), x(data[0]), y(data[1])
+	Vector2::Vector2(const Vector2& uv) : BaseVector<Vector2>(uv), x(data[0]), y(data[1])
 	{
 	}
 
@@ -29,17 +30,17 @@ namespace GTE
 	Vector2 & Vector2::operator= (const Vector2 & source)
 	{
 		if (this == &source)return *this;
-		BaseVector2::operator=(source);
+		BaseVector<Vector2>::operator=(source);
 		return *this;
 	}
 
 	/*
 	 * Over-ridden assignment operator from BaseVector2
 	 */
-	BaseVector2& Vector2::operator= (const BaseVector2& source)
+	BaseVector<Vector2>& Vector2::operator= (const  BaseVector<Vector2>& source)
 	{
 		if (this == &source)return *this;
-		BaseVector2::operator=(source);
+		BaseVector<Vector2>::operator=(source);
 		return *this;
 	}
 
@@ -48,7 +49,8 @@ namespace GTE
 	*/
 	void Vector2::Set(Real x, Real y)
 	{
-		BaseVector2::Set(x, y);
+		data[0] = x;
+		data[1] = y;
 	}
 
 	/*

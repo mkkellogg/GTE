@@ -2,12 +2,12 @@
 #define _GTE_UV2_H_
 
 #include "engine.h"
-#include "base/basevector2.h"
-#include "base/basevector2array.h"
+#include "base/basevector.h"
+#include "base/basevectorarray.h"
 
 namespace GTE
 {
-	class UV2 : public BaseVector2
+	class UV2 : public BaseVector<UV2>
 	{
 	protected:
 
@@ -23,13 +23,15 @@ namespace GTE
 		~UV2();
 
 		UV2 & operator= (const UV2 & source);
-		BaseVector2& operator= (const BaseVector2& source);
+		BaseVector<UV2>& operator= (const BaseVector<UV2>& source);
+
+		void Set(Real u, Real v);
 
 		virtual void AttachTo(Real * data);
 		virtual void Detach();
 	};
 
-	typedef BaseVector2Array<UV2> UV2Array;
+	typedef BaseVectorArray<UV2> UV2Array;
 }
 
 #endif

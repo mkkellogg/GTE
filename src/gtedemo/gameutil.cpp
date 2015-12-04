@@ -13,7 +13,7 @@
 #include "graphics/color/color4.h"
 #include "graphics/uv/uv2.h"
 #include "geometry/matrix4x4.h"
-#include "base/basevector4.h"
+#include "base/basevector.h"
 #include "geometry/transform.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"

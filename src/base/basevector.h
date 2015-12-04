@@ -1,5 +1,5 @@
 /*
- * class: BaseVector4
+ * class: BaseVector
  *
  * author: Mark Kellogg
  *
@@ -7,12 +7,14 @@
  * functionality that is shared by all of them.
  */
 
-#ifndef _GTE_BASEVECTOR4_H_
-#define _GTE_BASEVECTOR4_H_
+#ifndef _GTE_BASEVECTOR_H_
+#define _GTE_BASEVECTOR_H_
 
 #include "engine.h"
+#include "basevectortraits.h"
 #include "global/constants.h"
 #include "global/global.h"
+
 
 #ifdef _GTE_Real_DoublePrecision
 #define BaseVector4_QuickCopy(source, dest)		\
@@ -82,38 +84,162 @@
 
 namespace GTE
 {
-	template <class T> class BaseVector4Factory;
-
-	class BaseVector4
+	template <class T> class BaseVector
 	{
-		friend class BaseVector4Factory<BaseVector4>;
 
 	protected:
 
-		void Init(Real *target, Bool permAttach);
+		/*
+		* If [target] is not null, then use it as the storage array.
+		*
+		* If [permAttach] is true, then [target] cannot be null, as it will be used as the permanent
+		* backing storage array. If [permAttach] is false, then this base vector can attach and
+		* re-attach to various different backing storage arrays.
+		*/
+		void BaseVector::Init(Real *target, Bool permAttach)
+		{
+			data = baseData;
+
+			if(target == nullptr && permAttach == true)
+			{
+				Debug::PrintWarning("BaseVector::Init -> 'permAttach' is true, but 'target' is null!");
+				permAttach = false;
+			}
+
+			if(permAttach)
+			{
+				canDetach = false;
+			}
+			else
+			{
+				data = baseData;
+				canDetach = true;
+			}
+
+			if(target != nullptr)
+			{
+				data = target;
+				attached = true;
+			}
+			else
+			{
+				attached = false;
+			}
+		}
 
 		Real * data;
-		Real baseData[4];
+		Real baseData[BaseVectorTraits<T>::VectorSize];
 		Bool attached;
 		Bool canDetach;
 
 	public:
 
-		BaseVector4();
-		BaseVector4(Bool permAttached, Real * target);
-		BaseVector4(Real x, Real y, Real z, Real w);
-		BaseVector4(const BaseVector4& baseVector);
-		virtual ~BaseVector4();
+		/*
+		* Default constructor
+		*/
+		BaseVector()
+		{
+			Init(nullptr, false);
+			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
+			{
+				data[i] = 0;
+			}
+		}
 
-		BaseVector4& operator=(const BaseVector4& source);
+		/*
+		* Constructor will alternate backing storage
+		*/
+		BaseVector(Bool permAttached, Real * target)
+		{
+			Init(target, true);
+		}
 
-		Real * GetDataPtr();
-		void Set(Real x, Real y, Real z, Real w);
-		void SetTo(const BaseVector4& baseVector);
-		void Get(BaseVector4& baseVector) const;
+		/*
+		* Copy constructor
+		*/
+		BaseVector(const BaseVector<T>& baseVector)
+		{
+			Init(nullptr, false);
 
-		virtual void AttachTo(Real * data);
-		virtual void Detach();
+			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
+			{
+				data[i] = baseVector.data[i];
+			}
+		}
+
+		/*
+		* Clean up
+		*/
+		virtual BaseVector::~BaseVector()
+		{
+			if(!attached)data = nullptr;
+		}
+
+		/*
+		* Assignment operator.
+		*/
+		BaseVector& operator=(const BaseVector& source)
+		{
+			if(this == &source)return *this;
+
+			attached = source.attached;
+			canDetach = source.canDetach;
+
+			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
+			{
+				data[i] = source.data[i];
+			}
+
+			return *this;
+		}
+
+		/*
+		* Set this base vector's data to be equal to [baseVector]
+		*/
+		void SetTo(const BaseVector& baseVector)
+		{
+			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
+			{
+				data[i] = baseVector.data[i];
+			}
+		}
+
+		/*
+		* Copy this base vector's data into [baseVector]
+		*/
+		void Get(BaseVector& baseVector) const
+		{
+			memcpy(baseVector.data, data, sizeof(Real) * BaseVectorTraits<T>::VectorSize);
+		}
+
+		/*
+		* Get a pointer the backing data storage
+		*/
+		Real * GetDataPtr()
+		{
+			return data;
+		}
+
+		/*
+		* Attach the base vector to a new backing storage array [data]
+		*/
+		virtual void AttachTo(Real * data)
+		{
+			this->data = data;
+			attached = true;
+		}
+
+		/*
+		* Detach from the current backing storage array
+		*/
+		virtual void Detach()
+		{
+			if(canDetach)
+			{
+				this->data = baseData;
+				attached = false;
+			}
+		}
 	};
 }
 

@@ -1,7 +1,7 @@
 #include "particleutil.h"
 #include "particles.h"
 #include "gtemath/gtemath.h"
-#include "base/basevector4.h"
+#include "base/basevector.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/vector/vector2.h"
 #include "geometry/point/point3.h"
