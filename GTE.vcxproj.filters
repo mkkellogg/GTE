@@ -27,12 +27,6 @@
     <ClCompile Include="src\base\basevector2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\base\basevector2array.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\base\basevector2factory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\base\basevector4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -237,9 +231,6 @@
     <ClCompile Include="src\graphics\uv\uv2array.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\uv\uv2factory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\view\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -319,9 +310,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\geometry\vector\vector2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\geometry\vector\vector2factory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\geometry\vector\vector2array.cpp">
@@ -623,9 +611,6 @@
     <ClInclude Include="src\graphics\uv\uv2array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\uv\uv2factory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\graphics\view\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -720,9 +705,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\particles\framesetmodifier.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\geometry\vector\vector2factory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\geometry\vector\vector2array.h">

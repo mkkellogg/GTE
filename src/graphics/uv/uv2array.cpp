@@ -1,12 +1,12 @@
 #include "uv2array.h"
 #include "uv2.h"
-#include "uv2factory.h"
+#include "base/basevector2factory.h"
 #include "base/basevector2array.h"
 #include "debug/gtedebug.h"
 
 namespace GTE
 {
-	UV2Array::UV2Array() : BaseVector2Array(UV2Factory::GetInstance())
+	UV2Array::UV2Array() : BaseVector2Array<UV2>(new BaseVector2Factory<UV2>())
 	{
 	}
 

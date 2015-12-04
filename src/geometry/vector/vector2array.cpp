@@ -1,12 +1,12 @@
 #include "vector2array.h"
 #include "vector2.h"
-#include "vector2factory.h"
+#include "base/basevector2factory.h"
 #include "base/basevector2array.h"
 #include "debug/gtedebug.h"
 
 namespace GTE
 {
-	Vector2Array::Vector2Array() : BaseVector2Array(Vector2Factory::GetInstance())
+	Vector2Array::Vector2Array() : BaseVector2Array<Vector2>(new BaseVector2Factory<Vector2>())
 	{
 	}
 

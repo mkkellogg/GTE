@@ -148,8 +148,6 @@
     <ClCompile Include="src\asset\shadersourceloader.cpp" />
     <ClCompile Include="src\asset\shadersourceloaderGL.cpp" />
     <ClCompile Include="src\base\basevector2.cpp" />
-    <ClCompile Include="src\base\basevector2array.cpp" />
-    <ClCompile Include="src\base\basevector2factory.cpp" />
     <ClCompile Include="src\base\basevector4.cpp" />
     <ClCompile Include="src\base\intmask.cpp" />
     <ClCompile Include="src\base\longmask.cpp" />
@@ -167,7 +165,6 @@
     <ClCompile Include="src\geometry\transform.cpp" />
     <ClCompile Include="src\geometry\vector\vector2.cpp" />
     <ClCompile Include="src\geometry\vector\vector2array.cpp" />
-    <ClCompile Include="src\geometry\vector\vector2factory.cpp" />
     <ClCompile Include="src\geometry\vector\vector3.cpp" />
     <ClCompile Include="src\geometry\vector\vector3array.cpp" />
     <ClCompile Include="src\global\constants.cpp" />
@@ -236,7 +233,6 @@
     <ClCompile Include="src\graphics\texture\textureGL.cpp" />
     <ClCompile Include="src\graphics\uv\uv2.cpp" />
     <ClCompile Include="src\graphics\uv\uv2array.cpp" />
-    <ClCompile Include="src\graphics\uv\uv2factory.cpp" />
     <ClCompile Include="src\graphics\view\camera.cpp" />
     <ClCompile Include="src\gtedemo\game.cpp" />
     <ClCompile Include="src\gtedemo\gameutil.cpp" />
@@ -291,7 +287,6 @@
     <ClInclude Include="src\geometry\transform.h" />
     <ClInclude Include="src\geometry\vector\vector2.h" />
     <ClInclude Include="src\geometry\vector\vector2array.h" />
-    <ClInclude Include="src\geometry\vector\vector2factory.h" />
     <ClInclude Include="src\geometry\vector\vector3.h" />
     <ClInclude Include="src\geometry\vector\vector3array.h" />
     <ClInclude Include="src\global\assert.h" />
@@ -374,7 +369,6 @@
     <ClInclude Include="src\graphics\materialvardirectory.h" />
     <ClInclude Include="src\graphics\uv\uv2.h" />
     <ClInclude Include="src\graphics\uv\uv2array.h" />
-    <ClInclude Include="src\graphics\uv\uv2factory.h" />
     <ClInclude Include="src\graphics\view\camera.h" />
     <ClInclude Include="src\gtedemo\game.h" />
     <ClInclude Include="src\gtedemo\gameutil.h" />

@@ -7,7 +7,7 @@
 
 namespace GTE
 {
-	class UV2Array : public BaseVector2Array
+	class UV2Array : public BaseVector2Array<UV2>
 	{
 	public:
 
