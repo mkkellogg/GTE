@@ -151,8 +151,6 @@
     <ClCompile Include="src\base\basevector2array.cpp" />
     <ClCompile Include="src\base\basevector2factory.cpp" />
     <ClCompile Include="src\base\basevector4.cpp" />
-    <ClCompile Include="src\base\basevector4array.cpp" />
-    <ClCompile Include="src\base\basevector4factory.cpp" />
     <ClCompile Include="src\base\intmask.cpp" />
     <ClCompile Include="src\base\longmask.cpp" />
     <ClCompile Include="src\debug\gtedebug.cpp" />
@@ -164,7 +162,6 @@
     <ClCompile Include="src\geometry\matrix4x4.cpp" />
     <ClCompile Include="src\geometry\point\point3.cpp" />
     <ClCompile Include="src\geometry\point\point3array.cpp" />
-    <ClCompile Include="src\geometry\point\point3factory.cpp" />
     <ClCompile Include="src\geometry\quaternion.cpp" />
     <ClCompile Include="src\geometry\sceneobjecttransform.cpp" />
     <ClCompile Include="src\geometry\transform.cpp" />
@@ -173,7 +170,6 @@
     <ClCompile Include="src\geometry\vector\vector2factory.cpp" />
     <ClCompile Include="src\geometry\vector\vector3.cpp" />
     <ClCompile Include="src\geometry\vector\vector3array.cpp" />
-    <ClCompile Include="src\geometry\vector\vector3factory.cpp" />
     <ClCompile Include="src\global\constants.cpp" />
     <ClCompile Include="src\graphics\animation\animation.cpp" />
     <ClCompile Include="src\graphics\animation\animationinstance.cpp" />
@@ -193,7 +189,6 @@
     <ClCompile Include="src\graphics\animation\vertexbonemap.cpp" />
     <ClCompile Include="src\graphics\color\color4.cpp" />
     <ClCompile Include="src\graphics\color\color4array.cpp" />
-    <ClCompile Include="src\graphics\color\color4factory.cpp" />
     <ClCompile Include="src\graphics\graphics.cpp" />
     <ClCompile Include="src\graphics\graphicsGL.cpp" />
     <ClCompile Include="src\graphics\image\imageloader.cpp" />
@@ -291,7 +286,6 @@
     <ClInclude Include="src\geometry\matrix4x4.h" />
     <ClInclude Include="src\geometry\point\point3.h" />
     <ClInclude Include="src\geometry\point\point3array.h" />
-    <ClInclude Include="src\geometry\point\point3factory.h" />
     <ClInclude Include="src\geometry\quaternion.h" />
     <ClInclude Include="src\geometry\sceneobjecttransform.h" />
     <ClInclude Include="src\geometry\transform.h" />
@@ -300,7 +294,6 @@
     <ClInclude Include="src\geometry\vector\vector2factory.h" />
     <ClInclude Include="src\geometry\vector\vector3.h" />
     <ClInclude Include="src\geometry\vector\vector3array.h" />
-    <ClInclude Include="src\geometry\vector\vector3factory.h" />
     <ClInclude Include="src\global\assert.h" />
     <ClInclude Include="src\global\constants.h" />
     <ClInclude Include="src\global\global.h" />
@@ -322,7 +315,6 @@
     <ClInclude Include="src\graphics\animation\vertexbonemap.h" />
     <ClInclude Include="src\graphics\color\color4.h" />
     <ClInclude Include="src\graphics\color\color4array.h" />
-    <ClInclude Include="src\graphics\color\color4factory.h" />
     <ClInclude Include="src\graphics\gl_include.h" />
     <ClInclude Include="src\graphics\graphics.h" />
     <ClInclude Include="src\graphics\graphicsattr.h" />

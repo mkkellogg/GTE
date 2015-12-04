@@ -2,13 +2,11 @@
 #define _GTE_COLOR4_ARRAY_H_
 
 #include "base/basevector4array.h"
+#include "color4.h"
 
 namespace GTE
 {
-	//forward declarations
-	class Color4;
-
-	class Color4Array : public BaseVector4Array
+	class Color4Array : public BaseVector4Array<Color4>
 	{
 	public:
 

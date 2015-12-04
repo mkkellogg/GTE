@@ -2,13 +2,14 @@
 #define _GTE_VECTOR3ARRAY_H_
 
 #include "base/basevector4array.h"
+#include "vector3.h"
 
 namespace GTE
 {
 	//forward declarations
 	class Vector3;
 
-	class Vector3Array : public BaseVector4Array
+	class Vector3Array : public BaseVector4Array<Vector3>
 	{
 	public:
 

@@ -82,9 +82,11 @@
 
 namespace GTE
 {
+	template <class T> class BaseVector4Factory;
+
 	class BaseVector4
 	{
-		friend class BaseVector4Array;
+		friend class BaseVector4Factory<BaseVector4>;
 
 	protected:
 

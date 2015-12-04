@@ -2,13 +2,14 @@
 #define _GTE_POINT3ARRAY_H_
 
 #include "base/basevector4array.h"
+#include "point3.h"
 
 namespace GTE
 {
 	//forward declarations
 	class Point3;
 
-	class Point3Array : public BaseVector4Array
+	class Point3Array : public BaseVector4Array<Point3>
 	{
 	public:
 

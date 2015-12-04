@@ -3,28 +3,26 @@
 
 #include "engine.h"
 #include "basevector4.h"
+#include "basevector4factory.h"
 #include "global/global.h"
 
 namespace GTE
 {
-	// forward declarations
-	class BaseVector4Factory;
-
-	class BaseVector4Array
+	template <class T> class BaseVector4Array
 	{
 	public:
 
 		class Iterator
 		{
-			friend class BaseVector4Array;
+			friend class BaseVector4Factory<T>;
 
 		protected:
 
-			BaseVector4Array& targetArray;
-			BaseVector4& targetVector;
+			BaseVector4Array<T>& targetArray;
+			T& targetVector;
 			Int32 currentIndex;
 
-			Iterator(BaseVector4Array& targetArray, BaseVector4& targetVector) : targetArray(targetArray), targetVector(targetVector)
+			Iterator(BaseVector4Array<T>& targetArray, T& targetVector) : targetArray(targetArray), targetVector(targetVector)
 			{
 				currentIndex = -1;
 			}
@@ -50,24 +48,110 @@ namespace GTE
 		UInt32 reservedCount;
 		UInt32 count;
 		Real * data;
-		BaseVector4 ** objects;
-		BaseVector4Factory * baseFactory;
+		T ** objects;
+		BaseVector4Factory<T> * baseFactory;
 
-		void Destroy();
+		void Destroy()
+		{
+			if(objects != nullptr)baseFactory->DestroyArray(objects, reservedCount);
+			objects = nullptr;
+
+			SAFE_DELETE_ARRAY(data);
+		}
 
 	public:
 
-		BaseVector4Array(BaseVector4Factory * factory);
-		virtual ~BaseVector4Array();
+		BaseVector4Array(BaseVector4Factory<T> * factory) : reservedCount(0), count(0), data(nullptr), objects(nullptr), baseFactory(factory)
+		{
 
-		BaseVector4 * GetBaseVector(UInt32 index);
-		const Real * GetDataPtr() const;
-		Bool Init(UInt32 reservedCount);
-		UInt32 GetReservedCount() const;
-		void SetCount(UInt32 count);
-		UInt32 GetCount() const;
-		Bool CopyTo(BaseVector4Array * dest) const;
-		Iterator GetIterator(BaseVector4& targetVector);
+		}
+
+		virtual ~BaseVector4Array()
+		{
+			Destroy();
+		}
+
+		Bool Init(UInt32 reservedCount)
+		{
+			Destroy();
+
+			this->reservedCount = reservedCount;
+			this->count = reservedCount;
+
+			data = new(std::nothrow) Real[reservedCount * 4];
+			ASSERT(data != nullptr, "Could not allocate data memory for BaseVector4Array");
+
+			objects = baseFactory->CreateArray(reservedCount);
+			ASSERT(objects != nullptr, "Could not allocate objects memory for BaseVector4Array");
+
+			Real *dataPtr = data;
+
+			UInt32 index = 0;
+			while(index < reservedCount)
+			{
+				T * currentObject = (T*)baseFactory->CreatePermAttached(dataPtr);
+				ASSERT(currentObject != nullptr, "Could not allocate BaseVector4 for BaseVector4Array");
+
+				objects[index] = currentObject;
+
+				dataPtr[0] = 0;
+				dataPtr[1] = 0;
+				dataPtr[2] = 0;
+				dataPtr[3] = 0;
+
+				dataPtr += 4;
+				index++;
+			}
+
+			return true;
+		}
+
+		T * GetBaseVector(UInt32 index)
+		{
+			NONFATAL_ASSERT_RTRN(index < count, "BaseVector4Array::GetBaseVector -> Index is out of range.", nullptr, true);
+
+			return objects[index];
+		}
+
+		const Real * GetDataPtr() const
+		{
+			return (const Real *)data;
+		}
+
+		UInt32 GetReservedCount() const
+		{
+			return reservedCount;
+		}
+
+		void SetCount(UInt32 count)
+		{
+			this->count = count;
+		}
+
+		UInt32 GetCount() const
+		{
+			return count;
+		}
+
+		Bool CopyTo(BaseVector4Array<T> * dest) const
+		{
+			NONFATAL_ASSERT_RTRN(dest != nullptr, " BaseVector4Array::CopyTo -> 'dest' is null.", false, true);
+
+			if(dest->GetCount() != count)
+			{
+				Debug::PrintError("BaseVector4Array::CopyTo -> Source count does not match destination count.");
+				return false;
+			}
+
+			memcpy(dest->data, data, count * sizeof(Real) * 4);
+
+			return true;
+		}
+
+		Iterator GetIterator(T& targetVector)
+		{
+			return Iterator(*this, targetVector);
+		}
 	};
 }
 

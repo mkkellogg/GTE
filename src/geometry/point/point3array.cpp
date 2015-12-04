@@ -1,12 +1,12 @@
 #include "point3array.h"
 #include "point3.h"
-#include "point3factory.h"
+#include "base/basevector4factory.h"
 #include "base/basevector4array.h"
 #include "debug/gtedebug.h"
 
 namespace GTE
 {
-	Point3Array::Point3Array() : BaseVector4Array(Point3Factory::Instance())
+	Point3Array::Point3Array() : BaseVector4Array<Point3>(new BaseVector4Factory<Point3>())
 	{
 	}
 

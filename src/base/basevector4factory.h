@@ -3,22 +3,53 @@
 
 #include "engine.h"
 #include "global/global.h"
+#include "global/assert.h"
+#include "basevector4.h"
+
+#include <memory.h>
 
 namespace GTE
 {
-	// forward declarations
-	class BaseVector4;
-
-	class BaseVector4Factory
+	template <class T> class BaseVector4Factory
 	{
 	public:
 
-		BaseVector4Factory();
-		virtual ~BaseVector4Factory();
+		BaseVector4Factory()
+		{
 
-		virtual BaseVector4 * CreatePermAttached(Real * target);
-		virtual BaseVector4** CreateArray(Int32 count);
-		virtual void DestroyArray(BaseVector4 ** array, UInt32 size);
+		}
+
+		virtual ~BaseVector4Factory()
+		{
+
+		}
+
+		T * CreatePermAttached(Real * target)
+		{
+			return new(std::nothrow) T(true, target);
+		}
+
+		T** CreateArray(Int32 count)
+		{
+			T** pptr = new(std::nothrow) T*[count];
+			return pptr;
+		}
+
+		void DestroyArray(T ** array, UInt32 size)
+		{
+			NONFATAL_ASSERT(array != nullptr, "BaseVector4Factory::DestroyArray -> 'array' is null.", true);
+
+			for(UInt32 i = 0; i < size; i++)
+			{
+				T * baseObj = array[i];
+				if(baseObj != nullptr)
+				{
+					delete baseObj;
+					array[i] = nullptr;
+				}
+			}
+			delete[] array;
+		}
 	};
 }
 

@@ -1,12 +1,12 @@
 #include "color4array.h"
 #include "color4.h"
-#include "color4factory.h"
+#include "base/basevector4factory.h"
 #include "base/basevector4array.h"
 #include "debug/gtedebug.h"
 
 namespace GTE
 {
-	Color4Array::Color4Array() : BaseVector4Array(Color4Factory::GetInstance())
+	Color4Array::Color4Array() : BaseVector4Array<Color4>(new BaseVector4Factory<Color4>())
 	{
 	}
 
