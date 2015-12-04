@@ -61,6 +61,11 @@ namespace GTE
 
 	public:
 
+		BaseVector4Array() : BaseVector4Array(new BaseVector4Factory<T>())
+		{
+
+		}
+
 		BaseVector4Array(BaseVector4Factory<T> * factory) : reservedCount(0), count(0), data(nullptr), objects(nullptr), baseFactory(factory)
 		{
 
@@ -116,6 +121,21 @@ namespace GTE
 		const Real * GetDataPtr() const
 		{
 			return (const Real *)data;
+		}
+
+		T * GetElement(Int32 index)
+		{
+			return objects[index];
+		}
+
+		const T * GetElementConst(Int32 index) const
+		{
+			return (const T*)objects[index];
+		}
+
+		T ** GetElements()
+		{
+			return objects;
 		}
 
 		UInt32 GetReservedCount() const

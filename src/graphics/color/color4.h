@@ -2,6 +2,7 @@
 #define _GTE_COLOR4_H_
 
 #include "base/basevector4.h"
+#include "base/basevector4array.h"
 #include "global/global.h"
 
 namespace GTE
@@ -42,6 +43,8 @@ namespace GTE
 		virtual void AttachTo(Real * data);
 		virtual void Detach();
 	};
+
+	typedef BaseVector4Array<Color4> Color4Array;
 }
 
 #endif

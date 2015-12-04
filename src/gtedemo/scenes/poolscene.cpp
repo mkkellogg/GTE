@@ -672,7 +672,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	rot90.Rotate(1, 0, 0, -90, true);
 	for(GTE::UInt32 i = 0; i < waterMesh->GetSubMesh(0)->GetPostions()->GetCount(); i++)
 	{
-		GTE::Point3 * p = waterMesh->GetSubMesh(0)->GetPostions()->GetPoint(i);
+		GTE::Point3 * p = waterMesh->GetSubMesh(0)->GetPostions()->GetElement(i);
 		rot90.TransformPoint(*p);
 		p->y = 0;
 	}

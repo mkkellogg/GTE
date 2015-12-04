@@ -2,7 +2,7 @@
 #include "material.h"
 #include "multimaterial.h"
 #include "geometry/transform.h"
-#include "geometry/point/point3array.h"
+#include "geometry/point/point3.h"
 #include "geometry/quaternion.h"
 #include "geometry/sceneobjecttransform.h"
 #include "scene/sceneobject.h"
@@ -138,7 +138,7 @@ namespace GTE
 		// transform full-screen quad to: X: [0..1], Y: [0..1]
 		for (UInt32 i = 0; i < positions->GetCount(); i++)
 		{
-			Point3 * p = positions->GetPoint(i);
+			Point3 * p = positions->GetElement(i);
 			p->x += 0.5;
 			p->y += 0.5;
 		}

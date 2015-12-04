@@ -27,6 +27,11 @@ namespace GTE
 
 	public:
 
+		BaseVector2Array() : BaseVector2Array(new BaseVector2Factory<T>())
+		{
+
+		}
+
 		BaseVector2Array(BaseVector2Factory<T> * factory) : count(0), data(nullptr), objects(nullptr), baseFactory(factory)
 		{
 
@@ -73,6 +78,16 @@ namespace GTE
 		const Real * GetDataPtr() const
 		{
 			return (const Real *)data;
+		}
+
+		T * GetElement(Int32 index)
+		{
+			return objects[index];
+		}
+
+		T ** GetElements()
+		{
+			return objects;
 		}
 	};
 }

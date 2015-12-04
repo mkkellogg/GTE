@@ -93,7 +93,7 @@ void LavaField::DisplaceField()
 	// loop through each vertex in the lava field mesh and displace each
 	for(GTE::UInt32 i = 0; i < positions->GetCount(); i++)
 	{
-		GTE::Point3 * p = positions->GetPoint(i);
+		GTE::Point3 * p = positions->GetElement(i);
 
 		// calculate the x & y position (in model space) of the position in
 		// the displacements maps from which to read displacement data

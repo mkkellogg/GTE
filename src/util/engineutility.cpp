@@ -9,15 +9,12 @@
 #include "graphics/texture/textureattr.h"
 #include "graphics/texture/texture.h"
 #include "graphics/color/color4.h"
-#include "graphics/color/color4array.h"
 #include "graphics/uv/uv2.h"
-#include "graphics/uv/uv2array.h"
 #include "geometry/matrix4x4.h"
 #include "base/basevector4.h"
 #include "geometry/transform.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
-#include "geometry/point/point3array.h"
 #include "object/engineobjectmanager.h"
 #include "error/errormanager.h"
 #include "scene/sceneobject.h"
@@ -123,13 +120,13 @@ namespace GTE
 		{
 			for (UInt32 widthSquare = 0; widthSquare < subSquaresPerWidth; widthSquare++)
 			{
-				points->GetPoint(vertexIndex)->Set(currentWidth, currentHeight, 0);
-				points->GetPoint(vertexIndex + 1)->Set(currentWidth + subSquareWidth, currentHeight, 0);
-				points->GetPoint(vertexIndex + 2)->Set(currentWidth, currentHeight - subSquareHeight, 0);
+				points->GetElement(vertexIndex)->Set(currentWidth, currentHeight, 0);
+				points->GetElement(vertexIndex + 1)->Set(currentWidth + subSquareWidth, currentHeight, 0);
+				points->GetElement(vertexIndex + 2)->Set(currentWidth, currentHeight - subSquareHeight, 0);
 
-				points->GetPoint(vertexIndex + 3)->Set(currentWidth + subSquareWidth, currentHeight, 0);
-				points->GetPoint(vertexIndex + 4)->Set(currentWidth + subSquareWidth, currentHeight - subSquareHeight, 0);
-				points->GetPoint(vertexIndex + 5)->Set(currentWidth, currentHeight - subSquareHeight, 0);
+				points->GetElement(vertexIndex + 3)->Set(currentWidth + subSquareWidth, currentHeight, 0);
+				points->GetElement(vertexIndex + 4)->Set(currentWidth + subSquareWidth, currentHeight - subSquareHeight, 0);
+				points->GetElement(vertexIndex + 5)->Set(currentWidth, currentHeight - subSquareHeight, 0);
 
 				Real uvX = (currentWidth + halfWidth) / width;
 				Real uvY = ((currentHeight + halfHeight) / height);
@@ -152,13 +149,13 @@ namespace GTE
 							else continue;
 						}
 
-						uvs->GetCoordinate(vertexIndex)->Set(uvX, uvY);
-						uvs->GetCoordinate(vertexIndex + 1)->Set(uvX + subSquareUVWidth, uvY);
-						uvs->GetCoordinate(vertexIndex + 2)->Set(uvX, uvY - subSquareUVHeight);
+						uvs->GetElement(vertexIndex)->Set(uvX, uvY);
+						uvs->GetElement(vertexIndex + 1)->Set(uvX + subSquareUVWidth, uvY);
+						uvs->GetElement(vertexIndex + 2)->Set(uvX, uvY - subSquareUVHeight);
 
-						uvs->GetCoordinate(vertexIndex + 3)->Set(uvX + subSquareUVWidth, uvY);
-						uvs->GetCoordinate(vertexIndex + 4)->Set(uvX + subSquareUVWidth, uvY - subSquareUVHeight);
-						uvs->GetCoordinate(vertexIndex + 5)->Set(uvX, uvY - subSquareUVHeight);
+						uvs->GetElement(vertexIndex + 3)->Set(uvX + subSquareUVWidth, uvY);
+						uvs->GetElement(vertexIndex + 4)->Set(uvX + subSquareUVWidth, uvY - subSquareUVHeight);
+						uvs->GetElement(vertexIndex + 5)->Set(uvX, uvY - subSquareUVHeight);
 					}
 				}
 
@@ -204,64 +201,64 @@ namespace GTE
 
 		// --- Cube vertices -------
 		// cube front, triangle 1
-		points->GetPoint(0)->Set(-1, 1, 1);
-		points->GetPoint(1)->Set(1, 1, 1);
-		points->GetPoint(2)->Set(-1, -1, 1);
+		points->GetElement(0)->Set(-1, 1, 1);
+		points->GetElement(1)->Set(1, 1, 1);
+		points->GetElement(2)->Set(-1, -1, 1);
 
 		// cube front, triangle 2
-		points->GetPoint(3)->Set(1, 1, 1);
-		points->GetPoint(4)->Set(1, -1, 1);
-		points->GetPoint(5)->Set(-1, -1, 1);
+		points->GetElement(3)->Set(1, 1, 1);
+		points->GetElement(4)->Set(1, -1, 1);
+		points->GetElement(5)->Set(-1, -1, 1);
 
 		// cube right, triangle 1
-		points->GetPoint(6)->Set(1, 1, 1);
-		points->GetPoint(7)->Set(1, 1, -1);
-		points->GetPoint(8)->Set(1, -1, 1);
+		points->GetElement(6)->Set(1, 1, 1);
+		points->GetElement(7)->Set(1, 1, -1);
+		points->GetElement(8)->Set(1, -1, 1);
 
 		// cube right, triangle 2
-		points->GetPoint(9)->Set(1, 1, -1);
-		points->GetPoint(10)->Set(1, -1, -1);
-		points->GetPoint(11)->Set(1, -1, 1);
+		points->GetElement(9)->Set(1, 1, -1);
+		points->GetElement(10)->Set(1, -1, -1);
+		points->GetElement(11)->Set(1, -1, 1);
 
 		// cube left, triangle 1
-		points->GetPoint(12)->Set(-1, 1, -1);
-		points->GetPoint(13)->Set(-1, 1, 1);
-		points->GetPoint(14)->Set(-1, -1, -1);
+		points->GetElement(12)->Set(-1, 1, -1);
+		points->GetElement(13)->Set(-1, 1, 1);
+		points->GetElement(14)->Set(-1, -1, -1);
 
 		// cube left, triangle 2
-		points->GetPoint(15)->Set(-1, 1, 1);
-		points->GetPoint(16)->Set(-1, -1, 1);
-		points->GetPoint(17)->Set(-1, -1, -1);
+		points->GetElement(15)->Set(-1, 1, 1);
+		points->GetElement(16)->Set(-1, -1, 1);
+		points->GetElement(17)->Set(-1, -1, -1);
 
 		// cube top, triangle 1
-		points->GetPoint(18)->Set(-1, 1, -1);
-		points->GetPoint(19)->Set(1, 1, -1);
-		points->GetPoint(20)->Set(-1, 1, 1);
+		points->GetElement(18)->Set(-1, 1, -1);
+		points->GetElement(19)->Set(1, 1, -1);
+		points->GetElement(20)->Set(-1, 1, 1);
 
 		// cube top, triangle 2
-		points->GetPoint(21)->Set(1, 1, -1);
-		points->GetPoint(22)->Set(1, 1, 1);
-		points->GetPoint(23)->Set(-1, 1, 1);
+		points->GetElement(21)->Set(1, 1, -1);
+		points->GetElement(22)->Set(1, 1, 1);
+		points->GetElement(23)->Set(-1, 1, 1);
 
 		// cube back, triangle 1
-		points->GetPoint(24)->Set(1, 1, -1);
-		points->GetPoint(25)->Set(-1, 1, -1);
-		points->GetPoint(26)->Set(1, -1, -1);
+		points->GetElement(24)->Set(1, 1, -1);
+		points->GetElement(25)->Set(-1, 1, -1);
+		points->GetElement(26)->Set(1, -1, -1);
 
 		// cube back, triangle 2
-		points->GetPoint(27)->Set(-1, 1, -1);
-		points->GetPoint(28)->Set(-1, -1, -1);
-		points->GetPoint(29)->Set(1, -1, -1);
+		points->GetElement(27)->Set(-1, 1, -1);
+		points->GetElement(28)->Set(-1, -1, -1);
+		points->GetElement(29)->Set(1, -1, -1);
 
 		// cube bottom, triangle 1
-		points->GetPoint(30)->Set(-1, -1, -1);
-		points->GetPoint(31)->Set(-1, -1, 1);
-		points->GetPoint(32)->Set(1, -1, 1);
+		points->GetElement(30)->Set(-1, -1, -1);
+		points->GetElement(31)->Set(-1, -1, 1);
+		points->GetElement(32)->Set(1, -1, 1);
 
 		// cube bottom, triangle 2
-		points->GetPoint(33)->Set(-1, -1, -1);
-		points->GetPoint(34)->Set(1, -1, 1);
-		points->GetPoint(35)->Set(1, -1, -1);
+		points->GetElement(33)->Set(-1, -1, -1);
+		points->GetElement(34)->Set(1, -1, 1);
+		points->GetElement(35)->Set(1, -1, -1);
 		
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))
 		{
@@ -269,7 +266,7 @@ namespace GTE
 
 			for (Int32 i = 0; i < 36; i++)
 			{
-				colors->GetColor(i)->Set(1, 1, 1, 1);
+				colors->GetElement(i)->Set(1, 1, 1, 1);
 			}
 		}
 
@@ -279,80 +276,80 @@ namespace GTE
 
 			// --- Cube UVs -------
 			// cube front, triangle 1
-			uvs->GetCoordinate(0)->Set(0, 1);
-			uvs->GetCoordinate(1)->Set(1, 1);
-			uvs->GetCoordinate(2)->Set(0, 0);
+			uvs->GetElement(0)->Set(0, 1);
+			uvs->GetElement(1)->Set(1, 1);
+			uvs->GetElement(2)->Set(0, 0);
 
 			// cube front, triangle 2
-			uvs->GetCoordinate(3)->Set(1, 1);
-			uvs->GetCoordinate(4)->Set(1, 0);
-			uvs->GetCoordinate(5)->Set(0, 0);
+			uvs->GetElement(3)->Set(1, 1);
+			uvs->GetElement(4)->Set(1, 0);
+			uvs->GetElement(5)->Set(0, 0);
 
 			// cube right, triangle 1
-			uvs->GetCoordinate(6)->Set(0, 1);
-			uvs->GetCoordinate(7)->Set(1, 1);
-			uvs->GetCoordinate(8)->Set(0, 0);
+			uvs->GetElement(6)->Set(0, 1);
+			uvs->GetElement(7)->Set(1, 1);
+			uvs->GetElement(8)->Set(0, 0);
 
 			// cube right, triangle 2
-			uvs->GetCoordinate(9)->Set(1, 1);
-			uvs->GetCoordinate(10)->Set(1, 0);
-			uvs->GetCoordinate(11)->Set(0, 0);
+			uvs->GetElement(9)->Set(1, 1);
+			uvs->GetElement(10)->Set(1, 0);
+			uvs->GetElement(11)->Set(0, 0);
 
 			// cube left, triangle 1
-			uvs->GetCoordinate(12)->Set(0, 1);
-			uvs->GetCoordinate(13)->Set(1, 1);
-			uvs->GetCoordinate(14)->Set(0, 0);
+			uvs->GetElement(12)->Set(0, 1);
+			uvs->GetElement(13)->Set(1, 1);
+			uvs->GetElement(14)->Set(0, 0);
 
 			// cube left, triangle 2
-			uvs->GetCoordinate(15)->Set(1, 1);
-			uvs->GetCoordinate(16)->Set(1, 0);
-			uvs->GetCoordinate(17)->Set(0, 0);
+			uvs->GetElement(15)->Set(1, 1);
+			uvs->GetElement(16)->Set(1, 0);
+			uvs->GetElement(17)->Set(0, 0);
 
 			// cube top, triangle 1
-			uvs->GetCoordinate(18)->Set(0, 1);
-			uvs->GetCoordinate(19)->Set(1, 1);
-			uvs->GetCoordinate(20)->Set(0, 0);
+			uvs->GetElement(18)->Set(0, 1);
+			uvs->GetElement(19)->Set(1, 1);
+			uvs->GetElement(20)->Set(0, 0);
 
 			// cube top, triangle 2
-			uvs->GetCoordinate(21)->Set(1, 1);
-			uvs->GetCoordinate(22)->Set(1, 0);
-			uvs->GetCoordinate(23)->Set(0, 0);
+			uvs->GetElement(21)->Set(1, 1);
+			uvs->GetElement(22)->Set(1, 0);
+			uvs->GetElement(23)->Set(0, 0);
 
 			// cube back, triangle 1
-			uvs->GetCoordinate(24)->Set(0, 1);
-			uvs->GetCoordinate(25)->Set(1, 1);
-			uvs->GetCoordinate(26)->Set(0, 0);
+			uvs->GetElement(24)->Set(0, 1);
+			uvs->GetElement(25)->Set(1, 1);
+			uvs->GetElement(26)->Set(0, 0);
 
 			// cube back, triangle 2
-			uvs->GetCoordinate(27)->Set(1, 1);
-			uvs->GetCoordinate(28)->Set(1, 0);
-			uvs->GetCoordinate(29)->Set(0, 0);
+			uvs->GetElement(27)->Set(1, 1);
+			uvs->GetElement(28)->Set(1, 0);
+			uvs->GetElement(29)->Set(0, 0);
 
 			// cube back, triangle 1
-			uvs->GetCoordinate(30)->Set(0, 1);
-			uvs->GetCoordinate(31)->Set(1, 1);
-			uvs->GetCoordinate(32)->Set(0, 0);
+			uvs->GetElement(30)->Set(0, 1);
+			uvs->GetElement(31)->Set(1, 1);
+			uvs->GetElement(32)->Set(0, 0);
 
 			// cube back, triangle 2
-			uvs->GetCoordinate(33)->Set(1, 1);
-			uvs->GetCoordinate(34)->Set(1, 0);
-			uvs->GetCoordinate(35)->Set(0, 0);
+			uvs->GetElement(33)->Set(1, 1);
+			uvs->GetElement(34)->Set(1, 0);
+			uvs->GetElement(35)->Set(0, 0);
 		}
 
 		if (doCCW)
 		{
 			for (UInt32 i = 0; i < 36; i += 3)
 			{
-				Point3 * p1 = points->GetPoint(i);
+				Point3 * p1 = points->GetElement(i);
 				Point3  p1r = *p1;
-				Point3 * p3 = points->GetPoint(i + 2);
+				Point3 * p3 = points->GetElement(i + 2);
 
 				*p1 = *p3;
 				*p3 = p1r;
 
-				UV2 * u1 = uvs->GetCoordinate(i);
+				UV2 * u1 = uvs->GetElement(i);
 				UV2  u1r = *u1;
-				UV2 * u3 = uvs->GetCoordinate(i + 2);
+				UV2 * u3 = uvs->GetElement(i + 2);
 
 				*u1 = *u3;
 				*u3 = u1r;

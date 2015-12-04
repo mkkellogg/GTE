@@ -4,12 +4,10 @@
 #include "mesh3D.h"
 #include "submesh3Dface.h"
 #include "graphics/stdattributes.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2array.h"
+#include "graphics/color/color4.h"
+#include "graphics/uv/uv2.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
 #include "customfloatattributebuffer.h"
 #include "gtemath/gtemath.h"
 #include "global/global.h"
@@ -93,9 +91,9 @@ namespace GTE
 		Vector3 a, b, c;
 
 		// get Point3 objects for each vertex
-		const Point3 *pa = positions.GetPointConst(faceIndex);
-		const Point3 *pb = positions.GetPointConst(faceIndex + 1);
-		const Point3 *pc = positions.GetPointConst(faceIndex + 2);
+		const Point3 *pa = positions.GetElementConst(faceIndex);
+		const Point3 *pb = positions.GetElementConst(faceIndex + 1);
+		const Point3 *pc = positions.GetElementConst(faceIndex + 2);
 
 		NONFATAL_ASSERT(pa != nullptr && pb != nullptr && pc != nullptr, "SubMesh3D::CalculateFaceNormal -> Mesh vertex array contains null points.", true);
 
@@ -128,13 +126,13 @@ namespace GTE
 			Vector3 normal;
 			CalculateFaceNormal(v, normal);
 
-			vertexNormals.GetVector(v)->Set(normal.x, normal.y, normal.z);
-			vertexNormals.GetVector(v + 1)->Set(normal.x, normal.y, normal.z);
-			vertexNormals.GetVector(v + 2)->Set(normal.x, normal.y, normal.z);
+			vertexNormals.GetElement(v)->Set(normal.x, normal.y, normal.z);
+			vertexNormals.GetElement(v + 1)->Set(normal.x, normal.y, normal.z);
+			vertexNormals.GetElement(v + 2)->Set(normal.x, normal.y, normal.z);
 
-			faceNormals.GetVector(v)->Set(normal.x, normal.y, normal.z);
-			faceNormals.GetVector(v + 1)->Set(normal.x, normal.y, normal.z);
-			faceNormals.GetVector(v + 2)->Set(normal.x, normal.y, normal.z);
+			faceNormals.GetElement(v)->Set(normal.x, normal.y, normal.z);
+			faceNormals.GetElement(v + 1)->Set(normal.x, normal.y, normal.z);
+			faceNormals.GetElement(v + 2)->Set(normal.x, normal.y, normal.z);
 		}
 
 		// This vector is used to store the calculated average normal for all equal vertices
@@ -147,7 +145,7 @@ namespace GTE
 		{
 			// get existing normal for this vertex
 			Vector3 oNormal;
-			oNormal = *(faceNormals.GetVector(v));
+			oNormal = *(faceNormals.GetElement(v));
 			oNormal.Normalize();
 
 			// retrieve the list of equal vertices for vertex [v]
@@ -165,7 +163,7 @@ namespace GTE
 			for (UInt32 i = 0; i < list.size(); i++)
 			{
 				UInt32 vIndex = list[i];
-				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
+				Vector3 * currentPtr = faceNormals.GetElement(vIndex);
 				Vector3 current = *currentPtr;
 				current.Normalize();
 
@@ -207,7 +205,7 @@ namespace GTE
 			Vector3 avg = averageNormals[v];
 			avg.Normalize();
 			// set the normal for this vertex to the averaged normal
-			vertexNormals.GetVector(v)->Set(avg.x, avg.y, avg.z);
+			vertexNormals.GetElement(v)->Set(avg.x, avg.y, avg.z);
 		}
 
 		if (invertNormals)InvertNormals();
@@ -226,15 +224,15 @@ namespace GTE
 	{
 		UV2Array * sourceUVs = &uvs0;
 
-		UV2 * uv0 = sourceUVs->GetCoordinate(vertexIndex);
-		UV2 * uv2 = sourceUVs->GetCoordinate(rightIndex);
-		UV2 * uv1 = sourceUVs->GetCoordinate(leftIndex);
+		UV2 * uv0 = sourceUVs->GetElement(vertexIndex);
+		UV2 * uv2 = sourceUVs->GetElement(rightIndex);
+		UV2 * uv1 = sourceUVs->GetElement(leftIndex);
 
 		Vector3 e1, e2;
 
-		Point3 * p0 = positions.GetPoint(vertexIndex);
-		Point3 * p2 = positions.GetPoint(rightIndex);
-		Point3 * p1 = positions.GetPoint(leftIndex);
+		Point3 * p0 = positions.GetElement(vertexIndex);
+		Point3 * p2 = positions.GetElement(rightIndex);
+		Point3 * p1 = positions.GetElement(leftIndex);
 
 		Point3::Subtract(*p1, *p0, e1);
 		Point3::Subtract(*p2, *p0, e2);
@@ -284,9 +282,9 @@ namespace GTE
 			CalculateTangent(v + 1, v, v + 2, t1);
 			CalculateTangent(v + 2, v + 1, v, t2);
 
-			vertexTangents.GetVector(v)->SetTo(t0);
-			vertexTangents.GetVector(v + 1)->SetTo(t1);
-			vertexTangents.GetVector(v + 2)->SetTo(t2);
+			vertexTangents.GetElement(v)->SetTo(t0);
+			vertexTangents.GetElement(v + 1)->SetTo(t1);
+			vertexTangents.GetElement(v + 2)->SetTo(t2);
 		}
 
 		// This vector is used to store the calculated average tangent for all equal vertices
@@ -299,11 +297,11 @@ namespace GTE
 		{
 			// get existing normal for this vertex
 			Vector3 oNormal;
-			oNormal = *(faceNormals.GetVector(v));
+			oNormal = *(faceNormals.GetElement(v));
 			oNormal.Normalize();
 
 			Vector3 oTangent;
-			oTangent = *(vertexTangents.GetVector(v));
+			oTangent = *(vertexTangents.GetElement(v));
 			oTangent.Normalize();
 
 			// retrieve the list of equal vertices for vertex [v]
@@ -321,7 +319,7 @@ namespace GTE
 			for (UInt32 i = 0; i < list.size(); i++)
 			{
 				UInt32 vIndex = list[i];
-				Vector3 * currentPtr = faceNormals.GetVector(vIndex);
+				Vector3 * currentPtr = faceNormals.GetElement(vIndex);
 				Vector3 current = *currentPtr;
 				current.Normalize();
 
@@ -331,7 +329,7 @@ namespace GTE
 
 				if (dot > cosSmoothingThreshhold)
 				{
-					Vector3 * tanPtr = vertexTangents.GetVector(vIndex);
+					Vector3 * tanPtr = vertexTangents.GetElement(vIndex);
 					Vector3 tangent = *tanPtr;
 
 					avg.x += tangent.x;
@@ -367,7 +365,7 @@ namespace GTE
 			Vector3 avg = averageTangents[v];
 			avg.Normalize();
 			// set the tangent for this vertex to the averaged tangent
-			vertexTangents.GetVector(v)->Set(avg.x, avg.y, avg.z);
+			vertexTangents.GetElement(v)->Set(avg.x, avg.y, avg.z);
 		}
 
 		if(invertTangents)InvertTangents();
@@ -456,7 +454,7 @@ namespace GTE
 		// along each axis.
 		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
-			Point3 * point = positions.GetPoint(v);
+			Point3 * point = positions.GetElement(v);
 			if (point->x > maxX || v == 0)maxX = point->x;
 			if (point->x < minX || v == 0)minX = point->x;
 			if (point->y > maxY || v == 0)maxY = point->y;
@@ -546,7 +544,7 @@ namespace GTE
 		// appropriate vertex group.
 		for (UInt32 v = 0; v < renderVertexCount; v++)
 		{
-			Point3 * point = positions.GetPoint(v);
+			Point3 * point = positions.GetElement(v);
 			Point3 targetPoint = *point;
 
 			std::vector<UInt32>*& list = vertexGroups[targetPoint];
@@ -793,9 +791,9 @@ namespace GTE
 		{
 			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Position))
 			{
-				Point3 * p1 = positions.GetPoint(i);
+				Point3 * p1 = positions.GetElement(i);
 				Point3  p1r = *p1;
-				Point3 * p3 = positions.GetPoint(i + 2);
+				Point3 * p3 = positions.GetElement(i + 2);
 
 				*p1 = *p3;
 				*p3 = p1r;
@@ -803,16 +801,16 @@ namespace GTE
 
 			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::Normal))
 			{
-				Vector3 * n1 = vertexNormals.GetVector(i);
+				Vector3 * n1 = vertexNormals.GetElement(i);
 				Vector3  n1r = *n1;
-				Vector3 * n3 = vertexNormals.GetVector(i + 2);
+				Vector3 * n3 = vertexNormals.GetElement(i + 2);
 
 				*n1 = *n3;
 				*n3 = n1r;
 
-				n1 = faceNormals.GetVector(i);
+				n1 = faceNormals.GetElement(i);
 				n1r = *n1;
-				n3 = faceNormals.GetVector(i + 2);
+				n3 = faceNormals.GetElement(i + 2);
 
 				*n1 = *n3;
 				*n3 = n1r;
@@ -820,9 +818,9 @@ namespace GTE
 
 			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::VertexColor))
 			{
-				Color4 * c1 = colors.GetColor(i);
+				Color4 * c1 = colors.GetElement(i);
 				Color4  c1r = *c1;
-				Color4 * c3 = colors.GetColor(i + 2);
+				Color4 * c3 = colors.GetElement(i + 2);
 
 				*c1 = *c3;
 				*c3 = c1r;
@@ -830,9 +828,9 @@ namespace GTE
 
 			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::UVTexture0))
 			{
-				UV2 * u1 = uvs0.GetCoordinate(i);
+				UV2 * u1 = uvs0.GetElement(i);
 				UV2  u1r = *u1;
-				UV2 * u3 = uvs0.GetCoordinate(i + 2);
+				UV2 * u3 = uvs0.GetElement(i + 2);
 
 				*u1 = *u3;
 				*u3 = u1r;
@@ -840,9 +838,9 @@ namespace GTE
 
 			if (StandardAttributes::HasAttribute(standardAttributes, StandardAttribute::UVTexture1))
 			{
-				UV2 * u1 = uvs1.GetCoordinate(i);
+				UV2 * u1 = uvs1.GetElement(i);
 				UV2  u1r = *u1;
-				UV2 * u3 = uvs1.GetCoordinate(i + 2);
+				UV2 * u3 = uvs1.GetElement(i + 2);
 
 				*u1 = *u3;
 				*u3 = u1r;
@@ -875,9 +873,9 @@ namespace GTE
 		{
 			for (UInt32 i = 0; i < renderVertexCount; i++)
 			{
-				Vector3 * n1 = vertexNormals.GetVector(i);
+				Vector3 * n1 = vertexNormals.GetElement(i);
 				n1->Invert();
-				n1 = faceNormals.GetVector(i);
+				n1 = faceNormals.GetElement(i);
 				n1->Invert();
 			}
 		}
@@ -892,7 +890,7 @@ namespace GTE
 		{
 			for (UInt32 i = 0; i < renderVertexCount; i++)
 			{
-				Vector3 * n1 = vertexTangents.GetVector(i);
+				Vector3 * n1 = vertexTangents.GetElement(i);
 				n1->Invert();
 			}
 		}

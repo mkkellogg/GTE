@@ -13,12 +13,12 @@
 #include "engine.h"
 #include "graphics/stdattributes.h"
 #include "geometry/matrix4x4.h"
+#include "geometry/vector/vector3.h"
+#include "geometry/point/point3.h"
 
 namespace GTE
 {
 	//forward declarations
-	class Point3Array;
-	class Vector3Array;
 	class VertexAttrBuffer;
 	class Point3;
 

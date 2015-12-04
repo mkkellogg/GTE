@@ -11,6 +11,7 @@
 #define _GTE_Vector3_H_
 
 #include "base/basevector4.h"
+#include "base/basevector4array.h"
 
 namespace GTE
 {
@@ -76,6 +77,8 @@ namespace GTE
 		virtual void AttachTo(Real * data);
 		virtual void Detach();
 	};
+
+	typedef BaseVector4Array<Vector3> Vector3Array;
 }
 
 #endif

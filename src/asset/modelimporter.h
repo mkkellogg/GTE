@@ -20,6 +20,7 @@
 #include "object/shaderorganizer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/stduniforms.h"
+#include "graphics/uv/uv2.h"
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
 #include "base/longmask.h"
@@ -34,7 +35,6 @@ namespace GTE
 	class SceneObject;
 	class SubMesh3D;
 	class Material;
-	class UV2Array;
 	class Skeleton;
 	class VertexBoneMap;
 	

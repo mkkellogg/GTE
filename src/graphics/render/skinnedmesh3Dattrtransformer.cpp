@@ -9,9 +9,7 @@
 #include "base/basevector4array.h"
 #include "geometry/transform.h"
 #include "geometry/sceneobjecttransform.h"
-#include "geometry/point/point3array.h"
 #include "geometry/point/point3.h"
-#include "geometry/vector/vector3array.h"
 #include "geometry/vector/vector3.h"
 #include "scene/sceneobject.h"
 #include "global/assert.h"
@@ -327,12 +325,12 @@ namespace GTE
 
 			if (!seenVectors[desc->UniqueVertexIndex])
 			{
-				seenVectorValues.GetVector(desc->UniqueVertexIndex)->SetTo(*(fullList.GetVector(i)));
+				seenVectorValues.GetElement(desc->UniqueVertexIndex)->SetTo(*(fullList.GetElement(i)));
 				seenVectors[desc->UniqueVertexIndex] = true;
 			}
 			else
 			{
-				if (!Vector3::AreStrictlyEqual(seenVectorValues.GetVector(desc->UniqueVertexIndex), fullList.GetVector(i)))
+				if (!Vector3::AreStrictlyEqual(seenVectorValues.GetElement(desc->UniqueVertexIndex), fullList.GetElement(i)))
 				{
 					if (forNormals)identicalNormalFlags[desc->UniqueVertexIndex] = 0;
 					else identicalTangentFlags[desc->UniqueVertexIndex] = 0;

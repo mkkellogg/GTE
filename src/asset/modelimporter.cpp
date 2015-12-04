@@ -32,20 +32,15 @@
 #include "graphics/render/skinnedmesh3Drenderer.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/mesh3Dfilter.h"
-#include "graphics/uv/uv2array.h"
 #include "graphics/render/material.h"
 #include "graphics/image/rawimage.h"
 #include "graphics/color/color4.h"
 #include "graphics/uv/uv2.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2array.h"
 #include "graphics/render/skinnedmesh3Dattrtransformer.h"
 #include "filesys/filesystem.h"
 #include "geometry/sceneobjecttransform.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
 #include "geometry/matrix4x4.h"
 #include "base/longmask.h"
 #include "util/time.h"
@@ -534,29 +529,29 @@ SubMesh3DSharedPtr ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiSc
 			aiVector3D srcPosition = mesh.mVertices[vIndex];
 
 			// copy vertex position
-			mesh3D->GetPostions()->GetPoint(vertexIndex)->Set(srcPosition.x,srcPosition.y,srcPosition.z);
+			mesh3D->GetPostions()->GetElement(vertexIndex)->Set(srcPosition.x,srcPosition.y,srcPosition.z);
 
 			// copy mesh normals
 			if(mesh.mNormals != nullptr)
 			{
 				aiVector3D& srcNormal = mesh.mNormals[vIndex];
 				Vector3 normalCopy(srcNormal.x, srcNormal.y, srcNormal.z);
-				mesh3D->GetVertexNormals()->GetVector(vertexIndex)->Set(normalCopy.x,normalCopy.y,normalCopy.z);
+				mesh3D->GetVertexNormals()->GetElement(vertexIndex)->Set(normalCopy.x,normalCopy.y,normalCopy.z);
 			}
 
 			// copy vertex colors (if present)
 			Int32 c = materialImportDescriptor.meshSpecificProperties[meshIndex].vertexColorsIndex;
 			if(c >=0)
 			{
-				mesh3D->GetColors()->GetColor(vertexIndex)->Set(mesh.mColors[c]->r,mesh.mColors[c]->g,mesh.mColors[c]->b,mesh.mColors[c]->a);
+				mesh3D->GetColors()->GetElement(vertexIndex)->Set(mesh.mColors[c]->r,mesh.mColors[c]->g,mesh.mColors[c]->b,mesh.mColors[c]->a);
 			}
 
 			// copy relevant data for diffuse texture (UV coords)
 			if(diffuseTextureUVIndex >= 0)
 			{
 				UV2Array *uvs = GetMeshUVArrayForShaderMaterialCharacteristic(*mesh3D,ShaderMaterialCharacteristic::DiffuseTextured);
-				if(materialImportDescriptor.meshSpecificProperties[meshIndex].invertVCoords)uvs->GetCoordinate(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1-mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
-				else uvs->GetCoordinate(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
+				if(materialImportDescriptor.meshSpecificProperties[meshIndex].invertVCoords)uvs->GetElement(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1-mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
+				else uvs->GetElement(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 			}
 
 			vertexIndex++;

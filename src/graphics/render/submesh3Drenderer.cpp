@@ -13,13 +13,9 @@
 #include "mesh3Drenderer.h"
 #include "graphics/object/submesh3D.h"
 #include "geometry/point/point3.h"
-#include "geometry/point/point3array.h"
 #include "geometry/vector/vector3.h"
-#include "geometry/vector/vector3array.h"
 #include "graphics/color/color4.h"
-#include "graphics/color/color4array.h"
 #include "graphics/uv/uv2.h"
-#include "graphics/uv/uv2array.h"
 #include "scene/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "attributetransformer.h"
@@ -275,7 +271,7 @@ namespace GTE
 			faceVertexIndex = face->FirstVertexIndex;
 
 			// get the face's normal
-			faceNormal = normalsSource.GetVector(faceVertexIndex);
+			faceNormal = normalsSource.GetElement(faceVertexIndex);
 
 			// copy the three vertices of the face to [vertex1], [vertex2], and [vertex3]
 			faceVertex1 = positionsSrcPtr + (faceVertexIndex << 2);
@@ -382,7 +378,7 @@ namespace GTE
 						adjacentFaceVertexIndex = adjacentFace->FirstVertexIndex;
 
 						// get the adjacent face's normal
-						adjacentFaceNormal = normalsSource.GetVector(adjacentFaceVertexIndex);
+						adjacentFaceNormal = normalsSource.GetElement(adjacentFaceVertexIndex);
 
 						// copy the three vertices of the adjacent face to [adjVertex1], [adjVertex2], and [adjVertex3]
 						adjVertex1 = positionsSrcPtr + (adjacentFaceVertexIndex * 4);

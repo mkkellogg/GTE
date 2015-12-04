@@ -17,14 +17,12 @@
 #include "customfloatattributebuffer.h"
 #include "graphics/stdattributes.h"
 #include "graphics/materialvardirectory.h"
+#include "graphics/color/color4.h"
+#include "graphics/uv/uv2.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
 #include "submesh3Dfaces.h"
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
-#include "graphics/color/color4array.h"
-#include "graphics/uv/uv2array.h"
 #include "global/global.h"
 
 namespace GTE
@@ -32,8 +30,6 @@ namespace GTE
 	//forward declarations
 	class Point3;
 	class Vector3;
-	class color4;
-	class UV2;
 	class EngineObjectManager;
 	class SubMesh3DRenderer;
 

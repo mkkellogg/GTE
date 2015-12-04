@@ -15,14 +15,13 @@
 #include "engine.h"
 #include "attributetransformer.h"
 #include "skinnedmesh3Dattrtransformer.h"
-#include "geometry/point/point3array.h"
-#include "geometry/vector/vector3array.h"
+#include "geometry/point/point3.h"
+#include "geometry/vector/vector3.h"
 #include "graphics/stdattributes.h"
 
 namespace GTE
 {
 	//forward declarations
-	class Vector3Array;
 	class VertexAttrBuffer;
 	class Skeleton;
 	class Matrix4x4;

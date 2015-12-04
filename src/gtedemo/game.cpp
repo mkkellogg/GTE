@@ -25,7 +25,6 @@
 #include "geometry/sceneobjecttransform.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
-#include "geometry/point/point3array.h"
 #include "debug/gtedebug.h"
 #include "object/engineobjectmanager.h"
 #include "scene/sceneobject.h"

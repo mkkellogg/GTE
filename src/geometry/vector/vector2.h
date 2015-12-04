@@ -3,6 +3,7 @@
 
 #include "vector2.h"
 #include "base/basevector2.h"
+#include "base/basevector2array.h"
 
 namespace GTE
 {
@@ -41,6 +42,8 @@ namespace GTE
 		virtual void AttachTo(Real * data);
 		virtual void Detach();
 	};
+
+	typedef BaseVector2Array<Vector2> Vector2Array;
 }
 
 #endif

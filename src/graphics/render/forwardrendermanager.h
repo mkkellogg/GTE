@@ -26,6 +26,7 @@
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
 #include "geometry/transform.h"
+#include "geometry/point/point3.h"
 #include "assert.h"
 
 #include <vector>
@@ -44,7 +45,6 @@ namespace GTE
 	class SceneObjectComponent;
 	class SubMesh3D;
 	class Transform;
-	class Point3Array;
 
 	enum class FowardBlendingMethod
 	{

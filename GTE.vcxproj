@@ -159,14 +159,11 @@
     <ClCompile Include="src\filesys\filesystemWin.cpp" />
     <ClCompile Include="src\geometry\matrix4x4.cpp" />
     <ClCompile Include="src\geometry\point\point3.cpp" />
-    <ClCompile Include="src\geometry\point\point3array.cpp" />
     <ClCompile Include="src\geometry\quaternion.cpp" />
     <ClCompile Include="src\geometry\sceneobjecttransform.cpp" />
     <ClCompile Include="src\geometry\transform.cpp" />
     <ClCompile Include="src\geometry\vector\vector2.cpp" />
-    <ClCompile Include="src\geometry\vector\vector2array.cpp" />
     <ClCompile Include="src\geometry\vector\vector3.cpp" />
-    <ClCompile Include="src\geometry\vector\vector3array.cpp" />
     <ClCompile Include="src\global\constants.cpp" />
     <ClCompile Include="src\graphics\animation\animation.cpp" />
     <ClCompile Include="src\graphics\animation\animationinstance.cpp" />
@@ -185,7 +182,6 @@
     <ClCompile Include="src\graphics\animation\translationkeyframe.cpp" />
     <ClCompile Include="src\graphics\animation\vertexbonemap.cpp" />
     <ClCompile Include="src\graphics\color\color4.cpp" />
-    <ClCompile Include="src\graphics\color\color4array.cpp" />
     <ClCompile Include="src\graphics\graphics.cpp" />
     <ClCompile Include="src\graphics\graphicsGL.cpp" />
     <ClCompile Include="src\graphics\image\imageloader.cpp" />
@@ -232,7 +228,6 @@
     <ClCompile Include="src\graphics\texture\textureattr.cpp" />
     <ClCompile Include="src\graphics\texture\textureGL.cpp" />
     <ClCompile Include="src\graphics\uv\uv2.cpp" />
-    <ClCompile Include="src\graphics\uv\uv2array.cpp" />
     <ClCompile Include="src\graphics\view\camera.cpp" />
     <ClCompile Include="src\gtedemo\game.cpp" />
     <ClCompile Include="src\gtedemo\gameutil.cpp" />
@@ -281,14 +276,11 @@
     <ClInclude Include="src\filesys\filesystemWin.h" />
     <ClInclude Include="src\geometry\matrix4x4.h" />
     <ClInclude Include="src\geometry\point\point3.h" />
-    <ClInclude Include="src\geometry\point\point3array.h" />
     <ClInclude Include="src\geometry\quaternion.h" />
     <ClInclude Include="src\geometry\sceneobjecttransform.h" />
     <ClInclude Include="src\geometry\transform.h" />
     <ClInclude Include="src\geometry\vector\vector2.h" />
-    <ClInclude Include="src\geometry\vector\vector2array.h" />
     <ClInclude Include="src\geometry\vector\vector3.h" />
-    <ClInclude Include="src\geometry\vector\vector3array.h" />
     <ClInclude Include="src\global\assert.h" />
     <ClInclude Include="src\global\constants.h" />
     <ClInclude Include="src\global\global.h" />
@@ -309,7 +301,6 @@
     <ClInclude Include="src\graphics\animation\translationkeyframe.h" />
     <ClInclude Include="src\graphics\animation\vertexbonemap.h" />
     <ClInclude Include="src\graphics\color\color4.h" />
-    <ClInclude Include="src\graphics\color\color4array.h" />
     <ClInclude Include="src\graphics\gl_include.h" />
     <ClInclude Include="src\graphics\graphics.h" />
     <ClInclude Include="src\graphics\graphicsattr.h" />
@@ -368,7 +359,6 @@
     <ClInclude Include="src\graphics\texture\textureGL.h" />
     <ClInclude Include="src\graphics\materialvardirectory.h" />
     <ClInclude Include="src\graphics\uv\uv2.h" />
-    <ClInclude Include="src\graphics\uv\uv2array.h" />
     <ClInclude Include="src\graphics\view\camera.h" />
     <ClInclude Include="src\gtedemo\game.h" />
     <ClInclude Include="src\gtedemo\gameutil.h" />

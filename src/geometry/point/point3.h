@@ -12,6 +12,7 @@
 
 #include "engine.h"
 #include "base/basevector4.h"
+#include "base/basevector4array.h"
 #include "gtemath/gtemath.h"
 
 namespace GTE
@@ -84,8 +85,8 @@ namespace GTE
 			Bool operator() (const Point3& a, const Point3& b) const { return a.x == b.x && a.y == b.y && a.z == b.z; }
 		} Point3Eq;
 	};
+
+	typedef BaseVector4Array<Point3> Point3Array;
 }
-
-
 
 #endif

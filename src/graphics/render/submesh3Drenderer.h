@@ -31,9 +31,10 @@
 #include "scene/sceneobjectcomponent.h"
 #include "graphics/stdattributes.h"
 #include "graphics/render/material.h"
+#include "graphics/color/color4.h"
+#include "graphics/uv/uv2.h"
 #include "attributetransformer.h"
-#include "geometry/vector/vector3array.h"
-#include "geometry/point/point3array.h"
+#include "geometry/vector/vector3.h"
 #include "geometry/point/point3.h"
 
 namespace GTE
@@ -43,8 +44,6 @@ namespace GTE
 	class Graphics;
 	class VertexAttrBufferGL;
 	class VertexAttrBuffer;
-	class Color4Array;
-	class UV2Array;
 	class SubMesh3D;
 	class Material;
 	class Matrix4x4;

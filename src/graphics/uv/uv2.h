@@ -2,8 +2,8 @@
 #define _GTE_UV2_H_
 
 #include "engine.h"
-#include "uv2.h"
 #include "base/basevector2.h"
+#include "base/basevector2array.h"
 
 namespace GTE
 {
@@ -28,6 +28,8 @@ namespace GTE
 		virtual void AttachTo(Real * data);
 		virtual void Detach();
 	};
+
+	typedef BaseVector2Array<UV2> UV2Array;
 }
 
 #endif
