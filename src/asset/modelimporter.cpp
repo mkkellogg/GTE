@@ -42,7 +42,7 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
-#include "base/longmask.h"
+#include "base/binarymask.h"
 #include "util/time.h"
 #include "global/global.h"
 #include "global/assert.h"
@@ -802,7 +802,7 @@ Bool ModelImporter::SetupMeshSpecificMaterialWithTexture(const aiMaterial& assim
  */
 void ModelImporter::GetImportDetails(const aiMaterial* mtl, MaterialImportDescriptor& materialImportDesc, const aiScene& scene)
 {
-	LongMask flags = LongMaskUtil::CreateLongMask();
+	LongMask flags = LongMaskUtil::CreateMask();
 	aiString path;
 	aiColor4t<Real> color;
 

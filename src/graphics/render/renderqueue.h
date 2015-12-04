@@ -12,7 +12,7 @@
 #define _GTE_RENDER_QUEUE_H_
 
 #include "engine.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 #include "object/engineobject.h"
 
 namespace GTE

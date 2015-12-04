@@ -24,12 +24,6 @@
     <ClCompile Include="src\asset\shadersourceloaderGL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\base\intmask.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\base\longmask.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\debug\gtedebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -357,12 +351,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\asset\shadersourceloaderGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\intmask.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\base\longmask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\debug\gtedebug.h">
@@ -726,6 +714,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\base\basevectortraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\base\binarymask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

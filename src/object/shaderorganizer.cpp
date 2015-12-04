@@ -1,7 +1,7 @@
 #include "shaderorganizer.h"
 #include "graphics/stduniforms.h"
 #include "graphics/shader/shader.h"
-#include "base/longmask.h"
+#include "base/binarymask.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"

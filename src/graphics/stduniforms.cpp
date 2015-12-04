@@ -1,5 +1,5 @@
 #include "stduniforms.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 #include "debug/gtedebug.h"
 #include "materialvardirectory.h"
 
@@ -118,6 +118,6 @@ namespace GTE
 
 	StandardUniformSet StandardUniforms::CreateUniformSet()
 	{
-		return (StandardUniformSet)IntMaskUtil::CreateIntMask();
+		return (StandardUniformSet)IntMaskUtil::CreateMask();
 	}
 }

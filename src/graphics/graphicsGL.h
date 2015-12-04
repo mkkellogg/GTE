@@ -24,7 +24,7 @@
 #include "engine.h"
 #include "graphics/gl_include.h"
 #include "graphics.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 #define GL_GLEXT_PROTOTYPES
 

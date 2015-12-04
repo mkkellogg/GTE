@@ -2,7 +2,7 @@
 #define _GTE_EVENTMANAGER_H_
 
 #include "engine.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 namespace GTE
 {

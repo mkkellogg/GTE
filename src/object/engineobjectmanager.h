@@ -12,8 +12,8 @@
 #include "scene/layermanager.h"
 #include "graphics/texture/textureattr.h"
 #include "shaderorganizer.h"
-#include "base/longmask.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
+#include "base/binarymask.h"
 
 namespace GTE
 {

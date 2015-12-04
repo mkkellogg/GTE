@@ -26,8 +26,8 @@
 #include "graphics/view/camera.h"
 #include "asset/assetimporter.h"
 #include "debug/gtedebug.h"
-#include "base/longmask.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
+#include "base/binarymask.h"
 #include "util/engineutility.h"
 #include "filesys/filesystem.h"
 #include "global/constants.h"
@@ -81,7 +81,7 @@ namespace GTE
 		assetImporter.LoadBuiltInShaderSource("diffuse", shaderSource);
 		shader = CreateShader(shaderSource);
 		ASSERT(shader.IsValid(), "EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseColored");
-		shaderProperties = LongMaskUtil::CreateLongMask();
+		shaderProperties = LongMaskUtil::CreateMask();
 		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::DiffuseColored);
 		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexNormals);
 		loadedShaders.AddShader(shaderProperties, shader);
@@ -89,7 +89,7 @@ namespace GTE
 		assetImporter.LoadBuiltInShaderSource("diffuse_texture", shaderSource);
 		shader = CreateShader(shaderSource);
 		ASSERT(shader.IsValid(), "EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured");
-		shaderProperties = LongMaskUtil::CreateLongMask();
+		shaderProperties = LongMaskUtil::CreateMask();
 		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::DiffuseTextured);
 		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexNormals);
 		loadedShaders.AddShader(shaderProperties, shader);
@@ -97,7 +97,7 @@ namespace GTE
 		assetImporter.LoadBuiltInShaderSource("diffuse_texture_vcolor", shaderSource);
 		shader = CreateShader(shaderSource);
 		ASSERT(shader.IsValid(), "EngineObjectManager::InitBuiltinShaders -> could not create builtin shader: DiffuseTextured & VertexColors");
-		shaderProperties = LongMaskUtil::CreateLongMask();
+		shaderProperties = LongMaskUtil::CreateMask();
 		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::DiffuseTextured);
 		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexColors);
 		LongMaskUtil::SetBit(&shaderProperties, (Int16)ShaderMaterialCharacteristic::VertexNormals);

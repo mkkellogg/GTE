@@ -21,7 +21,7 @@ namespace GTE
 
 	Light::~Light()
 	{
-		cullingMask = IntMaskUtil::CreateIntMask();
+		cullingMask = IntMaskUtil::CreateMask();
 	}
 
 	const Color4& Light::GetColor() const

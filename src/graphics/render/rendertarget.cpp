@@ -1,5 +1,5 @@
 #include "rendertarget.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 #include "global/global.h"
 #include "global/assert.h"
 

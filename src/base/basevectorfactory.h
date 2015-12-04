@@ -14,7 +14,7 @@ namespace GTE
 	{
 	public:
 
-	BaseVectorFactory()
+		BaseVectorFactory()
 		{
 
 		}
@@ -32,6 +32,8 @@ namespace GTE
 		T** CreateArray(Int32 count)
 		{
 			T** pptr = new(std::nothrow) T*[count];
+			ASSERT(pptr != nullptr, "BaseVectorFactory::CreateArray -> Unable to allocate array.");
+
 			return pptr;
 		}
 

@@ -13,7 +13,7 @@
 #include "engine.h"
 #include "geometry/vector/vector3.h"
 #include "asset/assetimporter.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 
 class Scene

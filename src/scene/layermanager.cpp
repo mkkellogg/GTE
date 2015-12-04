@@ -44,7 +44,7 @@ namespace GTE
 
 	IntMask LayerManager::GetLayerMask(UInt32 layerIndex) const
 	{
-		IntMask mask = IntMaskUtil::CreateIntMask();
+		IntMask mask = IntMaskUtil::CreateMask();
 		if (layerIndex < 31)
 		{
 			IntMaskUtil::SetBit(&mask, layerIndex);
@@ -65,14 +65,14 @@ namespace GTE
 
 	IntMask LayerManager::CreateFullLayerMask()
 	{
-		IntMask mask = IntMaskUtil::CreateIntMask();
+		IntMask mask = IntMaskUtil::CreateMask();
 		IntMaskUtil::SetAll(&mask);
 		return mask;
 	}
 
 	IntMask LayerManager::CreateEmptyLayerMask()
 	{
-		return IntMaskUtil::CreateIntMask();
+		return IntMaskUtil::CreateMask();
 	}
 
 	Bool LayerManager::ContainsLayer(IntMask mask, UInt32 layerIndex)

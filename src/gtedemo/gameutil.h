@@ -14,7 +14,7 @@
 
 #include "engine.h"
 #include "graphics/stdattributes.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 class GameUtil
 {

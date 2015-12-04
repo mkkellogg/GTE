@@ -8,7 +8,7 @@
 #include "scene/sceneobject.h"
 #include "scene/eventmanager.h"
 #include "object/engineobjectmanager.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 #include "graphics/shader/shader.h"
 #include "graphics/graphics.h"
 #include "graphics/render/submesh3Drenderer.h"
@@ -281,7 +281,7 @@ namespace GTE
 		// clear buffers (if necessary)
 		if (clearBuffers)
 		{
-			IntMask clearMask = IntMaskUtil::CreateIntMask();
+			IntMask clearMask = IntMaskUtil::CreateMask();
 			IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Color);
 			IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Depth);
 			graphics->ClearRenderBuffers(clearMask);
@@ -875,7 +875,7 @@ namespace GTE
 		PushRenderTarget(depthRenderTarget);
 
 		// clear the relevant buffers in the off-screen render target
-		IntMask clearMask = IntMaskUtil::CreateIntMask();
+		IntMask clearMask = IntMaskUtil::CreateMask();
 		if(depthRenderTarget->HasBuffer(RenderBufferType::Color))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Color);
 		if(depthRenderTarget->HasBuffer(RenderBufferType::Depth))IntMaskUtil::SetBitForMask(&clearMask, (UInt32)RenderBufferType::Depth);
 		Engine::Instance()->GetGraphicsSystem()->ClearRenderBuffers(clearMask);

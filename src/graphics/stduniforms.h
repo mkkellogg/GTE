@@ -5,7 +5,7 @@
 #include <string>
 
 #include "engine.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 namespace GTE
 {

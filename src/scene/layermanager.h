@@ -2,7 +2,7 @@
 #define _GTE_LAYERMANAGER_H_
 
 #include "engine.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 #include <string>
 #include <map>

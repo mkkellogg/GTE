@@ -29,7 +29,7 @@ namespace GTE
 		transform.SetIdentity();
 		transform.SetSceneObject(this);
 
-		layerMask = IntMaskUtil::CreateIntMask();
+		layerMask = IntMaskUtil::CreateMask();
 	}
 
 	SceneObject::~SceneObject()

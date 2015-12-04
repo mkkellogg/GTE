@@ -7,7 +7,7 @@
 #include "engine.h"
 #include "geometry/sceneobjecttransform.h"
 #include "object/engineobject.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 namespace GTE
 {

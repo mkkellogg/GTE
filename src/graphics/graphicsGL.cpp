@@ -19,7 +19,7 @@
 #include "image/imageloader.h"
 #include "image/rawimage.h"
 #include "view/camera.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 #include "scene/sceneobject.h"
 #include "object/engineobjectmanager.h"
 #include "geometry/transform.h"

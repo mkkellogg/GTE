@@ -14,7 +14,7 @@
 #include "engine.h"
 #include "graphics/gl_include.h"
 #include "rendertarget.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 namespace GTE
 {

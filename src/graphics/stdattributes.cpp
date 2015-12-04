@@ -1,5 +1,5 @@
 #include "stdattributes.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 #include "debug/gtedebug.h"
 #include "materialvardirectory.h"
 
@@ -87,6 +87,6 @@ namespace GTE
 
 	StandardAttributeSet StandardAttributes::CreateAttributeSet()
 	{
-		return (StandardAttributeSet)IntMaskUtil::CreateIntMask();
+		return (StandardAttributeSet)IntMaskUtil::CreateMask();
 	}
 }

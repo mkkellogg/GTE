@@ -10,7 +10,7 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/transform.h"
 #include "asset/assetimporter.h"
-#include "base/intmask.h"
+#include "base/binarymask.h"
 
 class CastleScene : public Scene
 {
