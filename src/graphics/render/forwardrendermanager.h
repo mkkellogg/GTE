@@ -16,14 +16,16 @@
 
 #include "engine.h"
 #include "rendermanager.h"
+#include "renderqueue.h"
+#include "renderqueuemanager.h"
+#include "lightingdescriptor.h"
+#include "viewdescriptor.h"
 #include "object/engineobject.h"
 #include "object/objectpairkey.h"
 #include "util/datastack.h"
 #include "graphics/view/camera.h"
 #include "graphics/light/light.h"
 #include "geometry/transform.h"
-#include "renderqueue.h"
-#include "renderqueuemanager.h"
 #include "assert.h"
 
 #include <vector>
@@ -59,208 +61,8 @@ namespace GTE
 
 	class ForwardRenderManager : public RenderManager
 	{
+		// necessary to trigger lifecycle events and manage allocation
 		friend class Engine;
-
-		/*
-		 * Data structure that is passed to RenderSceneObjectMeshes() that describes lighting
-		 * information to be used (or not used) during rendering.
-		 */
-		class LightingDescriptor
-		{
-			Bool initialized;
-
-		public:
-
-			UInt32 LightCount;
-			Light** LightObjects;
-
-			Real* PositionDatas;
-			Real* DirectionDatas;
-			Real* ColorDatas;
-			Point3 * Positions;
-			Vector3 * Directions;
-			Color4 * Colors;
-			Int32* Types;
-			Real* Intensities;
-			Real* Ranges;
-			Real* Attenuations;
-			Int32* ParallelAngleAttenuations;
-			Int32* OrthoAngleAttenuations;
-			Int32* Enabled;
-
-			Bool UseLighting;
-
-			LightingDescriptor()
-			{
-				LightObjects = nullptr;
-
-				Positions = nullptr;
-				Directions = nullptr;
-				Colors = nullptr;
-
-				PositionDatas = nullptr;
-				DirectionDatas = nullptr;
-				ColorDatas = nullptr;
-
-				Types = nullptr;
-				Intensities = nullptr;
-				Ranges = nullptr;
-				Attenuations = nullptr;
-				ParallelAngleAttenuations = nullptr;
-				OrthoAngleAttenuations = nullptr;
-
-				Enabled = nullptr;
-
-				initialized = false;
-				UseLighting = true;
-				LightCount = 0;
-			}
-			
-			~LightingDescriptor()
-			{
-				SAFE_DELETE(LightObjects);
-
-				if(Positions != nullptr)
-				{
-					delete[] Positions;
-					Positions = nullptr;
-				}
-
-				if(Directions != nullptr)
-				{
-					delete[] Directions;
-					Directions = nullptr;
-				}
-
-				if(Colors != nullptr)
-				{
-					delete[] Colors;
-					Colors = nullptr;
-				}
-
-				SAFE_DELETE(PositionDatas);
-				SAFE_DELETE(DirectionDatas);
-				SAFE_DELETE(ColorDatas);
-
-				SAFE_DELETE(Types);
-				SAFE_DELETE(Intensities);
-				SAFE_DELETE(Ranges);
-				SAFE_DELETE(Attenuations);
-				SAFE_DELETE(ParallelAngleAttenuations);
-				SAFE_DELETE(OrthoAngleAttenuations);
-
-				SAFE_DELETE(Enabled);
-			}
-
-			Bool Init(UInt32 maxLights)
-			{
-				if(!initialized)
-				{
-					LightObjects = new Light*[maxLights];
-					ASSERT(LightObjects != nullptr, "LightingDescriptor::Init -> Unable to allocate light objects.");
-
-					Positions = new Point3[maxLights];
-					ASSERT(Positions != nullptr, "LightingDescriptor::Init -> Unable to allocate light positions.");
-
-					Directions = new Vector3[maxLights];
-					ASSERT(Directions != nullptr, "LightingDescriptor::Init -> Unable to allocate light directions.");
-
-					Colors = new Color4[maxLights];
-					ASSERT(Colors != nullptr, "LightingDescriptor::Init -> Unable to allocate light colors.");
-
-					PositionDatas = new Real[maxLights * 4];
-					ASSERT(PositionDatas != nullptr, "LightingDescriptor::Init -> Unable to allocate light position data.");
-
-					DirectionDatas = new Real[maxLights * 4];
-					ASSERT(DirectionDatas != nullptr, "LightingDescriptor::Init -> Unable to allocate light direction data.");
-
-					ColorDatas = new Real[maxLights * 4];
-					ASSERT(ColorDatas != nullptr, "LightingDescriptor::Init -> Unable to allocate light color data.");
-
-					Types = new Int32[maxLights];
-					ASSERT(Types != nullptr, "LightingDescriptor::Init -> Unable to allocate light types.");
-
-					Intensities = new Real[maxLights];
-					ASSERT(Intensities != nullptr, "LightingDescriptor::Init -> Unable to allocate light intensities.");
-
-					Ranges = new Real[maxLights];
-					ASSERT(Ranges != nullptr, "LightingDescriptor::Init -> Unable to allocate light ranges.");
-
-					Attenuations = new Real[maxLights];
-					ASSERT(Attenuations != nullptr, "LightingDescriptor::Init -> Unable to allocate light attenuations.");
-
-					OrthoAngleAttenuations = new Int32[maxLights];
-					ASSERT(OrthoAngleAttenuations != nullptr, "LightingDescriptor::Init -> Unable to allocate light ortho-angle attenuations.");
-
-					ParallelAngleAttenuations = new Int32[maxLights];
-					ASSERT(ParallelAngleAttenuations != nullptr, "LightingDescriptor::Init -> Unable to allocate light parallel angle attenuations.");
-
-					Enabled = new Int32[maxLights];
-					ASSERT(Enabled != nullptr, "LightingDescriptor::Init -> Unable to allocate 'Enabled' array.");
-
-					initialized = true;
-				}
-
-				return true;
-			}
-		};
-
-		/*
-		* Data structure that is passed to RenderSceneObjectMeshes() that describes properties
-		* such as the view transform, inverse view transform, and view position.
-		*/
-		class ViewDescriptor
-		{
-			public:
-
-			IntMask ClearBufferMask;
-			IntMask CullingMask;
-
-			Bool ReverseCulling;
-
-			Transform ViewTransform;
-			Transform ViewTransformInverse;
-
-			Point3 ViewPosition;
-
-			Transform ProjectionTransform;
-			Transform ProjectionTransformInverse;
-			Transform UniformWorldSceneObjectTransform;
-			Transform UniformWorldSceneObjectTransformInverse;
-
-			Bool AmbientPassEnabled;
-			Bool DepthPassEnabled;
-
-			Bool SSAOEnabled;
-			SSAORenderMode SSAOMode;
-
-			Bool SkyboxEnabled;
-			SceneObject * SkyboxObject;
-
-			UInt32 ClipPlaneCount;
-			Vector3 ClipPlane0Normal;
-			Real ClipPlane0Offset;
-
-			ViewDescriptor()
-			{
-				CullingMask = 0;
-				ClearBufferMask = 0;
-
-				ReverseCulling = false;
-
-				AmbientPassEnabled = true;
-				DepthPassEnabled = true;
-
-				SSAOEnabled = true;
-				SSAOMode = SSAORenderMode::Standard;
-
-				SkyboxEnabled = false;
-				SkyboxObject = nullptr;
-
-				ClipPlaneCount = 0;
-				ClipPlane0Offset = 0.0f;
-			}
-		};
 
 		static const UInt32 MAX_CAMERAS = 8;
 		static const UInt32 MAX_RENDER_QUEUES = 128;
@@ -311,7 +113,7 @@ namespace GTE
 		// current blending method used in forward rendering
 		FowardBlendingMethod forwardBlending;
 
-		// keep track of objects that have been rendered
+		// keep track of sub renderers that have rendered at least once.
 		// TODO: optimize usage of this hashing structure
 		std::unordered_map<UInt32, Bool> renderedSubRenderers;
 		// cache shadow volumes that don't need to be constantly rebuilt

@@ -21,7 +21,8 @@ namespace GTE
 {
 	class AnimationManager
 	{
-		// necessary to trigger lifecycle events
+		// necessary to trigger lifecycle events and manage
+		// allocation
 		friend class Engine;
 
 		AnimationManager();

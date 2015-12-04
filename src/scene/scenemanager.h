@@ -34,7 +34,7 @@ namespace GTE
 			Update = 2
 		};
 
-		// necessary since Engine manages/owns any instance of SceneManager
+		// necessary to trigger lifecycle events and manage allocation
 		friend class Engine;
 		// necessary since SceneObject will need to process instances of SceneObjectComponent
 		// as they are added

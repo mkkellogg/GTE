@@ -18,6 +18,7 @@ namespace GTE
 
 	class ErrorManager
 	{
+		// necessary to trigger lifecycle events and manage allocation
 		friend class Engine;
 
 		protected:

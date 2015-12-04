@@ -45,9 +45,8 @@ namespace GTE
 
 	class GraphicsGL : public Graphics
 	{
-		friend class Graphics;
+		// necessary to trigger lifecycle events and manage allocation
 		friend class Engine;
-		friend class SubMesh3DRenderer;
 
 		GLFWwindow* window;
 

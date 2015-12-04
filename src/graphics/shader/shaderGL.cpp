@@ -372,6 +372,7 @@ namespace GTE
 
 				desc->Name = name;
 
+				// don't include array subscripts in name
 				auto arrayCharacterPos = desc->Name.find('[');
 				if(arrayCharacterPos != std::string::npos)
 				{
@@ -435,6 +436,7 @@ namespace GTE
 
 				desc->Name = name;
 
+				// don't include array subscripts in name
 				auto arrayCharacterPos = desc->Name.find('[');
 				if(arrayCharacterPos != std::string::npos)
 				{

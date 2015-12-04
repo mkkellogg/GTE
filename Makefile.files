@@ -231,7 +231,7 @@ $(SHADEROBJ):
 # ==================================
 
 RENDERSRC= src/graphics/render
-RENDERSRCS= $(call toFullPath,$(RENDERSRC), renderer.cpp mesh3Drenderer.cpp skinnedmesh3Drenderer.cpp submesh3Drenderer.cpp attributetransformer.cpp skinnedmesh3Dattrtransformer.cpp rendertarget.cpp vertexattrbuffer.cpp multimaterial.cpp material.cpp forwardrendermanager.cpp rendermanager.cpp vertexattrbufferGL.cpp rendertargetGL.cpp renderqueue.cpp renderqueuemanager.cpp)
+RENDERSRCS= $(call toFullPath,$(RENDERSRC), renderer.cpp mesh3Drenderer.cpp skinnedmesh3Drenderer.cpp submesh3Drenderer.cpp attributetransformer.cpp skinnedmesh3Dattrtransformer.cpp rendertarget.cpp vertexattrbuffer.cpp multimaterial.cpp material.cpp forwardrendermanager.cpp rendermanager.cpp vertexattrbufferGL.cpp rendertargetGL.cpp renderqueue.cpp renderqueuemanager.cpp lightingdescriptor.cpp viewdescriptor.cpp)
 RENDEROBJ= $(call srcFilesToObjFiles,$(RENDERSRCS),$(RENDERSRC),$(OUTPUTDIR))
 
 $(RENDEROBJ): 

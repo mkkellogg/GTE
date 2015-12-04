@@ -47,7 +47,9 @@ namespace GTE
 
 	class EngineObjectManager
 	{
+		// necessary to trigger lifecycle events and manage allocation
 		friend class Engine;
+		// necessary to access functions for wrapping raw pointers inside engine objects
 		friend class Graphics;
 
 		std::unordered_map<ObjectID, SceneObjectSharedPtr> sceneObjectDirectory;

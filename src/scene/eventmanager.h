@@ -24,7 +24,7 @@ namespace GTE
 	{
 		// necessary to dispatch render events
 		friend class ForwardRenderManager;
-		// Engine is the manager class for EventManager. it needs to be able to instantiate it
+		// necessary to trigger lifecycle events and manage allocation
 		friend class Engine;
 		// necessary to dispatch update events
 		friend class SceneManager;

@@ -208,6 +208,7 @@
     <ClCompile Include="src\graphics\particles\particlesystem.cpp" />
     <ClCompile Include="src\graphics\particles\particleutil.cpp" />
     <ClCompile Include="src\graphics\render\attributetransformer.cpp" />
+    <ClCompile Include="src\graphics\render\lightingdescriptor.cpp" />
     <ClCompile Include="src\graphics\render\material.cpp" />
     <ClCompile Include="src\graphics\render\mesh3Drenderer.cpp" />
     <ClCompile Include="src\graphics\render\forwardrendermanager.cpp" />
@@ -224,6 +225,7 @@
     <ClCompile Include="src\graphics\render\submesh3Drenderer.cpp" />
     <ClCompile Include="src\graphics\render\vertexattrbuffer.cpp" />
     <ClCompile Include="src\graphics\render\vertexattrbufferGL.cpp" />
+    <ClCompile Include="src\graphics\render\viewdescriptor.cpp" />
     <ClCompile Include="src\graphics\screendesc.cpp" />
     <ClCompile Include="src\graphics\shader\attributedesc.cpp" />
     <ClCompile Include="src\graphics\shader\shader.cpp" />
@@ -345,6 +347,7 @@
     <ClInclude Include="src\graphics\object\submesh3Dface.h" />
     <ClInclude Include="src\graphics\object\submesh3Dfaces.h" />
     <ClInclude Include="src\graphics\render\attributetransformer.h" />
+    <ClInclude Include="src\graphics\render\lightingdescriptor.h" />
     <ClInclude Include="src\graphics\render\material.h" />
     <ClInclude Include="src\graphics\render\mesh3Drenderer.h" />
     <ClInclude Include="src\graphics\particles\particlemeshrenderer.h" />
@@ -362,6 +365,7 @@
     <ClInclude Include="src\graphics\render\submesh3Drenderer.h" />
     <ClInclude Include="src\graphics\render\vertexattrbuffer.h" />
     <ClInclude Include="src\graphics\render\vertexattrbufferGL.h" />
+    <ClInclude Include="src\graphics\render\viewdescriptor.h" />
     <ClInclude Include="src\graphics\screendesc.h" />
     <ClInclude Include="src\graphics\shader\attributedesc.h" />
     <ClInclude Include="src\graphics\shader\shader.h" />

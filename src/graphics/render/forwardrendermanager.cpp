@@ -65,20 +65,20 @@ namespace GTE
 
 		// construct shadow volume material
 		assetImporter.LoadBuiltInShaderSource("shadowvolume", shaderSource);
-		shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);		
+		shadowVolumeMaterial = objectManager->CreateMaterial("ShadowVolumeMaterial", shaderSource);
 		ASSERT(shadowVolumeMaterial.IsValid(), "ForwardRenderManager::Init -> Unable to create shadow volume material.");
 		shadowVolumeMaterial->SetFaceCulling(RenderState::FaceCulling::None);
 		shadowVolumeMaterial->SetDepthBufferWriteEnabled(false);
 
 		// construct SSAO outline material
 		assetImporter.LoadBuiltInShaderSource("ssaooutline", shaderSource);
-		ssaoOutlineMaterial = objectManager->CreateMaterial("SSAOOutline", shaderSource);		
+		ssaoOutlineMaterial = objectManager->CreateMaterial("SSAOOutline", shaderSource);
 		ASSERT(ssaoOutlineMaterial.IsValid(), "ForwardRenderManager::Init -> Unable to create SSAO outline material.");
 		ssaoOutlineMaterial->SetUseLighting(false);
 
 		// construct depth-only material
 		assetImporter.LoadBuiltInShaderSource("depthonly", shaderSource);
-		depthOnlyMaterial = objectManager->CreateMaterial("DepthOnlyMaterial", shaderSource);		
+		depthOnlyMaterial = objectManager->CreateMaterial("DepthOnlyMaterial", shaderSource);
 		ASSERT(depthOnlyMaterial.IsValid(), "ForwardRenderManager::Init -> Unable to create depth only material.");
 		depthOnlyMaterial->SetUseLighting(false);
 

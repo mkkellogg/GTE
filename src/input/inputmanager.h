@@ -44,6 +44,7 @@ namespace GTE
 
 	class InputManager
 	{
+		// necessary to trigger lifecycle events and manage allocation
 		friend class Engine;
 
 	protected:
