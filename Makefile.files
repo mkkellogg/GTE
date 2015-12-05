@@ -294,12 +294,12 @@ $(BASEGEOMETRYOBJ):
 # Base
 # ==================================
 
-BASESRC= src/base
-BASESRCS= $(call toFullPath,$(BASESRC), intmask.cpp longmask.cpp)
-BASEOBJ= $(call srcFilesToObjFiles,$(BASESRCS),$(BASESRC),$(OUTPUTDIR))
+#BASESRC= src/base
+#BASESRCS= $(call toFullPath,$(BASESRC), )
+#BASEOBJ= $(call srcFilesToObjFiles,$(BASESRCS),$(BASESRC),$(OUTPUTDIR))
 
-$(BASEOBJ): 
-	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(BASESRC),$@,$(OUTPUTDIR))
+#$(BASEOBJ):
+#	$(CC) $(CFLAGS) -o $@ -c $(call objFilesToSrcFiles,$(BASESRC),$@,$(OUTPUTDIR))
 	
 	
 # ==================================
