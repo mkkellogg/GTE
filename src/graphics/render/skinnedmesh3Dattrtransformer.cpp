@@ -80,7 +80,7 @@ namespace GTE
 	 */
 	void SkinnedMesh3DAttributeTransformer::DestroyTransformedBoneFlagsArray()
 	{
-		SAFE_DELETE(boneTransformed);
+		SAFE_DELETE_ARRAY(boneTransformed);
 	}
 
 	/*
@@ -135,11 +135,7 @@ namespace GTE
 		}
 		else if (target == CacheType::Transform)
 		{
-			if (savedTransforms != nullptr)
-			{
-				delete[] savedTransforms;
-				savedTransforms = nullptr;
-			}
+			SAFE_DELETE_ARRAY(savedTransforms);
 		}
 	}
 
@@ -231,8 +227,8 @@ namespace GTE
 	 */
 	void SkinnedMesh3DAttributeTransformer::DestroyIdenticalNormalsTangentsFlags()
 	{
-		SAFE_DELETE(identicalNormalFlags);
-		SAFE_DELETE(identicalTangentFlags);
+		SAFE_DELETE_ARRAY(identicalNormalFlags);
+		SAFE_DELETE_ARRAY(identicalTangentFlags);
 	}
 
 	/*
@@ -395,7 +391,7 @@ namespace GTE
 	 */
 	void SkinnedMesh3DAttributeTransformer::DestroyCaches()
 	{
-		SAFE_DELETE(cacheFlags);
+		SAFE_DELETE_ARRAY(cacheFlags);
 		DestroyCache(CacheType::Position);
 		DestroyCache(CacheType::VertexNormal);
 		DestroyCache(CacheType::FaceNormal);

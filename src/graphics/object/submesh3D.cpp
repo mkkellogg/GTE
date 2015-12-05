@@ -518,7 +518,7 @@ namespace GTE
 				}
 			}
 
-			delete vertexCrossMap;
+			delete[] vertexCrossMap;
 			vertexCrossMap = nullptr;
 		}
 	}

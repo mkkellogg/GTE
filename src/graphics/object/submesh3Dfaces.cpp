@@ -29,11 +29,7 @@ namespace GTE
 	 */
 	void SubMesh3DFaces::Destroy()
 	{
-		if (faces != nullptr)
-		{
-			delete[] faces;
-			faces = nullptr;
-		}
+		SAFE_DELETE_ARRAY(faces);
 	}
 
 	/*

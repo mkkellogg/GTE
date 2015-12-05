@@ -104,7 +104,7 @@ namespace GTE
 					attributes[i] = nullptr;
 				}
 			}
-			delete attributes;
+			delete[] attributes;
 		}
 		attributes = nullptr;
 
@@ -118,7 +118,7 @@ namespace GTE
 					uniforms[i] = nullptr;
 				}
 			}
-			delete uniforms;
+			delete[] uniforms;
 		}
 		uniforms = nullptr;
 	}

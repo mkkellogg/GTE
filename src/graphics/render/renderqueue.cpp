@@ -20,10 +20,7 @@ namespace GTE
 
 	RenderQueue::~RenderQueue()
 	{
-		if(renderObjects != nullptr)
-		{
-			delete[] renderObjects;
-		}
+		SAFE_DELETE_ARRAY(renderObjects);
 	}
 
 	UInt32 RenderQueue::GetID()

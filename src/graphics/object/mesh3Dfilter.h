@@ -40,7 +40,6 @@ namespace GTE
 		// up the back-facing triangles
 		Bool doBackSetShadowVolume;
 
-
 		Mesh3DFilter();
 		~Mesh3DFilter();
 

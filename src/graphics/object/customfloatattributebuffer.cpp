@@ -36,11 +36,7 @@ namespace GTE
 
 	void CustomFloatAttributeBuffer::Destroy()
 	{
-		if(data != nullptr)
-		{
-			delete data;
-			data = nullptr;
-		}
+		SAFE_DELETE_ARRAY(data);
 	}
 
 	void CustomFloatAttributeBuffer::SetAttributeID(AttributeID id)

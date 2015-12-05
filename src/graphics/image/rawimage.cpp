@@ -22,7 +22,7 @@ namespace GTE
 
 	void RawImage::Destroy()
 	{
-		SAFE_DELETE(imageBytes);
+		SAFE_DELETE_ARRAY(imageBytes);
 	}
 
 	UInt32 RawImage::ImageSizeBytes()

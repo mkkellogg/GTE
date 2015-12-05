@@ -160,11 +160,7 @@ namespace GTE
 			gpuBufferID = 0;
 		}
 
-		if (data != nullptr)
-		{
-			delete data;
-			data = nullptr;
-		}
+		SAFE_DELETE_ARRAY(data);
 	}
 
 	/*

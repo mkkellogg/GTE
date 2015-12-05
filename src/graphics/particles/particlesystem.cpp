@@ -583,9 +583,9 @@ namespace GTE
 				SAFE_DELETE(deadParticleArray[i]);
 			}
 
-			SAFE_DELETE(liveParticleArray);
-			SAFE_DELETE(deadParticleArray);
-			SAFE_DELETE(_tempParticleArray);
+			SAFE_DELETE_ARRAY(liveParticleArray);
+			SAFE_DELETE_ARRAY(deadParticleArray);
+			SAFE_DELETE_ARRAY(_tempParticleArray);
 		}
 	}
 
