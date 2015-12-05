@@ -12,6 +12,7 @@
 
 #include "engine.h"
 #include "base/basevector.h"
+#include "base/basevectortraits.h"
 #include "base/basevectorarray.h"
 #include "gtemath/gtemath.h"
 
@@ -19,7 +20,14 @@ namespace GTE
 {
 	//forward declarations
 	class Vector3;
+	class Point3;
 	class Matrix4x4;
+
+	template <> class BaseVectorTraits<Point3>
+	{
+		public:
+		static const UInt32 VectorSize = 4;
+	};
 
 	class Point3 : public BaseVector<Point3>
 	{

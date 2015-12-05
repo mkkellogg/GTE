@@ -3,10 +3,20 @@
 
 #include "engine.h"
 #include "base/basevector.h"
+#include "base/basevectortraits.h"
 #include "base/basevectorarray.h"
 
 namespace GTE
 {
+	// forward declarations
+	class UV2;
+
+	template <> class BaseVectorTraits<UV2>
+	{
+		public:
+		static const UInt32 VectorSize = 2;
+	};
+
 	class UV2 : public BaseVector<UV2>
 	{
 	protected:

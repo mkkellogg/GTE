@@ -2,11 +2,21 @@
 #define _GTE_COLOR4_H_
 
 #include "base/basevector.h"
+#include "base/basevectortraits.h"
 #include "base/basevectorarray.h"
 #include "global/global.h"
 
 namespace GTE
 {
+	// forward declarations
+	class Color4;
+
+	template <> class BaseVectorTraits<Color4>
+	{
+		public:
+		static const UInt32 VectorSize = 4;
+	};
+
 	class Color4 : public BaseVector<Color4>
 	{
 	protected:

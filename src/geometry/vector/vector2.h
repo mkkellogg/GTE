@@ -1,12 +1,21 @@
 #ifndef _GTE_VECTOR2_H_
 #define _GTE_VECTOR2_H_
 
-#include "vector2.h"
 #include "base/basevector.h"
+#include "base/basevectortraits.h"
 #include "base/basevectorarray.h"
 
 namespace GTE
 {
+	// forward declarations
+	class Vector2;
+
+	template <> class BaseVectorTraits<Vector2>
+	{
+		public:
+		static const UInt32 VectorSize = 2;
+	};
+
 	class Vector2 : public BaseVector<Vector2>
 	{
 	protected:

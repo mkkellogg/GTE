@@ -11,12 +11,20 @@
 #define _GTE_Vector3_H_
 
 #include "base/basevector.h"
+#include "base/basevectortraits.h"
 #include "base/basevectorarray.h"
 
 namespace GTE
 {
 	//forward declarations
 	class Matrix4x4;
+	class Vector3;
+
+	template <> class BaseVectorTraits<Vector3>
+	{
+		public:
+		static const UInt32 VectorSize = 4;
+	};
 
 	class Vector3 : public BaseVector<Vector3>
 	{
