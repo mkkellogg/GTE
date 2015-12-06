@@ -12,7 +12,7 @@
 #define _GTE_RENDER_TARGET_H_
 
 #include "engine.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "renderbuffer.h"
 #include "object/engineobject.h"
 #include "graphics/texture/textureattr.h"

@@ -1,7 +1,7 @@
 #include "rendertargetGL.h"
 #include "graphics/gl_include.h"
 #include "object/engineobjectmanager.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"

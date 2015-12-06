@@ -16,7 +16,7 @@
 #include "geometry/transform.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 
 namespace GTE
 {

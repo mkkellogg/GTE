@@ -260,7 +260,7 @@
     <ClInclude Include="src\base\basevectorarray.h" />
     <ClInclude Include="src\base\basevectorfactory.h" />
     <ClInclude Include="src\base\basevectortraits.h" />
-    <ClInclude Include="src\base\binarymask.h" />
+    <ClInclude Include="src\base\bitmask.h" />
     <ClInclude Include="src\debug\gtedebug.h" />
     <ClInclude Include="src\engine.h" />
     <ClInclude Include="src\error\errormanager.h" />

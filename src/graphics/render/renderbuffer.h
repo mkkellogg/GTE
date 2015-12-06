@@ -2,7 +2,7 @@
 #define _GTE_RENDER_BUFFER_H_
 
 #include "engine.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 
 namespace GTE
 {

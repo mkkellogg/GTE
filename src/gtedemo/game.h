@@ -18,7 +18,7 @@
 #include "geometry/transform.h"
 #include "asset/assetimporter.h"
 #include "scene.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 
 class Game
 {

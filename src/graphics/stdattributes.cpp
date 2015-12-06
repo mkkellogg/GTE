@@ -1,5 +1,5 @@
 #include "stdattributes.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "debug/gtedebug.h"
 #include "materialvardirectory.h"
 

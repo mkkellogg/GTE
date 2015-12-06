@@ -716,7 +716,7 @@
     <ClInclude Include="src\base\basevectortraits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\base\binarymask.h">
+    <ClInclude Include="src\base\bitmask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

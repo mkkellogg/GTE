@@ -8,7 +8,7 @@
 #include "scene/sceneobject.h"
 #include "scene/eventmanager.h"
 #include "object/engineobjectmanager.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "graphics/shader/shader.h"
 #include "graphics/graphics.h"
 #include "graphics/render/submesh3Drenderer.h"

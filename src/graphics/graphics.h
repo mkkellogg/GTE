@@ -30,7 +30,7 @@
 #include "engine.h"
 #include "graphicsattr.h"
 #include "renderstate.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "render/rendertarget.h"
 #include "render/material.h"
 #include "global/global.h"

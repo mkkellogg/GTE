@@ -7,7 +7,7 @@
 #include "scene/sceneobjectcomponent.h"
 #include "graphics/render/rendertarget.h"
 #include "graphics/graphics.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "global/constants.h"
 
 namespace GTE

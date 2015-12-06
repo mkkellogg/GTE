@@ -10,7 +10,7 @@
 #include "geometry/vector/vector3.h"
 #include "asset/assetimporter.h"
 #include "geometry/transform.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 
 //forward declarations
 class LavaField;

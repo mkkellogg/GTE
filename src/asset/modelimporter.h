@@ -23,7 +23,7 @@
 #include "graphics/uv/uv2.h"
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "global/global.h"
 
 

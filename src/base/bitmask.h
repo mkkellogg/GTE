@@ -9,7 +9,7 @@ namespace GTE
 	typedef UInt32 IntMask;
 	typedef UInt64 LongMask;
 	
-	template <class T> class BinaryMaskUtil
+	template <class T> class BitMaskUtil
 	{
 	public:
 
@@ -30,7 +30,7 @@ namespace GTE
 
 			T index = (T)0x00000001;
 			Int32 count = 0;
-			while(!(maskValue & index) && count < 32)
+			while(!(maskValue & index) && count < sizeof(T) * 8)
 			{
 				index <<= 1;
 				count++;
@@ -119,8 +119,8 @@ namespace GTE
 		}
 	};
 
-	typedef BinaryMaskUtil<IntMask> IntMaskUtil;
-	typedef BinaryMaskUtil<LongMask> LongMaskUtil;
+	typedef BitMaskUtil<IntMask> IntMaskUtil;
+	typedef BitMaskUtil<LongMask> LongMaskUtil;
 }
 
 #endif

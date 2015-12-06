@@ -13,7 +13,7 @@
 #include <map>
 
 #include "engine.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 
 namespace GTE
 {

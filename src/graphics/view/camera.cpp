@@ -10,7 +10,7 @@
 #include "graphics/object/mesh3Dfilter.h"
 #include "graphics/object/mesh3D.h"
 #include "graphics/object/submesh3D.h"
-#include "base/binarymask.h"
+#include "base/bitmask.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "global/constants.h"
