@@ -124,13 +124,13 @@ namespace GTE
 
 		const Point3Array * GetShadowVolumePositions();
 		void SetShadowVolumePositionData(const Point3Array * points);
-		void SetPositionData(Point3Array * points);
-		void SetNormalData(Vector3Array * normals);
-		void SetFaceNormalData(Vector3Array * normals);
-		void SetTangentData(Vector3Array * tangents);
-		void SetVertexColorData(Color4Array * colors);
-		void SetUV1Data(UV2Array * uvs);
-		void SetUV2Data(UV2Array * uvs);
+		void SetPositionData(Point3Array& points);
+		void SetNormalData(Vector3Array& normals);
+		void SetFaceNormalData(Vector3Array& normals);
+		void SetTangentData(Vector3Array& tangents);
+		void SetVertexColorData(Color4Array& colors);
+		void SetUV1Data(UV2Array& uvs);
+		void SetUV2Data(UV2Array& uvs);
 		void SetAttributeData(UInt32 index, const Real * data);
 
 		Bool ValidateMaterialForMesh(MaterialRef material);

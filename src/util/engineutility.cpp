@@ -93,7 +93,7 @@ namespace GTE
 		Mesh3DSharedPtr mesh = objectManager->CreateMesh3D(1);
 		mesh->Init();
 
-		Point3Array * points = subMesh->GetPostions();
+		Point3Array& points = subMesh->GetPositions();
 		UV2Array *uvs = nullptr;
 
 		Real halfWidth = width / 2.0f;
@@ -120,13 +120,13 @@ namespace GTE
 		{
 			for (UInt32 widthSquare = 0; widthSquare < subSquaresPerWidth; widthSquare++)
 			{
-				points->GetElement(vertexIndex)->Set(currentWidth, currentHeight, 0);
-				points->GetElement(vertexIndex + 1)->Set(currentWidth + subSquareWidth, currentHeight, 0);
-				points->GetElement(vertexIndex + 2)->Set(currentWidth, currentHeight - subSquareHeight, 0);
+				points.GetElement(vertexIndex)->Set(currentWidth, currentHeight, 0);
+				points.GetElement(vertexIndex + 1)->Set(currentWidth + subSquareWidth, currentHeight, 0);
+				points.GetElement(vertexIndex + 2)->Set(currentWidth, currentHeight - subSquareHeight, 0);
 
-				points->GetElement(vertexIndex + 3)->Set(currentWidth + subSquareWidth, currentHeight, 0);
-				points->GetElement(vertexIndex + 4)->Set(currentWidth + subSquareWidth, currentHeight - subSquareHeight, 0);
-				points->GetElement(vertexIndex + 5)->Set(currentWidth, currentHeight - subSquareHeight, 0);
+				points.GetElement(vertexIndex + 3)->Set(currentWidth + subSquareWidth, currentHeight, 0);
+				points.GetElement(vertexIndex + 4)->Set(currentWidth + subSquareWidth, currentHeight - subSquareHeight, 0);
+				points.GetElement(vertexIndex + 5)->Set(currentWidth, currentHeight - subSquareHeight, 0);
 
 				Real uvX = (currentWidth + halfWidth) / width;
 				Real uvY = ((currentHeight + halfHeight) / height);
@@ -138,14 +138,14 @@ namespace GTE
 						if (i == 0)
 						{
 							if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))
-								uvs = subMesh->GetUVs0();
+								uvs = &subMesh->GetUVs0();
 							else continue;
 						}
 
 						if (i == 1)
 						{
 							if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture1))
-								uvs = subMesh->GetUVs1();
+								uvs = &subMesh->GetUVs1();
 							else continue;
 						}
 
@@ -196,160 +196,161 @@ namespace GTE
 		mesh->Init();
 		mesh->SetSubMesh(subMesh, 0);
 
-		Point3Array * points = subMesh->GetPostions();
-		UV2Array *uvs = nullptr;
+		Point3Array& points = subMesh->GetPositions();
 
 		// --- Cube vertices -------
 		// cube front, triangle 1
-		points->GetElement(0)->Set(-1, 1, 1);
-		points->GetElement(1)->Set(1, 1, 1);
-		points->GetElement(2)->Set(-1, -1, 1);
+		points.GetElement(0)->Set(-1, 1, 1);
+		points.GetElement(1)->Set(1, 1, 1);
+		points.GetElement(2)->Set(-1, -1, 1);
 
 		// cube front, triangle 2
-		points->GetElement(3)->Set(1, 1, 1);
-		points->GetElement(4)->Set(1, -1, 1);
-		points->GetElement(5)->Set(-1, -1, 1);
+		points.GetElement(3)->Set(1, 1, 1);
+		points.GetElement(4)->Set(1, -1, 1);
+		points.GetElement(5)->Set(-1, -1, 1);
 
 		// cube right, triangle 1
-		points->GetElement(6)->Set(1, 1, 1);
-		points->GetElement(7)->Set(1, 1, -1);
-		points->GetElement(8)->Set(1, -1, 1);
+		points.GetElement(6)->Set(1, 1, 1);
+		points.GetElement(7)->Set(1, 1, -1);
+		points.GetElement(8)->Set(1, -1, 1);
 
 		// cube right, triangle 2
-		points->GetElement(9)->Set(1, 1, -1);
-		points->GetElement(10)->Set(1, -1, -1);
-		points->GetElement(11)->Set(1, -1, 1);
+		points.GetElement(9)->Set(1, 1, -1);
+		points.GetElement(10)->Set(1, -1, -1);
+		points.GetElement(11)->Set(1, -1, 1);
 
 		// cube left, triangle 1
-		points->GetElement(12)->Set(-1, 1, -1);
-		points->GetElement(13)->Set(-1, 1, 1);
-		points->GetElement(14)->Set(-1, -1, -1);
+		points.GetElement(12)->Set(-1, 1, -1);
+		points.GetElement(13)->Set(-1, 1, 1);
+		points.GetElement(14)->Set(-1, -1, -1);
 
 		// cube left, triangle 2
-		points->GetElement(15)->Set(-1, 1, 1);
-		points->GetElement(16)->Set(-1, -1, 1);
-		points->GetElement(17)->Set(-1, -1, -1);
+		points.GetElement(15)->Set(-1, 1, 1);
+		points.GetElement(16)->Set(-1, -1, 1);
+		points.GetElement(17)->Set(-1, -1, -1);
 
 		// cube top, triangle 1
-		points->GetElement(18)->Set(-1, 1, -1);
-		points->GetElement(19)->Set(1, 1, -1);
-		points->GetElement(20)->Set(-1, 1, 1);
+		points.GetElement(18)->Set(-1, 1, -1);
+		points.GetElement(19)->Set(1, 1, -1);
+		points.GetElement(20)->Set(-1, 1, 1);
 
 		// cube top, triangle 2
-		points->GetElement(21)->Set(1, 1, -1);
-		points->GetElement(22)->Set(1, 1, 1);
-		points->GetElement(23)->Set(-1, 1, 1);
+		points.GetElement(21)->Set(1, 1, -1);
+		points.GetElement(22)->Set(1, 1, 1);
+		points.GetElement(23)->Set(-1, 1, 1);
 
 		// cube back, triangle 1
-		points->GetElement(24)->Set(1, 1, -1);
-		points->GetElement(25)->Set(-1, 1, -1);
-		points->GetElement(26)->Set(1, -1, -1);
+		points.GetElement(24)->Set(1, 1, -1);
+		points.GetElement(25)->Set(-1, 1, -1);
+		points.GetElement(26)->Set(1, -1, -1);
 
 		// cube back, triangle 2
-		points->GetElement(27)->Set(-1, 1, -1);
-		points->GetElement(28)->Set(-1, -1, -1);
-		points->GetElement(29)->Set(1, -1, -1);
+		points.GetElement(27)->Set(-1, 1, -1);
+		points.GetElement(28)->Set(-1, -1, -1);
+		points.GetElement(29)->Set(1, -1, -1);
 
 		// cube bottom, triangle 1
-		points->GetElement(30)->Set(-1, -1, -1);
-		points->GetElement(31)->Set(-1, -1, 1);
-		points->GetElement(32)->Set(1, -1, 1);
+		points.GetElement(30)->Set(-1, -1, -1);
+		points.GetElement(31)->Set(-1, -1, 1);
+		points.GetElement(32)->Set(1, -1, 1);
 
 		// cube bottom, triangle 2
-		points->GetElement(33)->Set(-1, -1, -1);
-		points->GetElement(34)->Set(1, -1, 1);
-		points->GetElement(35)->Set(1, -1, -1);
+		points.GetElement(33)->Set(-1, -1, -1);
+		points.GetElement(34)->Set(1, -1, 1);
+		points.GetElement(35)->Set(1, -1, -1);
 		
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::VertexColor))
 		{
-			Color4Array * colors = subMesh->GetColors();
+			Color4Array& colors = subMesh->GetColors();
 
 			for (Int32 i = 0; i < 36; i++)
 			{
-				colors->GetElement(i)->Set(1, 1, 1, 1);
+				colors.GetElement(i)->Set(1, 1, 1, 1);
 			}
 		}
 
 		if (StandardAttributes::HasAttribute(meshAttributes, StandardAttribute::UVTexture0))
 		{
-			uvs = subMesh->GetUVs0();
+			UV2Array& uvs = subMesh->GetUVs0();
 
 			// --- Cube UVs -------
 			// cube front, triangle 1
-			uvs->GetElement(0)->Set(0, 1);
-			uvs->GetElement(1)->Set(1, 1);
-			uvs->GetElement(2)->Set(0, 0);
+			uvs.GetElement(0)->Set(0, 1);
+			uvs.GetElement(1)->Set(1, 1);
+			uvs.GetElement(2)->Set(0, 0);
 
 			// cube front, triangle 2
-			uvs->GetElement(3)->Set(1, 1);
-			uvs->GetElement(4)->Set(1, 0);
-			uvs->GetElement(5)->Set(0, 0);
+			uvs.GetElement(3)->Set(1, 1);
+			uvs.GetElement(4)->Set(1, 0);
+			uvs.GetElement(5)->Set(0, 0);
 
 			// cube right, triangle 1
-			uvs->GetElement(6)->Set(0, 1);
-			uvs->GetElement(7)->Set(1, 1);
-			uvs->GetElement(8)->Set(0, 0);
+			uvs.GetElement(6)->Set(0, 1);
+			uvs.GetElement(7)->Set(1, 1);
+			uvs.GetElement(8)->Set(0, 0);
 
 			// cube right, triangle 2
-			uvs->GetElement(9)->Set(1, 1);
-			uvs->GetElement(10)->Set(1, 0);
-			uvs->GetElement(11)->Set(0, 0);
+			uvs.GetElement(9)->Set(1, 1);
+			uvs.GetElement(10)->Set(1, 0);
+			uvs.GetElement(11)->Set(0, 0);
 
 			// cube left, triangle 1
-			uvs->GetElement(12)->Set(0, 1);
-			uvs->GetElement(13)->Set(1, 1);
-			uvs->GetElement(14)->Set(0, 0);
+			uvs.GetElement(12)->Set(0, 1);
+			uvs.GetElement(13)->Set(1, 1);
+			uvs.GetElement(14)->Set(0, 0);
 
 			// cube left, triangle 2
-			uvs->GetElement(15)->Set(1, 1);
-			uvs->GetElement(16)->Set(1, 0);
-			uvs->GetElement(17)->Set(0, 0);
+			uvs.GetElement(15)->Set(1, 1);
+			uvs.GetElement(16)->Set(1, 0);
+			uvs.GetElement(17)->Set(0, 0);
 
 			// cube top, triangle 1
-			uvs->GetElement(18)->Set(0, 1);
-			uvs->GetElement(19)->Set(1, 1);
-			uvs->GetElement(20)->Set(0, 0);
+			uvs.GetElement(18)->Set(0, 1);
+			uvs.GetElement(19)->Set(1, 1);
+			uvs.GetElement(20)->Set(0, 0);
 
 			// cube top, triangle 2
-			uvs->GetElement(21)->Set(1, 1);
-			uvs->GetElement(22)->Set(1, 0);
-			uvs->GetElement(23)->Set(0, 0);
+			uvs.GetElement(21)->Set(1, 1);
+			uvs.GetElement(22)->Set(1, 0);
+			uvs.GetElement(23)->Set(0, 0);
 
 			// cube back, triangle 1
-			uvs->GetElement(24)->Set(0, 1);
-			uvs->GetElement(25)->Set(1, 1);
-			uvs->GetElement(26)->Set(0, 0);
+			uvs.GetElement(24)->Set(0, 1);
+			uvs.GetElement(25)->Set(1, 1);
+			uvs.GetElement(26)->Set(0, 0);
 
 			// cube back, triangle 2
-			uvs->GetElement(27)->Set(1, 1);
-			uvs->GetElement(28)->Set(1, 0);
-			uvs->GetElement(29)->Set(0, 0);
+			uvs.GetElement(27)->Set(1, 1);
+			uvs.GetElement(28)->Set(1, 0);
+			uvs.GetElement(29)->Set(0, 0);
 
 			// cube back, triangle 1
-			uvs->GetElement(30)->Set(0, 1);
-			uvs->GetElement(31)->Set(1, 1);
-			uvs->GetElement(32)->Set(0, 0);
+			uvs.GetElement(30)->Set(0, 1);
+			uvs.GetElement(31)->Set(1, 1);
+			uvs.GetElement(32)->Set(0, 0);
 
 			// cube back, triangle 2
-			uvs->GetElement(33)->Set(1, 1);
-			uvs->GetElement(34)->Set(1, 0);
-			uvs->GetElement(35)->Set(0, 0);
+			uvs.GetElement(33)->Set(1, 1);
+			uvs.GetElement(34)->Set(1, 0);
+			uvs.GetElement(35)->Set(0, 0);
 		}
 
 		if (doCCW)
 		{
+			UV2Array& uvs = subMesh->GetUVs0();
+
 			for (UInt32 i = 0; i < 36; i += 3)
 			{
-				Point3 * p1 = points->GetElement(i);
+				Point3 * p1 = points.GetElement(i);
 				Point3  p1r = *p1;
-				Point3 * p3 = points->GetElement(i + 2);
+				Point3 * p3 = points.GetElement(i + 2);
 
 				*p1 = *p3;
 				*p3 = p1r;
 
-				UV2 * u1 = uvs->GetElement(i);
+				UV2 * u1 = uvs.GetElement(i);
 				UV2  u1r = *u1;
-				UV2 * u3 = uvs->GetElement(i + 2);
+				UV2 * u3 = uvs.GetElement(i + 2);
 
 				*u1 = *u3;
 				*u3 = u1r;

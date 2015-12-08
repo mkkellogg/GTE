@@ -529,27 +529,27 @@ SubMesh3DSharedPtr ModelImporter::ConvertAssimpMesh(UInt32 meshIndex, const aiSc
 			aiVector3D srcPosition = mesh.mVertices[vIndex];
 
 			// copy vertex position
-			mesh3D->GetPostions()->GetElement(vertexIndex)->Set(srcPosition.x,srcPosition.y,srcPosition.z);
+			mesh3D->GetPositions().GetElement(vertexIndex)->Set(srcPosition.x,srcPosition.y,srcPosition.z);
 
 			// copy mesh normals
 			if(mesh.mNormals != nullptr)
 			{
 				aiVector3D& srcNormal = mesh.mNormals[vIndex];
 				Vector3 normalCopy(srcNormal.x, srcNormal.y, srcNormal.z);
-				mesh3D->GetVertexNormals()->GetElement(vertexIndex)->Set(normalCopy.x,normalCopy.y,normalCopy.z);
+				mesh3D->GetVertexNormals().GetElement(vertexIndex)->Set(normalCopy.x,normalCopy.y,normalCopy.z);
 			}
 
 			// copy vertex colors (if present)
 			Int32 c = materialImportDescriptor.meshSpecificProperties[meshIndex].vertexColorsIndex;
 			if(c >=0)
 			{
-				mesh3D->GetColors()->GetElement(vertexIndex)->Set(mesh.mColors[c]->r,mesh.mColors[c]->g,mesh.mColors[c]->b,mesh.mColors[c]->a);
+				mesh3D->GetColors().GetElement(vertexIndex)->Set(mesh.mColors[c]->r,mesh.mColors[c]->g,mesh.mColors[c]->b,mesh.mColors[c]->a);
 			}
 
 			// copy relevant data for diffuse texture (UV coords)
 			if(diffuseTextureUVIndex >= 0)
 			{
-				UV2Array *uvs = GetMeshUVArrayForShaderMaterialCharacteristic(*mesh3D,ShaderMaterialCharacteristic::DiffuseTextured);
+				UV2Array* uvs = GetMeshUVArrayForShaderMaterialCharacteristic(*mesh3D,ShaderMaterialCharacteristic::DiffuseTextured);
 				if(materialImportDescriptor.meshSpecificProperties[meshIndex].invertVCoords)uvs->GetElement(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, 1-mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 				else uvs->GetElement(vertexIndex)->Set(mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].x, mesh.mTextureCoords[diffuseTextureUVIndex][vIndex].y);
 			}
@@ -1278,7 +1278,7 @@ UV2Array* ModelImporter::GetMeshUVArrayForShaderMaterialCharacteristic(SubMesh3D
 	switch(property)
 	{
 		case ShaderMaterialCharacteristic::DiffuseTextured:
-			return mesh.GetUVs0();
+			return &mesh.GetUVs0();
 		break;
 		default:
 			return nullptr;

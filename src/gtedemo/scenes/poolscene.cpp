@@ -28,6 +28,8 @@
 #include "global/assert.h"
 #include "global/constants.h"
 #include "gtemath/gtemath.h"
+#include "../../enginetypes.h"
+#include "../../geometry/point/point3.h"
 
 /*
  * Constructor - initialize member variables.
@@ -668,11 +670,13 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	waterSurfaceSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(waterMeshRenderer));
 
 	// apply rotation of -90 degrees around positive x-axis to water mesh
+	GTE::SubMesh3DRef waterSubMesh = waterMesh->GetSubMesh(0);
+	GTE::Point3Array& positions = waterSubMesh->GetPositions();
 	GTE::Transform rot90;
 	rot90.Rotate(1, 0, 0, -90, true);
-	for(GTE::UInt32 i = 0; i < waterMesh->GetSubMesh(0)->GetPostions()->GetCount(); i++)
+	for(GTE::UInt32 i = 0; i < positions.GetCount(); i++)
 	{
-		GTE::Point3 * p = waterMesh->GetSubMesh(0)->GetPostions()->GetElement(i);
+		GTE::Point3 * p = positions.GetElement(i);
 		rot90.TransformPoint(*p);
 		p->y = 0;
 	}

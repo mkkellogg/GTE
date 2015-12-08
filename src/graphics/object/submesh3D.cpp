@@ -1007,60 +1007,60 @@ namespace GTE
 	/*
 	 * Get the vertex positions for this sub-mesh.
 	 */
-	Point3Array * SubMesh3D::GetPostions()
+	Point3Array& SubMesh3D::GetPositions()
 	{
-		return &positions;
+		return positions;
 	}
 
 	/*
 	 * Get the vertex normals for this sub-mesh. These may or may not
 	 * be averaged for smooth shading.
 	 */
-	Vector3Array * SubMesh3D::GetVertexNormals()
+	Vector3Array& SubMesh3D::GetVertexNormals()
 	{
-		return &vertexNormals;
+		return vertexNormals;
 	}
 
 	/*
 	 * Get the vertex tangents for this sub-mesh. These may or may not
 	 * be averaged for smooth transitions between triangles.
 	 */
-	Vector3Array * SubMesh3D::GetVertexTangents()
+	Vector3Array& SubMesh3D::GetVertexTangents()
 	{
-		return &vertexTangents;
+		return vertexTangents;
 	}
 
 	/*
 	 * Get the face normals for this sub-mesh. The face normals are the
 	 * same as the original un-averaged vertex normals.
 	 */
-	Vector3Array * SubMesh3D::GetFaceNormals()
+	Vector3Array& SubMesh3D::GetFaceNormals()
 	{
-		return &faceNormals;
+		return faceNormals;
 	}
 
 	/*
 	 * Get the vertex colors for this sub-mesh.
 	 */
-	Color4Array * SubMesh3D::GetColors()
+	Color4Array& SubMesh3D::GetColors()
 	{
-		return &colors;
+		return colors;
 	}
 
 	/*
 	 * Get UV coordinates array 1 for this sub-mesh.
 	 */
-	UV2Array * SubMesh3D::GetUVs0()
+	UV2Array& SubMesh3D::GetUVs0()
 	{
-		return &uvs0;
+		return uvs0;
 	}
 
 	/*
 	 * Get UV coordinates array 2 for this sub-mesh.
 	 */
-	UV2Array * SubMesh3D::GetUVs1()
+	UV2Array& SubMesh3D::GetUVs1()
 	{
-		return &uvs1;
+		return uvs1;
 	}
 }
 

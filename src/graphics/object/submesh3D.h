@@ -161,13 +161,13 @@ namespace GTE
 		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByID(AttributeID id);
 		CustomFloatAttributeBuffer* GetCustomFloatAttributeBufferByOrder(UInt32 id);
 
-		Point3Array * GetPostions();
-		Vector3Array * GetVertexNormals();
-		Vector3Array * GetVertexTangents();
-		Vector3Array * GetFaceNormals();
-		Color4Array * GetColors();
-		UV2Array * GetUVs0();
-		UV2Array * GetUVs1();
+		Point3Array& GetPositions();
+		Vector3Array& GetVertexNormals();
+		Vector3Array& GetVertexTangents();
+		Vector3Array& GetFaceNormals();
+		Color4Array& GetColors();
+		UV2Array& GetUVs0();
+		UV2Array& GetUVs1();
 
 		void SetInvertNormals(Bool invert);
 		void SetInvertTangents(Bool invert);

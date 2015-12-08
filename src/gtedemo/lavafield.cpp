@@ -88,12 +88,12 @@ void LavaField::DisplaceField()
 	GTE::Byte * curPixelsB;
 
 	GTE::SubMesh3DSharedPtr subMesh = fieldMesh->GetSubMesh(0);
-	GTE::Point3Array * positions = subMesh->GetPostions();
+	GTE::Point3Array& positions = subMesh->GetPositions();
 
 	// loop through each vertex in the lava field mesh and displace each
-	for(GTE::UInt32 i = 0; i < positions->GetCount(); i++)
+	for(GTE::UInt32 i = 0; i < positions.GetCount(); i++)
 	{
-		GTE::Point3 * p = positions->GetElement(i);
+		GTE::Point3 * p = positions.GetElement(i);
 
 		// calculate the x & y position (in model space) of the position in
 		// the displacements maps from which to read displacement data

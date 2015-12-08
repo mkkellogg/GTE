@@ -133,12 +133,12 @@ namespace GTE
 		ASSERT(fullScreenQuad.IsValid(), "ForwardRenderManager::InitFullScreenQuad -> Unable to create full screen quad.");
 
 		// access position data
-		Point3Array * positions = fullScreenQuad->GetSubMesh(0)->GetPostions();
+		Point3Array& positions = fullScreenQuad->GetSubMesh(0)->GetPositions();
 
 		// transform full-screen quad to: X: [0..1], Y: [0..1]
-		for (UInt32 i = 0; i < positions->GetCount(); i++)
+		for (UInt32 i = 0; i < positions.GetCount(); i++)
 		{
-			Point3 * p = positions->GetElement(i);
+			Point3 * p = positions.GetElement(i);
 			p->x += 0.5;
 			p->y += 0.5;
 		}

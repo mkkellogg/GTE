@@ -247,36 +247,36 @@ namespace GTE
 
 			UInt32 baseIndex = p * (UInt32)ParticleConstants::VerticesPerParticle;
 
-			Point3Array * positions = targetMesh->GetPostions();
-			positions->GetElement(baseIndex)->SetTo(position);
-			positions->GetElement(baseIndex + 1)->SetTo(position);
-			positions->GetElement(baseIndex + 2)->SetTo(position);
-			positions->GetElement(baseIndex + 3)->SetTo(position);
-			positions->GetElement(baseIndex + 4)->SetTo(position);
-			positions->GetElement(baseIndex + 5)->SetTo(position);
+			Point3Array& positions = targetMesh->GetPositions();
+			positions.GetElement(baseIndex)->SetTo(position);
+			positions.GetElement(baseIndex + 1)->SetTo(position);
+			positions.GetElement(baseIndex + 2)->SetTo(position);
+			positions.GetElement(baseIndex + 3)->SetTo(position);
+			positions.GetElement(baseIndex + 4)->SetTo(position);
+			positions.GetElement(baseIndex + 5)->SetTo(position);
 		
 			Atlas::ImageDescriptor * imageDesc = atlas->GetImageDescriptor(particle->AtlasIndex);
-			UV2Array * uvs = targetMesh->GetUVs0();
-			uvs->GetElement(baseIndex)->Set(imageDesc->Left, imageDesc->Top);
-			uvs->GetElement(baseIndex + 1)->Set(imageDesc->Right, imageDesc->Top);
-			uvs->GetElement(baseIndex + 2)->Set(imageDesc->Left, imageDesc->Bottom);
-			uvs->GetElement(baseIndex + 3)->Set(imageDesc->Left, imageDesc->Bottom);
-			uvs->GetElement(baseIndex + 4)->Set(imageDesc->Right, imageDesc->Top);
-			uvs->GetElement(baseIndex + 5)->Set(imageDesc->Right, imageDesc->Bottom);
+			UV2Array& uvs = targetMesh->GetUVs0();
+			uvs.GetElement(baseIndex)->Set(imageDesc->Left, imageDesc->Top);
+			uvs.GetElement(baseIndex + 1)->Set(imageDesc->Right, imageDesc->Top);
+			uvs.GetElement(baseIndex + 2)->Set(imageDesc->Left, imageDesc->Bottom);
+			uvs.GetElement(baseIndex + 3)->Set(imageDesc->Left, imageDesc->Bottom);
+			uvs.GetElement(baseIndex + 4)->Set(imageDesc->Right, imageDesc->Top);
+			uvs.GetElement(baseIndex + 5)->Set(imageDesc->Right, imageDesc->Bottom);
 
-			Color4Array * colors = targetMesh->GetColors();
+			Color4Array& colors = targetMesh->GetColors();
 			Color4 color = particle->Color;
 			color.a = particle->Alpha;
 			if(premultiplyAlpha)
 			{
 				color.Scale(particle->Alpha);
 			}
-			colors->GetElement(baseIndex)->SetTo(color);
-			colors->GetElement(baseIndex + 1)->SetTo(color);
-			colors->GetElement(baseIndex + 2)->SetTo(color);
-			colors->GetElement(baseIndex + 3)->SetTo(color);
-			colors->GetElement(baseIndex + 4)->SetTo(color);
-			colors->GetElement(baseIndex + 5)->SetTo(color);
+			colors.GetElement(baseIndex)->SetTo(color);
+			colors.GetElement(baseIndex + 1)->SetTo(color);
+			colors.GetElement(baseIndex + 2)->SetTo(color);
+			colors.GetElement(baseIndex + 3)->SetTo(color);
+			colors.GetElement(baseIndex + 4)->SetTo(color);
+			colors.GetElement(baseIndex + 5)->SetTo(color);
 
 			CustomFloatAttributeBuffer * sizeAttribute = targetMesh->GetCustomFloatAttributeBufferByID(attributeSizeID);
 			CustomFloatAttributeBuffer * rotationAttribute = targetMesh->GetCustomFloatAttributeBufferByID(attributeRotationID);
