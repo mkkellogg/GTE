@@ -333,7 +333,7 @@ namespace GTE
 	 */
 	void Matrix4x4::Transform(const Vector3& vector, Vector3& out) const
 	{
-		Real * vectorData = const_cast<Vector3&>(vector).GetDataPtr();
+		const Real * vectorData = vector.GetConstDataPtr();
 		MultiplyMV(this->data, vectorData, out.GetDataPtr());
 	}
 
@@ -342,7 +342,7 @@ namespace GTE
 	 */
 	void Matrix4x4::Transform(const Point3& point, Point3& out) const
 	{
-		Real * pointData = const_cast<Point3&>(point).GetDataPtr();
+		const Real * pointData = point.GetConstDataPtr();
 		MultiplyMV(this->data, pointData, out.GetDataPtr());
 	}
 
@@ -693,9 +693,17 @@ namespace GTE
 	/*
 	 * Get a pointer the Real data that makes up this matrix
 	 */
-	const Real * Matrix4x4::GetDataPtr() const
+	const Real * Matrix4x4::GetConstDataPtr() const
 	{
 		return (const Real *)data;
+	}
+
+	/*
+	* Get a pointer the Real data that makes up this matrix
+	*/
+	Real * Matrix4x4::GetDataPtr()
+	{
+		return data;
 	}
 
 	/*
@@ -881,7 +889,7 @@ namespace GTE
 		Matrix4x4 trans;
 		trans.SetIdentity();
 
-		Real *matrixData = const_cast<Real *>(trans.GetDataPtr());
+		Real *matrixData = trans.GetDataPtr();
 		matrixData[12] = x;
 		matrixData[13] = y;
 		matrixData[14] = z;

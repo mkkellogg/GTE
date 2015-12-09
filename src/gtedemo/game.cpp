@@ -477,6 +477,13 @@ void Game::SetupPlayer(GTE::AssetImporter& importer)
 		ASSERT(playerObject.IsValid(), "Could not load Warrior model!\n");
 		playerObject->GetTransform().Translate(45, -10, 55, false);
 		playerObject->GetTransform().Scale(4, 4, 4, true);
+
+		GTE::SkinnedMesh3DRendererRef playerRenderer = GameUtil::FindFirstSkinnedMeshRenderer(playerObject);
+		GTE::SceneObjectSharedPtr playerMeshObject = playerRenderer->GetSceneObject();
+		GTE::Mesh3DFilterSharedPtr playerMeshFilter = playerMeshObject->GetMesh3DFilter();
+		playerMeshFilter->SetUseBackSetShadowVolume(false);
+		playerMeshFilter->SetUseCustomShadowVolumeOffset(true);
+		playerMeshFilter->SetCustomShadowVolumeOffset(2.5f);
 		break;
 	}
 

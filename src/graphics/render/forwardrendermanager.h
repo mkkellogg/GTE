@@ -36,7 +36,7 @@
 
 namespace GTE
 {
-	// forward declaration
+	// forward declarations
 	class SceneObject;
 	class Graphics;
 	class EngineObjectManager;
@@ -138,6 +138,7 @@ namespace GTE
 
 		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Int32 queueID);
 		void RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID);
+		void BuildMultiLightDescriptor();
 
 		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 
 									 FowardBlendingFilter blendingFilter,  std::function<Bool(SceneObject*)> filterFunction);
@@ -145,7 +146,7 @@ namespace GTE
 									 FowardBlendingFilter blendingFilter, std::function<Bool(SceneObject*)> filterFunction, Int32 queueID);
 
 		void RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const ViewDescriptor& viewDescriptor, 
-						MaterialRef materialOverride, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter);
+						MaterialRef materialOverride, Bool flagRendered, FowardBlendingFilter blendingFilter);
 
 		void RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 									   const ViewDescriptor& viewDescriptor);

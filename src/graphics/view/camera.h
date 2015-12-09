@@ -55,7 +55,7 @@ namespace GTE
 
 		SSAORenderMode ssaoMode;
 		Bool ssaoEnabled;
-		Bool ambientPassEnabled;
+		Bool lightingEnabled;
 		Bool depthPassEnabled;
 
 		UInt32 renderOrderIndex;
@@ -96,8 +96,8 @@ namespace GTE
 		void SetSSAORenderMode(SSAORenderMode mode);
 		SSAORenderMode GetSSAORenderMode() const;
 
-		void SetAmbientPassEnabled(Bool enabled);
-		Bool IsAmbientPassEnabled() const;
+		void SetLightingEnabled(Bool enabled);
+		Bool IsLightingEnabled() const;
 
 		void SetDepthPassEnabled(Bool enabled);
 		Bool IsDepthPassEnabled() const;

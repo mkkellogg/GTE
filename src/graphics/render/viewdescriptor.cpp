@@ -12,7 +12,7 @@ namespace GTE
 
 		ReverseCulling = false;
 
-		AmbientPassEnabled = true;
+		LightingEnabled = true;
 		DepthPassEnabled = true;
 
 		SSAOEnabled = true;

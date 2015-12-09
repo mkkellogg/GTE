@@ -39,7 +39,7 @@ namespace GTE
 		Transform UniformWorldSceneObjectTransform;
 		Transform UniformWorldSceneObjectTransformInverse;
 
-		Bool AmbientPassEnabled;
+		Bool LightingEnabled;
 		Bool DepthPassEnabled;
 
 		Bool SSAOEnabled;

@@ -56,7 +56,7 @@ namespace GTE
 		virtual void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer) = 0;
 
 		virtual void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture) = 0;
-		virtual void SendUniformToShader(Int32 varID, const Matrix4x4 * mat) = 0;
+		virtual void SendUniformToShader(Int32 varID, const Matrix4x4& mat) = 0;
 
 		virtual void SendUniformToShader(Int32 varID, Real x, Real y, Real z, Real w) = 0;
 		virtual void SendUniformToShader(Int32 varID, Real x, Real y, Real z) = 0;

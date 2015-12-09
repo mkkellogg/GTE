@@ -309,7 +309,7 @@ namespace GTE
 
 	void Quaternion::rotationMatrix(Matrix4x4& out) const
 	{
-		Real * outData = const_cast<Real*>(out.GetDataPtr());
+		Real * outData = out.GetDataPtr();
 		
 		outData[0] = 1 - 2 * y()*y() - 2 * z()*z();
 		outData[1] = 2 * x()*y() + 2 * z()*w();
@@ -341,7 +341,7 @@ namespace GTE
 		Real trace = matrix.A0 + matrix.B1 + matrix.C2;
 		Real root;
 
-		const Real * data = matrix.GetDataPtr();
+		const Real * data = matrix.GetConstDataPtr();
 
 		if (trace > 0.0)
 		{

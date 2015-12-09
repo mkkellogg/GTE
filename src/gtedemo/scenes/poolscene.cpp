@@ -624,7 +624,7 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 
 	waterSurfaceCamera = objectManager->CreateCamera();
 	waterSurfaceCamera->SetSSAOEnabled(false);
-	waterSurfaceCamera->SetAmbientPassEnabled(false);
+	waterSurfaceCamera->SetLightingEnabled(false);
 	waterSurfaceCamera->SetDepthPassEnabled(false);
 	// ensure [waterSurfaceCamera] renders after [mainCamera]
 	waterSurfaceCamera->SetRenderOrderIndex(10);

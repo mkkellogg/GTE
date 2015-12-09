@@ -211,7 +211,7 @@ namespace GTE
 		// from the target sub-mesh.
 		Point3Array& positions = mesh->GetPositions();
 		Point3Array& positionsSource = doPositionTransform == true ? transformedPositions : positions;
-		Real * positionsSrcPtr = const_cast<Real*>(positionsSource.GetDataPtr());
+		Real * positionsSrcPtr = positionsSource.GetDataPtr();
 
 		// if this sub-renderer is utilizing an attribute transformer, we want to use the normals that result
 		// from that transformation to build the shadow volume.
@@ -226,7 +226,7 @@ namespace GTE
 		// currentPositionVertexIndex = current number of process shadow volume vertices
 		UInt32 currentPositionVertexIndex = 0;
 		// use a raw pointer to the shadow volume position data because it's faster
-		Real * svPositionBase = const_cast<Real*>(shadowVolumePositions.GetDataPtr());
+		Real * svPositionBase = shadowVolumePositions.GetDataPtr();
 
 		// structure that describes that relationship of the mesh faces, specifically which faces are adjacent
 		SubMesh3DFaces& faces = mesh->GetFaces();
@@ -460,7 +460,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetShadowVolumePositionData(const Point3Array * points)
 	{
-		attributeBuffers[(Int32)StandardAttribute::ShadowPosition]->SetData(points->GetDataPtr());
+		attributeBuffers[(Int32)StandardAttribute::ShadowPosition]->SetData(points->GetConstDataPtr());
 	}
 
 	/*
@@ -468,7 +468,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetPositionData(Point3Array& points)
 	{
-		SetAttributeData((Int32)StandardAttribute::Position, points.GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::Position, points.GetConstDataPtr());
 	}
 
 	/*
@@ -476,7 +476,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetNormalData(Vector3Array& normals)
 	{
-		SetAttributeData((Int32)StandardAttribute::Normal, normals.GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::Normal, normals.GetConstDataPtr());
 	}
 
 	/*
@@ -484,7 +484,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetFaceNormalData(Vector3Array& faceNormals)
 	{
-		SetAttributeData((Int32)StandardAttribute::FaceNormal, faceNormals.GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::FaceNormal, faceNormals.GetConstDataPtr());
 	}
 
 	/*
@@ -492,7 +492,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetTangentData(Vector3Array& tangents)
 	{
-		SetAttributeData((Int32)StandardAttribute::Tangent, tangents.GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::Tangent, tangents.GetConstDataPtr());
 	}
 
 	/*
@@ -500,7 +500,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetVertexColorData(Color4Array& colors)
 	{
-		SetAttributeData((Int32)StandardAttribute::VertexColor, colors.GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::VertexColor, colors.GetConstDataPtr());
 	}
 
 	/*
@@ -508,7 +508,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetUV1Data(UV2Array& uvs)
 	{
-		SetAttributeData((Int32)StandardAttribute::UVTexture0, uvs.GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::UVTexture0, uvs.GetConstDataPtr());
 	}
 
 	/*
@@ -516,7 +516,7 @@ namespace GTE
 	 */
 	void SubMesh3DRenderer::SetUV2Data(UV2Array& uvs)
 	{
-		SetAttributeData((Int32)StandardAttribute::UVTexture1, uvs.GetDataPtr());
+		SetAttributeData((Int32)StandardAttribute::UVTexture1, uvs.GetConstDataPtr());
 	}
 
 	/*

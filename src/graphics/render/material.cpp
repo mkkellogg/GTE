@@ -604,7 +604,7 @@ namespace GTE
 				}
 				else if(desc.Type == UniformType::Matrix4x4)
 				{
-					shader->SendUniformToShader(desc.ShaderVarID, &desc.MatrixData);
+					shader->SendUniformToShader(desc.ShaderVarID, desc.MatrixData);
 					SetUniformSetValue(desc.ShaderVarID, GetRequiredUniformSize(UniformType::Matrix4x4));
 				}
 			}
@@ -861,7 +861,7 @@ namespace GTE
 	 * Send the 4x4 matrix data in [mat] to this material's shader via the
 	 * standard uniform ModelMatrixInverseTranspose.
 	 */
-	void Material::SendModelMatrixInverseTransposeToShader(const Matrix4x4 * mat)
+	void Material::SendModelMatrixInverseTransposeToShader(const Matrix4x4& mat)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelMatrixInverseTransposeToShader -> 'shader' is null.", true);
 
@@ -877,7 +877,7 @@ namespace GTE
 	 * Send the 4x4 matrix data in [mat] to this material's shader via the
 	 * standard uniform ModelMatrix.
 	 */
-	void Material::SendModelMatrixToShader(const Matrix4x4 * mat)
+	void Material::SendModelMatrixToShader(const Matrix4x4& mat)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelMatrixToShader -> 'shader' is null.", true);
 
@@ -893,7 +893,7 @@ namespace GTE
 	 * Send the 4x4 matrix data in [mat] to this material's shader via the
 	 * standard uniform ModelViewMatrix.
 	 */
-	void Material::SendModelViewMatrixToShader(const Matrix4x4 * mat)
+	void Material::SendModelViewMatrixToShader(const Matrix4x4& mat)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendModelViewMatrixToShader -> 'shader' is null.", true);
 
@@ -909,7 +909,7 @@ namespace GTE
 	* Send the 4x4 matrix data in [mat] to this material's shader via the
 	* standard uniform ViewMatrix.
 	*/
-	void Material::SendViewMatrixToShader(const Matrix4x4 * mat)
+	void Material::SendViewMatrixToShader(const Matrix4x4& mat)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendViewMatrixToShader -> 'shader' is null.", true);
 
@@ -925,7 +925,7 @@ namespace GTE
 	 * Send the 4x4 matrix data in [mat] to this material's shader via the
 	 * standard uniform ProjectionMatrix.
 	 */
-	void Material::SendProjectionMatrixToShader(const Matrix4x4 * mat)
+	void Material::SendProjectionMatrixToShader(const Matrix4x4& mat)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendProjectionMatrixToShader -> 'shader' is null.", true);
 
@@ -941,7 +941,7 @@ namespace GTE
 	 * Send the 4x4 matrix data in [mat] to this material's shader via the
 	 * standard uniform ModelViewProjectionMatrix.
 	 */
-	void Material::SendMVPMatrixToShader(const Matrix4x4 * mat)
+	void Material::SendMVPMatrixToShader(const Matrix4x4& mat)
 	{
 		NONFATAL_ASSERT(shader.IsValid(), "Material::SendMVPMatrixToShader -> 'shader' is null.", true);
 
@@ -1062,22 +1062,19 @@ namespace GTE
 	/*
 	 * Send the light data in [light] to this material's shader.
 	 */
-	void Material::SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection)
+	void Material::SendLightToShader(const Light& light, const Point3& position, const Vector3 * altDirection)
 	{
-		NONFATAL_ASSERT(light != nullptr, "Material::SendLightToShader -> 'light' is null.", true);
-		NONFATAL_ASSERT(position != nullptr, "Material::SendLightToShader -> 'position' is null.", true);
-
-		Real* positionData = const_cast<Point3*>(position)->GetDataPtr();
-		Real* directionData = const_cast<Vector3&>(light->GetDirection()).GetDataPtr();
-		Real* altDirectionData = altDirection != nullptr ? const_cast<Vector3*>(altDirection)->GetDataPtr() : nullptr;
-		Real* colorData = const_cast<Color4&>(light->GetColor()).GetDataPtr();
-		Color4 color = light->GetColor();
-		Int32 lightType = (Int32)light->GetType();
-		Real intensity = light->GetIntensity();
-		Real range = light->GetRange();
-		Real attenuation = light->GetAttenuation();
-		Int32 parallelAngleAttenuation = (Int32)light->GetParallelAngleAttenuationType();
-		Int32 orthoAngleAttenuationType = (Int32)light->GetOrthoAngleAttenuationType();
+		const Real* positionData = position.GetConstDataPtr();
+		const Real* directionData = light.GetDirection().GetConstDataPtr();
+		const Real* altDirectionData = altDirection != nullptr ? altDirection->GetConstDataPtr() : nullptr;
+		const Real* colorData = light.GetColor().GetConstDataPtr();
+		Color4 color = light.GetColor();
+		Int32 lightType = (Int32)light.GetType();
+		Real intensity = light.GetIntensity();
+		Real range = light.GetRange();
+		Real attenuation = light.GetAttenuation();
+		Int32 parallelAngleAttenuation = (Int32)light.GetParallelAngleAttenuationType();
+		Int32 orthoAngleAttenuationType = (Int32)light.GetOrthoAngleAttenuationType();
 		Int32 enabled = 1;
 
 		SendLightToShader(positionData, altDirection != nullptr ? altDirectionData : directionData, &lightType, colorData, &intensity, &range, &attenuation, &parallelAngleAttenuation, &orthoAngleAttenuationType, &enabled);

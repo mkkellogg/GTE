@@ -54,15 +54,6 @@ namespace GTE
 		UInt32 skeletonNodeCount = skeleton->GetNodeCount();
 		UInt32 channelCount = animation->GetChannelCount();
 
-		// verify matching node count
-		if (skeletonNodeCount != channelCount)
-		{
-			//std::string msg = std::string("AnimationManager::IsCompatible -> Mismatched node count: ") + std::to_string(skeletonNodeCount);
-			//msg += std::string(", ") + std::to_string(channelCount);
-			//Debug::PrintWarning(msg);
-			//return false;
-		}
-
 		// verify each channel in the animation has a matching node in [skeleton]
 		for (UInt32 c = 0; c < channelCount; c++)
 		{

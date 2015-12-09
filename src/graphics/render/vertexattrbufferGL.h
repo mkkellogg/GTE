@@ -45,7 +45,8 @@ namespace GTE
 
 		Bool Init(UInt32 vertexCount, UInt32 componentCount, UInt32 stride, Bool dataOnGPU, const Real *srcData);
 		void SetData(const Real * srcData);
-		const Real * GetDataPtr() const;
+		Real * GetDataPtr();
+		const Real * GetConstDataPtr() const;
 		Bool IsGPUBuffer() const;
 		GLuint GetGPUBufferID() const;
 	};

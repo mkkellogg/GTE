@@ -94,7 +94,7 @@ namespace GTE
 		void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer)  override;
 
 		void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture) override;
-		void SendUniformToShader(Int32 varID, const Matrix4x4 * mat) override;
+		void SendUniformToShader(Int32 varID, const Matrix4x4& mat) override;
 		void SendUniformToShader(Int32 varID, Real x, Real y, Real z, Real w) override;
 		void SendUniformToShader(Int32 varID, Real x, Real y, Real z) override;
 		void SendUniformToShader(Int32 varID, Real x, Real y) override;

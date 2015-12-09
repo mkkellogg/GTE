@@ -290,17 +290,19 @@ namespace GTE
 		fullScreenQuadObject->SetActive(true);
 
 		// set [material] to be the material for the full screen quad mesh
-		Mesh3DRendererRef renderer = DynamicCastEngineObject<Renderer, Mesh3DRenderer>(fullScreenQuadObject->GetRenderer());
-		if(renderer->GetMultiMaterialCount() > 0)
+		Renderer * renderer = fullScreenQuadObject->GetRenderer().GetPtr();
+		Mesh3DRenderer * meshRenderer = dynamic_cast<Mesh3DRenderer*>(renderer);
+		if(meshRenderer->GetMultiMaterialCount() > 0)
 		{
-			renderer->GetMultiMaterial(0)->SetMaterial(0, material);
+			meshRenderer->GetMultiMaterial(0)->SetMaterial(0, material);
 		}
-		else renderer->AddMultiMaterial(material);
+		else meshRenderer->AddMultiMaterial(material);
 
+		ASSERT(meshRenderer->GetSubRendererCount() == fullScreenQuad->GetSubMeshCount(), "ForwardRenderManager::RenderFullScreenQuad -> Sub-renderer count does not equal sub-mesh count.");
 		// render the full screen quad mesh
 		for (UInt32 i = 0; i < fullScreenQuad->GetSubMeshCount(); i++)
 		{
-			renderer->GetSubRenderer(i)->Render();
+			meshRenderer->GetSubRenderer(i)->Render();
 		}
 		fullScreenQuadObject->SetActive(false);
 
@@ -434,7 +436,7 @@ namespace GTE
 									RenderQueue* targetRenderQueue = renderQueueManager.GetRenderQueueForID(mat->GetRenderQueue());
 
 									SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
-									Transform * aggregateTransform = const_cast<Transform*>(&processingDesc.AggregateTransform);
+									Transform * aggregateTransform = &processingDesc.AggregateTransform;
 									targetRenderQueue->Add(child, mesh->GetSubMesh(i).GetPtr(), meshRenderer->GetSubRenderer(i).GetPtr(), &const_cast<MaterialSharedPtr&>(mat), meshFilter.GetPtr(), aggregateTransform);
 								}
 							}
@@ -535,7 +537,7 @@ namespace GTE
 		descriptor.UniformWorldSceneObjectTransformInverse = camera.GetUniformWorldSceneObjectTransform();
 		descriptor.UniformWorldSceneObjectTransformInverse.Invert();
 
-		descriptor.AmbientPassEnabled = camera.IsAmbientPassEnabled();
+		descriptor.LightingEnabled = camera.IsLightingEnabled();
 		descriptor.DepthPassEnabled = camera.IsDepthPassEnabled();
 
 		descriptor.SSAOEnabled = camera.IsSSAOEnabled();
@@ -599,45 +601,28 @@ namespace GTE
 			SceneObjectProcessingDescriptor& processingDesc = cameraObject->GetProcessingDescriptor();
 			const Transform& cameraTransform = processingDesc.AggregateTransform;
 
-			// front
-			graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Front);
-			GetViewDescriptorForCamera(camera, nullptr, viewDescriptor);
-			RenderSceneForCurrentRenderTarget(viewDescriptor);
+			static const Real orientations[6][4] =  {{ 0, 1, 0, 0},
+													 { 0, 1, 0, -180 },
+													 { 1, 0, 0, 90 },
+													 { 1, 0, 0, -90 },
+													 { 0, 1, 0, 90 },
+													 { 0, 1, 0, -90 }};
 
-			// back
-			graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Back);
-			altViewTransform.SetTo(cameraTransform);
-			altViewTransform.Rotate(0, 1, 0, -180, true);
-			GetViewDescriptorForCamera(camera, &altViewTransform, viewDescriptor);
-			RenderSceneForCurrentRenderTarget(viewDescriptor);
+			static const CubeTextureSide sides[6] = {CubeTextureSide::Front,
+													 CubeTextureSide::Back,
+													 CubeTextureSide::Top,
+													 CubeTextureSide::Bottom,
+													 CubeTextureSide::Left,
+													 CubeTextureSide::Right};
 
-			// top
-			graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Top);
-			altViewTransform.SetTo(cameraTransform);
-			altViewTransform.Rotate(1, 0, 0, 90, true);
-			GetViewDescriptorForCamera(camera, &altViewTransform, viewDescriptor);
-			RenderSceneForCurrentRenderTarget(viewDescriptor);
-
-			// bottom
-			graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Bottom);
-			altViewTransform.SetTo(cameraTransform);
-			altViewTransform.Rotate(1, 0, 0, -90, true);
-			GetViewDescriptorForCamera(camera, &altViewTransform, viewDescriptor);
-			RenderSceneForCurrentRenderTarget(viewDescriptor);
-
-			// left
-			graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Left);
-			altViewTransform.SetTo(cameraTransform);
-			altViewTransform.Rotate(0, 1, 0, 90, true);
-			GetViewDescriptorForCamera(camera, &altViewTransform, viewDescriptor);
-			RenderSceneForCurrentRenderTarget(viewDescriptor);
-
-			// right
-			graphics->ActivateCubeRenderTargetSide(CubeTextureSide::Right);
-			altViewTransform.SetTo(cameraTransform);
-			altViewTransform.Rotate(0, 1, 0, -90, true);
-			GetViewDescriptorForCamera(camera, &altViewTransform, viewDescriptor);
-			RenderSceneForCurrentRenderTarget(viewDescriptor);
+			for(UInt32 i = 0; i < 6; i++)
+			{
+				graphics->ActivateCubeRenderTargetSide(sides[i]);
+				altViewTransform.SetTo(cameraTransform);
+				altViewTransform.Rotate(orientations[i][0], orientations[i][1], orientations[i][2], orientations[i][3], true);
+				GetViewDescriptorForCamera(camera, nullptr, viewDescriptor);
+				RenderSceneForCurrentRenderTarget(viewDescriptor);
+			}
 		}
 		else
 		{
@@ -711,12 +696,12 @@ namespace GTE
 
 			if(queueID >= (Int32)RenderQueueType::Transparent)break;
 
-			// render objects whose materials have the "allLightsSinglePass" flag set
-			RenderSceneForMultiLight(viewDescriptor, queueID);
-
 			// loop through each ambient light and render objects in render queue [queueID] for it
-			if(viewDescriptor.AmbientPassEnabled)
+			if(viewDescriptor.LightingEnabled)
 			{
+				// render objects whose materials have the "allLightsSinglePass" flag set
+				RenderSceneForMultiLight(viewDescriptor, queueID);
+
 				for(UInt32 l = 0; l < ambientLightCount; l++)
 				{
 					SceneObject* lightObject = sceneAmbientLights[l];
@@ -756,38 +741,41 @@ namespace GTE
 		{
 			Int32 queueID = renderQueueManager.GetRenderQueueID(queueIndex);
 
-			// render objects whose materials have the "allLightsSinglePass" flag set
-			RenderSceneForMultiLight(viewDescriptor, queueID);
-
 			// loop through each ambient light and render objects in render queue [queueID] for it
-			if(viewDescriptor.AmbientPassEnabled && queueID >= (Int32)RenderQueueType::Transparent)
+			if(viewDescriptor.LightingEnabled)
 			{
-				for(UInt32 l = 0; l < ambientLightCount; l++)
+				// render objects whose materials have the "allLightsSinglePass" flag set
+				RenderSceneForMultiLight(viewDescriptor, queueID);
+
+				if(queueID >= (Int32)RenderQueueType::Transparent)
 				{
-					SceneObject* lightObject = sceneAmbientLights[l];
-					ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light's scene object is not valid.");
+					for(UInt32 l = 0; l < ambientLightCount; l++)
+					{
+						SceneObject* lightObject = sceneAmbientLights[l];
+						ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light's scene object is not valid.");
+
+						LightRef lightRef = lightObject->GetLight();
+						ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light is not valid.");
+
+						// render all objects in the scene that have materials the use lighting
+						RenderSceneForLight(lightRef.GetRef(), viewDescriptor, queueID);
+						renderedAmbient = true;
+					}
+				}
+
+				// Render objects in render queue [queueID] for each light for  -> this means everything below RenderQueueType::Transparent
+				for(UInt32 l = 0; l < lightCount; l++)
+				{
+					SceneObject* lightObject = sceneLights[l];
+					ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light's scene object is not valid.");
 
 					LightRef lightRef = lightObject->GetLight();
-					ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Ambient light is not valid.");
+					ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light is not valid.");
 
-					// render all objects in the scene that have materials the use lighting
 					RenderSceneForLight(lightRef.GetRef(), viewDescriptor, queueID);
-					renderedAmbient = true;
 				}
 			}
-
-			// Render objects in render queue [queueID] for each light for  -> this means everything below RenderQueueType::Transparent
-			for(UInt32 l = 0; l < lightCount; l++)
-			{
-				SceneObject* lightObject = sceneLights[l];
-				ASSERT(lightObject != nullptr, "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light's scene object is not valid.");
-
-				LightRef lightRef = lightObject->GetLight();
-				ASSERT(lightRef.IsValid(), "ForwardRenderManager::RenderSceneForCurrentRenderTarget -> Light is not valid.");
-
-				RenderSceneForLight(lightRef.GetRef(), viewDescriptor, queueID);
-			}
-
+			
 			// Render objects in render queue [queueID] for meshes that have materials which DO NOT use lighting.
 			RenderSceneWithoutLight(viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered, nullptr, queueID);
 
@@ -823,9 +811,9 @@ namespace GTE
 			NONFATAL_ASSERT(skyboxObject != nullptr, "ForwardRenderManager::RenderSkyboxForCamera -> View descriptor has invalid skybox scene object.", true);
 
 			RendererRef renderer = skyboxObject->GetRenderer();
-			Renderer* baseRenderer = nullptr;
-			if(renderer.IsValid())baseRenderer = renderer.GetPtr();
+			NONFATAL_ASSERT(renderer.IsValid(), "ForwardRenderManager::RenderSkyboxForCamera -> Skybox renderer is not valid.", true);
 
+			Renderer* baseRenderer = renderer.GetPtr();
 			Mesh3DRenderer* meshRenderer = dynamic_cast<Mesh3DRenderer*>(baseRenderer);
 
 			NONFATAL_ASSERT(meshRenderer != nullptr, "ForwardRenderManager::RenderSkyboxForCamera -> Could not find valid renderer for skybox.", true);
@@ -842,12 +830,14 @@ namespace GTE
 			skyboxEntry.Container = skyboxObject;
 			skyboxEntry.Mesh = mesh->GetSubMesh(0).GetPtr();
 			skyboxEntry.Renderer = meshRenderer->GetSubRenderer(0).GetPtr();
-			skyboxEntry.RenderMaterial = const_cast<MaterialSharedPtr*>(&meshRenderer->GetMultiMaterial(0)->GetMaterial(0));
+
+			MaterialRef skyboxMaterial = meshRenderer->GetMultiMaterial(0)->GetMaterial(0);
+			skyboxEntry.RenderMaterial = const_cast<MaterialSharedPtr*>(&skyboxMaterial);
 
 			singleLightDescriptor.UseLighting = false;
 
 			// render the skybox
-			RenderMesh(skyboxEntry, singleLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::Never);
+			RenderMesh(skyboxEntry, singleLightDescriptor, viewDescriptor, NullMaterialRef, true, FowardBlendingFilter::Never);
 
 			skyboxObject->SetActive(false);
 		}
@@ -868,6 +858,13 @@ namespace GTE
 	*/
 	void ForwardRenderManager::RenderSceneSSAO(const ViewDescriptor& viewDescriptor)
 	{
+		static const UniformID uniform_DEPTH_TEXTURE = UniformDirectory::RegisterVarID("DEPTH_TEXTURE");
+		static const UniformID uniform_INV_PROJECTION_MATRIX = UniformDirectory::RegisterVarID("INV_PROJECTION_MATRIX");
+		static const UniformID uniform_DISTANCE_THRESHHOLD = UniformDirectory::RegisterVarID("DISTANCE_THRESHHOLD");
+		static const UniformID uniform_FILTER_RADIUS = UniformDirectory::RegisterVarID("FILTER_RADIUS");
+		static const UniformID uniform_SCREEN_WIDTH = UniformDirectory::RegisterVarID("SCREEN_WIDTH");
+		static const UniformID uniform_SCREEN_HEIGHT = UniformDirectory::RegisterVarID("SCREEN_HEIGHT");
+
 		Engine::Instance()->GetGraphicsSystem()->EnterRenderMode(RenderMode::Standard);
 		GraphicsAttributes attributes = Engine::Instance()->GetGraphicsSystem()->GetAttributes();
 
@@ -896,12 +893,12 @@ namespace GTE
 		TextureRef depthTexture = depthRenderTarget->GetColorTexture();
 
 		// set SSAO material values
-		ssaoOutlineMaterial->SetTexture(depthTexture, "DEPTH_TEXTURE");
-		ssaoOutlineMaterial->SetMatrix4x4(projectionInvMat, "INV_PROJECTION_MATRIX");
-		ssaoOutlineMaterial->SetUniform1f(.5f, "DISTANCE_THRESHHOLD");
-		ssaoOutlineMaterial->SetUniform2f(.3f, .75f, "FILTER_RADIUS");
-		ssaoOutlineMaterial->SetUniform1f((Real)depthRenderTarget->GetWidth(), "SCREEN_WIDTH");
-		ssaoOutlineMaterial->SetUniform1f((Real)depthRenderTarget->GetHeight(), "SCREEN_HEIGHT");
+		ssaoOutlineMaterial->SetTexture(depthTexture, uniform_DEPTH_TEXTURE);
+		ssaoOutlineMaterial->SetMatrix4x4(projectionInvMat, uniform_INV_PROJECTION_MATRIX);
+		ssaoOutlineMaterial->SetUniform1f(.5f, uniform_DISTANCE_THRESHHOLD);
+		ssaoOutlineMaterial->SetUniform2f(.3f, .75f, uniform_FILTER_RADIUS);
+		ssaoOutlineMaterial->SetUniform1f((Real)depthRenderTarget->GetWidth(), uniform_SCREEN_WIDTH);
+		ssaoOutlineMaterial->SetUniform1f((Real)depthRenderTarget->GetHeight(), uniform_SCREEN_HEIGHT);
 
 		FowardBlendingMethod currentFoward = GetForwardBlending();
 
@@ -920,8 +917,7 @@ namespace GTE
 
 
 	/*
-	 * Forward-Render the scene for a single light [light] from the perspective
-	 * specified in [viewDescriptor].
+	 * Forward-Render the scene for a single light [light] from the perspective specified in [viewDescriptor].
 	 *
 	 * This method performs two passes:
 	 *
@@ -938,7 +934,9 @@ namespace GTE
 		Transform model;
 		Transform modelInverse;
 
-		SceneObjectProcessingDescriptor& processingDesc = const_cast<Light&>(light).GetSceneObject()->GetProcessingDescriptor();
+		Light& localLight = const_cast<Light&>(light);
+
+		SceneObjectProcessingDescriptor& processingDesc = localLight.GetSceneObject()->GetProcessingDescriptor();
 		Transform lightTransform = processingDesc.AggregateTransform;
 		lightTransform.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
 
@@ -949,7 +947,7 @@ namespace GTE
 		lightTransform.TransformVector(lightDirection);
 
 		// set up lighting descriptor for single light
-		singleLightDescriptor.LightObjects[0] = const_cast<Light*>(&light);
+		singleLightDescriptor.LightObjects[0] = &localLight;
 		singleLightDescriptor.Positions[0] = lightWorldPosition;
 		singleLightDescriptor.Directions[0] = lightDirection;
 		singleLightDescriptor.Enabled[0] = true;
@@ -1042,7 +1040,7 @@ namespace GTE
 								processingDesc.WillRenderCalled = true;
 							}
 
-							RenderMesh(*entry, singleLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
+							RenderMesh(*entry, singleLightDescriptor, viewDescriptor, NullMaterialRef, true, FowardBlendingFilter::OnlyIfRendered);
 						}
 					}
 				}
@@ -1050,6 +1048,14 @@ namespace GTE
 		}
 	}
 
+	/*
+	* Forward-Render the scene for all lights from the perspective specified in [viewDescriptor]. This is a 
+	* special-case function that will render a mesh for all lights in a single pass. The shader attached to
+	* the material that will be used to render the mesh must support multiple light uniforms (in array form).
+	*
+	* Shadows are not supported by this function, so all meshes rendered in this manner will not cast nor 
+	* receive shadows.
+	*/
 	void ForwardRenderManager::RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID)
 	{
 		UInt32 minQueue = renderQueueManager.GetMinQueue();
@@ -1080,68 +1086,7 @@ namespace GTE
 				NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
 
 				// set up lighting descriptor for multiple lights
-				multiLightDescriptor.LightCount = GTEMath::Min(Constants::MaxShaderLights, lightCount + ambientLightCount);
-				multiLightDescriptor.UseLighting = true;
-				for(UInt32 l = 0; l < Constants::MaxShaderLights; l++)
-				{
-					multiLightDescriptor.Enabled[l] = 0;
-				}
-				for(UInt32 l = 0; l < multiLightDescriptor.LightCount; l++)
-				{
-					SceneObject* lightObject = nullptr;
-
-					if(l >= ambientLightCount)
-					{
-						lightObject = sceneLights[l - ambientLightCount];
-					}
-					else
-					{
-						lightObject = sceneAmbientLights[l];
-					}
-
-					if(lightObject == nullptr) continue;
-					LightRef lightRef = lightObject->GetLight();
-					if(!lightRef.IsValid())continue;
-
-					Light& light = const_cast<Light&>(lightRef.GetRef());
-
-					SceneObjectProcessingDescriptor& processingDesc = light.GetSceneObject()->GetProcessingDescriptor();
-					Transform lightTransform = processingDesc.AggregateTransform;
-
-					multiLightDescriptor.LightObjects[l] = &light;
-
-					multiLightDescriptor.Positions[l].Set(0, 0, 0);
-					multiLightDescriptor.Directions[l] = light.GetDirection();
-					lightTransform.TransformPoint(multiLightDescriptor.Positions[l]);
-					lightTransform.TransformVector(multiLightDescriptor.Directions[l]);
-
-					multiLightDescriptor.Colors[l] = light.GetColor();
-
-					Real* positionDatas = multiLightDescriptor.PositionDatas;
-					Real* directionDatas = multiLightDescriptor.DirectionDatas;
-					Real* colorDatas = multiLightDescriptor.ColorDatas;
-
-					Real* thisPositionDatas = multiLightDescriptor.Positions[l].GetDataPtr();
-					Real* thisDirectionDatas = multiLightDescriptor.Directions[l].GetDataPtr();
-					Real* thisColorDatas = multiLightDescriptor.Colors[l].GetDataPtr();
-
-					for(UInt32 i = 0; i < 4; i++)
-					{
-						UInt32 dataIndex = l * 4 + i;
-						positionDatas[dataIndex] = thisPositionDatas[i];
-						directionDatas[dataIndex] = thisDirectionDatas[i];
-						colorDatas[dataIndex] = thisColorDatas[i];
-					}
-
-					multiLightDescriptor.Types[l] = (Int32)lightRef->GetType();
-					multiLightDescriptor.Intensities[l] = lightRef->GetIntensity();
-					multiLightDescriptor.Ranges[l] = lightRef->GetRange();
-					multiLightDescriptor.Attenuations[l] = lightRef->GetAttenuation();
-					multiLightDescriptor.ParallelAngleAttenuations[l] = (Int32)lightRef->GetParallelAngleAttenuationType();
-					multiLightDescriptor.OrthoAngleAttenuations[l] = (Int32)lightRef->GetOrthoAngleAttenuationType();
-
-					multiLightDescriptor.Enabled[l] = 1;
-				}
+				BuildMultiLightDescriptor();
 
 				// copy the full world transform of the scene object, including those of all ancestors
 				SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
@@ -1154,14 +1099,9 @@ namespace GTE
 					for(UInt32 l = 0; l < multiLightDescriptor.LightCount; l++)
 					{
 						Light& light = *multiLightDescriptor.LightObjects[l];
-
 						Bool shouldCull = ShouldCullFromLightByLayer(light, *sceneObject) ||
 										  ShouldCullFromLightByPosition(light, multiLightDescriptor.Positions[l], *entry->Mesh, sceneObjectWorldTransform);
-
-						if(shouldCull)
-						{
-							multiLightDescriptor.Enabled[l] = 0;
-						}
+						if(shouldCull)multiLightDescriptor.Enabled[l] = 0;
 					}
 
 					if(!renderModeEntered)
@@ -1177,9 +1117,71 @@ namespace GTE
 						processingDesc.WillRenderCalled = true;
 					}
 
-					RenderMesh(*entry, multiLightDescriptor, viewDescriptor, NullMaterialRef, true, true, FowardBlendingFilter::OnlyIfRendered);
+					RenderMesh(*entry, multiLightDescriptor, viewDescriptor, NullMaterialRef, true, FowardBlendingFilter::OnlyIfRendered);
 				}
 			}
+		}
+	}
+
+	void ForwardRenderManager::BuildMultiLightDescriptor()
+	{
+		// set up lighting descriptor for multiple lights
+		multiLightDescriptor.LightCount = GTEMath::Min(Constants::MaxShaderLights, lightCount + ambientLightCount);
+		multiLightDescriptor.UseLighting = true;
+		for(UInt32 l = 0; l < Constants::MaxShaderLights; l++)
+		{
+			multiLightDescriptor.Enabled[l] = 0;
+		}
+
+		Real* positionDatas = multiLightDescriptor.PositionDatas;
+		Real* directionDatas = multiLightDescriptor.DirectionDatas;
+		Real* colorDatas = multiLightDescriptor.ColorDatas;
+		for(UInt32 l = 0; l < multiLightDescriptor.LightCount; l++)
+		{
+			SceneObject* lightObject = nullptr;
+
+			if(l >= ambientLightCount)
+			{
+				lightObject = sceneLights[l - ambientLightCount];
+			}
+			else
+			{
+				lightObject = sceneAmbientLights[l];
+			}
+
+			if(lightObject == nullptr) continue;
+			LightRef lightRef = lightObject->GetLight();
+			if(!lightRef.IsValid())continue;
+			Light& light = const_cast<Light&>(lightRef.GetRef());
+
+			SceneObjectProcessingDescriptor& processingDesc = light.GetSceneObject()->GetProcessingDescriptor();
+			Transform lightTransform = processingDesc.AggregateTransform;
+
+			multiLightDescriptor.LightObjects[l] = &light;
+
+			multiLightDescriptor.Positions[l].Set(0, 0, 0);
+			multiLightDescriptor.Directions[l] = light.GetDirection();
+			lightTransform.TransformPoint(multiLightDescriptor.Positions[l]);
+			lightTransform.TransformVector(multiLightDescriptor.Directions[l]);
+
+			multiLightDescriptor.Colors[l] = light.GetColor();
+
+			Real* thisPositionDatas = multiLightDescriptor.Positions[l].GetDataPtr();
+			Real* thisDirectionDatas = multiLightDescriptor.Directions[l].GetDataPtr();
+			Real* thisColorDatas = multiLightDescriptor.Colors[l].GetDataPtr();
+
+			BaseVector4_QuickCopy_IncDest(thisPositionDatas, positionDatas);
+			BaseVector4_QuickCopy_IncDest(thisDirectionDatas, directionDatas);
+			BaseVector4_QuickCopy_IncDest(thisColorDatas, colorDatas);
+
+			multiLightDescriptor.Types[l] = (Int32)lightRef->GetType();
+			multiLightDescriptor.Intensities[l] = lightRef->GetIntensity();
+			multiLightDescriptor.Ranges[l] = lightRef->GetRange();
+			multiLightDescriptor.Attenuations[l] = lightRef->GetAttenuation();
+			multiLightDescriptor.ParallelAngleAttenuations[l] = (Int32)lightRef->GetParallelAngleAttenuationType();
+			multiLightDescriptor.OrthoAngleAttenuations[l] = (Int32)lightRef->GetOrthoAngleAttenuationType();
+
+			multiLightDescriptor.Enabled[l] = 1;
 		}
 	}
 
@@ -1220,6 +1222,12 @@ namespace GTE
 		{
 			RenderQueueEntry* entry = *itr;
 
+			SubMesh3DRenderer * subRenderer = entry->Renderer;
+			NONFATAL_ASSERT(subRenderer != nullptr, "ForwardRenderManager::RenderSceneWithoutLight -> Null sub renderer encountered.", true);
+
+			Bool rendered = renderedSubRenderers[subRenderer->GetObjectID()];
+			if(rendered && !renderMoreThanOnce)continue;
+
 			if(!material.IsValid() && (*entry->RenderMaterial)->UseLighting())
 			{
 				continue;
@@ -1248,7 +1256,7 @@ namespace GTE
 				processingDescriptor.WillRenderCalled = true;
 			}
 
-			RenderMesh(*entry, singleLightDescriptor, viewDescriptor, material, flagRendered, renderMoreThanOnce, blendingFilter);
+			RenderMesh(*entry, singleLightDescriptor, viewDescriptor, material, flagRendered, blendingFilter);
 		}
 	}
 
@@ -1265,7 +1273,7 @@ namespace GTE
 	 * [blendingFilter] - Determines how forward-rendering blending will be applied.
 	 */
 	void ForwardRenderManager::RenderMesh(RenderQueueEntry& entry, const LightingDescriptor& lightingDescriptor, const ViewDescriptor& viewDescriptor, 
-										  MaterialRef  materialOverride, Bool flagRendered, Bool renderMoreThanOnce, FowardBlendingFilter blendingFilter)
+										  MaterialRef  materialOverride, Bool flagRendered, FowardBlendingFilter blendingFilter)
 	{
 		Transform modelViewProjection;
 		Transform modelView;
@@ -1277,7 +1285,7 @@ namespace GTE
 		NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderMesh -> Scene object is not valid.", true);
 		NONFATAL_ASSERT(renderer != nullptr, "ForwardRenderManager::RenderMesh -> Null sub renderer encountered.", true);
 
-		// determine if this mesh has been rendered before
+		// determine if this mesh has been rendered using [renderer] before
 		Bool rendered = renderedSubRenderers[renderer->GetObjectID()];
 		
 		// if we have an override material, we use that for every mesh
@@ -1285,8 +1293,6 @@ namespace GTE
 		MaterialRef currentMaterial = doMaterialOvverride ? materialOverride : *entry.RenderMaterial;
 
 		NONFATAL_ASSERT(currentMaterial != nullptr, "ForwardRenderManager::RenderMesh -> Null material encountered.", true);
-
-		if(rendered && !renderMoreThanOnce)return;
 
 		ForwardRenderPass forwardRenderPass = currentMaterial->GetForwardRenderPass();
 		if(rendered && forwardRenderPass != ForwardRenderPass::All && forwardRenderPass != ForwardRenderPass::Additive)return;
@@ -1322,7 +1328,7 @@ namespace GTE
 			}
 			else
 			{
-				currentMaterial->SendLightToShader(lightingDescriptor.LightObjects[0], &lightingDescriptor.Positions[0], &lightingDescriptor.Directions[0]);
+				currentMaterial->SendLightToShader(*lightingDescriptor.LightObjects[0], lightingDescriptor.Positions[0], &lightingDescriptor.Directions[0]);
 			}
 		}
 
@@ -1375,6 +1381,8 @@ namespace GTE
 	 */
 	void ForwardRenderManager::RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection, const ViewDescriptor& viewDescriptor)
 	{
+		static const UniformID uniform_EPSILON = UniformDirectory::RegisterVarID("EPSILON");
+
 		Transform modelViewProjection;
 		Transform model;
 		Transform modelInverse;
@@ -1418,13 +1426,13 @@ namespace GTE
 		if (filter->GetUseCustomShadowVolumeOffset())
 		{
 			// set the epsilon offset for the shadow volume shader based on custom value
-			shadowVolumeMaterial->SetUniform1f(filter->GetCustomShadowVolumeOffset(), "EPSILON");
+			shadowVolumeMaterial->SetUniform1f(filter->GetCustomShadowVolumeOffset(), uniform_EPSILON);
 		}
 		else
 		{
 			// set the epsilon offset for the shadow volume shader based on type of shadow volume
-			if (filter->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.00002f, "EPSILON");
-			else shadowVolumeMaterial->SetUniform1f(.2f, "EPSILON");
+			if (filter->GetUseBackSetShadowVolume())shadowVolumeMaterial->SetUniform1f(.00002f, uniform_EPSILON);
+			else shadowVolumeMaterial->SetUniform1f(.2f, uniform_EPSILON);
 		}
 
 		// send uniforms set for the shadow volume material to its shader
@@ -1436,7 +1444,7 @@ namespace GTE
 		SendViewAttributesToShader(viewDescriptor);
 
 		// send shadow volume uniforms to shader
-		shadowVolumeMaterial->SendLightToShader(&light, &modelLocalLightPos, &modelLocalLightDir);
+		shadowVolumeMaterial->SendLightToShader(light, modelLocalLightPos, &modelLocalLightDir);
 
 		// form cache key from sub-renderer's object ID and light's object ID
 		ObjectPairKey cacheKey;
@@ -1941,12 +1949,12 @@ namespace GTE
 		modelInverseTranspose.Transpose();
 		modelInverseTranspose.Invert();
 
-		activeMaterial->SendModelMatrixInverseTransposeToShader(&modelInverseTranspose);
-		activeMaterial->SendModelMatrixToShader(&model.GetConstMatrix());
-		activeMaterial->SendModelViewMatrixToShader(&modelView.GetConstMatrix());
-		activeMaterial->SendViewMatrixToShader(&view.GetConstMatrix());
-		activeMaterial->SendProjectionMatrixToShader(&projection.GetConstMatrix());
-		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.GetConstMatrix());
+		activeMaterial->SendModelMatrixInverseTransposeToShader(modelInverseTranspose);
+		activeMaterial->SendModelMatrixToShader(model.GetConstMatrix());
+		activeMaterial->SendModelViewMatrixToShader(modelView.GetConstMatrix());
+		activeMaterial->SendViewMatrixToShader(view.GetConstMatrix());
+		activeMaterial->SendProjectionMatrixToShader(projection.GetConstMatrix());
+		activeMaterial->SendMVPMatrixToShader(modelViewProjection.GetConstMatrix());
 	}
 
 	/*
@@ -1961,7 +1969,7 @@ namespace GTE
 		ShaderRef shader = activeMaterial->GetShader();
 		ASSERT(shader.IsValid(), "ForwardRenderManager::SendModelViewProjectionToShader -> Active material contains null shader.");
 
-		activeMaterial->SendMVPMatrixToShader(&modelViewProjection.GetConstMatrix());
+		activeMaterial->SendMVPMatrixToShader(modelViewProjection.GetConstMatrix());
 	}
 
 	/*

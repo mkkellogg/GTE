@@ -489,7 +489,7 @@ namespace GTE
 		const VertexAttrBufferGL * bufferGL = dynamic_cast<const VertexAttrBufferGL *>(buffer);
 		ASSERT(bufferGL != nullptr, "ShaderGL::SendBufferToShader -> buffer is not VertexAttrBufferGL !!");
 
-		const Real * data = bufferGL->GetDataPtr();
+		const Real * data = bufferGL->GetConstDataPtr();
 		Int32 componentCount = bufferGL->GetComponentCount();
 		Int32 stride = bufferGL->GetStride();
 
@@ -549,12 +549,12 @@ namespace GTE
 	 * [varID] - ID/location of the shader uniform for which the value is to be set.
 	 * [mat] - Holds 4x4 matrix data to be sent.
 	 */
-	void ShaderGL::SendUniformToShader(Int32 varID, const Matrix4x4 * mat)
+	void ShaderGL::SendUniformToShader(Int32 varID, const Matrix4x4& mat)
 	{
 #ifdef _GTE_Real_DoublePrecision
-		glUniformMatrix4dv(varID, 1, GL_FALSE, mat->GetDataPtr());
+		glUniformMatrix4dv(varID, 1, GL_FALSE, mat.GetConstDataPtr());
 #else
-		glUniformMatrix4fv(varID, 1, GL_FALSE, mat->GetDataPtr());
+		glUniformMatrix4fv(varID, 1, GL_FALSE, mat.GetConstDataPtr());
 #endif
 	}
 
@@ -680,7 +680,7 @@ namespace GTE
 	 */
 	void ShaderGL::SendUniformToShaderM4x4V(Int32 varID, const Matrix4x4 * mat, UInt32 count)
 	{
-		glUniformMatrix4fv(varID, count, false, mat->GetDataPtr());
+		glUniformMatrix4fv(varID, count, false, mat->GetConstDataPtr());
 	}
 
 	/*

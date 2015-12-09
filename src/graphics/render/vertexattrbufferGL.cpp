@@ -1,10 +1,10 @@
-#include <memory.h>
-
 #include "graphics/gl_include.h"
 #include "vertexattrbufferGL.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
+
+#include <memory.h>
 
 namespace GTE
 {
@@ -167,7 +167,16 @@ namespace GTE
 	 * Get a pointer to the raw buffer data. This is only a CPU-side pointer;
 	 * if the buffer is a VBO, this will NOT be a pointer to the GPU memory.
 	 */
-	const Real * VertexAttrBufferGL::GetDataPtr() const
+	Real * VertexAttrBufferGL::GetDataPtr()
+	{
+		return data;
+	}
+
+	/*
+	* Get a const pointer to the raw buffer data. This is only a CPU-side pointer;
+	* if the buffer is a VBO, this will NOT be a pointer to the GPU memory.
+	*/
+	const Real * VertexAttrBufferGL::GetConstDataPtr() const
 	{
 		return (const Real *)data;
 	}

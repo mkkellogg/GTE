@@ -57,7 +57,7 @@ namespace GTE
 			for (UInt32 j = 0; j < 4; j++)
 			{
 				if (j>0)printf(",");
-				printf("%f", matrix.GetDataPtr()[i * 4 + j]);
+				printf("%f", matrix.GetConstDataPtr()[i * 4 + j]);
 			}
 			printf("\n");
 		}

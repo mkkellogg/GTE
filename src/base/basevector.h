@@ -185,10 +185,7 @@ namespace GTE
 			attached = source.attached;
 			canDetach = source.canDetach;
 
-			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
-			{
-				data[i] = source.data[i];
-			}
+			SetTo(source);
 
 			return *this;
 		}
@@ -198,9 +195,17 @@ namespace GTE
 		*/
 		void SetTo(const BaseVector& baseVector)
 		{
-			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
+			if(BaseVectorTraits<T>::VectorSize == 4)
 			{
-				data[i] = baseVector.data[i];
+				Real* dataPtr = baseVector.data;
+				BaseVector4_QuickCopy(dataPtr, data);
+			}
+			else
+			{
+				for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
+				{
+					data[i] = baseVector.data[i];
+				}
 			}
 		}
 
@@ -216,6 +221,14 @@ namespace GTE
 		* Get a pointer the backing data storage
 		*/
 		Real * GetDataPtr()
+		{
+			return data;
+		}
+
+		/*
+		* Get a pointer the backing data storage
+		*/
+		const Real * GetConstDataPtr() const
 		{
 			return data;
 		}

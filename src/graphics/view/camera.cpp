@@ -33,7 +33,7 @@ namespace GTE
 
 		ssaoMode = SSAORenderMode::Standard;
 		ssaoEnabled = false;
-		ambientPassEnabled = true;
+		lightingEnabled = true;
 		depthPassEnabled = true;
 
 		renderOrderIndex = 0;
@@ -163,14 +163,14 @@ namespace GTE
 		return ssaoMode;
 	}
 
-	void Camera::SetAmbientPassEnabled(Bool enabled)
+	void Camera::SetLightingEnabled(Bool enabled)
 	{
-		ambientPassEnabled = enabled;
+		lightingEnabled = enabled;
 	}
 
-	Bool Camera::IsAmbientPassEnabled() const
+	Bool Camera::IsLightingEnabled() const
 	{
-		return ambientPassEnabled;
+		return lightingEnabled;
 	}
 
 	void Camera::SetDepthPassEnabled(Bool enabled)

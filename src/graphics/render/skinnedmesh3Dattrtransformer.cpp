@@ -321,7 +321,8 @@ namespace GTE
 
 			if (!seenVectors[desc->UniqueVertexIndex])
 			{
-				seenVectorValues.GetElement(desc->UniqueVertexIndex)->SetTo(*(fullList.GetElement(i)));
+				Vector3* vec = fullList.GetElement(i);
+				seenVectorValues.GetElement(desc->UniqueVertexIndex)->SetTo(*vec);
 				seenVectors[desc->UniqueVertexIndex] = true;
 			}
 			else
@@ -470,25 +471,25 @@ namespace GTE
 			if (transformPositions)ASSERT(positionsOut.GetCount() == fullVertexCount, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Mismatched position count.");
 			if (transformNormals)ASSERT(vertexNormalsOut.GetCount() == fullVertexCount, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Mismatched vertex normal count.");
 			if (transformNormals)ASSERT(faceNormalsOut.GetCount() == fullVertexCount, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Mismatched face normal count.")
-				if (transformTangents)ASSERT(vertexTangentsOut.GetCount() == fullVertexCount, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Mismatched vertex tangent count.")
+			if (transformTangents)ASSERT(vertexTangentsOut.GetCount() == fullVertexCount, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Mismatched vertex tangent count.")
 
-					// initialize the position transformation flags array, saved transformed position array,
-					// normal transformation flags array, and saved transformed normal array
-					if (currentCacheSize < 0 || uniqueVertexCount != (UInt32)currentCacheSize)
-					{
-						DestroyCaches();
-						Bool createSuccess = CreateCaches();
-						ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Unable to create caches.");
+			// initialize the position transformation flags array, saved transformed position array,
+			// normal transformation flags array, and saved transformed normal array
+			if (currentCacheSize < 0 || uniqueVertexCount != (UInt32)currentCacheSize)
+			{
+				DestroyCaches();
+				Bool createSuccess = CreateCaches();
+				ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Unable to create caches.");
 
-						DestroyIdenticalNormalsTangentsFlags();
-						createSuccess = CreateIdenticalNormalsTangentsFlags();
-						ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Unable to create identical normal caches.");
+				DestroyIdenticalNormalsTangentsFlags();
+				createSuccess = CreateIdenticalNormalsTangentsFlags();
+				ASSERT(createSuccess == true, "SkinnedMesh3DAttributeTransformer::TransformAttributes -> Unable to create identical normal caches.");
 
-						if (transformNormals)FindIdenticalNormalsOrTangents(vertexNormalsOut, true);
-						if (transformTangents)FindIdenticalNormalsOrTangents(vertexTangentsOut, false);
+				if (transformNormals)FindIdenticalNormalsOrTangents(vertexNormalsOut, true);
+				if (transformTangents)FindIdenticalNormalsOrTangents(vertexTangentsOut, false);
 
-						currentCacheSize = uniqueVertexCount;
-					}
+				currentCacheSize = uniqueVertexCount;
+			}
 
 			SkeletonRef skeleton = renderer->GetSkeleton();
 			ASSERT(skeleton.IsValid(), "SkinnedMesh3DAttributeTransformer::TransformAttributes -> renderer's skeleton is not valid.");
@@ -502,19 +503,19 @@ namespace GTE
 			// clear the flags for all caches
 			ClearCacheFlags();
 
-			Real* transformedPositionsPtrBase = const_cast<Real*>(transformedPositions.GetDataPtr());
-			Real* transformedVertexNormalsPtrBase = const_cast<Real*>(transformedVertexNormals.GetDataPtr());
-			Real* transformedFaceNormalsPtrBase = const_cast<Real*>(transformedFaceNormals.GetDataPtr());
-			Real* transformedVertexTangentsPtrBase = const_cast<Real*>(transformedVertexTangents.GetDataPtr());
+			Real* transformedPositionsPtrBase = transformedPositions.GetDataPtr();
+			Real* transformedVertexNormalsPtrBase = transformedVertexNormals.GetDataPtr();
+			Real* transformedFaceNormalsPtrBase = transformedFaceNormals.GetDataPtr();
+			Real* transformedVertexTangentsPtrBase = transformedVertexTangents.GetDataPtr();
 			Real* transformedPositionsPtr = nullptr;
 			Real* transformedVertexNormalsPtr = nullptr;
 			Real* transformedFaceNormalsPtr = nullptr;
 			Real* transformedVertexTangentsPtr = nullptr;
 
-			Real * positionsOutBase = const_cast<Real*>(positionsOut.GetDataPtr());
-			Real * vertexNormalsOutBase = const_cast<Real*>(vertexNormalsOut.GetDataPtr());
-			Real * faceNormalsOutBase = const_cast<Real*>(faceNormalsOut.GetDataPtr());
-			Real * vertexTangentsOutBase = const_cast<Real*>(vertexTangentsOut.GetDataPtr());
+			Real * positionsOutBase = positionsOut.GetDataPtr();
+			Real * vertexNormalsOutBase = vertexNormalsOut.GetDataPtr();
+			Real * faceNormalsOutBase = faceNormalsOut.GetDataPtr();
+			Real * vertexTangentsOutBase = vertexTangentsOut.GetDataPtr();
 
 			UInt32 fullPositionCount = vertexBoneMap->GetVertexCount();
 			// loop through each vertex

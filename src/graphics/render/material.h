@@ -183,19 +183,19 @@ namespace GTE
 		StandardUniformSet GetStandardUniforms() const;
 		void SendClipPlaneCountToShader(UInt32 count);
 		void SendClipPlaneToShader(UInt32 index, Real eq1, Real eq2, Real eq3, Real eq4);
-		void SendModelMatrixInverseTransposeToShader(const Matrix4x4 * mat);
-		void SendModelMatrixToShader(const Matrix4x4 * mat);
-		void SendModelViewMatrixToShader(const Matrix4x4 * mat);
-		void SendViewMatrixToShader(const Matrix4x4 * mat);
-		void SendProjectionMatrixToShader(const Matrix4x4 * mat);
-		void SendMVPMatrixToShader(const Matrix4x4 * mat);
+		void SendModelMatrixInverseTransposeToShader(const Matrix4x4& mat);
+		void SendModelMatrixToShader(const Matrix4x4& mat);
+		void SendModelViewMatrixToShader(const Matrix4x4& mat);
+		void SendViewMatrixToShader(const Matrix4x4& mat);
+		void SendProjectionMatrixToShader(const Matrix4x4& mat);
+		void SendMVPMatrixToShader(const Matrix4x4& mat);
 		void SendLightToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
 							   const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
 							   const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, const Int32* enabled);
 		void SendLightsToShader(const Real * positions, const Real * directions, const Int32 * lightTypes,
 				   	   	   	    const Real* colors, const Real * intensities, const Real * ranges, const Real * attenuations,
 								const Int32 * parallelAngleAttenuations, const Int32 * orthoAngleAttenuations, const Int32* enabled, UInt32 count);
-		void SendLightToShader(const Light * light, const Point3 * position, const Vector3 * altDirection);
+		void SendLightToShader(const Light& light, const Point3& position, const Vector3 * altDirection);
 		void SendEyePositionToShader(const Point3 * position);
 
 		void SendAllStoredUniformValuesToShader();

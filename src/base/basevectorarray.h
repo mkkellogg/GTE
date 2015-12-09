@@ -117,9 +117,14 @@ namespace GTE
 			return objects[index];
 		}
 
-		const Real * GetDataPtr() const
+		Real * GetDataPtr()
 		{
-			return (const Real *)data;
+			return data;
+		}
+
+		const Real * GetConstDataPtr() const
+		{
+			return data;
 		}
 
 		T * GetElement(Int32 index)

@@ -116,7 +116,8 @@ namespace GTE
 
 		static inline void Mx4transform(Real x, Real y, Real z, Real w, const Real* pM, Real* pDest);
 
-		const Real * GetDataPtr() const;
+		const Real * GetConstDataPtr() const;
+		Real* GetDataPtr();
 	};
 }
 

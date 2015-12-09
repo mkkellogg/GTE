@@ -65,19 +65,14 @@ namespace GTE
 	 */
 	void AnimationPlayer::ClearBlendOpQueue()
 	{
-		if (activeBlendOperations.size() > 0)
+		UInt32 clearCount = 0;
+		while(activeBlendOperations.size() > 0)
 		{
 			BlendOp * op = activeBlendOperations.front();
-			op->OnStoppedEarly();
+			if(clearCount == 0)op->OnStoppedEarly();
 			activeBlendOperations.pop();
 			delete op;
-		}
-
-		while (activeBlendOperations.size() > 0)
-		{
-			BlendOp * op = activeBlendOperations.front();
-			activeBlendOperations.pop();
-			delete op;
+			clearCount++;
 		}
 	}
 
