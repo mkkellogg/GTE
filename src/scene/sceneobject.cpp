@@ -68,7 +68,7 @@ namespace GTE
 
 	void SceneObject::SetInheritsTransform(Bool inherit)
 	{
-		this->inheritTransform = inheritTransform;
+		this->inheritTransform = inherit;
 	}
 
 	void SceneObject::SetName(const std::string& name)

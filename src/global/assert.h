@@ -4,6 +4,8 @@
 #include "error/errormanager.h"
 #include "debug/gtedebug.h"
 
+#include <stdlib.h>
+
 #define ASSERT(exp, msg)    				        \
 {										   	        \
 	if(!(exp))					     		        \

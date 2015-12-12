@@ -33,7 +33,7 @@ namespace GTE
 
 			Iterator()
 			{
-				this->manager = manager;
+				this->manager = nullptr;
 				currentQueue = nullptr;
 				queueIndex = 0;
 				entryIndex = 0;

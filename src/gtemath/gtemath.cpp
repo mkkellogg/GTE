@@ -1,7 +1,8 @@
+#include "gtemath.h"
+
 #include <math.h>
 #include <cmath>
-
-#include "gtemath.h"
+#include <stdlib.h>
 
 namespace GTE
 {
