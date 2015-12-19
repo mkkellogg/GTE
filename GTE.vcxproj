@@ -299,6 +299,7 @@
     <ClInclude Include="src\graphics\graphicsattr.h" />
     <ClInclude Include="src\graphics\graphicsGL.h" />
     <ClInclude Include="src\graphics\object\customfloatattributebuffer.h" />
+    <ClInclude Include="src\graphics\particles\custommodifier.h" />
     <ClInclude Include="src\graphics\particles\evenintervalindexmodifier.h" />
     <ClInclude Include="src\graphics\particles\framesetmodifier.h" />
     <ClInclude Include="src\graphics\particles\particle.h" />

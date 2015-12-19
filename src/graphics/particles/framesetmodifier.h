@@ -27,7 +27,7 @@ namespace GTE
 
 		public:
 
-		FrameSetModifier() : ParticleModifier<T>(false)
+		FrameSetModifier() : ParticleModifier<T>()
 		{
 
 		}
@@ -42,17 +42,9 @@ namespace GTE
 			frameSet.AddKeyFrame(time, value);
 		}
 
-		void Initialize(Particle& particle, T& targetAttribute) const override
-		{
-			frameSet.InterpolateFrameValues(0.0f, targetAttribute);
-		}
-
 		void Update(Particle& particle, T& targetAttribute, Real t) const override
 		{
-			if(!this->runOnce)
-			{				
-				frameSet.InterpolateFrameValues(t, targetAttribute);
-			}
+			frameSet.InterpolateFrameValues(t, targetAttribute);
 		}
 
 		ParticleModifier<T>* Clone() const override

@@ -23,13 +23,11 @@ namespace GTE
 	{
 		protected:
 
-		Bool runOnce;
-
 		public:
 
-		ParticleModifier(Bool runOnce)
+		ParticleModifier()
 		{
-			this->runOnce = runOnce;
+			
 		}
 
 		virtual ~ParticleModifier()
@@ -37,17 +35,6 @@ namespace GTE
 
 		}
 
-		Bool SetOnce()
-		{
-			return runOnce;
-		}
-
-		Bool RunOnce()
-		{
-			return runOnce;
-		}
-
-		virtual void Initialize(Particle& particle, T& targetAttribute) const = 0;
 		virtual void Update(Particle& particle, T& targetAttribute, Real t) const = 0;
 		virtual ParticleModifier<T>* Clone() const = 0;
 	};

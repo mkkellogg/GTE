@@ -4,7 +4,7 @@
 *
 * author: Mark Kellogg
 *
-* A particle modifier generates an increasing integer value at an even
+* A particle modifier that generates an increasing integer value at an even
 * interval based on a specified integer range and the particle's age.
 *
 */
@@ -25,7 +25,7 @@ namespace GTE
 
 		public:
 
-		EvenIntervalIndexModifier(UInt32 totalSteps) : ParticleModifier<UInt32>(false)
+		EvenIntervalIndexModifier(UInt32 totalSteps) : ParticleModifier<UInt32>()
 		{
 			this->totalSteps = totalSteps;
 		}
@@ -35,20 +35,12 @@ namespace GTE
 
 		}
 
-		void Initialize(Particle& particle, UInt32& targetAttribute) const override
-		{
-			targetAttribute = 0;
-		}
-
 		void Update(Particle& particle, UInt32& targetAttribute, Real t) const override
 		{
-			if(!runOnce)
-			{
-				Real fraction = particle.Age / particle.LifeSpan;
-				UInt32 step = (UInt32)(fraction * totalSteps);
-				if(step == totalSteps && step > 0) step--;
-				targetAttribute = step;
-			}
+			Real fraction = particle.Age / particle.LifeSpan;
+			UInt32 step = (UInt32)(fraction * totalSteps);
+			if(step == totalSteps && step > 0) step--;
+			targetAttribute = step;
 		}
 
 		ParticleModifier<UInt32>* Clone() const override

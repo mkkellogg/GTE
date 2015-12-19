@@ -37,6 +37,15 @@ namespace GTE
 
 		// necessary so ParticleMeshRenderer can forward WillRender event
 		friend class ParticleMeshRenderer;
+
+		public:
+
+		enum class ModifierType
+		{
+			Initializer = 0,
+			Updater = 1,
+			All = 2
+		};
 		
 		private:
 	
@@ -57,20 +66,30 @@ namespace GTE
 		Bool hasInitialReleaseOccurred;
 		Bool isActive;
 
-		ParticleModifier<UInt32>* atlasModifier;
-		ParticleModifier<Color4>* colorModifier;
-		ParticleModifier<Real>* alphaModifier;
-		ParticleModifier<Vector2>* sizeModifier;
+		ParticleModifier<UInt32>* atlasInitializer;
+		ParticleModifier<Color4>* colorInitializer;
+		ParticleModifier<Real>* alphaInitializer;
+		ParticleModifier<Vector2>* sizeInitializer;
+		ParticleModifier<UInt32>* atlasUpdater;
+		ParticleModifier<Color4>* colorUpdater;
+		ParticleModifier<Real>* alphaUpdater;
+		ParticleModifier<Vector2>* sizeUpdater;
 
 		// Particle position and position modifiers (velocity and acceleration)
-		ParticleModifier<Point3>* positionModifier;
-		ParticleModifier<Vector3>* velocityModifier;
-		ParticleModifier<Vector3>* accelerationModifier;
+		ParticleModifier<Point3>* positionInitializer;
+		ParticleModifier<Vector3>* velocityInitializer;
+		ParticleModifier<Vector3>* accelerationInitializer;
+		ParticleModifier<Point3>* positionUpdater;
+		ParticleModifier<Vector3>* velocityUpdater;
+		ParticleModifier<Vector3>* accelerationUpdater;
 
 		// Particle rotation and rotation modifiers (rotational speed and rotational acceleration)
-		ParticleModifier<Real>* rotationModifier;
-		ParticleModifier<Real>* rotationalSpeedModifier;
-		ParticleModifier<Real>* rotationalAccelerationModifier;
+		ParticleModifier<Real>* rotationInitializer;
+		ParticleModifier<Real>* rotationalSpeedInitializer;
+		ParticleModifier<Real>* rotationalAccelerationInitializer;
+		ParticleModifier<Real>* rotationUpdater;
+		ParticleModifier<Real>* rotationalSpeedUpdater;
+		ParticleModifier<Real>* rotationalAccelerationUpdater;
 
 		Real particleReleaseRate;
 		Real particleLifeSpan;
@@ -148,20 +167,46 @@ namespace GTE
 		void Destroy();
 		void DestroyModifiers();
 
+		template <typename T> Bool BindModifierFromType(ParticleModifier<T>** localInitializer, ParticleModifier<T>** localUpdater, 
+													const ParticleModifier<T>& modifier, ModifierType modifierType)
+		{
+			Bool success = true;
+
+			if(modifierType == ModifierType::Initializer || modifierType == ModifierType::All)
+			{
+				success &= BindModifier(localInitializer, modifier);
+			}
+
+			if(modifierType == ModifierType::Updater || modifierType == ModifierType::All)
+			{
+				success &= BindModifier(localUpdater, modifier);
+			}
+
+			return success;
+		}
+
+		template <typename T> Bool BindModifier(ParticleModifier<T>** local, const ParticleModifier<T>& modifier)
+		{
+			SAFE_DELETE(*local);
+			*local = modifier.Clone();
+			NONFATAL_ASSERT_RTRN(*local != nullptr, "ParticleSystem::BindModifier -> Unable to clone modifier.", false, false);
+			return true;
+		}
+
 		public:
 
-		Bool BindPositionModifier(const ParticleModifier<Point3>& modifier);
-		Bool BindVelocityModifier(const ParticleModifier<Vector3>& modifier);
-		Bool BindAccelerationModifier(const ParticleModifier<Vector3>& modifier);
+		Bool BindPositionModifier(const ParticleModifier<Point3>& modifier, ModifierType modifierType);
+		Bool BindVelocityModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType);
+		Bool BindAccelerationModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType);
 		
-		Bool BindRotationModifier(const ParticleModifier<Real>& modifier);
-		Bool BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier);
-		Bool BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier);
+		Bool BindRotationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
+		Bool BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
+		Bool BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
 
-		Bool BindAtlasModifier(const ParticleModifier<UInt32>& modifier);
-		Bool BindColorModifier(const ParticleModifier<Color4>& modifier);
-		Bool BindAlphaModifier(const ParticleModifier<Real>& modifier);
-		Bool BindSizeModifier(const ParticleModifier<Vector2>& modifier);
+		Bool BindAtlasModifier(const ParticleModifier<UInt32>& modifier, ModifierType modifierType);
+		Bool BindColorModifier(const ParticleModifier<Color4>& modifier, ModifierType modifierType);
+		Bool BindAlphaModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
+		Bool BindSizeModifier(const ParticleModifier<Vector2>& modifier, ModifierType modifierType);
 
 		void SetPremultiplyAlpha(Bool premultiply);
 		void SetZSort(Bool sort);

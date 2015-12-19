@@ -8,6 +8,7 @@
 #include "framesetmodifier.h"
 #include "randommodifier.h"
 #include "evenintervalindexmodifier.h"
+#include "custommodifier.h"
 #include "global/global.h"
 #include "global/assert.h"
 #include "debug/gtedebug.h"
@@ -32,6 +33,48 @@ namespace GTE
 {
 	ParticleSystem::ParticleSystem()
 	{
+		static CustomModifier<UInt32> DefaultUInt32Initializer([](Particle& particle, UInt32& ta, Real t){ta = 0;});
+		static CustomModifier<Real> DefaultRealInitializer([](Particle& particle, Real& ta, Real t){ta = 0.0f;});
+		static CustomModifier<Vector3> DefaultVector3Initializer([](Particle& particle, Vector3& ta, Real t){ta.Set(0, 0, 0);});
+		static CustomModifier<Point3> DefaultPoint3Initializer([](Particle& particle, Point3& ta, Real t){ta.Set(0, 0, 0);});
+		static CustomModifier<Color4> DefaultColor4Initializer([](Particle& particle, Color4& ta, Real t){ta.Set(0, 0, 0, 0);});
+		static CustomModifier<Vector2> DefaultVector2Initializer([](Particle& particle, Vector2& ta, Real t){ta.Set(0, 0);});
+
+		static CustomModifier<UInt32> DefaultAtlasUpdater([](Particle& particle, UInt32& ta, Real t){ });
+		static CustomModifier<Color4> DefaultColorUpdater([](Particle& particle, Color4& ta, Real t) { });
+		static CustomModifier<Real> DefaultAlphaUpdater([](Particle& particle, Real& ta, Real t) {});
+		static CustomModifier<Vector2> DefaultSizeUpdater([](Particle& particle, Vector2& ta, Real t) {});
+
+		static CustomModifier<Point3> DefaultPositionUpdater([](Particle& particle, Point3& ta, Real t)
+		{
+			Vector3 velocity = particle.Velocity;
+			velocity.Scale(Time::GetDeltaTime());
+			particle.Position.Add(velocity);
+		
+		});
+
+		static CustomModifier<Vector3> DefaultVelocityUpdater([](Particle& particle, Vector3& ta, Real t) 
+		{ 
+
+			Vector3 acceleration = particle.Acceleration;
+			acceleration.Scale(Time::GetDeltaTime());
+			particle.Velocity.Add(acceleration);
+		});
+
+		static CustomModifier<Vector3> DefaultAccelerationUpdater([](Particle& particle, Vector3& ta, Real t){ });
+
+		static CustomModifier<Real> DefaultRotationUpdater([](Particle& particle, Real& ta, Real t) 
+		{ 
+			particle.Rotation += particle.RotationalSpeed * Time::GetDeltaTime();
+		});
+
+		static CustomModifier<Real> DefaultRotationalSpeedUpdater([](Particle& particle, Real& ta, Real t)
+		{
+			particle.RotationalSpeed += particle.RotationalAcceleration * Time::GetDeltaTime();
+		});
+
+		static CustomModifier<Real> DefaultRotationalAccelerationUpdater([](Particle& particle, Real& ta, Real t){ });
+
 		currentCamera = nullptr;
 
 		zSort = false;
@@ -46,20 +89,30 @@ namespace GTE
 		attributeRotationID = AttributeDirectory::VarID_Invalid;
 		attributeIndexID = AttributeDirectory::VarID_Invalid;
 
-		atlasModifier = nullptr;
-		colorModifier = nullptr;
-		alphaModifier = nullptr;
-		sizeModifier = nullptr;
+		atlasInitializer = DefaultUInt32Initializer.Clone();
+		colorInitializer = DefaultColor4Initializer.Clone();
+		alphaInitializer = DefaultRealInitializer.Clone();
+		sizeInitializer = DefaultVector2Initializer.Clone();
+		atlasUpdater = DefaultAtlasUpdater.Clone();
+		colorUpdater = DefaultColorUpdater.Clone();
+		alphaUpdater = DefaultAlphaUpdater.Clone();
+		sizeUpdater = DefaultSizeUpdater.Clone();
 
 		// Particle position and position modifiers (velocity and acceleration)
-		positionModifier = nullptr;
-		velocityModifier = nullptr;
-		accelerationModifier = nullptr;
+		positionInitializer = DefaultPoint3Initializer.Clone();
+		velocityInitializer = DefaultVector3Initializer.Clone();
+		accelerationInitializer = DefaultVector3Initializer.Clone();
+		positionUpdater = DefaultPositionUpdater.Clone();
+		velocityUpdater = DefaultVelocityUpdater.Clone();
+		accelerationUpdater = DefaultAccelerationUpdater.Clone();
 
 		// Particle rotation and rotation modifiers (rotational speed and rotational acceleration)
-		rotationModifier = nullptr;
-		rotationalSpeedModifier = nullptr;
-		rotationalAccelerationModifier = nullptr;
+		rotationInitializer = DefaultRealInitializer.Clone();
+		rotationalSpeedInitializer = DefaultRealInitializer.Clone();
+		rotationalAccelerationInitializer = DefaultRealInitializer.Clone();
+		rotationUpdater = DefaultRotationUpdater.Clone();
+		rotationalSpeedUpdater = DefaultRotationalSpeedUpdater.Clone();
+		rotationalAccelerationUpdater = DefaultRotationalAccelerationUpdater.Clone();
 
 		particleReleaseRate = 100;
 		particleLifeSpan = 1.0f;
@@ -98,18 +151,28 @@ namespace GTE
 
 	void ParticleSystem::DestroyModifiers()
 	{
-		SAFE_DELETE(atlasModifier);
-		SAFE_DELETE(colorModifier);
-		SAFE_DELETE(alphaModifier);
-		SAFE_DELETE(sizeModifier);
+		SAFE_DELETE(atlasInitializer);
+		SAFE_DELETE(colorInitializer);
+		SAFE_DELETE(alphaInitializer);
+		SAFE_DELETE(sizeInitializer);
+		SAFE_DELETE(atlasUpdater);
+		SAFE_DELETE(colorUpdater);
+		SAFE_DELETE(alphaUpdater);
+		SAFE_DELETE(sizeUpdater);
 
-		SAFE_DELETE(positionModifier);
-		SAFE_DELETE(velocityModifier);
-		SAFE_DELETE(accelerationModifier);
+		SAFE_DELETE(positionInitializer);
+		SAFE_DELETE(velocityInitializer);
+		SAFE_DELETE(accelerationInitializer);
+		SAFE_DELETE(positionUpdater);
+		SAFE_DELETE(velocityUpdater);
+		SAFE_DELETE(accelerationUpdater);
 
-		SAFE_DELETE(rotationModifier);
-		SAFE_DELETE(rotationalSpeedModifier);
-		SAFE_DELETE(rotationalAccelerationModifier);
+		SAFE_DELETE(rotationInitializer);
+		SAFE_DELETE(rotationalSpeedInitializer);
+		SAFE_DELETE(rotationalAccelerationInitializer);
+		SAFE_DELETE(rotationUpdater);
+		SAFE_DELETE(rotationalSpeedUpdater);
+		SAFE_DELETE(rotationalAccelerationUpdater);
 	}
 
 	MaterialSharedPtr ParticleSystem::CreateMaterial(const std::string& shaderName, const std::string& materialName)
@@ -607,25 +670,10 @@ namespace GTE
 
 	void ParticleSystem::ResetParticleDisplayAttributes(Particle * particle)
 	{
-		if(atlasModifier != nullptr)
-		{
-			atlasModifier->Initialize(*particle, particle->AtlasIndex);
-		}
-
-		if(sizeModifier != nullptr)
-		{
-			sizeModifier->Initialize(*particle, particle->Size);
-		}
-
-		if(colorModifier != nullptr)
-		{
-			colorModifier->Initialize(*particle, particle->Color);
-		}
-
-		if(alphaModifier != nullptr)
-		{
-			alphaModifier->Initialize(*particle, particle->Alpha);
-		}
+		atlasInitializer->Update(*particle, particle->AtlasIndex, 0.0f);
+		sizeInitializer->Update(*particle, particle->Size, 0.0f);
+		colorInitializer->Update(*particle, particle->Color, 0.0f);
+		alphaInitializer->Update(*particle, particle->Alpha, 0.0f);
 	}
 
 	void ParticleSystem::ResetParticlePositionData(Particle * particle)
@@ -634,10 +682,7 @@ namespace GTE
 		particle->Velocity.Set(0, 0, 0);
 		particle->Acceleration.Set(0, 0, 0);
 
-		if(positionModifier != nullptr)
-		{
-			positionModifier->Initialize(*particle, particle->Position);
-		}
+		positionInitializer->Update(*particle, particle->Position, 0.0f);
 
 		if(!simulateInLocalSpace)
 		{
@@ -651,16 +696,8 @@ namespace GTE
 			particle->Position.Add(offset);
 		}
 
-		if(velocityModifier != nullptr)
-		{
-			velocityModifier->Initialize(*particle, particle->Velocity);
-		}
-
-		if(accelerationModifier != nullptr)
-		{
-			accelerationModifier->Initialize(*particle, particle->Acceleration);
-		}
-
+		velocityInitializer->Update(*particle, particle->Velocity, 0.0f);
+		accelerationInitializer->Update(*particle, particle->Acceleration, 0.0f);
 	}
 
 	void ParticleSystem::ResetParticleRotationData(Particle * particle)
@@ -669,20 +706,9 @@ namespace GTE
 		particle->RotationalSpeed = 0.0f;
 		particle->RotationalAcceleration = 0.0f;
 
-		if(rotationModifier != nullptr)
-		{
-			rotationModifier->Initialize(*particle, particle->Rotation);
-		}
-
-		if(rotationalSpeedModifier != nullptr)
-		{
-			rotationalSpeedModifier->Initialize(*particle, particle->RotationalSpeed);
-		}
-
-		if(rotationalAccelerationModifier != nullptr)
-		{
-			rotationalAccelerationModifier->Initialize(*particle, particle->RotationalAcceleration);
-		}
+		rotationInitializer->Update(*particle, particle->Rotation, 0.0f);
+		rotationalSpeedInitializer->Update(*particle, particle->RotationalSpeed, 0.0f);
+		rotationalAccelerationInitializer->Update(*particle, particle->RotationalAcceleration, 0.0f);
 	}
 
 	void ParticleSystem::AdvanceParticle(Particle* particle, Real deltaTime)
@@ -696,81 +722,24 @@ namespace GTE
 
 	void ParticleSystem::AdvanceParticleDisplayAttributes(Particle * particle, Real deltaTime)
 	{
-		if(atlasModifier != nullptr && !atlasModifier->RunOnce())
-		{
-			atlasModifier->Update(*particle, particle->AtlasIndex, particle->Age);
-		}
-
-		if(sizeModifier != nullptr && !sizeModifier->RunOnce())
-		{
-			sizeModifier->Update(*particle, particle->Size, particle->Age);
-		}
-
-		if(colorModifier != nullptr && !colorModifier->RunOnce())
-		{
-			colorModifier->Update(*particle, particle->Color, particle->Age);
-		}
-
-		if(alphaModifier != nullptr && !alphaModifier->RunOnce())
-		{
-			alphaModifier->Update(*particle, particle->Alpha, particle->Age);
-		}
+		atlasUpdater->Update(*particle, particle->AtlasIndex, particle->Age);
+		sizeUpdater->Update(*particle, particle->Size, particle->Age);
+		colorUpdater->Update(*particle, particle->Color, particle->Age);
+		alphaUpdater->Update(*particle, particle->Alpha, particle->Age);
 	}
 
 	void ParticleSystem::AdvanceParticlePositionData(Particle * particle, Real deltaTime)
 	{
-		if(positionModifier != nullptr && !positionModifier->RunOnce())
-		{
-			positionModifier->Update(*particle, particle->Position, particle->Age);
-		}
-		else
-		{
-			Vector3 velocity = particle->Velocity;
-			velocity.Scale(deltaTime);
-			particle->Position.Add(velocity);
-		}
-
-		if(velocityModifier != nullptr && !velocityModifier->RunOnce())
-		{
-			velocityModifier->Update(*particle, particle->Velocity, particle->Age);
-		}
-		else
-		{
-			Vector3 acceleration = particle->Acceleration;
-			acceleration.Scale(deltaTime);
-			particle->Velocity.Add(acceleration);
-		}
-
-		if(accelerationModifier != nullptr && !accelerationModifier->RunOnce())
-		{
-			accelerationModifier->Update(*particle, particle->Acceleration, particle->Age);
-		}
+		positionUpdater->Update(*particle, particle->Position, particle->Age);
+		velocityUpdater->Update(*particle, particle->Velocity, particle->Age);
+		accelerationUpdater->Update(*particle, particle->Acceleration, particle->Age);
 	}
 
 	void ParticleSystem::AdvanceParticleRotationData(Particle * particle, Real deltaTime)
 	{
-		if(rotationModifier != nullptr && !rotationModifier->RunOnce())
-		{
-			rotationModifier->Update(*particle, particle->Rotation, particle->Age);
-		}
-		else
-		{
-			particle->Rotation += particle->RotationalSpeed * deltaTime;
-		}
-
-		if(rotationalSpeedModifier != nullptr && !rotationalSpeedModifier->RunOnce())
-		{
-			rotationalSpeedModifier->Update(*particle, particle->RotationalSpeed, particle->Age);
-		}
-		else
-		{
-			particle->RotationalSpeed += particle->RotationalAcceleration * deltaTime;
-		}
-
-		if(rotationalAccelerationModifier != nullptr && !rotationalAccelerationModifier->RunOnce())
-		{
-			rotationalAccelerationModifier->Update(*particle, particle->RotationalAcceleration, particle->Age);
-		}
+		rotationUpdater->Update(*particle, particle->Rotation, particle->Age);
+		rotationalSpeedUpdater->Update(*particle, particle->RotationalSpeed, particle->Age);
+		rotationalAccelerationUpdater->Update(*particle, particle->RotationalAcceleration, particle->Age);
 	}
 
 	void ParticleSystem::AdvanceParticles(Real deltaTime)
@@ -917,84 +886,54 @@ namespace GTE
 	}
 
 
-	Bool ParticleSystem::BindAtlasModifier(const ParticleModifier<UInt32>& modifier)
+	Bool ParticleSystem::BindAtlasModifier(const ParticleModifier<UInt32>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(atlasModifier);
-		atlasModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(atlasModifier != nullptr, "ParticleSystem::BindAtlasModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<UInt32>(&atlasInitializer, &atlasUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindColorModifier(const ParticleModifier<Color4>& modifier)
+	Bool ParticleSystem::BindColorModifier(const ParticleModifier<Color4>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(colorModifier);
-		colorModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(colorModifier != nullptr, "ParticleSystem::BindColorModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Color4>(&colorInitializer, &colorUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindAlphaModifier(const ParticleModifier<Real>& modifier)
+	Bool ParticleSystem::BindAlphaModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(alphaModifier);
-		alphaModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(alphaModifier != nullptr, "ParticleSystem::BindAlphaModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Real>(&alphaInitializer, &alphaUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindSizeModifier(const ParticleModifier<Vector2>& modifier)
+	Bool ParticleSystem::BindSizeModifier(const ParticleModifier<Vector2>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(sizeModifier);
-		sizeModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(sizeModifier != nullptr, "ParticleSystem::BindSizeModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Vector2>(&sizeInitializer, &sizeUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindPositionModifier(const ParticleModifier<Point3>& modifier)
+	Bool ParticleSystem::BindPositionModifier(const ParticleModifier<Point3>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(positionModifier);
-		positionModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(positionModifier != nullptr, "ParticleSystem::BindPositionModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Point3>(&positionInitializer, &positionUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindVelocityModifier(const ParticleModifier<Vector3>& modifier)
+	Bool ParticleSystem::BindVelocityModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(velocityModifier);
-		velocityModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(velocityModifier != nullptr, "ParticleSystem::BindVelocityModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Vector3>(&velocityInitializer, &velocityUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindAccelerationModifier(const ParticleModifier<Vector3>& modifier)
+	Bool ParticleSystem::BindAccelerationModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(accelerationModifier);
-		accelerationModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(accelerationModifier != nullptr, "ParticleSystem::BindAccelerationModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Vector3>(&accelerationInitializer, &accelerationUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindRotationModifier(const ParticleModifier<Real>& modifier)
+	Bool ParticleSystem::BindRotationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(rotationModifier);
-		rotationModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(rotationModifier != nullptr, "ParticleSystem::BindRotationModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Real>(&rotationInitializer, &rotationUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier)
+	Bool ParticleSystem::BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(rotationalSpeedModifier);
-		rotationalSpeedModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(rotationalSpeedModifier != nullptr, "ParticleSystem::BindRotationalSpeedModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Real>(&rotationalSpeedInitializer, &rotationalSpeedUpdater, modifier, modifierType);
 	}
 
-	Bool ParticleSystem::BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier)
+	Bool ParticleSystem::BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType)
 	{
-		SAFE_DELETE(rotationalAccelerationModifier);
-		rotationalAccelerationModifier = modifier.Clone();
-		NONFATAL_ASSERT_RTRN(rotationalAccelerationModifier != nullptr, "ParticleSystem::BindRotationalAccelerationModifier -> Unable to clone modifier.", false, false);
-		return true;
+		return BindModifierFromType<Real>(&rotationalAccelerationInitializer, &rotationalAccelerationUpdater, modifier, modifierType);
 	}
 
 	void ParticleSystem::SetPremultiplyAlpha(Bool premultiply)

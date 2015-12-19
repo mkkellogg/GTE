@@ -715,8 +715,8 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	flameSystemObject->SetParticleSystem(flameSystem);
 	flameSystem->SetPremultiplyAlpha(true);
 
-	GTE::RandomModifier<GTE::Point3> flamePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.0f, 0.0f, 0.0f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> flameVelocityModifier(GTE::Vector3(0.0f, 2.3f, 0.0f), GTE::Vector3(0.9f, 0.4f, 0.9f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Point3> flamePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.0f, 0.0f, 0.0f), GTE::ParticleRangeType::Sphere, false);
+	GTE::RandomModifier<GTE::Vector3> flameVelocityModifier(GTE::Vector3(0.0f, 2.3f, 0.0f), GTE::Vector3(0.9f, 0.4f, 0.9f), GTE::ParticleRangeType::Sphere, false);
 	GTE::EvenIntervalIndexModifier flameAtlasModifier(64);
 
 	GTE::FrameSetModifier<GTE::Vector2> flameSizeModifier;
@@ -735,12 +735,12 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	flameColorModifier.AddFrame(0.2f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
 	flameColorModifier.AddFrame(3.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	flameSystem->BindPositionModifier(flamePositionModifier);
-	flameSystem->BindVelocityModifier(flameVelocityModifier);
-	flameSystem->BindSizeModifier(flameSizeModifier);
-	flameSystem->BindAlphaModifier(flameAlphaModifier);
-	flameSystem->BindColorModifier(flameColorModifier);
-	flameSystem->BindAtlasModifier(flameAtlasModifier);
+	flameSystem->BindPositionModifier(flamePositionModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	flameSystem->BindVelocityModifier(flameVelocityModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	flameSystem->BindSizeModifier(flameSizeModifier, GTE::ParticleSystem::ModifierType::All);
+	flameSystem->BindAlphaModifier(flameAlphaModifier, GTE::ParticleSystem::ModifierType::All);
+	flameSystem->BindColorModifier(flameColorModifier, GTE::ParticleSystem::ModifierType::All);
+	flameSystem->BindAtlasModifier(flameAtlasModifier, GTE::ParticleSystem::ModifierType::All);
 
 
 	//================================
@@ -770,11 +770,11 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	emberSystemObject->SetParticleSystem(emberSystem);
 	emberSystem->SetPremultiplyAlpha(true);
 
-	GTE::RandomModifier<GTE::Point3> emberPositionModifier(GTE::Point3(0.0f, 2.0f, 0.0f), GTE::Point3(0.4f, 0.0f, 0.4f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> emberVelocityModifier(GTE::Vector3(0.0f, 5.0f, 0.0f), GTE::Vector3(3.0f, 5.0f, 3.0f), GTE::ParticleRangeType::Sphere, true, true);
-	GTE::RandomModifier<GTE::Vector3> emberAccelerationModifier(GTE::Vector3(0.0f, 3.0f, 0.0f), GTE::Vector3(75.0f, 65.0f, 75.0f), GTE::ParticleRangeType::Sphere, true, false);
+	GTE::RandomModifier<GTE::Point3> emberPositionModifier(GTE::Point3(0.0f, 2.0f, 0.0f), GTE::Point3(0.4f, 0.0f, 0.4f), GTE::ParticleRangeType::Sphere, false);
+	GTE::RandomModifier<GTE::Vector3> emberVelocityModifier(GTE::Vector3(0.0f, 5.0f, 0.0f), GTE::Vector3(3.0f, 5.0f, 3.0f), GTE::ParticleRangeType::Sphere, true);
+	GTE::RandomModifier<GTE::Vector3> emberAccelerationModifier(GTE::Vector3(0.0f, 3.0f, 0.0f), GTE::Vector3(75.0f, 65.0f, 75.0f), GTE::ParticleRangeType::Sphere, true);
 	GTE::EvenIntervalIndexModifier emberAtlasModifier(1);
-	GTE::RandomModifier<GTE::Vector2> emberSizeModifier(GTE::Vector2(0.05f, 0.05f), GTE::Vector2(0.01f, 0.01f), GTE::ParticleRangeType::Sphere, false, true);
+	GTE::RandomModifier<GTE::Vector2> emberSizeModifier(GTE::Vector2(0.05f, 0.05f), GTE::Vector2(0.01f, 0.01f), GTE::ParticleRangeType::Sphere, false);
 
 	GTE::FrameSetModifier<GTE::Real> emberAlphaModifier;
 	emberAlphaModifier.AddFrame(0.0f, 0.0f);
@@ -788,13 +788,13 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	emberColorModifier.AddFrame(0.2f, GTE::Color4(0.75f, 0.4f, 0.4f, 1.0f));
 	emberColorModifier.AddFrame(3.0f, GTE::Color4(0.6f, 0.6f, 0.6f, 0.0f));
 
-	emberSystem->BindPositionModifier(emberPositionModifier);
-	emberSystem->BindVelocityModifier(emberVelocityModifier);
-	emberSystem->BindSizeModifier(emberSizeModifier);
-	emberSystem->BindAlphaModifier(emberAlphaModifier);
-	emberSystem->BindColorModifier(emberColorModifier);
-	emberSystem->BindAtlasModifier(emberAtlasModifier);
-	emberSystem->BindAccelerationModifier(emberAccelerationModifier);
+	emberSystem->BindPositionModifier(emberPositionModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	emberSystem->BindVelocityModifier(emberVelocityModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	emberSystem->BindSizeModifier(emberSizeModifier, GTE::ParticleSystem::ModifierType::All);
+	emberSystem->BindAlphaModifier(emberAlphaModifier, GTE::ParticleSystem::ModifierType::All);
+	emberSystem->BindColorModifier(emberColorModifier, GTE::ParticleSystem::ModifierType::All);
+	emberSystem->BindAtlasModifier(emberAtlasModifier, GTE::ParticleSystem::ModifierType::All);
+	emberSystem->BindAccelerationModifier(emberAccelerationModifier, GTE::ParticleSystem::ModifierType::All);
 
 	//================================
 	// Setup smoke particle system
@@ -830,12 +830,12 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	smokeSystem->SetPremultiplyAlpha(false);
 	smokeSystem->SetZSort(true);
 
-	GTE::RandomModifier<GTE::Point3> smokePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.5f, 0.0f, 0.5f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> smokeVelocityModifier(GTE::Vector3(0.0f, 9.0f, 0.0f), GTE::Vector3(0.5f, 2.6f, 0.5f), GTE::ParticleRangeType::Sphere, false, true);
-	GTE::RandomModifier<GTE::Vector3> smokeAccelerationModifier(GTE::Vector3(0.0f, -1.8f, 0.0f), GTE::Vector3(3.5f, 2.0f, 3.5f), GTE::ParticleRangeType::Cube, false, true);
+	GTE::RandomModifier<GTE::Point3> smokePositionModifier(GTE::Point3(0.0f, 0.0f, 0.0f), GTE::Point3(0.5f, 0.0f, 0.5f), GTE::ParticleRangeType::Sphere, false);
+	GTE::RandomModifier<GTE::Vector3> smokeVelocityModifier(GTE::Vector3(0.0f, 9.0f, 0.0f), GTE::Vector3(0.5f, 2.6f, 0.5f), GTE::ParticleRangeType::Sphere, false);
+	GTE::RandomModifier<GTE::Vector3> smokeAccelerationModifier(GTE::Vector3(0.0f, -1.8f, 0.0f), GTE::Vector3(3.5f, 2.0f, 3.5f), GTE::ParticleRangeType::Cube, false);
 
-	GTE::RandomModifier<GTE::Real> smokeRotationModifier(0.0f, 360.0f, GTE::ParticleRangeType::Linear, false, true);
-	GTE::RandomModifier<GTE::Real> smokeRotationalSpeedModifier(50.0f, 400.0f, GTE::ParticleRangeType::Linear, false, true);
+	GTE::RandomModifier<GTE::Real> smokeRotationModifier(0.0f, 360.0f, GTE::ParticleRangeType::Linear, false);
+	GTE::RandomModifier<GTE::Real> smokeRotationalSpeedModifier(50.0f, 400.0f, GTE::ParticleRangeType::Linear, false);
 
 	GTE::EvenIntervalIndexModifier smokeAtlasModifier(1);
 
@@ -868,15 +868,15 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	smokeColorModifier.AddFrame(4.0f, GTE::Color4(1.0f, 1.0f, 1.0f, 1.0f));*/
 
 
-	smokeSystem->BindPositionModifier(smokePositionModifier);
-	smokeSystem->BindVelocityModifier(smokeVelocityModifier);
-	smokeSystem->BindAccelerationModifier(smokeAccelerationModifier);
-	smokeSystem->BindRotationModifier(smokeRotationModifier);
-	smokeSystem->BindRotationalSpeedModifier(smokeRotationalSpeedModifier);
-	smokeSystem->BindSizeModifier(smokeSizeModifier);
-	smokeSystem->BindAlphaModifier(smokeAlphaModifier);
-	smokeSystem->BindColorModifier(smokeColorModifier);
-	smokeSystem->BindAtlasModifier(smokeAtlasModifier);
+	smokeSystem->BindPositionModifier(smokePositionModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	smokeSystem->BindVelocityModifier(smokeVelocityModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	smokeSystem->BindAccelerationModifier(smokeAccelerationModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	smokeSystem->BindRotationModifier(smokeRotationModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	smokeSystem->BindRotationalSpeedModifier(smokeRotationalSpeedModifier, GTE::ParticleSystem::ModifierType::Initializer);
+	smokeSystem->BindSizeModifier(smokeSizeModifier, GTE::ParticleSystem::ModifierType::All);
+	smokeSystem->BindAlphaModifier(smokeAlphaModifier, GTE::ParticleSystem::ModifierType::All);
+	smokeSystem->BindColorModifier(smokeColorModifier, GTE::ParticleSystem::ModifierType::All);
+	smokeSystem->BindAtlasModifier(smokeAtlasModifier, GTE::ParticleSystem::ModifierType::All);
 	
 
 	GTE::LayerManager& layerManager = objectManager->GetLayerManager();

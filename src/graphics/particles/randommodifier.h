@@ -33,7 +33,7 @@ namespace GTE
 
 		public:
 
-		RandomModifier(const T& offset, const T& range, ParticleRangeType rangeType, Bool edgeClamp, Bool runOnce) : ParticleModifier<T>(runOnce)
+		RandomModifier(const T& offset, const T& range, ParticleRangeType rangeType, Bool edgeClamp) : ParticleModifier<T>()
 		{
 			this->offset = offset;
 			this->range = range;
@@ -46,22 +46,14 @@ namespace GTE
 
 		}
 
-		void Initialize(Particle& particle, T& targetAttribute) const override
+		void Update(Particle& particle, T& targetAttribute, Real t) const override
 		{
 			ParticleUtil::GetRandom(offset, range, targetAttribute, edgeClamp, rangeType);
 		}
 
-		void Update(Particle& particle, T& targetAttribute, Real t) const override
-		{
-			if(!this->runOnce)
-			{
-				ParticleUtil::GetRandom(offset, range, targetAttribute, edgeClamp, rangeType);
-			}
-		}
-
 		ParticleModifier<T>* Clone() const override
 		{
-			RandomModifier<T> * baseClone = new RandomModifier<T>(offset, range, rangeType, edgeClamp, ParticleModifier<T>::runOnce);
+			RandomModifier<T> * baseClone = new RandomModifier<T>(offset, range, rangeType, edgeClamp);
 			ASSERT(baseClone != nullptr, "RandomModifer<T>::Clone -> Could not clone modifier.");
 			return static_cast<ParticleModifier<T>*>(baseClone);
 		}
