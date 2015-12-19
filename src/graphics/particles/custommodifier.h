@@ -15,12 +15,15 @@
 #include "engine.h"
 #include "object/engineobject.h"
 #include "particlemodifier.h"
-#include "particle.h"
+#include "global/assert.h"
 
 #include <functional>
 
 namespace GTE
 {
+	// forward declarations
+	class Particle;
+
 	template <typename T> class CustomModifier : public ParticleModifier<T>
 	{
 		std::function<void(Particle& particle, T& targetAttribute, Real t)> callback;

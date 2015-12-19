@@ -31,50 +31,50 @@
 
 namespace GTE
 {
+	const CustomModifier<UInt32> ParticleSystem::DefaultUInt32Initializer([](Particle& particle, UInt32& ta, Real t) { ta = 0; });
+	const CustomModifier<Real> ParticleSystem::DefaultRealInitializer([](Particle& particle, Real& ta, Real t) { ta = 0.0f; });
+	const CustomModifier<Vector3> ParticleSystem::DefaultVector3Initializer([](Particle& particle, Vector3& ta, Real t) { ta.Set(0, 0, 0); });
+	const CustomModifier<Point3> ParticleSystem::DefaultPoint3Initializer([](Particle& particle, Point3& ta, Real t) { ta.Set(0, 0, 0); });
+	const CustomModifier<Color4> ParticleSystem::DefaultColor4Initializer([](Particle& particle, Color4& ta, Real t) { ta.Set(0, 0, 0, 0); });
+	const CustomModifier<Vector2> ParticleSystem::DefaultVector2Initializer([](Particle& particle, Vector2& ta, Real t) { ta.Set(0, 0); });
+
+	const CustomModifier<UInt32> ParticleSystem::DefaultAtlasUpdater([](Particle& particle, UInt32& ta, Real t) {});
+	const CustomModifier<Color4> ParticleSystem::DefaultColorUpdater([](Particle& particle, Color4& ta, Real t) {});
+	const CustomModifier<Real> ParticleSystem::DefaultAlphaUpdater([](Particle& particle, Real& ta, Real t) {});
+	const CustomModifier<Vector2> ParticleSystem::DefaultSizeUpdater([](Particle& particle, Vector2& ta, Real t) {});
+
+	const CustomModifier<Point3> ParticleSystem::DefaultPositionUpdater([](Particle& particle, Point3& ta, Real t)
+	{
+		Vector3 velocity = particle.Velocity;
+		velocity.Scale(Time::GetDeltaTime());
+		particle.Position.Add(velocity);
+
+	});
+
+	const CustomModifier<Vector3> ParticleSystem::DefaultVelocityUpdater([](Particle& particle, Vector3& ta, Real t)
+	{
+
+		Vector3 acceleration = particle.Acceleration;
+		acceleration.Scale(Time::GetDeltaTime());
+		particle.Velocity.Add(acceleration);
+	});
+
+	const CustomModifier<Vector3> ParticleSystem::DefaultAccelerationUpdater([](Particle& particle, Vector3& ta, Real t) {});
+
+	const CustomModifier<Real> ParticleSystem::DefaultRotationUpdater([](Particle& particle, Real& ta, Real t)
+	{
+		particle.Rotation += particle.RotationalSpeed * Time::GetDeltaTime();
+	});
+
+	const CustomModifier<Real> ParticleSystem::DefaultRotationalSpeedUpdater([](Particle& particle, Real& ta, Real t)
+	{
+		particle.RotationalSpeed += particle.RotationalAcceleration * Time::GetDeltaTime();
+	});
+
+	const CustomModifier<Real> ParticleSystem::DefaultRotationalAccelerationUpdater([](Particle& particle, Real& ta, Real t) {});
+
 	ParticleSystem::ParticleSystem()
 	{
-		static CustomModifier<UInt32> DefaultUInt32Initializer([](Particle& particle, UInt32& ta, Real t){ta = 0;});
-		static CustomModifier<Real> DefaultRealInitializer([](Particle& particle, Real& ta, Real t){ta = 0.0f;});
-		static CustomModifier<Vector3> DefaultVector3Initializer([](Particle& particle, Vector3& ta, Real t){ta.Set(0, 0, 0);});
-		static CustomModifier<Point3> DefaultPoint3Initializer([](Particle& particle, Point3& ta, Real t){ta.Set(0, 0, 0);});
-		static CustomModifier<Color4> DefaultColor4Initializer([](Particle& particle, Color4& ta, Real t){ta.Set(0, 0, 0, 0);});
-		static CustomModifier<Vector2> DefaultVector2Initializer([](Particle& particle, Vector2& ta, Real t){ta.Set(0, 0);});
-
-		static CustomModifier<UInt32> DefaultAtlasUpdater([](Particle& particle, UInt32& ta, Real t){ });
-		static CustomModifier<Color4> DefaultColorUpdater([](Particle& particle, Color4& ta, Real t) { });
-		static CustomModifier<Real> DefaultAlphaUpdater([](Particle& particle, Real& ta, Real t) {});
-		static CustomModifier<Vector2> DefaultSizeUpdater([](Particle& particle, Vector2& ta, Real t) {});
-
-		static CustomModifier<Point3> DefaultPositionUpdater([](Particle& particle, Point3& ta, Real t)
-		{
-			Vector3 velocity = particle.Velocity;
-			velocity.Scale(Time::GetDeltaTime());
-			particle.Position.Add(velocity);
-		
-		});
-
-		static CustomModifier<Vector3> DefaultVelocityUpdater([](Particle& particle, Vector3& ta, Real t) 
-		{ 
-
-			Vector3 acceleration = particle.Acceleration;
-			acceleration.Scale(Time::GetDeltaTime());
-			particle.Velocity.Add(acceleration);
-		});
-
-		static CustomModifier<Vector3> DefaultAccelerationUpdater([](Particle& particle, Vector3& ta, Real t){ });
-
-		static CustomModifier<Real> DefaultRotationUpdater([](Particle& particle, Real& ta, Real t) 
-		{ 
-			particle.Rotation += particle.RotationalSpeed * Time::GetDeltaTime();
-		});
-
-		static CustomModifier<Real> DefaultRotationalSpeedUpdater([](Particle& particle, Real& ta, Real t)
-		{
-			particle.RotationalSpeed += particle.RotationalAcceleration * Time::GetDeltaTime();
-		});
-
-		static CustomModifier<Real> DefaultRotationalAccelerationUpdater([](Particle& particle, Real& ta, Real t){ });
-
 		currentCamera = nullptr;
 
 		zSort = false;

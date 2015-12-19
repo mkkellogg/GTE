@@ -14,6 +14,7 @@
 #include "object/engineobject.h"
 #include "scene/sceneobjectcomponent.h"
 #include "particlemodifier.h"
+#include "custommodifier.h"
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 #include "geometry/vector/vector2.h"
@@ -48,6 +49,24 @@ namespace GTE
 		};
 		
 		private:
+
+		static const CustomModifier<UInt32> DefaultUInt32Initializer;
+		static const CustomModifier<Real> DefaultRealInitializer;
+		static const CustomModifier<Vector3> DefaultVector3Initializer;
+		static const CustomModifier<Point3> DefaultPoint3Initializer;
+		static const CustomModifier<Color4> DefaultColor4Initializer;
+		static const CustomModifier<Vector2> DefaultVector2Initializer;
+
+		static const CustomModifier<UInt32> DefaultAtlasUpdater;
+		static const CustomModifier<Color4> DefaultColorUpdater;
+		static const CustomModifier<Real> DefaultAlphaUpdater;
+		static const CustomModifier<Vector2> DefaultSizeUpdater;
+		static const CustomModifier<Point3> DefaultPositionUpdater;
+		static const CustomModifier<Vector3> DefaultVelocityUpdater;
+		static const CustomModifier<Vector3> DefaultAccelerationUpdater;
+		static const CustomModifier<Real> DefaultRotationUpdater;
+		static const CustomModifier<Real> DefaultRotationalSpeedUpdater;
+		static const CustomModifier<Real> DefaultRotationalAccelerationUpdater;
 	
 		SceneObjectSharedPtr meshObject;
 		Mesh3DSharedPtr mesh;
