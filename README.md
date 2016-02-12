@@ -109,13 +109,21 @@ On certain Linux distros you might encounter linkage errors if you have installe
 On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Homebrew package management utility, and the version of Assimp available through Homebrew seems to support FBX models. The actual names of the Homebrew packages you need to install are as follows:
 	
 * Assimp: assimp
-* DevIL: devil
+* DevIL: devil 
 * GLFW: run 'brew install glfw3' to get the correct full package name
 * GLEW: glew
 	
-You will also need to make sure to have XCode command line tools installed. Version 6.2 seems to work well, while versions 6.3 and above (at the time of this writing) exhibit STL - related compile errors. Even after installing XCode command line tools you may need to install gcc with brew:
+You will also need to make sure to have XCode command line tools installed. Even after installing XCode command line tools you may need to install gcc with brew:
 
 		brew install gcc
+	
+**Note**: Newer versions of `gcc` cause DevIL installation to fail with:
+	
+		Error: devil cannot be built with any available compilers.
+	
+In this case try installing version 4.9 of `gcc`:
+
+		brew install homebrew/versions/gcc49
 	
 	
 ####2.5 Compiling & building GTE on Windows
