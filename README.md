@@ -112,6 +112,8 @@ On OSX it is fairly straight forward to install the pre-requisite libraries ment
 * DevIL: devil 
 * GLFW: run 'brew install glfw3' to get the correct full package name
 * GLEW: glew
+
+**Update**: Homebrew now installs Assimp 3.2 by default, which causes bugs with the included "Warrior" animation. At the time of this writing it is best to download and build Assimp 3.1.1 from source.
 	
 You will also need to make sure to have XCode command line tools installed. Even after installing XCode command line tools you may need to install gcc with brew:
 
