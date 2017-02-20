@@ -11,7 +11,7 @@ clean:
 	rm -rf bin/resources
 
 all: $(OUTPUTDIR) bin depend $(OBJECTFILES)
-	$(CC)  $(OBJECTFILES) -o bin/gtedemo $(LIBS)  
+	$(CC) $(OBJECTFILES) -o bin/gtedemo $(LIBS)  
 	rm -rf bin/resources
 	cp -r resources bin/
 

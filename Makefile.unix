@@ -10,14 +10,14 @@
 # - GLFW 3.0
 # - GLEW (OpenGL Extension Wrangler library)
 
-#ASSIMP_LIB=~/assimp/lib
-#ASSIMP_INC=~/assimp/include
+ASSIMP_LIB=/home/mark/Development/assimp/lib
+ASSIMP_INC=/home/mark/Development/assimp/include
 
 #this needs to be changed to your own OpenGL lib path (or removed)
-OPENGL_LIB=/usr/lib/nvidia-331-updates/
+OPENGL_LIB=/usr/lib/nvidia-367/
 
-LIBS= -L$(OPENGL_LIB) -lassimp -lm -lGL -lglfw3 -lGLU -lGLEW -lassimp -lIL -lXrandr -lXi -lX11 -lXxf86vm -lpthread  -lXcursor -lXinerama
-CFLAGS=-Isrc -std=c++11 -Wall
+LIBS= -L$(OPENGL_LIB) -L$(ASSIMP_LIB) -lassimp -lm -lGL -lglfw3 -lGLU -lGLEW -lassimp -lIL -lXrandr -lXi -lX11 -lXxf86vm -lpthread  -lXcursor -lXinerama -ldl
+CFLAGS=-Isrc -I$(ASSIMP_INC) -std=c++11 -Wall
 CC=g++ -DNDEBUG
 
 include Makefile.base
