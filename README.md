@@ -76,7 +76,7 @@ GLFW 3 is not yet (at the time of this writing) available via standard package m
 
 First install GLFW's dependencies, including OpenGL/Mesa:
 
-		sudo apt-get install cmake xorg-dev libglu1-mesa-dev 
+		sudo apt-get install cmake xorg-dev libglu1-mesa-dev
 	
 You must have sudo privileges. (On Red Hat, you'll need to install cmake28 instead.)
 
@@ -87,14 +87,13 @@ To acquire the source visit:
 Unzip the GLFW source archive and change your working directory to the glfw-x.x.x directory. Install GLFW:
 	
 		cd glfw-x.x.x
-		rehash 
 		cmake -G "Unix Makefiles"
 		make
 		sudo make install
 	
 You should now have:
 	
-		/usr/local/include/GLFW /usr/local/lib/libglfw3.a
+		/usr/local/include/GLFW/usr/local/lib/libglfw3.a
 
 DeVIL and GLEW are available through standard package management channels, although the package names differ from the official names:
 
