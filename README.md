@@ -29,7 +29,7 @@ Supported operating systems: Microsoft Windows, Apple OS X, Linux, Unix
 
 A number of pre-requisite libraries must be installed prior to building GTE. These libraries are:
 	
-* Assimp (Asset import library)
+* Assimp (Asset import library) **Version 3.1.1 required, new versions are broken**
 * DevIL image loading library
 * GLFW 3
 * GLEW (OpenGL Extension Wrangler library)
@@ -57,14 +57,14 @@ Lastly before running the included demo you will need to add the appropriate exe
 	
 On multiple flavors of Linux the Assimp package that is available through standard package management channels seems to not have the ability to load FBX files. Therefore if you are trying to build GTE on Linux you will probably have to build Assimp from source.
 	
-Building Assimp on Linux can be accomplished through the following steps:
+Building Assimp 3.1.1 on Linux can be accomplished through the following steps:
 	
 * Make sure CMake is installed.
 * Make sure you have the cmake-gui package installed
 * Use cmake-gui to configure the CMake build for Assimp
 * To clone the Git repo, run:
 		
-		git clone https://github.com/assimp/assimp.git
+		git clone --branch v3.1.1 https://github.com/assimp/assimp.git
 	
 * In a terminal window, navigate to the root of your Assimp repo and run:
 	
@@ -101,7 +101,7 @@ DeVIL and GLEW are available through standard package management channels, altho
 * DevIL: libdevil-dev
 * GLEW: libglew-dev
 
-On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location.
+On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location. Additionally you will need to update the makefile to point to the correct locations of the Assimp include and lib directories.
 	
 
 ####2.4 OSX notes
