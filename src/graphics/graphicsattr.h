@@ -57,6 +57,8 @@ namespace GTE
 
 		UInt32 WindowWidth;
 		UInt32 WindowHeight;
+		mutable UInt32 FrameBufferWidth;
+		mutable UInt32 FrameBufferHeight;
 		std::string WindowTitle;
 		Bool WaitForVSync;
 		AntialiasingMethod AAMethod;
@@ -65,6 +67,8 @@ namespace GTE
 		{
 			WindowWidth = 640;
 			WindowHeight = 480;
+			FrameBufferWidth = WindowWidth;
+			FrameBufferHeight = WindowHeight;
 			WindowTitle = std::string("GTE window");
 			WaitForVSync = false;
 			AAMethod = AntialiasingMethod::MSAAx2;

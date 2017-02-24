@@ -110,10 +110,6 @@ namespace GTE
 		// create a windowed mode window and its OpenGL context 
 		window = glfwCreateWindow(attributes.WindowWidth, attributes.WindowHeight, attributes.WindowTitle.c_str(), nullptr, nullptr);
 
-		//GLFWvidmode vm;
-		//glfwGetDesktopMode(&amp;vm);
-		//window = glfwOpenWindow(attributes.WindowWidth, attributes.WindowHeight,vm.RedBits, vm.GreenBits, vm.BlueBits, 0, 0, 0, GLFW_WINDOW)
-
 		if (window == nullptr)
 		{
 			Debug::PrintError("Unable to create GLFW window.");
@@ -123,6 +119,13 @@ namespace GTE
 
 		// Make the window's context current 
 		glfwMakeContextCurrent(window);
+		glfwShowWindow(window);
+
+		Int32 frameBufferWidth;
+		Int32 frameBufferHeight;
+		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+		this->attributes.FrameBufferWidth = (UInt32)frameBufferWidth;
+		this->attributes.FrameBufferHeight = (UInt32)frameBufferHeight;
 
 		if (attributes.WaitForVSync)glfwSwapInterval(1);
 		else glfwSwapInterval(0);
@@ -794,9 +797,8 @@ namespace GTE
 	RenderTarget * GraphicsGL::CreateDefaultRenderTarget()
 	{
 		TextureAttributes colorAttributes;
-		RenderTargetGL * defaultTarget = new(std::nothrow) RenderTargetGL(false, false, false, colorAttributes, this->attributes.WindowWidth, this->attributes.WindowHeight);
+		RenderTargetGL * defaultTarget = new(std::nothrow) RenderTargetGL(false, false, false, colorAttributes, this->attributes.FrameBufferWidth, this->attributes.FrameBufferHeight);
 		ASSERT(defaultTarget != nullptr, "GraphicsGL::CreateDefaultRenderTarget -> Unable to allocate default render target");
-
 		return defaultTarget;
 	}
 

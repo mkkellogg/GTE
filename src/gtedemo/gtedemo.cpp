@@ -58,8 +58,8 @@ int main(int argc, char** argv)
 
 	// specify basic graphics attributes
 	GTE::GraphicsAttributes graphicsAttributes;
-	graphicsAttributes.WindowWidth = 1280;
-	graphicsAttributes.WindowHeight = 800;
+	graphicsAttributes.WindowWidth = 900;
+	graphicsAttributes.WindowHeight = 600;
 	graphicsAttributes.WindowTitle = "GTE Test";
 	graphicsAttributes.AAMethod = GTE::AntialiasingMethod::MSAAx4;
 	graphicsAttributes.WaitForVSync = false;
