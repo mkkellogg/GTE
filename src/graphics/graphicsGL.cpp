@@ -121,11 +121,11 @@ namespace GTE
 		glfwMakeContextCurrent(window);
 		glfwShowWindow(window);
 
-		Int32 frameBufferWidth;
-		Int32 frameBufferHeight;
-		glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-		this->attributes.FrameBufferWidth = (UInt32)frameBufferWidth;
-		this->attributes.FrameBufferHeight = (UInt32)frameBufferHeight;
+		Int32 framebufferWidth;
+		Int32 framebufferHeight;
+		glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
+		this->attributes.FramebufferWidth = (UInt32)framebufferWidth;
+		this->attributes.FramebufferHeight = (UInt32)framebufferHeight;
 
 		if (attributes.WaitForVSync)glfwSwapInterval(1);
 		else glfwSwapInterval(0);
@@ -797,7 +797,7 @@ namespace GTE
 	RenderTarget * GraphicsGL::CreateDefaultRenderTarget()
 	{
 		TextureAttributes colorAttributes;
-		RenderTargetGL * defaultTarget = new(std::nothrow) RenderTargetGL(false, false, false, colorAttributes, this->attributes.FrameBufferWidth, this->attributes.FrameBufferHeight);
+		RenderTargetGL * defaultTarget = new(std::nothrow) RenderTargetGL(false, false, false, colorAttributes, this->attributes.FramebufferWidth, this->attributes.FramebufferHeight);
 		ASSERT(defaultTarget != nullptr, "GraphicsGL::CreateDefaultRenderTarget -> Unable to allocate default render target");
 		return defaultTarget;
 	}

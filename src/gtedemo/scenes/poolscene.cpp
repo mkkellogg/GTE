@@ -600,10 +600,10 @@ void PoolScene::SetupWaterSurface(GTE::AssetImporter& importer)
 	waterReflectionCamera->AddClearBuffer(GTE::RenderBufferType::Depth);
 	// ensure [waterReflectionCamera] renders before [mainCamera]
 	waterReflectionCamera->SetRenderOrderIndex(0);
-	waterReflectionCamera->SetupOffscreenRenderTarget(graphicsAttr.WindowWidth, graphicsAttr.WindowHeight, false);
+	waterReflectionCamera->SetupOffscreenRenderTarget(graphicsAttr.FramebufferWidth, graphicsAttr.FramebufferHeight, false);
 	waterReflectionCamera->ShareSkybox(mainCamera);
 	waterReflectionCamera->SetSkyboxEnabled(true);
-	waterReflectionCamera->SetWidthHeightRatio((GTE::Real)graphicsAttr.WindowWidth, (GTE::Real)graphicsAttr.WindowHeight);
+	waterReflectionCamera->SetWidthHeightRatio((GTE::Real)graphicsAttr.FramebufferWidth, (GTE::Real)graphicsAttr.FramebufferHeight);
 
 	// prevent [waterReflectionCamera] from rendering the water surface's mesh
 	cameraMask = waterReflectionCamera->GetCullingMask();
