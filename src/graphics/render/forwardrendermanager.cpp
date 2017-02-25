@@ -561,8 +561,9 @@ namespace GTE
 		}
 		else
 		{
+			static const Vector3 defaultVector = Vector3(0.0, 0.0, 0.0);
 			descriptor.ClipPlaneCount = 0;
-			descriptor.ClipPlane0Normal = Vector3(0.0, 0.0, 0.0);
+			descriptor.ClipPlane0Normal = defaultVector;
 			descriptor.ClipPlane0Offset = 0.0f;
 		}
 	}
