@@ -57,7 +57,7 @@ namespace GTE
 		// destroy the FBO
 		if (fboID > 0)
 		{
-			glDeleteFramebuffersEXT(1, &fboID);
+			glDeleteFramebuffers(1, &fboID);
 		}
 	}
 

@@ -17,3 +17,5 @@ x64/
 *.opensdf
 
 CMakeLists.txt
+GTE.VC.db
+GTE.VC.VC.opendb
