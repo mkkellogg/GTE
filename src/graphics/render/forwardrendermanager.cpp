@@ -672,7 +672,7 @@ namespace GTE
 		  each pass is combined with the others using additive blending. This is accomplished through a call to
 		  RenderSceneForLight(), which then calls RenderMesh(). The additive blending occurs in the RenderMesh() method.
 
-		- Each mesh with a 'singlePassMode' that is not SinglePassMode::None is rendered via a call to RenderSceneForMultiLight(). 
+		- Each mesh with a 'singlePassMode' that is not SinglePassMode::None is rendered via a call to RenderSceneSinglePass(). 
 		  No additive blending occurs for these meshes because it is assumed the blending will occur in the shader.
 	 *
 	 * This method will render to whatever render target is currently active.
@@ -706,7 +706,7 @@ namespace GTE
 				if(queueID >= (Int32)RenderQueueType::Transparent)break;
 
 				// perform single-pass rendering for objects whose materials have a 'singlePassMode' of SinglePassMode::PreSSAO.
-				RenderSceneForMultiLight(viewDescriptor, queueID, SinglePassMode::PreSSAO);
+				RenderSceneSinglePass(viewDescriptor, queueID, SinglePassMode::PreSSAO);
 
 				// loop through each ambient light and render objects in render queue [queueID] for it
 				for(UInt32 l = 0; l < ambientLightCount; l++)
@@ -760,7 +760,7 @@ namespace GTE
 			if(viewDescriptor.LightingEnabled)
 			{
 				// perform single-pass rendering for objects whose materials have a 'singlePassMode' of SinglePassMode::Standard.
-				RenderSceneForMultiLight(viewDescriptor, queueID, SinglePassMode::Standard);
+				RenderSceneSinglePass(viewDescriptor, queueID, SinglePassMode::Standard);
 
 				// render ambient lights again, but only for transparent objects
 				if(queueID >= (Int32)RenderQueueType::Transparent)
@@ -1072,7 +1072,7 @@ namespace GTE
 	* Shadows are not supported by this function, so all meshes rendered in this manner will not cast nor 
 	* receive shadows.
 	*/
-	void ForwardRenderManager::RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID, SinglePassMode singlePassMode)
+	void ForwardRenderManager::RenderSceneSinglePass(const ViewDescriptor& viewDescriptor, Int32 queueID, SinglePassMode singlePassMode)
 	{
 		UInt32 minQueue = renderQueueManager.GetMinQueue();
 		UInt32 maxQueue = renderQueueManager.GetMaxQueue();
