@@ -666,9 +666,14 @@ namespace GTE
 	 * is used is because on the GPU side of things the view transform is used to move the world relative to the camera, 
 	 * rather than move the camera in the world.
 	 *
-	 * Since we are using a forward-rendering approach, each mesh is rendered once for each light and the output from
-	 * each pass is combined with the others using additive blending. This method calls RenderSceneForLight(),
-	 * which then calls RenderMesh(). The additive blending occurs in the RenderMesh() method.
+	 * Since we are using a forward-rendering approach, meshes are rendered in one of two ways:
+
+		- Each mesh without the "allLightsSinglePass" flag set is rendered once for each light and the output from
+		  each pass is combined with the others using additive blending. This is accomplished through a call to
+		  RenderSceneForLight(), which then calls RenderMesh(). The additive blending occurs in the RenderMesh() method.
+
+		- Each mesh with the "allLightsSinglePass" set is rendered via a call to RenderSceneForMultiLight(). No additive
+		  blending occurs for these meshes because it is assumed the blending will occur in the shader.
 	 *
 	 * This method will render to whatever render target is currently active.
 	 */
@@ -718,12 +723,20 @@ namespace GTE
 			}
 		}
 
+		// =============================
+		// DEPTH FILL PASS
+		// =============================
+
 		// we need to fill the depth buffer with the scene to allow
 		// for proper shadow volume rendering and depth-buffer culling
 		if(viewDescriptor.DepthPassEnabled)
 		{
 			RenderDepthBuffer(viewDescriptor);
 		}
+
+		// =============================
+		// SSAO PASS
+		// =============================
 
 		// perform the standard screen-space ambient occlusion pass
 		if(renderedAmbient && viewDescriptor.SSAOEnabled && viewDescriptor.SSAOMode == SSAORenderMode::Standard)
@@ -732,10 +745,10 @@ namespace GTE
 		}
 
 		// =============================
-		// STANDARD PASS 
+		// STANDARD PASS
 		// =============================
 
-		// Render all objects (both lit an self-lit) in render queues above or equal to RenderQueueType::Transparent.
+		// Render all objects (both lit and self-lit) in render queues above or equal to RenderQueueType::Transparent.
 		// These are the objects for which SSAO will NOT be applied.
 		Bool skyboxPassComplete = false;
 		for(UInt32 queueIndex = 0; queueIndex < renderQueueCount; queueIndex++)
