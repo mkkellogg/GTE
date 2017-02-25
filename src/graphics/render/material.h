@@ -75,6 +75,13 @@ namespace GTE
 		Additive = 2
 	};
 
+	enum class SinglePassMode
+	{
+		None = 0,
+		PreSSAO = 1,
+		Standard = 2
+	};
+
 	class Material : public EngineObject
 	{
 		// Since this derives from EngineObject, we make this class
@@ -135,7 +142,7 @@ namespace GTE
 		UInt32 GetRequiredUniformSize(UniformType uniformType);
 		Bool allSetUniformsandAttributesVerified;
 
-		Bool allLightsSinglePass;
+		SinglePassMode singlePassMode;
 
 		void BindVars();
 
@@ -241,8 +248,8 @@ namespace GTE
 		void SetDepthBufferFunction(RenderState::DepthBufferFunction function);
 		RenderState::DepthBufferFunction GetDepthBufferFunction();
 
-		void SetAllLightsSinglePass(Bool allLightsSinglePass);
-		Bool AllLightsSinglePass();
+		void SetSinglePassMode(SinglePassMode allLightsSinglePass);
+		SinglePassMode GetSinglePassMode();
 	};
 }
 

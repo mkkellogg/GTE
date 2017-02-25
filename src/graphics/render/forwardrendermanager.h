@@ -137,7 +137,7 @@ namespace GTE
 		void RenderSceneSSAO(const ViewDescriptor& viewDescriptor);
 
 		void RenderSceneForLight(const Light& light, const ViewDescriptor& viewDescriptor, Int32 queueID);
-		void RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID);
+		void RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID, SinglePassMode singlePassMode);
 		void BuildMultiLightDescriptor();
 
 		void RenderSceneWithoutLight(const ViewDescriptor& viewDescriptor, MaterialRef  material, Bool flagRendered, Bool renderMoreThanOnce, 

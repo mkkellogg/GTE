@@ -814,7 +814,7 @@ void CastleScene::SetupCampfire(GTE::AssetImporter& importer, GTE::SceneObjectSh
 	smokeMaterial->SetBlendingMode(GTE::RenderState::BlendingMode::Custom);
 	smokeMaterial->SetSourceBlendingMethod(GTE::RenderState::BlendingMethod::SrcAlpha);
 	smokeMaterial->SetDestBlendingMethod(GTE::RenderState::BlendingMethod::OneMinusSrcAlpha);
-	smokeMaterial->SetAllLightsSinglePass(true);
+	smokeMaterial->SetSinglePassMode(GTE::SinglePassMode::Standard);
 
 	// load texture for the smoke particle
 	GTE::TextureRef smokeTexture = objectManager->CreateTexture("resources/textures/particles/smokeparticle.png", texAttributes);

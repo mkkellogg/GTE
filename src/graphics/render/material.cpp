@@ -44,7 +44,7 @@ namespace GTE
 
 		currentSamplerUnitIndex = 0;
 
-		allLightsSinglePass = false;
+		singlePassMode = SinglePassMode::None;
 	}
 
 	/*
@@ -1293,17 +1293,17 @@ namespace GTE
 	 * Set whether or not the renderer should send all lights to this this material
 	 * at once to let it use them all in one pass.
 	 */
-	void Material::SetAllLightsSinglePass(Bool allLightsSinglePass)
+	void Material::SetSinglePassMode(SinglePassMode singlePassMode)
 	{
-		this->allLightsSinglePass = allLightsSinglePass;
+		this->singlePassMode = singlePassMode;
 	}
 
 	/*
 	 * Should all lights be sent to this material at once?
 	 */
-	Bool Material::AllLightsSinglePass()
+	SinglePassMode Material::GetSinglePassMode()
 	{
-		return allLightsSinglePass;
+		return singlePassMode;
 	}
 }
 

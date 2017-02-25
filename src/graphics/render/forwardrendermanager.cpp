@@ -668,12 +668,12 @@ namespace GTE
 	 *
 	 * Since we are using a forward-rendering approach, meshes are rendered in one of two ways:
 
-		- Each mesh without the "allLightsSinglePass" flag set is rendered once for each light and the output from
+		- Each mesh with a 'singlePassMode' of SinglePassMode::None is rendered once for each light and the output from
 		  each pass is combined with the others using additive blending. This is accomplished through a call to
 		  RenderSceneForLight(), which then calls RenderMesh(). The additive blending occurs in the RenderMesh() method.
 
-		- Each mesh with the "allLightsSinglePass" set is rendered via a call to RenderSceneForMultiLight(). No additive
-		  blending occurs for these meshes because it is assumed the blending will occur in the shader.
+		- Each mesh with a 'singlePassMode' that is not SinglePassMode::None is rendered via a call to RenderSceneForMultiLight(). 
+		  No additive blending occurs for these meshes because it is assumed the blending will occur in the shader.
 	 *
 	 * This method will render to whatever render target is currently active.
 	 */
@@ -691,23 +691,24 @@ namespace GTE
 		// BASE PASS (PRE-SSAO AMBIENT-ONLY PASS)
 		// ===========================================
 
+		Bool renderedAmbient = false;
+
 		// Render all objects that can receive ambient light in render queues preceeding RenderQueueType::Transparent.
 		// These are the objects for which SSAO can be applied, so their ambient pass must be rendered completely
 		// before the SSAO effect, which is screen-space. Objects in render queues greater than or equal to 
-		// RenderQueueType::Transparent will not get SSAO.
-		Bool renderedAmbient = false;
-		for(UInt32 queueIndex = 0; queueIndex < renderQueueCount; queueIndex++)
+		// RenderQueueType::Transparent will not get SSAO. 
+		if(viewDescriptor.LightingEnabled)
 		{
-			Int32 queueID = renderQueueManager.GetRenderQueueID(queueIndex);
-
-			if(queueID >= (Int32)RenderQueueType::Transparent)break;
-
-			// loop through each ambient light and render objects in render queue [queueID] for it
-			if(viewDescriptor.LightingEnabled)
+			for(UInt32 queueIndex = 0; queueIndex < renderQueueCount; queueIndex++)
 			{
-				// render objects whose materials have the "allLightsSinglePass" flag set
-				RenderSceneForMultiLight(viewDescriptor, queueID);
+				Int32 queueID = renderQueueManager.GetRenderQueueID(queueIndex);
 
+				if(queueID >= (Int32)RenderQueueType::Transparent)break;
+
+				// perform single-pass rendering for objects whose materials have a 'singlePassMode' of SinglePassMode::PreSSAO.
+				RenderSceneForMultiLight(viewDescriptor, queueID, SinglePassMode::PreSSAO);
+
+				// loop through each ambient light and render objects in render queue [queueID] for it
 				for(UInt32 l = 0; l < ambientLightCount; l++)
 				{
 					SceneObject* lightObject = sceneAmbientLights[l];
@@ -758,9 +759,10 @@ namespace GTE
 			// loop through each ambient light and render objects in render queue [queueID] for it
 			if(viewDescriptor.LightingEnabled)
 			{
-				// render objects whose materials have the "allLightsSinglePass" flag set
-				RenderSceneForMultiLight(viewDescriptor, queueID);
+				// perform single-pass rendering for objects whose materials have a 'singlePassMode' of SinglePassMode::Standard.
+				RenderSceneForMultiLight(viewDescriptor, queueID, SinglePassMode::Standard);
 
+				// render ambient lights again, but only for transparent objects
 				if(queueID >= (Int32)RenderQueueType::Transparent)
 				{
 					for(UInt32 l = 0; l < ambientLightCount; l++)
@@ -1004,7 +1006,7 @@ namespace GTE
 				NONFATAL_ASSERT(entry != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null render queue entry encountered.", true);
 
 				MaterialRef entryMaterial = *entry->RenderMaterial;
-				if(entryMaterial->UseLighting() && !entryMaterial->AllLightsSinglePass())
+				if(entryMaterial->UseLighting() && entryMaterial->GetSinglePassMode() == SinglePassMode::None)
 				{
 					SceneObject* sceneObject = entry->Container;
 					NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
@@ -1070,7 +1072,7 @@ namespace GTE
 	* Shadows are not supported by this function, so all meshes rendered in this manner will not cast nor 
 	* receive shadows.
 	*/
-	void ForwardRenderManager::RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID)
+	void ForwardRenderManager::RenderSceneForMultiLight(const ViewDescriptor& viewDescriptor, Int32 queueID, SinglePassMode singlePassMode)
 	{
 		UInt32 minQueue = renderQueueManager.GetMinQueue();
 		UInt32 maxQueue = renderQueueManager.GetMaxQueue();
@@ -1094,7 +1096,7 @@ namespace GTE
 
 			Bool rendered = renderedSubRenderers[subRenderer->GetObjectID()];
 
-			if(entryMaterial->UseLighting() && entryMaterial->AllLightsSinglePass() && !rendered)
+			if(entryMaterial->UseLighting() && entryMaterial->GetSinglePassMode() == singlePassMode && !rendered)
 			{
 				SceneObject* sceneObject = entry->Container;
 				NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderSceneForLight -> Null scene object encountered.", true);
@@ -1333,7 +1335,7 @@ namespace GTE
 		// send light data to the active shader (if it needs it)
 		if (lightingDescriptor.UseLighting)
 		{
-			if(currentMaterial->AllLightsSinglePass())
+			if(currentMaterial->GetSinglePassMode() != SinglePassMode::None)
 			{
 				currentMaterial->SendLightsToShader(lightingDescriptor.PositionDatas, lightingDescriptor.DirectionDatas, lightingDescriptor.Types,
 												   lightingDescriptor.ColorDatas, lightingDescriptor.Intensities, lightingDescriptor.Ranges,
