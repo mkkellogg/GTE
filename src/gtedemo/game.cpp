@@ -698,17 +698,17 @@ void Game::DisplayInfo()
 		switch(currentScene)
 		{
 		case Scenes::LavaScene:
-			printf(" |  Current scene: Lava ");
+			printf(" |  Current scene: Lava");
 			break;
 		case Scenes::CastleScene:
 			printf(" |  Current scene: Castle");
 			break;
 		case Scenes::PoolScene:
-			printf(" |  Current scene: Reflecting Pool");
+			printf(" |  Current scene: Pool");
 			break;
 		}
 
-		printf("                             \r");
+		printf("               \r");
 		fflush(stdout);
 
 		lastInfoPrintTime = GTE::Time::GetRealTimeSinceStartup();
