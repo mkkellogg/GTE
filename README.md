@@ -70,7 +70,9 @@ Building Assimp 3.1.1 on Linux can be accomplished through the following steps:
 	
 		cmake -G "Unix Makefiles"
 	
-* Now run make, followed by make install
+* Now run make, followed by make install. Once the build is complete, update your LD_LIBRARY_PATH:
+
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<path to assimp/lib>
 	
 GLFW 3 is not yet (at the time of this writing) available via standard package management channels, so you will have to build it. 
 
