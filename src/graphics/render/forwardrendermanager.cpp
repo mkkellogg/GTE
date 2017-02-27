@@ -1301,25 +1301,18 @@ namespace GTE
 		NONFATAL_ASSERT(sceneObject != nullptr, "ForwardRenderManager::RenderMesh -> Scene object is not valid.", true);
 		NONFATAL_ASSERT(renderer != nullptr, "ForwardRenderManager::RenderMesh -> Null sub renderer encountered.", true);
 
-		// determine if this mesh has been rendered using [renderer] before
-		Bool rendered = renderedSubRenderers[renderer->GetObjectID()];
-		
-		// if we have an override material, we use that for every mesh
+			// if we have an override material, we use that for every mesh
 		Bool doMaterialOvverride = materialOverride.IsValid() ? true : false;
 		MaterialRef currentMaterial = doMaterialOvverride ? materialOverride : *entry.RenderMaterial;
 
 		NONFATAL_ASSERT(currentMaterial != nullptr, "ForwardRenderManager::RenderMesh -> Null material encountered.", true);
 
-		ForwardRenderPass forwardRenderPass = currentMaterial->GetForwardRenderPass();
-		if(rendered && forwardRenderPass != ForwardRenderPass::All && forwardRenderPass != ForwardRenderPass::Additive)return;
-		if(!rendered && forwardRenderPass != ForwardRenderPass::All && forwardRenderPass != ForwardRenderPass::Base)return;
+		if (!ValidateRenderPassForRenderer(*renderer, currentMaterial)) return;
 
+		// Build model, model-view and model-view-projection transforms
 		SceneObjectProcessingDescriptor& processingDesc = sceneObject->GetProcessingDescriptor();
 		model.SetTo(processingDesc.AggregateTransform);
 		model.PreTransformBy(viewDescriptor.UniformWorldSceneObjectTransform);
-
-		// concatenate model transform with inverted view transform, and then with
-		// the projection transform.
 		modelView.SetTo(model);
 		modelView.PreTransformBy(viewDescriptor.ViewTransformInverse);
 		modelViewProjection.SetTo(modelView);
@@ -1357,6 +1350,9 @@ namespace GTE
 		// apply additive or subtractive blending ONLY if the material has not specified its own blending mode
 		if(currentMaterial->GetBlendingMode() == RenderState::BlendingMode::None)
 		{
+			// determine if this mesh has been rendered using [renderer] before
+			Bool rendered = renderedSubRenderers[renderer->GetObjectID()];
+
 			// if this sub mesh has already been rendered by this camera, then we want to use
 			// additive blending to combine it with the output from other lights. Otherwise
 			// turn off blending and render.
@@ -1384,6 +1380,24 @@ namespace GTE
 
 		// flag the current mesh & renderer combo as being rendered (at least once)
 		if(flagRendered) renderedSubRenderers[renderer->GetObjectID()] = true;
+	}
+
+	Bool ForwardRenderManager::ValidateRenderPassForRenderer(SubMesh3DRenderer& renderer, MaterialRef material)
+	{
+		Bool rendered = renderedSubRenderers[renderer.GetObjectID()];
+
+		ForwardRenderPass forwardRenderPass = material->GetForwardRenderPass();
+		switch(forwardRenderPass)
+		{
+			case ForwardRenderPass::All:
+			break;
+			case ForwardRenderPass::Base:
+			if(rendered) return false;
+			case ForwardRenderPass::Additive:
+			if(!rendered) return false;
+		}
+
+		return true;
 	}
 
 	/*

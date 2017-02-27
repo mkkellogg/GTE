@@ -150,6 +150,8 @@ namespace GTE
 
 		void RenderShadowVolumeForMesh(RenderQueueEntry& entry, const Light& light, const Point3& lightPosition, const Vector3& lightDirection,
 									   const ViewDescriptor& viewDescriptor);
+
+		Bool ValidateRenderPassForRenderer(SubMesh3DRenderer& renderer, MaterialRef material) ;
 		
 		void BuildShadowVolumeMVPTransform(const Transform& modelTransform, const Transform& viewTransformInverse, const Transform& projectionTransform,
 										   Transform& outTransform, Real xScale, Real yScale) const;
