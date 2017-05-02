@@ -92,6 +92,4 @@
 	}																												\
 }
 
-//#define _GTE_Real_DoublePrecision
-
 #endif
