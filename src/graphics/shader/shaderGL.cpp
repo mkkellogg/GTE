@@ -680,7 +680,11 @@ namespace GTE
 	 */
 	void ShaderGL::SendUniformToShaderM4x4V(Int32 varID, const Matrix4x4 * mat, UInt32 count)
 	{
-		glUniformMatrix4fv(varID, count, false, mat->GetConstDataPtr());
+		#ifdef _GTE_Real_DoublePrecision
+				glUniformMatrix4dv(varID, count, false, mat->GetConstDataPtr());
+		#else
+				glUniformMatrix4fv(varID, count, false, mat->GetConstDataPtr());
+		#endif
 	}
 
 	/*

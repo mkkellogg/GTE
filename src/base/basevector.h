@@ -18,67 +18,70 @@
 
 #ifdef _GTE_Real_DoublePrecision
 #define BaseVector4_QuickCopy(source, dest)		\
-{												\
-	*(dest) = *(source);(source)++;(dest)++;	\
-	*(dest) = *(source);(source)++;(dest)++;	\
-	*(dest) = *(source);(source)++;(dest)++;	\
-	*(dest) = *(source);(source)-=3;(dest)-=3;	\
+{																							\
+	*(dest) = *(source);					\
+	*(dest + 1) = *(source + 1);	\
+	*(dest + 2) = *(source + 2);	\
+	*(dest + 3) = *(source + 3);	\
 }
 #else
-#define BaseVector4_QuickCopy(source, dest)														\
-{																								\
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) -= 2;	\
+#define BaseVector4_QuickCopy(source, dest)		\
+{																							\
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source));  				\
+	  *((GTE::RealDouble *)(dest) + 1) = *((GTE::RealDouble *)(source) + 1); 	\
 }
 #endif
 
 #ifdef _GTE_Real_DoublePrecision
 #define BaseVector4_QuickCopy_IncDest(source, dest)		\
-{														\
-	*(dest) = *(source);(source)++;(dest)++;			\
-	*(dest) = *(source);(source)++;(dest)++;			\
-	*(dest) = *(source);(source)++;(dest)++;			\
-	*(dest) = *(source);(source)-=3;(dest)++;			\
+{																											\
+	*(dest) = *(source);					\
+	*(dest + 1) = *(source + 1);	\
+	*(dest + 2) = *(source + 2);	\
+	*(dest + 3) = *(source + 3);	\
+	(dest) +=4;										\
 }
 #else
-#define BaseVector4_QuickCopy_IncDest(source, dest)												\
-{																								\
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) += 2;	\
+#define BaseVector4_QuickCopy_IncDest(source, dest)	\
+{																										\
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source));  			 \
+	  *((GTE::RealDouble *)(dest) + 1) = *((GTE::RealDouble *)(source) + 1); \
+		(dest) += 4; 																													 \
 }
 #endif
 
 #ifdef _GTE_Real_DoublePrecision
 #define BaseVector4_QuickCopy_ZeroW(source, dest)	\
-{													\
-	*(dest) = *(source);(source)++;(dest)++;		\
-	*(dest) = *(source);(source)++;(dest)++;		\
-	*(dest) = *(source);(source)++;(dest)++;		\
-	*(dest) = 0;(source)-=3;(dest)-=3;				\
+{																									\
+	*(dest) = *(source);						\
+	*(dest + 1) = *(source + 1);		\
+	*(dest + 2) = *(source + 2);		\
+	*(dest + 3) = 0;								\
 }
 #else
-#define BaseVector4_QuickCopy_ZeroW(source, dest)												\
-{																								\
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) ++;   \
-	  *((GTE::Real *)(dest)) = 0;(dest) -=3;													\
+#define BaseVector4_QuickCopy_ZeroW(source, dest)		\
+{																							    	\
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); 						\
+	  *((GTE::RealDouble *)(dest) + 1) = *((GTE::RealDouble *)(source) + 1);    \
+	  *((GTE::Real *)(dest + 3)) = 0;																						\
 }
 #endif
 
 #ifdef _GTE_Real_DoublePrecision
-#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)\
-{														\
-	*(dest) = *(source);(source)++;(dest)++;			\
-	*(dest) = *(source);(source)++;(dest)++;			\
-	*(dest) = *(source);(source)++;(dest)++;			\
-	*(dest) = 0;(source)-=3;(dest)++;					\
+#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)	\
+{																													\
+	*(dest) = *(source);						\
+	*(dest + 1) = *(source + 1);		\
+	*(dest + 2) = *(source + 2);		\
+	*(dest + 3) = 0;								\
+	(dest) += 4;										\
 }
 #else
-#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)										\
-{																								\
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) += 2;(dest) += 2; \
-	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); (source) -= 2;(dest) ++;	\
-	  *((GTE::Real *)(dest)) = 0;(dest) ++;														\
+#define BaseVector4_QuickCopy_ZeroW_IncDest(source, dest)	 \
+{																													 \
+	  *((GTE::RealDouble *)(dest)) = *((GTE::RealDouble *)(source)); 					\
+	  *((GTE::RealDouble *)(dest) + 1) = *((GTE::RealDouble *)(source) + 1); 	\
+	  *((GTE::Real *)(dest + 3)) = 0;(dest) += 4;														  \
 }
 #endif
 
