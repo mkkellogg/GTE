@@ -1,6 +1,6 @@
 
 
-###1. Overview
+### 1. Overview
 
 GTE is a basic graphics engine developed in C++ that currently supports the following features:
 	
@@ -23,9 +23,9 @@ Supported operating systems: Microsoft Windows, Apple OS X, Linux, Unix
 
 	
 
-###2. Building GTE
+### 2. Building GTE
 
-####2.1 Build overview
+#### 2.1 Build overview
 
 A number of pre-requisite libraries must be installed prior to building GTE. These libraries are:
 	
@@ -36,7 +36,7 @@ A number of pre-requisite libraries must be installed prior to building GTE. The
 	
 Your Assimp installation needs to include the ability to load FBX files in order to run the demo included in the project.
 
-####2.2 Windows notes
+#### 2.2 Windows notes
 	
 The binaries for all required libraries are available for Windows and can be downloaded from the following links:
 	
@@ -53,7 +53,7 @@ The library paths can be set by right clicking on the "GTE" project, selecting "
 	
 Lastly before running the included demo you will need to add the appropriate executable directories for each library's DLL to your PATH environment variable.
 
-####2.3 Linux notes
+#### 2.3 Linux notes
 	
 On multiple flavors of Linux the Assimp package that is available through standard package management channels seems to not have the ability to load FBX files. Therefore if you are trying to build GTE on Linux you will probably have to build Assimp from source.
 	
@@ -105,7 +105,7 @@ DeVIL and GLEW are available through standard package management channels, altho
 On certain Linux distros you might encounter linkage errors if you have installed proprietary graphics drivers that come with their own OpenGL shared library. In this case you may need to modify the location in which the linker searches for the OpenGL shared library during the build process. In the included Unix (Linux) makefile, a variable called OPENGL_LIB is defined to point to such a location. Additionally you will need to update the makefile to point to the correct locations of the Assimp include and lib directories.
 	
 
-####2.4 OSX notes
+#### 2.4 OSX notes
 	
 On OSX it is fairly straight forward to install the pre-requisite libraries mentioned above. They are all available through the Homebrew package management utility, and the version of Assimp available through Homebrew seems to support FBX models. The actual names of the Homebrew packages you need to install are as follows:
 	
@@ -129,11 +129,11 @@ In this case try installing version 4.9 of `gcc`:
 		brew install homebrew/versions/gcc49
 	
 	
-####2.5 Compiling & building GTE on Windows
+#### 2.5 Compiling & building GTE on Windows
 
 Using the standard build commands from within Visual Studio will produce an executable named "GTE.exe" in x64/release.
 	
-####2.6 Compiling & building GTE on Linux, Unix, or OS X
+#### 2.6 Compiling & building GTE on Linux, Unix, or OS X
 	
 On Linux, Unix, and OS X the build process produces a single executable: bin/gtedemo. It has not yet been modified to produce a library (shared or static); that is still on the to-do list. The 'gtedemo' executable is a sample of what the engine can do, and the source for the demo is in the engine's source tree at src/gtedemo.
 	
@@ -148,7 +148,7 @@ Where `makefile` is the makefile that is appropriate for your platform. Currentl
 		
 Assuming the build succeeded, the 'gtedemo' executable will be produced in the 'bin' subdirectory of the GTE installation. 
 
-###3. Running the demo
+### 3. Running the demo
 
 Before running the demo, make sure you have downloaded the models and textures that it needs. They can be found at: http://projects.markkellogg.org/downloads/models-textures.zip. Uncompress the archive in the 'resources' sub-folder, the process should create two new folders: 'resources/models' and 'resources/textures'.
 
@@ -161,7 +161,7 @@ On all platforms, ensure that the shared libraries for the external libraries As
 	
 Note: Screen-Space Ambient Occlusion is still in the alpha stage, so it won't look right in some places (such as terrain meshes).
 	
-####Demo Controls:
+#### Demo Controls:
 	
 There are three scenes in the demo and they can be accessed via the numeric keys:
 	
