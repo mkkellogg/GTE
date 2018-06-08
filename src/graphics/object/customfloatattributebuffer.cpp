@@ -7,60 +7,50 @@
 #include "debug/gtedebug.h"
 
 
-namespace GTE
-{
-	CustomFloatAttributeBuffer::CustomFloatAttributeBuffer()
-	{
-		componentCount = 0;
-		size = 0;
-		data = nullptr;
-	}
+namespace GTE {
+    CustomFloatAttributeBuffer::CustomFloatAttributeBuffer() {
+        componentCount = 0;
+        size = 0;
+        data = nullptr;
+    }
 
-	CustomFloatAttributeBuffer::~CustomFloatAttributeBuffer()
-	{
-		Destroy();
-	}
+    CustomFloatAttributeBuffer::~CustomFloatAttributeBuffer() {
+        Destroy();
+    }
 
-	Bool CustomFloatAttributeBuffer::Init(UInt32 size, UInt32 componentCount)
-	{
-		Destroy();
+    Bool CustomFloatAttributeBuffer::Init(UInt32 size, UInt32 componentCount) {
+        Destroy();
 
-		this->componentCount = componentCount;
-		this->size = size;
+        this->componentCount = componentCount;
+        this->size = size;
 
-		data = new(std::nothrow) Real[componentCount * size];
-		ASSERT(data != nullptr, "CustomFloatAttributeBuffer::Init -> Unable to allocate data.");
+        data = new(std::nothrow) Real[componentCount * size];
+        ASSERT(data != nullptr, "CustomFloatAttributeBuffer::Init -> Unable to allocate data.");
 
-		return true;
-	}
+        return true;
+    }
 
-	void CustomFloatAttributeBuffer::Destroy()
-	{
-		SAFE_DELETE_ARRAY(data);
-	}
+    void CustomFloatAttributeBuffer::Destroy() {
+        SAFE_DELETE_ARRAY(data);
+    }
 
-	void CustomFloatAttributeBuffer::SetAttributeID(AttributeID id)
-	{
-		this->attributeID = id;
-	}
+    void CustomFloatAttributeBuffer::SetAttributeID(AttributeID id) {
+        this->attributeID = id;
+    }
 
-	AttributeID CustomFloatAttributeBuffer::GetAttributeID()
-	{
-		return attributeID;
-	}
+    AttributeID CustomFloatAttributeBuffer::GetAttributeID() {
+        return attributeID;
+    }
 
-	Real * CustomFloatAttributeBuffer::GetDataPtr()
-	{
-		return data;
-	}
+    Real * CustomFloatAttributeBuffer::GetDataPtr() {
+        return data;
+    }
 
-	UInt32 CustomFloatAttributeBuffer::GetSize() const
-	{
-		return size;
-	}
+    UInt32 CustomFloatAttributeBuffer::GetSize() const {
+        return size;
+    }
 
-	UInt32 CustomFloatAttributeBuffer::GetComponentCount() const
-	{
-		return componentCount;
-	}
+    UInt32 CustomFloatAttributeBuffer::GetComponentCount() const {
+        return componentCount;
+    }
 }

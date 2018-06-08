@@ -18,43 +18,41 @@
 #include "geometry/vector/vector3.h"
 #include "base/bitmask.h"
 
-namespace GTE
-{
-	class ViewDescriptor
-	{
-		public:
+namespace GTE {
+    class ViewDescriptor {
+    public:
 
-		IntMask ClearBufferMask;
-		IntMask CullingMask;
+        IntMask ClearBufferMask;
+        IntMask CullingMask;
 
-		Bool ReverseCulling;
+        Bool ReverseCulling;
 
-		Transform ViewTransform;
-		Transform ViewTransformInverse;
+        Transform ViewTransform;
+        Transform ViewTransformInverse;
 
-		Point3 ViewPosition;
+        Point3 ViewPosition;
 
-		Transform ProjectionTransform;
-		Transform ProjectionTransformInverse;
-		Transform UniformWorldSceneObjectTransform;
-		Transform UniformWorldSceneObjectTransformInverse;
+        Transform ProjectionTransform;
+        Transform ProjectionTransformInverse;
+        Transform UniformWorldSceneObjectTransform;
+        Transform UniformWorldSceneObjectTransformInverse;
 
-		Bool LightingEnabled;
-		Bool DepthPassEnabled;
+        Bool LightingEnabled;
+        Bool DepthPassEnabled;
 
-		Bool SSAOEnabled;
-		SSAORenderMode SSAOMode;
+        Bool SSAOEnabled;
+        SSAORenderMode SSAOMode;
 
-		Bool SkyboxEnabled;
-		SceneObject * SkyboxObject;
+        Bool SkyboxEnabled;
+        SceneObject * SkyboxObject;
 
-		UInt32 ClipPlaneCount;
-		Vector3 ClipPlane0Normal;
-		Real ClipPlane0Offset;
+        UInt32 ClipPlaneCount;
+        Vector3 ClipPlane0Normal;
+        Real ClipPlane0Offset;
 
-		ViewDescriptor();
-		~ViewDescriptor();
-	};
+        ViewDescriptor();
+        ~ViewDescriptor();
+    };
 }
 
 #endif

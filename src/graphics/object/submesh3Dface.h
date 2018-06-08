@@ -16,28 +16,26 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
 
-namespace GTE
-{
-	class SubMesh3DFace
-	{
-	public:
+namespace GTE {
+    class SubMesh3DFace {
+    public:
 
-		SubMesh3DFace();
-		~SubMesh3DFace();
+        SubMesh3DFace();
+        ~SubMesh3DFace();
 
-		// index in the respective mesh's attribute arrays of the first
-		// vertex of this face
-		Int32 FirstVertexIndex;
-		// index in the respective mesh's attribute arrays of the first
-		// vertex of this face's first adjacent face
-		Int32 AdjacentFaceIndex1;
-		// index in the respective mesh's attribute arrays of the second
-		// vertex of this face's first adjacent face
-		Int32 AdjacentFaceIndex2;
-		// index in the respective mesh's attribute arrays of the third
-		// vertex of this face's first adjacent face
-		Int32 AdjacentFaceIndex3;
-	};
+        // index in the respective mesh's attribute arrays of the first
+        // vertex of this face
+        Int32 FirstVertexIndex;
+        // index in the respective mesh's attribute arrays of the first
+        // vertex of this face's first adjacent face
+        Int32 AdjacentFaceIndex1;
+        // index in the respective mesh's attribute arrays of the second
+        // vertex of this face's first adjacent face
+        Int32 AdjacentFaceIndex2;
+        // index in the respective mesh's attribute arrays of the third
+        // vertex of this face's first adjacent face
+        Int32 AdjacentFaceIndex3;
+    };
 }
 
 #endif

@@ -1,54 +1,43 @@
 #include "sceneobjectcomponent.h"
 
-namespace GTE
-{
-	SceneObjectComponent::SceneObjectComponent()
-	{
+namespace GTE {
+    SceneObjectComponent::SceneObjectComponent() {
 
-	}
+    }
 
-	SceneObjectComponent::~SceneObjectComponent()
-	{
+    SceneObjectComponent::~SceneObjectComponent() {
 
-	}
+    }
 
-	SceneObjectComponentProcessingDescriptor& SceneObjectComponent::GetProcessingDescriptor()
-	{
-		return processingDescriptor;
-	}
+    SceneObjectComponentProcessingDescriptor& SceneObjectComponent::GetProcessingDescriptor() {
+        return processingDescriptor;
+    }
 
-	void SceneObjectComponent::SetSceneObject(SceneObjectRef sceneObject)
-	{
-		this->sceneObject = sceneObject;
-	}
+    void SceneObjectComponent::SetSceneObject(SceneObjectRef sceneObject) {
+        this->sceneObject = sceneObject;
+    }
 
-	SceneObjectRef SceneObjectComponent::GetSceneObject()
-	{
-		return sceneObject;
-	}
+    SceneObjectRef SceneObjectComponent::GetSceneObject() {
+        return sceneObject;
+    }
 
-	void SceneObjectComponent::Awake()
-	{
+    void SceneObjectComponent::Awake() {
 
-	}
+    }
 
-	void SceneObjectComponent::Start()
-	{
+    void SceneObjectComponent::Start() {
 
-	}
+    }
 
-	void SceneObjectComponent::Update()
-	{
+    void SceneObjectComponent::Update() {
 
-	}
+    }
 
-	void SceneObjectComponent::PreRender()
-	{
+    void SceneObjectComponent::PreRender() {
 
-	}
+    }
 
-	void SceneObjectComponent::WillRender()
-	{
+    void SceneObjectComponent::WillRender() {
 
-	}
+    }
 }

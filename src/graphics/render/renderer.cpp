@@ -3,21 +3,18 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 
-namespace GTE
-{
-	/*
-	* Default constructor
-	*/
-	Renderer::Renderer()
-	{
+namespace GTE {
+    /*
+    * Default constructor
+    */
+    Renderer::Renderer() {
 
-	}
+    }
 
-	/*
-	 * Clean-up
-	 */
-	Renderer::~Renderer()
-	{
+    /*
+     * Clean-up
+     */
+    Renderer::~Renderer() {
 
-	}
+    }
 }

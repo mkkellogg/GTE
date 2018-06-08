@@ -6,24 +6,22 @@
 #include "shadersourceloader.h"
 #include "global/global.h"
 
-namespace GTE
-{
-	//forward declarations
-	class ShaderSource;
+namespace GTE {
+    //forward declarations
+    class ShaderSource;
 
-	class ShaderSourceLoaderGL : public ShaderSourceLoader
-	{
-		friend class AssetImporter;
+    class ShaderSourceLoaderGL : public ShaderSourceLoader {
+        friend class AssetImporter;
 
-	protected:
+    protected:
 
-		ShaderSourceLoaderGL();
-		~ShaderSourceLoaderGL();
+        ShaderSourceLoaderGL();
+        ~ShaderSourceLoaderGL();
 
-	public:
+    public:
 
-		void LoadShaderSource(const std::string name, ShaderSource& shaderSource) const;
-	};
+        void LoadShaderSource(const std::string name, ShaderSource& shaderSource) const;
+    };
 
 }
 #endif

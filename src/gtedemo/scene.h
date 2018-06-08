@@ -16,22 +16,21 @@
 #include "base/bitmask.h"
 
 
-class Scene
-{
-	protected:
+class Scene {
+protected:
 
-	GTE::Vector3 baseCameraForward;
+    GTE::Vector3 baseCameraForward;
 
-	public:
+public:
 
-	Scene();
-	virtual ~Scene();
+    Scene();
+    virtual ~Scene();
 
-	virtual GTE::SceneObjectSharedPtr GetSceneRoot() = 0;
-	virtual void OnActivate() = 0;
-	virtual void Update() = 0;
-	virtual void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject,
-					   GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject) = 0;
+    virtual GTE::SceneObjectSharedPtr GetSceneRoot() = 0;
+    virtual void OnActivate() = 0;
+    virtual void Update() = 0;
+    virtual void Setup(GTE::AssetImporter& importer, GTE::SceneObjectSharedPtr ambientLightObject,
+                       GTE::SceneObjectSharedPtr directionalLightObject, GTE::SceneObjectSharedPtr playerObject) = 0;
 };
 
 #endif

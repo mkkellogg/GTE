@@ -28,95 +28,93 @@
 
 #include <string>
 
-namespace GTE
-{
-	//forward declarations
-	class ShaderSource;
-	class GraphicsGL;
-	class Texture;
-	class AttributeDescriptor;
-	class UniformDescriptor;
+namespace GTE {
+    //forward declarations
+    class ShaderSource;
+    class GraphicsGL;
+    class Texture;
+    class AttributeDescriptor;
+    class UniformDescriptor;
 
-	class ShaderGL : public Shader
-	{
-		friend class GraphicsGL;
+    class ShaderGL : public Shader {
+        friend class GraphicsGL;
 
-		// is this shader loaded, compiled and linked?
-		Bool ready;
+        // is this shader loaded, compiled and linked?
+        Bool ready;
 
-		std::string name;
+        std::string name;
 
-		// OpenGL identifier for the linked shader program
-		GLuint programID;
+        // OpenGL identifier for the linked shader program
+        GLuint programID;
 
-		// OpenGL identifier for the loaded and compiled vertex shader
-		GLuint vertexShaderID;
+        // OpenGL identifier for the loaded and compiled vertex shader
+        GLuint vertexShaderID;
 
-		// OpenGL identifier for the loaded and compiled fragment shader
-		GLuint fragmentShaderID;
+        // OpenGL identifier for the loaded and compiled fragment shader
+        GLuint fragmentShaderID;
 
-		// number of attributes exposed by this shader
-		UInt32 attributeCount;
+        // number of attributes exposed by this shader
+        UInt32 attributeCount;
 
-		// number of uniforms exposed by this shader
-		UInt32 uniformCount;
+        // number of uniforms exposed by this shader
+        UInt32 uniformCount;
 
-		// descriptors for this shader's attributes
-		AttributeDescriptor ** attributes;
+        // descriptors for this shader's attributes
+        AttributeDescriptor ** attributes;
 
-		// descriptors for this shader's uniforms
-		UniformDescriptor ** uniforms;
+        // descriptors for this shader's uniforms
+        UniformDescriptor ** uniforms;
 
-		void DestroyShaders();
-		void DestroyProgram();
-		void DestroyComponents();
-		void DestroyUniformAndAttributeInfo();
+        void DestroyShaders();
+        void DestroyProgram();
+        void DestroyComponents();
+        void DestroyUniformAndAttributeInfo();
 
-		Char * GetShaderLog(GLuint obj);
-		Char * GetProgramLog(GLuint obj);
-		Bool CheckCompilation(Int32 shaderID, ShaderType shaderType);
+        Char * GetShaderLog(GLuint obj);
+        Char * GetProgramLog(GLuint obj);
+        Bool CheckCompilation(Int32 shaderID, ShaderType shaderType);
 
-		Bool StoreUniformAndAttributeInfo();
+        Bool StoreUniformAndAttributeInfo();
 
-	protected:
+    protected:
 
-		ShaderGL(const ShaderSource& shaderSource);
-		virtual ~ShaderGL();
+        ShaderGL(const ShaderSource& shaderSource);
+        virtual ~ShaderGL();
 
-	public:
+    public:
 
-		Bool Load();
-		Bool IsLoaded() const;
-		Int32 GetAttributeVarID(const std::string& varName) const;
-		Int32 GetUniformVarID(const std::string& varName) const;
-		GLuint GetProgramID() const;
+        Bool Load();
+        Bool IsLoaded() const;
+        Int32 GetAttributeVarID(const std::string& varName) const;
+        Int32 GetUniformVarID(const std::string& varName) const;
+        GLuint GetProgramID() const;
 
-		void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer)  override;
+        void SendBufferToShader(Int32 varID, const VertexAttrBuffer * buffer)  override;
 
-		void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture) override;
-		void SendUniformToShader(Int32 varID, const Matrix4x4& mat) override;
-		void SendUniformToShader(Int32 varID, Real x, Real y, Real z, Real w) override;
-		void SendUniformToShader(Int32 varID, Real x, Real y, Real z) override;
-		void SendUniformToShader(Int32 varID, Real x, Real y) override;
-		void SendUniformToShader(Int32 varID, Real  data) override;
-		void SendUniformToShader(Int32 varID, Int32  data) override;
+        void SendUniformToShader(Int32 varID, UInt32 samplerUnitIndex, const TextureSharedPtr texture) override;
+        void SendUniformToShader(Int32 varID, const Matrix4x4& mat) override;
+        void SendUniformToShader(Int32 varID, Real x, Real y, Real z, Real w) override;
+        void SendUniformToShader(Int32 varID, Real x, Real y, Real z) override;
+        void SendUniformToShader(Int32 varID, Real x, Real y) override;
+        void SendUniformToShader(Int32 varID, Real  data) override;
+        void SendUniformToShader(Int32 varID, Int32  data) override;
 
-		void SendUniformToShader4FV(Int32 varID, const Real * data, UInt32 count) override;
-		void SendUniformToShader3FV(Int32 varID, const Real * data, UInt32 count) override;
-		void SendUniformToShader2FV(Int32 varID, const Real * data, UInt32 count) override;
-		void SendUniformToShader1FV(Int32 varID, const Real * data, UInt32 count) override;
-		void SendUniformToShader4IV(Int32 varID, const Int32 * data, UInt32 count) override;
-		void SendUniformToShader3IV(Int32 varID, const Int32 * data, UInt32 count) override;
-		void SendUniformToShader2IV(Int32 varID, const Int32 * data, UInt32 count) override;
-		void SendUniformToShader1IV(Int32 varID, const Int32 * data, UInt32 count) override;
-		void SendUniformToShaderM4x4V(Int32 varID, const Matrix4x4 * mat, UInt32 count) override;
+        void SendUniformToShader4FV(Int32 varID, const Real * data, UInt32 count) override;
+        void SendUniformToShader3FV(Int32 varID, const Real * data, UInt32 count) override;
+        void SendUniformToShader2FV(Int32 varID, const Real * data, UInt32 count) override;
+        void SendUniformToShader1FV(Int32 varID, const Real * data, UInt32 count) override;
+        void SendUniformToShader4IV(Int32 varID, const Int32 * data, UInt32 count) override;
+        void SendUniformToShader3IV(Int32 varID, const Int32 * data, UInt32 count) override;
+        void SendUniformToShader2IV(Int32 varID, const Int32 * data, UInt32 count) override;
+        void SendUniformToShader1IV(Int32 varID, const Int32 * data, UInt32 count) override;
+        void SendUniformToShaderM4x4V(Int32 varID, const Matrix4x4 * mat, UInt32 count) override;
 
-		UInt32 GetUniformCount() const;
-		const UniformDescriptor * GetUniformDescriptor(UInt32 index) const;
+        UInt32 GetUniformCount() const;
+        const UniformDescriptor * GetUniformDescriptor(UInt32 index) const;
 
-		UInt32 GetAttributeCount() const;
-		const AttributeDescriptor * GetAttributeDescriptor(UInt32 index) const;
-	};
+        UInt32 GetAttributeCount() const;
+        const AttributeDescriptor * GetAttributeDescriptor(UInt32 index) const;
+    };
 }
 
 #endif

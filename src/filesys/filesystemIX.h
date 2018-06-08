@@ -14,25 +14,23 @@
 #include "filesystem.h"
 #include <string>
 
-namespace GTE
-{
-	class FileSystemIX : public FileSystem
-	{
-		friend class FileSystem;
+namespace GTE {
+    class FileSystemIX : public FileSystem {
+        friend class FileSystem;
 
-	protected:
+    protected:
 
-		FileSystemIX();
-		~FileSystemIX();
+        FileSystemIX();
+        ~FileSystemIX();
 
-	public:
+    public:
 
-		std::string ConcatenatePaths(const std::string& pathA, const std::string& pathB) const;
-		std::string GetBasePath(const std::string& path) const;
-		std::string FixupPathForLocalFilesystem(const std::string& path) const;
-		std::string GetFileName(const std::string& fullPath) const;
-		Bool FileExists(const std::string& fullPath) const;
-	};
+        std::string ConcatenatePaths(const std::string& pathA, const std::string& pathB) const;
+        std::string GetBasePath(const std::string& path) const;
+        std::string FixupPathForLocalFilesystem(const std::string& path) const;
+        std::string GetFileName(const std::string& fullPath) const;
+        Bool FileExists(const std::string& fullPath) const;
+    };
 }
 
 #endif

@@ -4,44 +4,41 @@
 #include "engine.h"
 #include "base/bitmask.h"
 
-namespace GTE
-{
-	//forward declarations
-	class EngineObjectManager;
-	class SceneObject;
-	class SceneObjectComponent;
+namespace GTE {
+    //forward declarations
+    class EngineObjectManager;
+    class SceneObject;
+    class SceneObjectComponent;
 
-	enum class SceneObjectEvent
-	{
-		Awake = 0,
-		Start = 2,
-		Update = 3,
-		PreRender = 4,
-		WillRender = 5
-	};
+    enum class SceneObjectEvent {
+        Awake = 0,
+        Start = 2,
+        Update = 3,
+        PreRender = 4,
+        WillRender = 5
+    };
 
-	class EventManager
-	{
-		// necessary to dispatch render events
-		friend class ForwardRenderManager;
-		// necessary to trigger lifecycle events and manage allocation
-		friend class Engine;
-		// necessary to dispatch update events
-		friend class SceneManager;
+    class EventManager {
+        // necessary to dispatch render events
+        friend class ForwardRenderManager;
+        // necessary to trigger lifecycle events and manage allocation
+        friend class Engine;
+        // necessary to dispatch update events
+        friend class SceneManager;
 
-		protected:
-				
-		EventManager();
-		~EventManager();
+    protected:
 
-		Bool Init();
+        EventManager();
+        ~EventManager();
 
-		void DispatchSceneObjectComponentEvent(SceneObjectEvent evnt, SceneObjectComponent& component);
-		void DispatchSceneObjectEvent(SceneObjectEvent evnt, SceneObject& object);
+        Bool Init();
 
-		public:
-		
-	};
+        void DispatchSceneObjectComponentEvent(SceneObjectEvent evnt, SceneObjectComponent& component);
+        void DispatchSceneObjectEvent(SceneObjectEvent evnt, SceneObject& object);
+
+    public:
+
+    };
 }
 
 #endif

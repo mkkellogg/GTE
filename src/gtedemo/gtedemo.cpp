@@ -6,80 +6,71 @@
 /*
  * Custom implementation of EngineCallbacks to handle GTE engine events.
  */
-class CustomEngineCallbacks : public GTE::EngineCallbacks
-{
-	Game * game = nullptr;
+class CustomEngineCallbacks : public GTE::EngineCallbacks {
+    Game * game = nullptr;
 
-	public:
+public:
 
-	CustomEngineCallbacks() {}
+    CustomEngineCallbacks() {}
 
-	void OnAwake() override
-	{
-		// instantiate the main Game instance
-		game = new Game();
+    void OnAwake() override {
+        // instantiate the main Game instance
+        game = new Game();
 
-		// initialize the main game instance
-		game->Init();
-	}
+        // initialize the main game instance
+        game->Init();
+    }
 
-	void OnStart() override
-	{
+    void OnStart() override {
 
-	}
+    }
 
-	void OnUpdate() override
-	{
-		// pass the Update event to the main Game instance
-		game->Update();
-	}
+    void OnUpdate() override {
+        // pass the Update event to the main Game instance
+        game->Update();
+    }
 
-	void OnPreRender() override
-	{
-		// pass the OnPreRender event to the main Game instance
-		game->OnPreRender();
-	}
+    void OnPreRender() override {
+        // pass the OnPreRender event to the main Game instance
+        game->OnPreRender();
+    }
 
-	void OnQuit()
-	{
-		game->OnQuit();
-	}
-	virtual ~CustomEngineCallbacks() {}
+    void OnQuit() {
+        game->OnQuit();
+    }
+    virtual ~CustomEngineCallbacks() {}
 };
 
 /*
  * Entry point for the GTE Demo. This method is minimal; its only purpose
  * is to initialize and start the engine.
  */
-int main(int argc, char** argv)
-{
-	// instance CustomEngineCallbacks to handle engine events
-	CustomEngineCallbacks engineCallbacks;
+int main(int argc, char** argv) {
+    // instance CustomEngineCallbacks to handle engine events
+    CustomEngineCallbacks engineCallbacks;
 
-	// specify basic graphics attributes
-	GTE::GraphicsAttributes graphicsAttributes;
-	graphicsAttributes.WindowWidth = 900;
-	graphicsAttributes.WindowHeight = 600;
-	graphicsAttributes.WindowTitle = "GTE Test";
-	graphicsAttributes.AAMethod = GTE::AntialiasingMethod::MSAAx4;
-	graphicsAttributes.WaitForVSync = false;
+    // specify basic graphics attributes
+    GTE::GraphicsAttributes graphicsAttributes;
+    graphicsAttributes.WindowWidth = 900;
+    graphicsAttributes.WindowHeight = 600;
+    graphicsAttributes.WindowTitle = "GTE Test";
+    graphicsAttributes.AAMethod = GTE::AntialiasingMethod::MSAAx4;
+    graphicsAttributes.WaitForVSync = false;
 
-	// initialize the engine
-	GTE::Bool initSuccess = GTE::Engine::Init(&engineCallbacks, graphicsAttributes);
+    // initialize the engine
+    GTE::Bool initSuccess = GTE::Engine::Init(&engineCallbacks, graphicsAttributes);
 
-	if(initSuccess)
-	{
-		// start the engine
-		GTE::Engine::Start();
-	}
-	else
-	{
-		GTE::Debug::PrintError("Error occurred while initializing engine.");
-		return EXIT_FAILURE;
-	}
+    if (initSuccess) {
+        // start the engine
+        GTE::Engine::Start();
+    }
+    else {
+        GTE::Debug::PrintError("Error occurred while initializing engine.");
+        return EXIT_FAILURE;
+    }
 
-	// shutdown the engine
-	GTE::Engine::ShutDown();
-	return EXIT_SUCCESS;
+    // shutdown the engine
+    GTE::Engine::ShutDown();
+    return EXIT_SUCCESS;
 }
 

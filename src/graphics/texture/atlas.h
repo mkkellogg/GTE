@@ -16,51 +16,47 @@
 #include "engine.h"
 #include "object/engineobject.h"
 
-namespace GTE
-{
-	class Atlas
-	{
-		friend class Graphics;
-		friend class EngineObjectManager;
+namespace GTE {
+    class Atlas {
+        friend class Graphics;
+        friend class EngineObjectManager;
 
-		public:
+    public:
 
-		class ImageDescriptor
-		{
-			public:
+        class ImageDescriptor {
+        public:
 
-			Real Left;
-			Real Top;
-			Real Right;
-			Real Bottom;
+            Real Left;
+            Real Top;
+            Real Right;
+            Real Bottom;
 
-			ImageDescriptor(Real left, Real top, Real right, Real bottom)
-			{
-				Left = left;
-				Top = top;
-				Right = right;
-				Bottom = bottom;
-			}
-		};
+            ImageDescriptor(Real left, Real top, Real right, Real bottom) {
+                Left = left;
+                Top = top;
+                Right = right;
+                Bottom = bottom;
+            }
+        };
 
-		private:
+    private:
 
-		TextureSharedPtr texture;
-		UInt32 imageCount; 
-		std::vector<ImageDescriptor> imageDescriptors;
+        TextureSharedPtr texture;
+        UInt32 imageCount;
+        std::vector<ImageDescriptor> imageDescriptors;
 
-		protected:
+    protected:
 
-		static Atlas* CreateGridAtlas(TextureRef texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY);
-		Atlas(TextureRef texture, Bool createFirstFullFrame);
-		virtual ~Atlas();
+        static Atlas* CreateGridAtlas(TextureRef texture, Real left, Real top, Real right, Real bottom, UInt32 xCount, UInt32 yCount, Bool reverseX, Bool reverseY);
+        Atlas(TextureRef texture, Bool createFirstFullFrame);
+        virtual ~Atlas();
 
-		public:
-		
-		void AddImageDescriptor(Real left, Real top, Real right, Real bottom);
-		ImageDescriptor* GetImageDescriptor(UInt32 index);
-		TextureRef GetTexture();
-	};
+    public:
+
+        void AddImageDescriptor(Real left, Real top, Real right, Real bottom);
+        ImageDescriptor* GetImageDescriptor(UInt32 index);
+        TextureRef GetTexture();
+    };
 }
 
 #endif

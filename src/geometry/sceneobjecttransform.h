@@ -16,47 +16,45 @@
 #include "transform.h"
 #include "matrix4x4.h"
 
-namespace GTE
-{
-	// forward declarations
-	class Transform;
+namespace GTE {
+    // forward declarations
+    class Transform;
 
-	class SceneObjectTransform : public Transform
-	{
-		friend class SceneObject;
+    class SceneObjectTransform : public Transform {
+        friend class SceneObject;
 
-		SceneObject * sceneObject;
+        SceneObject * sceneObject;
 
-		void GetInheritedTransform(Transform& transform, Bool invert) const;
-		void SetSceneObject(SceneObject* sceneObject);
-		void GetLocalTransformationFromWorldTransformation(const Transform& worldTransformation, Transform& localTransformation);
+        void GetInheritedTransform(Transform& transform, Bool invert) const;
+        void SetSceneObject(SceneObject* sceneObject);
+        void GetLocalTransformationFromWorldTransformation(const Transform& worldTransformation, Transform& localTransformation);
 
-	public:
+    public:
 
-		SceneObjectTransform();
-		SceneObjectTransform(SceneObject* sceneObject);
-		~SceneObjectTransform() override;
+        SceneObjectTransform();
+        SceneObjectTransform(SceneObject* sceneObject);
+        ~SceneObjectTransform() override;
 
-		static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, Bool includeSelf, Bool invert);
-		static void GetWorldTransform(Transform& transform, const SceneObject * sceneObject, Bool includeSelf, Bool invert);
-		static void GetWorldTransform(Transform& transform, const SceneObject& sceneObject, Bool includeSelf, Bool invert);
+        static void GetWorldTransform(Transform& transform, SceneObjectRef sceneObject, Bool includeSelf, Bool invert);
+        static void GetWorldTransform(Transform& transform, const SceneObject * sceneObject, Bool includeSelf, Bool invert);
+        static void GetWorldTransform(Transform& transform, const SceneObject& sceneObject, Bool includeSelf, Bool invert);
 
-		void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-		void SetLocalComponents(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
+        void GetLocalComponents(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+        void SetLocalComponents(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
 
-		void Translate(Real x, Real y, Real z, Bool local) override;
-		void Translate(Vector3& vector, Bool local);
-		void RotateAround(const Point3& point, const Vector3& axis, Real angle, Bool local) override;
-		void RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, Bool local) override;
-		void Scale(const Vector3& mag, Bool local) override;
-		void Scale(Real x, Real y, Real z, Bool local) override;
-		void Rotate(const Vector3& vector, Real a, Bool local) override;
-		void Rotate(Real x, Real y, Real z, Real a, Bool local) override;
+        void Translate(Real x, Real y, Real z, Bool local) override;
+        void Translate(Vector3& vector, Bool local);
+        void RotateAround(const Point3& point, const Vector3& axis, Real angle, Bool local) override;
+        void RotateAround(Real px, Real py, Real pz, Real ax, Real ay, Real az, Real angle, Bool local) override;
+        void Scale(const Vector3& mag, Bool local) override;
+        void Scale(Real x, Real y, Real z, Bool local) override;
+        void Rotate(const Vector3& vector, Real a, Bool local) override;
+        void Rotate(Real x, Real y, Real z, Real a, Bool local) override;
 
-		void TransformVector(Vector3& vector) const override;
-		void TransformPoint(Point3& point3) const override;
-		void TransformVector4f(Real * vector) const override;
-	};
+        void TransformVector(Vector3& vector) const override;
+        void TransformPoint(Point3& point3) const override;
+        void TransformVector4f(Real * vector) const override;
+    };
 }
 
 #endif

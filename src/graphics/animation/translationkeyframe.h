@@ -16,19 +16,17 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
 
-namespace GTE
-{
-	class TranslationKeyFrame : public KeyFrame
-	{
-	public:
+namespace GTE {
+    class TranslationKeyFrame : public KeyFrame {
+    public:
 
-		// translation transformation
-		Vector3 Translation;
+        // translation transformation
+        Vector3 Translation;
 
-		TranslationKeyFrame();
-		TranslationKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& translation);
-		~TranslationKeyFrame() override;
-	};
+        TranslationKeyFrame();
+        TranslationKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& translation);
+        ~TranslationKeyFrame() override;
+    };
 }
 
 #endif

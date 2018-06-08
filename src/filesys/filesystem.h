@@ -16,27 +16,25 @@
 #include "engine.h"
 #include "global/global.h"
 
-namespace GTE
-{
-	class FileSystem
-	{
-		static FileSystem * theInstance;
+namespace GTE {
+    class FileSystem {
+        static FileSystem * theInstance;
 
-		protected:
+    protected:
 
-		FileSystem();
-		virtual ~FileSystem();
+        FileSystem();
+        virtual ~FileSystem();
 
-		public:
+    public:
 
-		static FileSystem * Instance();
+        static FileSystem * Instance();
 
-		virtual std::string ConcatenatePaths(const std::string& pathA, const std::string& pathB) const = 0;
-		virtual std::string GetBasePath(const std::string& path) const = 0;
-		virtual std::string FixupPathForLocalFilesystem(const std::string& path) const = 0;
-		virtual std::string GetFileName(const std::string& fullPath) const = 0;
-		virtual Bool FileExists(const std::string& fullPath) const = 0;
-	};
+        virtual std::string ConcatenatePaths(const std::string& pathA, const std::string& pathB) const = 0;
+        virtual std::string GetBasePath(const std::string& path) const = 0;
+        virtual std::string FixupPathForLocalFilesystem(const std::string& path) const = 0;
+        virtual std::string GetFileName(const std::string& fullPath) const = 0;
+        virtual Bool FileExists(const std::string& fullPath) const = 0;
+    };
 }
 
 #endif

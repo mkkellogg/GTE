@@ -5,20 +5,16 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 
-namespace GTE
-{
-	TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID) : Texture(attributes)
-	{
-		this->textureID = textureID;
-	}
+namespace GTE {
+    TextureGL::TextureGL(TextureAttributes attributes, GLuint textureID) : Texture(attributes) {
+        this->textureID = textureID;
+    }
 
-	TextureGL::~TextureGL()
-	{
+    TextureGL::~TextureGL() {
 
-	}
+    }
 
-	GLuint TextureGL::GetTextureID() const
-	{
-		return textureID;
-	}
+    GLuint TextureGL::GetTextureID() const {
+        return textureID;
+    }
 }

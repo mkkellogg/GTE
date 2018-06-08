@@ -19,39 +19,33 @@
 
 #include <functional>
 
-namespace GTE
-{
-	// forward declarations
-	class Particle;
+namespace GTE {
+    // forward declarations
+    class Particle;
 
-	template <typename T> class CustomModifier : public ParticleModifier<T>
-	{
-		std::function<void(Particle& particle, T& targetAttribute, Real t)> callback;
+    template <typename T> class CustomModifier : public ParticleModifier<T> {
+        std::function<void(Particle& particle, T& targetAttribute, Real t)> callback;
 
-		public:
+    public:
 
-		CustomModifier(std::function<void(Particle& particle, T& targetAttribute, Real t)> callback) : ParticleModifier<T>()
-		{
-			this->callback = callback;
-		}
+        CustomModifier(std::function<void(Particle& particle, T& targetAttribute, Real t)> callback) : ParticleModifier<T>() {
+            this->callback = callback;
+        }
 
-		virtual ~CustomModifier()
-		{
+        virtual ~CustomModifier() {
 
-		}
+        }
 
-		void Update(Particle& particle, T& targetAttribute, Real t) const override
-		{
-			callback(particle, targetAttribute, t);
-		}
+        void Update(Particle& particle, T& targetAttribute, Real t) const override {
+            callback(particle, targetAttribute, t);
+        }
 
-		ParticleModifier<T>* Clone() const override
-		{
-			CustomModifier* baseClone = new CustomModifier(callback);
-			ASSERT(baseClone != nullptr, "CustomModifier::Clone -> Could not clone modifier.");
-			return static_cast<ParticleModifier<T>*>(baseClone);
-		}
-	};
+        ParticleModifier<T>* Clone() const override {
+            CustomModifier* baseClone = new CustomModifier(callback);
+            ASSERT(baseClone != nullptr, "CustomModifier::Clone -> Could not clone modifier.");
+            return static_cast<ParticleModifier<T>*>(baseClone);
+        }
+    };
 }
 
 #endif

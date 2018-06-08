@@ -3,31 +3,29 @@
 
 #include "engine.h"
 
-namespace GTE
-{
-	//forward declarations
-	class EngineObjectManager;
+namespace GTE {
+    //forward declarations
+    class EngineObjectManager;
 
-	typedef UInt32 ObjectID;
+    typedef UInt32 ObjectID;
 
-	class EngineObject
-	{
-		// all instances of EngineObject and classes that derive from
-		// EngineObject should have their life-cycle managed by EngineObjectManager
-		friend class EngineObjectManager;
+    class EngineObject {
+        // all instances of EngineObject and classes that derive from
+        // EngineObject should have their life-cycle managed by EngineObjectManager
+        friend class EngineObjectManager;
 
-		ObjectID objectID;
-		void SetObjectID(ObjectID id);
+        ObjectID objectID;
+        void SetObjectID(ObjectID id);
 
-	protected:
+    protected:
 
-		EngineObject();
-		virtual ~EngineObject();
+        EngineObject();
+        virtual ~EngineObject();
 
-	public:
+    public:
 
-		ObjectID GetObjectID() const;
-	};
+        ObjectID GetObjectID() const;
+    };
 }
 
 #endif

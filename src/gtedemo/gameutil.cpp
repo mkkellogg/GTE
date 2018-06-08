@@ -28,24 +28,21 @@
  * instance of SceneObject that contains a SkinnedMesh3DRenderer component,
  * but return just the SkinnedMesh3DRenderer instance.
  */
-GTE::SkinnedMesh3DRendererSharedPtr GameUtil::FindFirstSkinnedMeshRenderer(GTE::SceneObjectSharedPtr ref)
-{
-	if(!ref.IsValid())return GTE::SkinnedMesh3DRendererSharedPtr::Null();
+GTE::SkinnedMesh3DRendererSharedPtr GameUtil::FindFirstSkinnedMeshRenderer(GTE::SceneObjectSharedPtr ref) {
+    if (!ref.IsValid())return GTE::SkinnedMesh3DRendererSharedPtr::Null();
 
-	if(ref->GetRenderer().IsValid())
-	{
-		GTE::SkinnedMesh3DRendererSharedPtr skinnedMeshRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::SkinnedMesh3DRenderer>(ref->GetRenderer());
-		return skinnedMeshRenderer;
-	}
+    if (ref->GetRenderer().IsValid()) {
+        GTE::SkinnedMesh3DRendererSharedPtr skinnedMeshRenderer = GTE::DynamicCastEngineObject<GTE::Renderer, GTE::SkinnedMesh3DRenderer>(ref->GetRenderer());
+        return skinnedMeshRenderer;
+    }
 
-	for(GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++)
-	{
-		GTE::SceneObjectSharedPtr childRef = ref->GetChildAt(i);
-		GTE::SkinnedMesh3DRendererSharedPtr subRef = FindFirstSkinnedMeshRenderer(childRef);
-		if(subRef.IsValid())return subRef;
-	}
+    for (GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++) {
+        GTE::SceneObjectSharedPtr childRef = ref->GetChildAt(i);
+        GTE::SkinnedMesh3DRendererSharedPtr subRef = FindFirstSkinnedMeshRenderer(childRef);
+        if (subRef.IsValid())return subRef;
+    }
 
-	return GTE::SkinnedMesh3DRendererSharedPtr::Null();
+    return GTE::SkinnedMesh3DRendererSharedPtr::Null();
 }
 
 
@@ -54,132 +51,111 @@ GTE::SkinnedMesh3DRendererSharedPtr GameUtil::FindFirstSkinnedMeshRenderer(GTE::
  * instance of SceneObject that contains a Mesh3D component, and return
  * the containing SceneObject instance.
  */
-GTE::SceneObjectSharedPtr GameUtil::FindFirstSceneObjectWithMesh(GTE::SceneObjectSharedPtr ref)
-{
-	if(!ref.IsValid())return GTE::SceneObjectSharedPtr::Null();
+GTE::SceneObjectSharedPtr GameUtil::FindFirstSceneObjectWithMesh(GTE::SceneObjectSharedPtr ref) {
+    if (!ref.IsValid())return GTE::SceneObjectSharedPtr::Null();
 
-	if(ref->GetMesh3D().IsValid())return ref;
+    if (ref->GetMesh3D().IsValid())return ref;
 
-	for(GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++)
-	{
-		GTE::SceneObjectSharedPtr childRef = ref->GetChildAt(i);
-		GTE::SceneObjectSharedPtr subRef = FindFirstSceneObjectWithMesh(childRef);
-		if(subRef.IsValid())return subRef;
-	}
+    for (GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++) {
+        GTE::SceneObjectSharedPtr childRef = ref->GetChildAt(i);
+        GTE::SceneObjectSharedPtr subRef = FindFirstSceneObjectWithMesh(childRef);
+        if (subRef.IsValid())return subRef;
+    }
 
-	return GTE::SceneObjectSharedPtr::Null();
+    return GTE::SceneObjectSharedPtr::Null();
 }
 
 /*
  * Recursively visit objects in the scene hierarchy with root at [ref] and for each
  * invoke [func] with the current SceneObject instance as the only parameter.
  */
-void GameUtil::ProcessSceneObjects(GTE::SceneObjectSharedPtr ref, std::function<void(GTE::SceneObjectSharedPtr)> func)
-{
-	if(!ref.IsValid())return;
+void GameUtil::ProcessSceneObjects(GTE::SceneObjectSharedPtr ref, std::function<void(GTE::SceneObjectSharedPtr)> func) {
+    if (!ref.IsValid())return;
 
-	// invoke [func]
-	func(ref);
+    // invoke [func]
+    func(ref);
 
-	for(GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++)
-	{
-		GTE::SceneObjectSharedPtr childRef = ref->GetChildAt(i);
-		ProcessSceneObjects(childRef, func);
-	}
+    for (GTE::UInt32 i = 0; i < ref->GetChildrenCount(); i++) {
+        GTE::SceneObjectSharedPtr childRef = ref->GetChildAt(i);
+        ProcessSceneObjects(childRef, func);
+    }
 }
 
 /*
  * Set the SceneObject [root] and all children to be static.
  */
-void GameUtil::SetAllObjectsStatic(GTE::SceneObjectSharedPtr root)
-{
-	ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current)
-	{
-		current->SetStatic(true);
-	});
+void GameUtil::SetAllObjectsStatic(GTE::SceneObjectSharedPtr root) {
+    ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current) {
+        current->SetStatic(true);
+    });
 }
 
 /*
  * Set the SceneObject [root] and all children to have layer mask [mask].
  */
-void GameUtil::SetAllObjectsLayerMask(GTE::SceneObjectSharedPtr root, GTE::IntMask mask)
-{
-	ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current)
-	{
-		current->SetLayerMask(mask);
-	});
+void GameUtil::SetAllObjectsLayerMask(GTE::SceneObjectSharedPtr root, GTE::IntMask mask) {
+    ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current) {
+        current->SetLayerMask(mask);
+    });
 }
 
 /*
  * Set any mesh encountered in the scene hierarchy beginning with [root]
  * to use the standard shadow volume generation algorithm.
  */
-void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectSharedPtr root)
-{
-	ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current)
-	{
-		GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
-		if(filter.IsValid())
-		{
-			filter->SetUseBackSetShadowVolume(false);
-		}
-	});
+void GameUtil::SetAllMeshesStandardShadowVolume(GTE::SceneObjectSharedPtr root) {
+    ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current) {
+        GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
+        if (filter.IsValid()) {
+            filter->SetUseBackSetShadowVolume(false);
+        }
+    });
 }
 
 /*
 * Set any mesh encountered in the scene hierarchy beginning with [root]
 * to use a shadow volume offset specified by [offset].
 */
-void GameUtil::SetAllMeshesShadowVolumeOffset(GTE::SceneObjectSharedPtr root, GTE::Real offset)
-{
-	ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current)
-	{
-		GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
-		if(filter.IsValid())
-		{
-			filter->SetUseCustomShadowVolumeOffset(true);
-			filter->SetCustomShadowVolumeOffset(offset);
-		}
-	});
+void GameUtil::SetAllMeshesShadowVolumeOffset(GTE::SceneObjectSharedPtr root, GTE::Real offset) {
+    ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current) {
+        GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
+        if (filter.IsValid()) {
+            filter->SetUseCustomShadowVolumeOffset(true);
+            filter->SetCustomShadowVolumeOffset(offset);
+        }
+    });
 }
 
 /*
  * Set any mesh encountered in the scene hierarchy beginning with [root]
  * to set shadow casting to [castShadows].
  */
-void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectSharedPtr root, GTE::Bool castShadows)
-{
-	ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current)
-	{
-		GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
-		if(filter.IsValid())
-		{
-			filter->SetCastShadows(castShadows);
-		}
-	});
+void GameUtil::SetAllObjectsCastShadows(GTE::SceneObjectSharedPtr root, GTE::Bool castShadows) {
+    ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current) {
+        GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
+        if (filter.IsValid()) {
+            filter->SetCastShadows(castShadows);
+        }
+    });
 }
 
 /*
 * Set any mesh encountered in the scene hierarchy beginning with [root]
 * to set shadow receiving to [castShadows].
 */
-void GameUtil::SetAllObjectsReceiveShadows(GTE::SceneObjectSharedPtr root, GTE::Bool receiveShadows)
-{
-	ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current)
-	{
-		GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
-		if(filter.IsValid())
-		{
-			filter->SetReceiveShadows(receiveShadows);
-		}
-	});
+void GameUtil::SetAllObjectsReceiveShadows(GTE::SceneObjectSharedPtr root, GTE::Bool receiveShadows) {
+    ProcessSceneObjects(root, [=](GTE::SceneObjectSharedPtr current) {
+        GTE::Mesh3DFilterSharedPtr filter = current->GetMesh3DFilter();
+        if (filter.IsValid()) {
+            filter->SetReceiveShadows(receiveShadows);
+        }
+    });
 }
 
 
 GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
-	GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
-{
-	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
+                                                   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows) {
+    return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
 }
 
 /*
@@ -187,22 +163,20 @@ GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GT
  * MultiMaterial instances.
  */
 GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
-	GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume)
-{
-	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
-	GTE::MultiMaterialRef multiMaterial = objectManager->CreateMultiMaterial();
-	ASSERT(multiMaterial.IsValid(), "GameUtil::AddMeshToScene -> Unable to create MultiMaterial to hold 'material'.");
+                                                   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume) {
+    GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+    GTE::MultiMaterialRef multiMaterial = objectManager->CreateMultiMaterial();
+    ASSERT(multiMaterial.IsValid(), "GameUtil::AddMeshToScene -> Unable to create MultiMaterial to hold 'material'.");
 
-	multiMaterial->AddMaterial(material);
-	GTE::SceneObjectSharedPtr object =  AddMeshToScene(mesh, multiMaterial, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, useBackSetShadowVolume);
-	return object;
+    multiMaterial->AddMaterial(material);
+    GTE::SceneObjectSharedPtr object = AddMeshToScene(mesh, multiMaterial, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, useBackSetShadowVolume);
+    return object;
 }
 
 
 GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MultiMaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
-												   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows)
-{
-	return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
+                                                   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows) {
+    return AddMeshToScene(mesh, material, sx, sy, sz, rx, ry, rz, ra, tx, ty, tz, isStatic, castShadows, receiveShadows, true);
 }
 
 /*
@@ -214,26 +188,25 @@ GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GT
 * This method is used to handle all the details of placing an arbitrary mesh somewhere in the scene at a specified orientation.
 */
 GTE::SceneObjectSharedPtr GameUtil::AddMeshToScene(GTE::Mesh3DSharedPtr mesh, GTE::MultiMaterialSharedPtr material, GTE::Real sx, GTE::Real sy, GTE::Real sz, GTE::Real rx, GTE::Real ry, GTE::Real rz, GTE::Real ra, GTE::Real tx, GTE::Real ty, GTE::Real tz,
-												   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume)
-{
-	GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
-	GTE::SceneObjectSharedPtr meshSceneObject = objectManager->CreateSceneObject();
-	meshSceneObject->SetActive(true);
-	GTE::Mesh3DFilterSharedPtr meshFilter = objectManager->CreateMesh3DFilter();
-	meshFilter->SetUseBackSetShadowVolume(useBackSetShadowVolume);
-	meshFilter->SetMesh3D(mesh);
-	meshFilter->SetCastShadows(castShadows);
-	meshFilter->SetReceiveShadows(receiveShadows);
-	meshSceneObject->SetMesh3DFilter(meshFilter);
-	GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
-	renderer->AddMultiMaterial(material);
-	meshSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
+                                                   GTE::Bool isStatic, GTE::Bool castShadows, GTE::Bool receiveShadows, GTE::Bool useBackSetShadowVolume) {
+    GTE::EngineObjectManager * objectManager = GTE::Engine::Instance()->GetEngineObjectManager();
+    GTE::SceneObjectSharedPtr meshSceneObject = objectManager->CreateSceneObject();
+    meshSceneObject->SetActive(true);
+    GTE::Mesh3DFilterSharedPtr meshFilter = objectManager->CreateMesh3DFilter();
+    meshFilter->SetUseBackSetShadowVolume(useBackSetShadowVolume);
+    meshFilter->SetMesh3D(mesh);
+    meshFilter->SetCastShadows(castShadows);
+    meshFilter->SetReceiveShadows(receiveShadows);
+    meshSceneObject->SetMesh3DFilter(meshFilter);
+    GTE::Mesh3DRendererSharedPtr renderer = objectManager->CreateMesh3DRenderer();
+    renderer->AddMultiMaterial(material);
+    meshSceneObject->SetRenderer(GTE::DynamicCastEngineObject<GTE::Mesh3DRenderer, GTE::Renderer>(renderer));
 
-	meshSceneObject->GetTransform().Scale(sx, sy, sz, false);
-	if(ra != 0)meshSceneObject->GetTransform().Rotate(rx, ry, rz, ra, false);
-	meshSceneObject->GetTransform().Translate(tx, ty, tz, false);
+    meshSceneObject->GetTransform().Scale(sx, sy, sz, false);
+    if (ra != 0)meshSceneObject->GetTransform().Rotate(rx, ry, rz, ra, false);
+    meshSceneObject->GetTransform().Translate(tx, ty, tz, false);
 
-	if(isStatic)SetAllObjectsStatic(meshSceneObject);
+    if (isStatic)SetAllObjectsStatic(meshSceneObject);
 
-	return meshSceneObject;
+    return meshSceneObject;
 }

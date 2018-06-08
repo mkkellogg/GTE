@@ -17,30 +17,28 @@
 
 #include <unordered_map>
 
-namespace GTE
-{
-	class AnimationManager
-	{
-		// necessary to trigger lifecycle events and manage
-		// allocation
-		friend class Engine;
+namespace GTE {
+    class AnimationManager {
+        // necessary to trigger lifecycle events and manage
+        // allocation
+        friend class Engine;
 
-		AnimationManager();
-		~AnimationManager();
+        AnimationManager();
+        ~AnimationManager();
 
-		// map object IDs of Skeleton objects to their assign animation player
-		std::unordered_map<ObjectID, AnimationPlayerSharedPtr> activePlayers;
+        // map object IDs of Skeleton objects to their assign animation player
+        std::unordered_map<ObjectID, AnimationPlayerSharedPtr> activePlayers;
 
-	public:
+    public:
 
-		Bool IsCompatible(SkinnedMesh3DRendererConstRef meshRenderer, AnimationConstRef animation) const;
-		Bool IsCompatible(SkeletonConstRef skeleton, AnimationConstRef animation) const;
+        Bool IsCompatible(SkinnedMesh3DRendererConstRef meshRenderer, AnimationConstRef animation) const;
+        Bool IsCompatible(SkeletonConstRef skeleton, AnimationConstRef animation) const;
 
-		void Update();
+        void Update();
 
-		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkeletonRef target);
-		AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererConstRef renderer);
-	};
+        AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkeletonRef target);
+        AnimationPlayerSharedPtr RetrieveOrCreateAnimationPlayer(SkinnedMesh3DRendererConstRef renderer);
+    };
 }
 
 #endif

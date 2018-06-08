@@ -3,22 +3,20 @@
 
 #include "engine.h"
 
-namespace GTE
-{
-	class ScreenDescriptor
-	{
-		Int32 screenWidth;
-		Int32 screenHeight;
+namespace GTE {
+    class ScreenDescriptor {
+        Int32 screenWidth;
+        Int32 screenHeight;
 
-	public:
+    public:
 
-		ScreenDescriptor();
-		ScreenDescriptor(Int32 screenWidth, Int32 screenHeight);
-		~ScreenDescriptor();
+        ScreenDescriptor();
+        ScreenDescriptor(Int32 screenWidth, Int32 screenHeight);
+        ~ScreenDescriptor();
 
-		Int32 GetScreenWidth();
-		Int32 getScreenHeight();
-	};
+        Int32 GetScreenWidth();
+        Int32 getScreenHeight();
+    };
 }
 
 #endif

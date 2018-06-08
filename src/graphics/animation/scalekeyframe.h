@@ -17,19 +17,17 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
 
-namespace GTE
-{
-	class ScaleKeyFrame : public KeyFrame
-	{
-	public:
+namespace GTE {
+    class ScaleKeyFrame : public KeyFrame {
+    public:
 
-		// scale transformation
-		Vector3 Scale;
+        // scale transformation
+        Vector3 Scale;
 
-		ScaleKeyFrame();
-		ScaleKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& scale);
-		~ScaleKeyFrame() override;
-	};
+        ScaleKeyFrame();
+        ScaleKeyFrame(Real normalizedTime, Real realTime, Real realTimeTicks, const Vector3& scale);
+        ~ScaleKeyFrame() override;
+    };
 
 }
 #endif

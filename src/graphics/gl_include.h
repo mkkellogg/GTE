@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #else
 #ifdef _WIN32
-  #include <windows.h>
+#include <windows.h>
 #endif
 #include <GL/glew.h>
 #include <GL/gl.h>

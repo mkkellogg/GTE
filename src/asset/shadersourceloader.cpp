@@ -1,15 +1,12 @@
 #include "shadersourceloader.h"
 #include "global/global.h"
 
-namespace GTE
-{
-	ShaderSourceLoader::ShaderSourceLoader()
-	{
+namespace GTE {
+    ShaderSourceLoader::ShaderSourceLoader() {
 
-	}
+    }
 
-	ShaderSourceLoader::~ShaderSourceLoader()
-	{
+    ShaderSourceLoader::~ShaderSourceLoader() {
 
-	}
+    }
 }

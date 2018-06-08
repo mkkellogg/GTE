@@ -24,216 +24,209 @@
 #include "particlemodifier.h"
 #include "graphics/materialvardirectory.h"
 
-namespace GTE
-{
-	// forward declarations
-	class Camera;
+namespace GTE {
+    // forward declarations
+    class Camera;
 
-	class ParticleSystem : public SceneObjectComponent
-	{
-		// Since this ultimately derives from EngineObject, we make this class
-		// a friend of EngineObjectManager, and the constructor & destructor
-		// protected so its life-cycle can be handled completely by EngineObjectManager
-		friend class EngineObjectManager;
+    class ParticleSystem : public SceneObjectComponent {
+        // Since this ultimately derives from EngineObject, we make this class
+        // a friend of EngineObjectManager, and the constructor & destructor
+        // protected so its life-cycle can be handled completely by EngineObjectManager
+        friend class EngineObjectManager;
 
-		// necessary so ParticleMeshRenderer can forward WillRender event
-		friend class ParticleMeshRenderer;
+        // necessary so ParticleMeshRenderer can forward WillRender event
+        friend class ParticleMeshRenderer;
 
-		public:
+    public:
 
-		enum class ModifierType
-		{
-			Initializer = 0,
-			Updater = 1,
-			All = 2
-		};
-		
-		private:
+        enum class ModifierType {
+            Initializer = 0,
+            Updater = 1,
+            All = 2
+        };
 
-		static const CustomModifier<UInt32> DefaultUInt32Initializer;
-		static const CustomModifier<Real> DefaultRealInitializer;
-		static const CustomModifier<Vector3> DefaultVector3Initializer;
-		static const CustomModifier<Point3> DefaultPoint3Initializer;
-		static const CustomModifier<Color4> DefaultColor4Initializer;
-		static const CustomModifier<Vector2> DefaultVector2Initializer;
+    private:
 
-		static const CustomModifier<UInt32> DefaultAtlasUpdater;
-		static const CustomModifier<Color4> DefaultColorUpdater;
-		static const CustomModifier<Real> DefaultAlphaUpdater;
-		static const CustomModifier<Vector2> DefaultSizeUpdater;
-		static const CustomModifier<Point3> DefaultPositionUpdater;
-		static const CustomModifier<Vector3> DefaultVelocityUpdater;
-		static const CustomModifier<Vector3> DefaultAccelerationUpdater;
-		static const CustomModifier<Real> DefaultRotationUpdater;
-		static const CustomModifier<Real> DefaultRotationalSpeedUpdater;
-		static const CustomModifier<Real> DefaultRotationalAccelerationUpdater;
-	
-		SceneObjectSharedPtr meshObject;
-		Mesh3DSharedPtr mesh;
-		MultiMaterialSharedPtr particleMaterial;
-		AtlasSharedPtr atlas;
-		Camera* currentCamera;
+        static const CustomModifier<UInt32> DefaultUInt32Initializer;
+        static const CustomModifier<Real> DefaultRealInitializer;
+        static const CustomModifier<Vector3> DefaultVector3Initializer;
+        static const CustomModifier<Point3> DefaultPoint3Initializer;
+        static const CustomModifier<Color4> DefaultColor4Initializer;
+        static const CustomModifier<Vector2> DefaultVector2Initializer;
 
-		AttributeID attributeSizeID;
-		AttributeID attributeRotationID;
-		AttributeID attributeIndexID;
+        static const CustomModifier<UInt32> DefaultAtlasUpdater;
+        static const CustomModifier<Color4> DefaultColorUpdater;
+        static const CustomModifier<Real> DefaultAlphaUpdater;
+        static const CustomModifier<Vector2> DefaultSizeUpdater;
+        static const CustomModifier<Point3> DefaultPositionUpdater;
+        static const CustomModifier<Vector3> DefaultVelocityUpdater;
+        static const CustomModifier<Vector3> DefaultAccelerationUpdater;
+        static const CustomModifier<Real> DefaultRotationUpdater;
+        static const CustomModifier<Real> DefaultRotationalSpeedUpdater;
+        static const CustomModifier<Real> DefaultRotationalAccelerationUpdater;
 
-		Bool zSort;
-		Bool simulateInLocalSpace;
-		Bool releaseAtOnce;
-		UInt32 releaseAtOnceCount = 0;
-		Bool hasInitialReleaseOccurred;
-		Bool isActive;
+        SceneObjectSharedPtr meshObject;
+        Mesh3DSharedPtr mesh;
+        MultiMaterialSharedPtr particleMaterial;
+        AtlasSharedPtr atlas;
+        Camera* currentCamera;
 
-		ParticleModifier<UInt32>* atlasInitializer;
-		ParticleModifier<Color4>* colorInitializer;
-		ParticleModifier<Real>* alphaInitializer;
-		ParticleModifier<Vector2>* sizeInitializer;
-		ParticleModifier<UInt32>* atlasUpdater;
-		ParticleModifier<Color4>* colorUpdater;
-		ParticleModifier<Real>* alphaUpdater;
-		ParticleModifier<Vector2>* sizeUpdater;
+        AttributeID attributeSizeID;
+        AttributeID attributeRotationID;
+        AttributeID attributeIndexID;
 
-		// Particle position and position modifiers (velocity and acceleration)
-		ParticleModifier<Point3>* positionInitializer;
-		ParticleModifier<Vector3>* velocityInitializer;
-		ParticleModifier<Vector3>* accelerationInitializer;
-		ParticleModifier<Point3>* positionUpdater;
-		ParticleModifier<Vector3>* velocityUpdater;
-		ParticleModifier<Vector3>* accelerationUpdater;
+        Bool zSort;
+        Bool simulateInLocalSpace;
+        Bool releaseAtOnce;
+        UInt32 releaseAtOnceCount = 0;
+        Bool hasInitialReleaseOccurred;
+        Bool isActive;
 
-		// Particle rotation and rotation modifiers (rotational speed and rotational acceleration)
-		ParticleModifier<Real>* rotationInitializer;
-		ParticleModifier<Real>* rotationalSpeedInitializer;
-		ParticleModifier<Real>* rotationalAccelerationInitializer;
-		ParticleModifier<Real>* rotationUpdater;
-		ParticleModifier<Real>* rotationalSpeedUpdater;
-		ParticleModifier<Real>* rotationalAccelerationUpdater;
+        ParticleModifier<UInt32>* atlasInitializer;
+        ParticleModifier<Color4>* colorInitializer;
+        ParticleModifier<Real>* alphaInitializer;
+        ParticleModifier<Vector2>* sizeInitializer;
+        ParticleModifier<UInt32>* atlasUpdater;
+        ParticleModifier<Color4>* colorUpdater;
+        ParticleModifier<Real>* alphaUpdater;
+        ParticleModifier<Vector2>* sizeUpdater;
 
-		Real particleReleaseRate;
-		Real particleLifeSpan;
-		Real averageParticleLifeSpan;
+        // Particle position and position modifiers (velocity and acceleration)
+        ParticleModifier<Point3>* positionInitializer;
+        ParticleModifier<Vector3>* velocityInitializer;
+        ParticleModifier<Vector3>* accelerationInitializer;
+        ParticleModifier<Point3>* positionUpdater;
+        ParticleModifier<Vector3>* velocityUpdater;
+        ParticleModifier<Vector3>* accelerationUpdater;
 
-		UInt32 vertexCount;
-		UInt32 maxParticleCount;
+        // Particle rotation and rotation modifiers (rotational speed and rotational acceleration)
+        ParticleModifier<Real>* rotationInitializer;
+        ParticleModifier<Real>* rotationalSpeedInitializer;
+        ParticleModifier<Real>* rotationalAccelerationInitializer;
+        ParticleModifier<Real>* rotationUpdater;
+        ParticleModifier<Real>* rotationalSpeedUpdater;
+        ParticleModifier<Real>* rotationalAccelerationUpdater;
 
-		UInt32 liveParticleCount;
-		UInt32 deadParticleCount;
-		Particle** liveParticleArray;
-		Particle** deadParticleArray;
+        Real particleReleaseRate;
+        Real particleLifeSpan;
+        Real averageParticleLifeSpan;
 
-		Real timeSinceLastEmit;
-		Bool emitting;
-		Real age;
-		Real systemLifeSpan;
+        UInt32 vertexCount;
+        UInt32 maxParticleCount;
 
-		UInt32 renderCount;
+        UInt32 liveParticleCount;
+        UInt32 deadParticleCount;
+        Particle** liveParticleArray;
+        Particle** deadParticleArray;
 
-		Bool premultiplyAlpha;
+        Real timeSinceLastEmit;
+        Bool emitting;
+        Real age;
+        Real systemLifeSpan;
 
-		// temporary storage 
-		Real lastDeltaTime;
-		Particle** _tempParticleArray;
-		Vector3 _tempVector3;
-		Quaternion _tempQuaternion;
-		Matrix4x4 _tempMatrix4;
+        UInt32 renderCount;
 
-		protected:
+        Bool premultiplyAlpha;
 
-		void CalculateAverageParticleLifeSpan();
-		void CalculateMaxParticleCount();
-		void GetCameraWorldAxes(Camera& camera, Vector3& axisX, Vector3& axisY, Vector3& axisZ);
-		void GenerateXYAlignedQuadForParticle(Particle* particle, Vector3& axisX, Vector3& axisY, Vector3& axisZ, Point3& p1, Point3& p2, Point3& p3, Point3& p4);
-		void UpdateShaderWithParticleData();
+        // temporary storage 
+        Real lastDeltaTime;
+        Particle** _tempParticleArray;
+        Vector3 _tempVector3;
+        Quaternion _tempQuaternion;
+        Matrix4x4 _tempMatrix4;
 
-		void Awake() override;
-		void Start() override;
-		void WillRender() override;
-		void Update() override;
+    protected:
 
-		Bool Initialize(MultiMaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
+        void CalculateAverageParticleLifeSpan();
+        void CalculateMaxParticleCount();
+        void GetCameraWorldAxes(Camera& camera, Vector3& axisX, Vector3& axisY, Vector3& axisZ);
+        void GenerateXYAlignedQuadForParticle(Particle* particle, Vector3& axisX, Vector3& axisY, Vector3& axisZ, Point3& p1, Point3& p2, Point3& p3, Point3& p4);
+        void UpdateShaderWithParticleData();
 
-		Bool InitializeMesh();
-		void DestroyMesh();
+        void Awake() override;
+        void Start() override;
+        void WillRender() override;
+        void Update() override;
 
-		void DestroyParticleArray();
-		Bool InitializeParticleArray();
-		Bool InitializeParticle(Particle * particle);
+        Bool Initialize(MultiMaterialRef material, AtlasRef atlas, Bool zSort, Real releaseRate, Real particleLifeSpan, Real systemLifeSpan);
 
-		void ResetParticle(Particle * particle);
-		void ResetParticleDisplayAttributes(Particle * particle);
-		void ResetParticlePositionData(Particle * particle);
-		void ResetParticleRotationData(Particle * particle);
+        Bool InitializeMesh();
+        void DestroyMesh();
 
-		void AdvanceParticle(Particle* particle, Real deltaTime);
-		void AdvanceParticleDisplayAttributes(Particle * particle, Real deltaTime);
-		void AdvanceParticlePositionData(Particle * particle, Real deltaTime);
-		void AdvanceParticleRotationData(Particle * particle, Real deltaTime);
-		void AdvanceParticles(Real deltaTime);
+        void DestroyParticleArray();
+        Bool InitializeParticleArray();
+        Bool InitializeParticle(Particle * particle);
 
-		void KillParticle(Particle * particle);
-		void ActivateParticle(Particle* particle);
-		void ActivateParticles(UInt32 count);
-		void CleanupDeadParticles();
+        void ResetParticle(Particle * particle);
+        void ResetParticleDisplayAttributes(Particle * particle);
+        void ResetParticlePositionData(Particle * particle);
+        void ResetParticleRotationData(Particle * particle);
 
-		void SortParticleArray(const Matrix4x4& mvpMatrix);
-		void QuickSortParticleArray(Particle** array, Int32 left, Int32 right);
-		void QuickSortSwap(Particle** particleArray, Int32 a, Int32 b);
-		UInt32 QuickSortPartition(Particle** particleArray, Int32 left, Int32 right);
+        void AdvanceParticle(Particle* particle, Real deltaTime);
+        void AdvanceParticleDisplayAttributes(Particle * particle, Real deltaTime);
+        void AdvanceParticlePositionData(Particle * particle, Real deltaTime);
+        void AdvanceParticleRotationData(Particle * particle, Real deltaTime);
+        void AdvanceParticles(Real deltaTime);
 
-		ParticleSystem();
-		virtual ~ParticleSystem();
-		void Destroy();
-		void DestroyModifiers();
+        void KillParticle(Particle * particle);
+        void ActivateParticle(Particle* particle);
+        void ActivateParticles(UInt32 count);
+        void CleanupDeadParticles();
 
-		template <typename T> Bool BindModifierFromType(ParticleModifier<T>** localInitializer, ParticleModifier<T>** localUpdater, 
-													const ParticleModifier<T>& modifier, ModifierType modifierType)
-		{
-			Bool success = true;
+        void SortParticleArray(const Matrix4x4& mvpMatrix);
+        void QuickSortParticleArray(Particle** array, Int32 left, Int32 right);
+        void QuickSortSwap(Particle** particleArray, Int32 a, Int32 b);
+        UInt32 QuickSortPartition(Particle** particleArray, Int32 left, Int32 right);
 
-			if(modifierType == ModifierType::Initializer || modifierType == ModifierType::All)
-			{
-				success &= BindModifier(localInitializer, modifier);
-			}
+        ParticleSystem();
+        virtual ~ParticleSystem();
+        void Destroy();
+        void DestroyModifiers();
 
-			if(modifierType == ModifierType::Updater || modifierType == ModifierType::All)
-			{
-				success &= BindModifier(localUpdater, modifier);
-			}
+        template <typename T> Bool BindModifierFromType(ParticleModifier<T>** localInitializer, ParticleModifier<T>** localUpdater,
+                                                        const ParticleModifier<T>& modifier, ModifierType modifierType) {
+            Bool success = true;
 
-			return success;
-		}
+            if (modifierType == ModifierType::Initializer || modifierType == ModifierType::All) {
+                success &= BindModifier(localInitializer, modifier);
+            }
 
-		template <typename T> Bool BindModifier(ParticleModifier<T>** local, const ParticleModifier<T>& modifier)
-		{
-			SAFE_DELETE(*local);
-			*local = modifier.Clone();
-			NONFATAL_ASSERT_RTRN(*local != nullptr, "ParticleSystem::BindModifier -> Unable to clone modifier.", false, false);
-			return true;
-		}
+            if (modifierType == ModifierType::Updater || modifierType == ModifierType::All) {
+                success &= BindModifier(localUpdater, modifier);
+            }
 
-		public:
+            return success;
+        }
 
-		Bool BindPositionModifier(const ParticleModifier<Point3>& modifier, ModifierType modifierType);
-		Bool BindVelocityModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType);
-		Bool BindAccelerationModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType);
-		
-		Bool BindRotationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
-		Bool BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
-		Bool BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
+        template <typename T> Bool BindModifier(ParticleModifier<T>** local, const ParticleModifier<T>& modifier) {
+            SAFE_DELETE(*local);
+            *local = modifier.Clone();
+            NONFATAL_ASSERT_RTRN(*local != nullptr, "ParticleSystem::BindModifier -> Unable to clone modifier.", false, false);
+            return true;
+        }
 
-		Bool BindAtlasModifier(const ParticleModifier<UInt32>& modifier, ModifierType modifierType);
-		Bool BindColorModifier(const ParticleModifier<Color4>& modifier, ModifierType modifierType);
-		Bool BindAlphaModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
-		Bool BindSizeModifier(const ParticleModifier<Vector2>& modifier, ModifierType modifierType);
+    public:
 
-		void SetPremultiplyAlpha(Bool premultiply);
-		void SetZSort(Bool sort);
+        Bool BindPositionModifier(const ParticleModifier<Point3>& modifier, ModifierType modifierType);
+        Bool BindVelocityModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType);
+        Bool BindAccelerationModifier(const ParticleModifier<Vector3>& modifier, ModifierType modifierType);
 
-		SceneObjectRef GetMeshSceneObject();
+        Bool BindRotationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
+        Bool BindRotationalSpeedModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
+        Bool BindRotationalAccelerationModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
 
-		static MaterialSharedPtr CreateMaterial(const std::string& shaderName, const std::string& materialName);
-	};
+        Bool BindAtlasModifier(const ParticleModifier<UInt32>& modifier, ModifierType modifierType);
+        Bool BindColorModifier(const ParticleModifier<Color4>& modifier, ModifierType modifierType);
+        Bool BindAlphaModifier(const ParticleModifier<Real>& modifier, ModifierType modifierType);
+        Bool BindSizeModifier(const ParticleModifier<Vector2>& modifier, ModifierType modifierType);
+
+        void SetPremultiplyAlpha(Bool premultiply);
+        void SetZSort(Bool sort);
+
+        SceneObjectRef GetMeshSceneObject();
+
+        static MaterialSharedPtr CreateMaterial(const std::string& shaderName, const std::string& materialName);
+    };
 }
 
 #endif

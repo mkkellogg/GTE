@@ -4,7 +4,7 @@
 *
 * author: Mark Kellogg
 *
-* A particle modifier that randomizes a particle's attributes based 
+* A particle modifier that randomizes a particle's attributes based
 * on configurable parameters.
 *
 */
@@ -22,42 +22,36 @@
 #include "engine.h"
 #include "global/assert.h"
 
-namespace GTE
-{
-	template <typename T> class RandomModifier : public ParticleModifier<T>
-	{
-		T offset;
-		T range;
-		ParticleRangeType rangeType;
-		Bool edgeClamp;
+namespace GTE {
+    template <typename T> class RandomModifier : public ParticleModifier<T> {
+        T offset;
+        T range;
+        ParticleRangeType rangeType;
+        Bool edgeClamp;
 
-		public:
+    public:
 
-		RandomModifier(const T& offset, const T& range, ParticleRangeType rangeType, Bool edgeClamp) : ParticleModifier<T>()
-		{
-			this->offset = offset;
-			this->range = range;
-			this->rangeType = rangeType;
-			this->edgeClamp = edgeClamp;
-		}
+        RandomModifier(const T& offset, const T& range, ParticleRangeType rangeType, Bool edgeClamp) : ParticleModifier<T>() {
+            this->offset = offset;
+            this->range = range;
+            this->rangeType = rangeType;
+            this->edgeClamp = edgeClamp;
+        }
 
-		virtual ~RandomModifier()
-		{
+        virtual ~RandomModifier() {
 
-		}
+        }
 
-		void Update(Particle& particle, T& targetAttribute, Real t) const override
-		{
-			ParticleUtil::GetRandom(offset, range, targetAttribute, edgeClamp, rangeType);
-		}
+        void Update(Particle& particle, T& targetAttribute, Real t) const override {
+            ParticleUtil::GetRandom(offset, range, targetAttribute, edgeClamp, rangeType);
+        }
 
-		ParticleModifier<T>* Clone() const override
-		{
-			RandomModifier<T> * baseClone = new RandomModifier<T>(offset, range, rangeType, edgeClamp);
-			ASSERT(baseClone != nullptr, "RandomModifer<T>::Clone -> Could not clone modifier.");
-			return static_cast<ParticleModifier<T>*>(baseClone);
-		}
-	};
+        ParticleModifier<T>* Clone() const override {
+            RandomModifier<T> * baseClone = new RandomModifier<T>(offset, range, rangeType, edgeClamp);
+            ASSERT(baseClone != nullptr, "RandomModifer<T>::Clone -> Could not clone modifier.");
+            return static_cast<ParticleModifier<T>*>(baseClone);
+        }
+    };
 }
 
 #endif

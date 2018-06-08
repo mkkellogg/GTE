@@ -5,14 +5,12 @@
 #include "geometry/matrix4x4.h"
 #include "global/global.h"
 
-namespace GTE
-{
-	class ImportUtil
-	{
-	public:
+namespace GTE {
+    class ImportUtil {
+    public:
 
-		static void ConvertAssimpMatrix(const aiMatrix4x4& source, Matrix4x4& dest);
-	};
+        static void ConvertAssimpMatrix(const aiMatrix4x4& source, Matrix4x4& dest);
+    };
 }
 
 #endif

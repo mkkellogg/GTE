@@ -16,29 +16,26 @@
 #include <IL/il.h>
 #include <string>
 
-namespace GTE
-{
-	//forward declarations
-	class RawImage;
+namespace GTE {
+    //forward declarations
+    class RawImage;
 
-	enum ImageLoaderError
-	{
-		GeneralLoadError = 1
-	};
+    enum ImageLoaderError {
+        GeneralLoadError = 1
+    };
 
-	class ImageLoader
-	{
-		static Bool ilInitialized;
-		static Bool Initialize();
+    class ImageLoader {
+        static Bool ilInitialized;
+        static Bool Initialize();
 
-	public:
+    public:
 
-		static RawImage * LoadImageU(const std::string& fullPath);
-		static RawImage * LoadImageU(const std::string& fullPath, Bool reverseOrigin);
-		static RawImage * GetRawImageFromILData(const ILubyte * data, UInt32 width, UInt32 height);
-		static void DestroyRawImage(RawImage * image);
-		static std::string GetFileExtension(const std::string& filePath);
-	};
+        static RawImage * LoadImageU(const std::string& fullPath);
+        static RawImage * LoadImageU(const std::string& fullPath, Bool reverseOrigin);
+        static RawImage * GetRawImageFromILData(const ILubyte * data, UInt32 width, UInt32 height);
+        static void DestroyRawImage(RawImage * image);
+        static std::string GetFileExtension(const std::string& filePath);
+    };
 }
 
 #endif

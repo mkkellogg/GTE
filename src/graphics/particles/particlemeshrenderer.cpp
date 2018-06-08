@@ -6,38 +6,32 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 
-namespace GTE
-{
-	/*
-	* Default constructor
-	*/
-	ParticleMeshRenderer::ParticleMeshRenderer()
-	{
-		
-	}
+namespace GTE {
+    /*
+    * Default constructor
+    */
+    ParticleMeshRenderer::ParticleMeshRenderer() {
 
-	/*
-	 * Clean-up
-	 */
-	ParticleMeshRenderer::~ParticleMeshRenderer()
-	{
+    }
 
-	}
+    /*
+     * Clean-up
+     */
+    ParticleMeshRenderer::~ParticleMeshRenderer() {
 
-	void ParticleMeshRenderer::SetTargetSystemObject(SceneObjectRef particleSystemObject)
-	{
-		this->particleSystemObject = particleSystemObject;
-	}
+    }
 
-	/*
-	* Handle 'WillRender' lifecycle event
-	*/
-	void ParticleMeshRenderer::WillRender()
-	{
-		if(particleSystemObject.IsValid())
-		{
-			ParticleSystemRef system = particleSystemObject->GetParticleSystem();
-			system->WillRender();
-		}
-	}
+    void ParticleMeshRenderer::SetTargetSystemObject(SceneObjectRef particleSystemObject) {
+        this->particleSystemObject = particleSystemObject;
+    }
+
+    /*
+    * Handle 'WillRender' lifecycle event
+    */
+    void ParticleMeshRenderer::WillRender() {
+        if (particleSystemObject.IsValid()) {
+            ParticleSystemRef system = particleSystemObject->GetParticleSystem();
+            system->WillRender();
+        }
+    }
 }

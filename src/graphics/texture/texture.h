@@ -16,33 +16,31 @@
 
 #include <vector>
 
-namespace GTE
-{
-	//forward declarations
-	class Graphics;
-	class TextureAttributes;
-	class RawImage;
+namespace GTE {
+    //forward declarations
+    class Graphics;
+    class TextureAttributes;
+    class RawImage;
 
-	class Texture : public EngineObject
-	{
-		friend class Graphics;
+    class Texture : public EngineObject {
+        friend class Graphics;
 
-	protected:
+    protected:
 
-		std::vector<RawImage *> imageData;
-		TextureAttributes attributes;
+        std::vector<RawImage *> imageData;
+        TextureAttributes attributes;
 
-		Texture(TextureAttributes attributes);
-		virtual ~Texture();
+        Texture(TextureAttributes attributes);
+        virtual ~Texture();
 
-		void DestroyImageData();
-		void AddImageData(RawImage* imageData);
+        void DestroyImageData();
+        void AddImageData(RawImage* imageData);
 
-	public:
+    public:
 
-		TextureAttributes GetAttributes() const;
-		RawImage * GetImageData(UInt32 index);
-	};
+        TextureAttributes GetAttributes() const;
+        RawImage * GetImageData(UInt32 index);
+    };
 }
 
 #endif

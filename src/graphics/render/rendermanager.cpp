@@ -4,25 +4,20 @@
 #include "global/constants.h"
 #include "debug/gtedebug.h"
 
-namespace GTE
-{
-	RenderManager::RenderManager()
-	{
+namespace GTE {
+    RenderManager::RenderManager() {
 
-	}
+    }
 
-	RenderManager::~RenderManager()
-	{
+    RenderManager::~RenderManager() {
 
-	}
+    }
 
-	void RenderManager::SetCurrentCamera(CameraRef camera)
-	{
-		currentCamera = camera;
-	}
+    void RenderManager::SetCurrentCamera(CameraRef camera) {
+        currentCamera = camera;
+    }
 
-	CameraRef RenderManager::GetCurrentCamera()
-	{
-		return currentCamera;
-	}
+    CameraRef RenderManager::GetCurrentCamera() {
+        return currentCamera;
+    }
 }

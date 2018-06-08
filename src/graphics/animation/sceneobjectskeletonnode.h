@@ -17,26 +17,24 @@
 #include "engine.h"
 #include "skeletonnode.h"
 
-namespace GTE
-{
-	//forward declarations
-	class Transform;
+namespace GTE {
+    //forward declarations
+    class Transform;
 
-	class SceneObjectSkeletonNode : public SkeletonNode
-	{
-	public:
+    class SceneObjectSkeletonNode : public SkeletonNode {
+    public:
 
-		// target SceneObject
-		SceneObjectSharedPtr Target;
+        // target SceneObject
+        SceneObjectSharedPtr Target;
 
-		SceneObjectSkeletonNode(SceneObjectRef target, Int32 boneIndex, const std::string& name);
-		~SceneObjectSkeletonNode();
+        SceneObjectSkeletonNode(SceneObjectRef target, Int32 boneIndex, const std::string& name);
+        ~SceneObjectSkeletonNode();
 
-		const Transform * GetFullTransform() const;
-		Transform * GetLocalTransform();
-		Bool HasTarget() const;
-		SkeletonNode * FullClone() const;
-	};
+        const Transform * GetFullTransform() const;
+        Transform * GetLocalTransform();
+        Bool HasTarget() const;
+        SkeletonNode * FullClone() const;
+    };
 }
 
 #endif

@@ -17,248 +17,219 @@
 #include "util/datastack.h"
 #include "debug/gtedebug.h"
 
-namespace GTE
-{
-	/*
-	* Default constructor
-	*/
-	SceneManager::SceneManager() : sceneProcessingStack(Constants::MaxObjectRecursionDepth, 1)
-	{
-		sceneObjectCount = 0;
-		maxPhaseReached = -1;
-	}
+namespace GTE {
+    /*
+    * Default constructor
+    */
+    SceneManager::SceneManager() : sceneProcessingStack(Constants::MaxObjectRecursionDepth, 1) {
+        sceneObjectCount = 0;
+        maxPhaseReached = -1;
+    }
 
-	/*
-	 * Destructor
-	 */
-	SceneManager::~SceneManager()
-	{
+    /*
+     * Destructor
+     */
+    SceneManager::~SceneManager() {
 
-	}
+    }
 
-	
 
-	/*
-	* Initialize. Return false if initialization false, true if it succeeds.
-	*/
-	Bool SceneManager::Init()
-	{
-		ASSERT(sceneProcessingStack.Init(), "SceneManager::Init -> Unable to initialize view transform stack.");
-		return true;
-	}
 
-	/*
-	* Called once when the scene manager first starts.
-	*/
-	void SceneManager::Awake()
-	{
-		Update(UpdatePhase::Awake);
-		maxPhaseReached = (Int32)UpdatePhase::Awake;
-	}
+    /*
+    * Initialize. Return false if initialization false, true if it succeeds.
+    */
+    Bool SceneManager::Init() {
+        ASSERT(sceneProcessingStack.Init(), "SceneManager::Init -> Unable to initialize view transform stack.");
+        return true;
+    }
 
-	/*
-	* Called once when the scene manager first starts, but after Awake().
-	*/
-	void SceneManager::Start()
-	{
-		Update(UpdatePhase::Start);
-		maxPhaseReached = (Int32)UpdatePhase::Start;
-	}
+    /*
+    * Called once when the scene manager first starts.
+    */
+    void SceneManager::Awake() {
+        Update(UpdatePhase::Awake);
+        maxPhaseReached = (Int32)UpdatePhase::Awake;
+    }
 
-	/*
-	 * Kick off scene processing from the scene root.
-	 */
-	void SceneManager::Update()
-	{
-		Update(UpdatePhase::Update);
-		maxPhaseReached = (Int32)UpdatePhase::Update;
-	}
+    /*
+    * Called once when the scene manager first starts, but after Awake().
+    */
+    void SceneManager::Start() {
+        Update(UpdatePhase::Start);
+        maxPhaseReached = (Int32)UpdatePhase::Start;
+    }
 
-	/*
-	* Kick off scene processing from the scene root.
-	*/
-	void SceneManager::Update(UpdatePhase phase)
-	{
-		SceneObjectRef sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
-		ASSERT(sceneRoot.IsValid(), "SceneManager::Update -> 'sceneRoot' is null.");
+    /*
+     * Kick off scene processing from the scene root.
+     */
+    void SceneManager::Update() {
+        Update(UpdatePhase::Update);
+        maxPhaseReached = (Int32)UpdatePhase::Update;
+    }
 
-		sceneObjectCount = 0;
+    /*
+    * Kick off scene processing from the scene root.
+    */
+    void SceneManager::Update(UpdatePhase phase) {
+        SceneObjectRef sceneRoot = Engine::Instance()->GetEngineObjectManager()->GetSceneRoot();
+        ASSERT(sceneRoot.IsValid(), "SceneManager::Update -> 'sceneRoot' is null.");
 
-		Transform baseTransform;
-		// form list of scene objects
-		ProcessScene(sceneRoot.GetRef(), baseTransform);
-		// process resulting list of scene objects
-		ProcessSceneObjectList(phase);
-	}
+        sceneObjectCount = 0;
 
-	/*
-	*
-	* Recursively visits each object in the scene that is reachable from [parent]. The transforms of each
-	* scene object are concatenated as progress moves down the scene object tree and passed to the current
-	* invocation via [aggregateTransform]. These aggregate transforms are saved to each SceneObject via
-	* SceneObject::SetAggregateTransform().
-	*
-	*/
-	void SceneManager::ProcessScene(SceneObject& parent, Transform& aggregateTransform)
-	{
-		// enforce max recursion depth
-		if(sceneProcessingStack.GetEntryCount() >= Constants::MaxObjectRecursionDepth - 1)return;
+        Transform baseTransform;
+        // form list of scene objects
+        ProcessScene(sceneRoot.GetRef(), baseTransform);
+        // process resulting list of scene objects
+        ProcessSceneObjectList(phase);
+    }
 
-		for(UInt32 i = 0; i < parent.GetChildrenCount(); i++)
-		{
-			SceneObjectRef child = parent.GetChildAt(i);
+    /*
+    *
+    * Recursively visits each object in the scene that is reachable from [parent]. The transforms of each
+    * scene object are concatenated as progress moves down the scene object tree and passed to the current
+    * invocation via [aggregateTransform]. These aggregate transforms are saved to each SceneObject via
+    * SceneObject::SetAggregateTransform().
+    *
+    */
+    void SceneManager::ProcessScene(SceneObject& parent, Transform& aggregateTransform) {
+        // enforce max recursion depth
+        if (sceneProcessingStack.GetEntryCount() >= Constants::MaxObjectRecursionDepth - 1)return;
 
-			if(!child.IsValid())
-			{
-				Debug::PrintWarning("SceneManager::PreProcessScene -> Null scene object encountered.");
-				continue;
-			}
+        for (UInt32 i = 0; i < parent.GetChildrenCount(); i++) {
+            SceneObjectRef child = parent.GetChildAt(i);
 
-			// only process active scene objects
-			if(child->IsActive())
-			{
-				// save the existing view transform
-				PushTransformData(aggregateTransform, sceneProcessingStack);
+            if (!child.IsValid()) {
+                Debug::PrintWarning("SceneManager::PreProcessScene -> Null scene object encountered.");
+                continue;
+            }
 
-				// concatenate the current view transform with that of the current scene object
-				Transform& localTransform = child->GetTransform();
-				if(!child->InheritsTransform())
-				{
-					aggregateTransform.SetIdentity();
-				}
-				aggregateTransform.TransformBy(localTransform);
+            // only process active scene objects
+            if (child->IsActive()) {
+                // save the existing view transform
+                PushTransformData(aggregateTransform, sceneProcessingStack);
 
-				// save the aggregate/global/world transform
-				SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
-				processingDesc.AggregateTransform = aggregateTransform;
-				processingDesc.AggregateTransformInverse = aggregateTransform;
-				processingDesc.AggregateTransformInverse.Invert();
+                // concatenate the current view transform with that of the current scene object
+                Transform& localTransform = child->GetTransform();
+                if (!child->InheritsTransform()) {
+                    aggregateTransform.SetIdentity();
+                }
+                aggregateTransform.TransformBy(localTransform);
 
-				sceneObjectList[sceneObjectCount] = child.GetPtr();
-				sceneObjectCount++;
-				if(sceneObjectCount >= Constants::MaxSceneObjects)return;
+                // save the aggregate/global/world transform
+                SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
+                processingDesc.AggregateTransform = aggregateTransform;
+                processingDesc.AggregateTransformInverse = aggregateTransform;
+                processingDesc.AggregateTransformInverse.Invert();
 
-				// continue recursion through child object
-				ProcessScene(child.GetRef(), aggregateTransform);
+                sceneObjectList[sceneObjectCount] = child.GetPtr();
+                sceneObjectCount++;
+                if (sceneObjectCount >= Constants::MaxSceneObjects)return;
 
-				// restore previous view transform
-				PopTransformData(aggregateTransform, sceneProcessingStack);
-			}
-		}
-	}
+                // continue recursion through child object
+                ProcessScene(child.GetRef(), aggregateTransform);
 
-	void SceneManager::ProcessSceneObjectList(UpdatePhase phase)
-	{
-		for(UInt32 i = 0; i < sceneObjectCount; i++)
-		{
-			SceneObject * sceneObject = sceneObjectList[i];
-			
-			ProcessSceneObjectUpdatePhase(phase, *sceneObject);
-		}
-	}
+                // restore previous view transform
+                PopTransformData(aggregateTransform, sceneProcessingStack);
+            }
+        }
+    }
 
-	void SceneManager::ProcessSceneObjectUpdatePhase(UpdatePhase phase, SceneObject& object)
-	{
-		switch(phase)
-		{
-			case UpdatePhase::Awake:
-				Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::Awake, object);
-			break;
-			case UpdatePhase::Start:
-				Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::Start, object);
-			break;
-			case UpdatePhase::Update:
-				Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::Update, object);
-			break;
-		}
-	}
+    void SceneManager::ProcessSceneObjectList(UpdatePhase phase) {
+        for (UInt32 i = 0; i < sceneObjectCount; i++) {
+            SceneObject * sceneObject = sceneObjectList[i];
 
-	void SceneManager::ProcessSceneObjectComponentUpdatePhase(UpdatePhase phase, SceneObjectComponent& component)
-	{
-		switch(phase)
-		{
-			case UpdatePhase::Awake:
-				Engine::Instance()->GetEventManager()->DispatchSceneObjectComponentEvent(SceneObjectEvent::Awake, component);
-			break;
-			case UpdatePhase::Start:
-				Engine::Instance()->GetEventManager()->DispatchSceneObjectComponentEvent(SceneObjectEvent::Start, component);
-			break;
-			case UpdatePhase::Update:
-				Engine::Instance()->GetEventManager()->DispatchSceneObjectComponentEvent(SceneObjectEvent::Update, component);
-			break;
-		}
-	}
+            ProcessSceneObjectUpdatePhase(phase, *sceneObject);
+        }
+    }
 
-	/*
-	* Fully process a SceneObject instance as if it were newly added.
-	*/
-	void SceneManager::ProcessSceneObjectAsNew(SceneObject& object)
-	{
-		// only process active scene objects
-		if(object.IsActive())
-		{
-			Transform aggregateTransform;
-			SceneObjectTransform::GetWorldTransform(aggregateTransform, object, true, false);
+    void SceneManager::ProcessSceneObjectUpdatePhase(UpdatePhase phase, SceneObject& object) {
+        switch (phase) {
+            case UpdatePhase::Awake:
+            Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::Awake, object);
+            break;
+            case UpdatePhase::Start:
+            Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::Start, object);
+            break;
+            case UpdatePhase::Update:
+            Engine::Instance()->GetEventManager()->DispatchSceneObjectEvent(SceneObjectEvent::Update, object);
+            break;
+        }
+    }
 
-			// save the aggregate/global/world transform
-			SceneObjectProcessingDescriptor& processingDesc = object.GetProcessingDescriptor();
-			processingDesc.AggregateTransform = aggregateTransform;
-			processingDesc.AggregateTransformInverse = aggregateTransform;
-			processingDesc.AggregateTransformInverse.Invert();
+    void SceneManager::ProcessSceneObjectComponentUpdatePhase(UpdatePhase phase, SceneObjectComponent& component) {
+        switch (phase) {
+            case UpdatePhase::Awake:
+            Engine::Instance()->GetEventManager()->DispatchSceneObjectComponentEvent(SceneObjectEvent::Awake, component);
+            break;
+            case UpdatePhase::Start:
+            Engine::Instance()->GetEventManager()->DispatchSceneObjectComponentEvent(SceneObjectEvent::Start, component);
+            break;
+            case UpdatePhase::Update:
+            Engine::Instance()->GetEventManager()->DispatchSceneObjectComponentEvent(SceneObjectEvent::Update, component);
+            break;
+        }
+    }
 
-			if(maxPhaseReached >= (Int32)UpdatePhase::Awake)
-			{
-				ProcessSceneObjectUpdatePhase(UpdatePhase::Awake, object);
-			}
+    /*
+    * Fully process a SceneObject instance as if it were newly added.
+    */
+    void SceneManager::ProcessSceneObjectAsNew(SceneObject& object) {
+        // only process active scene objects
+        if (object.IsActive()) {
+            Transform aggregateTransform;
+            SceneObjectTransform::GetWorldTransform(aggregateTransform, object, true, false);
 
-			if(maxPhaseReached >= (Int32)UpdatePhase::Start)
-			{
-				ProcessSceneObjectUpdatePhase(UpdatePhase::Start, object);
-			}
-		}
-	}
+            // save the aggregate/global/world transform
+            SceneObjectProcessingDescriptor& processingDesc = object.GetProcessingDescriptor();
+            processingDesc.AggregateTransform = aggregateTransform;
+            processingDesc.AggregateTransformInverse = aggregateTransform;
+            processingDesc.AggregateTransformInverse.Invert();
 
-	/*
-	* Fully process a SceneObjectComponent instance as if it were newly added.
-	*/
-	void SceneManager::ProcessSceneObjectComponentAsNew(SceneObjectComponent& component)
-	{
-		SceneObjectRef container = component.GetSceneObject();
-		NONFATAL_ASSERT(container.IsValid(), "SceneManager::ProcessSceneObjectComponentAsNew -> Component's container is not valid!", true);
+            if (maxPhaseReached >= (Int32)UpdatePhase::Awake) {
+                ProcessSceneObjectUpdatePhase(UpdatePhase::Awake, object);
+            }
 
-		// only process components that belong to active scene objects
-		if(container->IsActive())
-		{
-			if(maxPhaseReached >= (Int32)UpdatePhase::Awake)
-			{
-				ProcessSceneObjectComponentUpdatePhase(UpdatePhase::Awake, component);
-			}
+            if (maxPhaseReached >= (Int32)UpdatePhase::Start) {
+                ProcessSceneObjectUpdatePhase(UpdatePhase::Start, object);
+            }
+        }
+    }
 
-			if(maxPhaseReached >= (Int32)UpdatePhase::Start)
-			{
-				ProcessSceneObjectComponentUpdatePhase(UpdatePhase::Start, component);
-			}
-		}
-	}
+    /*
+    * Fully process a SceneObjectComponent instance as if it were newly added.
+    */
+    void SceneManager::ProcessSceneObjectComponentAsNew(SceneObjectComponent& component) {
+        SceneObjectRef container = component.GetSceneObject();
+        NONFATAL_ASSERT(container.IsValid(), "SceneManager::ProcessSceneObjectComponentAsNew -> Component's container is not valid!", true);
 
-	/*
-	* Save a transform to the transform stack. This method is used to to save transformations
-	* as the render manager progresses through the object tree that makes up the scene.
-	*/
-	void SceneManager::PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack)
-	{
-		const Matrix4x4& matrix = transform.GetConstMatrix();
-		transformStack.Push(&matrix);
-	}
+        // only process components that belong to active scene objects
+        if (container->IsActive()) {
+            if (maxPhaseReached >= (Int32)UpdatePhase::Awake) {
+                ProcessSceneObjectComponentUpdatePhase(UpdatePhase::Awake, component);
+            }
 
-	/*
-	* Remove the top transform from the transform stack.
-	*/
-	void SceneManager::PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack)
-	{
-		NONFATAL_ASSERT(transformStack.GetEntryCount() > 0, "SceneManager::PopTransformData -> 'transformStack' is empty!", true);
+            if (maxPhaseReached >= (Int32)UpdatePhase::Start) {
+                ProcessSceneObjectComponentUpdatePhase(UpdatePhase::Start, component);
+            }
+        }
+    }
 
-		Matrix4x4 * mat = transformStack.Pop();
-		transform.SetTo(*mat);
-	}
+    /*
+    * Save a transform to the transform stack. This method is used to to save transformations
+    * as the render manager progresses through the object tree that makes up the scene.
+    */
+    void SceneManager::PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack) {
+        const Matrix4x4& matrix = transform.GetConstMatrix();
+        transformStack.Push(&matrix);
+    }
+
+    /*
+    * Remove the top transform from the transform stack.
+    */
+    void SceneManager::PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack) {
+        NONFATAL_ASSERT(transformStack.GetEntryCount() > 0, "SceneManager::PopTransformData -> 'transformStack' is empty!", true);
+
+        Matrix4x4 * mat = transformStack.Pop();
+        transform.SetTo(*mat);
+    }
 }

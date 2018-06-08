@@ -26,52 +26,50 @@
 
 #include <vector>
 
-namespace GTE
-{
-	//forward declarations
-	class EngineObjectManager;
-	class SubMesh3DRenderer;
-	class SubMesh3D;
-	class Material;
-	class Mesh3D;
+namespace GTE {
+    //forward declarations
+    class EngineObjectManager;
+    class SubMesh3DRenderer;
+    class SubMesh3D;
+    class Material;
+    class Mesh3D;
 
-	class Mesh3DRenderer : public Renderer
-	{
-		// Since this ultimately derives from EngineObject, we make this class
-		// a friend of EngineObjectManager, and the constructor & destructor
-		// protected so its life-cycle can be handled completely by EngineObjectManager.
-		friend class EngineObjectManager;
+    class Mesh3DRenderer : public Renderer {
+        // Since this ultimately derives from EngineObject, we make this class
+        // a friend of EngineObjectManager, and the constructor & destructor
+        // protected so its life-cycle can be handled completely by EngineObjectManager.
+        friend class EngineObjectManager;
 
-	protected:
+    protected:
 
-		// list of materials that will be used to render the sub-meshes
-		std::vector <MultiMaterialSharedPtr> materials;
-		// the renderers for each of the sub-meshes
-		std::vector <SubMesh3DRendererSharedPtr> subRenderers;
+        // list of materials that will be used to render the sub-meshes
+        std::vector <MultiMaterialSharedPtr> materials;
+        // the renderers for each of the sub-meshes
+        std::vector <SubMesh3DRendererSharedPtr> subRenderers;
 
-		Mesh3DRenderer();
-		virtual ~Mesh3DRenderer();
-		void DestroyRenderers();
-		void DestroyRenderer(UInt32 index);
+        Mesh3DRenderer();
+        virtual ~Mesh3DRenderer();
+        void DestroyRenderers();
+        void DestroyRenderer(UInt32 index);
 
-	public:
+    public:
 
-		UInt32 GetMultiMaterialCount() const;
-		MultiMaterialRef GetMultiMaterial(UInt32 index);
-		void SetMultiMaterial(UInt32 index, MultiMaterialRef material);
-		void AddMultiMaterial(MaterialRef material);
-		void AddMultiMaterial(MultiMaterialRef material);
+        UInt32 GetMultiMaterialCount() const;
+        MultiMaterialRef GetMultiMaterial(UInt32 index);
+        void SetMultiMaterial(UInt32 index, MultiMaterialRef material);
+        void AddMultiMaterial(MaterialRef material);
+        void AddMultiMaterial(MultiMaterialRef material);
 
-		virtual void InitializeForMesh();
-		void InitializeForMesh(Mesh3DConstRef mesh);
-		void UpdateFromSubMesh(UInt32 index);
+        virtual void InitializeForMesh();
+        void InitializeForMesh(Mesh3DConstRef mesh);
+        void UpdateFromSubMesh(UInt32 index);
 
-		virtual Mesh3DRef GetTargetMesh();
-		SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererConstRef subRenderer);
-		virtual SubMesh3DRef GetSubMesh(UInt32 index);
-		SubMesh3DRendererRef GetSubRenderer(UInt32 index);
-		UInt32 GetSubRendererCount() const;
-	};
+        virtual Mesh3DRef GetTargetMesh();
+        SubMesh3DRef GetSubMeshForSubRenderer(SubMesh3DRendererConstRef subRenderer);
+        virtual SubMesh3DRef GetSubMesh(UInt32 index);
+        SubMesh3DRendererRef GetSubRenderer(UInt32 index);
+        UInt32 GetSubRendererCount() const;
+    };
 }
 
 #endif

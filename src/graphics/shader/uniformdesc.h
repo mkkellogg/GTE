@@ -15,57 +15,54 @@
 #include "geometry/matrix4x4.h"
 #include "graphics/materialvardirectory.h"
 
-namespace GTE
-{
-	//forward declarations
-	class Texture;
+namespace GTE {
+    //forward declarations
+    class Texture;
 
-	enum class UniformType
-	{
-		Sampler2D,
-		SamplerCube,
-		Matrix4x4,
-		Matrix3x3,
-		Matrix2x3,
-		Float,
-		Float2,
-		Float3,
-		Float4,
-		Int,
-		Int2,
-		Int3,
-		Int4,
-		Bool,
-		Bool2,
-		Bool3,
-		Bool4,
-		Custom,
-		Unknown
-	};
+    enum class UniformType {
+        Sampler2D,
+        SamplerCube,
+        Matrix4x4,
+        Matrix3x3,
+        Matrix2x3,
+        Float,
+        Float2,
+        Float3,
+        Float4,
+        Int,
+        Int2,
+        Int3,
+        Int4,
+        Bool,
+        Bool2,
+        Bool3,
+        Bool4,
+        Custom,
+        Unknown
+    };
 
-	class UniformDescriptor
-	{
-	public:
+    class UniformDescriptor {
+    public:
 
-		UniformDescriptor();
-		~UniformDescriptor();
+        UniformDescriptor();
+        ~UniformDescriptor();
 
-		Int32 Size;
-		std::string Name;		
-		UInt32 ShaderVarID;
-		UInt32 SamplerUnitIndex;
-		UniformType Type;
+        Int32 Size;
+        std::string Name;
+        UInt32 ShaderVarID;
+        UInt32 SamplerUnitIndex;
+        UniformType Type;
 
-		Bool IsSet;
-		Bool IsDelayedSet;
-		UInt32 SetSize;
-		UniformID RegisteredUniformID;
-		TextureSharedPtr SamplerData;
-		Matrix4x4 MatrixData;
-		Real BasicFloatData[4];
-		Real * ExtendedFloatData;
-		Bool RequiresVerification;
-	};
+        Bool IsSet;
+        Bool IsDelayedSet;
+        UInt32 SetSize;
+        UniformID RegisteredUniformID;
+        TextureSharedPtr SamplerData;
+        Matrix4x4 MatrixData;
+        Real BasicFloatData[4];
+        Real * ExtendedFloatData;
+        Bool RequiresVerification;
+    };
 }
 
 #endif

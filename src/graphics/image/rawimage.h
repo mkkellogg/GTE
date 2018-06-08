@@ -13,34 +13,32 @@
 #include "engine.h"
 #include "global/global.h"
 
-namespace GTE
-{
-	class RawImage
-	{
-		friend class ImageLoader;
+namespace GTE {
+    class RawImage {
+        friend class ImageLoader;
 
-	protected:
+    protected:
 
-		UInt32 width;
-		UInt32 height;
-		Byte * imageBytes;
+        UInt32 width;
+        UInt32 height;
+        Byte * imageBytes;
 
-		UInt32 ImageSizeBytes();
-		void Destroy();
+        UInt32 ImageSizeBytes();
+        void Destroy();
 
-	public:
+    public:
 
-		RawImage(UInt32 width, UInt32 height);
-		~RawImage();
+        RawImage(UInt32 width, UInt32 height);
+        ~RawImage();
 
-		Bool Init();
-		void SetDataTo(Byte * data);
-		void SetByte(UInt32 index, Byte byte);
+        Bool Init();
+        void SetDataTo(Byte * data);
+        void SetByte(UInt32 index, Byte byte);
 
-		Byte * GetPixels();
-		UInt32 GetWidth() const;
-		UInt32 GetHeight() const;
-	};
+        Byte * GetPixels();
+        UInt32 GetWidth() const;
+        UInt32 GetHeight() const;
+    };
 }
 
 #endif

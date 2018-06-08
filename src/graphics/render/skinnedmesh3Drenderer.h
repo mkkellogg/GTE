@@ -23,50 +23,48 @@
 #include <vector>
 #include <unordered_map>
 
-namespace GTE
-{
-	// forward declarations
-	class Skeleton;
-	class VertexBoneMap;
+namespace GTE {
+    // forward declarations
+    class Skeleton;
+    class VertexBoneMap;
 
-	class SkinnedMesh3DRenderer : public Mesh3DRenderer
-	{
-		// Since this ultimately derives from EngineObject, we make this class
-		// a friend of EngineObjectManager, and the constructor & destructor
-		// protected so its life-cycle can be handled completely by EngineObjectManager.
-		friend class EngineObjectManager;
-		friend class SubMesh3DRenderer;
+    class SkinnedMesh3DRenderer : public Mesh3DRenderer {
+        // Since this ultimately derives from EngineObject, we make this class
+        // a friend of EngineObjectManager, and the constructor & destructor
+        // protected so its life-cycle can be handled completely by EngineObjectManager.
+        friend class EngineObjectManager;
+        friend class SubMesh3DRenderer;
 
-		// the skeleton for this skinned mesh renderer, describes the bone hierarchy
-		// and (inverse) bind pose transformation of each bone. it also describes the scene
-		// object to which each bone corresponds indirectly through the node structures
-		// it contains.
-		SkeletonSharedPtr skeleton;
+        // the skeleton for this skinned mesh renderer, describes the bone hierarchy
+        // and (inverse) bind pose transformation of each bone. it also describes the scene
+        // object to which each bone corresponds indirectly through the node structures
+        // it contains.
+        SkeletonSharedPtr skeleton;
 
-		// all the VertexBoneMap objects for this renderer
-		std::vector<VertexBoneMap *> vertexBoneMaps;
+        // all the VertexBoneMap objects for this renderer
+        std::vector<VertexBoneMap *> vertexBoneMaps;
 
-		// the attribute transformer for this renderer, does performs the vertex skinning
-		SkinnedMesh3DAttributeTransformer attributeTransformer;
+        // the attribute transformer for this renderer, does performs the vertex skinning
+        SkinnedMesh3DAttributeTransformer attributeTransformer;
 
-		// maps each sub-mesh in the target mesh of this renderer to its corresponding
-		// VertexBoneMap structure, which describe the attachment of mesh vertices to
-		// the bones in [skeleton]
-		std::unordered_map<UInt32, int>subMeshIndexMap;
+        // maps each sub-mesh in the target mesh of this renderer to its corresponding
+        // VertexBoneMap structure, which describe the attachment of mesh vertices to
+        // the bones in [skeleton]
+        std::unordered_map<UInt32, int>subMeshIndexMap;
 
-		SkinnedMesh3DRenderer();
-		~SkinnedMesh3DRenderer();
+        SkinnedMesh3DRenderer();
+        ~SkinnedMesh3DRenderer();
 
-	public:
+    public:
 
-		void SetSkeleton(SkeletonRef skeleton);
-		SkeletonRef GetSkeleton();
-		void InitializeForMesh();
-		void MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, Int32 vertexBoneMapIndex);
+        void SetSkeleton(SkeletonRef skeleton);
+        SkeletonRef GetSkeleton();
+        void InitializeForMesh();
+        void MapSubMeshToVertexBoneMap(UInt32 subMeshIndex, Int32 vertexBoneMapIndex);
 
-		void AddVertexBoneMap(VertexBoneMap * map);
-		VertexBoneMap * GetVertexBoneMap(UInt32 index);
-	};
+        void AddVertexBoneMap(VertexBoneMap * map);
+        VertexBoneMap * GetVertexBoneMap(UInt32 index);
+    };
 }
 
 #endif

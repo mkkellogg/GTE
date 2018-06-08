@@ -14,30 +14,26 @@
 #include "engine.h"
 #include "object/engineobject.h"
 
-namespace GTE
-{
-	//forward declarations
-	class Particle;
+namespace GTE {
+    //forward declarations
+    class Particle;
 
-	template <typename T> class ParticleModifier
-	{
-		protected:
+    template <typename T> class ParticleModifier {
+    protected:
 
-		public:
+    public:
 
-		ParticleModifier()
-		{
-			
-		}
+        ParticleModifier() {
 
-		virtual ~ParticleModifier()
-		{
+        }
 
-		}
+        virtual ~ParticleModifier() {
 
-		virtual void Update(Particle& particle, T& targetAttribute, Real t) const = 0;
-		virtual ParticleModifier<T>* Clone() const = 0;
-	};
+        }
+
+        virtual void Update(Particle& particle, T& targetAttribute, Real t) const = 0;
+        virtual ParticleModifier<T>* Clone() const = 0;
+    };
 }
 
 #endif

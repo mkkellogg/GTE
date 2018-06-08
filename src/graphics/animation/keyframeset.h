@@ -19,24 +19,22 @@
 #include "rotationkeyframe.h"
 #include "global/global.h"
 
-namespace GTE
-{
-	class KeyFrameSet
-	{
-	public:
+namespace GTE {
+    class KeyFrameSet {
+    public:
 
-		// is this key frame set active?
-		Bool Used;
-		// key frames with translation transformations
-		std::vector<TranslationKeyFrame> TranslationKeyFrames;
-		// key frames with scale transformations
-		std::vector<ScaleKeyFrame> ScaleKeyFrames;
-		// key frames with rotation transformations
-		std::vector<RotationKeyFrame> RotationKeyFrames;
+        // is this key frame set active?
+        Bool Used;
+        // key frames with translation transformations
+        std::vector<TranslationKeyFrame> TranslationKeyFrames;
+        // key frames with scale transformations
+        std::vector<ScaleKeyFrame> ScaleKeyFrames;
+        // key frames with rotation transformations
+        std::vector<RotationKeyFrame> RotationKeyFrames;
 
-		KeyFrameSet();
-		~KeyFrameSet();
-	};
+        KeyFrameSet();
+        ~KeyFrameSet();
+    };
 }
 
 #endif

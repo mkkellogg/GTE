@@ -16,30 +16,28 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/matrix4x4.h"
 
-namespace GTE
-{
-	// forward declarations
-	class SubMesh3DFace;
+namespace GTE {
+    // forward declarations
+    class SubMesh3DFace;
 
-	class SubMesh3DFaces
-	{
-		// number of faces in [faces]
-		UInt32 faceCount;
-		// face data array
-		SubMesh3DFace * faces;
+    class SubMesh3DFaces {
+        // number of faces in [faces]
+        UInt32 faceCount;
+        // face data array
+        SubMesh3DFace * faces;
 
-		void Destroy();
+        void Destroy();
 
-	public:
+    public:
 
-		SubMesh3DFaces();
-		~SubMesh3DFaces();
+        SubMesh3DFaces();
+        ~SubMesh3DFaces();
 
-		UInt32 GetFaceCount() const;
-		Bool Init(UInt32 faceCount);
-		SubMesh3DFace * GetFace(UInt32 index);
-		const SubMesh3DFace * GetFaceConst(UInt32 index) const;
-	};
+        UInt32 GetFaceCount() const;
+        Bool Init(UInt32 faceCount);
+        SubMesh3DFace * GetFace(UInt32 index);
+        const SubMesh3DFace * GetFaceConst(UInt32 index) const;
+    };
 }
 
 #endif

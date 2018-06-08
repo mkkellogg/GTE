@@ -20,39 +20,37 @@
 #include "geometry/vector/vector3.h"
 #include "graphics/light/light.h"
 
-namespace GTE
-{
-	//forward declarations
-	class EngineObjectManager;
-	class SubMesh3D;
+namespace GTE {
+    //forward declarations
+    class EngineObjectManager;
+    class SubMesh3D;
 
-	class Mesh3D : public EngineObject
-	{
-		// Since this derives from EngineObject, we make this class
-		// a friend of EngineObjectManager, and the constructor & destructor
-		// protected so its life-cycle can be handled completely by EngineObjectManager.
-		friend class EngineObjectManager;
+    class Mesh3D : public EngineObject {
+        // Since this derives from EngineObject, we make this class
+        // a friend of EngineObjectManager, and the constructor & destructor
+        // protected so its life-cycle can be handled completely by EngineObjectManager.
+        friend class EngineObjectManager;
 
-	protected:
+    protected:
 
-		// numnber of sub-meshes managed by the Mesh3D instance
-		UInt32 subMeshCount;
-		// container for the submeshes
-		std::vector<SubMesh3DSharedPtr> subMeshes;
+        // numnber of sub-meshes managed by the Mesh3D instance
+        UInt32 subMeshCount;
+        // container for the submeshes
+        std::vector<SubMesh3DSharedPtr> subMeshes;
 
-		Mesh3D(UInt32 subMeshCount);
-		~Mesh3D();
-		void Destroy();
+        Mesh3D(UInt32 subMeshCount);
+        ~Mesh3D();
+        void Destroy();
 
-	public:
+    public:
 
-		UInt32 GetSubMeshCount() const;
-		void SetSubMesh(SubMesh3DRef mesh, UInt32 index);
-		SubMesh3DRef GetSubMesh(UInt32 index);
-		Bool Init();
-		void UpdateAll();
+        UInt32 GetSubMeshCount() const;
+        void SetSubMesh(SubMesh3DRef mesh, UInt32 index);
+        SubMesh3DRef GetSubMesh(UInt32 index);
+        Bool Init();
+        void UpdateAll();
 
-	};
+    };
 }
 
 #endif

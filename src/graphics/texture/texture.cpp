@@ -6,44 +6,35 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 
-namespace GTE
-{
-	Texture::Texture(TextureAttributes attributes)
-	{
-		this->attributes = attributes;
-	}
+namespace GTE {
+    Texture::Texture(TextureAttributes attributes) {
+        this->attributes = attributes;
+    }
 
-	Texture::~Texture()
-	{
-		DestroyImageData();
-	}
+    Texture::~Texture() {
+        DestroyImageData();
+    }
 
-	void Texture::DestroyImageData()
-	{
-		for (UInt32 i = 0; i < imageData.size(); i++)
-		{
-			RawImage * raw = imageData[i];
-			if (raw != nullptr)
-			{
-				ImageLoader::DestroyRawImage(raw);
-			}
-		}
-		imageData.clear();
-	}
+    void Texture::DestroyImageData() {
+        for (UInt32 i = 0; i < imageData.size(); i++) {
+            RawImage * raw = imageData[i];
+            if (raw != nullptr) {
+                ImageLoader::DestroyRawImage(raw);
+            }
+        }
+        imageData.clear();
+    }
 
-	TextureAttributes Texture::GetAttributes() const
-	{
-		return attributes;
-	}
+    TextureAttributes Texture::GetAttributes() const {
+        return attributes;
+    }
 
-	void Texture::AddImageData(RawImage* imageData)
-	{
-		this->imageData.push_back(imageData);
-	}
+    void Texture::AddImageData(RawImage* imageData) {
+        this->imageData.push_back(imageData);
+    }
 
-	RawImage * Texture::GetImageData(UInt32 index)
-	{
-		NONFATAL_ASSERT_RTRN(index < imageData.size(), "Texture::GetImageData -> 'index' is out of range.", nullptr, true);
-		return imageData[index];
-	}
+    RawImage * Texture::GetImageData(UInt32 index) {
+        NONFATAL_ASSERT_RTRN(index < imageData.size(), "Texture::GetImageData -> 'index' is out of range.", nullptr, true);
+        return imageData[index];
+    }
 }

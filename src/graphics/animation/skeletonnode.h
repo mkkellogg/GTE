@@ -24,35 +24,33 @@
 #include "geometry/vector/vector3.h"
 #include "geometry/quaternion.h"
 
-namespace GTE
-{
-	//forward declarations
-	class Bone;
+namespace GTE {
+    //forward declarations
+    class Bone;
 
-	class SkeletonNode
-	{
-	public:
+    class SkeletonNode {
+    public:
 
-		// the index of the corresponding bone (if there is one) in the container Skeleton object's
-		// bone array.
-		Int32 BoneIndex;
-		// the name of this node
-		std::string Name;
-		// save the original transformations
-		Matrix4x4 InitialTransform;
-		Vector3 InitialTranslation;
-		Vector3 InitialScale;
-		Quaternion InitialRotation;
+        // the index of the corresponding bone (if there is one) in the container Skeleton object's
+        // bone array.
+        Int32 BoneIndex;
+        // the name of this node
+        std::string Name;
+        // save the original transformations
+        Matrix4x4 InitialTransform;
+        Vector3 InitialTranslation;
+        Vector3 InitialScale;
+        Quaternion InitialRotation;
 
-		SkeletonNode(Int32 boneIndex, const std::string& name);
-		virtual ~SkeletonNode();
+        SkeletonNode(Int32 boneIndex, const std::string& name);
+        virtual ~SkeletonNode();
 
-		virtual const Transform * GetFullTransform() const = 0;
-		virtual Transform * GetLocalTransform() = 0;
-		virtual Bool HasTarget() const = 0;
+        virtual const Transform * GetFullTransform() const = 0;
+        virtual Transform * GetLocalTransform() = 0;
+        virtual Bool HasTarget() const = 0;
 
-		virtual SkeletonNode * FullClone() const = 0;
-	};
+        virtual SkeletonNode * FullClone() const = 0;
+    };
 }
 
 #endif

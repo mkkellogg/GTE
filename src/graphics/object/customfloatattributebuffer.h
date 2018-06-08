@@ -15,33 +15,31 @@
 #include "gtemath/gtemath.h"
 #include "graphics/materialvardirectory.h"
 
-namespace GTE
-{
-	class CustomFloatAttributeBuffer
-	{
-		friend class SubMesh3D;
+namespace GTE {
+    class CustomFloatAttributeBuffer {
+        friend class SubMesh3D;
 
-		Real * data;
-		UInt32 componentCount;
-		UInt32 size;
-		AttributeID attributeID;
+        Real * data;
+        UInt32 componentCount;
+        UInt32 size;
+        AttributeID attributeID;
 
-		
-		Bool Init(UInt32 size, UInt32 componentCount);
-		void Destroy();
 
-		public:
-		
-		CustomFloatAttributeBuffer();
-		virtual ~CustomFloatAttributeBuffer();
+        Bool Init(UInt32 size, UInt32 componentCount);
+        void Destroy();
 
-		void SetAttributeID(AttributeID id);
-		AttributeID GetAttributeID();
+    public:
 
-		Real * GetDataPtr();
-		UInt32 GetSize() const;
-		UInt32 GetComponentCount() const;
-	};
+        CustomFloatAttributeBuffer();
+        virtual ~CustomFloatAttributeBuffer();
+
+        void SetAttributeID(AttributeID id);
+        AttributeID GetAttributeID();
+
+        Real * GetDataPtr();
+        UInt32 GetSize() const;
+        UInt32 GetComponentCount() const;
+    };
 }
 
 #endif 

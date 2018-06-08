@@ -2,34 +2,29 @@
 #include "filesystemIX.h"
 #include "filesystemWin.h"
 
-namespace GTE
-{
-	FileSystem * FileSystem::theInstance = nullptr;
+namespace GTE {
+    FileSystem * FileSystem::theInstance = nullptr;
 
-	FileSystem::FileSystem()
-	{
+    FileSystem::FileSystem() {
 
-	}
+    }
 
-	FileSystem::~FileSystem()
-	{
+    FileSystem::~FileSystem() {
 
-	}
+    }
 
-	FileSystem * FileSystem::Instance()
-	{
-		//TODO: make thread safe and add double checked locking
-		if (theInstance == nullptr)
-		{
+    FileSystem * FileSystem::Instance() {
+        //TODO: make thread safe and add double checked locking
+        if (theInstance == nullptr) {
 
 #ifdef _WIN32
-			theInstance = new FileSystemWin();
+            theInstance = new FileSystemWin();
 #else		
-			theInstance = new FileSystemIX();
+            theInstance = new FileSystemIX();
 #endif
-		}
+        }
 
-		return theInstance;
-	}
+        return theInstance;
+    }
 
 }

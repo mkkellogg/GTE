@@ -10,20 +10,17 @@
 #ifndef _GTE_PARTICLES_H_
 #define _GTE_PARTICLES_H_
 
-namespace GTE
-{
-	enum class ParticleRangeType
-	{
-		Linear = 0,
-		Cube = 1,
-		Sphere = 2,
-		Planar = 3
-	};
+namespace GTE {
+    enum class ParticleRangeType {
+        Linear = 0,
+        Cube = 1,
+        Sphere = 2,
+        Planar = 3
+    };
 
-	enum class ParticleConstants
-	{
-		VerticesPerParticle = 6
-	};
+    enum class ParticleConstants {
+        VerticesPerParticle = 6
+    };
 }
 
 #endif

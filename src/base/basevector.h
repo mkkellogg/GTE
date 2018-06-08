@@ -85,178 +85,153 @@
 }
 #endif
 
-namespace GTE
-{
-	template <class T> class BaseVector
-	{
+namespace GTE {
+    template <class T> class BaseVector {
 
-	protected:
+    protected:
 
-		/*
-		* If [target] is not null, then use it as the storage array.
-		*
-		* If [permAttach] is true, then [target] cannot be null, as it will be used as the permanent
-		* backing storage array. If [permAttach] is false, then this base vector can attach and
-		* re-attach to various different backing storage arrays.
-		*/
-		void Init(Real *target, Bool permAttach)
-		{
-			data = baseData;
+        /*
+        * If [target] is not null, then use it as the storage array.
+        *
+        * If [permAttach] is true, then [target] cannot be null, as it will be used as the permanent
+        * backing storage array. If [permAttach] is false, then this base vector can attach and
+        * re-attach to various different backing storage arrays.
+        */
+        void Init(Real *target, Bool permAttach) {
+            data = baseData;
 
-			if(target == nullptr && permAttach == true)
-			{
-				Debug::PrintWarning("BaseVector::Init -> 'permAttach' is true, but 'target' is null!");
-				permAttach = false;
-			}
+            if (target == nullptr && permAttach == true) {
+                Debug::PrintWarning("BaseVector::Init -> 'permAttach' is true, but 'target' is null!");
+                permAttach = false;
+            }
 
-			if(permAttach)
-			{
-				canDetach = false;
-			}
-			else
-			{
-				data = baseData;
-				canDetach = true;
-			}
+            if (permAttach) {
+                canDetach = false;
+            }
+            else {
+                data = baseData;
+                canDetach = true;
+            }
 
-			if(target != nullptr)
-			{
-				data = target;
-				attached = true;
-			}
-			else
-			{
-				attached = false;
-			}
-		}
+            if (target != nullptr) {
+                data = target;
+                attached = true;
+            }
+            else {
+                attached = false;
+            }
+        }
 
-		Real * data;
-		Real baseData[BaseVectorTraits<T>::VectorSize];
-		Bool attached;
-		Bool canDetach;
+        Real * data;
+        Real baseData[BaseVectorTraits<T>::VectorSize];
+        Bool attached;
+        Bool canDetach;
 
-	public:
+    public:
 
-		/*
-		* Default constructor
-		*/
-		BaseVector()
-		{
-			Init(nullptr, false);
-			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
-			{
-				data[i] = 0;
-			}
-		}
+        /*
+        * Default constructor
+        */
+        BaseVector() {
+            Init(nullptr, false);
+            for (UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++) {
+                data[i] = 0;
+            }
+        }
 
-		/*
-		* Constructor will alternate backing storage
-		*/
-		BaseVector(Bool permAttached, Real * target)
-		{
-			Init(target, true);
-		}
+        /*
+        * Constructor will alternate backing storage
+        */
+        BaseVector(Bool permAttached, Real * target) {
+            Init(target, true);
+        }
 
-		/*
-		* Copy constructor
-		*/
-		BaseVector(const BaseVector<T>& baseVector)
-		{
-			Init(nullptr, false);
+        /*
+        * Copy constructor
+        */
+        BaseVector(const BaseVector<T>& baseVector) {
+            Init(nullptr, false);
 
-			for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
-			{
-				data[i] = baseVector.data[i];
-			}
-		}
+            for (UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++) {
+                data[i] = baseVector.data[i];
+            }
+        }
 
-		/*
-		* Clean up
-		*/
-		virtual ~BaseVector()
-		{
-			if(!attached)data = nullptr;
-		}
+        /*
+        * Clean up
+        */
+        virtual ~BaseVector() {
+            if (!attached)data = nullptr;
+        }
 
-		/*
-		* Assignment operator.
-		*/
-		BaseVector& operator=(const BaseVector& source)
-		{
-			if(this == &source)return *this;
+        /*
+        * Assignment operator.
+        */
+        BaseVector& operator=(const BaseVector& source) {
+            if (this == &source)return *this;
 
-			attached = source.attached;
-			canDetach = source.canDetach;
+            attached = source.attached;
+            canDetach = source.canDetach;
 
-			SetTo(source);
+            SetTo(source);
 
-			return *this;
-		}
+            return *this;
+        }
 
-		/*
-		* Set this base vector's data to be equal to [baseVector]
-		*/
-		void SetTo(const BaseVector& baseVector)
-		{
-			if(BaseVectorTraits<T>::VectorSize == 4)
-			{
-				Real* dataPtr = baseVector.data;
-				BaseVector4_QuickCopy(dataPtr, data);
-			}
-			else
-			{
-				for(UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++)
-				{
-					data[i] = baseVector.data[i];
-				}
-			}
-		}
+        /*
+        * Set this base vector's data to be equal to [baseVector]
+        */
+        void SetTo(const BaseVector& baseVector) {
+            if (BaseVectorTraits<T>::VectorSize == 4) {
+                Real* dataPtr = baseVector.data;
+                BaseVector4_QuickCopy(dataPtr, data);
+            }
+            else {
+                for (UInt32 i = 0; i < BaseVectorTraits<T>::VectorSize; i++) {
+                    data[i] = baseVector.data[i];
+                }
+            }
+        }
 
-		/*
-		* Copy this base vector's data into [baseVector]
-		*/
-		void Get(BaseVector& baseVector) const
-		{
-			memcpy(baseVector.data, data, sizeof(Real) * BaseVectorTraits<T>::VectorSize);
-		}
+        /*
+        * Copy this base vector's data into [baseVector]
+        */
+        void Get(BaseVector& baseVector) const {
+            memcpy(baseVector.data, data, sizeof(Real) * BaseVectorTraits<T>::VectorSize);
+        }
 
-		/*
-		* Get a pointer the backing data storage
-		*/
-		Real * GetDataPtr()
-		{
-			return data;
-		}
+        /*
+        * Get a pointer the backing data storage
+        */
+        Real * GetDataPtr() {
+            return data;
+        }
 
-		/*
-		* Get a pointer the backing data storage
-		*/
-		const Real * GetConstDataPtr() const
-		{
-			return data;
-		}
+        /*
+        * Get a pointer the backing data storage
+        */
+        const Real * GetConstDataPtr() const {
+            return data;
+        }
 
-		/*
-		* Attach the base vector to a new backing storage array [data]
-		*/
-		virtual void AttachTo(Real * data)
-		{
-			this->data = data;
-			attached = true;
-		}
+        /*
+        * Attach the base vector to a new backing storage array [data]
+        */
+        virtual void AttachTo(Real * data) {
+            this->data = data;
+            attached = true;
+        }
 
-		/*
-		* Detach from the current backing storage array
-		*/
-		virtual void Detach()
-		{
-			if(canDetach)
-			{
-				this->data = baseData;
-				attached = false;
-			}
-		}
-	};
+        /*
+        * Detach from the current backing storage array
+        */
+        virtual void Detach() {
+            if (canDetach) {
+                this->data = baseData;
+                attached = false;
+            }
+        }
+    };
 }
 
 #endif

@@ -16,27 +16,25 @@
 #include "graphics/gl_include.h"
 #include "texture.h"
 
-namespace GTE
-{
-	//forward declarations
-	class TextureGL;
-	class RawImage;
+namespace GTE {
+    //forward declarations
+    class TextureGL;
+    class RawImage;
 
-	class TextureGL : public Texture
-	{
-		friend class GraphicsGL;
+    class TextureGL : public Texture {
+        friend class GraphicsGL;
 
-	protected:
+    protected:
 
-		GLuint textureID;
+        GLuint textureID;
 
-		TextureGL(TextureAttributes attributes, GLuint textureID);
-		~TextureGL();
+        TextureGL(TextureAttributes attributes, GLuint textureID);
+        ~TextureGL();
 
-	public:
+    public:
 
-		GLuint GetTextureID() const;
-	};
+        GLuint GetTextureID() const;
+    };
 }
 
 #endif

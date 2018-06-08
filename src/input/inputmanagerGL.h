@@ -4,30 +4,28 @@
 #include "engine.h"
 #include "inputmanager.h"
 
-namespace GTE
-{
+namespace GTE {
 
-	class InputManagerGL : public InputManager
-	{
-		friend class Engine;
+    class InputManagerGL : public InputManager {
+        friend class Engine;
 
-	protected:
+    protected:
 
-		InputManagerGL();
-		~InputManagerGL();
-		DigitalInput MapSpecialInputToDigitalInput(Int32 key);
-		Int32 MapSpecialInputToKeyIndex(Int32 key);
-		Int32 MapModifierToKeyIndex(Int32 modifier);
-		UInt32 GetKeyIndexForNonCharacterKey(NonCharacterKey key);
-		UInt32 GetKeyIndexFromCharacter(UChar key);
+        InputManagerGL();
+        ~InputManagerGL();
+        DigitalInput MapSpecialInputToDigitalInput(Int32 key);
+        Int32 MapSpecialInputToKeyIndex(Int32 key);
+        Int32 MapModifierToKeyIndex(Int32 modifier);
+        UInt32 GetKeyIndexForNonCharacterKey(NonCharacterKey key);
+        UInt32 GetKeyIndexFromCharacter(UChar key);
 
-	public:
+    public:
 
-		Bool Init();
-		void Update();
-		void KeyboardFunction(Int32 key, Int32 scanCode, Int32 mods);
-		void KeyboardFunctionUp(Int32 key, Int32 scanCode, Int32 mods);
-	};
+        Bool Init();
+        void Update();
+        void KeyboardFunction(Int32 key, Int32 scanCode, Int32 mods);
+        void KeyboardFunctionUp(Int32 key, Int32 scanCode, Int32 mods);
+    };
 }
 
 #endif

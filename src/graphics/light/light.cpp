@@ -3,159 +3,130 @@
 #include "geometry/point/point3.h"
 #include "geometry/vector/vector3.h"
 
-namespace GTE
-{
-	Light::Light()
-	{
-		type = LightType::Directional;
-		color.Set(1, 1, 1, 1);
-		direction.Set(1, -1, 0);
-		intensity = 1;
-		attenuation = 1;
-		SetRange(30);
-		shadowsEnabled = false;
-		attenuationOverride = false;
-		parallelAttenuation = AngleAttenuationType::None;
-		orthoAttenuation = AngleAttenuationType::None;
-	}
+namespace GTE {
+    Light::Light() {
+        type = LightType::Directional;
+        color.Set(1, 1, 1, 1);
+        direction.Set(1, -1, 0);
+        intensity = 1;
+        attenuation = 1;
+        SetRange(30);
+        shadowsEnabled = false;
+        attenuationOverride = false;
+        parallelAttenuation = AngleAttenuationType::None;
+        orthoAttenuation = AngleAttenuationType::None;
+    }
 
-	Light::~Light()
-	{
-		cullingMask = IntMaskUtil::CreateMask();
-	}
+    Light::~Light() {
+        cullingMask = IntMaskUtil::CreateMask();
+    }
 
-	const Color4& Light::GetColor() const
-	{
-		return color;
-	}
+    const Color4& Light::GetColor() const {
+        return color;
+    }
 
-	void Light::CalcAttentuationForCurrentRange()
-	{
-		if(!attenuationOverride)
-		{
-			// multiplying by 0.95f causes the light to fully attenuate slightly before reaching maximum range
-			attenuation = 1.0f / (range * 0.95f);
-		}
-	}
+    void Light::CalcAttentuationForCurrentRange() {
+        if (!attenuationOverride) {
+            // multiplying by 0.95f causes the light to fully attenuate slightly before reaching maximum range
+            attenuation = 1.0f / (range * 0.95f);
+        }
+    }
 
-	const Color4 * Light::GetColorPtr() const
-	{
-		return &color;
-	}
+    const Color4 * Light::GetColorPtr() const {
+        return &color;
+    }
 
-	void Light::SetColor(Color4 color)
-	{
-		this->color = color;
-	}
+    void Light::SetColor(Color4 color) {
+        this->color = color;
+    }
 
-	void Light::SetColor(Real r, Real g, Real b, Real a)
-	{
-		color.Set(r, g, b, a);
-	}
+    void Light::SetColor(Real r, Real g, Real b, Real a) {
+        color.Set(r, g, b, a);
+    }
 
-	const Vector3& Light::GetDirection() const
-	{
-		return direction;
-	}
+    const Vector3& Light::GetDirection() const {
+        return direction;
+    }
 
-	const Vector3 * Light::GetDirectionPtr() const
-	{
-		return &direction;
-	}
+    const Vector3 * Light::GetDirectionPtr() const {
+        return &direction;
+    }
 
-	void Light::SetDirection(Vector3  direction)
-	{
-		this->direction = direction;
-		this->direction.Normalize();
-	}
+    void Light::SetDirection(Vector3  direction) {
+        this->direction = direction;
+        this->direction.Normalize();
+    }
 
-	void Light::SetDirection(Real x, Real y, Real z)
-	{
-		direction.Set(x, y, z);
-		direction.Normalize();
-	}
+    void Light::SetDirection(Real x, Real y, Real z) {
+        direction.Set(x, y, z);
+        direction.Normalize();
+    }
 
-	LightType Light::GetType() const
-	{
-		return type;
-	}
+    LightType Light::GetType() const {
+        return type;
+    }
 
-	void Light::SetType(LightType type)
-	{
-		this->type = type;
-	}
+    void Light::SetType(LightType type) {
+        this->type = type;
+    }
 
-	Real Light::GetRange() const
-	{
-		return range;
-	}
+    Real Light::GetRange() const {
+        return range;
+    }
 
-	void Light::SetRange(Real range)
-	{
-		this->range = range;
-		CalcAttentuationForCurrentRange();
-	}
+    void Light::SetRange(Real range) {
+        this->range = range;
+        CalcAttentuationForCurrentRange();
+    }
 
-	void Light::SetIntensity(Real intensity)
-	{
-		this->intensity = intensity;
-		CalcAttentuationForCurrentRange();
-	}
+    void Light::SetIntensity(Real intensity) {
+        this->intensity = intensity;
+        CalcAttentuationForCurrentRange();
+    }
 
-	Real Light::GetIntensity() const
-	{
-		return intensity;
-	}
+    Real Light::GetIntensity() const {
+        return intensity;
+    }
 
-	void Light::SetAttenuation(Real attenuation)
-	{
-		this->attenuation = attenuation;
-		attenuationOverride = true;
-	}
+    void Light::SetAttenuation(Real attenuation) {
+        this->attenuation = attenuation;
+        attenuationOverride = true;
+    }
 
-	Real Light::GetAttenuation() const
-	{
-		return attenuation;
-	}
+    Real Light::GetAttenuation() const {
+        return attenuation;
+    }
 
-	AngleAttenuationType Light::GetParallelAngleAttenuationType() const
-	{
-		return parallelAttenuation;
-	}
+    AngleAttenuationType Light::GetParallelAngleAttenuationType() const {
+        return parallelAttenuation;
+    }
 
-	void Light::SetParallelAngleAttenuationType(AngleAttenuationType type)
-	{
-		parallelAttenuation = type;
-	}
+    void Light::SetParallelAngleAttenuationType(AngleAttenuationType type) {
+        parallelAttenuation = type;
+    }
 
-	AngleAttenuationType Light::GetOrthoAngleAttenuationType() const
-	{
-		return orthoAttenuation;
-	}
+    AngleAttenuationType Light::GetOrthoAngleAttenuationType() const {
+        return orthoAttenuation;
+    }
 
-	void Light::SetOrthoAngleAttenuationType(AngleAttenuationType type)
-	{
-		orthoAttenuation = type;
-	}
+    void Light::SetOrthoAngleAttenuationType(AngleAttenuationType type) {
+        orthoAttenuation = type;
+    }
 
-	void Light::SetShadowsEnabled(Bool enabled)
-	{
-		shadowsEnabled = enabled;
-	}
+    void Light::SetShadowsEnabled(Bool enabled) {
+        shadowsEnabled = enabled;
+    }
 
-	Bool Light::GetShadowsEnabled() const
-	{
-		return shadowsEnabled;
-	}
+    Bool Light::GetShadowsEnabled() const {
+        return shadowsEnabled;
+    }
 
-	void Light::SetCullingMask(IntMask mask)
-	{
-		cullingMask = mask;
-	}
+    void Light::SetCullingMask(IntMask mask) {
+        cullingMask = mask;
+    }
 
-	IntMask Light::GetCullingMask() const
-	{
-		return cullingMask;
-	}
+    IntMask Light::GetCullingMask() const {
+        return cullingMask;
+    }
 }
 

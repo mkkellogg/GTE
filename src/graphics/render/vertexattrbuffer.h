@@ -18,35 +18,33 @@
 
 #include "engine.h"
 
-namespace GTE
-{
-	class VertexAttrBuffer
-	{
-	protected:
+namespace GTE {
+    class VertexAttrBuffer {
+    protected:
 
-		// number of components per attribute, e.g. vertex positions have
-		// a component count of 4 (x,y,z,w)
-		UInt32 componentCount;
-		// total number of vertices in the buffer
-		UInt32 totalVertexCount;
-		// total number of vertices to be rendered
-		UInt32 renderVertexCount;
-		// padding space between attributes, can be used to achieve optimal memory alignment
-		UInt32 stride;
+        // number of components per attribute, e.g. vertex positions have
+        // a component count of 4 (x,y,z,w)
+        UInt32 componentCount;
+        // total number of vertices in the buffer
+        UInt32 totalVertexCount;
+        // total number of vertices to be rendered
+        UInt32 renderVertexCount;
+        // padding space between attributes, can be used to achieve optimal memory alignment
+        UInt32 stride;
 
-	public:
+    public:
 
-		VertexAttrBuffer();
-		virtual ~VertexAttrBuffer();
+        VertexAttrBuffer();
+        virtual ~VertexAttrBuffer();
 
-		virtual Bool Init(UInt32 totalVertexCount, UInt32 componentCount, UInt32 stride, Bool dataOnGPU, const Real *srcData) = 0;
-		virtual void SetData(const Real * data) = 0;
-		Int32 GetTotalVertexCount() const;
-		void SetRenderVertexCount(UInt32 count);
-		Int32 GetRenderVertexCount() const;
-		Int32 GetComponentCount() const;
-		Int32 GetStride() const;
-	};
+        virtual Bool Init(UInt32 totalVertexCount, UInt32 componentCount, UInt32 stride, Bool dataOnGPU, const Real *srcData) = 0;
+        virtual void SetData(const Real * data) = 0;
+        Int32 GetTotalVertexCount() const;
+        void SetRenderVertexCount(UInt32 count);
+        Int32 GetRenderVertexCount() const;
+        Int32 GetComponentCount() const;
+        Int32 GetStride() const;
+    };
 }
 
 #endif

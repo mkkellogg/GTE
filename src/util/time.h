@@ -14,37 +14,35 @@
 
 #include "engine.h"
 
-namespace GTE
-{
-	class Time
-	{
-		static Real timeScale;
+namespace GTE {
+    class Time {
+        static Real timeScale;
 
-		static Bool initialized;
-		static unsigned long long startupTime;
-		static std::chrono::high_resolution_clock::time_point _startupTime;
-		static Real lastRecordedTime;
-		static Real lastRecordedRealTime;
-		static Real deltaTime;
-		static Real realDeltaTime;
+        static Bool initialized;
+        static unsigned long long startupTime;
+        static std::chrono::high_resolution_clock::time_point _startupTime;
+        static Real lastRecordedTime;
+        static Real lastRecordedRealTime;
+        static Real deltaTime;
+        static Real realDeltaTime;
 
-		static void Initialize();
+        static void Initialize();
 
-		Time();
-		~Time();
+        Time();
+        ~Time();
 
-	protected:
+    protected:
 
-	public:
+    public:
 
-		static void Update();
+        static void Update();
 
-		static Real GetRealTimeSinceStartup();
-		static Real GetTime();
-		static Real GetRealDeltaTime();
-		static Real GetDeltaTime();
+        static Real GetRealTimeSinceStartup();
+        static Real GetTime();
+        static Real GetRealDeltaTime();
+        static Real GetDeltaTime();
 
-	};
+    };
 }
 
 #endif

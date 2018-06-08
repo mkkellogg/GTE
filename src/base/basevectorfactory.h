@@ -8,51 +8,42 @@
 
 #include <memory.h>
 
-namespace GTE
-{
-	template <class T> class BaseVectorFactory
-	{
-	public:
+namespace GTE {
+    template <class T> class BaseVectorFactory {
+    public:
 
-		BaseVectorFactory()
-		{
+        BaseVectorFactory() {
 
-		}
+        }
 
-		virtual ~BaseVectorFactory()
-		{
+        virtual ~BaseVectorFactory() {
 
-		}
+        }
 
-		T * CreatePermAttached(Real * target)
-		{
-			return new(std::nothrow) T(true, target);
-		}
+        T * CreatePermAttached(Real * target) {
+            return new(std::nothrow) T(true, target);
+        }
 
-		T** CreateArray(Int32 count)
-		{
-			T** pptr = new(std::nothrow) T*[count];
-			ASSERT(pptr != nullptr, "BaseVectorFactory::CreateArray -> Unable to allocate array.");
+        T** CreateArray(Int32 count) {
+            T** pptr = new(std::nothrow) T*[count];
+            ASSERT(pptr != nullptr, "BaseVectorFactory::CreateArray -> Unable to allocate array.");
 
-			return pptr;
-		}
+            return pptr;
+        }
 
-		void DestroyArray(T ** array, UInt32 size)
-		{
-			NONFATAL_ASSERT(array != nullptr, "BaseVectorFactory::DestroyArray -> 'array' is null.", true);
+        void DestroyArray(T ** array, UInt32 size) {
+            NONFATAL_ASSERT(array != nullptr, "BaseVectorFactory::DestroyArray -> 'array' is null.", true);
 
-			for(UInt32 i = 0; i < size; i++)
-			{
-				T * baseObj = array[i];
-				if(baseObj != nullptr)
-				{
-					delete baseObj;
-					array[i] = nullptr;
-				}
-			}
-			delete[] array;
-		}
-	};
+            for (UInt32 i = 0; i < size; i++) {
+                T * baseObj = array[i];
+                if (baseObj != nullptr) {
+                    delete baseObj;
+                    array[i] = nullptr;
+                }
+            }
+            delete[] array;
+        }
+    };
 }
 
 #endif

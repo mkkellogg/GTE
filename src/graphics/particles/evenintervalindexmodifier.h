@@ -17,39 +17,33 @@
 #include "particlemodifier.h"
 #include "particle.h"
 
-namespace GTE
-{
-	class EvenIntervalIndexModifier : public ParticleModifier<UInt32>
-	{
-		UInt32 totalSteps;
+namespace GTE {
+    class EvenIntervalIndexModifier : public ParticleModifier<UInt32> {
+        UInt32 totalSteps;
 
-		public:
+    public:
 
-		EvenIntervalIndexModifier(UInt32 totalSteps) : ParticleModifier<UInt32>()
-		{
-			this->totalSteps = totalSteps;
-		}
+        EvenIntervalIndexModifier(UInt32 totalSteps) : ParticleModifier<UInt32>() {
+            this->totalSteps = totalSteps;
+        }
 
-		virtual ~EvenIntervalIndexModifier()
-		{
+        virtual ~EvenIntervalIndexModifier() {
 
-		}
+        }
 
-		void Update(Particle& particle, UInt32& targetAttribute, Real t) const override
-		{
-			Real fraction = particle.Age / particle.LifeSpan;
-			UInt32 step = (UInt32)(fraction * totalSteps);
-			if(step == totalSteps && step > 0) step--;
-			targetAttribute = step;
-		}
+        void Update(Particle& particle, UInt32& targetAttribute, Real t) const override {
+            Real fraction = particle.Age / particle.LifeSpan;
+            UInt32 step = (UInt32)(fraction * totalSteps);
+            if (step == totalSteps && step > 0) step--;
+            targetAttribute = step;
+        }
 
-		ParticleModifier<UInt32>* Clone() const override
-		{
-			EvenIntervalIndexModifier* baseClone = new EvenIntervalIndexModifier(totalSteps);
-			ASSERT(baseClone != nullptr, "EvenIntervalIndexModifier::Clone -> Could not clone modifier.");
-			return static_cast<ParticleModifier<UInt32>*>(baseClone);
-		}
-	};
+        ParticleModifier<UInt32>* Clone() const override {
+            EvenIntervalIndexModifier* baseClone = new EvenIntervalIndexModifier(totalSteps);
+            ASSERT(baseClone != nullptr, "EvenIntervalIndexModifier::Clone -> Could not clone modifier.");
+            return static_cast<ParticleModifier<UInt32>*>(baseClone);
+        }
+    };
 }
 
 #endif

@@ -12,40 +12,37 @@
 #include "engine.h"
 #include "object/engineobject.h"
 
-namespace GTE
-{
-	enum class RenderQueueType
-	{
-		Opaque = 1000,
-		OpaquePostSSAO = 2000,
-		Skybox = 3000,
-		Transparent = 4000,
-		MaxQueue = 10000
-	};
+namespace GTE {
+    enum class RenderQueueType {
+        Opaque = 1000,
+        OpaquePostSSAO = 2000,
+        Skybox = 3000,
+        Transparent = 4000,
+        MaxQueue = 10000
+    };
 
-	class RenderManager
-	{
-		friend class Engine;
+    class RenderManager {
+        friend class Engine;
 
-		protected:
+    protected:
 
-		RenderManager();
-		virtual ~RenderManager();
+        RenderManager();
+        virtual ~RenderManager();
 
-		virtual void PreRender() = 0;
+        virtual void PreRender() = 0;
 
-		CameraSharedPtr currentCamera;
-		void SetCurrentCamera(CameraRef camera);
+        CameraSharedPtr currentCamera;
+        void SetCurrentCamera(CameraRef camera);
 
-		public:
-		
-		CameraRef GetCurrentCamera();
+    public:
 
-		virtual void RenderScene() = 0;
-		virtual void ClearCaches() = 0;
+        CameraRef GetCurrentCamera();
 
-		virtual void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers) = 0;
-	};
+        virtual void RenderScene() = 0;
+        virtual void ClearCaches() = 0;
+
+        virtual void RenderFullScreenQuad(RenderTargetRef renderTarget, MaterialRef material, Bool clearBuffers) = 0;
+    };
 }
 
 #endif

@@ -6,23 +6,20 @@
 #include "global/assert.h"
 #include "debug/gtedebug.h"
 
-namespace GTE
-{
-	/*
-	* Only constructor.
-	*/
-	SkeletonNode::SkeletonNode(Int32 boneIndex, const std::string& name)
-	{
-		this->BoneIndex = boneIndex;
-		this->Name = name;
-	}
+namespace GTE {
+    /*
+    * Only constructor.
+    */
+    SkeletonNode::SkeletonNode(Int32 boneIndex, const std::string& name) {
+        this->BoneIndex = boneIndex;
+        this->Name = name;
+    }
 
-	/*
-	 * Destructor.
-	 */
-	SkeletonNode::~SkeletonNode()
-	{
+    /*
+     * Destructor.
+     */
+    SkeletonNode::~SkeletonNode() {
 
-	}
+    }
 }
 

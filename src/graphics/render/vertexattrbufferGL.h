@@ -14,42 +14,40 @@
 #include "graphics/gl_include.h"
 #include "vertexattrbuffer.h"
 
-namespace GTE
-{
-	class VertexAttrBufferGL : public GTE::VertexAttrBuffer
-	{
-		friend class SubMesh3DRendererGL;
-		// necessary during rendering
-		friend class GraphicsGL;
+namespace GTE {
+    class VertexAttrBufferGL : public GTE::VertexAttrBuffer {
+        friend class SubMesh3DRendererGL;
+        // necessary during rendering
+        friend class GraphicsGL;
 
-		// raw pointer to the buffer data
-		Real * data;
-		// is this a VBO?
-		Bool dataOnGPU;
-		// OpenGL id for the buffer
-		GLuint gpuBufferID;
+        // raw pointer to the buffer data
+        Real * data;
+        // is this a VBO?
+        Bool dataOnGPU;
+        // OpenGL id for the buffer
+        GLuint gpuBufferID;
 
-	protected:
+    protected:
 
-		VertexAttrBufferGL();
-		virtual ~VertexAttrBufferGL();
+        VertexAttrBufferGL();
+        virtual ~VertexAttrBufferGL();
 
-		void Destroy();
-		UInt32 CalcTotalFullSize() const;
-		UInt32 CalcTotalFloatCount() const;
-		UInt32 CalcRenderFullSize() const;
-		UInt32 CalcRenderFloatCount() const;
-		void InitData(const Real * srcData);
+        void Destroy();
+        UInt32 CalcTotalFullSize() const;
+        UInt32 CalcTotalFloatCount() const;
+        UInt32 CalcRenderFullSize() const;
+        UInt32 CalcRenderFloatCount() const;
+        void InitData(const Real * srcData);
 
-	public:
+    public:
 
-		Bool Init(UInt32 vertexCount, UInt32 componentCount, UInt32 stride, Bool dataOnGPU, const Real *srcData);
-		void SetData(const Real * srcData);
-		Real * GetDataPtr();
-		const Real * GetConstDataPtr() const;
-		Bool IsGPUBuffer() const;
-		GLuint GetGPUBufferID() const;
-	};
+        Bool Init(UInt32 vertexCount, UInt32 componentCount, UInt32 stride, Bool dataOnGPU, const Real *srcData);
+        void SetData(const Real * srcData);
+        Real * GetDataPtr();
+        const Real * GetConstDataPtr() const;
+        Bool IsGPUBuffer() const;
+        GLuint GetGPUBufferID() const;
+    };
 }
 
 #endif

@@ -10,138 +10,134 @@
 #include "base/bitmask.h"
 #include "global/constants.h"
 
-namespace GTE
-{
-	//forward declarations
-	class Camera;
-	class Graphics;
+namespace GTE {
+    //forward declarations
+    class Camera;
+    class Graphics;
 
-	class ClipPlane
-	{
-	public:
+    class ClipPlane {
+    public:
 
-		Vector3 Normal;
-		Real Offset;
-	};
+        Vector3 Normal;
+        Real Offset;
+    };
 
-	enum class ProjectionMode
-	{
-		Perspective = 0,
-		Orthographic = 1
-	};
+    enum class ProjectionMode {
+        Perspective = 0,
+        Orthographic = 1
+    };
 
-	class Camera : public SceneObjectComponent
-	{
-		// Since this ultimately derives from EngineObject, we make this class
-		// a friend of EngineObjectManager, and the constructor & destructor
-		// protected so its life-cycle can be handled completely by EngineObjectManager.
-		friend class EngineObjectManager;
+    class Camera : public SceneObjectComponent {
+        // Since this ultimately derives from EngineObject, we make this class
+        // a friend of EngineObjectManager, and the constructor & destructor
+        // protected so its life-cycle can be handled completely by EngineObjectManager.
+        friend class EngineObjectManager;
 
-		UInt32 clearBufferMask;
+        UInt32 clearBufferMask;
 
-		Transform projection;
-		Transform projectionInverse;
-		Transform skyboxTextureTransform;
+        Transform projection;
+        Transform projectionInverse;
+        Transform skyboxTextureTransform;
 
-		Bool skyboxSetup;
-		Bool skyboxEnabled;
-		MaterialSharedPtr skyboxMaterial;
-		TextureSharedPtr skyboxTexture;
-		SceneObjectSharedPtr skyboxSceneObject;
-		Mesh3DSharedPtr skyboxMesh;
-		Mesh3DFilterSharedPtr skyboxMeshFilter;
-		Mesh3DRendererSharedPtr skyboxMeshRenderer;
-		CameraSharedPtr sharedSkyboxCamera;
+        Bool skyboxSetup;
+        Bool skyboxEnabled;
+        MaterialSharedPtr skyboxMaterial;
+        TextureSharedPtr skyboxTexture;
+        SceneObjectSharedPtr skyboxSceneObject;
+        Mesh3DSharedPtr skyboxMesh;
+        Mesh3DFilterSharedPtr skyboxMeshFilter;
+        Mesh3DRendererSharedPtr skyboxMeshRenderer;
+        CameraSharedPtr sharedSkyboxCamera;
 
-		SSAORenderMode ssaoMode;
-		Bool ssaoEnabled;
-		Bool lightingEnabled;
-		Bool depthPassEnabled;
+        SSAORenderMode ssaoMode;
+        Bool ssaoEnabled;
+        Bool lightingEnabled;
+        Bool depthPassEnabled;
 
-		UInt32 renderOrderIndex;
+        UInt32 renderOrderIndex;
 
-		RenderTargetSharedPtr renderTarget;
+        RenderTargetSharedPtr renderTarget;
 
-		RenderTargetSharedPtr copyTarget;
+        RenderTargetSharedPtr copyTarget;
 
-		IntMask cullingMask;
+        IntMask cullingMask;
 
-		Real fov;
-		Real widthHeightRatio;
+        Real fov;
+        Real widthHeightRatio;
 
-		UInt32 clipPlaneCount;
-		ClipPlane clipPlanes[Constants::MaxClipPlanes];
+        UInt32 clipPlaneCount;
+        ClipPlane clipPlanes[Constants::MaxClipPlanes];
 
-		Transform uniformWorldSceneObjectTransform;
-		Bool reverseCulling;
+        Transform uniformWorldSceneObjectTransform;
+        Bool reverseCulling;
 
-		ProjectionMode projectionMode;
+        ProjectionMode projectionMode;
 
-		Camera();
-		~Camera();
+        Camera();
+        ~Camera();
 
-	public:
+    public:
 
-		void SetupSkybox(TextureRef cubeTexture);
-		void ShareSkybox(CameraRef camera);
-		Bool IsSkyboxSetup() const;
-		void SetSkyboxEnabled(Bool enabled);
-		Bool IsSkyboxEnabled() const;
-		SceneObjectRef GetSkyboxSceneObject();
-		TextureRef GetSkyboxTexture();
-		MaterialRef GetSkyboxMaterial();
+        void SetupSkybox(TextureRef cubeTexture);
+        void ShareSkybox(CameraRef camera);
+        Bool IsSkyboxSetup() const;
+        void SetSkyboxEnabled(Bool enabled);
+        Bool IsSkyboxEnabled() const;
+        SceneObjectRef GetSkyboxSceneObject();
+        TextureRef GetSkyboxTexture();
+        MaterialRef GetSkyboxMaterial();
 
-		void SetSSAOEnabled(Bool enabled);
-		Bool IsSSAOEnabled() const;
-		void SetSSAORenderMode(SSAORenderMode mode);
-		SSAORenderMode GetSSAORenderMode() const;
+        void SetSSAOEnabled(Bool enabled);
+        Bool IsSSAOEnabled() const;
+        void SetSSAORenderMode(SSAORenderMode mode);
+        SSAORenderMode GetSSAORenderMode() const;
 
-		void SetLightingEnabled(Bool enabled);
-		Bool IsLightingEnabled() const;
+        void SetLightingEnabled(Bool enabled);
+        Bool IsLightingEnabled() const;
 
-		void SetDepthPassEnabled(Bool enabled);
-		Bool IsDepthPassEnabled() const;
+        void SetDepthPassEnabled(Bool enabled);
+        Bool IsDepthPassEnabled() const;
 
-		void SetRenderOrderIndex(UInt32 index);
-		UInt32 GetRenderOrderIndex() const;
+        void SetRenderOrderIndex(UInt32 index);
+        UInt32 GetRenderOrderIndex() const;
 
-		const Transform& GetProjectionTransform() const;
-		const Transform& GetInverseProjectionTransform() const;
-		void TransformProjectionTransformBy(const Transform& transform);
-		void PreTransformProjectionTransformBy(const Transform& transform);
+        const Transform& GetProjectionTransform() const;
+        const Transform& GetInverseProjectionTransform() const;
+        void TransformProjectionTransformBy(const Transform& transform);
+        void PreTransformProjectionTransformBy(const Transform& transform);
 
-		void AddClearBuffer(RenderBufferType buffer);
-		void RemoveClearBuffer(RenderBufferType buffer);
-		IntMask GetClearBufferMask() const;
+        void AddClearBuffer(RenderBufferType buffer);
+        void RemoveClearBuffer(RenderBufferType buffer);
+        IntMask GetClearBufferMask() const;
 
-		void SetupOffscreenRenderTarget(Int32 width, Int32 height);
-		void SetupOffscreenRenderTarget(Int32 width, Int32 height, Bool cube);
-		RenderTargetRef GetRenderTarget();
-		void SetWidthHeightRatio(Real width, Real height);
+        void SetupOffscreenRenderTarget(Int32 width, Int32 height);
+        void SetupOffscreenRenderTarget(Int32 width, Int32 height, Bool cube);
+        RenderTargetRef GetRenderTarget();
+        void SetWidthHeightRatio(Real width, Real height);
 
-		void SetupCopyRenderTarget();
-		RenderTargetRef GetCopyRenderTarget();
+        void SetupCopyRenderTarget();
+        RenderTargetRef GetCopyRenderTarget();
 
-		void UpdateDisplay();
+        void UpdateDisplay();
 
-		void SetCullingMask(IntMask mask);
-		void MergeCullingMask(IntMask mask);
-		IntMask GetCullingMask() const;
+        void SetCullingMask(IntMask mask);
+        void MergeCullingMask(IntMask mask);
+        IntMask GetCullingMask() const;
 
-		void SetFOV(Real fov);
+        void SetFOV(Real fov);
 
-		Bool AddClipPlane(const Vector3& normal, Real offset);
-		const ClipPlane* GetClipPlane(UInt32 index);
-		UInt32 GetClipPlaneCount() const;
+        Bool AddClipPlane(const Vector3& normal, Real offset);
+        const ClipPlane* GetClipPlane(UInt32 index);
+        UInt32 GetClipPlaneCount() const;
 
-		void SetReverseCulling(Bool reverseCulling);
-		Bool GetReverseCulling() const;
+        void SetReverseCulling(Bool reverseCulling);
+        Bool GetReverseCulling() const;
 
-		void SetUniformWorldSceneObjectTransform(const Transform& transform);
-		const Transform& GetUniformWorldSceneObjectTransform() const;
+        void SetUniformWorldSceneObjectTransform(const Transform& transform);
+        const Transform& GetUniformWorldSceneObjectTransform() const;
 
-		void SetProjectionMode(ProjectionMode mode);
-	};
+        void SetProjectionMode(ProjectionMode mode);
+    };
 }
 
 #endif

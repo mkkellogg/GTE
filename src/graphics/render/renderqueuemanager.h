@@ -13,165 +13,144 @@
 #include "object/engineobject.h"
 #include "renderqueue.h"
 
-namespace GTE
-{
-	class RenderQueueManager
-	{
-		public:	
+namespace GTE {
+    class RenderQueueManager {
+    public:
 
-		class Iterator
-		{
-			friend class RenderQueueManager;
+        class Iterator {
+            friend class RenderQueueManager;
 
-			RenderQueueManager *manager;
-			mutable UInt32 queueIndex;
-			mutable RenderQueue * currentQueue;
-			mutable UInt32 entryIndex;
-			mutable Bool valid;
-			mutable UInt32 minQueue;
-			mutable UInt32 maxQueue;
+            RenderQueueManager *manager;
+            mutable UInt32 queueIndex;
+            mutable RenderQueue * currentQueue;
+            mutable UInt32 entryIndex;
+            mutable Bool valid;
+            mutable UInt32 minQueue;
+            mutable UInt32 maxQueue;
 
-			Iterator()
-			{
-				this->manager = nullptr;
-				currentQueue = nullptr;
-				queueIndex = 0;
-				entryIndex = 0;
-				valid = false;
-			}
-			
-			void Init(RenderQueueManager *manager, UInt32 minQueue, UInt32 maxQueue)
-			{
-				this->manager = manager;
-				this->minQueue = minQueue;
-				this->maxQueue = maxQueue;
-				currentQueue = nullptr;
-				queueIndex = 0;
-				entryIndex = 0;
-				valid = false;
+            Iterator() {
+                this->manager = nullptr;
+                currentQueue = nullptr;
+                queueIndex = 0;
+                entryIndex = 0;
+                valid = false;
+            }
 
-				if(manager != nullptr)
-				{
-					UInt32 testQueueIndex = 0;
-					while(testQueueIndex < manager->GetRenderQueueCount())
-					{
-						currentQueue = manager->GetRenderQueueAtIndex(testQueueIndex);
-						if(currentQueue->GetObjectCount() > 0 && currentQueue->GetID() >= minQueue && currentQueue->GetID() <= maxQueue)
-						{
-							queueIndex = testQueueIndex;
-							valid = true;
-							break;
-						}
-						testQueueIndex++;
-					}
-				}
-			}
+            void Init(RenderQueueManager *manager, UInt32 minQueue, UInt32 maxQueue) {
+                this->manager = manager;
+                this->minQueue = minQueue;
+                this->maxQueue = maxQueue;
+                currentQueue = nullptr;
+                queueIndex = 0;
+                entryIndex = 0;
+                valid = false;
 
-			void Advance() const
-			{
-				entryIndex++;
-				if(entryIndex >= currentQueue->GetObjectCount())
-				{
-					queueIndex++;
-					while(queueIndex < manager->GetRenderQueueCount())
-					{
-						currentQueue = manager->GetRenderQueueAtIndex(queueIndex);
-						if(currentQueue->GetObjectCount() > 0)
-						{
-							break;
-						}
-						queueIndex++;
-					}
+                if (manager != nullptr) {
+                    UInt32 testQueueIndex = 0;
+                    while (testQueueIndex < manager->GetRenderQueueCount()) {
+                        currentQueue = manager->GetRenderQueueAtIndex(testQueueIndex);
+                        if (currentQueue->GetObjectCount() > 0 && currentQueue->GetID() >= minQueue && currentQueue->GetID() <= maxQueue) {
+                            queueIndex = testQueueIndex;
+                            valid = true;
+                            break;
+                        }
+                        testQueueIndex++;
+                    }
+                }
+            }
 
-					if(queueIndex >= manager->GetRenderQueueCount() || currentQueue->GetID() > maxQueue)
-					{
-						StopIteration();
-					}
-					else
-					{
-						entryIndex = 0;
-					}
-				}
-			}
+            void Advance() const {
+                entryIndex++;
+                if (entryIndex >= currentQueue->GetObjectCount()) {
+                    queueIndex++;
+                    while (queueIndex < manager->GetRenderQueueCount()) {
+                        currentQueue = manager->GetRenderQueueAtIndex(queueIndex);
+                        if (currentQueue->GetObjectCount() > 0) {
+                            break;
+                        }
+                        queueIndex++;
+                    }
 
-			void StopIteration() const
-			{
-				currentQueue = nullptr;
-				queueIndex = 0;
-				entryIndex = 0;
-				valid = false;
-			}
+                    if (queueIndex >= manager->GetRenderQueueCount() || currentQueue->GetID() > maxQueue) {
+                        StopIteration();
+                    }
+                    else {
+                        entryIndex = 0;
+                    }
+                }
+            }
 
-			public:
+            void StopIteration() const {
+                currentQueue = nullptr;
+                queueIndex = 0;
+                entryIndex = 0;
+                valid = false;
+            }
 
-			const Iterator& operator ++() const
-			{
-				if(valid)
-				{
-					Advance();
-				}
-				return *this;
-			}
+        public:
 
-			RenderQueueEntry* operator *() const
-			{
-				if(valid)
-					return currentQueue->GetObject(entryIndex);
-				else
-				{
-					return nullptr;
-				}
-			}
+            const Iterator& operator ++() const {
+                if (valid) {
+                    Advance();
+                }
+                return *this;
+            }
 
-			Bool operator ==(const Iterator& other) const
-			{
-				return  other.valid == valid &&
-						other.queueIndex == queueIndex && 
-						other.entryIndex == entryIndex;
-			}
+            RenderQueueEntry* operator *() const {
+                if (valid)
+                    return currentQueue->GetObject(entryIndex);
+                else {
+                    return nullptr;
+                }
+            }
 
-			Bool operator !=(const Iterator& other) const
-			{
-				return  other.valid != valid ||
-						other.queueIndex != queueIndex ||
-						other.entryIndex != entryIndex;
-			}
-		};
+            Bool operator ==(const Iterator& other) const {
+                return  other.valid == valid &&
+                    other.queueIndex == queueIndex &&
+                    other.entryIndex == entryIndex;
+            }
 
-		typedef const RenderQueueManager::Iterator ConstIterator;
+            Bool operator !=(const Iterator& other) const {
+                return  other.valid != valid ||
+                    other.queueIndex != queueIndex ||
+                    other.entryIndex != entryIndex;
+            }
+        };
 
-		protected:
+        typedef const RenderQueueManager::Iterator ConstIterator;
 
-		static const UInt32 MAX_RENDER_QUEUES = 128;
+    protected:
 
-		// the render queues that are managed by this instance of RenderQueueManager
-		RenderQueue* renderQueues[MAX_RENDER_QUEUES];
+        static const UInt32 MAX_RENDER_QUEUES = 128;
 
-		UInt32 renderQueueCount;
-		UInt32 minQueue;
-		UInt32 maxQueue;
+        // the render queues that are managed by this instance of RenderQueueManager
+        RenderQueue* renderQueues[MAX_RENDER_QUEUES];
 
-		public:
-		
-		RenderQueueManager();
-		virtual ~RenderQueueManager();
+        UInt32 renderQueueCount;
+        UInt32 minQueue;
+        UInt32 maxQueue;
 
-		Int32 GetRenderQueueID(UInt32 index);
-		RenderQueue* GetRenderQueueForID(UInt32 id);
-		RenderQueue* GetRenderQueueAtIndex(UInt32 index);
-		void ClearAllRenderQueues();
-		void DestroyRenderQueues();
+    public:
 
-		UInt32 GetRenderQueueCount() const;
+        RenderQueueManager();
+        virtual ~RenderQueueManager();
 
-		UInt32 GetMaxQueue() const;
-		UInt32 GetMinQueue() const;
+        Int32 GetRenderQueueID(UInt32 index);
+        RenderQueue* GetRenderQueueForID(UInt32 id);
+        RenderQueue* GetRenderQueueAtIndex(UInt32 index);
+        void ClearAllRenderQueues();
+        void DestroyRenderQueues();
 
-		ConstIterator Begin();
-		ConstIterator Begin(UInt32 minQueue, UInt32 maxQueue);
-		ConstIterator BeginWithRange(UInt32 minQueue, UInt32 maxQueue);
-		ConstIterator End();
-	};
+        UInt32 GetRenderQueueCount() const;
+
+        UInt32 GetMaxQueue() const;
+        UInt32 GetMinQueue() const;
+
+        ConstIterator Begin();
+        ConstIterator Begin(UInt32 minQueue, UInt32 maxQueue);
+        ConstIterator BeginWithRange(UInt32 minQueue, UInt32 maxQueue);
+        ConstIterator End();
+    };
 }
 
 #endif

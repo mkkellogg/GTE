@@ -1,15 +1,12 @@
 #include "shader.h"
 
-namespace GTE
-{
-	Shader::Shader(const ShaderSource& shaderSource) : shaderSource(shaderSource)
-	{
+namespace GTE {
+    Shader::Shader(const ShaderSource& shaderSource) : shaderSource(shaderSource) {
 
-	}
+    }
 
-	Shader::~Shader()
-	{
+    Shader::~Shader() {
 
-	}
+    }
 }
 

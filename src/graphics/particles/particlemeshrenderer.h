@@ -15,35 +15,33 @@
 #include "scene/sceneobjectcomponent.h"
 #include "graphics/render/mesh3Drenderer.h"
 
-namespace GTE
-{
-	//forward declarations
-	class EngineObjectManager;
+namespace GTE {
+    //forward declarations
+    class EngineObjectManager;
 
-	class ParticleMeshRenderer : public Mesh3DRenderer
-	{
-		// Since this ultimately derives from EngineObject, we make this class
-		// a friend of EngineObjectManager, and the constructor & destructor
-		// protected so its life-cycle can be handled completely by EngineObjectManager.
-		friend class EngineObjectManager;
-		// needed since ForwardRenderManager may need to directly access this renderer
-		friend class ForwardRenderManager;
-		// Particle system needs direct access to thsi class
-		friend class ParticleSystem;
+    class ParticleMeshRenderer : public Mesh3DRenderer {
+        // Since this ultimately derives from EngineObject, we make this class
+        // a friend of EngineObjectManager, and the constructor & destructor
+        // protected so its life-cycle can be handled completely by EngineObjectManager.
+        friend class EngineObjectManager;
+        // needed since ForwardRenderManager may need to directly access this renderer
+        friend class ForwardRenderManager;
+        // Particle system needs direct access to thsi class
+        friend class ParticleSystem;
 
-	protected:
-		
-		SceneObjectSharedPtr particleSystemObject;
+    protected:
 
-		ParticleMeshRenderer();
-		virtual ~ParticleMeshRenderer();
+        SceneObjectSharedPtr particleSystemObject;
 
-		void SetTargetSystemObject(SceneObjectRef particleSystemObject);
-		void WillRender() override;
+        ParticleMeshRenderer();
+        virtual ~ParticleMeshRenderer();
 
-	public:
+        void SetTargetSystemObject(SceneObjectRef particleSystemObject);
+        void WillRender() override;
 
-	};
+    public:
+
+    };
 }
 
 #endif

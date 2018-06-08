@@ -18,81 +18,67 @@
 #include "object/engineobject.h"
 #include "particleutil.h"
 
-namespace GTE
-{
-	template <typename T> class ParticleFrameSet
-	{
-		template <typename F> class KeyFrame
-		{
-			public:
+namespace GTE {
+    template <typename T> class ParticleFrameSet {
+        template <typename F> class KeyFrame {
+        public:
 
-			Real Time;
-			F Value;
+            Real Time;
+            F Value;
 
-			KeyFrame(Real time, F value)
-			{
-				Time = time;
-				Value = value;
-			}
+            KeyFrame(Real time, F value) {
+                Time = time;
+                Value = value;
+            }
 
-		};
+        };
 
-		std::vector<KeyFrame<T>> frames;
+        std::vector<KeyFrame<T>> frames;
 
-		public:
+    public:
 
-		ParticleFrameSet()
-		{
+        ParticleFrameSet() {
 
-		}
+        }
 
-		virtual ~ParticleFrameSet()
-		{
+        virtual ~ParticleFrameSet() {
 
-		}
+        }
 
-		UInt32 FindNextFrameForTimeValue(Real t) const
-		{
-			UInt32 frameIndex = 0;
-			while(frameIndex < frames.size() && frames[frameIndex].Time < t)
-			{
-				frameIndex = frameIndex + 1;
-			}
+        UInt32 FindNextFrameForTimeValue(Real t) const {
+            UInt32 frameIndex = 0;
+            while (frameIndex < frames.size() && frames[frameIndex].Time < t) {
+                frameIndex = frameIndex + 1;
+            }
 
-			return frameIndex;
-		}
+            return frameIndex;
+        }
 
-		Real CalculateFraction(Real a, Real b, Real z) const
-		{
-			return (z - a) / (b - a);
-		}
+        Real CalculateFraction(Real a, Real b, Real z) const {
+            return (z - a) / (b - a);
+        }
 
-		void AddKeyFrame(Real time, T value)
-		{
-			KeyFrame<T> newFrame(time, value);
-			frames.push_back(newFrame);
-		}
+        void AddKeyFrame(Real time, T value) {
+            KeyFrame<T> newFrame(time, value);
+            frames.push_back(newFrame);
+        }
 
-		void InterpolateFrameValues(Real t, T& target) const
-		{
-			UInt32 nextFrameIndex = FindNextFrameForTimeValue(t);
-			UInt32 currentFrameIndex = nextFrameIndex - 1;
-			
-			if(nextFrameIndex == 0)
-			{
-				target = frames[0].Value;
-			}
-			else if(nextFrameIndex == frames.size())
-			{
-				target = frames[currentFrameIndex].Value;
-			}
-			else
-			{
-				Real fraction = CalculateFraction(frames[currentFrameIndex].Time, frames[nextFrameIndex].Time, t);
-				ParticleUtil::Lerp<T>(frames[currentFrameIndex].Value, frames[nextFrameIndex].Value, target, fraction);
-			}
-		}
-	};
+        void InterpolateFrameValues(Real t, T& target) const {
+            UInt32 nextFrameIndex = FindNextFrameForTimeValue(t);
+            UInt32 currentFrameIndex = nextFrameIndex - 1;
+
+            if (nextFrameIndex == 0) {
+                target = frames[0].Value;
+            }
+            else if (nextFrameIndex == frames.size()) {
+                target = frames[currentFrameIndex].Value;
+            }
+            else {
+                Real fraction = CalculateFraction(frames[currentFrameIndex].Time, frames[nextFrameIndex].Time, t);
+                ParticleUtil::Lerp<T>(frames[currentFrameIndex].Value, frames[nextFrameIndex].Value, target, fraction);
+            }
+        }
+    };
 }
 
 #endif

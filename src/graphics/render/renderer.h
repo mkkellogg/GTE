@@ -13,26 +13,24 @@
 #include "object/engineobject.h"
 #include "scene/sceneobjectcomponent.h"
 
-namespace GTE
-{
-	//forward declarations
-	class EngineObjectManager;
+namespace GTE {
+    //forward declarations
+    class EngineObjectManager;
 
-	class Renderer : public SceneObjectComponent
-	{
-		// Since this ultimately derives from EngineObject, we make this class
-		// a friend of EngineObjectManager, and the constructor & destructor
-		// protected so its life-cycle can be handled completely by EngineObjectManager.
-		friend class EngineObjectManager;
+    class Renderer : public SceneObjectComponent {
+        // Since this ultimately derives from EngineObject, we make this class
+        // a friend of EngineObjectManager, and the constructor & destructor
+        // protected so its life-cycle can be handled completely by EngineObjectManager.
+        friend class EngineObjectManager;
 
-	protected:
+    protected:
 
-		Renderer();
-		virtual ~Renderer();
+        Renderer();
+        virtual ~Renderer();
 
-	public:
+    public:
 
-	};
+    };
 }
 
 #endif
