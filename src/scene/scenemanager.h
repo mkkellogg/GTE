@@ -15,7 +15,6 @@
 #include "engine.h"
 #include "object/engineobject.h"
 #include "global/constants.h"
-#include "util/datastack.h"
 #include "geometry/transform.h"
 
 namespace GTE {
@@ -40,17 +39,12 @@ namespace GTE {
         SceneManager();
         ~SceneManager();
 
-        // transform stack used for processing scene hierarchy
-        DataStack<Matrix4x4> sceneProcessingStack;
-
         Int32 maxPhaseReached;
         UInt32 sceneObjectCount;
         SceneObject* sceneObjectList[Constants::MaxSceneObjects];
 
         void Update(UpdatePhase phase);
         void ProcessScene(SceneObject& parent, Transform& aggregateTransform);
-        void PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack);
-        void PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack);
         void ProcessSceneObjectList(UpdatePhase phase);
 
         void ProcessSceneObjectUpdatePhase(UpdatePhase phase, SceneObject& object);

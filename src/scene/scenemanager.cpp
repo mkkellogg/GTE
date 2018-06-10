@@ -21,7 +21,7 @@ namespace GTE {
     /*
     * Default constructor
     */
-    SceneManager::SceneManager() : sceneProcessingStack(Constants::MaxObjectRecursionDepth, 1) {
+    SceneManager::SceneManager() {
         sceneObjectCount = 0;
         maxPhaseReached = -1;
     }
@@ -39,7 +39,6 @@ namespace GTE {
     * Initialize. Return false if initialization false, true if it succeeds.
     */
     Bool SceneManager::Init() {
-        ASSERT(sceneProcessingStack.Init(), "SceneManager::Init -> Unable to initialize view transform stack.");
         return true;
     }
 
@@ -91,12 +90,25 @@ namespace GTE {
     * SceneObject::SetAggregateTransform().
     *
     */
-    void SceneManager::ProcessScene(SceneObject& parent, Transform& aggregateTransform) {
-        // enforce max recursion depth
-        if (sceneProcessingStack.GetEntryCount() >= Constants::MaxObjectRecursionDepth - 1)return;
+    void SceneManager::ProcessScene(SceneObject& obj, Transform& aggregateTransform) {
+        Transform nextTransform = aggregateTransform;
+        Transform& localTransform = obj.GetTransform();
+        if (!obj.InheritsTransform()) {
+            nextTransform.SetIdentity();
+        }
+        nextTransform.TransformBy(localTransform);
 
-        for (UInt32 i = 0; i < parent.GetChildrenCount(); i++) {
-            SceneObjectRef child = parent.GetChildAt(i);
+        // save the aggregate/global/world transform
+        SceneObjectProcessingDescriptor& processingDesc = obj.GetProcessingDescriptor();
+        processingDesc.AggregateTransform = nextTransform;
+        processingDesc.AggregateTransformInverse = nextTransform;
+        processingDesc.AggregateTransformInverse.Invert();
+
+        sceneObjectList[sceneObjectCount] = &obj;
+        sceneObjectCount++;
+
+        for (UInt32 i = 0; i < obj.GetChildrenCount(); i++) {
+            SceneObjectRef child = obj.GetChildAt(i);
 
             if (!child.IsValid()) {
                 Debug::PrintWarning("SceneManager::PreProcessScene -> Null scene object encountered.");
@@ -105,31 +117,9 @@ namespace GTE {
 
             // only process active scene objects
             if (child->IsActive()) {
-                // save the existing view transform
-                PushTransformData(aggregateTransform, sceneProcessingStack);
-
-                // concatenate the current view transform with that of the current scene object
-                Transform& localTransform = child->GetTransform();
-                if (!child->InheritsTransform()) {
-                    aggregateTransform.SetIdentity();
-                }
-                aggregateTransform.TransformBy(localTransform);
-
-                // save the aggregate/global/world transform
-                SceneObjectProcessingDescriptor& processingDesc = child->GetProcessingDescriptor();
-                processingDesc.AggregateTransform = aggregateTransform;
-                processingDesc.AggregateTransformInverse = aggregateTransform;
-                processingDesc.AggregateTransformInverse.Invert();
-
-                sceneObjectList[sceneObjectCount] = child.GetPtr();
-                sceneObjectCount++;
                 if (sceneObjectCount >= Constants::MaxSceneObjects)return;
-
                 // continue recursion through child object
-                ProcessScene(child.GetRef(), aggregateTransform);
-
-                // restore previous view transform
-                PopTransformData(aggregateTransform, sceneProcessingStack);
+                ProcessScene(child.GetRef(), nextTransform);
             }
         }
     }
@@ -214,22 +204,4 @@ namespace GTE {
         }
     }
 
-    /*
-    * Save a transform to the transform stack. This method is used to to save transformations
-    * as the render manager progresses through the object tree that makes up the scene.
-    */
-    void SceneManager::PushTransformData(const Transform& transform, DataStack<Matrix4x4>& transformStack) {
-        const Matrix4x4& matrix = transform.GetConstMatrix();
-        transformStack.Push(&matrix);
-    }
-
-    /*
-    * Remove the top transform from the transform stack.
-    */
-    void SceneManager::PopTransformData(Transform& transform, DataStack<Matrix4x4>& transformStack) {
-        NONFATAL_ASSERT(transformStack.GetEntryCount() > 0, "SceneManager::PopTransformData -> 'transformStack' is empty!", true);
-
-        Matrix4x4 * mat = transformStack.Pop();
-        transform.SetTo(*mat);
-    }
 }
