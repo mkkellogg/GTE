@@ -22,15 +22,19 @@ namespace GTE {
         std::string pathATrimmed = EngineUtility::Trim(pathA);
         std::string pathBTrimmed = EngineUtility::Trim(pathB);
 
-        while (pathBTrimmed.size() > 0 && pathBTrimmed.substr(0, 1).compare("/") == 0) {
-            pathBTrimmed = pathBTrimmed.substr(1, pathBTrimmed.size() - 1);
-        }
+        Char separator = '/';
 
-        while (pathATrimmed.size() > 0 && pathATrimmed.substr(pathATrimmed.size() - 1, 1).compare("/") == 0) {
-            pathATrimmed = pathATrimmed.substr(0, pathATrimmed.size() - 1);
-        }
+        UInt32 iB = 0;
+        while (iB < pathBTrimmed.size() && pathBTrimmed.c_str()[iB] != separator) iB++;
+        Int32 iA = 0;
+        while (iA >= 0 && pathATrimmed.c_str()[iA] != separator) iA--;
 
-        return pathATrimmed + std::string("/") + pathBTrimmed;
+        if (iA >= 0) pathATrimmed = pathATrimmed.substr(0, iA + 1);
+        if (iB < pathBTrimmed.size()) pathBTrimmed = pathBTrimmed.substr(iB, pathBTrimmed.size() - 1 - iB);
+
+        pathATrimmed.append(1, separator);
+
+        return pathATrimmed + pathBTrimmed;
     }
 
     std::string FileSystemIX::GetBasePath(const std::string& path) const {
@@ -41,7 +45,7 @@ namespace GTE {
     std::string FileSystemIX::FixupPathForLocalFilesystem(const std::string& path) const {
         const UInt32 size = (UInt32)path.size() + 1;
         Char *chars = new(std::nothrow) Char[size];
-        ASSERT(chars != nullptr, " FileSystemIX::FixupPath -> Could not allocate path array.");
+        ASSERT(chars != nullptr, " FileSystemIX::FixupPathForLocalFilesystem -> Could not allocate path array.");
 
         strcpy(chars, path.c_str());
 
@@ -50,9 +54,8 @@ namespace GTE {
         }
 
         std::string newPath = std::string(chars);
-        //newPath.replace(newPath.begin(),newPath.end(), "\\", "/");
 
-        delete chars;
+        delete[] chars;
 
         return newPath;
     }

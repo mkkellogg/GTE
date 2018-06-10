@@ -7,6 +7,7 @@
 #include "util/engineutility.h"
 #include "global/global.h"
 #include "global/assert.h"
+#include <stdio.h>
 
 namespace GTE {
     FileSystemWin::FileSystemWin() {
@@ -21,43 +22,46 @@ namespace GTE {
         std::string pathATrimmed = EngineUtility::Trim(pathA);
         std::string pathBTrimmed = EngineUtility::Trim(pathB);
 
-        while (pathBTrimmed.size() > 0 && pathBTrimmed.substr(0, 1).compare("/") == 0) {
-            pathBTrimmed = pathBTrimmed.substr(1, pathBTrimmed.size() - 1);
-        }
+        Char separator = '\\';
 
-        while (pathATrimmed.size() > 0 && pathATrimmed.substr(pathATrimmed.size() - 1, 1).compare("/") == 0) {
-            pathATrimmed = pathATrimmed.substr(0, pathATrimmed.size() - 1);
-        }
+        UInt32 iB = 0;
+        while (iB < pathBTrimmed.size() && pathBTrimmed.c_str()[iB] != separator) iB++;
+        Int32 iA = 0;
+        while (iA >= 0 && pathATrimmed.c_str()[iA] != separator) iA--;
 
-        return pathATrimmed + std::string("/") + pathBTrimmed;
+        if (iA >= 0) pathATrimmed = pathATrimmed.substr(0, iA + 1);
+        if (iB < pathBTrimmed.size()) pathBTrimmed = pathBTrimmed.substr(iB, pathBTrimmed.size() - 1 - iB);
+
+        pathATrimmed.append(1, separator);
+        
+        return pathATrimmed + pathBTrimmed;
     }
 
     std::string FileSystemWin::GetBasePath(const std::string& path) const {
-        size_t pos = path.find_last_of("/");
+        size_t pos = path.find_last_of('/');
         return (std::string::npos == pos) ? "" : path.substr(0, pos + 1);
     }
 
     std::string FileSystemWin::FixupPathForLocalFilesystem(const std::string& path) const {
         const UInt32 size = (UInt32)path.size() + 1;
         Char *chars = new Char[size];
-        ASSERT(chars != nullptr, " FileSystemIX::FixupPath -> Could not allocate path array.");
+        ASSERT(chars != nullptr, " FileSystemWin::FixupPathForLocalFilesystem -> Could not allocate path array.");
 
         strcpy(chars, path.c_str());
 
         for (UInt32 i = 0; i < path.size(); i++) {
-            if (chars[i] == '\\')chars[i] = '/';
+            if (chars[i] == '\\') chars[i] = '/';
         }
 
         std::string newPath = std::string(chars);
-        //newPath.replace(newPath.begin(),newPath.end(), "\\", "/");
 
-        delete chars;
+        delete[] chars;
 
         return newPath;
     }
 
     std::string FileSystemWin::GetFileName(const std::string& fullPath) const {
-        size_t pos = fullPath.find_last_of("/");
+        size_t pos = fullPath.find_last_of('/');
         return (std::string::npos == pos) ? std::string() : fullPath.substr(pos + 1);
     }
 
