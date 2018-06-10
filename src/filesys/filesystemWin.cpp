@@ -9,6 +9,8 @@
 #include "global/assert.h"
 #include <stdio.h>
 
+// TODO: this file is almost identical to FileSystemIX.cpp .... DRY it out!
+
 namespace GTE {
     FileSystemWin::FileSystemWin() {
 
@@ -67,15 +69,8 @@ namespace GTE {
 
     Bool FileSystemWin::FileExists(const std::string& fullPath) const {
         std::ifstream f(fullPath.c_str());
-        if (f.good()) {
-            f.close();
-            return true;
-        }
-        else {
-            f.close();
-            return false;
-        }
+        Bool isGood = f.good();
+        f.close();
+        return isGood;
     }
 }
-
-

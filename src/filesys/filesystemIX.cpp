@@ -67,15 +67,8 @@ namespace GTE {
 
     Bool FileSystemIX::FileExists(const std::string& fullPath) const {
         std::ifstream f(fullPath.c_str());
-        if (f.good()) {
-            f.close();
-            return true;
-        }
-        else {
-            f.close();
-            return false;
-        }
+        Bool isGood = f.good();
+        f.close();
+        return isGood;
     }
 }
-
-
