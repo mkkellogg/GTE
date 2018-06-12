@@ -378,20 +378,12 @@ namespace GTE {
         view[10] = -vDir.z;
         view[14] = 0.0f;
 
-        view[3] = 0.0f;
-        view[7] = 0.0f;
-        view[11] = 0.0f;
+        view[3] = -posX;
+        view[7] = -posY;
+        view[11] = -posZ;
         view[15] = 1.0f;
 
-        Matrix4x4 viewMatrix;
-        viewMatrix.SetTo(view);
-
-        Matrix4x4 aux;
-
-        aux.SetIdentity();
-        aux.Translate(-posX, -posY, -posZ);
-
-        Matrix4x4::Multiply(viewMatrix, aux, matrix);
+        matrix.SetTo(view);
     }
 
     /*
